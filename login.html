@@ -598,13 +598,6 @@
         try {
           const snap = await getDoc(doc(db, "users", uid));
           if (snap.exists()) return snap.data().role || "client";
-          // fallback: look up by email for seeded accounts
-          if (email) {
-            const { getDocs, collection, query, where } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-            const q = query(collection(db, "users"), where("email", "==", email));
-            const qs = await getDocs(q);
-            if (!qs.empty) return qs.docs[0].data().role || "client";
-          }
         } catch {}
         return "client";
       }
