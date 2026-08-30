@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CultureWave | Request Custom Website</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #1454ff;
+      --blue-2: #4c7dff;
+      --blue-light: #dbe6ff;
+      --blue-soft: #f0f4ff;
+      --border: #dbe4f0;
+      --muted: #64748b;
+      --text: #0f172a;
+      --green: #10b981;
+      --red: #ef4444;
+      --sidebar-w: 270px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Manrope, sans-serif; background: #f4f6fb; color: var(--text); font-size: 14px; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea, select { font: inherit; }
+
+    .topbar { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; box-shadow: 0 2px 12px rgba(20,84,255,0.06); }
+    .topbar-inner { max-width: 1400px; margin: 0 auto; padding: 0 1.2rem; height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.6rem; }
+    .brand-icon { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, var(--blue), var(--blue-2)); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 0.9rem; }
+    .brand strong { font-size: 1rem; letter-spacing: -0.04em; color: var(--text); }
+    .topbar-right { display: flex; align-items: center; gap: 0.6rem; }
+    .tb-ghost { padding: 0.45rem 0.8rem; border-radius: 9px; border: 1px solid var(--border); background: #fff; color: var(--muted); font-weight: 700; font-size: 0.82rem; cursor: pointer; }
+    .tb-primary { padding: 0.45rem 0.9rem; border-radius: 9px; border: 0; background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-weight: 800; font-size: 0.82rem; cursor: pointer; box-shadow: 0 3px 12px rgba(20,84,255,0.25); }
+    .tb-avatar { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, var(--blue), var(--blue-2)); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 0.82rem; }
+    .event-title-bar { display: flex; align-items: center; gap: 0.7rem; }
+    .event-title-bar span { font-size: 0.9rem; font-weight: 800; color: var(--text); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .draft-badge { padding: 0.2rem 0.55rem; border-radius: 999px; background: #fef3c7; color: #92400e; font-size: 0.68rem; font-weight: 800; }
+    .progress-wrap { display: flex; align-items: center; gap: 0.6rem; }
+    .progress-track { width: 140px; height: 7px; border-radius: 999px; background: var(--blue-light); overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--blue), var(--blue-2)); transition: width 0.4s ease; }
+    .progress-pct { font-size: 0.78rem; font-weight: 800; color: var(--blue); }
+
+    .layout { max-width: 1400px; margin: 0 auto; padding: 1rem 1.2rem; display: grid; grid-template-columns: var(--sidebar-w) minmax(0,1fr); gap: 1rem; align-items: start; }
+
+    .sidebar { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 0.8rem; position: sticky; top: 74px; max-height: calc(100vh - 90px); overflow-y: auto; box-shadow: 0 4px 16px rgba(20,84,255,0.05); }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+    .sidebar-head { padding: 0.2rem 0.3rem 0.7rem; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem; }
+    .sidebar-head strong { display: block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); }
+    .sidebar-head span { font-size: 0.74rem; color: var(--muted); margin-top: 0.1rem; display: block; }
+    .step-nav { display: flex; flex-direction: column; gap: 0.25rem; }
+    .step-btn { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.65rem; border-radius: 12px; border: 1px solid transparent; background: transparent; color: #475569; font-weight: 700; font-size: 0.84rem; cursor: pointer; text-align: left; width: 100%; transition: background 0.12s; }
+    .step-btn:hover { background: #f4f6fb; color: var(--text); }
+    .step-btn.active { background: var(--blue-light); color: var(--blue); border-color: rgba(20,84,255,0.18); }
+    .step-btn.done { color: var(--green); }
+    .step-btn.done .step-num { background: #d1fae5; color: var(--green); }
+    .step-num { width: 24px; height: 24px; border-radius: 7px; background: #f1f5f9; color: var(--muted); display: grid; place-items: center; font-size: 0.7rem; font-weight: 800; flex: none; }
+    .step-btn.active .step-num { background: rgba(20,84,255,0.15); color: var(--blue); }
+    .step-info strong { display: block; font-size: 0.84rem; }
+    .step-info span { font-size: 0.72rem; color: var(--muted); }
+    .step-check { margin-left: auto; font-size: 0.8rem; }
+
+    .content { display: flex; flex-direction: column; gap: 0.75rem; }
+    .alert { border-radius: 14px; padding: 0.75rem 0.9rem; display: flex; align-items: center; gap: 0.75rem; border: 1px solid #fde68a; background: #fffbeb; }
+    .alert.success { border-color: #a7f3d0; background: #ecfdf5; }
+    .alert-icon { width: 32px; height: 32px; border-radius: 9px; background: #fef3c7; display: grid; place-items: center; font-size: 0.9rem; flex: none; }
+    .alert.success .alert-icon { background: #d1fae5; }
+    .alert-body strong { display: block; font-size: 0.84rem; color: #92400e; }
+    .alert.success .alert-body strong { color: #065f46; }
+    .alert-body span { font-size: 0.76rem; color: var(--muted); }
+
+    .step-panel { display: none; flex-direction: column; gap: 0.75rem; }
+    .step-panel.active { display: flex; }
+
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 1.1rem; box-shadow: 0 4px 16px rgba(20,84,255,0.04); }
+    .card-head { margin-bottom: 1rem; }
+    .card-head h2 { font-size: 0.96rem; font-weight: 800; letter-spacing: -0.03em; }
+    .card-head p { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .field { display: grid; gap: 0.35rem; }
+    .field label { font-size: 0.78rem; font-weight: 800; color: #475569; }
+    .field label .req { color: var(--red); margin-left: 2px; }
+    .field input, .field textarea, .field select { width: 100%; border: 1px solid var(--border); border-radius: 11px; padding: 0.72rem 0.85rem; background: #fff; color: var(--text); transition: border-color 0.15s, box-shadow 0.15s; outline: none; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(20,84,255,0.1); }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .field-hint { font-size: 0.72rem; color: var(--muted); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0.85rem; border-radius: 12px; background: var(--blue-soft); border: 1px solid var(--border); }
+    .toggle-row strong { font-size: 0.86rem; }
+    .toggle-row span { font-size: 0.76rem; color: var(--muted); display: block; margin-top: 0.1rem; }
+    .toggle { width: 44px; height: 24px; border-radius: 999px; background: #e2e8f0; border: 0; cursor: pointer; position: relative; transition: background 0.2s; flex: none; }
+    .toggle.on { background: var(--blue); }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    .toggle.on::after { left: 23px; }
+
+    .type-card { border: 1px solid var(--border); border-radius: 14px; padding: 0.9rem; cursor: pointer; background: var(--blue-soft); transition: border-color 0.15s, box-shadow 0.15s; }
+    .type-card:hover, .type-card.active { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(20,84,255,0.08); }
+    .type-card.active { background: var(--blue-light); }
+    .type-card .tc-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+    .type-card strong { display: block; font-size: 0.88rem; font-weight: 800; }
+    .type-card span { font-size: 0.74rem; color: var(--muted); margin-top: 0.2rem; display: block; }
+
+    .feature-chip { padding: 0.45rem 0.85rem; border-radius: 10px; border: 1px solid var(--border); background: #fff; color: #475569; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.12s; }
+    .feature-chip.active { background: var(--blue-light); color: var(--blue); border-color: rgba(20,84,255,0.3); }
+
+    .ref-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border-radius: 12px; background: var(--blue-soft); border: 1px solid var(--border); }
+    .ref-row .rr-url { flex: 1; font-size: 0.84rem; color: var(--blue); font-weight: 600; word-break: break-all; }
+    .rr-del { width: 28px; height: 28px; border-radius: 8px; border: 1px solid #fca5a5; background: #fef2f2; color: var(--red); cursor: pointer; display: grid; place-items: center; font-size: 0.8rem; }
+
+    .upload-zone { border: 2px dashed var(--border); border-radius: 14px; padding: 1.5rem; text-align: center; cursor: pointer; background: var(--blue-soft); transition: border-color 0.15s; }
+    .upload-zone:hover { border-color: var(--blue); }
+
+    .step-actions { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; flex-wrap: wrap; padding-top: 0.5rem; }
+    .btn-ghost { padding: 0.6rem 1rem; border-radius: 11px; border: 1px solid var(--border); background: #fff; color: #475569; font-weight: 700; font-size: 0.84rem; cursor: pointer; }
+    .btn-primary { padding: 0.6rem 1.2rem; border-radius: 11px; border: 0; background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-weight: 800; font-size: 0.84rem; cursor: pointer; box-shadow: 0 3px 12px rgba(20,84,255,0.25); }
+    .btn-success { padding: 0.6rem 1.2rem; border-radius: 11px; border: 0; background: linear-gradient(135deg, #10b981, #34d399); color: #fff; font-weight: 800; font-size: 0.84rem; cursor: pointer; box-shadow: 0 3px 12px rgba(16,185,129,0.25); }
+
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .topbar-inner { padding: 0 0.8rem; } .layout { padding: 0.7rem; } .progress-wrap { display: none; } }
+  </style>
+</head>
+<body>
+
+<!-- HERO BANNER -->
+<div style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 40%,#1454ff 80%,#4c7dff 100%);padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+  <div style="display:flex;align-items:center;gap:.85rem;">
+    <div style="font-size:1.8rem;">🌐</div>
+    <div>
+      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);">OGSHOOTS Team</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;">Request a Custom Website</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+    <span style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;color:#fff;">🎨 Custom Design</span>
+    <span style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;color:#fff;">⚡ Fast Delivery</span>
+    <span style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;color:#fff;">🔒 Private Request</span>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div style="display:flex;align-items:center;gap:1.2rem;">
+      <div class="brand">
+        <div class="brand-icon">C</div>
+        <strong>CultureWave</strong>
+      </div>
+      <div class="event-title-bar">
+        <span id="topTitle">Custom Website Request</span>
+        <span class="draft-badge" id="topBadge">Draft</span>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-ghost" id="saveDraftBtn">Save Draft</button>
+      <button class="tb-primary" id="submitBtn">Submit Request</button>
+      <div class="tb-avatar" id="topAvatar">U</div>
+    </div>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <strong>Website Request</strong>
+      <span>Complete all sections</span>
+    </div>
+    <nav class="step-nav" id="stepNav">
+      <button class="step-btn active" data-step="0">
+        <span class="step-num">1</span>
+        <div class="step-info"><strong>Business Info</strong><span>About your business</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="1">
+        <span class="step-num">2</span>
+        <div class="step-info"><strong>Website Type</strong><span>What kind of site</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="2">
+        <span class="step-num">3</span>
+        <div class="step-info"><strong>Features</strong><span>Pages & functionality</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="3">
+        <span class="step-num">4</span>
+        <div class="step-info"><strong>Design Preferences</strong><span>Style & branding</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="4">
+        <span class="step-num">5</span>
+        <div class="step-info"><strong>Budget & Timeline</strong><span>Investment & deadline</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="5">
+        <span class="step-num">6</span>
+        <div class="step-info"><strong>References & Assets</strong><span>Inspiration & files</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="6">
+        <span class="step-num">7</span>
+        <div class="step-info"><strong>Review & Submit</strong><span>Confirm & send</span></div>
+        <span class="step-check"></span>
+      </button>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="alert" id="alertBox">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-body">
+        <strong id="alertTitle">Required fields missing</strong>
+        <span id="alertMsg">Complete Business Name, Website Type, and Budget to continue.</span>
+      </div>
+    </div>
+
+    <!-- STEP 0: BUSINESS INFO -->
+    <div class="step-panel active" data-panel="0">
+      <div class="card">
+        <div class="card-head"><h2>Business Details</h2><p>Tell us about your business so we can build the right website</p></div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="bizName">Business / Brand Name <span class="req">*</span></label>
+            <input id="bizName" type="text" placeholder="e.g. Priya's Boutique" />
+          </div>
+          <div class="field">
+            <label for="bizIndustry">Industry <span class="req">*</span></label>
+            <select id="bizIndustry">
+              <option value="">Select industry</option>
+              <option>Fashion & Apparel</option>
+              <option>Beauty & Wellness</option>
+              <option>Food & Restaurant</option>
+              <option>Events & Entertainment</option>
+              <option>Photography & Media</option>
+              <option>Fitness & Sports</option>
+              <option>Education & Coaching</option>
+              <option>Real Estate</option>
+              <option>Technology & SaaS</option>
+              <option>Healthcare</option>
+              <option>Travel & Hospitality</option>
+              <option>E-commerce / Retail</option>
+              <option>Influencer / Creator</option>
+              <option>NGO / Non-profit</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:.75rem;">
+          <div class="field">
+            <label for="contactName">Contact Person <span class="req">*</span></label>
+            <input id="contactName" type="text" placeholder="Your full name" />
+          </div>
+          <div class="field">
+            <label for="contactPhone">Phone / WhatsApp <span class="req">*</span></label>
+            <input id="contactPhone" type="tel" placeholder="e.g. +91 98765 43210" />
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:.75rem;">
+          <div class="field">
+            <label for="contactEmail">Email <span class="req">*</span></label>
+            <input id="contactEmail" type="email" placeholder="you@email.com" />
+          </div>
+          <div class="field">
+            <label for="existingWebsite">Existing Website (if any)</label>
+            <input id="existingWebsite" type="url" placeholder="https://yoursite.com" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Business Description <span style="color:var(--red)">*</span></h2><p>What does your business do? Who are your customers?</p></div>
+        <div class="field">
+          <textarea id="bizDescription" placeholder="Describe your business, products/services, target audience, and what makes you unique..."></textarea>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <a class="btn-ghost" href="premium-client-dashboard.html">← Back to Dashboard</a>
+        <button class="btn-primary" onclick="goStep(1)">Next: Website Type →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: WEBSITE TYPE -->
+    <div class="step-panel" data-panel="1">
+      <div class="card">
+        <div class="card-head"><h2>What type of website do you need? <span style="color:var(--red)">*</span></h2><p>Select the option that best describes your goal</p></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.65rem;">
+          <div class="type-card active" id="type-portfolio" onclick="setWebsiteType('portfolio')">
+            <div class="tc-icon">🎨</div>
+            <strong>Portfolio / Personal Brand</strong>
+            <span>Showcase your work, skills, and story</span>
+          </div>
+          <div class="type-card" id="type-business" onclick="setWebsiteType('business')">
+            <div class="tc-icon">🏢</div>
+            <strong>Business / Corporate</strong>
+            <span>Professional presence for your company</span>
+          </div>
+          <div class="type-card" id="type-ecommerce" onclick="setWebsiteType('ecommerce')">
+            <div class="tc-icon">🛒</div>
+            <strong>E-commerce / Store</strong>
+            <span>Sell products online with payments</span>
+          </div>
+          <div class="type-card" id="type-events" onclick="setWebsiteType('events')">
+            <div class="tc-icon">📅</div>
+            <strong>Events & Ticketing</strong>
+            <span>Event listings, RSVP, and ticket sales</span>
+          </div>
+          <div class="type-card" id="type-blog" onclick="setWebsiteType('blog')">
+            <div class="tc-icon">✍️</div>
+            <strong>Blog / Content</strong>
+            <span>Articles, news, and content publishing</span>
+          </div>
+          <div class="type-card" id="type-landing" onclick="setWebsiteType('landing')">
+            <div class="tc-icon">🚀</div>
+            <strong>Landing Page</strong>
+            <span>Single page for a product or campaign</span>
+          </div>
+          <div class="type-card" id="type-booking" onclick="setWebsiteType('booking')">
+            <div class="tc-icon">📆</div>
+            <strong>Booking / Appointment</strong>
+            <span>Let clients book sessions or services</span>
+          </div>
+          <div class="type-card" id="type-restaurant" onclick="setWebsiteType('restaurant')">
+            <div class="tc-icon">🍽️</div>
+            <strong>Restaurant / Menu</strong>
+            <span>Menu, reservations, and ordering</span>
+          </div>
+          <div class="type-card" id="type-custom" onclick="setWebsiteType('custom')">
+            <div class="tc-icon">⚙️</div>
+            <strong>Custom / Other</strong>
+            <span>Something unique — describe below</span>
+          </div>
+        </div>
+        <div class="field" style="margin-top:.75rem;" id="customTypeField">
+          <label for="customTypeDesc">Describe your custom website type</label>
+          <input id="customTypeDesc" type="text" placeholder="e.g. A membership portal for fitness coaches" />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Website Goal</h2><p>What is the primary purpose of this website?</p></div>
+        <div class="field">
+          <textarea id="websiteGoal" style="min-height:80px;" placeholder="e.g. I want to attract new clients, showcase my photography portfolio, and allow people to book sessions directly from the site..."></textarea>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(0)">← Back</button>
+        <button class="btn-primary" onclick="goStep(2)">Next: Features →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: FEATURES -->
+    <div class="step-panel" data-panel="2">
+      <div class="card">
+        <div class="card-head"><h2>Pages Required</h2><p>Select all pages you need on your website</p></div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <button type="button" class="feature-chip active" data-feat="home">🏠 Home</button>
+          <button type="button" class="feature-chip active" data-feat="about">👤 About</button>
+          <button type="button" class="feature-chip active" data-feat="contact">📞 Contact</button>
+          <button type="button" class="feature-chip" data-feat="services">🛠️ Services</button>
+          <button type="button" class="feature-chip" data-feat="portfolio">🎨 Portfolio / Gallery</button>
+          <button type="button" class="feature-chip" data-feat="blog">✍️ Blog</button>
+          <button type="button" class="feature-chip" data-feat="shop">🛒 Shop / Products</button>
+          <button type="button" class="feature-chip" data-feat="events">📅 Events</button>
+          <button type="button" class="feature-chip" data-feat="booking">📆 Booking</button>
+          <button type="button" class="feature-chip" data-feat="faq">❓ FAQ</button>
+          <button type="button" class="feature-chip" data-feat="testimonials">⭐ Testimonials</button>
+          <button type="button" class="feature-chip" data-feat="team">👥 Team</button>
+          <button type="button" class="feature-chip" data-feat="pricing">💰 Pricing</button>
+          <button type="button" class="feature-chip" data-feat="careers">💼 Careers</button>
+          <button type="button" class="feature-chip" data-feat="privacy">🔒 Privacy Policy</button>
+        </div>
+        <div class="field" style="margin-top:.75rem;">
+          <label for="customPages">Any other pages?</label>
+          <input id="customPages" type="text" placeholder="e.g. Membership portal, Live stream page" />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Key Features & Functionality</h2><p>Select all features you need</p></div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <button type="button" class="feature-chip" data-feat="payment">💳 Payment Gateway</button>
+          <button type="button" class="feature-chip" data-feat="login">🔐 User Login / Accounts</button>
+          <button type="button" class="feature-chip" data-feat="search">🔍 Search</button>
+          <button type="button" class="feature-chip" data-feat="newsletter">📧 Newsletter / Email Capture</button>
+          <button type="button" class="feature-chip" data-feat="whatsapp">💬 WhatsApp Chat Button</button>
+          <button type="button" class="feature-chip" data-feat="maps">📍 Google Maps</button>
+          <button type="button" class="feature-chip" data-feat="social">📱 Social Media Feed</button>
+          <button type="button" class="feature-chip" data-feat="analytics">📊 Analytics Dashboard</button>
+          <button type="button" class="feature-chip" data-feat="multilang">🌍 Multi-language</button>
+          <button type="button" class="feature-chip" data-feat="seo">🔎 SEO Optimisation</button>
+          <button type="button" class="feature-chip" data-feat="cms">📝 CMS / Easy Editing</button>
+          <button type="button" class="feature-chip" data-feat="mobile">📱 Mobile App (PWA)</button>
+          <button type="button" class="feature-chip" data-feat="chatbot">🤖 Chatbot / AI Assistant</button>
+          <button type="button" class="feature-chip" data-feat="crm">🗂️ CRM Integration</button>
+        </div>
+        <div class="field" style="margin-top:.75rem;">
+          <label for="customFeatures">Any other features?</label>
+          <textarea id="customFeatures" style="min-height:70px;" placeholder="Describe any specific functionality you need..."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Number of Pages</h2><p>Approximate total pages for the website</p></div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="pageCount">Estimated Pages</label>
+            <select id="pageCount">
+              <option value="">Select range</option>
+              <option value="1-3">1–3 pages</option>
+              <option value="4-7">4–7 pages</option>
+              <option value="8-15">8–15 pages</option>
+              <option value="16-30">16–30 pages</option>
+              <option value="30+">30+ pages</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="languages">Languages</label>
+            <input id="languages" type="text" placeholder="e.g. English, Hindi" />
+          </div>
+          <div class="field">
+            <label for="domainStatus">Domain Status</label>
+            <select id="domainStatus">
+              <option value="">Select</option>
+              <option value="have">I already have a domain</option>
+              <option value="need">I need a domain</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="margin-top:.75rem;" id="domainField">
+          <label for="domainName">Domain Name (if you have one)</label>
+          <input id="domainName" type="text" placeholder="e.g. yoursite.com" />
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn-primary" onclick="goStep(3)">Next: Design →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: DESIGN PREFERENCES -->
+    <div class="step-panel" data-panel="3">
+      <div class="card">
+        <div class="card-head"><h2>Design Style</h2><p>What visual style best represents your brand?</p></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;">
+          <div class="type-card" id="style-minimal" onclick="setDesignStyle('minimal')">
+            <div class="tc-icon">⬜</div>
+            <strong>Minimal & Clean</strong>
+            <span>White space, simple, elegant</span>
+          </div>
+          <div class="type-card" id="style-bold" onclick="setDesignStyle('bold')">
+            <div class="tc-icon">🎨</div>
+            <strong>Bold & Vibrant</strong>
+            <span>Strong colors, big typography</span>
+          </div>
+          <div class="type-card" id="style-luxury" onclick="setDesignStyle('luxury')">
+            <div class="tc-icon">💎</div>
+            <strong>Luxury & Premium</strong>
+            <span>Dark tones, gold accents, refined</span>
+          </div>
+          <div class="type-card" id="style-playful" onclick="setDesignStyle('playful')">
+            <div class="tc-icon">🎉</div>
+            <strong>Playful & Fun</strong>
+            <span>Bright, energetic, youthful</span>
+          </div>
+          <div class="type-card" id="style-corporate" onclick="setDesignStyle('corporate')">
+            <div class="tc-icon">🏛️</div>
+            <strong>Corporate & Professional</strong>
+            <span>Trustworthy, structured, formal</span>
+          </div>
+          <div class="type-card" id="style-custom" onclick="setDesignStyle('custom')">
+            <div class="tc-icon">✏️</div>
+            <strong>Custom Style</strong>
+            <span>I'll describe it below</span>
+          </div>
+        </div>
+        <div class="field" style="margin-top:.75rem;">
+          <label for="styleNotes">Additional style notes</label>
+          <input id="styleNotes" type="text" placeholder="e.g. Dark mode, glassmorphism, earthy tones" />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Brand Colors & Fonts</h2><p>Share your existing brand identity if you have one</p></div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="primaryColor">Primary Brand Color</label>
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <input id="primaryColorPicker" type="color" value="#1454ff" style="width:44px;height:44px;padding:.2rem;border-radius:9px;border:1px solid var(--border);cursor:pointer;" oninput="document.getElementById('primaryColor').value=this.value" />
+              <input id="primaryColor" type="text" placeholder="#1454ff" style="flex:1;" oninput="syncColorPicker('primaryColorPicker','primaryColor')" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="secondaryColor">Secondary Color</label>
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <input id="secondaryColorPicker" type="color" value="#0f172a" style="width:44px;height:44px;padding:.2rem;border-radius:9px;border:1px solid var(--border);cursor:pointer;" oninput="document.getElementById('secondaryColor').value=this.value" />
+              <input id="secondaryColor" type="text" placeholder="#0f172a" style="flex:1;" oninput="syncColorPicker('secondaryColorPicker','secondaryColor')" />
+            </div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:.75rem;">
+          <div class="field">
+            <label for="preferredFonts">Preferred Fonts (if any)</label>
+            <input id="preferredFonts" type="text" placeholder="e.g. Manrope, Playfair Display" />
+          </div>
+          <div class="field">
+            <label for="logoStatus">Do you have a logo?</label>
+            <select id="logoStatus">
+              <option value="yes">Yes, I'll provide it</option>
+              <option value="need">No, I need one designed</option>
+              <option value="maybe">I have a rough version</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Content Readiness</h2><p>What content do you already have?</p></div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <div class="toggle-row">
+            <div><strong>✍️ I have written content / copy</strong><span>Text for pages is ready</span></div>
+            <button class="toggle" id="toggleHasCopy" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>📸 I have photos / images</strong><span>Brand photos and product images ready</span></div>
+            <button class="toggle" id="toggleHasPhotos" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>🎬 I have videos</strong><span>Promo or product videos ready</span></div>
+            <button class="toggle" id="toggleHasVideos" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>🖼️ I have a logo file</strong><span>PNG or SVG logo available</span></div>
+            <button class="toggle" id="toggleHasLogo" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(2)">← Back</button>
+        <button class="btn-primary" onclick="goStep(4)">Next: Budget & Timeline →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: BUDGET & TIMELINE -->
+    <div class="step-panel" data-panel="4">
+      <div class="card">
+        <div class="card-head"><h2>💰 Budget Range <span style="color:var(--red)">*</span></h2><p>Select your approximate budget for this project</p></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;" id="budgetOptions">
+          <div class="type-card" id="budget-5k" onclick="setBudget('under-5k')">
+            <div class="tc-icon">💵</div>
+            <strong>Under ₹5,000</strong>
+            <span>Basic landing page</span>
+          </div>
+          <div class="type-card" id="budget-5-15k" onclick="setBudget('5k-15k')">
+            <div class="tc-icon">💰</div>
+            <strong>₹5,000 – ₹15,000</strong>
+            <span>Small business site</span>
+          </div>
+          <div class="type-card" id="budget-15-50k" onclick="setBudget('15k-50k')">
+            <div class="tc-icon">💎</div>
+            <strong>₹15,000 – ₹50,000</strong>
+            <span>Professional website</span>
+          </div>
+          <div class="type-card" id="budget-50-150k" onclick="setBudget('50k-150k')">
+            <div class="tc-icon">🏆</div>
+            <strong>₹50,000 – ₹1,50,000</strong>
+            <span>Full-featured platform</span>
+          </div>
+          <div class="type-card" id="budget-150k+" onclick="setBudget('150k+')">
+            <div class="tc-icon">🚀</div>
+            <strong>₹1,50,000+</strong>
+            <span>Enterprise / complex app</span>
+          </div>
+          <div class="type-card" id="budget-discuss" onclick="setBudget('discuss')">
+            <div class="tc-icon">🤝</div>
+            <strong>Let's Discuss</strong>
+            <span>I'm open to a quote</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>📅 Timeline</h2><p>When do you need the website ready?</p></div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="launchDate">Desired Launch Date</label>
+            <input id="launchDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="urgency">Urgency</label>
+            <select id="urgency">
+              <option value="">Select</option>
+              <option value="asap">ASAP (within 1 week)</option>
+              <option value="2weeks">Within 2 weeks</option>
+              <option value="1month">Within 1 month</option>
+              <option value="2months">Within 2 months</option>
+              <option value="flexible">Flexible / No rush</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="margin-top:.75rem;">
+          <label for="timelineNotes">Any important dates or events driving the deadline?</label>
+          <input id="timelineNotes" type="text" placeholder="e.g. Product launch on 15 Aug, Festival season" />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Maintenance & Support</h2><p>What ongoing support do you need after launch?</p></div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <div class="toggle-row">
+            <div><strong>🔧 Monthly Maintenance</strong><span>Regular updates, backups, and security patches</span></div>
+            <button class="toggle" id="toggleMaintenance" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>📝 Content Updates</strong><span>Regular content changes and additions</span></div>
+            <button class="toggle" id="toggleContentUpdates" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>📊 SEO & Marketing Support</strong><span>Ongoing SEO and digital marketing help</span></div>
+            <button class="toggle" id="toggleSEO" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(3)">← Back</button>
+        <button class="btn-primary" onclick="goStep(5)">Next: References →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: REFERENCES & ASSETS -->
+    <div class="step-panel" data-panel="5">
+      <div class="card">
+        <div class="card-head"><h2>🌐 Reference Websites</h2><p>Share websites you like — for design, layout, or functionality inspiration</p></div>
+        <div style="display:flex;gap:.5rem;margin-bottom:.75rem;">
+          <input id="refUrlInput" type="url" placeholder="https://example.com" style="flex:1;border:1px solid var(--border);border-radius:11px;padding:.65rem .85rem;outline:none;" />
+          <button class="btn-primary" style="padding:.6rem 1rem;" onclick="addRefUrl()">+ Add</button>
+        </div>
+        <div id="refUrlList" style="display:flex;flex-direction:column;gap:.4rem;">
+          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:.82rem;border:1px dashed var(--border);border-radius:10px;">No reference sites added yet.</div>
+        </div>
+        <div class="field" style="margin-top:.75rem;">
+          <label for="refNotes">What do you like about these sites?</label>
+          <textarea id="refNotes" style="min-height:70px;" placeholder="e.g. I love the clean layout of site 1, the color scheme of site 2, and the booking flow of site 3..."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>📎 Upload Assets</h2><p>Upload your logo, brand guidelines, photos, or any reference files</p></div>
+        <div id="assetsDropZone" onclick="document.getElementById('assetsInput').click()" style="border:2px dashed var(--border);border-radius:14px;padding:1.5rem;text-align:center;cursor:pointer;background:var(--blue-soft);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:1.8rem;margin-bottom:.4rem;">📁</div>
+          <strong style="display:block;font-size:.88rem;">Click to upload files</strong>
+          <span style="font-size:.74rem;color:var(--muted);">PNG, JPG, PDF, SVG · max 10 MB each</span>
+        </div>
+        <input type="file" id="assetsInput" accept="image/*,application/pdf,.svg" multiple style="display:none;" onchange="loadAssets(this)" />
+        <div id="assetsList" style="display:flex;flex-direction:column;gap:.4rem;margin-top:.6rem;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>💬 Anything Else?</h2><p>Any other requirements, questions, or context for the team</p></div>
+        <div class="field">
+          <textarea id="additionalNotes" placeholder="Share anything else that will help us understand your vision — integrations needed, special requirements, competitors to avoid looking like, etc."></textarea>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(4)">← Back</button>
+        <button class="btn-primary" onclick="goStep(6)">Next: Review & Submit →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: REVIEW & SUBMIT -->
+    <div class="step-panel" data-panel="6">
+      <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:none;">
+        <div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);margin-bottom:.75rem;">Summary</div>
+        <div id="reviewSummary" style="display:grid;gap:.6rem;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>📋 Terms & Confirmation</h2><p>Please read before submitting</p></div>
+        <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:.85rem;">
+          By submitting this request, you agree that:<br>
+          • This is a <strong>private request</strong> sent only to the OGSHOOTS team — it will not be publicly listed.<br>
+          • The OGSHOOTS team will review your request and contact you within <strong>24–48 hours</strong>.<br>
+          • A detailed quote and project plan will be shared before any work begins.<br>
+          • All information shared is kept <strong>strictly confidential</strong>.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <div class="toggle-row">
+            <div><strong>✅ I confirm all details are accurate</strong><span>The information I've provided is correct</span></div>
+            <button class="toggle" id="toggleConfirm" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>📞 I'm available for a discovery call</strong><span>The team can contact me to discuss the project</span></div>
+            <button class="toggle on" id="toggleCall" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Preferred Contact Method</h2><p>How should the team reach you first?</p></div>
+        <div class="grid-3">
+          <div class="type-card active" id="contact-whatsapp" onclick="setContactMethod('whatsapp')">
+            <div class="tc-icon">💬</div>
+            <strong>WhatsApp</strong>
+          </div>
+          <div class="type-card" id="contact-email" onclick="setContactMethod('email')">
+            <div class="tc-icon">📧</div>
+            <strong>Email</strong>
+          </div>
+          <div class="type-card" id="contact-call" onclick="setContactMethod('call')">
+            <div class="tc-icon">📞</div>
+            <strong>Phone Call</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(5)">← Back</button>
+        <button class="btn-success" id="submitRequestBtn" onclick="submitRequest()">🚀 Submit Request to Admin</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8",
+});
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+let uid = null, userName = '';
+let websiteType = 'portfolio', designStyle = '', budgetRange = '', contactMethod = 'whatsapp';
+let refUrls = [], assetFiles = [];
+
+// ── AUTH ──
+async function loadUser() {
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!res.ok) { window.location.href = '/login.html'; return; }
+    const { user } = await res.json();
+    uid = user.uid; userName = user.name || '';
+    document.getElementById('topAvatar').textContent = (userName || 'U').trim().charAt(0).toUpperCase();
+    if (user.email) document.getElementById('contactEmail').value = user.email;
+    if (user.name) document.getElementById('contactName').value = user.name;
+    if (user.phone) document.getElementById('contactPhone').value = user.phone;
+  } catch {}
+}
+loadUser();
+
+// ── STEP NAV ──
+window.goStep = function(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.toggle('active', +p.dataset.panel === n));
+  document.querySelectorAll('.step-btn').forEach(b => b.classList.toggle('active', +b.dataset.step === n));
+  if (n === 6) buildReviewSummary();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+document.querySelectorAll('.step-btn').forEach(btn => btn.addEventListener('click', () => goStep(+btn.dataset.step)));
+
+// ── PROGRESS ──
+function updateProgress() {
+  const fields = [
+    document.getElementById('bizName').value.trim(),
+    document.getElementById('bizIndustry').value,
+    document.getElementById('contactName').value.trim(),
+    document.getElementById('contactPhone').value.trim(),
+    document.getElementById('contactEmail').value.trim(),
+    document.getElementById('bizDescription').value.trim(),
+    websiteType,
+    budgetRange,
+  ];
+  const filled = fields.filter(Boolean).length;
+  const pct = Math.round((filled / fields.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  updateAlert();
+  markDoneSteps();
+}
+
+function markDoneSteps() {
+  const checks = [
+    !!(document.getElementById('bizName').value.trim() && document.getElementById('contactEmail').value.trim()),
+    !!websiteType,
+    true,
+    !!designStyle,
+    !!budgetRange,
+    true,
+    false,
+  ];
+  document.querySelectorAll('.step-btn').forEach((btn, i) => {
+    const check = btn.querySelector('.step-check');
+    if (checks[i]) { btn.classList.add('done'); if (check) check.textContent = '✓'; }
+    else { btn.classList.remove('done'); if (check) check.textContent = ''; }
+  });
+}
+
+function updateAlert() {
+  const missing = [];
+  if (!document.getElementById('bizName').value.trim()) missing.push('Business Name');
+  if (!document.getElementById('contactEmail').value.trim()) missing.push('Email');
+  if (!budgetRange) missing.push('Budget');
+  const box = document.getElementById('alertBox');
+  if (!missing.length) {
+    box.className = 'alert success';
+    box.querySelector('.alert-icon').textContent = '✅';
+    document.getElementById('alertTitle').textContent = 'Looking good!';
+    document.getElementById('alertMsg').textContent = 'Review your details and submit your request.';
+  } else {
+    box.className = 'alert';
+    box.querySelector('.alert-icon').textContent = '⚠️';
+    document.getElementById('alertTitle').textContent = missing.length + ' required field(s) missing';
+    document.getElementById('alertMsg').textContent = 'Complete: ' + missing.join(', ');
+  }
+}
+
+['bizName','bizIndustry','contactName','contactPhone','contactEmail','bizDescription'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', updateProgress);
+});
+
+// ── WEBSITE TYPE ──
+const allTypes = ['portfolio','business','ecommerce','events','blog','landing','booking','restaurant','custom'];
+window.setWebsiteType = function(type) {
+  websiteType = type;
+  allTypes.forEach(t => { const el = document.getElementById('type-' + t); if (el) el.classList.toggle('active', t === type); });
+  document.getElementById('customTypeField').style.display = type === 'custom' ? '' : 'none';
+  updateProgress();
+};
+document.getElementById('customTypeField').style.display = 'none';
+
+// ── DESIGN STYLE ──
+const allStyles = ['minimal','bold','luxury','playful','corporate','custom'];
+window.setDesignStyle = function(style) {
+  designStyle = style;
+  allStyles.forEach(s => { const el = document.getElementById('style-' + s); if (el) el.classList.toggle('active', s === style); });
+  updateProgress();
+};
+
+// ── BUDGET ──
+const allBudgets = ['under-5k','5k-15k','15k-50k','50k-150k','150k+','discuss'];
+window.setBudget = function(b) {
+  budgetRange = b;
+  allBudgets.forEach(bv => { const el = document.getElementById('budget-' + bv); if (el) el.classList.toggle('active', bv === b); });
+  updateProgress();
+};
+
+// ── CONTACT METHOD ──
+window.setContactMethod = function(m) {
+  contactMethod = m;
+  ['whatsapp','email','call'].forEach(c => { const el = document.getElementById('contact-' + c); if (el) el.classList.toggle('active', c === m); });
+};
+
+// ── COLOR SYNC ──
+window.syncColorPicker = function(pickerId, inputId) {
+  const val = document.getElementById(inputId).value;
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) document.getElementById(pickerId).value = val;
+};
+
+// ── FEATURE CHIPS ──
+document.querySelectorAll('.feature-chip').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('active'));
+});
+
+// ── REF URLS ──
+window.addRefUrl = function() {
+  const input = document.getElementById('refUrlInput');
+  const url = input.value.trim();
+  if (!url) return;
+  refUrls.push(url);
+  input.value = '';
+  renderRefUrls();
+};
+function renderRefUrls() {
+  const list = document.getElementById('refUrlList');
+  if (!refUrls.length) {
+    list.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:.82rem;border:1px dashed var(--border);border-radius:10px;">No reference sites added yet.</div>';
+    return;
+  }
+  list.innerHTML = refUrls.map((url, i) => `
+    <div class="ref-row">
+      <span class="rr-url">${url}</span>
+      <button class="rr-del" onclick="removeRefUrl(${i})">✕</button>
+    </div>`).join('');
+}
+window.removeRefUrl = i => { refUrls.splice(i, 1); renderRefUrls(); };
+
+// ── ASSETS ──
+window.loadAssets = function(input) {
+  Array.from(input.files).forEach(f => assetFiles.push({ name: f.name, size: f.size }));
+  renderAssets();
+  input.value = '';
+};
+function renderAssets() {
+  const list = document.getElementById('assetsList');
+  if (!assetFiles.length) { list.innerHTML = ''; return; }
+  list.innerHTML = assetFiles.map((f, i) => `
+    <div class="ref-row">
+      <span style="font-size:.8rem;">📎</span>
+      <span class="rr-url" style="color:var(--text);">${f.name} <span style="color:var(--muted);font-size:.72rem;">(${(f.size/1024).toFixed(0)} KB)</span></span>
+      <button class="rr-del" onclick="removeAsset(${i})">✕</button>
+    </div>`).join('');
+}
+window.removeAsset = i => { assetFiles.splice(i, 1); renderAssets(); };
+
+// ── REVIEW SUMMARY ──
+function buildReviewSummary() {
+  const pages = Array.from(document.querySelectorAll('.feature-chip[data-feat].active')).map(c => c.textContent.trim()).join(', ');
+  const items = [
+    { label: 'Business', value: document.getElementById('bizName').value || '—' },
+    { label: 'Industry', value: document.getElementById('bizIndustry').value || '—' },
+    { label: 'Contact', value: document.getElementById('contactName').value + ' · ' + document.getElementById('contactPhone').value },
+    { label: 'Email', value: document.getElementById('contactEmail').value || '—' },
+    { label: 'Website Type', value: websiteType || '—' },
+    { label: 'Design Style', value: designStyle || '—' },
+    { label: 'Budget', value: budgetRange || '—' },
+    { label: 'Launch Date', value: document.getElementById('launchDate').value || 'Flexible' },
+    { label: 'Pages / Features', value: pages || 'None selected' },
+    { label: 'Reference Sites', value: refUrls.length ? refUrls.length + ' added' : 'None' },
+    { label: 'Assets Uploaded', value: assetFiles.length ? assetFiles.length + ' files' : 'None' },
+    { label: 'Contact Method', value: contactMethod },
+  ];
+  document.getElementById('reviewSummary').innerHTML = items.map(item => `
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.55rem .75rem;background:rgba(255,255,255,.06);border-radius:10px;">
+      <span style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);width:110px;flex:none;">${item.label}</span>
+      <span style="font-size:.84rem;font-weight:700;color:#fff;">${item.value}</span>
+    </div>`).join('');
+}
+
+// ── SUBMIT ──
+window.submitRequest = async function() {
+  if (!document.getElementById('toggleConfirm').classList.contains('on')) {
+    alert('Please confirm that all details are accurate before submitting.'); return;
+  }
+  const bizName = document.getElementById('bizName').value.trim();
+  const contactEmail = document.getElementById('contactEmail').value.trim();
+  if (!bizName || !contactEmail || !budgetRange) {
+    goStep(0); alert('Please complete Business Name, Email, and Budget before submitting.'); return;
+  }
+  if (!uid) {
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!res.ok) { window.location.href = '/login.html'; return; }
+      uid = (await res.json()).user.uid;
+    } catch { window.location.href = '/login.html'; return; }
+  }
+
+  const pages = Array.from(document.querySelectorAll('.feature-chip[data-feat].active')).map(c => c.dataset.feat);
+
+  const payload = {
+    type: 'custom_website_request',
+    status: 'pending',
+    isPublic: false,
+    submittedBy: uid,
+    bizName,
+    bizIndustry: document.getElementById('bizIndustry').value,
+    contactName: document.getElementById('contactName').value.trim(),
+    contactPhone: document.getElementById('contactPhone').value.trim(),
+    contactEmail,
+    existingWebsite: document.getElementById('existingWebsite').value.trim(),
+    bizDescription: document.getElementById('bizDescription').value.trim(),
+    websiteType,
+    customTypeDesc: document.getElementById('customTypeDesc').value.trim(),
+    websiteGoal: document.getElementById('websiteGoal').value.trim(),
+    selectedPages: pages,
+    customPages: document.getElementById('customPages').value.trim(),
+    customFeatures: document.getElementById('customFeatures').value.trim(),
+    pageCount: document.getElementById('pageCount').value,
+    languages: document.getElementById('languages').value.trim(),
+    domainStatus: document.getElementById('domainStatus').value,
+    domainName: document.getElementById('domainName').value.trim(),
+    designStyle,
+    styleNotes: document.getElementById('styleNotes').value.trim(),
+    primaryColor: document.getElementById('primaryColor').value.trim(),
+    secondaryColor: document.getElementById('secondaryColor').value.trim(),
+    preferredFonts: document.getElementById('preferredFonts').value.trim(),
+    logoStatus: document.getElementById('logoStatus').value,
+    hasCopy: document.getElementById('toggleHasCopy').classList.contains('on'),
+    hasPhotos: document.getElementById('toggleHasPhotos').classList.contains('on'),
+    hasVideos: document.getElementById('toggleHasVideos').classList.contains('on'),
+    hasLogo: document.getElementById('toggleHasLogo').classList.contains('on'),
+    budgetRange,
+    launchDate: document.getElementById('launchDate').value,
+    urgency: document.getElementById('urgency').value,
+    timelineNotes: document.getElementById('timelineNotes').value.trim(),
+    needsMaintenance: document.getElementById('toggleMaintenance').classList.contains('on'),
+    needsContentUpdates: document.getElementById('toggleContentUpdates').classList.contains('on'),
+    needsSEO: document.getElementById('toggleSEO').classList.contains('on'),
+    refUrls,
+    refNotes: document.getElementById('refNotes').value.trim(),
+    assetFileNames: assetFiles.map(f => f.name),
+    additionalNotes: document.getElementById('additionalNotes').value.trim(),
+    contactMethod,
+    availableForCall: document.getElementById('toggleCall').classList.contains('on'),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+
+  const btn = document.getElementById('submitRequestBtn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+  try {
+    await db.collection('websiteRequests').add(payload);
+    btn.textContent = '✅ Request Submitted!';
+    btn.style.background = 'linear-gradient(135deg,#10b981,#34d399)';
+    document.getElementById('topBadge').textContent = 'Submitted';
+    document.getElementById('topBadge').style.background = '#d1fae5';
+    document.getElementById('topBadge').style.color = '#065f46';
+    setTimeout(() => window.location.href = 'premium-client-dashboard.html', 1800);
+  } catch (err) {
+    alert('Error submitting request: ' + err.message);
+    btn.textContent = '🚀 Submit Request to Admin'; btn.disabled = false;
+  }
+};
+
+// ── SAVE DRAFT ──
+document.getElementById('saveDraftBtn').addEventListener('click', async () => {
+  if (!uid) { alert('Please log in first.'); return; }
+  const btn = document.getElementById('saveDraftBtn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    await db.collection('websiteRequests').add({
+      type: 'custom_website_request', status: 'draft', isPublic: false,
+      submittedBy: uid,
+      bizName: document.getElementById('bizName').value.trim(),
+      contactEmail: document.getElementById('contactEmail').value.trim(),
+      websiteType, budgetRange,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    btn.textContent = '✓ Draft Saved';
+    setTimeout(() => { btn.textContent = 'Save Draft'; btn.disabled = false; }, 1500);
+  } catch (err) {
+    alert('Error: ' + err.message); btn.textContent = 'Save Draft'; btn.disabled = false;
+  }
+});
+
+document.getElementById('submitBtn').addEventListener('click', () => { goStep(6); });
+
+updateProgress();
+</script>
+</body>
+</html>

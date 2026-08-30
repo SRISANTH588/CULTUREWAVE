@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Organiser Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--blue:#1454ff;--blue-2:#4c7dff;--green:#10b981;--red:#ef4444;--border:#dbe4f0;--muted:#64748b;--text:#0f172a;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Manrope,sans-serif;background:#f4f6fb;color:var(--text);font-size:14px;min-height:100vh;}
+    a{text-decoration:none;color:inherit;}
+    button{font:inherit;cursor:pointer;}
+
+    /* HERO BANNER */
+    .banner{height:220px;background:linear-gradient(135deg,#1454ff 0%,#4c7dff 50%,#7c3aed 100%);position:relative;overflow:hidden;}
+    .banner::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+    .banner-edit{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:.4rem .85rem;font-size:.76rem;font-weight:800;backdrop-filter:blur(8px);display:none;}
+
+    /* PROFILE SECTION */
+    .profile-wrap{max-width:1100px;margin:0 auto;padding:0 1.5rem;}
+    .profile-head{display:flex;align-items:flex-end;gap:1.25rem;margin-top:-52px;margin-bottom:1.5rem;flex-wrap:wrap;}
+    .avatar{width:104px;height:104px;border-radius:24px;border:4px solid #fff;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:2.4rem;font-weight:900;color:#fff;flex:none;box-shadow:0 8px 24px rgba(20,84,255,.25);}
+    .profile-meta{flex:1;padding-bottom:.25rem;}
+    .profile-meta h1{font-size:1.6rem;font-weight:900;letter-spacing:-.04em;color:var(--text);}
+    .profile-meta .handle{font-size:.82rem;color:var(--muted);font-weight:700;margin-top:.15rem;}
+    .profile-meta .bio{font-size:.88rem;color:#475569;margin-top:.4rem;line-height:1.55;max-width:520px;}
+    .profile-actions{display:flex;gap:.6rem;align-items:center;padding-bottom:.25rem;flex-wrap:wrap;}
+    .btn{border:0;border-radius:12px;padding:.6rem 1.1rem;font-weight:800;font-size:.84rem;display:inline-flex;align-items:center;gap:.4rem;}
+    .btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff;box-shadow:0 4px 14px rgba(20,84,255,.3);}
+    .btn-ghost{background:#fff;color:var(--text);border:1.5px solid var(--border);}
+    .btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
+
+    /* STATS ROW */
+    .stats-row{display:flex;gap:2rem;padding:.85rem 0 1.25rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;flex-wrap:wrap;}
+    .stat{text-align:center;}
+    .stat strong{display:block;font-size:1.3rem;font-weight:900;letter-spacing:-.04em;color:var(--text);}
+    .stat span{font-size:.74rem;color:var(--muted);font-weight:700;}
+
+    /* SOCIAL CHIPS */
+    .socials{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+    .social-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.28rem .7rem;border-radius:999px;background:#f1f5f9;border:1px solid var(--border);font-size:.74rem;font-weight:700;color:var(--muted);}
+    .social-chip:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+
+    /* SECTION HEADER */
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .section-head h2{font-size:1.1rem;font-weight:900;letter-spacing:-.03em;}
+    .section-head span{font-size:.76rem;color:var(--muted);font-weight:700;}
+
+    /* EVENT GRID */
+    .events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;padding-bottom:3rem;}
+
+    /* EVENT CARD */
+    .ev-card{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 2px 12px rgba(15,23,42,.06);transition:transform .2s,box-shadow .2s;cursor:pointer;}
+    .ev-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(15,23,42,.12);}
+    .ev-cover{height:160px;background:linear-gradient(135deg,#1454ff,#4c7dff);position:relative;overflow:hidden;}
+    .ev-cover img{width:100%;height:100%;object-fit:cover;}
+    .ev-cover-placeholder{width:100%;height:100%;display:grid;place-items:center;font-size:2.5rem;}
+    .ev-status{position:absolute;top:.65rem;left:.65rem;font-size:.65rem;font-weight:900;padding:.22rem .6rem;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;}
+    .ev-status.live{background:#dcfce7;color:#166534;}
+    .ev-status.draft{background:#fff7ed;color:#b45309;}
+    .ev-body{padding:1rem 1.1rem 1.1rem;}
+    .ev-date{font-size:.72rem;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem;}
+    .ev-name{font-size:1rem;font-weight:900;letter-spacing:-.03em;color:var(--text);margin-bottom:.35rem;line-height:1.3;}
+    .ev-loc{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.3rem;margin-bottom:.75rem;}
+    .ev-footer{display:flex;align-items:center;justify-content:space-between;}
+    .ev-price{font-size:.9rem;font-weight:900;color:var(--text);}
+    .ev-price small{font-size:.7rem;font-weight:700;color:var(--muted);}
+    .ev-cta{background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff;border:0;border-radius:10px;padding:.45rem .9rem;font-size:.78rem;font-weight:800;box-shadow:0 3px 10px rgba(20,84,255,.25);}
+
+    /* EMPTY */
+    .empty{text-align:center;padding:3rem 1rem;color:var(--muted);}
+    .empty-icon{font-size:2.5rem;margin-bottom:.75rem;}
+    .empty strong{display:block;font-size:1rem;font-weight:800;color:var(--text);margin-bottom:.3rem;}
+
+    /* SKELETON */
+    .skel{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* SHARE TOAST */
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+    @media(max-width:640px){
+      .profile-head{flex-direction:column;align-items:flex-start;}
+      .profile-actions{width:100%;}
+      .stats-row{gap:1.25rem;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="banner">
+  <button class="banner-edit" id="bannerEditBtn">✏️ Edit Profile</button>
+</div>
+
+<div class="profile-wrap">
+
+  <div class="profile-head">
+    <div class="avatar" id="profileAvatar">🎪</div>
+    <div class="profile-meta">
+      <h1 id="profileName">Loading...</h1>
+      <div class="handle" id="profileHandle">@handle</div>
+      <div class="bio" id="profileBio"></div>
+      <div class="socials" id="profileSocials"></div>
+    </div>
+    <div class="profile-actions" id="profileActions">
+      <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share Profile</button>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><strong id="statEvents">—</strong><span>Events</span></div>
+    <div class="stat"><strong id="statLive">—</strong><span>Live Now</span></div>
+    <div class="stat"><strong id="statFollowers">—</strong><span>Followers</span></div>
+  </div>
+
+  <div class="section-head">
+    <h2>🎉 Events</h2>
+    <span id="eventsSubtitle"></span>
+  </div>
+
+  <div class="events-grid" id="eventsGrid">
+    <!-- skeleton -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+      <div class="skel" style="height:160px;border-radius:0;"></div>
+      <div style="padding:1rem;display:flex;flex-direction:column;gap:.6rem;">
+        <div class="skel" style="height:12px;width:60%;"></div>
+        <div class="skel" style="height:18px;width:85%;"></div>
+        <div class="skel" style="height:12px;width:45%;"></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+      <div class="skel" style="height:160px;border-radius:0;"></div>
+      <div style="padding:1rem;display:flex;flex-direction:column;gap:.6rem;">
+        <div class="skel" style="height:12px;width:55%;"></div>
+        <div class="skel" style="height:18px;width:80%;"></div>
+        <div class="skel" style="height:12px;width:40%;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+});
+const db = firebase.firestore();
+
+const params = new URLSearchParams(location.search);
+const targetUid = params.get('uid');
+let isOwner = false;
+let profileData = {};
+
+function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtDate(ts){
+  if(!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function fmtPrice(p){
+  if(!p || p==0) return '<span class="ev-price">Free</span>';
+  return `<span class="ev-price">₹${Number(p).toLocaleString('en-IN')}<small> onwards</small></span>`;
+}
+
+function statusBadge(s){
+  const norm = (s||'draft').toLowerCase();
+  if(norm==='published') return '<span class="ev-status live">Live</span>';
+  return '<span class="ev-status draft">Draft</span>';
+}
+
+function renderEvents(events){
+  const grid = document.getElementById('eventsGrid');
+  document.getElementById('statEvents').textContent = events.length;
+  document.getElementById('statLive').textContent = events.filter(e=>(e.status||'').toLowerCase()==='published').length;
+  document.getElementById('eventsSubtitle').textContent = events.length + ' listing' + (events.length!==1?'s':'');
+
+  if(!events.length){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎪</div><strong>No events yet</strong><span>This organiser hasn't published any events.</span></div>`;
+    return;
+  }
+
+  grid.innerHTML = events.map(ev=>{
+    const cover = ev.coverUrl
+      ? `<img src="${esc(ev.coverUrl)}" alt="${esc(ev.coverAlt||ev.name)}" loading="lazy"/>`
+      : `<div class="ev-cover-placeholder">🎉</div>`;
+    const editBtn = isOwner
+      ? `<a href="event-create.html?eventId=${ev.id}" class="ev-cta" style="background:#fff;color:var(--blue);border:1.5px solid var(--border);box-shadow:none;">Edit</a>`
+      : '';
+    return `
+    <div class="ev-card" onclick="location.href='event-detail.html?eventId=${ev.id}'">
+      <div class="ev-cover">
+        ${cover}
+        ${isOwner ? statusBadge(ev.status) : ''}
+      </div>
+      <div class="ev-body">
+        <div class="ev-date">📅 ${fmtDate(ev.startDate||ev.createdAt)}</div>
+        <div class="ev-name">${esc(ev.name||'Untitled Event')}</div>
+        <div class="ev-loc">📍 ${esc(ev.venueName||ev.city||'Location TBA')}</div>
+        <div class="ev-footer">
+          ${fmtPrice(ev.price)}
+          <div style="display:flex;gap:.4rem;">
+            ${editBtn}
+            <button class="ev-cta" onclick="event.stopPropagation();location.href='event-detail.html?eventId=${ev.id}'">View →</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderProfile(data){
+  profileData = data;
+  const initials = (data.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const avatarEl = document.getElementById('profileAvatar');
+  if(data.avatarUrl) avatarEl.innerHTML = `<img src="${esc(data.avatarUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:20px;" alt="avatar"/>`;
+  else avatarEl.textContent = initials;
+
+  document.getElementById('profileName').textContent = data.name || 'Organiser';
+  document.getElementById('profileHandle').textContent = '@' + (data.handle || data.uid?.slice(0,8) || 'organiser');
+  document.getElementById('profileBio').textContent = data.bio || '';
+  document.getElementById('statFollowers').textContent = (data.followers||0).toLocaleString('en-IN');
+  document.title = `${data.name||'Organiser'} | CultureWave`;
+
+  // socials
+  const socials = [];
+  if(data.instagram) socials.push(`<a class="social-chip" href="https://instagram.com/${data.instagram}" target="_blank">📸 Instagram</a>`);
+  if(data.twitter)   socials.push(`<a class="social-chip" href="https://twitter.com/${data.twitter}" target="_blank">🐦 Twitter</a>`);
+  if(data.website)   socials.push(`<a class="social-chip" href="${esc(data.website)}" target="_blank">🌐 Website</a>`);
+  document.getElementById('profileSocials').innerHTML = socials.join('');
+
+  if(isOwner){
+    document.getElementById('bannerEditBtn').style.display = 'block';
+    document.getElementById('profileActions').innerHTML = `
+      <a class="btn btn-primary" href="event-list.html">📋 My Events</a>
+      <a class="btn btn-ghost" href="event-create.html">+ Create Event</a>
+      <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share</button>`;
+  }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function shareProfile(){
+  const url = location.href;
+  navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!')).catch(()=>showToast(url));
+}
+
+async function init(){
+  // check if logged-in user is the owner
+  let myUid = null;
+  try{
+    const res = await fetch('/api/auth/me',{credentials:'include'});
+    if(res.ok){ const p = await res.json(); myUid = p.user?.uid; }
+  }catch(e){}
+
+  const uid = targetUid || myUid;
+  if(!uid){ document.getElementById('profileName').textContent='Profile not found'; return; }
+  isOwner = (myUid && myUid === uid);
+
+  // load organiser profile doc
+  const profSnap = await db.collection('organisers').doc(uid).get();
+  if(profSnap.exists) renderProfile({uid, ...profSnap.data()});
+  else renderProfile({uid, name: 'Organiser'});
+
+  // load their published events (+ drafts if owner)
+  let q = db.collection('events').where('ownerId','==',uid).orderBy('createdAt','desc').limit(50);
+  const snap = await q.get();
+  const events = snap.docs
+    .map(d=>({id:d.id,...d.data()}))
+    .filter(e=> isOwner || (e.status||'').toLowerCase()==='published');
+  renderEvents(events);
+}
+
+init();
+</script>
+</body>
+</html>

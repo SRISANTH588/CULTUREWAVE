@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cityvibe | Login</title>
+    <title>CultureWave | Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,7 +16,7 @@
     <header class="topbar">
       <div class="nav-wrap">
         <div class="brand-block">
-          <div class="logo">cityvibe</div>
+          <div class="logo">CultureWave</div>
           <div class="brand-sub">by OGSHOOTS LUXE</div>
         </div>
         <div class="auth-actions">
@@ -130,7 +130,7 @@
     <footer class="site-footer login-footer">
       <div class="footer-wrap">
         <div class="footer-branding">
-          <div class="footer-brand">cityvibe</div>
+          <div class="footer-brand">CultureWave</div>
           <p>Simple login, Google sign-in, and verified account access.</p>
           <span class="footer-tag">Premium city experience</span>
         </div>
@@ -142,12 +142,12 @@
         </div>
         <div class="footer-contact">
           <h3>Need help?</h3>
-          <a href="mailto:support@cityvibe.com">support@cityvibe.com</a>
+          <a href="mailto:support@CultureWave.com">support@CultureWave.com</a>
           <span>Use the form above to sign in or create a new account.</span>
         </div>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 cityvibe. All rights reserved.</span>
+        <span>© 2026 CultureWave. All rights reserved.</span>
         <span>Login secured with Firebase and backend session sync.</span>
       </div>
     </footer>
@@ -188,10 +188,6 @@
 
       function goHome(role = selectedRole) {
         window.location.href = getDashboardUrl(role);
-      }
-
-      function goOnboarding() {
-        window.location.href = "client-onboarding.html";
       }
 
       function setMode(mode) {
@@ -257,11 +253,7 @@
         try {
           const result = await signInLocalAccount(loginValue, password);
           selectedRole = result.user?.role === "admin" ? "admin" : "client";
-          setStatus("Login successful. Redirecting...", "success");
-          if (selectedRole === "client" && !result.user?.onboardingComplete) {
-            goOnboarding();
-            return;
-          }
+          setStatus(`Login successful as ${selectedRole}. Redirecting...`, "success");
           goHome(selectedRole);
         } catch (error) {
           console.error("Login error:", error);
@@ -295,10 +287,6 @@
           }
           selectedRole = "client";
           setStatus("Account created. Redirecting...", "success");
-          if (selectedRole === "client" && !data.user?.onboardingComplete) {
-            goOnboarding();
-            return;
-          }
           goHome(selectedRole);
         } catch (error) {
           setStatus(error.message || "Registration failed. Try again.", "warning");

@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CultureWave | Buy Credits</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #1454ff; --blue-2: #4c7dff; --blue-light: #e8f0ff;
+      --blue-soft: #f0f5ff; --border: #dbe4f0; --muted: #64748b;
+      --text: #0f172a; --green: #10b981; --red: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Manrope, sans-serif; background: #f4f6fb; color: var(--text); font-size: 14px; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+
+    .topbar { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; box-shadow: 0 2px 12px rgba(20,84,255,0.06); }
+    .topbar-inner { max-width: 1200px; margin: 0 auto; padding: 0 1.2rem; height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.6rem; }
+    .brand-icon { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, var(--blue), var(--blue-2)); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 0.9rem; }
+    .brand strong { font-size: 1rem; letter-spacing: -0.04em; }
+
+    .wallet-badge { display: flex; align-items: center; gap: 0.5rem; background: var(--blue-soft); border: 1px solid var(--border); border-radius: 10px; padding: 0.4rem 0.75rem; font-size: 0.82rem; font-weight: 800; color: var(--blue); }
+    .wallet-badge span { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+
+    .page { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1.2rem; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, #0f172a, #1e3a8a); border-radius: 20px; padding: 2rem 2rem 1.8rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; border-radius: 50%; background: rgba(20,84,255,0.2); }
+    .hero::after { content: ''; position: absolute; bottom: -40px; left: 30%; width: 160px; height: 160px; border-radius: 50%; background: rgba(76,125,255,0.15); }
+    .hero-content { position: relative; z-index: 1; }
+    .hero h1 { font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: -0.04em; margin-bottom: 0.4rem; }
+    .hero p { font-size: 0.84rem; color: rgba(255,255,255,0.65); margin-bottom: 1.2rem; }
+    .hero-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .hero-stat { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 0.75rem 1rem; }
+    .hero-stat .val { font-size: 1.4rem; font-weight: 800; color: #fff; }
+    .hero-stat .lbl { font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.1rem; }
+
+    /* HOW IT WORKS */
+    .how-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .how-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }
+    .how-num { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; font-size: 0.78rem; font-weight: 800; color: #fff; flex: none; }
+    .how-card h3 { font-size: 0.86rem; font-weight: 800; margin-bottom: 0.2rem; }
+    .how-card p { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
+
+    /* PACKS */
+    .section-title { font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: -0.02em; }
+    .packs-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .pack-card { background: #fff; border: 2px solid var(--border); border-radius: 18px; padding: 1.2rem; cursor: pointer; transition: all 0.15s; position: relative; }
+    .pack-card:hover { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(20,84,255,0.08); }
+    .pack-card.selected { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(20,84,255,0.1); background: var(--blue-soft); }
+    .pack-card.popular { border-color: var(--blue); }
+    .popular-badge { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 999px; white-space: nowrap; letter-spacing: 0.06em; text-transform: uppercase; }
+    .pack-icon { font-size: 1.6rem; margin-bottom: 0.6rem; }
+    .pack-credits { font-size: 1.5rem; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
+    .pack-credits span { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+    .pack-price { font-size: 1.1rem; font-weight: 800; color: var(--blue); margin: 0.3rem 0; }
+    .pack-per { font-size: 0.72rem; color: var(--muted); }
+    .pack-tickets { font-size: 0.76rem; color: var(--green); font-weight: 700; margin-top: 0.5rem; }
+    .pack-save { display: inline-block; background: #dcfce7; color: #166534; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px; margin-top: 0.35rem; }
+
+    /* CUSTOM */
+    .custom-card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 1.2rem; margin-bottom: 1.5rem; }
+    .custom-card h3 { font-size: 0.9rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .custom-slider-wrap { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; }
+    .custom-slider-wrap input[type=range] { flex: 1; accent-color: var(--blue); height: 6px; }
+    .custom-val { font-size: 1.1rem; font-weight: 800; color: var(--blue); min-width: 80px; text-align: right; }
+    .custom-breakdown { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem; }
+    .cb-item { background: var(--blue-soft); border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 0.75rem; text-align: center; }
+    .cb-item .cv { font-size: 1rem; font-weight: 800; color: var(--text); }
+    .cb-item .cl { font-size: 0.68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.1rem; }
+
+    /* CHECKOUT */
+    .checkout-grid { display: grid; grid-template-columns: 1fr 360px; gap: 1rem; align-items: start; }
+    .checkout-card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 1.2rem; }
+    .checkout-card h3 { font-size: 0.9rem; font-weight: 800; margin-bottom: 0.9rem; }
+    .field { display: grid; gap: 0.35rem; margin-bottom: 0.75rem; }
+    .field label { font-size: 0.76rem; font-weight: 800; color: #475569; }
+    .field input, .field select { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 0.65rem 0.8rem; background: #fff; color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .field input:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(20,84,255,0.1); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    .pay-methods { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem; margin-bottom: 0.9rem; }
+    .pay-method { border: 2px solid var(--border); border-radius: 12px; padding: 0.65rem; text-align: center; cursor: pointer; transition: all 0.12s; }
+    .pay-method:hover { border-color: var(--blue); }
+    .pay-method.active { border-color: var(--blue); background: var(--blue-soft); }
+    .pay-method .pm-icon { font-size: 1.3rem; margin-bottom: 0.2rem; }
+    .pay-method .pm-label { font-size: 0.7rem; font-weight: 800; color: #475569; }
+    .pay-method.active .pm-label { color: var(--blue); }
+
+    /* ORDER SUMMARY */
+    .order-summary { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 1.2rem; position: sticky; top: 80px; }
+    .order-summary h3 { font-size: 0.9rem; font-weight: 800; margin-bottom: 1rem; }
+    .os-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+    .os-row:last-of-type { border-bottom: none; }
+    .os-row .lbl { color: var(--muted); }
+    .os-row .val { font-weight: 700; }
+    .os-total { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0 0; margin-top: 0.25rem; border-top: 2px solid var(--border); }
+    .os-total .lbl { font-size: 0.86rem; font-weight: 800; }
+    .os-total .val { font-size: 1.2rem; font-weight: 800; color: var(--blue); }
+    .btn-pay { width: 100%; padding: 0.85rem; border-radius: 12px; border: 0; background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-weight: 800; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 16px rgba(20,84,255,0.3); margin-top: 0.9rem; transition: opacity 0.15s; }
+    .btn-pay:hover { opacity: 0.9; }
+    .secure-note { display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.7rem; color: var(--muted); margin-top: 0.6rem; }
+
+    /* HISTORY */
+    .history-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .history-table th { padding: 0.6rem 0.85rem; text-align: left; font-size: 0.7rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; background: var(--blue-soft); border-bottom: 1px solid var(--border); }
+    .history-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); }
+    .history-table tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 999px; font-size: 0.68rem; font-weight: 800; }
+    .badge.success { background: #dcfce7; color: #166534; }
+    .badge.used { background: #fef3c7; color: #92400e; }
+    .badge.pending { background: #f1f5f9; color: #475569; }
+
+    /* SUCCESS MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; place-items: center; z-index: 100; }
+    .modal-overlay.open { display: grid; }
+    .modal { background: #fff; border-radius: 24px; padding: 2rem; width: min(420px,90%); text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,0.2); }
+    .modal .success-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .modal h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.4rem; }
+    .modal p { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem; }
+    .modal .credit-added { font-size: 2rem; font-weight: 800; color: var(--blue); margin: 0.5rem 0 1rem; }
+    .btn-primary { padding: 0.65rem 1.4rem; border-radius: 11px; border: 0; background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-weight: 800; font-size: 0.86rem; cursor: pointer; }
+
+    @media (max-width: 900px) {
+      .packs-grid { grid-template-columns: 1fr 1fr; }
+      .checkout-grid { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: 1fr; }
+      .order-summary { position: static; }
+    }
+    @media (max-width: 600px) {
+      .packs-grid { grid-template-columns: 1fr 1fr; }
+      .hero h1 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div style="display:flex;align-items:center;gap:1.2rem;">
+      <a href="event-list.html" class="brand">
+        <div class="brand-icon">C</div>
+        <strong>CultureWave</strong>
+      </a>
+      <span style="font-size:0.78rem;color:var(--muted);">/ Buy Credits</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div class="wallet-badge">
+        &#128176; <strong id="walletBalance">0</strong> credits <span>available</span>
+      </div>
+      <a href="event-list.html" style="font-size:0.82rem;font-weight:700;color:var(--muted);padding:0.4rem 0.75rem;border:1px solid var(--border);border-radius:9px;background:#fff;">&#8592; Back</a>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-content">
+      <h1>&#128176; Buy Credits</h1>
+      <p>Credits power your ticket delivery. Each ticket sent costs 2 credits (&#8377;4). Buy once, use anytime.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="val">2</div>
+          <div class="lbl">Credits per ticket</div>
+        </div>
+        <div class="hero-stat">
+          <div class="val">&#8377;2</div>
+          <div class="lbl">Per credit</div>
+        </div>
+        <div class="hero-stat">
+          <div class="val">&#8377;4</div>
+          <div class="lbl">Per ticket sent</div>
+        </div>
+        <div class="hero-stat">
+          <div class="val" id="heroBalance">0</div>
+          <div class="lbl">Your balance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num" style="background:linear-gradient(135deg,#1454ff,#4c7dff);">1</div>
+      <div>
+        <h3>Buy a credit pack</h3>
+        <p>Choose a pack below or enter a custom amount. Credits never expire.</p>
+      </div>
+    </div>
+    <div class="how-card">
+      <div class="how-num" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">2</div>
+      <div>
+        <h3>Credits added instantly</h3>
+        <p>Credits are added to your wallet immediately after payment.</p>
+      </div>
+    </div>
+    <div class="how-card">
+      <div class="how-num" style="background:linear-gradient(135deg,#059669,#34d399);">3</div>
+      <div>
+        <h3>Send tickets automatically</h3>
+        <p>2 credits deducted per ticket sent via WhatsApp or Email.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREDIT PACKS -->
+  <div class="section-title">&#127873; Choose a Credit Pack</div>
+  <div class="packs-grid" id="packsGrid">
+    <div class="pack-card" data-credits="100" data-price="200" onclick="selectPack(this)">
+      <div class="pack-icon">&#9889;</div>
+      <div class="pack-credits">100 <span>credits</span></div>
+      <div class="pack-price">&#8377;200</div>
+      <div class="pack-per">&#8377;2 per credit</div>
+      <div class="pack-tickets">= 50 tickets</div>
+    </div>
+    <div class="pack-card popular" data-credits="500" data-price="900" onclick="selectPack(this)">
+      <div class="popular-badge">&#128293; Most Popular</div>
+      <div class="pack-icon">&#128640;</div>
+      <div class="pack-credits">500 <span>credits</span></div>
+      <div class="pack-price">&#8377;900</div>
+      <div class="pack-per">&#8377;1.80 per credit</div>
+      <div class="pack-tickets">= 250 tickets</div>
+      <div class="pack-save">Save 10%</div>
+    </div>
+    <div class="pack-card" data-credits="1000" data-price="1600" onclick="selectPack(this)">
+      <div class="pack-icon">&#128081;</div>
+      <div class="pack-credits">1,000 <span>credits</span></div>
+      <div class="pack-price">&#8377;1,600</div>
+      <div class="pack-per">&#8377;1.60 per credit</div>
+      <div class="pack-tickets">= 500 tickets</div>
+      <div class="pack-save">Save 20%</div>
+    </div>
+    <div class="pack-card" data-credits="5000" data-price="7000" onclick="selectPack(this)">
+      <div class="pack-icon">&#127775;</div>
+      <div class="pack-credits">5,000 <span>credits</span></div>
+      <div class="pack-price">&#8377;7,000</div>
+      <div class="pack-per">&#8377;1.40 per credit</div>
+      <div class="pack-tickets">= 2,500 tickets</div>
+      <div class="pack-save">Save 30%</div>
+    </div>
+  </div>
+
+  <!-- CUSTOM AMOUNT -->
+  <div class="custom-card">
+    <h3>&#9881;&#65039; Custom Amount</h3>
+    <div class="custom-slider-wrap">
+      <span style="font-size:0.78rem;color:var(--muted);white-space:nowrap;">100 credits</span>
+      <input type="range" id="customSlider" min="100" max="10000" step="100" value="500" oninput="updateCustom(this.value)" />
+      <span style="font-size:0.78rem;color:var(--muted);white-space:nowrap;">10,000 credits</span>
+      <div class="custom-val" id="customVal">500 credits</div>
+    </div>
+    <div class="custom-breakdown">
+      <div class="cb-item"><div class="cv" id="cbCredits">500</div><div class="cl">Credits</div></div>
+      <div class="cb-item"><div class="cv" id="cbTickets">250</div><div class="cl">Tickets</div></div>
+      <div class="cb-item"><div class="cv" id="cbCost">&#8377;900</div><div class="cl">Total Cost</div></div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT -->
+  <div class="checkout-grid">
+
+    <!-- Payment form -->
+    <div class="checkout-card">
+      <h3>&#128179; Payment Details</h3>
+      <div style="font-size:0.76rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.6rem;">Payment Method</div>
+      <div class="pay-methods">
+        <div class="pay-method active" onclick="setPayMethod(this,'upi')">
+          <div class="pm-icon">&#128242;</div>
+          <div class="pm-label">UPI</div>
+        </div>
+        <div class="pay-method" onclick="setPayMethod(this,'card')">
+          <div class="pm-icon">&#128179;</div>
+          <div class="pm-label">Card</div>
+        </div>
+        <div class="pay-method" onclick="setPayMethod(this,'netbanking')">
+          <div class="pm-icon">&#127981;</div>
+          <div class="pm-label">Net Banking</div>
+        </div>
+      </div>
+
+      <!-- UPI section -->
+      <div id="upiSection">
+        <div class="field">
+          <label>UPI ID</label>
+          <input id="upiId" type="text" placeholder="yourname@upi" />
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+          <span style="font-size:0.72rem;color:var(--muted);">Quick:</span>
+          <button onclick="document.getElementById('upiId').value='yourname@gpay'" style="font-size:0.72rem;font-weight:700;color:var(--blue);background:var(--blue-soft);border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;">GPay</button>
+          <button onclick="document.getElementById('upiId').value='yourname@paytm'" style="font-size:0.72rem;font-weight:700;color:var(--blue);background:var(--blue-soft);border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;">Paytm</button>
+          <button onclick="document.getElementById('upiId').value='yourname@phonepe'" style="font-size:0.72rem;font-weight:700;color:var(--blue);background:var(--blue-soft);border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;">PhonePe</button>
+        </div>
+      </div>
+
+      <!-- Card section -->
+      <div id="cardSection" style="display:none;">
+        <div class="field"><label>Card Number</label><input type="text" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)" /></div>
+        <div class="grid-2">
+          <div class="field"><label>Expiry</label><input type="text" placeholder="MM / YY" maxlength="7" /></div>
+          <div class="field"><label>CVV</label><input type="password" placeholder="&#8226;&#8226;&#8226;" maxlength="4" /></div>
+        </div>
+        <div class="field"><label>Name on Card</label><input type="text" placeholder="Full name" /></div>
+      </div>
+
+      <!-- Net banking section -->
+      <div id="netbankingSection" style="display:none;">
+        <div class="field">
+          <label>Select Bank</label>
+          <select>
+            <option value="">Choose your bank</option>
+            <option>SBI</option><option>HDFC Bank</option><option>ICICI Bank</option>
+            <option>Axis Bank</option><option>Kotak Mahindra</option><option>Yes Bank</option>
+            <option>Punjab National Bank</option><option>Bank of Baroda</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:10px;padding:0.65rem 0.85rem;font-size:0.74rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem;">
+        &#128274; Payments are secured by Razorpay. Your card details are never stored.
+      </div>
+    </div>
+
+    <!-- Order summary -->
+    <div class="order-summary">
+      <h3>&#128203; Order Summary</h3>
+      <div class="os-row"><span class="lbl">Pack</span><span class="val" id="osPack">500 Credits</span></div>
+      <div class="os-row"><span class="lbl">Credits</span><span class="val" id="osCredits">500</span></div>
+      <div class="os-row"><span class="lbl">Tickets covered</span><span class="val" id="osTickets">250 tickets</span></div>
+      <div class="os-row"><span class="lbl">Rate</span><span class="val" id="osRate">&#8377;1.80 / credit</span></div>
+      <div class="os-row"><span class="lbl">Subtotal</span><span class="val" id="osSubtotal">&#8377;900</span></div>
+      <div class="os-total">
+        <span class="lbl">Total</span>
+        <span class="val" id="osTotal">&#8377;900</span>
+      </div>
+      <button class="btn-pay" onclick="processPayment()">
+        &#128176; Pay &amp; Add Credits
+      </button>
+      <div class="secure-note">&#128274; Secured by Razorpay &middot; 256-bit SSL</div>
+
+      <!-- Current balance -->
+      <div style="margin-top:1rem;padding:0.75rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;">
+        <div style="font-size:0.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;">After Purchase</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.78rem;color:var(--muted);">New Balance</span>
+          <span style="font-size:1rem;font-weight:800;color:var(--blue);" id="newBalance">500 credits</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="checkout-card" style="margin-top:1rem;">
+    <h3 style="margin-bottom:0.9rem;">&#128200; Transaction History</h3>
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Description</th><th>Credits</th><th>Amount</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody">
+          <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">No transactions yet. Purchase your first credit pack above.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="success-icon">&#127881;</div>
+    <h2>Credits Added!</h2>
+    <p>Your credits have been added to your wallet instantly.</p>
+    <div class="credit-added" id="modalCredits">+500 credits</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1.2rem;">New balance: <strong id="modalBalance">500 credits</strong></div>
+    <button class="btn-primary" onclick="closeSuccess()">&#127915; Start Sending Tickets</button>
+  </div>
+</div>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8",
+});
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+// ── STATE ──
+let selectedCredits = 500;
+let selectedPrice = 900;
+let walletCredits = 0;
+let uid = null;
+
+// pricing tiers: credits -> price per credit
+function calcPrice(credits) {
+  if (credits >= 5000) return Math.round(credits * 1.4);
+  if (credits >= 1000) return Math.round(credits * 1.6);
+  if (credits >= 500)  return Math.round(credits * 1.8);
+  return credits * 2;
+}
+function rateLabel(credits) {
+  if (credits >= 5000) return '₹1.40';
+  if (credits >= 1000) return '₹1.60';
+  if (credits >= 500)  return '₹1.80';
+  return '₹2.00';
+}
+
+// ── AUTH ──
+async function loadUser() {
+  // try session API first
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (res.ok) {
+      const { user } = await res.json();
+      uid = user.uid;
+    }
+  } catch(e) {}
+
+  // fallback: firebase auth state
+  if (!uid) {
+    await new Promise(resolve => {
+      auth.onAuthStateChanged(user => {
+        if (user) uid = user.uid;
+        resolve();
+      });
+    });
+  }
+
+  if (uid) {
+    // real-time wallet listener — updates instantly on any change
+    db.collection('wallets').doc(uid).onSnapshot(doc => {
+      walletCredits = doc.exists ? (doc.data().credits || 0) : 0;
+      updateWalletUI();
+    });
+    loadHistory();
+  }
+}
+function updateWalletUI() {
+  document.getElementById('walletBalance').textContent = walletCredits.toLocaleString('en-IN');
+  document.getElementById('heroBalance').textContent = walletCredits.toLocaleString('en-IN');
+  document.getElementById('newBalance').textContent = (walletCredits + selectedCredits).toLocaleString('en-IN') + ' credits';
+}
+
+// ── PACK SELECTION ──
+window.selectPack = function(el) {
+  document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCredits = +el.dataset.credits;
+  selectedPrice = +el.dataset.price;
+  updateOrderSummary();
+  // sync slider
+  document.getElementById('customSlider').value = selectedCredits;
+  updateCustom(selectedCredits, false);
+};
+
+// ── CUSTOM SLIDER ──
+window.updateCustom = function(val, deselect = true) {
+  val = +val;
+  selectedCredits = val;
+  selectedPrice = calcPrice(val);
+  document.getElementById('customVal').textContent = val.toLocaleString('en-IN') + ' credits';
+  document.getElementById('cbCredits').textContent = val.toLocaleString('en-IN');
+  document.getElementById('cbTickets').textContent = Math.floor(val / 2).toLocaleString('en-IN');
+  document.getElementById('cbCost').innerHTML = '₹' + selectedPrice.toLocaleString('en-IN');
+  if (deselect) document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('selected'));
+  updateOrderSummary();
+};
+
+// ── ORDER SUMMARY ──
+function updateOrderSummary() {
+  const total = selectedPrice;
+  document.getElementById('osPack').textContent = selectedCredits.toLocaleString('en-IN') + ' Credits';
+  document.getElementById('osCredits').textContent = selectedCredits.toLocaleString('en-IN');
+  document.getElementById('osTickets').textContent = Math.floor(selectedCredits / 2).toLocaleString('en-IN') + ' tickets';
+  document.getElementById('osRate').innerHTML = rateLabel(selectedCredits) + ' / credit';
+  document.getElementById('osSubtotal').innerHTML = '₹' + selectedPrice.toLocaleString('en-IN');
+  document.getElementById('osTotal').innerHTML = '₹' + total.toLocaleString('en-IN');
+  document.getElementById('newBalance').textContent = (walletCredits + selectedCredits).toLocaleString('en-IN') + ' credits';
+}
+
+// ── PAYMENT METHOD ──
+window.setPayMethod = function(el, method) {
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('upiSection').style.display = method === 'upi' ? '' : 'none';
+  document.getElementById('cardSection').style.display = method === 'card' ? '' : 'none';
+  document.getElementById('netbankingSection').style.display = method === 'netbanking' ? '' : 'none';
+};
+
+// ── CARD FORMAT ──
+window.fmtCard = function(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,16);
+  input.value = v.replace(/(.{4})/g,'$1 ').trim();
+};
+
+// ── PROCESS PAYMENT ──
+window.processPayment = async function() {
+  const btn = document.querySelector('.btn-pay');
+  btn.innerHTML = '&#9203; Processing...';
+  btn.disabled = true;
+  await new Promise(r => setTimeout(r, 1800));
+  try {
+    // ensure uid via firebase auth fallback
+    if (!uid) {
+      const user = auth.currentUser;
+      if (user) uid = user.uid;
+    }
+    if (uid) {
+      await db.collection('wallets').doc(uid).set(
+        { credits: firebase.firestore.FieldValue.increment(selectedCredits) },
+        { merge: true }
+      );
+      await db.collection('creditTransactions').add({
+        uid, credits: selectedCredits, amount: selectedPrice,
+        total: selectedPrice, type: 'purchase', status: 'success',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      // re-read from firestore to confirm actual balance
+      const doc = await db.collection('wallets').doc(uid).get();
+      walletCredits = doc.exists ? (doc.data().credits || 0) : walletCredits;
+    } else {
+      // no auth — update local only (demo mode)
+      walletCredits += selectedCredits;
+    }
+    updateWalletUI();
+    document.getElementById('modalCredits').textContent = '+' + selectedCredits.toLocaleString('en-IN') + ' credits';
+    document.getElementById('modalBalance').textContent = walletCredits.toLocaleString('en-IN') + ' credits';
+    document.getElementById('successModal').classList.add('open');
+    loadHistory();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+  btn.innerHTML = '&#128176; Pay &amp; Add Credits';
+  btn.disabled = false;
+};
+
+// ── HISTORY ──
+async function loadHistory() {
+  if (!uid) return;
+  try {
+    const snap = await db.collection('creditTransactions').where('uid','==',uid).orderBy('createdAt','desc').limit(10).get();
+    const tbody = document.getElementById('historyBody');
+    if (snap.empty) return;
+    tbody.innerHTML = snap.docs.map(d => {
+      const t = d.data();
+      const date = t.createdAt?.toDate?.()?.toLocaleDateString('en-IN') || '—';
+      const badge = t.status === 'success' ? 'success' : 'pending';
+      const label = t.type === 'purchase' ? '&#128176; Credit Purchase' : '&#127915; Ticket Send';
+      const sign = t.type === 'purchase' ? '+' : '-';
+      return `<tr>
+        <td>${date}</td>
+        <td>${label}</td>
+        <td style="font-weight:800;color:${t.type==='purchase'?'var(--green)':'var(--red)'}">${sign}${t.credits}</td>
+        <td>&#8377;${(t.total||t.amount||0).toLocaleString('en-IN')}</td>
+        <td><span class="badge ${badge}">${t.status}</span></td>
+      </tr>`;
+    }).join('');
+  } catch(e) {}
+}
+
+window.closeSuccess = function() {
+  document.getElementById('successModal').classList.remove('open');
+  window.location.href = 'event-create.html';
+};
+
+// ── INIT ──
+loadUser();
+updateOrderSummary();
+// auto-select popular pack
+document.querySelector('.pack-card.popular').classList.add('selected');
+</script>
+</body>
+</html>

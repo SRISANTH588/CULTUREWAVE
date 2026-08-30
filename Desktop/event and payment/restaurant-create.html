@@ -1,0 +1,2861 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CultureWave | Create Restaurant Listing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #dc2626;
+      --blue-2: #f97316;
+      --blue-light: #fff1f2;
+      --blue-soft: #fff8f5;
+      --border: #dbe4f0;
+      --muted: #64748b;
+      --text: #0f172a;
+      --green: #10b981;
+      --red: #ef4444;
+      --sidebar-w: 270px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Manrope, sans-serif; background: #f4f6fb; color: var(--text); font-size: 14px; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea, select { font: inherit; }
+
+    /* TOPBAR */
+    .topbar {
+      background: #fff; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+      box-shadow: 0 2px 12px rgba(20,84,255,0.06);
+    }
+    .topbar-inner {
+      max-width: 1400px; margin: 0 auto;
+      padding: 0 1.2rem; height: 62px;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.6rem; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 0.9rem;
+    }
+    .brand strong { font-size: 1rem; letter-spacing: -0.04em; color: var(--text); }
+    .topbar-right { display: flex; align-items: center; gap: 0.6rem; }
+    .tb-ghost {
+      padding: 0.45rem 0.8rem; border-radius: 9px;
+      border: 1px solid var(--border); background: #fff;
+      color: var(--muted); font-weight: 700; font-size: 0.82rem; cursor: pointer;
+    }
+    .tb-primary {
+      padding: 0.45rem 0.9rem; border-radius: 9px; border: 0;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      color: #fff; font-weight: 800; font-size: 0.82rem; cursor: pointer;
+      box-shadow: 0 3px 12px rgba(20,84,255,0.25);
+    }
+    .tb-avatar {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 0.82rem;
+    }
+    .event-title-bar {
+      display: flex; align-items: center; gap: 0.7rem;
+    }
+    .event-title-bar span {
+      font-size: 0.9rem; font-weight: 800; color: var(--text);
+      max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .draft-badge {
+      padding: 0.2rem 0.55rem; border-radius: 999px;
+      background: #fef3c7; color: #92400e;
+      font-size: 0.68rem; font-weight: 800;
+    }
+    .progress-wrap { display: flex; align-items: center; gap: 0.6rem; }
+    .progress-track {
+      width: 140px; height: 7px; border-radius: 999px;
+      background: var(--blue-light); overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), var(--blue-2));
+      transition: width 0.4s ease;
+    }
+    .progress-pct { font-size: 0.78rem; font-weight: 800; color: var(--blue); }
+
+    /* LAYOUT */
+    .layout {
+      max-width: 1400px; margin: 0 auto;
+      padding: 1rem 1.2rem;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) minmax(0,1fr);
+      gap: 1rem; align-items: start;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 18px; padding: 0.8rem;
+      position: sticky; top: 74px;
+      max-height: calc(100vh - 90px);
+      overflow-y: auto;
+      box-shadow: 0 4px 16px rgba(20,84,255,0.05);
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+    .sidebar::-webkit-scrollbar-thumb:hover { background: #b0bec5; }
+    .sidebar-head {
+      padding: 0.2rem 0.3rem 0.7rem;
+      border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;
+    }
+    .sidebar-head strong { display: block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); }
+    .sidebar-head span { font-size: 0.74rem; color: var(--muted); margin-top: 0.1rem; display: block; }
+    .step-nav { display: flex; flex-direction: column; gap: 0.25rem; }
+    .step-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.6rem 0.65rem; border-radius: 12px;
+      border: 1px solid transparent; background: transparent;
+      color: #475569; font-weight: 700; font-size: 0.84rem;
+      cursor: pointer; text-align: left; width: 100%;
+      transition: background 0.12s, color 0.12s;
+    }
+    .step-btn:hover { background: #f4f6fb; color: var(--text); }
+    .step-btn.active {
+      background: var(--blue-light); color: var(--blue);
+      border-color: rgba(20,84,255,0.18);
+    }
+    .step-btn.done { color: var(--green); }
+    .step-btn.done .step-num { background: #d1fae5; color: var(--green); }
+    .step-num {
+      width: 24px; height: 24px; border-radius: 7px;
+      background: #f1f5f9; color: var(--muted);
+      display: grid; place-items: center;
+      font-size: 0.7rem; font-weight: 800; flex: none;
+    }
+    .step-btn.active .step-num { background: rgba(20,84,255,0.15); color: var(--blue); }
+    .step-info strong { display: block; font-size: 0.84rem; }
+    .step-info span { font-size: 0.72rem; color: var(--muted); }
+    .step-btn.active .step-info span { color: rgba(20,84,255,0.7); }
+    .step-check { margin-left: auto; font-size: 0.8rem; }
+
+    /* CONTENT */
+    .content { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    /* ALERT */
+    .alert {
+      border-radius: 14px; padding: 0.75rem 0.9rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      border: 1px solid #fde68a; background: #fffbeb;
+    }
+    .alert.success { border-color: #a7f3d0; background: #ecfdf5; }
+    .alert.error { border-color: #fca5a5; background: #fef2f2; }
+    .alert-icon {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: #fef3c7; display: grid; place-items: center;
+      font-size: 0.9rem; flex: none;
+    }
+    .alert.error .alert-icon { background: #fee2e2; }
+    .alert.success .alert-icon { background: #d1fae5; }
+    .alert-body strong { display: block; font-size: 0.84rem; color: #92400e; }
+    .alert.error .alert-body strong { color: #991b1b; }
+    .alert.success .alert-body strong { color: #065f46; }
+    .alert-body span { font-size: 0.76rem; color: var(--muted); }
+
+    /* STEP PANELS */
+    .step-panel { display: none; flex-direction: column; gap: 0.75rem; }
+    .step-panel.active { display: flex; }
+
+    /* CARD */
+    .card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 18px; padding: 1.1rem;
+      box-shadow: 0 4px 16px rgba(20,84,255,0.04);
+    }
+    .card-head { margin-bottom: 1rem; }
+    .card-head h2 { font-size: 0.96rem; font-weight: 800; letter-spacing: -0.03em; }
+    .card-head p { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* FIELDS */
+    .field { display: grid; gap: 0.35rem; }
+    .field label { font-size: 0.78rem; font-weight: 800; color: #475569; }
+    .field label .req { color: var(--red); margin-left: 2px; }
+    .field input, .field textarea, .field select {
+      width: 100%; border: 1px solid var(--border);
+      border-radius: 11px; padding: 0.72rem 0.85rem;
+      background: #fff; color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(20,84,255,0.1);
+    }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .field-hint { font-size: 0.72rem; color: var(--muted); }
+    .field-count { font-size: 0.72rem; color: var(--muted); text-align: right; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+
+    /* TICKET ROW */
+    .ticket-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.75rem 0.85rem; border-radius: 12px;
+      background: var(--blue-soft); border: 1px solid var(--border);
+    }
+    .ticket-row .tr-name { flex: 1; font-weight: 700; font-size: 0.86rem; }
+    .ticket-row .tr-price { font-weight: 800; color: var(--blue); font-size: 0.86rem; }
+    .ticket-row .tr-qty { font-size: 0.78rem; color: var(--muted); }
+    .tr-del {
+      width: 28px; height: 28px; border-radius: 8px;
+      border: 1px solid #fca5a5; background: #fef2f2;
+      color: var(--red); cursor: pointer; display: grid; place-items: center; font-size: 0.8rem;
+    }
+    .add-ticket-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.65rem 0.85rem; border-radius: 11px;
+      border: 1px dashed rgba(20,84,255,0.3); background: var(--blue-soft);
+      color: var(--blue); font-weight: 800; font-size: 0.82rem;
+      cursor: pointer; width: 100%; justify-content: center;
+    }
+
+    /* COUPON ROW */
+    .coupon-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.65rem 0.85rem; border-radius: 12px;
+      background: var(--blue-soft); border: 1px solid var(--border);
+    }
+    .coupon-row .cr-code { font-weight: 800; font-size: 0.86rem; color: var(--blue); flex: 1; }
+    .coupon-row .cr-val { font-size: 0.78rem; color: var(--muted); }
+
+    /* FAQ ROW */
+    .faq-row {
+      border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; background: #fff;
+    }
+    .faq-q {
+      padding: 0.7rem 0.85rem; font-weight: 700; font-size: 0.86rem;
+      background: var(--blue-soft); border-bottom: 1px solid var(--border);
+    }
+    .faq-a { padding: 0.65rem 0.85rem; font-size: 0.82rem; color: var(--muted); }
+
+    /* MEDIA UPLOAD */
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: 14px;
+      padding: 2rem; text-align: center; cursor: pointer;
+      background: var(--blue-soft); transition: border-color 0.15s;
+    }
+    .upload-zone:hover { border-color: var(--blue); }
+    .upload-zone .uz-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .upload-zone strong { display: block; font-size: 0.9rem; color: var(--text); }
+    .upload-zone span { font-size: 0.78rem; color: var(--muted); }
+    .cover-preview {
+      width: 100%; height: 180px; border-radius: 14px;
+      object-fit: cover; border: 1px solid var(--border); display: none;
+    }
+
+    /* TOGGLE */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 0.85rem; border-radius: 12px;
+      background: var(--blue-soft); border: 1px solid var(--border);
+    }
+    .toggle-row strong { font-size: 0.86rem; }
+    .toggle-row span { font-size: 0.76rem; color: var(--muted); display: block; margin-top: 0.1rem; }
+    .toggle {
+      width: 44px; height: 24px; border-radius: 999px;
+      background: #e2e8f0; border: 0; cursor: pointer;
+      position: relative; transition: background 0.2s; flex: none;
+    }
+    .toggle.on { background: var(--blue); }
+    .toggle::after {
+      content: ''; position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; transition: left 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .toggle.on::after { left: 23px; }
+
+    /* RSVP FIELD ROW */
+    .rsvp-fr{display:flex;align-items:center;gap:.75rem;padding:.8rem 1rem;border-radius:14px;background:#fff;border:1px solid var(--border);margin-bottom:.5rem;box-shadow:0 1px 4px rgba(15,23,42,.04);}
+    .rsvp-fr.locked{background:#f8fafc;}
+    .rsvp-fr .fr-drag{color:#cbd5e1;font-size:.9rem;flex:none;cursor:grab;width:16px;text-align:center;}
+    .rsvp-fr .fr-icon{width:40px;height:40px;border-radius:11px;background:#f1f5f9;border:1px solid var(--border);display:grid;place-items:center;font-size:1.1rem;flex:none;}
+    .rsvp-fr .fr-info{flex:1;}
+    .rsvp-fr .fr-info strong{display:block;font-size:.9rem;font-weight:800;color:var(--text);}
+    .rsvp-fr .fr-info span{font-size:.76rem;color:var(--muted);margin-top:.1rem;display:block;}
+    .rsvp-fr .fr-right{display:flex;align-items:center;gap:.55rem;}
+    .fr-badge{font-size:.72rem;font-weight:800;padding:.22rem .6rem;border-radius:999px;}
+    .fr-badge.req{background:#fee2e2;color:#991b1b;}
+    .fr-badge.on{color:var(--green);font-size:.78rem;}
+    .fr-badge.off{color:var(--muted);font-size:.78rem;}
+    /* RSVP PREVIEW */
+    .rsvp-pv-wrap{position:sticky;top:74px;display:flex;flex-direction:column;gap:.75rem;}
+    .rsvp-pv-label{display:flex;align-items:center;justify-content:space-between;}
+    .rsvp-pv-label span{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);display:flex;align-items:center;gap:.4rem;}
+    .rsvp-pv-label span::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;box-shadow:0 0 0 3px rgba(34,197,94,.2);}
+    .rsvp-pv-toggle-btn{font-size:.7rem;font-weight:700;padding:.28rem .75rem;border-radius:999px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .2s;}
+    .rsvp-pv-toggle-btn.active{background:#1454ff;color:#fff;border-color:#1454ff;}
+    .rsvp-pv-phone{background:linear-gradient(160deg,#1e293b 0%,#0f172a 100%);border-radius:36px;padding:10px;box-shadow:0 24px 64px rgba(15,23,42,.35),0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.08);}
+    .rsvp-pv-notch{width:80px;height:20px;background:#0f172a;border-radius:0 0 14px 14px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;gap:5px;}
+    .rsvp-pv-notch-cam{width:7px;height:7px;border-radius:50%;background:#1e293b;border:1px solid #334155;}
+    .rsvp-pv-notch-pill{width:28px;height:5px;border-radius:999px;background:#1e293b;border:1px solid #334155;}
+    .rsvp-pv-screen{border-radius:26px;overflow:hidden;background:#f8fafc;}
+    .rsvp-pv-statusbar{background:linear-gradient(135deg,#1454ff,#4c7dff);display:flex;align-items:center;justify-content:space-between;padding:.35rem .9rem;}
+    .rsvp-pv-statusbar-time{font-size:.6rem;font-weight:800;color:#fff;}
+    .rsvp-pv-statusbar-icons{display:flex;align-items:center;gap:.3rem;font-size:.55rem;color:rgba(255,255,255,.8);}
+    .rsvp-pv-card{background:transparent;}
+    .rsvp-pv-bar{background:linear-gradient(135deg,#1454ff,#4c7dff);padding:1.1rem 1.25rem 1rem;}
+    .rsvp-pv-dots{display:flex;gap:.4rem;margin-bottom:.8rem;}
+    .rsvp-pv-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s;}
+    .rsvp-pv-dot.active{background:#fff;width:24px;border-radius:4px;box-shadow:0 0 8px rgba(255,255,255,.5);}
+    .rsvp-pv-tag{display:inline-flex;align-items:center;gap:.3rem;font-size:.6rem;font-weight:800;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.1em;background:rgba(255,255,255,.12);border-radius:999px;padding:.18rem .55rem;margin-bottom:.5rem;}
+    .rsvp-pv-ename{font-size:1rem;font-weight:900;color:#fff;line-height:1.25;letter-spacing:-.01em;margin-bottom:.75rem;text-shadow:0 1px 4px rgba(0,0,0,.2);}
+    .rsvp-pv-prog-track{background:rgba(255,255,255,.2);border-radius:999px;height:4px;}
+    .rsvp-pv-prog-fill{height:4px;border-radius:999px;background:#fff;width:0%;transition:width .4s cubic-bezier(.4,0,.2,1);box-shadow:0 0 6px rgba(255,255,255,.6);}
+    .rsvp-pv-prog-meta{display:flex;justify-content:space-between;margin-top:.3rem;}
+    .rsvp-pv-prog-meta span{font-size:.58rem;color:rgba(255,255,255,.6);}
+    .rsvp-pv-prog-meta strong{font-size:.58rem;color:rgba(255,255,255,.85);font-weight:800;}
+    .rsvp-pv-body{padding:1rem 1.1rem;max-height:340px;overflow-y:auto;background:#f8fafc;}
+    .rsvp-pv-body::-webkit-scrollbar{width:3px;}
+    .rsvp-pv-body::-webkit-scrollbar-thumb{background:#dbe4f0;border-radius:999px;}
+    .rpf-section{font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin:1rem 0 .5rem;padding-bottom:.35rem;border-bottom:1px solid #e2e8f0;}
+    .rpf-section:first-child{margin-top:0;}
+    .rpf-group{margin-bottom:.7rem;}
+    .rpf-label{font-size:.7rem;font-weight:800;color:#334155;margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem;}
+    .rpf-req{color:#ef4444;}
+    .rpf-input{background:#fff;border:1.5px solid #e2e8f0;border-radius:11px;padding:.65rem .9rem;font-size:.84rem;color:#94a3b8;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(15,23,42,.06);transition:border .2s;}
+    .rpf-input.is-select::after{content:'\25BE';color:#cbd5e1;font-size:.8rem;}
+    .rpf-input.is-textarea{min-height:56px;align-items:flex-start;}
+    .rpf-checkbox{display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;background:#fff;border:1.5px solid #e2e8f0;border-radius:11px;font-size:.84rem;color:#94a3b8;}
+    .rpf-checkbox-box{width:15px;height:15px;border-radius:4px;border:1.5px solid #cbd5e1;flex:none;}
+    .rsvp-pv-footer{background:#fff;padding:1rem 1.1rem;border-top:1px solid #f1f5f9;}
+    .rsvp-pv-submit{height:46px;background:linear-gradient(135deg,#1454ff,#4c7dff);border-radius:14px;display:grid;place-items:center;box-shadow:0 6px 20px rgba(20,84,255,.35);cursor:pointer;transition:transform .15s;}
+    .rsvp-pv-submit:hover{transform:translateY(-1px);}
+    .rsvp-pv-submit span{font-size:.82rem;font-weight:800;color:#fff;letter-spacing:.02em;}
+    .rsvp-pv-tc{font-size:.72rem;color:#94a3b8;display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:.6rem;}
+    .rsvp-pv-tc-box{width:13px;height:13px;border-radius:4px;border:1.5px solid #cbd5e1;flex:none;}
+    .rsvp-pv-confirm{background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #a7f3d0;border-radius:14px;padding:1.25rem 1.1rem;margin:.85rem 1.1rem;display:none;text-align:center;}
+    .rsvp-pv-confirm .cicon{font-size:2rem;margin-bottom:.45rem;}
+    .rsvp-pv-confirm .cmsg{font-size:.84rem;color:#065f46;font-weight:700;line-height:1.55;}
+    .rsvp-pv-counts{display:flex;justify-content:space-between;align-items:center;padding:.6rem 1rem;background:#fff;border-top:1px solid #f1f5f9;font-size:.72rem;color:var(--muted);}
+    .rsvp-pv-counts span{display:flex;align-items:center;gap:.3rem;}
+    .rsvp-pv-counts span::before{content:'';width:5px;height:5px;border-radius:50%;background:#dbe4f0;display:inline-block;}
+
+    /* STEP ACTIONS */
+    .step-actions {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 0.6rem; flex-wrap: wrap;
+      padding-top: 0.5rem;
+    }
+    .btn-ghost {
+      padding: 0.6rem 1rem; border-radius: 11px;
+      border: 1px solid var(--border); background: #fff;
+      color: #475569; font-weight: 700; font-size: 0.84rem; cursor: pointer;
+    }
+    .btn-primary {
+      padding: 0.6rem 1.2rem; border-radius: 11px; border: 0;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      color: #fff; font-weight: 800; font-size: 0.84rem; cursor: pointer;
+      box-shadow: 0 3px 12px rgba(20,84,255,0.25);
+    }
+    .btn-success {
+      padding: 0.6rem 1.2rem; border-radius: 11px; border: 0;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      color: #fff; font-weight: 800; font-size: 0.84rem; cursor: pointer;
+      box-shadow: 0 3px 12px rgba(16,185,129,0.25);
+    }
+
+    /* TICKET MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+      display: none; place-items: center; z-index: 100; padding: 1rem;
+    }
+    .modal-overlay.open { display: grid; }
+    .modal {
+      background: #fff; border-radius: 20px; padding: 1.3rem;
+      width: min(480px, 100%);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+    .modal h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.9rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+
+    /* SCHEDULE PREMIUM */
+    .sched-info-box {
+      background: var(--blue-soft); border: 1px solid var(--border);
+      border-radius: 14px; padding: 0.9rem 1rem;
+    }
+    .sched-info-box h3 { font-size: 0.92rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .sched-how-list { display: flex; flex-direction: column; gap: 0.4rem; }
+    .sched-how-item {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      font-size: 0.82rem; color: var(--muted);
+    }
+    .sched-how-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--blue); color: #fff;
+      font-size: 0.68rem; font-weight: 800;
+      display: grid; place-items: center; flex: none; margin-top: 1px;
+    }
+    .date-card {
+      border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; background: #fff;
+      box-shadow: 0 2px 10px rgba(20,84,255,0.04);
+    }
+    .date-card-head {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      background: linear-gradient(135deg, var(--blue-soft), #fff);
+      border-bottom: 1px solid var(--border);
+    }
+    .date-card-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      display: grid; place-items: center;
+      color: #fff; font-size: 1rem; flex: none;
+    }
+    .date-card-label { flex: 1; }
+    .date-card-label strong { display: block; font-size: 0.9rem; font-weight: 800; color: var(--text); }
+    .date-card-label span { font-size: 0.74rem; color: var(--muted); }
+    .date-card-body { padding: 0.85rem 1rem; }
+    .slot-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.6rem 0.75rem; border-radius: 10px;
+      background: var(--blue-soft); border: 1px solid var(--border);
+      margin-bottom: 0.4rem;
+    }
+    .slot-row .slot-name { flex: 1; font-weight: 700; font-size: 0.84rem; }
+    .slot-row .slot-time { font-size: 0.76rem; color: var(--muted); }
+    .slot-row .slot-cap { font-size: 0.74rem; color: var(--blue); font-weight: 800; }
+    .add-slot-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      width: 100%; padding: 0.55rem; border-radius: 10px;
+      border: 1px dashed rgba(20,84,255,0.3); background: transparent;
+      color: var(--blue); font-weight: 700; font-size: 0.8rem; cursor: pointer;
+      transition: background 0.12s;
+    }
+    .add-slot-btn:hover { background: var(--blue-light); }
+    .schedule-hero {
+      border-radius: 18px; overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(20,84,255,0.08);
+    }
+    .schedule-hero-head {
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      padding: 1.2rem 1.3rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .schedule-hero-head h2 { font-size: 1rem; font-weight: 800; color: #fff; margin: 0; }
+    .schedule-hero-head p { font-size: 0.76rem; color: rgba(255,255,255,0.75); margin-top: 0.2rem; }
+    .schedule-hero-body { background: #fff; padding: 1.2rem 1.3rem; }
+    .datetime-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .datetime-block {
+      border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden;
+    }
+    .datetime-block-head {
+      background: var(--blue-soft); padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .datetime-block-head span { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); }
+    .datetime-block-head .dt-icon { font-size: 0.9rem; }
+    .datetime-block-body { padding: 0.75rem 0.85rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .dt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+    .timeline-bar {
+      display: flex; align-items: center; gap: 0; margin: 0.8rem 0;
+    }
+    .tl-dot {
+      width: 12px; height: 12px; border-radius: 50%; flex: none;
+      border: 2px solid var(--blue); background: #fff;
+    }
+    .tl-dot.filled { background: var(--blue); }
+    .tl-line { flex: 1; height: 2px; background: linear-gradient(90deg, var(--blue), var(--blue-2)); }
+    .tl-label { font-size: 0.7rem; font-weight: 800; color: var(--blue); margin: 0 0.4rem; white-space: nowrap; }
+    .capacity-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+    }
+    .cap-card {
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 0.85rem; text-align: center;
+      background: var(--blue-soft);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .cap-card:hover { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(20,84,255,0.08); }
+    .cap-card .cap-icon { font-size: 1.3rem; margin-bottom: 0.35rem; }
+    .cap-card label { font-size: 0.72rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 0.4rem; }
+    .cap-card input, .cap-card select {
+      width: 100%; border: 1px solid var(--border); border-radius: 9px;
+      padding: 0.55rem 0.6rem; background: #fff; color: var(--text);
+      text-align: center; font-weight: 700; outline: none;
+    }
+    .cap-card input:focus, .cap-card select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(20,84,255,0.1); }
+    .recur-options {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;
+    }
+    .recur-btn {
+      padding: 0.55rem 0.4rem; border-radius: 10px;
+      border: 1px solid var(--border); background: #fff;
+      color: #475569; font-weight: 700; font-size: 0.78rem;
+      cursor: pointer; text-align: center; transition: all 0.12s;
+    }
+    .recur-btn.active {
+      background: var(--blue-light); color: var(--blue);
+      border-color: rgba(20,84,255,0.25);
+    }
+    .session-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.7rem 0.85rem; border-radius: 12px;
+      background: var(--blue-soft); border: 1px solid var(--border);
+    }
+    .session-row .sr-label { flex: 1; font-weight: 700; font-size: 0.84rem; }
+    .session-row .sr-time { font-size: 0.78rem; color: var(--muted); }
+    .session-row .sr-cap { font-size: 0.74rem; color: var(--blue); font-weight: 800; }
+    .dur-chip {
+      padding: 0.32rem 0.75rem; border-radius: 8px;
+      border: 1px solid var(--border); background: #fff;
+      color: #475569; font-size: 0.78rem; font-weight: 700;
+      cursor: pointer; transition: all 0.12s;
+    }
+    .dur-chip.active {
+      background: var(--blue-light); color: var(--blue);
+      border-color: rgba(20,84,255,0.3);
+    }
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .topbar-inner { padding: 0 0.8rem; }
+      .layout { padding: 0.7rem; }
+      .progress-wrap { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- RESTAURANT HERO BANNER -->
+<div style="background:linear-gradient(135deg,#0a0a0a 0%,#7f1d1d 40%,#dc2626 80%,#f97316 100%);padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+  <div style="display:flex;align-items:center;gap:.85rem;">
+    <div style="font-size:1.8rem;">&#127869;</div>
+    <div>
+      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);">Restaurant Creator</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;">Create Restaurant Listing</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+    <span style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;color:#fff;">&#127860; Fine Dining</span>
+    <span style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;color:#fff;">&#9749; Cafe</span>
+    <span style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;color:#fff;">&#127867; Rooftop</span>
+    <span style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;color:#fff;">&#127859; Private Dining</span>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div style="display:flex;align-items:center;gap:1.2rem;">
+      <div class="brand">
+        <div class="brand-icon">C</div>
+        <strong>CultureWave</strong>
+      </div>
+      <div class="event-title-bar">
+        <span id="topEventTitle">Untitled Restaurant</span>
+        <span class="draft-badge" id="topBadge">Draft</span>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-ghost" id="saveDraftBtn">Save Draft</button>
+      <a href="credits.html" class="tb-ghost" style="display:flex;align-items:center;gap:0.4rem;">&#128176; <span id="topCredits">0</span> credits</a>
+      <button class="tb-primary" id="publishBtn">Publish Listing</button>
+      <div class="tb-avatar" id="topAvatar">U</div>
+    </div>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <strong>Restaurant Setup</strong>
+      <span>Complete all sections</span>
+    </div>
+    <nav class="step-nav" id="stepNav">
+      <button class="step-btn active" data-step="0">
+        <span class="step-num">1</span>
+        <div class="step-info"><strong>Basic Info</strong><span>Name, URL & description</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="1">
+        <span class="step-num">2</span>
+        <div class="step-info"><strong>Location</strong><span>Venue & address</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="2">
+        <span class="step-num">3</span>
+        <div class="step-info"><strong>Schedule</strong><span>Date, time & capacity</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="3">
+        <span class="step-num">4</span>
+        <div class="step-info"><strong>Tickets</strong><span>Pricing & availability</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="4">
+        <span class="step-num">5</span>
+        <div class="step-info"><strong>Ticket Design</strong><span>Style & branding</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="5">
+        <span class="step-num">6</span>
+        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="6">
+        <span class="step-num">7</span>
+        <div class="step-info"><strong>Booking Form</strong><span>Guest fields</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="7">
+        <span class="step-num">8</span>
+        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="8">
+        <span class="step-num">9</span>
+        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="9">
+        <span class="step-num">10</span>
+        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="10">
+        <span class="step-num">11</span>
+        <div class="step-info"><strong>Invite Only</strong><span>Access control & guests</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="11">
+        <span class="step-num">12</span>
+        <div class="step-info"><strong>Sold Out</strong><span>Mark & manage sold out</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="12">
+        <span class="step-num">13</span>
+        <div class="step-info"><strong>Settings</strong><span>Access & preferences</span></div>
+        <span class="step-check"></span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ALERT -->
+    <div class="alert" id="alertBox">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-body">
+        <strong id="alertTitle">Required fields missing</strong>
+        <span id="alertMsg">Complete Event Name, URL Key, Summary and Description to continue.</span>
+      </div>
+    </div>
+
+    <!-- STEP 0: BASIC INFO -->
+    <div class="step-panel active" data-panel="0">
+      <div class="card">
+        <div class="card-head"><h2>Event Name & URL</h2><p>Choose a memorable name and a unique URL slug</p></div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="eventName">Restaurant / Experience Name <span class="req">*</span></label>
+            <input id="eventName" type="text" placeholder="e.g. The Grand Dining Experience" />
+          </div>
+          <div class="field">
+            <label for="urlKey">URL Key <span class="req">*</span></label>
+            <input id="urlKey" type="text" placeholder="the-grand-dining-experience" />
+            <span class="field-hint">Lowercase letters, numbers and hyphens only.</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>One-Line Summary <span style="color:var(--red)">*</span></h2><p>Short preview shown on restaurant listings (max 120 chars)</p></div>
+        <div class="field">
+          <input id="summary" type="text" maxlength="120" placeholder="An exclusive fine dining experience with curated menus and live music" />
+          <span class="field-count" id="summaryCount">0 / 120</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Full Description <span style="color:var(--red)">*</span></h2><p>Detailed information about your event</p></div>
+        <div class="field">
+          <textarea id="description" placeholder="Describe the dining experience — cuisine type, ambience, chef specialties, dress code, inclusions and everything guests need to know..."></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Category & Tags</h2><p>Help attendees discover your event</p></div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="category">Category</label>
+            <select id="category">
+              <option value="">Select category</option>
+              <option>Music</option><option>Sports</option><option>Arts</option>
+              <option>Food & Drink</option><option>Business</option><option>Wellness</option>
+              <option>Education</option><option>Technology</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="tags">Tags</label>
+            <input id="tags" type="text" placeholder="yoga, wellness, retreat" />
+            <span class="field-hint">Comma separated</span>
+          </div>
+        </div>
+      </div>
+      <div class="step-actions">
+        <a class="btn-ghost" href="premium-client-dashboard.html">← Back to Restaurant</a>
+        <button class="btn-primary" onclick="goStep(1)">Next: Location →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: LOCATION -->
+    <div class="step-panel" data-panel="1">
+      <div class="card">
+        <div class="card-head"><h2>Dining Type</h2><p>What kind of dining experience is this?</p></div>
+        <div class="grid-2">
+          <div class="toggle-row" id="typeInPerson" style="cursor:pointer;" onclick="setEventType('in-person')">
+            <div><strong>🍽️ Dine-In</strong><span>In-restaurant dining experience</span></div>
+            <span id="typeInPersonCheck" style="font-size:1.1rem;color:var(--blue);">✓</span>
+          </div>
+          <div class="toggle-row" id="typeOnline" style="cursor:pointer;" onclick="setEventType('online')">
+            <div><strong>🚗 Private / Outdoor</strong><span>Private dining or outdoor setup</span></div>
+            <span id="typeOnlineCheck" style="font-size:1.1rem;color:var(--muted);">○</span>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="venueCard">
+        <div class="card-head"><h2>Restaurant Location</h2><p>Where is your restaurant located?</p></div>
+        <div class="field" style="margin-bottom:0.75rem;">
+          <label for="venueName">Venue Name</label>
+          <input id="venueName" type="text" placeholder="e.g. The Grand Bistro, Rooftop Lounge" />
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="city">City</label>
+            <input id="city" type="text" placeholder="e.g. Hyderabad" />
+          </div>
+          <div class="field">
+            <label for="state">State</label>
+            <input id="state" type="text" placeholder="e.g. Telangana" />
+          </div>
+        </div>
+        <div class="field" style="margin-top:0.75rem;">
+          <label for="address">Full Address</label>
+          <textarea id="address" style="min-height:70px;" placeholder="Street, area, landmark, parking info..."></textarea>
+        </div>
+        <div class="field" style="margin-top:0.75rem;">
+          <label for="mapLink">Google Maps Link</label>
+          <input id="mapLink" type="url" placeholder="https://maps.google.com/..." />
+        </div>
+      </div>
+      <div class="card" id="onlineCard" style="display:none;">
+        <div class="card-head"><h2>Private / Outdoor Setup</h2><p>Provide details for the private dining setup</p></div>
+        <div class="field">
+          <label for="onlineLink">Event Link / Meeting URL</label>
+          <input id="onlineLink" type="url" placeholder="https://zoom.us/j/..." />
+          <span class="field-hint">Shared with confirmed attendees only</span>
+        </div>
+        <div class="field" style="margin-top:0.75rem;">
+          <label for="onlinePlatform">Platform</label>
+          <select id="onlinePlatform">
+            <option value="">Select platform</option>
+            <option>Zoom</option><option>Google Meet</option><option>Microsoft Teams</option>
+            <option>YouTube Live</option><option>Instagram Live</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(0)">← Back</button>
+        <button class="btn-primary" onclick="goStep(2)">Next: Schedule →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: SCHEDULE -->
+    <div class="step-panel" data-panel="2">
+      <input type="hidden" id="startDate" />
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:0.9rem;">
+          <div>
+            <h2 style="font-size:1rem;font-weight:800;letter-spacing:-0.03em;">&#128197; Dining Schedule</h2>
+            <p style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">Set your dining slots. Add multiple dates for recurring dining experiences.</p>
+          </div>
+          <button class="btn-primary" onclick="openAddDateModal()">+ Add Date</button>
+        </div>
+        <div class="sched-info-box">
+          <h3>How scheduling works</h3>
+          <div class="sched-how-list">
+            <div class="sched-how-item"><span class="sched-how-num">1</span><span>Add a date for each dining day</span></div>
+            <div class="sched-how-item"><span class="sched-how-num">2</span><span>Add time slots for lunch, dinner or special seatings on the same day</span></div>
+            <div class="sched-how-item"><span class="sched-how-num">3</span><span>Guests will choose a specific date + dining slot when booking</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="dateCardsList"></div>
+
+      <div id="schedEmptyState" style="text-align:center;padding:2.5rem 1rem;border:2px dashed var(--border);border-radius:16px;background:var(--blue-soft);">
+        <div style="font-size:2.2rem;margin-bottom:0.6rem;">&#128197;</div>
+        <strong style="display:block;font-size:0.92rem;color:var(--text);">No dining slots added yet</strong>
+        <p style="font-size:0.8rem;color:var(--muted);margin:0.3rem 0 1rem;">Click "Add Date" to set when your event takes place</p>
+        <button class="btn-primary" onclick="openAddDateModal()">+ Add First Date</button>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>&#9200; Dining Duration</h2><p>How long is each dining session? (in minutes)</p></div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.55rem;">
+          <button type="button" class="dur-chip" data-val="150" onclick="setDuration(150)">2.5h</button>
+          <button type="button" class="dur-chip" data-val="150" onclick="setDuration(150)">2.5h</button>
+          <button type="button" class="dur-chip" data-val="150" onclick="setDuration(150)">2.5h</button>
+          <button type="button" class="dur-chip" data-val="150" onclick="setDuration(150)">2.5h</button>
+          <button type="button" class="dur-chip" data-val="180" onclick="setDuration(180)">3h</button>
+        </div>
+        <div class="field">
+          <input id="eventDuration" type="number" min="1" placeholder="or type custom minutes e.g. 90" oninput="syncDurChips()" />
+          <span class="field-hint" id="durHint"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Global Settings</h2><p>Applies to all dates unless overridden per slot</p></div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="timezone">Timezone</label>
+            <select id="timezone">
+              <option value="IST">IST (UTC+5:30)</option>
+              <option value="UTC">UTC</option>
+              <option value="EST">EST (UTC-5)</option>
+              <option value="PST">PST (UTC-8)</option>
+              <option value="GMT">GMT</option>
+              <option value="SGT">SGT (UTC+8)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="capacity">Table / Seat Capacity per Slot</label>
+            <input id="capacity" type="number" min="1" placeholder="e.g. 20" />
+          </div>
+          <div class="field">
+            <label for="regDeadline">Registration Deadline</label>
+            <input id="regDeadline" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(1)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(3)">Next: Packages &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: TICKETS -->
+    <div class="step-panel" data-panel="3">
+
+      <!-- Mode toggle -->
+      <div class="card">
+        <div style="font-size:0.96rem;font-weight:800;margin-bottom:0.75rem;">&#127915; Pricing &amp; Packages</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+          <div id="ticketModeShared" onclick="setTicketMode('shared')" style="cursor:pointer;padding:0.85rem;border-radius:14px;border:2px solid var(--blue);background:var(--blue-light);">
+            <div style="font-size:0.9rem;font-weight:800;color:var(--blue);">&#9989; Same for all dates</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem;">One set of packages applies to every dining slot</div>
+          </div>
+          <div id="ticketModePerDate" onclick="setTicketMode('perdate')" style="cursor:pointer;padding:0.85rem;border-radius:14px;border:2px solid var(--border);background:#fff;">
+            <div style="font-size:0.9rem;font-weight:800;color:#475569;">&#127914; Different per date</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem;">Set separate packages for each dining date</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared tickets -->
+      <div id="sharedTicketsSection">
+        <div class="card">
+          <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
+            <div><h2>Dining Packages</h2><p>Available across all dining slots</p></div>
+            <button class="btn-primary" style="font-size:0.78rem;padding:0.4rem 0.75rem;" onclick="openTicketModal()">+ Add Package</button>
+          </div>
+          <div id="ticketList" style="display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:0.84rem;border:1px dashed var(--border);border-radius:12px;">No packages yet. Click "+ Add Package" to create your first dining package.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-date tickets -->
+      <div id="perDateTicketsSection" style="display:none;">
+        <div id="perDateTicketCards"></div>
+        <div id="perDateEmpty" style="text-align:center;padding:2rem;border:2px dashed var(--border);border-radius:16px;background:var(--blue-soft);font-size:0.84rem;color:var(--muted);">Go back to Schedule and add dining dates first, then set packages per date here.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Pricing Settings</h2><p>Configure fees and payment options</p></div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="currency">Currency</label>
+            <select id="currency">
+              <option value="INR">&#8377; INR</option>
+              <option value="USD">$ USD</option>
+              <option value="EUR">&euro; EUR</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="feeMode">Platform Fee</label>
+            <select id="feeMode">
+              <option value="absorb">I absorb the fee</option>
+              <option value="pass">Pass to guest</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(2)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: TICKET DESIGN -->
+    <div class="step-panel" data-panel="4">
+
+      <!-- 3-step process header -->
+      <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:none;padding:1.2rem 1.3rem;">
+        <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.45);margin-bottom:1rem;">How it works</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">
+          <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:0.9rem;">
+            <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#1454ff,#4c7dff);display:grid;place-items:center;font-size:0.75rem;font-weight:800;color:#fff;margin-bottom:0.6rem;">1</div>
+            <div style="font-size:0.84rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">Customize your dining pass</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.5;">Upload a banner, pick an accent color, and toggle which fields to display</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:0.9rem;">
+            <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:grid;place-items:center;font-size:0.75rem;font-weight:800;color:#fff;margin-bottom:0.6rem;">2</div>
+            <div style="font-size:0.84rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">Upload a CSV</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.5;">Add your guest list. AI auto-maps name, phone, and package columns</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:0.9rem;">
+            <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#059669,#34d399);display:grid;place-items:center;font-size:0.75rem;font-weight:800;color:#fff;margin-bottom:0.6rem;">3</div>
+            <div style="font-size:0.84rem;font-weight:800;color:#fff;margin-bottom:0.25rem;">Generate &amp; Send</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.5;">Each pass is generated as a unique image with a QR code and sent via WhatsApp</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1: Customize -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#1454ff,#4c7dff);display:grid;place-items:center;font-size:0.75rem;font-weight:800;color:#fff;flex:none;">1</div>
+          <div><div style="font-size:0.96rem;font-weight:800;">Customize Your Ticket</div><div style="font-size:0.76rem;color:var(--muted);">Design how the ticket looks when sent to attendees</div></div>
+        </div>
+
+        <!-- Live preview -->
+        <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">&#128065; Live Preview</div>
+          <div style="display:flex;justify-content:center;">
+            <div id="ticketPreview" style="width:100%;max-width:380px;border-radius:16px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.5);">
+              <div id="tpHeader" style="position:relative;padding:1.1rem 1.1rem 0.85rem;">
+                <div id="tpBanner" style="position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.25;display:none;"></div>
+                <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;">
+                  <div>
+                    <div id="tpEventName" style="font-size:0.96rem;font-weight:800;color:#fff;letter-spacing:-0.02em;">Restaurant Name</div>
+                    <div id="tpDate" style="font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:0.2rem;">&#128197; Date &amp; Time</div>
+                    <div id="tpVenue" style="font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:0.1rem;">&#128205; Location</div>
+                  </div>
+                  <div id="tpLogo" style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,0.2);display:grid;place-items:center;font-size:1rem;flex:none;">&#127915;</div>
+                </div>
+                <div style="position:relative;margin-top:0.65rem;display:flex;gap:0.35rem;flex-wrap:wrap;">
+                  <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:0.65rem;font-weight:800;padding:0.18rem 0.5rem;border-radius:999px;">General Admission</span>
+                  <span id="tpSeatBadge" style="background:rgba(255,255,255,0.15);color:#fff;font-size:0.65rem;font-weight:700;padding:0.18rem 0.5rem;border-radius:999px;">Seat #001</span>
+                </div>
+              </div>
+              <div style="background:#fff;display:flex;align-items:center;height:14px;">
+                <div style="width:14px;height:14px;border-radius:50%;background:#0f172a;margin-left:-7px;flex:none;"></div>
+                <div style="flex:1;border-top:2px dashed #dbe4f0;margin:0 0.35rem;"></div>
+                <div style="width:14px;height:14px;border-radius:50%;background:#0f172a;margin-right:-7px;flex:none;"></div>
+              </div>
+              <div style="background:#fff;padding:0.85rem 1.1rem 0.9rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+                <div style="flex:1;">
+                  <div style="font-size:0.78rem;font-weight:800;color:#0f172a;">Guest Name</div>
+                  <div style="font-size:0.62rem;color:#64748b;margin-top:0.1rem;">Order #CV-000001</div>
+                  <div id="tpCustomMsg" style="font-size:0.68rem;color:#475569;margin-top:0.28rem;font-style:italic;"></div>
+                  <div id="tpFooterMsg" style="font-size:0.6rem;color:#94a3b8;margin-top:0.2rem;"></div>
+                </div>
+                <div id="tpQRBlock" style="text-align:center;">
+                  <div style="width:52px;height:52px;background:#0f172a;border-radius:7px;display:grid;place-items:center;padding:5px;">
+                    <svg width="42" height="42" viewBox="0 0 44 44" fill="none">
+                      <rect x="0" y="0" width="18" height="18" rx="2" fill="white"/><rect x="4" y="4" width="10" height="10" rx="1" fill="#0f172a"/>
+                      <rect x="26" y="0" width="18" height="18" rx="2" fill="white"/><rect x="30" y="4" width="10" height="10" rx="1" fill="#0f172a"/>
+                      <rect x="0" y="26" width="18" height="18" rx="2" fill="white"/><rect x="4" y="30" width="10" height="10" rx="1" fill="#0f172a"/>
+                      <rect x="26" y="26" width="4" height="4" fill="white"/><rect x="32" y="26" width="4" height="4" fill="white"/><rect x="38" y="26" width="6" height="4" fill="white"/>
+                      <rect x="26" y="32" width="6" height="4" fill="white"/><rect x="34" y="32" width="4" height="4" fill="white"/>
+                      <rect x="26" y="38" width="4" height="6" fill="white"/><rect x="32" y="38" width="6" height="6" fill="white"/><rect x="40" y="38" width="4" height="6" fill="white"/>
+                    </svg>
+                  </div>
+                  <div style="font-size:0.52rem;color:#64748b;margin-top:0.2rem;font-weight:700;">SCAN TO VERIFY</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner upload -->
+        <div class="field" style="margin-bottom:0.75rem;">
+          <label>Banner Image <span style="font-weight:400;color:var(--muted);">(shown behind ticket header)</span></label>
+          <div class="upload-zone" id="tdBannerZone" onclick="document.getElementById('tdBannerInput').click()" style="padding:1.2rem;">
+            <div class="uz-icon" style="font-size:1.4rem;">&#128444;&#65039;</div>
+            <strong style="font-size:0.84rem;">Click to upload banner</strong>
+            <span>PNG, JPG &middot; Recommended 1200&times;400px</span>
+          </div>
+          <input type="file" id="tdBannerInput" accept="image/*" style="display:none;" onchange="loadTicketBanner(this)" />
+        </div>
+
+        <!-- Theme swatches -->
+        <div class="field" style="margin-bottom:0.75rem;">
+          <label>Accent Color Theme</label>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.45rem;margin-top:0.35rem;">
+            <div class="theme-swatch active" data-g1="#1454ff" data-g2="#4c7dff" onclick="setTicketTheme(this)" title="Blue" style="height:36px;border-radius:9px;background:linear-gradient(135deg,#1454ff,#4c7dff);cursor:pointer;outline:3px solid #1454ff;outline-offset:2px;"></div>
+            <div class="theme-swatch" data-g1="#7c3aed" data-g2="#a78bfa" onclick="setTicketTheme(this)" title="Purple" style="height:36px;border-radius:9px;background:linear-gradient(135deg,#7c3aed,#a78bfa);cursor:pointer;outline:3px solid transparent;"></div>
+            <div class="theme-swatch" data-g1="#059669" data-g2="#34d399" onclick="setTicketTheme(this)" title="Emerald" style="height:36px;border-radius:9px;background:linear-gradient(135deg,#059669,#34d399);cursor:pointer;outline:3px solid transparent;"></div>
+            <div class="theme-swatch" data-g1="#dc2626" data-g2="#f87171" onclick="setTicketTheme(this)" title="Red" style="height:36px;border-radius:9px;background:linear-gradient(135deg,#dc2626,#f87171);cursor:pointer;outline:3px solid transparent;"></div>
+            <div class="theme-swatch" data-g1="#0f172a" data-g2="#334155" onclick="setTicketTheme(this)" title="Midnight" style="height:36px;border-radius:9px;background:linear-gradient(135deg,#0f172a,#334155);cursor:pointer;outline:3px solid transparent;"></div>
+          </div>
+          <div class="grid-2" style="margin-top:0.55rem;">
+            <div class="field"><label for="tdColor1" style="font-size:0.72rem;">Custom Start</label><input id="tdColor1" type="color" value="#1454ff" oninput="applyCustomTheme()" style="height:38px;padding:0.2rem;" /></div>
+            <div class="field"><label for="tdColor2" style="font-size:0.72rem;">Custom End</label><input id="tdColor2" type="color" value="#4c7dff" oninput="applyCustomTheme()" style="height:38px;padding:0.2rem;" /></div>
+          </div>
+        </div>
+
+        <!-- Branding -->
+        <div class="grid-2" style="margin-bottom:0.75rem;">
+          <div class="field"><label for="tdOrgName">Organiser Name</label><input id="tdOrgName" type="text" placeholder="e.g. The Grand Bistro" oninput="updateTicketPreview()" /></div>
+          <div class="field"><label for="tdTagline">Custom Message</label><input id="tdTagline" type="text" placeholder="e.g. We look forward to serving you!" oninput="updateTicketPreview()" /></div>
+        </div>
+        <div class="field" style="margin-bottom:0.75rem;"><label for="tdFooter">Footer Note</label><input id="tdFooter" type="text" placeholder="e.g. Non-transferable. Valid for one seating only." oninput="updateTicketPreview()" /></div>
+
+        <!-- Field toggles -->
+        <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.4rem;">Toggle Fields</div>
+        <div style="display:flex;flex-direction:column;gap:0.35rem;">
+          <div class="toggle-row"><div><strong>Show QR Code</strong><span>Scannable QR for entry verification</span></div><button class="toggle on" id="tdShowQR" onclick="this.classList.toggle('on');updateTicketPreview()"></button></div>
+          <div class="toggle-row"><div><strong>Show Seat Number</strong><span>Display assigned seat on ticket</span></div><button class="toggle on" id="tdShowSeat" onclick="this.classList.toggle('on');updateTicketPreview()"></button></div>
+          <div class="toggle-row"><div><strong>Show Venue</strong><span>Print venue name on ticket</span></div><button class="toggle on" id="tdShowVenue" onclick="this.classList.toggle('on');updateTicketPreview()"></button></div>
+          <div class="toggle-row"><div><strong>Show Organiser Logo</strong><span>Display brand icon on ticket</span></div><button class="toggle on" id="tdShowLogo" onclick="this.classList.toggle('on');updateTicketPreview()"></button></div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Upload CSV -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:grid;place-items:center;font-size:0.75rem;font-weight:800;color:#fff;flex:none;">2</div>
+          <div><div style="font-size:0.96rem;font-weight:800;">Upload Attendee CSV</div><div style="font-size:0.76rem;color:var(--muted);">AI auto-maps name, phone &amp; ticket type columns</div></div>
+        </div>
+
+        <div class="upload-zone" id="csvZone" onclick="document.getElementById('csvInput').click()" style="padding:1.5rem;">
+          <div class="uz-icon" style="font-size:1.6rem;">&#128196;</div>
+          <strong>Click to upload CSV file</strong>
+          <span>Columns: name, phone, email, package &mdash; any order, AI will map them</span>
+        </div>
+        <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="loadCSV(this)" />
+
+        <!-- CSV preview table -->
+        <div id="csvPreviewWrap" style="display:none;margin-top:0.75rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+            <div style="font-size:0.78rem;font-weight:800;">&#128200; Guest Preview</div>
+            <div id="csvStats" style="font-size:0.72rem;color:var(--muted);"></div>
+          </div>
+          <!-- Column mapping -->
+          <div id="csvMappingRow" style="display:grid;gap:0.4rem;margin-bottom:0.6rem;"></div>
+          <!-- Rows -->
+          <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
+            <table id="csvTable" style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+              <thead id="csvThead" style="background:var(--blue-soft);"></thead>
+              <tbody id="csvTbody"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.5rem;">
+            <span style="font-size:0.7rem;color:var(--green);font-weight:700;">&#10003; AI column mapping complete</span>
+            <button onclick="document.getElementById('csvInput').click()" style="font-size:0.72rem;color:var(--blue);font-weight:700;background:none;border:none;cursor:pointer;text-decoration:underline;">Re-upload</button>
+          </div>
+        </div>
+
+        <!-- Sample CSV download -->
+        <div style="margin-top:0.75rem;padding:0.65rem 0.85rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.76rem;color:var(--muted);">Don't have a CSV? Download our sample template</div>
+          <button onclick="downloadSampleCSV()" style="font-size:0.76rem;font-weight:800;color:var(--blue);background:none;border:none;cursor:pointer;">&#11015; Download Sample</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Generate & Send -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#059669,#34d399);display:grid;place-items:center;font-size:0.75rem;font-weight:800;color:#fff;flex:none;">3</div>
+          <div><div style="font-size:0.96rem;font-weight:800;">Generate &amp; Send Tickets</div><div style="font-size:0.76rem;color:var(--muted);">Each ticket gets a unique QR code image, sent via WhatsApp</div></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.85rem;">
+          <div class="toggle-row">
+            <div><strong>&#128242; Send via WhatsApp</strong><span>Passes sent as images to guest phone numbers</span></div>
+            <button class="toggle on" id="tdSendWA" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>&#128140; Send via Email</strong><span>Passes sent as PDF attachments to guest emails</span></div>
+            <button class="toggle on" id="tdSendEmail" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>&#128274; Password-protect PDF</strong><span>Use guest phone number as PDF password</span></div>
+            <button class="toggle" id="tdPDFPass" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:0.75rem;">
+          <label for="tdWAMsg">WhatsApp Message Template</label>
+          <textarea id="tdWAMsg" style="min-height:80px;" placeholder="Hi {{name}}, your dining pass for {{event}} is confirmed! Show this QR at the restaurant. See you there! &#127869;">Hi {{name}}, your dining pass for {{event}} is confirmed! Show this QR at the restaurant. See you there! &#127869;</textarea>
+          <span class="field-hint">Use {{name}}, {{event}}, {{date}}, {{seat}} as placeholders</span>
+        </div>
+
+        <div id="generateStatus" style="display:none;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:0.75rem 1rem;margin-bottom:0.75rem;">
+          <div style="font-size:0.84rem;font-weight:800;color:#065f46;margin-bottom:0.3rem;">&#9989; Ready to generate</div>
+          <div id="generateStatusMsg" style="font-size:0.76rem;color:#047857;"></div>
+        </div>
+
+        <!-- Credit cost summary -->
+        <div id="creditSummary" style="display:none;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin-bottom:0.75rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:1rem;flex:none;">&#128176;</div>
+              <div>
+                <div style="font-size:0.84rem;font-weight:800;">Credit Cost</div>
+                <div style="font-size:0.72rem;color:var(--muted);">2 credits per pass &middot; 1 credit = &#8377;2</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:1.2rem;font-weight:800;color:var(--blue);" id="totalCredits">0 credits</div>
+              <div style="font-size:0.72rem;color:var(--muted);" id="totalCost">&#8377;0</div>
+            </div>
+          </div>
+          <div style="margin-top:0.75rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
+            <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:0.55rem 0.7rem;text-align:center;">
+              <div style="font-size:0.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Tickets</div>
+              <div style="font-size:1rem;font-weight:800;color:var(--text);" id="ccTickets">0</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:0.55rem 0.7rem;text-align:center;">
+              <div style="font-size:0.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Credits Used</div>
+              <div style="font-size:1rem;font-weight:800;color:var(--blue);" id="ccCredits">0</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:0.55rem 0.7rem;text-align:center;">
+              <div style="font-size:0.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Total Cost</div>
+              <div style="font-size:1rem;font-weight:800;color:var(--green);" id="ccCost">&#8377;0</div>
+            </div>
+          </div>
+          <div style="margin-top:0.6rem;font-size:0.72rem;color:var(--muted);padding:0.5rem 0.65rem;background:#fff;border-radius:8px;border:1px solid var(--border);">
+            &#128161; Credits are deducted only after successful delivery. <a href="credits.html" style="color:var(--blue);font-weight:700;">Buy more credits</a>
+          </div>
+        </div>
+
+        <button class="btn-success" id="generateBtn" onclick="generateTickets()" style="width:100%;padding:0.75rem;font-size:0.9rem;">
+          &#127915; Generate &amp; Send All Tickets
+        </button>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(3)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: MEDIA -->
+    <div class="step-panel" data-panel="5">
+
+      <!-- Card Image -->
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <h2>Card Image</h2>
+            <span style="background:#ef4444;color:#fff;font-size:.62rem;font-weight:800;padding:.18rem .5rem;border-radius:999px;">*</span>
+          </div>
+          <p>2:3 vertical &mdash; Displayed on listing cards when customers browse your offerings. Also used as the preview when shared on social media.<br><span style="color:var(--blue);font-weight:700;">Think: Instagram story or movie poster format</span></p>
+        </div>
+
+        <div style="display:flex;gap:1.2rem;align-items:flex-start;flex-wrap:wrap;">
+
+          <!-- Upload zone -->
+          <div style="flex:1;min-width:200px;">
+            <div id="cardImgDrop" onclick="document.getElementById('cardImgInput').click()" ondragover="event.preventDefault();this.style.borderColor='var(--blue)';this.style.background='rgba(20,84,255,.04)'" ondragleave="this.style.borderColor='var(--border)';this.style.background='var(--blue-soft)'" ondrop="handleCardImgDrop(event)" style="border:2px dashed var(--border);border-radius:14px;padding:2rem 1rem;text-align:center;cursor:pointer;background:var(--blue-soft);transition:border-color .2s,background .2s;">
+              <div style="font-size:1.8rem;margin-bottom:.4rem;">🎴</div>
+              <strong style="display:block;font-size:.88rem;">Drop image or click to upload</strong>
+              <span style="font-size:.74rem;color:var(--muted);">JPG, PNG &middot; max 5 MB &middot; <strong>2:3 ratio recommended</strong> (e.g. 800&times;1200px)</span>
+            </div>
+            <input type="file" id="cardImgInput" accept="image/*" style="display:none;" onchange="loadCardImg(this)" />
+            <div class="field" style="margin-top:.65rem;">
+              <label for="cardImgUrl">Or paste image URL</label>
+              <input id="cardImgUrl" type="url" placeholder="https://example.com/poster.jpg" oninput="syncCardImgUrl()" />
+            </div>
+          </div>
+
+          <!-- Live card preview -->
+          <div style="flex:none;">
+            <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.45rem;">Live Preview</div>
+            <div id="cardImgPreviewWrap" style="width:160px;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(15,23,42,.13);border:1px solid var(--border);background:#f8fafc;">
+              <!-- 2:3 image area -->
+              <div id="cardImgPlaceholder" style="width:160px;height:240px;background:linear-gradient(135deg,#e2e8f0,#f1f5f9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;color:#94a3b8;">
+                <span style="font-size:2rem;">🎴</span>
+                <span style="font-size:.7rem;font-weight:700;">2 : 3</span>
+              </div>
+              <img id="cardImgPreview" src="" style="width:160px;height:240px;object-fit:cover;display:none;" alt="Card image preview" />
+              <!-- Card info skeleton -->
+              <div style="padding:.6rem .7rem;background:#fff;">
+                <div style="height:9px;background:#e2e8f0;border-radius:4px;margin-bottom:.35rem;width:85%;"></div>
+                <div style="height:7px;background:#f1f5f9;border-radius:4px;width:55%;margin-bottom:.5rem;"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="height:7px;background:#f1f5f9;border-radius:4px;width:38%;"></div>
+                  <div style="height:20px;width:52px;background:linear-gradient(135deg,var(--blue),var(--blue-2));border-radius:6px;"></div>
+                </div>
+              </div>
+            </div>
+            <div id="cardImgRemoveWrap" style="display:none;margin-top:.5rem;">
+              <button onclick="removeCardImg()" style="background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;width:100%">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cover Image -->
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <h2>Cover Image</h2>
+            <span style="background:#ef4444;color:#fff;font-size:.62rem;font-weight:800;padding:.18rem .5rem;border-radius:999px;">*</span>
+          </div>
+          <p>1:1 square &mdash; The hero image on your landing page. This is the first thing visitors see when they open your event or tour page.</p>
+        </div>
+
+        <div style="display:flex;gap:1.2rem;align-items:flex-start;flex-wrap:wrap;">
+
+          <!-- Upload zone -->
+          <div style="flex:1;min-width:200px;">
+            <div id="coverDropZone" onclick="document.getElementById('coverInput').click()" ondragover="event.preventDefault();this.style.borderColor='var(--blue)';this.style.background='rgba(20,84,255,.04)'" ondragleave="this.style.borderColor='var(--border)';this.style.background='var(--blue-soft)'" ondrop="handleCoverDrop(event)" style="border:2px dashed var(--border);border-radius:14px;padding:2rem 1rem;text-align:center;cursor:pointer;background:var(--blue-soft);transition:border-color .2s,background .2s;">
+              <div style="font-size:1.8rem;margin-bottom:.4rem;">🖼️</div>
+              <strong style="display:block;font-size:.88rem;">Drop image or click to upload</strong>
+              <span style="font-size:.74rem;color:var(--muted);">JPG, PNG &middot; max 5 MB &middot; <strong>1:1 ratio recommended</strong> (e.g. 1080&times;1080px)</span>
+            </div>
+            <input type="file" id="coverInput" accept="image/*" style="display:none;" onchange="loadCoverFile(this)" />
+            <div class="field" style="margin-top:.65rem;">
+              <label for="coverUrl">Or paste image URL</label>
+              <input id="coverUrl" type="url" placeholder="https://example.com/cover.jpg" oninput="syncCoverUrl()" />
+            </div>
+          </div>
+
+          <!-- Live square preview -->
+          <div style="flex:none;">
+            <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.45rem;">Live Preview</div>
+            <div style="width:200px;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(15,23,42,.13);border:1px solid var(--border);background:#f8fafc;">
+              <div id="coverPlaceholder" style="width:200px;height:200px;background:linear-gradient(135deg,#e2e8f0,#f1f5f9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;color:#94a3b8;">
+                <span style="font-size:2rem;">🖼️</span>
+                <span style="font-size:.7rem;font-weight:700;">1 : 1</span>
+              </div>
+              <img id="coverPreview" src="" style="width:200px;height:200px;object-fit:cover;display:none;" alt="Cover preview" />
+              <div style="padding:.6rem .7rem;background:#fff;">
+                <div style="height:9px;background:#e2e8f0;border-radius:4px;margin-bottom:.35rem;width:80%;"></div>
+                <div style="height:7px;background:#f1f5f9;border-radius:4px;width:55%;margin-bottom:.5rem;"></div>
+                <div style="height:7px;background:#f1f5f9;border-radius:4px;width:40%;"></div>
+              </div>
+            </div>
+            <div id="coverPreviewWrap" style="display:none;margin-top:.5rem;">
+              <button onclick="removeCover()" style="background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;width:100%">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery -->
+      <div class="card">
+        <div class="card-head"><h2>📸 Photo Gallery</h2><p>Add up to 10 photos shown on your event page</p></div>
+        <div id="galleryGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.6rem;">
+          <div id="addGalleryBtn" onclick="document.getElementById('galleryInput').click()" style="border:2px dashed var(--border);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:.78rem;font-weight:700;gap:.3rem;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+            <span style="font-size:1.3rem;">＋</span><span>Add photo</span>
+          </div>
+        </div>
+        <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;" onchange="loadGalleryFiles(this)" />
+      </div>
+
+      <!-- Promo Video -->
+      <div class="card">
+        <div class="card-head"><h2>🎬 Promo Video</h2><p>A short teaser can increase ticket sales by up to 30%</p></div>
+        <div class="field">
+          <label for="videoUrl">YouTube or Vimeo URL</label>
+          <input id="videoUrl" type="url" placeholder="https://youtube.com/watch?v=..." oninput="syncVideoEmbed()" />
+        </div>
+        <div id="videoEmbedWrap" style="display:none;margin-top:.75rem;border-radius:14px;overflow:hidden;">
+          <iframe id="videoEmbedFrame" style="width:100%;height:210px;border:none;display:block;"></iframe>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(3)">← Back</button>
+        <button class="btn-primary" onclick="goStep(6)">Next: RSVP Form →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: RSVP -->
+    <div class="step-panel" data-panel="6">
+
+      <div style="display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:start;">
+
+        <!-- LEFT -->
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+
+          <!-- field toggles -->
+          <div class="card">
+            <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;">
+              <div><h2>Booking Form Fields</h2><p>Toggle fields on/off. Required fields are always collected from guests.</p></div>
+              <div style="display:flex;gap:.4rem;">
+                <button class="btn-ghost" style="font-size:.76rem;padding:.35rem .7rem;" onclick="rsvpShareModal()">&#128279; Share</button>
+                <button class="btn-ghost" style="font-size:.76rem;padding:.35rem .7rem;" onclick="rsvpDownload()">&#8595; Download</button>
+                <button class="btn-primary" style="font-size:.76rem;padding:.35rem .7rem;" onclick="rsvpCreate()">&#10003; Create Form</button>
+              </div>
+            </div>
+            <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:.5rem;">Always collected</div>
+            <div class="rsvp-fr locked"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#128100;</div><div class="fr-info"><strong>Full Name</strong><span>Text field</span></div><div class="fr-right"><span style="font-size:.68rem;font-weight:800;background:#e0e7ff;color:#3730a3;padding:.2rem .55rem;border-radius:999px;">Required</span></div></div>
+            <div class="rsvp-fr locked"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#9993;&#65039;</div><div class="fr-info"><strong>Email Address</strong><span>Text field</span></div><div class="fr-right"><span style="font-size:.68rem;font-weight:800;background:#e0e7ff;color:#3730a3;padding:.2rem .55rem;border-radius:999px;">Required</span></div></div>
+            <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin:.85rem 0 .5rem;">Optional fields</div>
+            <div class="rsvp-fr"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#128241;</div><div class="fr-info"><strong>Phone Number</strong><span>Number field</span></div><div class="fr-right"><button class="toggle on" data-field="phone" onclick="this.classList.toggle('on');renderRsvpPreview()"></button></div></div>
+            <div class="rsvp-fr"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#127874;</div><div class="fr-info"><strong>Date of Birth</strong><span>Date picker</span></div><div class="fr-right"><button class="toggle" data-field="dob" onclick="this.classList.toggle('on');renderRsvpPreview()"></button></div></div>
+            <div class="rsvp-fr"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#129518;</div><div class="fr-info"><strong>Gender</strong><span>Dropdown</span></div><div class="fr-right"><button class="toggle" data-field="gender" onclick="this.classList.toggle('on');renderRsvpPreview()"></button></div></div>
+            <div class="rsvp-fr"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#128205;</div><div class="fr-info"><strong>City</strong><span>Text field</span></div><div class="fr-right"><button class="toggle" data-field="city" onclick="this.classList.toggle('on');renderRsvpPreview()"></button></div></div>
+            <div class="rsvp-fr"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#129367;</div><div class="fr-info"><strong>Dietary Preferences</strong><span>Dropdown — always on for restaurants</span></div><div class="fr-right"><button class="toggle" data-field="dietary" onclick="this.classList.toggle('on');renderRsvpPreview()"></button></div></div>
+            <div class="rsvp-fr"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#128085;</div><div class="fr-info"><strong>T-Shirt Size</strong><span>Dropdown</span></div><div class="fr-right"><button class="toggle" data-field="tshirt" onclick="this.classList.toggle('on');renderRsvpPreview()"></button></div></div>
+            <div class="rsvp-fr"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#127970;</div><div class="fr-info"><strong>Company / Organisation</strong><span>Text field</span></div><div class="fr-right"><button class="toggle" data-field="company" onclick="this.classList.toggle('on');renderRsvpPreview()"></button></div></div>
+            <div class="rsvp-fr"><div class="fr-drag">&#8942;</div><div class="fr-icon">&#128680;</div><div class="fr-info"><strong>Special Requests</strong><span>Text field</span></div><div class="fr-right"><button class="toggle" data-field="emergency" onclick="this.classList.toggle('on');renderRsvpPreview()"></button></div></div>
+          </div>
+
+          <!-- custom questions -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+              <div><h2 style="font-size:.96rem;font-weight:800;">Custom Questions</h2><p style="font-size:.78rem;color:var(--muted);margin-top:.15rem;">Text, dropdown or checkbox</p></div>
+              <button class="btn-primary" style="font-size:.76rem;padding:.38rem .75rem;" onclick="addRsvpCQ()">+ Add</button>
+            </div>
+            <div id="rsvpCQList">
+              <div style="text-align:center;padding:1.2rem;border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-size:.82rem;">No custom questions yet.</div>
+            </div>
+          </div>
+
+          <!-- form settings -->
+          <div class="card">
+            <div class="card-head"><h2>Form Settings</h2><p>Behaviour and confirmation options</p></div>
+            <div style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.85rem;">
+              <div class="toggle-row">
+                <div><strong>&#128203; Terms &amp; Conditions checkbox</strong><span>Attendees must agree before submitting</span></div>
+                <button class="toggle on" id="rsvpToggleTC" onclick="this.classList.toggle('on');renderRsvpPreview()"></button>
+              </div>
+              <div class="toggle-row">
+                <div><strong>&#128231; Send confirmation email</strong><span>Auto-send booking confirmation</span></div>
+                <button class="toggle on" id="rsvpToggleConfEmail" onclick="this.classList.toggle('on')"></button>
+              </div>
+              <div class="toggle-row">
+                <div><strong>&#128241; Send WhatsApp confirmation</strong><span>Requires phone number field</span></div>
+                <button class="toggle on" id="rsvpToggleConfWA" onclick="this.classList.toggle('on')"></button>
+              </div>
+            </div>
+            <div style="display:grid;gap:.3rem;">
+              <label style="font-size:.76rem;font-weight:800;color:#475569;">Confirmation message shown after submission</label>
+              <textarea id="rsvpConfirmMsg" style="min-height:68px;border:1px solid var(--border);border-radius:10px;padding:.65rem .8rem;background:#fff;color:var(--text);outline:none;resize:vertical;font:inherit;font-size:.84rem;" placeholder="You're registered! Check your email for your ticket." oninput="renderRsvpPreview()">&#127881; You're registered! Check your email for your ticket.</textarea>
+            </div>
+          </div>
+
+        </div><!-- /left -->
+
+        <!-- RIGHT: live preview -->
+        <div class="rsvp-pv-wrap">
+          <div class="rsvp-pv-label">
+            <span>Live Preview</span>
+            <button id="rsvpPvConfirmBtn" class="rsvp-pv-toggle-btn" onclick="toggleRsvpConfirmPreview()">Show Confirm &#10230;</button>
+          </div>
+          <div class="rsvp-pv-phone">
+            <div class="rsvp-pv-notch"><div class="rsvp-pv-notch-pill"></div><div class="rsvp-pv-notch-cam"></div></div>
+            <div class="rsvp-pv-screen">
+              <div class="rsvp-pv-statusbar">
+                <div class="rsvp-pv-statusbar-time">9:41</div>
+                <div class="rsvp-pv-statusbar-icons">&#9679;&#9679;&#9679; &#9646;&#9646;&#9646;&#9646; &#9646;</div>
+              </div>
+              <div class="rsvp-pv-card">
+                <div class="rsvp-pv-bar">
+                  <div class="rsvp-pv-dots"><div class="rsvp-pv-dot active"></div><div class="rsvp-pv-dot"></div><div class="rsvp-pv-dot"></div></div>
+                  <div class="rsvp-pv-tag">&#127869; Table Booking Form</div>
+                  <div class="rsvp-pv-ename" id="rsvpPvEventName">Your Event Name</div>
+                  <div class="rsvp-pv-prog-track">
+                    <div class="rsvp-pv-prog-fill" id="rsvpPvProgress"></div>
+                  </div>
+                  <div class="rsvp-pv-prog-meta">
+                    <span>Step 1 of 1</span>
+                    <strong id="rsvpPvProgressLabel">0 / 0 fields</strong>
+                  </div>
+                </div>
+                <div class="rsvp-pv-body" id="rsvpPreviewFields"></div>
+                <div class="rsvp-pv-confirm" id="rsvpPreviewConfirm">
+                  <div class="cicon">&#127881;</div>
+                  <div class="cmsg" id="rsvpPvConfirmMsg">You're registered! Check your email for your ticket.</div>
+                </div>
+                <div class="rsvp-pv-footer">
+                  <div class="rsvp-pv-submit"><span>Register Now</span></div>
+                  <div class="rsvp-pv-tc" id="rsvpPvTC">
+                    <div class="rsvp-pv-tc-box"></div>
+                    <span>I agree to the Terms &amp; Conditions</span>
+                  </div>
+                </div>
+                <div class="rsvp-pv-counts">
+                  <span id="rsvpPvFieldCount">2 fields</span>
+                  <span id="rsvpPvReqCount">2 required</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /right -->
+
+      </div><!-- /grid -->
+
+      <!-- share modal -->
+      <div class="modal-overlay" id="rsvpShareModalEl">
+        <div class="modal">
+          <h3>&#128279; Share RSVP Form</h3>
+          <div style="display:flex;gap:.5rem;align-items:center;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:.6rem .85rem;margin-bottom:.85rem;">
+            <span style="flex:1;font-size:.78rem;color:var(--muted);">https://CultureWave.in/e/your-event/rsvp</span>
+            <button class="btn-primary" style="font-size:.74rem;padding:.3rem .65rem;" onclick="navigator.clipboard.writeText('https://CultureWave.in/e/your-event/rsvp');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.75rem;">
+            <div onclick="window.open('https://wa.me/?text=Register: https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128172;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">WhatsApp</div></div>
+            <div onclick="window.open('https://twitter.com/intent/tweet?text=Register: https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128038;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Twitter</div></div>
+            <div onclick="window.open('mailto:?subject=Register&body=https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#9993;&#65039;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Email</div></div>
+            <div onclick="alert('Copy the link and paste in your Instagram story!')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128247;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Instagram</div></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;"><button class="btn-ghost" onclick="document.getElementById('rsvpShareModalEl').classList.remove('open')">Close</button></div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(5)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(7)">Next: Coupons &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: COUPONS -->
+    <div class="step-panel" data-panel="7">
+      <div class="card">
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
+          <div><h2>Discount Coupons</h2><p>Create promo codes for your event</p></div>
+          <button class="btn-primary" style="font-size:0.78rem;padding:0.4rem 0.75rem;" onclick="openCouponModal()">+ Add Coupon</button>
+        </div>
+        <div id="couponList" style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:0.84rem;border:1px dashed var(--border);border-radius:12px;">
+            No coupons added yet.
+          </div>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(6)">← Back</button>
+        <button class="btn-primary" onclick="goStep(8)">Next: FAQs →</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: FAQS -->
+    <div class="step-panel" data-panel="8">
+      <div class="card">
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
+          <div><h2>Frequently Asked Questions</h2><p>Help attendees with common queries</p></div>
+          <button class="btn-primary" style="font-size:0.78rem;padding:0.4rem 0.75rem;" onclick="openFaqModal()">+ Add FAQ</button>
+        </div>
+        <div id="faqList" style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:0.84rem;border:1px dashed var(--border);border-radius:12px;">
+            No FAQs added yet.
+          </div>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(7)">← Back</button>
+        <button class="btn-primary" onclick="goStep(9)">Next: Settings →</button>
+      </div>
+    </div>
+
+    <!-- STEP 8: ADDITIONAL INFO -->
+    <div class="step-panel" data-panel="9">
+      <div class="card">
+        <div class="card-head"><h2>Terms & Conditions</h2><p>Legal terms attendees must agree to</p></div>
+        <div class="field">
+          <label for="termsText">Terms & Conditions</label>
+          <textarea id="termsText" style="min-height:130px;" placeholder="By registering for this event, you agree to..."></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Refund Policy</h2><p>Explain your cancellation and refund rules</p></div>
+        <div class="field">
+          <label for="refundPolicy">Refund Policy</label>
+          <textarea id="refundPolicy" style="min-height:100px;" placeholder="Refunds are available up to 48 hours before the event..."></textarea>
+        </div>
+        <div class="grid-2" style="margin-top:0.75rem;">
+          <div class="field">
+            <label for="refundDeadlineDays">Refund Deadline (days before event)</label>
+            <input id="refundDeadlineDays" type="number" min="0" placeholder="e.g. 2" />
+          </div>
+          <div class="field">
+            <label for="refundPercent">Refund Amount (%)</label>
+            <input id="refundPercent" type="number" min="0" max="100" placeholder="e.g. 100" />
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Restaurant Instructions</h2><p>Dress code, parking, cancellation policy, etc.</p></div>
+        <div class="field">
+          <label for="notes">Notes for Attendees</label>
+          <textarea id="notes" placeholder="Dress code: smart casual. Parking available at basement. Please arrive 10 mins early. Cancellation 24hrs prior..."></textarea>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
+        <button class="btn-primary" onclick="goStep(10)">Next: Invite Only →</button>
+      </div>
+    </div>
+
+    <!-- STEP 9: INVITE ONLY -->
+    <div class="step-panel" data-panel="10">
+      <div class="card">
+        <div class="card-head"><h2>Invite Only Access</h2><p>Restrict who can book this dining experience</p></div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div class="toggle-row">
+            <div><strong>🔒 Enable Invite Only</strong><span>Only guests with an invite link or code can register</span></div>
+            <button class="toggle" id="toggleInvite" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>🔗 Generate Invite Link</strong><span>Share a private link with selected guests</span></div>
+            <button class="toggle" id="toggleInviteLink" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Guest List</h2><p>Add email addresses of invited guests</p></div>
+        <div class="field">
+          <label for="guestEmails">Guest Emails</label>
+          <textarea id="guestEmails" style="min-height:100px;" placeholder="one@email.com&#10;two@email.com&#10;three@email.com"></textarea>
+          <span class="field-hint">One email per line. Guests will receive an invite email.</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Invite Code</h2><p>Set a secret code guests must enter to register</p></div>
+        <div class="field">
+          <label for="inviteCode">Invite Code</label>
+          <input id="inviteCode" type="text" placeholder="e.g. VIP2025" />
+          <span class="field-hint">Leave blank to not require a code</span>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
+        <button class="btn-primary" onclick="goStep(11)">Next: Sold Out →</button>
+      </div>
+    </div>
+
+    <!-- STEP 10: SOLD OUT -->
+    <div class="step-panel" data-panel="11">
+      <div class="card">
+        <div class="card-head"><h2>Fully Booked Status</h2><p>Mark this dining slot as fully booked</p></div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div class="toggle-row" style="border:1px solid #fca5a5;background:#fef2f2;">
+            <div><strong style="color:#991b1b;">⛔ Mark as Sold Out</strong><span>Registrations will be closed immediately</span></div>
+            <button class="toggle" id="toggleSoldOut" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>📋 Enable Waitlist</strong><span>Collect waitlist registrations when sold out</span></div>
+            <button class="toggle" id="toggleWaitlist" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>🔔 Notify Waitlist</strong><span>Auto-notify waitlisted guests if spots open up</span></div>
+            <button class="toggle" id="toggleNotifyWaitlist" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Fully Booked Message</h2><p>Shown when the dining slot is fully booked</p></div>
+        <div class="field">
+          <label for="soldOutMsg">Message</label>
+          <textarea id="soldOutMsg" style="min-height:80px;" placeholder="This dining slot is fully booked. Join the waitlist to be notified if a table becomes available."></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Overflow Options</h2><p>What happens when capacity is reached</p></div>
+        <div class="field">
+          <label for="overflowAction">When capacity is full</label>
+          <select id="overflowAction">
+            <option value="close">Close registrations</option>
+            <option value="waitlist">Move to waitlist</option>
+            <option value="notify">Show sold out & notify me</option>
+          </select>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(10)">← Back</button>
+        <button class="btn-primary" onclick="goStep(12)">Next: Settings →</button>
+      </div>
+    </div>
+
+    <!-- STEP 11: SETTINGS -->
+    <div class="step-panel" data-panel="12">
+      <div class="card">
+        <div class="card-head"><h2>Visibility & Display</h2><p>Control how your event appears publicly</p></div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div class="toggle-row">
+            <div><strong>Show Attendee Count</strong><span>Display number of reservations publicly</span></div>
+            <button class="toggle on" id="toggleAttendeeCount" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>Enable Refunds</strong><span>Allow guests to request refunds</span></div>
+            <button class="toggle on" id="toggleRefunds" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>Show on Public Listing</strong><span>Appear in CultureWave restaurant discovery</span></div>
+            <button class="toggle on" id="togglePublicListing" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>Allow Social Sharing</strong><span>Show share buttons on event page</span></div>
+            <button class="toggle on" id="toggleSharing" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(11)">← Back</button>
+        <button class="btn-success" id="createEventBtn">🚀 Create Event</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<!-- ADD DATE MODAL -->
+<div class="modal-overlay" id="addDateModal">
+  <div class="modal">
+    <h3>Add Dining Date</h3>
+    <div style="display:flex;flex-direction:column;gap:0.65rem;">
+      <div class="field"><label for="newDate">Date <span class="req">*</span></label><input id="newDate" type="date" /></div>
+      <div class="field"><label for="newDateLabel">Label (optional)</label><input id="newDateLabel" type="text" placeholder="e.g. Valentine's Dinner, Weekend Brunch" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeAddDateModal()">Cancel</button>
+      <button class="btn-primary" onclick="addDate()">Add Date</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SLOT MODAL -->
+<div class="modal-overlay" id="addSlotModal">
+  <div class="modal">
+    <h3>Add Dining Slot</h3>
+    <input type="hidden" id="slotDateIdx" />
+    <div style="display:flex;flex-direction:column;gap:0.65rem;">
+      <div class="field"><label for="slotName">Slot Name <span class="req">*</span></label><input id="slotName" type="text" placeholder="e.g. Lunch Seating, Dinner Seating" /></div>
+      <div class="grid-2">
+        <div class="field"><label for="slotStart">Start Time</label><input id="slotStart" type="time" /></div>
+        <div class="field"><label for="slotEnd">End Time</label><input id="slotEnd" type="time" /></div>
+      </div>
+      <div class="field"><label for="slotCap">Capacity for this slot</label><input id="slotCap" type="number" min="1" placeholder="Leave blank to use default" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeAddSlotModal()">Cancel</button>
+      <button class="btn-primary" onclick="addSlot()">Add Slot</button>
+    </div>
+  </div>
+</div>
+
+<!-- OLD SESSION MODAL (hidden) -->
+<div class="modal-overlay" id="sessionModal" style="display:none!important">
+  <div class="modal">
+    <h3>Add Session / Time Slot</h3>
+    <div style="display:flex;flex-direction:column;gap:0.65rem;">
+      <div class="field"><label for="sName">Session Name <span class="req">*</span></label><input id="sName" type="text" placeholder="e.g. Morning Session" /></div>
+      <div class="grid-2">
+        <div class="field"><label for="sDate">Date</label><input id="sDate" type="date" /></div>
+        <div class="field"><label for="sCap">Capacity</label><input id="sCap" type="number" min="1" placeholder="e.g. 50" /></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label for="sStart">Start Time</label><input id="sStart" type="time" /></div>
+        <div class="field"><label for="sEnd">End Time</label><input id="sEnd" type="time" /></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeSessionModal()">Cancel</button>
+      <button class="btn-primary" onclick="addSession()">Add Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET MODAL -->
+<div class="modal-overlay" id="ticketModal">
+  <div class="modal" style="width:min(560px,100%);">
+    <h3>Add Dining Package</h3>
+    <div style="display:flex;flex-direction:column;gap:0.65rem;">
+      <div class="field"><label for="tName">Ticket Name <span class="req">*</span></label><input id="tName" type="text" placeholder="e.g. Lunch for 2, Dinner Package, VIP Table" /></div>
+      <div class="field"><label for="tDesc">Description</label><input id="tDesc" type="text" placeholder="What's included?" /></div>
+      <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:0.75rem;">
+        <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:0.55rem;">&#127939; Single / Per Person</div>
+        <div class="grid-2">
+          <div class="field"><label for="tPrice">Price per person (₹)</label><input id="tPrice" type="number" min="0" value="0" placeholder="0 = Free" /></div>
+          <div class="field"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.75rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;">
+        <div>
+          <div style="font-size:0.84rem;font-weight:800;">&#128101; Enable Group / Bulk Pricing</div>
+          <div style="font-size:0.72rem;color:var(--muted);">Discounted price per person when booking as a group</div>
+        </div>
+        <button class="toggle" id="toggleBulk" onclick="toggleBulkSection()"></button>
+      </div>
+      <div id="bulkSection" style="display:none;background:#f0fdf4;border:1px solid #a7f3d0;border-radius:12px;padding:0.75rem;">
+        <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#065f46;margin-bottom:0.55rem;">&#128101; Group / Bulk Pricing</div>
+        <div class="grid-3">
+          <div class="field"><label for="tGroupMin">Min. persons <span class="req">*</span></label><input id="tGroupMin" type="number" min="2" placeholder="e.g. 3" oninput="updateBulkPreview()" /></div>
+          <div class="field"><label for="tGroupMax">Max. persons</label><input id="tGroupMax" type="number" min="2" placeholder="e.g. 10" oninput="updateBulkPreview()" /></div>
+          <div class="field"><label for="tGroupPrice">Price per person (₹)</label><input id="tGroupPrice" type="number" min="0" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
+        </div>
+        <div id="bulkPreview" style="margin-top:0.55rem;font-size:0.76rem;color:#065f46;font-weight:700;"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeTicketModal()">Cancel</button>
+      <button class="btn-primary" onclick="addTicket()">Add Package</button>
+    </div>
+  </div>
+</div>
+
+<!-- COUPON MODAL -->
+<div class="modal-overlay" id="couponModal">
+  <div class="modal">
+    <h3>Add Coupon</h3>
+    <div style="display:flex;flex-direction:column;gap:0.65rem;">
+      <div class="field"><label for="cCode">Coupon Code <span class="req">*</span></label><input id="cCode" type="text" placeholder="e.g. EARLY20" style="text-transform:uppercase;" /></div>
+      <div class="grid-2">
+        <div class="field"><label for="cType">Discount Type</label><select id="cType"><option value="percent">Percentage (%)</option><option value="flat">Flat (₹)</option></select></div>
+        <div class="field"><label for="cValue">Value</label><input id="cValue" type="number" min="1" placeholder="e.g. 20" /></div>
+      </div>
+      <div class="field"><label for="cLimit">Usage Limit</label><input id="cLimit" type="number" min="1" placeholder="Leave blank for unlimited" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeCouponModal()">Cancel</button>
+      <button class="btn-primary" onclick="addCoupon()">Add Coupon</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ MODAL -->
+<div class="modal-overlay" id="faqModal">
+  <div class="modal">
+    <h3>Add FAQ</h3>
+    <div style="display:flex;flex-direction:column;gap:0.65rem;">
+      <div class="field"><label for="faqQ">Question <span class="req">*</span></label><input id="faqQ" type="text" placeholder="e.g. Is parking available?" /></div>
+      <div class="field"><label for="faqA">Answer <span class="req">*</span></label><textarea id="faqA" style="min-height:80px;" placeholder="Yes, free parking is available..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeFaqModal()">Cancel</button>
+      <button class="btn-primary" onclick="addFaq()">Add FAQ</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8",
+});
+
+const db = firebase.firestore();
+const auth = firebase.auth();
+function serverTimestamp() { return firebase.firestore.FieldValue.serverTimestamp(); }
+function collection(db, name) { return db.collection(name); }
+async function addDoc(ref, data) { return await ref.add(data); }
+
+// ── STATE ──
+let currentStep = 0;
+let eventType = 'in-person';
+let tickets = [];
+let coupons = [];
+let faqs = [];
+let uid = null;
+
+// ── AUTH ──
+async function loadUser() {
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (res.ok) {
+      const { user } = await res.json();
+      uid = user.uid;
+      localStorage.setItem('cw_uid', uid);
+      const init = (user.name || 'U').trim().charAt(0).toUpperCase();
+      const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
+      return;
+    }
+  } catch {}
+  // fallback: Firebase Auth (works on file://)
+  await new Promise(resolve => {
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        uid = user.uid;
+        const init = (user.displayName || user.email || 'U').trim().charAt(0).toUpperCase();
+        const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
+      } else {
+        // not signed in via Firebase — try localStorage fallback
+        uid = localStorage.getItem('cw_uid') || ('local_' + Date.now());
+        localStorage.setItem('cw_uid', uid);
+      }
+      resolve();
+    });
+  });
+}
+loadUser();
+
+// ── STEP NAVIGATION ──
+window.goStep = function(n) {
+  const panels = document.querySelectorAll('.step-panel');
+  const btns = document.querySelectorAll('.step-btn');
+  panels.forEach(p => p.classList.toggle('active', +p.dataset.panel === n));
+  btns.forEach(b => b.classList.toggle('active', +b.dataset.step === n));
+  currentStep = n;
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+document.querySelectorAll('.step-btn').forEach(btn => {
+  btn.addEventListener('click', () => goStep(+btn.dataset.step));
+});
+
+// ── PROGRESS ──
+function updateProgress() {
+  const fields = [
+    document.getElementById('eventName').value.trim(),
+    document.getElementById('urlKey').value.trim(),
+    document.getElementById('summary').value.trim(),
+    document.getElementById('description').value.trim(),
+    document.getElementById('startDate').value,
+  ];
+  const filled = fields.filter(Boolean).length;
+  const extra = tickets.length > 0 ? 1 : 0;
+  const pct = Math.round(((filled + extra) / (fields.length + 1)) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  updateAlert();
+  updateTopTitle();
+  markDoneSteps();
+}
+
+function markDoneSteps() {
+  const checks = [
+    document.getElementById('eventName').value.trim() && document.getElementById('urlKey').value.trim() && document.getElementById('summary').value.trim() && document.getElementById('description').value.trim(),
+    document.getElementById('city').value.trim() || document.getElementById('onlineLink').value.trim(),
+    document.getElementById('startDate').value,
+    tickets.length > 0,
+    document.getElementById('coverUrl').value.trim() || (document.getElementById('coverInput').files && document.getElementById('coverInput').files.length > 0) || galleryImages.length > 0,
+    true, true, true, true, true, true, true,
+  ];
+  document.querySelectorAll('.step-btn').forEach((btn, i) => {
+    const check = btn.querySelector('.step-check');
+    if (checks[i]) { btn.classList.add('done'); if (check) check.textContent = '✓'; }
+    else { btn.classList.remove('done'); if (check) check.textContent = ''; }
+  });
+}
+
+function updateTopTitle() {
+  const name = document.getElementById('eventName').value.trim();
+  document.getElementById('topEventTitle').textContent = name || 'Untitled Restaurant';
+}
+
+function updateAlert() {
+  const missing = [];
+  if (!document.getElementById('eventName').value.trim()) missing.push('Event Name');
+  if (!document.getElementById('urlKey').value.trim()) missing.push('URL Key');
+  if (!document.getElementById('summary').value.trim()) missing.push('Summary');
+  if (!document.getElementById('description').value.trim()) missing.push('Description');
+  const box = document.getElementById('alertBox');
+  if (missing.length === 0) {
+    box.className = 'alert success';
+    box.querySelector('.alert-icon').textContent = '✅';
+    document.getElementById('alertTitle').textContent = 'All required fields complete';
+    document.getElementById('alertMsg').textContent = 'You can save a draft or publish your event.';
+  } else {
+    box.className = 'alert';
+    box.querySelector('.alert-icon').textContent = '⚠️';
+    document.getElementById('alertTitle').textContent = missing.length + ' required field(s) missing';
+    document.getElementById('alertMsg').textContent = 'Complete: ' + missing.join(', ');
+  }
+}
+
+// ── INPUTS ──
+const eventNameEl = document.getElementById('eventName');
+const urlKeyEl = document.getElementById('urlKey');
+const summaryEl = document.getElementById('summary');
+const descEl = document.getElementById('description');
+
+function slugify(v) { return v.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+
+eventNameEl.addEventListener('input', () => {
+  if (!urlKeyEl.dataset.manual) urlKeyEl.value = slugify(eventNameEl.value);
+  updateProgress();
+  renderRsvpPreview();
+});
+urlKeyEl.addEventListener('input', () => { urlKeyEl.dataset.manual = '1'; updateProgress(); });
+summaryEl.addEventListener('input', () => {
+  document.getElementById('summaryCount').textContent = summaryEl.value.length + ' / 120';
+  updateProgress();
+});
+descEl.addEventListener('input', updateProgress);
+document.getElementById('startDate').addEventListener('change', updateProgress);
+document.getElementById('coverUrl').addEventListener('input', updateProgress);
+
+// ── EVENT TYPE ──
+window.setEventType = function(type) {
+  eventType = type;
+  document.getElementById('venueCard').style.display = type === 'in-person' ? '' : 'none';
+  document.getElementById('onlineCard').style.display = type === 'online' ? '' : 'none';
+  document.getElementById('typeInPersonCheck').style.color = type === 'in-person' ? 'var(--blue)' : 'var(--muted)';
+  document.getElementById('typeInPersonCheck').textContent = type === 'in-person' ? '✓' : '○';
+  document.getElementById('typeOnlineCheck').style.color = type === 'online' ? 'var(--blue)' : 'var(--muted)';
+  document.getElementById('typeOnlineCheck').textContent = type === 'online' ? '✓' : '○';
+};
+
+// ── COVER IMAGE ──
+// ── MEDIA: Card Image ──
+function showCardImg(src) {
+  const img = document.getElementById('cardImgPreview');
+  const placeholder = document.getElementById('cardImgPlaceholder');
+  const removeWrap = document.getElementById('cardImgRemoveWrap');
+  if (!src) {
+    img.style.display = 'none'; img.src = '';
+    placeholder.style.display = 'flex';
+    removeWrap.style.display = 'none';
+    return;
+  }
+  img.src = src; img.style.display = 'block';
+  placeholder.style.display = 'none';
+  removeWrap.style.display = '';
+}
+window.loadCardImg = function(input) {
+  const file = input.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = e => { document.getElementById('cardImgUrl').value = ''; showCardImg(e.target.result); };
+  r.readAsDataURL(file);
+};
+window.syncCardImgUrl = function() { showCardImg(document.getElementById('cardImgUrl').value); };
+window.removeCardImg = function() {
+  document.getElementById('cardImgUrl').value = '';
+  document.getElementById('cardImgInput').value = '';
+  showCardImg('');
+};
+window.handleCardImgDrop = function(e) {
+  e.preventDefault();
+  const dz = document.getElementById('cardImgDrop');
+  dz.style.borderColor = 'var(--border)'; dz.style.background = 'var(--blue-soft)';
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  const r = new FileReader();
+  r.onload = ev => showCardImg(ev.target.result);
+  r.readAsDataURL(file);
+};
+
+// ── MEDIA: Cover ──
+function showCoverPreview(src) {
+  const img = document.getElementById('coverPreview');
+  const placeholder = document.getElementById('coverPlaceholder');
+  const wrap = document.getElementById('coverPreviewWrap');
+  if (!src) {
+    img.style.display = 'none'; img.src = '';
+    placeholder.style.display = 'flex';
+    wrap.style.display = 'none';
+    return;
+  }
+  img.src = src; img.style.display = 'block';
+  placeholder.style.display = 'none';
+  wrap.style.display = '';
+}
+window.loadCoverFile = function(input) {
+  const file = input.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = e => { document.getElementById('coverUrl').value = ''; showCoverPreview(e.target.result); updateProgress(); };
+  r.readAsDataURL(file);
+};
+window.syncCoverUrl = function() {
+  showCoverPreview(document.getElementById('coverUrl').value);
+  updateProgress();
+};
+window.removeCover = function() {
+  document.getElementById('coverUrl').value = '';
+  document.getElementById('coverInput').value = '';
+  showCoverPreview('');
+  updateProgress();
+};
+window.handleCoverDrop = function(e) {
+  e.preventDefault();
+  document.getElementById('coverDropZone').style.borderColor = 'var(--border)';
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  const r = new FileReader();
+  r.onload = ev => { showCoverPreview(ev.target.result); updateProgress(); };
+  r.readAsDataURL(file);
+};
+
+// ── MEDIA: Gallery ──
+let galleryImages = [];
+window.loadGalleryFiles = function(input) {
+  const files = Array.from(input.files).slice(0, 10 - galleryImages.length);
+  let done = 0;
+  files.forEach(f => {
+    const r = new FileReader();
+    r.onload = e => {
+      galleryImages.push(e.target.result);
+      done++;
+      if (done === files.length) renderGallery();
+    };
+    r.readAsDataURL(f);
+  });
+  input.value = '';
+};
+function renderGallery() {
+  const grid = document.getElementById('galleryGrid');
+  grid.querySelectorAll('.gal-thumb').forEach(t => t.remove());
+  galleryImages.forEach((src, i) => {
+    const div = document.createElement('div');
+    div.className = 'gal-thumb';
+    div.style.cssText = 'position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;background:#f0f3fa;';
+    div.innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;display:block;"><button onclick="removeGalleryImg(${i})" style="position:absolute;top:.25rem;right:.25rem;background:rgba(229,62,62,.85);color:#fff;border:none;border-radius:6px;padding:.18rem .45rem;font-size:.7rem;font-weight:800;cursor:pointer;">✕</button>`;
+    grid.insertBefore(div, document.getElementById('addGalleryBtn'));
+  });
+  document.getElementById('addGalleryBtn').style.display = galleryImages.length >= 10 ? 'none' : '';
+}
+window.removeGalleryImg = function(i) { galleryImages.splice(i, 1); renderGallery(); };
+
+// ── MEDIA: Video embed ──
+window.syncVideoEmbed = function() {
+  const url = document.getElementById('videoUrl').value;
+  const wrap = document.getElementById('videoEmbedWrap');
+  const frame = document.getElementById('videoEmbedFrame');
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  const vi = url.match(/vimeo\.com\/(\d+)/);
+  if (yt) { frame.src = 'https://www.youtube.com/embed/' + yt[1]; wrap.style.display = ''; }
+  else if (vi) { frame.src = 'https://player.vimeo.com/video/' + vi[1]; wrap.style.display = ''; }
+  else { frame.src = ''; wrap.style.display = 'none'; }
+};
+
+// ── TICKET MODE ──
+let ticketMode = 'shared'; // 'shared' | 'perdate'
+let perDateTickets = {}; // { dateStr: [tickets] }
+let activePerDateIdx = null;
+
+window.setTicketMode = function(mode) {
+  ticketMode = mode;
+  document.getElementById('sharedTicketsSection').style.display = mode === 'shared' ? '' : 'none';
+  document.getElementById('perDateTicketsSection').style.display = mode === 'perdate' ? '' : 'none';
+  const shared = document.getElementById('ticketModeShared');
+  const perdate = document.getElementById('ticketModePerDate');
+  shared.style.border = mode === 'shared' ? '2px solid var(--blue)' : '2px solid var(--border)';
+  shared.style.background = mode === 'shared' ? 'var(--blue-light)' : '#fff';
+  shared.querySelector('div').style.color = mode === 'shared' ? 'var(--blue)' : '#475569';
+  perdate.style.border = mode === 'perdate' ? '2px solid var(--blue)' : '2px solid var(--border)';
+  perdate.style.background = mode === 'perdate' ? 'var(--blue-light)' : '#fff';
+  perdate.querySelector('div').style.color = mode === 'perdate' ? 'var(--blue)' : '#475569';
+  if (mode === 'perdate') renderPerDateTicketCards();
+};
+
+function renderPerDateTicketCards() {
+  const container = document.getElementById('perDateTicketCards');
+  const empty = document.getElementById('perDateEmpty');
+  if (!eventDates.length) { container.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  container.innerHTML = eventDates.map((d, di) => {
+    const dtix = perDateTickets[d.date] || [];
+    return `
+    <div class="card" style="margin-bottom:0.75rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;color:#fff;font-size:0.85rem;flex:none;">&#128197;</div>
+          <div>
+            <div style="font-weight:800;font-size:0.9rem;">${d.label || fmtDate(d.date)}</div>
+            <div style="font-size:0.72rem;color:var(--muted);">${fmtDate(d.date)} &middot; ${dtix.length} ticket type${dtix.length !== 1 ? 's' : ''}</div>
+          </div>
+        </div>
+        <button class="btn-primary" style="font-size:0.76rem;padding:0.35rem 0.7rem;" onclick="openPerDateTicketModal(${di})">+ Add Package</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        ${dtix.length ? dtix.map((t, ti) => `
+          <div class="ticket-row">
+            <div><div class="tr-name">${t.name}</div>${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);">${t.desc}</div>` : ''}</div>
+            <span class="tr-price">${t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
+            <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
+            <button class="tr-del" onclick="removePerDateTicket('${d.date}',${ti})">&#10005;</button>
+          </div>`).join('') : `<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.82rem;border:1px dashed var(--border);border-radius:10px;">No tickets for this date yet</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.openPerDateTicketModal = (di) => {
+  activePerDateIdx = di;
+  document.getElementById('ticketModal').classList.add('open');
+};
+window.removePerDateTicket = (dateStr, ti) => {
+  perDateTickets[dateStr].splice(ti, 1);
+  renderPerDateTicketCards();
+};
+
+// ── TICKET MODAL ──
+window.toggleBulkSection = function() {
+  const btn = document.getElementById('toggleBulk');
+  btn.classList.toggle('on');
+  const on = btn.classList.contains('on');
+  document.getElementById('bulkSection').style.display = on ? '' : 'none';
+  if (!on) document.getElementById('bulkPreview').textContent = '';
+};
+window.updateBulkPreview = function() {
+  const min = +document.getElementById('tGroupMin').value;
+  const max = +document.getElementById('tGroupMax').value;
+  const price = +document.getElementById('tGroupPrice').value;
+  const preview = document.getElementById('bulkPreview');
+  if (!min || !price) { preview.textContent = ''; return; }
+  const maxStr = max ? `–${max}` : '+';
+  const total = price * min;
+  preview.textContent = `Group of ${min}${maxStr} persons → ₹${price}/person (min total ₹${total.toLocaleString('en-IN')})`;
+};
+
+window.openTicketModal = () => { activePerDateIdx = null; document.getElementById('ticketModal').classList.add('open'); };
+window.closeTicketModal = () => {
+  document.getElementById('ticketModal').classList.remove('open');
+  ['tName','tPrice','tQty','tDesc','tGroupMin','tGroupMax','tGroupPrice'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'tPrice' ? '0' : '';
+  });
+  const btn = document.getElementById('toggleBulk');
+  btn.classList.remove('on');
+  document.getElementById('bulkSection').style.display = 'none';
+  document.getElementById('bulkPreview').textContent = '';
+  activePerDateIdx = null;
+};
+window.addTicket = () => {
+  const name = document.getElementById('tName').value.trim();
+  if (!name) { alert('Ticket name is required.'); return; }
+  const bulkOn = document.getElementById('toggleBulk').classList.contains('on');
+  const ticket = {
+    name,
+    price: Number(document.getElementById('tPrice').value || 0),
+    qty: Number(document.getElementById('tQty').value || 0),
+    desc: document.getElementById('tDesc').value.trim(),
+    bulk: bulkOn ? {
+      minPersons: Number(document.getElementById('tGroupMin').value || 0),
+      maxPersons: Number(document.getElementById('tGroupMax').value || 0),
+      pricePerPerson: Number(document.getElementById('tGroupPrice').value || 0),
+    } : null,
+  };
+  if (bulkOn && !ticket.bulk.minPersons) { alert('Please enter minimum persons for group pricing.'); return; }
+  if (activePerDateIdx !== null) {
+    const dateStr = eventDates[activePerDateIdx].date;
+    if (!perDateTickets[dateStr]) perDateTickets[dateStr] = [];
+    perDateTickets[dateStr].push(ticket);
+    renderPerDateTicketCards();
+  } else {
+    tickets.push(ticket);
+    renderTickets();
+    updateProgress();
+  }
+  closeTicketModal();
+};
+function renderTickets() {
+  const list = document.getElementById('ticketList');
+  if (!list) return;
+  if (!tickets.length) {
+    list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:0.84rem;border:1px dashed var(--border);border-radius:12px;">No packages yet. Click "+ Add Package" to create your first dining package.</div>';
+    return;
+  }
+  list.innerHTML = tickets.map((t, i) => `
+    <div class="ticket-row">
+      <div style="flex:1;">
+        <div class="tr-name">${t.name}</div>
+        ${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);margin-top:0.1rem;">${t.desc}</div>` : ''}
+        ${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;margin-top:0.2rem;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}
+      </div>
+      <span class="tr-price">${t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
+      <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
+      <button class="tr-del" onclick="removeTicket(${i})">&#10005;</button>
+    </div>`).join('');
+}
+window.removeTicket = i => { tickets.splice(i, 1); renderTickets(); updateProgress(); };
+
+// ── COUPON MODAL ──
+window.openCouponModal = () => document.getElementById('couponModal').classList.add('open');
+window.closeCouponModal = () => {
+  document.getElementById('couponModal').classList.remove('open');
+  ['cCode','cValue','cLimit'].forEach(id => document.getElementById(id).value = '');
+};
+window.addCoupon = () => {
+  const code = document.getElementById('cCode').value.trim().toUpperCase();
+  if (!code) { alert('Coupon code is required.'); return; }
+  coupons.push({
+    code, type: document.getElementById('cType').value,
+    value: Number(document.getElementById('cValue').value || 0),
+    limit: document.getElementById('cLimit').value || null,
+  });
+  renderCoupons();
+  closeCouponModal();
+};
+function renderCoupons() {
+  const list = document.getElementById('couponList');
+  if (!coupons.length) {
+    list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:0.84rem;border:1px dashed var(--border);border-radius:12px;">No coupons added yet.</div>';
+    return;
+  }
+  list.innerHTML = coupons.map((c, i) => `
+    <div class="coupon-row">
+      <span class="cr-code">${c.code}</span>
+      <span class="cr-val">${c.type === 'percent' ? c.value + '% off' : '₹' + c.value + ' off'}</span>
+      ${c.limit ? `<span class="cr-val">Limit: ${c.limit}</span>` : ''}
+      <button class="tr-del" onclick="removeCoupon(${i})">✕</button>
+    </div>`).join('');
+}
+window.removeCoupon = i => { coupons.splice(i, 1); renderCoupons(); };
+
+// ── FAQ MODAL ──
+window.openFaqModal = () => document.getElementById('faqModal').classList.add('open');
+window.closeFaqModal = () => {
+  document.getElementById('faqModal').classList.remove('open');
+  document.getElementById('faqQ').value = '';
+  document.getElementById('faqA').value = '';
+};
+window.addFaq = () => {
+  const q = document.getElementById('faqQ').value.trim();
+  const a = document.getElementById('faqA').value.trim();
+  if (!q || !a) { alert('Both question and answer are required.'); return; }
+  faqs.push({ q, a });
+  renderFaqs();
+  closeFaqModal();
+};
+function renderFaqs() {
+  const list = document.getElementById('faqList');
+  if (!faqs.length) {
+    list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:0.84rem;border:1px dashed var(--border);border-radius:12px;">No FAQs added yet.</div>';
+    return;
+  }
+  list.innerHTML = faqs.map((f, i) => `
+    <div class="faq-row">
+      <div class="faq-q" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>${f.q}</span>
+        <button class="tr-del" onclick="removeFaq(${i})">✕</button>
+      </div>
+      <div class="faq-a">${f.a}</div>
+    </div>`).join('');
+}
+window.removeFaq = i => { faqs.splice(i, 1); renderFaqs(); };
+
+// ── CLOSE MODALS ON OVERLAY CLICK ──
+['ticketModal','couponModal','faqModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ── SAVE / PUBLISH ──
+async function saveEvent(status) {
+  const name = document.getElementById('eventName').value.trim();
+  const urlKey = document.getElementById('urlKey').value.trim() || slugify(name);
+  const summary = document.getElementById('summary').value.trim();
+  const description = document.getElementById('description').value.trim();
+
+  if (!name || !urlKey || !summary || !description) {
+    goStep(0);
+    alert('Please complete Event Name, URL Key, Summary and Description.');
+    return;
+  }
+  if (!uid) { await loadUser(); }
+  if (!uid) { alert("Please sign in to save."); return; }
+
+  const rsvpToggles = {};
+  document.querySelectorAll('.toggle[data-field]').forEach(t => {
+    rsvpToggles[t.dataset.field] = t.classList.contains('on');
+  });
+
+  const payload = {
+    ownerId: uid, name, urlKey, summary, description,
+    category: document.getElementById('category').value,
+    tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    eventType,
+    venueName: document.getElementById('venueName').value.trim(),
+    city: document.getElementById('city').value.trim(),
+    state: document.getElementById('state').value.trim(),
+    address: document.getElementById('address').value.trim(),
+    mapLink: document.getElementById('mapLink').value.trim(),
+    onlineLink: document.getElementById('onlineLink').value.trim(),
+    onlinePlatform: document.getElementById('onlinePlatform').value,
+    eventDates,
+    startDate: eventDates.length ? eventDates[0].date : '',
+    capacity: Number(document.getElementById('capacity').value || 0),
+    duration: Number(document.getElementById('eventDuration').value || 0),
+    regDeadline: document.getElementById('regDeadline').value,
+    timezone: document.getElementById('timezone').value,
+    currency: document.getElementById('currency').value,
+    feeMode: document.getElementById('feeMode').value,
+    coverUrl: document.getElementById('coverUrl').value.trim(),
+    videoUrl: document.getElementById('videoUrl').value.trim(),
+    rsvpFields: rsvpToggles,
+    customQuestion: document.getElementById('customQ').value.trim(),
+    tickets, coupons, faqs, eventDates,
+    ticketMode,
+    perDateTickets,
+    ticketDesign: {
+      gradientStart: ticketDesign.g1,
+      gradientEnd: ticketDesign.g2,
+      organiserName: document.getElementById('tdOrgName').value.trim(),
+      tagline: document.getElementById('tdTagline').value.trim(),
+      footer: document.getElementById('tdFooter').value.trim(),
+      showQR: document.getElementById('tdShowQR').classList.contains('on'),
+      showSeat: document.getElementById('tdShowSeat').classList.contains('on'),
+      showVenue: document.getElementById('tdShowVenue').classList.contains('on'),
+      showLogo: document.getElementById('tdShowLogo').classList.contains('on'),
+    },
+    notes: document.getElementById('notes').value.trim(),
+    termsText: document.getElementById('termsText').value.trim(),
+    refundPolicy: document.getElementById('refundPolicy').value.trim(),
+    refundDeadlineDays: Number(document.getElementById('refundDeadlineDays').value || 0),
+    refundPercent: Number(document.getElementById('refundPercent').value || 100),
+    inviteOnly: document.getElementById('toggleInvite').classList.contains('on'),
+    inviteCode: document.getElementById('inviteCode').value.trim(),
+    guestEmails: document.getElementById('guestEmails').value.split('\n').map(e => e.trim()).filter(Boolean),
+    soldOut: document.getElementById('toggleSoldOut').classList.contains('on'),
+    soldOutMsg: document.getElementById('soldOutMsg').value.trim(),
+    allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on'),
+    notifyWaitlist: document.getElementById('toggleNotifyWaitlist').classList.contains('on'),
+    overflowAction: document.getElementById('overflowAction').value,
+    showAttendeeCount: document.getElementById('toggleAttendeeCount').classList.contains('on'),
+    enableRefunds: document.getElementById('toggleRefunds').classList.contains('on'),
+    publicListing: document.getElementById('togglePublicListing').classList.contains('on'),
+    allowSharing: document.getElementById('toggleSharing').classList.contains('on'),
+    status,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+
+  try {
+    const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+    await addDoc(collection(db, 'events'), payload);
+    window.location.href = 'premium-client-dashboard.html';
+  } catch (err) {
+    alert('Error saving event: ' + err.message);
+    document.getElementById('publishBtn').textContent = 'Publish Listing';
+    document.getElementById('publishBtn').disabled = false;
+    document.getElementById('saveDraftBtn').textContent = 'Save Draft';
+    document.getElementById('saveDraftBtn').disabled = false;
+  }
+}
+
+document.getElementById('saveDraftBtn').addEventListener('click', () => saveEvent('draft'));
+document.getElementById('publishBtn').addEventListener('click', () => saveEvent('published'));
+document.getElementById('createEventBtn').addEventListener('click', () => saveEvent('published'));
+
+// ── SCHEDULE ──
+let eventDates = [];
+
+function fmtDate(v) {
+  if (!v) return '';
+  return new Date(v + 'T00:00:00').toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+}
+function fmtTime(v) {
+  if (!v) return '';
+  const [h, m] = v.split(':'); const hr = +h;
+  return `${hr % 12 || 12}:${m} ${hr >= 12 ? 'PM' : 'AM'}`;
+}
+
+function renderDateCards() {
+  const list = document.getElementById('dateCardsList');
+  const empty = document.getElementById('schedEmptyState');
+  if (!list) return;
+  if (!eventDates.length) { list.innerHTML = ''; if(empty) empty.style.display = ''; return; }
+  if(empty) empty.style.display = 'none';
+  list.innerHTML = eventDates.map((d, di) => `
+    <div class="date-card" style="margin-bottom:0.75rem;">
+      <div class="date-card-head">
+        <div class="date-card-icon">&#128197;</div>
+        <div class="date-card-label">
+          <strong>${d.label || fmtDate(d.date)}</strong>
+          <span>${fmtDate(d.date)} &middot; ${d.slots.length} slot${d.slots.length !== 1 ? 's' : ''}</span>
+        </div>
+        <button class="tr-del" onclick="removeDate(${di})">&#10005;</button>
+      </div>
+      <div class="date-card-body">
+        ${d.slots.length ? d.slots.map((s, si) => `
+          <div class="slot-row">
+            <span class="slot-name">${s.name}</span>
+            <span class="slot-time">${s.start ? fmtTime(s.start) : ''} ${s.end ? '&ndash; ' + fmtTime(s.end) : ''}</span>
+            <span class="slot-cap">${s.capacity ? s.capacity + ' seats' : 'Default cap'}</span>
+            <button class="tr-del" onclick="removeSlot(${di},${si})">&#10005;</button>
+          </div>`).join('') : '<p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">No time slots yet &mdash; add at least one slot for customers to choose.</p>'}
+        <button class="add-slot-btn" onclick="openAddSlotModal(${di})">+ Add Time Slot</button>
+      </div>
+    </div>`).join('');
+  const sd = document.getElementById('startDate');
+  if (sd) sd.value = eventDates[0]?.date || '';
+  updateProgress();
+}
+
+window.openAddDateModal = () => {
+  document.getElementById('newDate').value = '';
+  document.getElementById('newDateLabel').value = '';
+  document.getElementById('addDateModal').classList.add('open');
+};
+window.closeAddDateModal = () => document.getElementById('addDateModal').classList.remove('open');
+window.addDate = () => {
+  const date = document.getElementById('newDate').value;
+  if (!date) { alert('Please select a date.'); return; }
+  if (eventDates.find(d => d.date === date)) { alert('This date is already added.'); return; }
+  eventDates.push({ date, label: document.getElementById('newDateLabel').value.trim(), slots: [] });
+  eventDates.sort((a, b) => a.date.localeCompare(b.date));
+  renderDateCards();
+  closeAddDateModal();
+};
+window.removeDate = i => { eventDates.splice(i, 1); renderDateCards(); };
+
+window.openAddSlotModal = (di) => {
+  document.getElementById('slotDateIdx').value = di;
+  ['slotName','slotStart','slotEnd','slotCap'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('addSlotModal').classList.add('open');
+};
+window.closeAddSlotModal = () => document.getElementById('addSlotModal').classList.remove('open');
+window.addSlot = () => {
+  const name = document.getElementById('slotName').value.trim();
+  if (!name) { alert('Slot name is required.'); return; }
+  const di = +document.getElementById('slotDateIdx').value;
+  eventDates[di].slots.push({
+    name,
+    start: document.getElementById('slotStart').value,
+    end: document.getElementById('slotEnd').value,
+    capacity: Number(document.getElementById('slotCap').value || 0),
+  });
+  renderDateCards();
+  closeAddSlotModal();
+};
+window.removeSlot = (di, si) => { eventDates[di].slots.splice(si, 1); renderDateCards(); };
+
+['addDateModal','addSlotModal'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+});
+
+// dummy to keep old refs alive
+let sessions = []; let recurType = 'none';
+
+window.openSessionModal = () => document.getElementById('sessionModal').classList.add('open');
+window.closeSessionModal = () => {
+  document.getElementById('sessionModal').classList.remove('open');
+  ['sName','sDate','sCap','sStart','sEnd'].forEach(id => document.getElementById(id).value = '');
+};
+window.addSession = () => {
+  const name = document.getElementById('sName').value.trim();
+  if (!name) { alert('Session name is required.'); return; }
+  sessions.push({
+    name,
+    date: document.getElementById('sDate').value,
+    start: document.getElementById('sStart').value,
+    end: document.getElementById('sEnd').value,
+    capacity: Number(document.getElementById('sCap').value || 0),
+  });
+  closeSessionModal();
+};
+
+document.getElementById('sessionModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+// ── DURATION ──
+window.setDuration = function(val) {
+  document.getElementById('eventDuration').value = val;
+  syncDurChips();
+};
+function syncDurChips() {
+  const val = +document.getElementById('eventDuration').value;
+  document.querySelectorAll('.dur-chip').forEach(c => {
+    c.classList.toggle('active', +c.dataset.val === val);
+  });
+  const hint = document.getElementById('durHint');
+  if (val >= 60) {
+    const h = Math.floor(val / 60), m = val % 60;
+    hint.textContent = `= ${h}h${m ? ' ' + m + 'm' : ''}`;
+  } else if (val > 0) {
+    hint.textContent = `= ${val} minutes`;
+  } else {
+    hint.textContent = '';
+  }
+}
+
+// ── TICKET DESIGN ──
+let ticketDesign = { g1: '#1454ff', g2: '#4c7dff' };
+let csvAttendees = [];
+
+window.setTicketTheme = function(el) {
+  document.querySelectorAll('.theme-swatch').forEach(s => s.style.outline = '3px solid transparent');
+  el.style.outline = '3px solid ' + el.dataset.g1;
+  ticketDesign.g1 = el.dataset.g1; ticketDesign.g2 = el.dataset.g2;
+  document.getElementById('tdColor1').value = el.dataset.g1;
+  document.getElementById('tdColor2').value = el.dataset.g2;
+  applyThemeToPreview(el.dataset.g1, el.dataset.g2);
+};
+window.applyCustomTheme = function() {
+  const g1 = document.getElementById('tdColor1').value;
+  const g2 = document.getElementById('tdColor2').value;
+  ticketDesign.g1 = g1; ticketDesign.g2 = g2;
+  document.querySelectorAll('.theme-swatch').forEach(s => s.style.outline = '3px solid transparent');
+  applyThemeToPreview(g1, g2);
+};
+function applyThemeToPreview(g1, g2) {
+  const h = document.getElementById('tpHeader');
+  if (h) h.style.background = 'linear-gradient(135deg,' + g1 + ',' + g2 + ')';
+}
+window.loadTicketBanner = function(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const banner = document.getElementById('tpBanner');
+    if (banner) { banner.style.backgroundImage = 'url(' + e.target.result + ')'; banner.style.display = ''; }
+    const zone = document.getElementById('tdBannerZone');
+    if (zone) zone.innerHTML = '<div style="font-size:0.8rem;font-weight:700;color:var(--green);">&#10003; Banner uploaded: ' + file.name + '</div>';
+  };
+  reader.readAsDataURL(file);
+};
+window.updateTicketPreview = function() {
+  const evName = document.getElementById('eventName')?.value.trim() || 'Event Name';
+  const venue = document.getElementById('venueName')?.value.trim() || 'Venue';
+  const tagline = document.getElementById('tdTagline')?.value.trim() || '';
+  const footer = document.getElementById('tdFooter')?.value.trim() || '';
+  const showQR = document.getElementById('tdShowQR')?.classList.contains('on');
+  const showSeat = document.getElementById('tdShowSeat')?.classList.contains('on');
+  const showVenue = document.getElementById('tdShowVenue')?.classList.contains('on');
+  const showLogo = document.getElementById('tdShowLogo')?.classList.contains('on');
+  const el = id => document.getElementById(id);
+  if (el('tpEventName')) el('tpEventName').textContent = evName;
+  if (el('tpVenue')) { el('tpVenue').style.display = showVenue ? '' : 'none'; el('tpVenue').textContent = '\uD83D\uDCCD ' + venue; }
+  if (el('tpSeatBadge')) el('tpSeatBadge').style.display = showSeat ? '' : 'none';
+  if (el('tpQRBlock')) el('tpQRBlock').style.display = showQR ? '' : 'none';
+  if (el('tpLogo')) el('tpLogo').style.display = showLogo ? '' : 'none';
+  if (el('tpCustomMsg')) el('tpCustomMsg').textContent = tagline;
+  if (el('tpFooterMsg')) el('tpFooterMsg').textContent = footer;
+};
+
+// CSV
+const AI_MAP = { name:['name','full name','attendee','attendee name','guest'], phone:['phone','mobile','whatsapp','contact','number','phone number'], email:['email','e-mail','mail'], ticket_type:['ticket','ticket type','type','tier','pass'] };
+function aiMapColumns(headers) {
+  const map = {};
+  headers.forEach((h, i) => {
+    const hl = h.toLowerCase().trim();
+    for (const [field, aliases] of Object.entries(AI_MAP)) {
+      if (!map[field] && aliases.some(a => hl.includes(a))) map[field] = i;
+    }
+  });
+  return map;
+}
+window.loadCSV = function(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.trim().split('\n').map(l => l.split(',').map(c => c.trim().replace(/^"|"$/g,'')));
+    if (lines.length < 2) { alert('CSV must have a header row and at least one attendee.'); return; }
+    const headers = lines[0];
+    const rows = lines.slice(1).filter(r => r.some(c => c));
+    const colMap = aiMapColumns(headers);
+    csvAttendees = rows.map(r => ({ name: r[colMap.name] || '', phone: r[colMap.phone] || '', email: r[colMap.email] || '', ticket_type: r[colMap.ticket_type] || '' }));
+    renderCSVPreview(headers, rows, colMap);
+    updateGenerateStatus();
+  };
+  reader.readAsText(file);
+};
+function renderCSVPreview(headers, rows, colMap) {
+  const wrap = document.getElementById('csvPreviewWrap');
+  wrap.style.display = '';
+  document.getElementById('csvStats').textContent = rows.length + ' attendees found';
+  // mapping badges
+  const mappingRow = document.getElementById('csvMappingRow');
+  mappingRow.style.gridTemplateColumns = 'repeat(' + Object.keys(colMap).length + ',1fr)';
+  mappingRow.innerHTML = Object.entries(colMap).map(([field, idx]) =>
+    '<div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:8px;padding:0.35rem 0.6rem;font-size:0.7rem;"><span style="font-weight:800;color:var(--blue);">' + field + '</span><span style="color:var(--muted);"> ← ' + headers[idx] + '</span></div>'
+  ).join('');
+  // table
+  const preview = rows.slice(0, 5);
+  document.getElementById('csvThead').innerHTML = '<tr>' + headers.map(h => '<th style="padding:0.45rem 0.65rem;text-align:left;font-size:0.72rem;font-weight:800;color:var(--muted);border-bottom:1px solid var(--border);">' + h + '</th>').join('') + '</tr>';
+  document.getElementById('csvTbody').innerHTML = preview.map(r =>
+    '<tr>' + r.map(c => '<td style="padding:0.4rem 0.65rem;font-size:0.76rem;border-bottom:1px solid var(--border);">' + c + '</td>').join('') + '</tr>'
+  ).join('');
+}
+window.downloadSampleCSV = function() {
+  const csv = 'name,phone,email,ticket_type\nRahul Sharma,9876543210,rahul@email.com,General\nPriya Patel,9123456789,priya@email.com,VIP';
+  const a = document.createElement('a'); a.href = 'data:text/csv,' + encodeURIComponent(csv); a.download = 'sample_attendees.csv'; a.click();
+};
+function updateGenerateStatus() {
+  const status = document.getElementById('generateStatus');
+  const msg = document.getElementById('generateStatusMsg');
+  const creditSummary = document.getElementById('creditSummary');
+  const count = csvAttendees.length;
+  const credits = count * 2;
+  const cost = credits * 2;
+  if (count) {
+    status.style.display = '';
+    msg.textContent = count + ' tickets will be generated and sent.';
+    creditSummary.style.display = '';
+    document.getElementById('totalCredits').textContent = credits + ' credits';
+    document.getElementById('totalCost').textContent = '\u20b9' + cost.toLocaleString('en-IN');
+    document.getElementById('ccTickets').textContent = count;
+    document.getElementById('ccCredits').textContent = credits;
+    document.getElementById('ccCost').innerHTML = '\u20b9' + cost.toLocaleString('en-IN');
+  } else {
+    status.style.display = 'none';
+    creditSummary.style.display = 'none';
+  }
+}
+window.generateTickets = function() {
+  if (!csvAttendees.length) { alert('Please upload a CSV with attendees first.'); return; }
+  const credits = csvAttendees.length * 2;
+  const cost = credits * 2;
+  if (!confirm(csvAttendees.length + ' tickets will be sent.\n' + credits + ' credits (' + '\u20b9' + cost + ') will be deducted.\n\nProceed?')) return;
+  const btn = document.getElementById('generateBtn');
+  btn.textContent = '\u23F3 Generating...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '\u2705 ' + csvAttendees.length + ' Tickets Generated & Sent!';
+    btn.style.background = 'linear-gradient(135deg,#059669,#34d399)';
+    btn.disabled = false;
+  }, 2000);
+};
+
+// ── RSVP preview ──
+const rsvpFieldDefs = {
+  phone:     { icon:'&#128241;', label:'Phone Number',           type:'tel',      placeholder:'e.g. 9876543210' },
+  dob:       { icon:'&#127874;', label:'Date of Birth',          type:'date',     placeholder:'' },
+  gender:    { icon:'&#129518;', label:'Gender',                 type:'select',   placeholder:'' },
+  city:      { icon:'&#128205;', label:'City',                   type:'text',     placeholder:'e.g. Mumbai' },
+  dietary:   { icon:'&#129367;', label:'Dietary Preferences',    type:'select',   placeholder:'' },
+  tshirt:    { icon:'&#128085;', label:'T-Shirt Size',           type:'select',   placeholder:'' },
+  company:   { icon:'&#127970;', label:'Company / Organisation', type:'text',     placeholder:'e.g. Acme Corp' },
+  emergency: { icon:'&#128680;', label:'Emergency Contact',      type:'text',     placeholder:'Name & phone' },
+};
+
+let rsvpShowConfirm = false;
+window.toggleRsvpConfirmPreview = function() {
+  rsvpShowConfirm = !rsvpShowConfirm;
+  document.getElementById('rsvpPreviewConfirm').style.display = rsvpShowConfirm ? '' : 'none';
+  document.getElementById('rsvpPreviewFields').style.display  = rsvpShowConfirm ? 'none' : '';
+  const btn = document.getElementById('rsvpPvConfirmBtn');
+  btn.textContent = rsvpShowConfirm ? 'Show Form' : 'Show Confirm';
+  btn.style.color = rsvpShowConfirm ? 'var(--blue)' : 'var(--muted)';
+  if (rsvpShowConfirm) syncRsvpConfirmMsg();
+};
+
+function syncRsvpConfirmMsg() {
+  const raw = (document.getElementById('rsvpConfirmMsg') || {}).value || '';
+  const clean = raw.replace(/^[\s\S]{0,2}/, '').trim() || raw.trim();
+  document.getElementById('rsvpPvConfirmMsg').textContent = clean || "You're registered! Check your email for your ticket.";
+}
+
+function rsvpPreviewFieldHtml(icon, label, type, placeholder, required) {
+  let input;
+  if (type === 'select') {
+    input = '<div class="rpf-input is-select"><span>Select an option</span></div>';
+  } else if (type === 'textarea') {
+    input = '<div class="rpf-input is-textarea"><span>' + (placeholder || 'Type here...') + '</span></div>';
+  } else if (type === 'date') {
+    input = '<div class="rpf-input"><span>&#128197; Pick a date</span></div>';
+  } else if (type === 'checkbox') {
+    return '<div class="rpf-group"><div class="rpf-checkbox"><div class="rpf-checkbox-box"></div><span>' + label + '</span></div></div>';
+  } else {
+    input = '<div class="rpf-input"><span>' + (placeholder || 'Type here...') + '</span></div>';
+  }
+  return '<div class="rpf-group"><div class="rpf-label">' + icon + ' ' + label + (required ? '<span class="rpf-req">*</span>' : '') + '</div>' + input + '</div>';
+}
+
+window.renderRsvpPreview = function() {
+  const container = document.getElementById('rsvpPreviewFields');
+  if (!container) return;
+  let html = '<div class="rpf-section">Personal Details</div>';
+  html += rsvpPreviewFieldHtml('&#128100;', 'Full Name', 'text', 'Enter your full name', true);
+  html += rsvpPreviewFieldHtml('&#9993;&#65039;', 'Email Address', 'email', 'your@email.com', true);
+
+  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="6"] .toggle[data-field].on');
+  // collect active optional fields from toggles in the RSVP panel
+  const activeOpt = [];
+  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
+    if (t.classList.contains('on')) activeOpt.push(t.dataset.field);
+  });
+  if (activeOpt.length) {
+    html += '<div class="rpf-section">Additional Info</div>';
+    activeOpt.forEach(key => {
+      const d = rsvpFieldDefs[key];
+      if (d) html += rsvpPreviewFieldHtml(d.icon, d.label, d.type, d.placeholder, false);
+    });
+  }
+
+  const validCQs = rsvpCQs.filter(q => q.question);
+  if (validCQs.length) {
+    html += '<div class="rpf-section">Custom Questions</div>';
+    validCQs.forEach(q => html += rsvpPreviewFieldHtml('&#10067;', q.question, q.type, '', q.required));
+  }
+
+  container.innerHTML = html;
+
+  // update event name
+  const evName = (document.getElementById('eventName') || {}).value || 'Your Event Name';
+  const pvName = document.getElementById('rsvpPvEventName');
+  if (pvName) pvName.textContent = evName || 'Your Event Name';
+
+  // counts & progress
+  const total = 2 + activeOpt.length + validCQs.length;
+  const req   = 2 + validCQs.filter(q => q.required).length;
+  const pct   = Math.round((req / Math.max(total, 1)) * 100);
+  const fc = document.getElementById('rsvpPvFieldCount'); if (fc) fc.textContent = total + ' fields';
+  const rc = document.getElementById('rsvpPvReqCount');   if (rc) rc.textContent = req + ' required';
+  const pb = document.getElementById('rsvpPvProgress');   if (pb) pb.style.width = pct + '%';
+  const pl = document.getElementById('rsvpPvProgressLabel'); if (pl) pl.textContent = req + ' / ' + total;
+
+  // TC row
+  const tcEl = document.getElementById('rsvpPvTC');
+  const tcToggle = document.getElementById('rsvpToggleTC');
+  if (tcEl && tcToggle) tcEl.style.display = tcToggle.classList.contains('on') ? '' : 'none';
+
+  if (rsvpShowConfirm) syncRsvpConfirmMsg();
+};
+
+// ── RSVP step helpers ──
+let rsvpCQs = [];
+window.addRsvpCQ = function() {
+  rsvpCQs.push({ question:'', type:'text', required:false });
+  renderRsvpCQs();
+};
+function renderRsvpCQs() {
+  const list = document.getElementById('rsvpCQList');
+  if (!list) return;
+  if (!rsvpCQs.length) {
+    list.innerHTML = '<div style="text-align:center;padding:1.2rem;border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-size:.82rem;">No custom questions yet.</div>';
+    return;
+  }
+  list.innerHTML = rsvpCQs.map((q, i) => `
+    <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:.5rem;">
+      <div style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;background:var(--blue-soft);border-bottom:1px solid var(--border);">
+        <strong style="flex:1;font-size:.84rem;">Question ${i+1}</strong>
+        <label style="display:flex;align-items:center;gap:.3rem;font-size:.74rem;font-weight:700;cursor:pointer;">
+          <input type="checkbox" ${q.required?'checked':''} onchange="rsvpCQs[${i}].required=this.checked" style="accent-color:var(--blue);"> Required
+        </label>
+        <button onclick="rsvpCQs.splice(${i},1);renderRsvpCQs();renderRsvpPreview()" style="background:none;border:none;color:var(--red);cursor:pointer;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.75rem .85rem;display:flex;flex-direction:column;gap:.5rem;">
+        <div class="field"><label>Question text</label><input type="text" value="${q.question}" placeholder="e.g. How did you hear about us?" oninput="rsvpCQs[${i}].question=this.value;renderRsvpPreview()" /></div>
+        <div class="field"><label>Answer type</label>
+          <select onchange="rsvpCQs[${i}].type=this.value;renderRsvpPreview()">
+            <option value="text" ${q.type==='text'?'selected':''}>Short text</option>
+            <option value="textarea" ${q.type==='textarea'?'selected':''}>Long text</option>
+            <option value="select" ${q.type==='select'?'selected':''}>Dropdown</option>
+            <option value="checkbox" ${q.type==='checkbox'?'selected':''}>Checkbox</option>
+          </select>
+        </div>
+      </div>
+    </div>`).join('');
+}
+window.rsvpCreate = async function() {
+  const btn = event.target; btn.textContent = 'Saving...';
+  const rsvpToggles = {};
+  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
+    rsvpToggles[t.dataset.field] = t.classList.contains('on');
+  });
+  const payload = {
+    rsvpForm: {
+      activeFields: rsvpToggles,
+      customQuestions: rsvpCQs,
+      confirmMsg: (document.getElementById('rsvpConfirmMsg') || {}).value || '',
+      sendConfirmEmail: document.getElementById('rsvpToggleConfEmail').classList.contains('on'),
+      sendConfirmWA: document.getElementById('rsvpToggleConfWA').classList.contains('on'),
+      requireTC: document.getElementById('rsvpToggleTC').classList.contains('on'),
+    },
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    if (!uid) { await loadUser(); }
+    if (!uid) { alert("Please sign in."); return; }
+    // find or create draft
+    const params = new URLSearchParams(location.search);
+    const eventId = params.get('eventId');
+    if (eventId) {
+      await db.collection('events').doc(eventId).update(payload);
+    } else {
+      const ref = await db.collection('events').add({ ownerId: uid, status: 'draft', ...payload, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      history.replaceState(null, '', '?eventId=' + ref.id);
+    }
+    btn.textContent = '✓ Created!';
+  } catch(e) {
+    btn.textContent = '✓ Create Form';
+    alert('Error saving: ' + e.message);
+    return;
+  }
+  setTimeout(() => btn.textContent = '✓ Create Form', 1200);
+};
+window.rsvpDownload = function() {
+  const rows = ['Field,Type,Required', 'Full Name,text,Yes', 'Email Address,email,Yes'];
+  document.querySelectorAll('.toggle[data-field]').forEach(t => {
+    if (t.classList.contains('on')) rows.push(t.dataset.field + ',text,No');
+  });
+  rsvpCQs.forEach(q => { if(q.question) rows.push(`"${q.question}",${q.type},${q.required?'Yes':'No'}`); });
+  const a = document.createElement('a');
+  a.href = 'data:text/csv,' + encodeURIComponent(rows.join('\n'));
+  a.download = 'rsvp-form.csv'; a.click();
+};
+window.rsvpShareModal = function() {
+  document.getElementById('rsvpShareModalEl').classList.add('open');
+};
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('rsvpShareModalEl');
+  if (el) el.addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+});
+
+// ── RSVP step helpers ──
+updateProgress();
+renderRsvpPreview();
+
+// load wallet credits in topbar
+(async function loadWalletBalance() {
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!res.ok) return;
+    const { user } = await res.json();
+    // real-time listener so it updates after purchase
+    db.collection('wallets').doc(user.uid).onSnapshot(doc => {
+      const credits = doc.exists ? (doc.data().credits || 0) : 0;
+      const el = document.getElementById('topCredits');
+      if (el) el.textContent = credits.toLocaleString('en-IN');
+    });
+  } catch(e) {
+    // fallback: firebase auth
+    auth.onAuthStateChanged(user => {
+      if (!user) return;
+      db.collection('wallets').doc(user.uid).onSnapshot(doc => {
+        const credits = doc.exists ? (doc.data().credits || 0) : 0;
+        const el = document.getElementById('topCredits');
+        if (el) el.textContent = credits.toLocaleString('en-IN');
+      });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
