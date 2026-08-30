@@ -1,507 +1,925 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CultureWave | Booking</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <style>
-      body { background: #fff; }
-      .book-hero {
-        background: linear-gradient(135deg, #f0f5ff 0%, #e8f0fe 60%, #fff 100%);
-        border-bottom: 1px solid #e2eafc;
-        padding: 3.5rem 0 3rem;
-        text-align: center;
-      }
-      .book-hero-inner { max-width: 700px; margin: 0 auto; padding: 0 1.4rem; }
-      .book-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        background: rgba(18,66,197,0.08);
-        border: 1px solid rgba(18,66,197,0.2);
-        border-radius: 999px;
-        padding: 0.32rem 0.9rem;
-        font-size: 0.75rem;
-        font-weight: 800;
-        color: #1242c5;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-      }
-      .book-hero h1 {
-        margin: 0 0 0.8rem;
-        font-size: clamp(2.4rem, 5vw, 3.8rem);
-        font-weight: 800;
-        letter-spacing: -0.06em;
-        color: #0a0f1e;
-      }
-      .book-hero h1 span { color: #1242c5; }
-      .book-hero p { margin: 0; color: #5a6480; font-size: 1rem; line-height: 1.7; }
-      .book-wrap { max-width: 1240px; margin: 0 auto; padding: 0 1.4rem; }
-      .book-section { padding: 3rem 0; }
-      .book-grid {
-        display: grid;
-        grid-template-columns: 1.25fr 0.95fr;
-        gap: 1.6rem;
-        align-items: start;
-      }
-      .book-card {
-        border: 1.5px solid #e8edf8;
-        border-radius: 24px;
-        padding: 1.8rem;
-        background: #fff;
-        box-shadow: 0 4px 24px rgba(18,66,197,0.07);
-      }
-      .book-title { font-size: 1.3rem; font-weight: 800; color: #0a0f1e; margin: 0 0 0.3rem; }
-      .book-sub { color: #6b7280; font-size: 0.88rem; margin: 0 0 1.4rem; }
-      .book-form { display: grid; gap: 1rem; }
-      .book-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-      .book-label { display: grid; gap: 0.4rem; }
-      .book-label span {
-        font-size: 0.75rem;
-        font-weight: 800;
-        color: #5f6f95;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-      }
-      .book-input, .book-select {
-        padding: 0.8rem 1rem;
-        border: 1.5px solid #d0d9f0;
-        border-radius: 12px;
-        background: #f7faff;
-        color: #0f172a;
-        font-size: 0.9rem;
-        font-family: inherit;
-        outline: none;
-      }
-      .book-input:focus, .book-select:focus { border-color: #1242c5; background: #fff; }
-      .book-methods { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-      .book-method {
-        flex: 1;
-        min-width: 80px;
-        border: 1.5px solid #d0d9f0;
-        border-radius: 14px;
-        padding: 0.75rem 0.5rem;
-        background: #f7faff;
-        text-align: center;
-        cursor: pointer;
-      }
-      .book-method input { display: none; }
-      .book-method .icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
-      .book-method .label { font-size: 0.78rem; font-weight: 800; color: #4a5580; }
-      .book-method.selected { border-color: #1242c5; background: #f0f5ff; box-shadow: 0 0 0 3px rgba(18,66,197,0.1); }
-      .summary {
-        background: #f7faff;
-        border: 1.5px solid #e2eafc;
-        border-radius: 16px;
-        padding: 1rem 1.2rem;
-      }
-      .summary-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.45rem 0;
-        font-size: 0.9rem;
-        color: #374151;
-        font-weight: 600;
-        border-bottom: 1px solid #edf0f8;
-      }
-      .summary-row:last-child { border-bottom: none; }
-      .summary-row.total { font-size: 1rem; font-weight: 800; color: #0a0f1e; }
-      .summary-row.total strong { color: #1242c5; font-size: 1.1rem; }
-      .book-btn {
-        width: 100%;
-        padding: 1rem;
-        border: 0;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #1242c5, #2f6bff);
-        color: #fff;
-        font-size: 1rem;
-        font-weight: 800;
-        cursor: pointer;
-        box-shadow: 0 8px 24px rgba(18,66,197,0.28);
-        margin-top: 0.4rem;
-      }
-      .receipt {
-        border: 1.5px solid #e8edf8;
-        border-radius: 24px;
-        padding: 1.6rem;
-        background: #fff;
-        box-shadow: 0 4px 24px rgba(18,66,197,0.07);
-        position: sticky;
-        top: 5.5rem;
-      }
-      .receipt-banner {
-        height: 110px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #1242c5, #4f8ef7);
-        margin-bottom: 1.2rem;
-        display: grid;
-        place-items: center;
-        font-size: 2rem;
-      }
-      .receipt-title { font-size: 1.1rem; font-weight: 800; color: #0a0f1e; margin: 0 0 0.2rem; }
-      .receipt-venue { font-size: 0.82rem; color: #6b7280; font-weight: 600; margin: 0 0 1rem; }
-      .receipt-rows { display: grid; gap: 0.5rem; margin-bottom: 1.2rem; }
-      .receipt-row { display: flex; justify-content: space-between; font-size: 0.88rem; color: #374151; font-weight: 600; }
-      .receipt-row strong { color: #0a0f1e; }
-      .receipt-status { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
-      .receipt-status.success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-      .receipt-divider { border: none; border-top: 1.5px dashed #e2eafc; margin: 1rem 0; }
-      .receipt-total { display: flex; justify-content: space-between; font-weight: 800; font-size: 1rem; color: #0a0f1e; }
-      .receipt-total span { color: #1242c5; font-size: 1.15rem; }
-      @media (max-width: 900px) {
-        .book-grid { grid-template-columns: 1fr; }
-        .receipt { position: static; }
-        .book-row { grid-template-columns: 1fr; }
-      }
-      @media (max-width: 600px) {
-        .book-hero { padding: 2.5rem 0 2rem; }
-        .book-hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
-        .book-card { padding: 1.2rem; }
-        .book-methods { gap: 0.5rem; }
-        .book-method { min-width: 60px; padding: 0.6rem 0.4rem; }
-      }
-    </style>
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="nav-wrap">
-        <div class="brand-block">
-          <div class="logo">CultureWave</div>
-          <div class="brand-sub">by OGSHOOTS LUXE</div>
-        </div>
-        <nav class="topnav">
-          <a href="index.html">Home</a>
-          <a href="events.html">Events</a>
-          <a href="features.html">Features</a>
-          <a href="how-it-works.html">How it works</a>
-        </nav>
-        <div class="auth-actions">
-          <a class="nav-link" href="login.html">Login</a>
-          <a class="nav-cta" href="login.html">Get Started</a>
-        </div>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CultureWave | Booking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    body { background: #f0f4ff; }
 
-    <nav class="mobile-nav" id="mobileNav">
-      <a href="index.html">Home</a>
-      <a href="events.html">Events</a>
-      <a href="features.html">Features</a>
-      <a href="how-it-works.html">How it works</a>
-      <div class="mobile-nav-ctas">
+    /* ── HERO ── */
+    .bk-hero {
+      background: linear-gradient(145deg,#0a0f1e 0%,#0d1f4a 55%,#0f2d6b 100%);
+      padding: 3.8rem 0 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .bk-hero::before {
+      content:""; position:absolute; top:-140px; right:-140px;
+      width:500px; height:500px; border-radius:50%;
+      background:radial-gradient(circle,rgba(47,107,255,.28) 0%,transparent 68%);
+      pointer-events:none;
+    }
+    .bk-hero::after {
+      content:""; position:absolute; bottom:-80px; left:-80px;
+      width:340px; height:340px; border-radius:50%;
+      background:radial-gradient(circle,rgba(18,66,197,.22) 0%,transparent 68%);
+      pointer-events:none;
+    }
+    .bk-hero-inner { max-width:680px; margin:0 auto; padding:0 1.4rem; position:relative; z-index:1; }
+    .bk-badge {
+      display:inline-flex; align-items:center; gap:.4rem;
+      background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
+      border-radius:999px; padding:.35rem 1rem;
+      font-size:.72rem; font-weight:800; color:rgba(255,255,255,.85);
+      letter-spacing:.14em; text-transform:uppercase; margin-bottom:1.1rem;
+    }
+    .bk-hero h1 {
+      margin:0 0 .7rem;
+      font-size:clamp(2.2rem,5vw,3.6rem);
+      font-weight:800; letter-spacing:-.06em; color:#fff; line-height:1.05;
+    }
+    .bk-hero h1 span { color:#7eb3ff; }
+    .bk-hero p { margin:0; color:rgba(255,255,255,.5); font-size:.97rem; line-height:1.7; }
+
+    /* ── STEPPER ── */
+    .bk-stepper-wrap {
+      position:relative; z-index:1;
+      margin-top:2.6rem;
+      background:rgba(255,255,255,.06);
+      border-top:1px solid rgba(255,255,255,.1);
+      backdrop-filter:blur(12px);
+    }
+    .bk-stepper {
+      max-width:680px; margin:0 auto; padding:0 1.4rem;
+      display:flex; align-items:stretch;
+    }
+    .bk-step-tab {
+      flex:1; display:flex; flex-direction:column;
+      align-items:center; gap:.35rem;
+      padding:1.1rem .5rem;
+      position:relative; cursor:default;
+      border-bottom:3px solid transparent;
+      transition:border-color .25s;
+    }
+    .bk-step-tab.done   { border-bottom-color:rgba(126,179,255,.4); }
+    .bk-step-tab.active { border-bottom-color:#2f6bff; }
+    .bk-step-circle {
+      width:2rem; height:2rem; border-radius:50%;
+      display:grid; place-items:center;
+      font-size:.78rem; font-weight:800;
+      border:2px solid rgba(255,255,255,.2);
+      color:rgba(255,255,255,.4);
+      transition:all .25s;
+    }
+    .bk-step-tab.done .bk-step-circle {
+      background:rgba(126,179,255,.18);
+      border-color:rgba(126,179,255,.5);
+      color:#7eb3ff;
+    }
+    .bk-step-tab.active .bk-step-circle {
+      background:#2f6bff; border-color:#2f6bff; color:#fff;
+      box-shadow:0 0 0 5px rgba(47,107,255,.25);
+    }
+    .bk-step-label {
+      font-size:.7rem; font-weight:800; letter-spacing:.06em;
+      text-transform:uppercase; color:rgba(255,255,255,.35);
+      transition:color .25s;
+    }
+    .bk-step-tab.done   .bk-step-label { color:rgba(126,179,255,.7); }
+    .bk-step-tab.active .bk-step-label { color:#fff; }
+    .bk-step-connector {
+      align-self:center; flex:none;
+      width:2rem; height:2px;
+      background:rgba(255,255,255,.12);
+      margin-bottom:1.4rem;
+      position:relative; overflow:hidden;
+    }
+    .bk-step-connector::after {
+      content:""; position:absolute; inset:0;
+      background:#2f6bff;
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .4s ease;
+    }
+    .bk-step-connector.filled::after { transform:scaleX(1); }
+
+    /* ── MAIN LAYOUT ── */
+    .bk-wrap { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
+    .bk-section { padding:2.6rem 0 4rem; }
+    .bk-grid {
+      display:grid;
+      grid-template-columns:1.35fr 1fr;
+      gap:1.6rem; align-items:start;
+    }
+
+    /* ── STEP PANELS ── */
+    .bk-panel { display:none; }
+    .bk-panel.active { display:grid; gap:1.1rem; }
+
+    /* ── FORM CARD ── */
+    .bk-card {
+      background:#fff; border:1.5px solid #e2eafc;
+      border-radius:28px; padding:2rem;
+      box-shadow:0 8px 36px rgba(18,66,197,.09);
+    }
+    .bk-card-head { margin-bottom:1.5rem; }
+    .bk-card-head h2 {
+      font-size:1.35rem; font-weight:800;
+      color:#0a0f1e; letter-spacing:-.04em; margin:0 0 .3rem;
+    }
+    .bk-card-head p { color:#6b7280; font-size:.88rem; margin:0; }
+
+    .bk-field { display:grid; gap:.4rem; }
+    .bk-field-label {
+      font-size:.7rem; font-weight:800;
+      letter-spacing:.14em; text-transform:uppercase; color:#5f6f95;
+    }
+    .bk-input-wrap {
+      display:flex; align-items:center; gap:.6rem;
+      padding:0 1rem; min-height:50px;
+      border-radius:14px; border:1.5px solid #dce4f5;
+      background:#f7faff;
+      transition:border-color .2s,box-shadow .2s,background .2s;
+    }
+    .bk-input-wrap:focus-within {
+      border-color:#1242c5; background:#fff;
+      box-shadow:0 0 0 3px rgba(18,66,197,.08);
+    }
+    .bk-input-icon { font-size:1rem; flex:none; }
+    .bk-input-wrap input,
+    .bk-input-wrap select {
+      flex:1; border:none; outline:none;
+      background:transparent; color:#0a0f1e;
+      font-size:.92rem; font-family:inherit;
+    }
+    .bk-input-wrap input::placeholder { color:#b0bcd4; }
+    .bk-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+    /* event cards */
+    .bk-event-cards { display:grid; gap:.7rem; }
+    .bk-event-card {
+      display:flex; align-items:center; gap:1rem;
+      padding:1rem 1.1rem;
+      border:1.5px solid #dce4f5; border-radius:18px;
+      background:#f7faff; cursor:pointer;
+      transition:all .18s;
+    }
+    .bk-event-card:hover { border-color:#1242c5; background:#eef4ff; }
+    .bk-event-card.selected {
+      border-color:#1242c5; background:#eef4ff;
+      box-shadow:0 0 0 3px rgba(18,66,197,.1);
+    }
+    .bk-event-card input[type=radio] { display:none; }
+    .bk-event-emoji {
+      width:3rem; height:3rem; border-radius:14px;
+      background:linear-gradient(135deg,#1242c5,#2f6bff);
+      display:grid; place-items:center; font-size:1.4rem; flex:none;
+    }
+    .bk-event-info { flex:1; }
+    .bk-event-info strong { display:block; font-size:.95rem; font-weight:800; color:#0a0f1e; }
+    .bk-event-info span { font-size:.78rem; color:#6b7280; font-weight:600; }
+    .bk-event-price {
+      font-size:.88rem; font-weight:800; color:#1242c5;
+      white-space:nowrap;
+    }
+    .bk-event-check {
+      width:1.4rem; height:1.4rem; border-radius:50%;
+      border:2px solid #dce4f5; flex:none;
+      display:grid; place-items:center;
+      transition:all .18s;
+    }
+    .bk-event-card.selected .bk-event-check {
+      background:#1242c5; border-color:#1242c5;
+    }
+    .bk-event-card.selected .bk-event-check::after {
+      content:"✓"; color:#fff; font-size:.7rem; font-weight:800;
+    }
+
+    /* payment method tiles */
+    .bk-methods { display:grid; grid-template-columns:repeat(4,1fr); gap:.7rem; }
+    .bk-method {
+      border:1.5px solid #dce4f5; border-radius:18px;
+      padding:1rem .5rem; background:#f7faff;
+      text-align:center; cursor:pointer; transition:all .18s;
+    }
+    .bk-method input { display:none; }
+    .bk-method-icon { font-size:1.6rem; display:block; margin-bottom:.4rem; }
+    .bk-method-label { font-size:.75rem; font-weight:800; color:#4a5580; }
+    .bk-method.selected {
+      border-color:#1242c5; background:#eef4ff;
+      box-shadow:0 0 0 3px rgba(18,66,197,.1);
+    }
+    .bk-method.selected .bk-method-label { color:#1242c5; }
+
+    /* summary box */
+    .bk-summary {
+      background:linear-gradient(135deg,#f0f5ff,#eef4ff);
+      border:1.5px solid #dce8ff; border-radius:18px;
+      padding:1.1rem 1.3rem;
+    }
+    .bk-summary-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:.42rem 0; font-size:.88rem; color:#374151; font-weight:600;
+      border-bottom:1px solid rgba(18,66,197,.07);
+    }
+    .bk-summary-row:last-child { border-bottom:none; }
+    .bk-summary-row.total {
+      font-size:1rem; font-weight:800; color:#0a0f1e;
+      padding-top:.7rem; margin-top:.2rem;
+    }
+    .bk-summary-row.total strong { color:#1242c5; font-size:1.15rem; }
+
+    /* nav buttons */
+    .bk-nav { display:flex; gap:.8rem; margin-top:.4rem; }
+    .bk-btn-next {
+      flex:1; min-height:52px; border:none; border-radius:14px;
+      background:linear-gradient(135deg,#2f6bff,#1242c5);
+      color:#fff; font-size:.95rem; font-weight:800; cursor:pointer;
+      box-shadow:0 8px 24px rgba(18,66,197,.28);
+      transition:transform .15s,box-shadow .15s;
+      display:flex; align-items:center; justify-content:center; gap:.5rem;
+    }
+    .bk-btn-next:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(18,66,197,.36); }
+    .bk-btn-back {
+      min-height:52px; padding:0 1.4rem; border:1.5px solid #dce4f5;
+      border-radius:14px; background:#fff; color:#5f6f95;
+      font-size:.9rem; font-weight:800; cursor:pointer;
+      transition:border-color .18s,color .18s;
+    }
+    .bk-btn-back:hover { border-color:#1242c5; color:#1242c5; }
+    .bk-secure-note {
+      display:flex; align-items:center; justify-content:center;
+      gap:.4rem; font-size:.74rem; color:#9ca3af; font-weight:600;
+      margin-top:.5rem;
+    }
+
+    /* ── RECEIPT CARD ── */
+    .bk-receipt {
+      background:#fff; border:1.5px solid #e2eafc;
+      border-radius:28px; overflow:hidden;
+      box-shadow:0 8px 36px rgba(18,66,197,.09);
+      position:sticky; top:5.5rem;
+    }
+    .bk-receipt-banner {
+      height:150px;
+      background:linear-gradient(135deg,#0a0f1e 0%,#1242c5 60%,#2f6bff 100%);
+      display:grid; place-items:center; font-size:3.2rem;
+      position:relative; overflow:hidden;
+    }
+    .bk-receipt-banner::before {
+      content:""; position:absolute; inset:0;
+      background:radial-gradient(circle at 75% 25%,rgba(126,179,255,.25),transparent 55%);
+    }
+    .bk-receipt-body { padding:1.5rem; }
+    .bk-receipt-event { font-size:1.1rem; font-weight:800; color:#0a0f1e; margin:0 0 .2rem; }
+    .bk-receipt-venue {
+      font-size:.78rem; color:#6b7280; font-weight:600;
+      margin:0 0 1.2rem; display:flex; align-items:center; gap:.3rem;
+    }
+    .bk-receipt-venue::before { content:"📍"; font-size:.72rem; }
+    .bk-receipt-rows { display:grid; }
+    .bk-receipt-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:.52rem 0; font-size:.84rem; color:#6b7280; font-weight:600;
+      border-bottom:1px solid #f0f4ff;
+    }
+    .bk-receipt-row:last-child { border-bottom:none; }
+    .bk-receipt-row strong { color:#0a0f1e; font-weight:800; }
+    .bk-receipt-divider { border:none; border-top:1.5px dashed #dce8ff; margin:1rem 0; }
+    .bk-receipt-total {
+      display:flex; justify-content:space-between; align-items:center;
+      font-weight:800; font-size:1rem; color:#0a0f1e;
+    }
+    .bk-receipt-total-amt { color:#1242c5; font-size:1.2rem; }
+    .bk-status-pill {
+      display:inline-flex; align-items:center; gap:.35rem;
+      padding:.28rem .75rem; border-radius:999px;
+      font-size:.72rem; font-weight:800;
+      background:#fef9c3; color:#854d0e; border:1px solid #fde68a;
+    }
+    .bk-status-pill.success { background:#dcfce7; color:#166534; border-color:#bbf7d0; }
+    .bk-status-pill.failed  { background:#fee2e2; color:#991b1b; border-color:#fca5a5; }
+
+    /* progress bar inside receipt */
+    .bk-progress-bar {
+      height:4px; background:#f0f4ff; margin-bottom:1.2rem; border-radius:2px; overflow:hidden;
+    }
+    .bk-progress-fill {
+      height:100%; background:linear-gradient(90deg,#2f6bff,#7eb3ff);
+      border-radius:2px; transition:width .4s ease;
+      width:25%;
+    }
+
+    /* trust badges */
+    .bk-trust {
+      display:grid; grid-template-columns:repeat(3,1fr);
+      gap:.55rem; margin-top:1.3rem;
+    }
+    .bk-trust-item {
+      background:#f7faff; border:1px solid #e2eafc;
+      border-radius:14px; padding:.75rem .5rem; text-align:center;
+    }
+    .bk-trust-item span { font-size:1.1rem; display:block; margin-bottom:.25rem; }
+    .bk-trust-item p { font-size:.68rem; font-weight:700; color:#5f6f95; margin:0; line-height:1.3; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:900px) {
+      .bk-grid { grid-template-columns:1fr; }
+      .bk-receipt { position:static; }
+    }
+    @media (max-width:600px) {
+      .bk-hero { padding:2.8rem 0 0; }
+      .bk-hero h1 { font-size:clamp(1.9rem,8vw,2.8rem); }
+      .bk-card { padding:1.4rem; border-radius:22px; }
+      .bk-row { grid-template-columns:1fr; }
+      .bk-methods { grid-template-columns:repeat(2,1fr); }
+      .bk-step-label { display:none; }
+      .bk-step-connector { width:1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="nav-wrap">
+      <div class="brand-block">
+        <div class="logo">CultureWave</div>
+        <div class="brand-sub">by OGSHOOTS LUXE</div>
+      </div>
+      <nav class="topnav">
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="features.html">Features</a>
+        <a href="how-it-works.html">How it works</a>
+      </nav>
+      <div class="auth-actions">
         <a class="nav-link" href="login.html">Login</a>
         <a class="nav-cta" href="login.html">Get Started</a>
       </div>
-    </nav>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
 
-    <main>
-      <section class="book-hero">
-        <div class="book-hero-inner">
-          <div class="book-badge">🎟️ Booking</div>
-          <h1>Book seats <span>instantly</span></h1>
-          <p>Choose an event, add your details, pick a payment method, and confirm your booking in one focused flow.</p>
-        </div>
-      </section>
+  <nav class="mobile-nav" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="events.html">Events</a>
+    <a href="features.html">Features</a>
+    <a href="how-it-works.html">How it works</a>
+    <div class="mobile-nav-ctas">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="login.html">Get Started</a>
+    </div>
+  </nav>
 
-      <section class="book-section">
-        <div class="book-wrap">
-          <div class="book-grid">
-            <div class="book-card">
-              <p class="book-title">Complete your booking</p>
-              <p class="book-sub">Fill in your details and choose a payment method to confirm your seat.</p>
-              <form class="book-form" id="bookForm">
-                <div class="book-label">
-                  <span>Select Event</span>
-                  <select class="book-select" id="bookEventSelect">
-                    <option value="himtex">HIMTEX 2026 - Free</option>
-                    <option value="nullcon">Nullcon Hyderabad 2026 - ₹2,499</option>
-                    <option value="sportexpo">Sport Expo India - ₹499</option>
-                    <option value="credai">CREDAI Property Show - Free</option>
-                    <option value="design">Design Democracy 2026 - ₹999</option>
-                  </select>
-                </div>
-                <div class="book-row">
-                  <label class="book-label">
-                    <span>Your Name</span>
-                    <input class="book-input" type="text" placeholder="Full name" id="bookName" required />
-                  </label>
-                  <label class="book-label">
-                    <span>Email</span>
-                    <input class="book-input" type="email" placeholder="you@example.com" id="bookEmail" required />
-                  </label>
-                </div>
-                <div class="book-row">
-                  <label class="book-label">
-                    <span>Phone</span>
-                    <input class="book-input" type="tel" placeholder="10-digit number" id="bookPhone" />
-                  </label>
-                  <label class="book-label">
-                    <span>Seats / Passes</span>
-                    <input class="book-input" type="number" min="1" max="10" value="1" id="bookSeats" />
-                  </label>
-                </div>
-                <div class="book-label">
-                  <span>Payment Method</span>
-                  <div class="book-methods">
-                    <label class="book-method selected">
-                      <input type="radio" name="bookMethod" value="upi" checked />
-                      <span class="icon">📱</span>
-                      <span class="label">UPI</span>
-                    </label>
-                    <label class="book-method">
-                      <input type="radio" name="bookMethod" value="qr" />
-                      <span class="icon">📷</span>
-                      <span class="label">QR Scan</span>
-                    </label>
-                    <label class="book-method">
-                      <input type="radio" name="bookMethod" value="card" />
-                      <span class="icon">💳</span>
-                      <span class="label">Card</span>
-                    </label>
-                    <label class="book-method">
-                      <input type="radio" name="bookMethod" value="wallet" />
-                      <span class="icon">👛</span>
-                      <span class="label">Wallet</span>
-                    </label>
-                  </div>
-                </div>
-                <div class="summary">
-                  <div class="summary-row"><span>Ticket price</span><span id="pricePerTicket">₹0</span></div>
-                  <div class="summary-row"><span>Seats</span><span id="seatCount">1</span></div>
-                  <div class="summary-row"><span>Subtotal</span><span id="subtotalAmt">₹0</span></div>
-                  <div class="summary-row"><span>Booking charge</span><span id="feeAmt">₹0</span></div>
-                  <div class="summary-row total"><span>Grand Total</span><strong id="grandAmt">₹0</strong></div>
-                </div>
-                <button class="book-btn" type="submit">Book Now →</button>
-              </form>
-            </div>
+  <main>
+    <!-- HERO -->
+    <section class="bk-hero">
+      <div class="bk-hero-inner">
+        <div class="bk-badge">🎟️ Secure Booking</div>
+        <h1>Book your seat <span>instantly</span></h1>
+        <p>Four simple steps — pick an event, add your details, choose payment, and confirm.</p>
+      </div>
 
-            <aside class="receipt">
-              <div class="receipt-banner" id="receiptBanner">🎟️</div>
-              <p class="receipt-title" id="receiptEventName">HIMTEX 2026</p>
-              <p class="receipt-venue" id="receiptVenue">HITEX Exhibition Centre, Hyderabad</p>
-              <div class="receipt-rows">
-                <div class="receipt-row"><span>Buyer</span><strong id="rName">—</strong></div>
-                <div class="receipt-row"><span>Seats</span><strong id="rSeats">1</strong></div>
-                <div class="receipt-row"><span>Method</span><strong id="rMethod">UPI</strong></div>
-                <div class="receipt-row"><span>Date</span><strong id="rDate">—</strong></div>
-                <div class="receipt-row"><span>Status</span><span class="receipt-status" id="rStatus">⏳ Pending</span></div>
-              </div>
-              <hr class="receipt-divider" />
-              <div class="receipt-total"><span>Total</span><span id="rTotal">₹0</span></div>
-            </aside>
+      <!-- STEPPER -->
+      <div class="bk-stepper-wrap">
+        <div class="bk-stepper">
+          <div class="bk-step-tab active" id="tab1">
+            <div class="bk-step-circle">1</div>
+            <span class="bk-step-label">Select Event</span>
+          </div>
+          <div class="bk-step-connector" id="conn1"></div>
+          <div class="bk-step-tab" id="tab2">
+            <div class="bk-step-circle">2</div>
+            <span class="bk-step-label">Your Details</span>
+          </div>
+          <div class="bk-step-connector" id="conn2"></div>
+          <div class="bk-step-tab" id="tab3">
+            <div class="bk-step-circle">3</div>
+            <span class="bk-step-label">Payment</span>
+          </div>
+          <div class="bk-step-connector" id="conn3"></div>
+          <div class="bk-step-tab" id="tab4">
+            <div class="bk-step-circle">4</div>
+            <span class="bk-step-label">Confirm</span>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
 
-    <footer class="site-footer">
-      <div class="footer-wrap">
-        <div class="footer-branding">
-          <div class="footer-brand">CultureWave</div>
-          <p>Events, workshops, and restaurant bookings in one smooth flow.</p>
-          <span class="footer-tag">Developed by Srisanth Boddu</span>
-        </div>
-        <div class="footer-links">
-          <a href="index.html">Home</a>
-          <a href="events.html">Events</a>
-          <a href="features.html">Features</a>
-          <a href="booking.html">Booking</a>
-          <a href="privacy-policy.html">Privacy Policy</a>
-          <a href="terms-and-conditions.html">Terms & Conditions</a>
-          <a href="refund-policy.html">Refund Policy</a>
-        </div>
-        <div class="footer-contact">
-          <h3>Contact</h3>
-          <a href="tel:+916305183601">6305183601</a>
-          <span>Contact details will be updated from the admin panel.</span>
+    <section class="bk-section">
+      <div class="bk-wrap">
+        <div class="bk-grid">
+
+          <!-- LEFT: FORM CARD -->
+          <div class="bk-card">
+
+            <!-- STEP 1: SELECT EVENT / RESTAURANT (dynamic) -->
+            <div class="bk-panel active" id="panel1">
+              <div class="bk-card-head">
+                <h2 id="step1Title">Select an event</h2>
+                <p id="step1Sub">Choose the event you want to attend.</p>
+              </div>
+              <div class="bk-event-cards" id="itemCards">
+                <!-- filled by JS -->
+              </div>
+              <div class="bk-nav">
+                <button class="bk-btn-next" id="next1">Continue → Your Details</button>
+              </div>
+            </div>
+
+            <!-- STEP 2: YOUR DETAILS -->
+            <div class="bk-panel" id="panel2">
+              <div class="bk-card-head">
+                <h2>Your details</h2>
+                <p>We'll send your confirmation to these details.</p>
+              </div>
+              <div class="bk-row">
+                <div class="bk-field">
+                  <span class="bk-field-label">Full Name</span>
+                  <div class="bk-input-wrap">
+                    <span class="bk-input-icon">👤</span>
+                    <input type="text" id="bookName" placeholder="Your full name" required />
+                  </div>
+                </div>
+                <div class="bk-field">
+                  <span class="bk-field-label">Email</span>
+                  <div class="bk-input-wrap">
+                    <span class="bk-input-icon">✉️</span>
+                    <input type="email" id="bookEmail" placeholder="you@example.com" required />
+                  </div>
+                </div>
+              </div>
+              <div class="bk-row">
+                <div class="bk-field">
+                  <span class="bk-field-label">Phone</span>
+                  <div class="bk-input-wrap">
+                    <span class="bk-input-icon">📱</span>
+                    <input type="tel" id="bookPhone" placeholder="10-digit number" />
+                  </div>
+                </div>
+                <div class="bk-field" id="seatsField">
+                  <span class="bk-field-label" id="seatsLabel">Seats / Passes</span>
+                  <div class="bk-input-wrap">
+                    <span class="bk-input-icon">🪑</span>
+                    <input type="number" id="bookSeats" min="1" max="20" value="1" />
+                  </div>
+                </div>
+              </div>
+              <!-- Restaurant-only fields -->
+              <div class="bk-row" id="restaurantFields" style="display:none;">
+                <div class="bk-field">
+                  <span class="bk-field-label">Date</span>
+                  <div class="bk-input-wrap">
+                    <span class="bk-input-icon">📅</span>
+                    <input type="date" id="bookDate" />
+                  </div>
+                </div>
+                <div class="bk-field">
+                  <span class="bk-field-label">Time Slot</span>
+                  <div class="bk-input-wrap">
+                    <span class="bk-input-icon">⏰</span>
+                    <select id="bookTime">
+                      <option value="12:00 PM">12:00 PM – Lunch</option>
+                      <option value="1:00 PM">1:00 PM – Lunch</option>
+                      <option value="7:00 PM" selected>7:00 PM – Dinner</option>
+                      <option value="8:00 PM">8:00 PM – Dinner</option>
+                      <option value="9:00 PM">9:00 PM – Dinner</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="bk-field" id="specialField" style="display:none;">
+                <span class="bk-field-label">Special Requests</span>
+                <div class="bk-input-wrap">
+                  <span class="bk-input-icon">📝</span>
+                  <input type="text" id="bookSpecial" placeholder="Allergies, occasion, seating preference…" />
+                </div>
+              </div>
+              <div class="bk-nav">
+                <button class="bk-btn-back" id="back2">← Back</button>
+                <button class="bk-btn-next" id="next2">Continue → Payment</button>
+              </div>
+            </div>
+
+            <!-- STEP 3: PAYMENT -->
+            <div class="bk-panel" id="panel3">
+              <div class="bk-card-head">
+                <h2>Choose payment</h2>
+                <p>Pick how you'd like to pay for your booking.</p>
+              </div>
+              <div class="bk-field">
+                <span class="bk-field-label">Payment Method</span>
+                <div class="bk-methods">
+                  <label class="bk-method selected">
+                    <input type="radio" name="bookMethod" value="upi" checked />
+                    <span class="bk-method-icon">📱</span>
+                    <span class="bk-method-label">UPI</span>
+                  </label>
+                  <label class="bk-method">
+                    <input type="radio" name="bookMethod" value="qr" />
+                    <span class="bk-method-icon">📷</span>
+                    <span class="bk-method-label">QR Scan</span>
+                  </label>
+                  <label class="bk-method">
+                    <input type="radio" name="bookMethod" value="card" />
+                    <span class="bk-method-icon">💳</span>
+                    <span class="bk-method-label">Card</span>
+                  </label>
+                  <label class="bk-method">
+                    <input type="radio" name="bookMethod" value="wallet" />
+                    <span class="bk-method-icon">👛</span>
+                    <span class="bk-method-label">Wallet</span>
+                  </label>
+                </div>
+              </div>
+              <div class="bk-summary">
+                <div class="bk-summary-row"><span>Ticket price</span><span id="pricePerTicket">₹0</span></div>
+                <div class="bk-summary-row"><span>Seats</span><span id="seatCount">1</span></div>
+                <div class="bk-summary-row"><span>Subtotal</span><span id="subtotalAmt">₹0</span></div>
+                <div class="bk-summary-row"><span>Booking charge (5%)</span><span id="feeAmt">₹0</span></div>
+                <div class="bk-summary-row total"><span>Grand Total</span><strong id="grandAmt">₹0</strong></div>
+              </div>
+              <div class="bk-nav">
+                <button class="bk-btn-back" id="back3">← Back</button>
+                <button class="bk-btn-next" id="next3">Continue → Confirm</button>
+              </div>
+            </div>
+
+            <!-- STEP 4: CONFIRM -->
+            <div class="bk-panel" id="panel4">
+              <div class="bk-card-head">
+                <h2>Confirm &amp; pay</h2>
+                <p>Review your booking and complete payment.</p>
+              </div>
+              <div class="bk-summary">
+                <div class="bk-summary-row"><span id="confirmTypeLabel">Event</span><strong id="confirmEvent">—</strong></div>
+                <div class="bk-summary-row"><span>Name</span><strong id="confirmName">—</strong></div>
+                <div class="bk-summary-row"><span>Email</span><strong id="confirmEmail">—</strong></div>
+                <div class="bk-summary-row"><span id="confirmSeatsLabel">Seats</span><strong id="confirmSeats">1</strong></div>
+                <div class="bk-summary-row" id="confirmDateRow" style="display:none"><span>Date &amp; Time</span><strong id="confirmDateTime">—</strong></div>
+                <div class="bk-summary-row" id="confirmSpecialRow" style="display:none"><span>Special Requests</span><strong id="confirmSpecial">—</strong></div>
+                <div class="bk-summary-row"><span>Method</span><strong id="confirmMethod">UPI</strong></div>
+                <div class="bk-summary-row total"><span>Total</span><strong id="confirmTotal">₹0</strong></div>
+              </div>
+              <div class="bk-nav">
+                <button class="bk-btn-back" id="back4">← Back</button>
+                <button class="bk-btn-next" id="submitBtn" type="button">🔒 Book Now &amp; Pay</button>
+              </div>
+              <p class="bk-secure-note">🛡️ Secured by Razorpay · 256-bit SSL encryption</p>
+            </div>
+
+          </div><!-- /bk-card -->
+
+          <!-- RIGHT: RECEIPT -->
+          <aside class="bk-receipt">
+            <div class="bk-receipt-banner" id="receiptBanner">🎟️</div>
+            <div class="bk-receipt-body">
+              <div class="bk-progress-bar"><div class="bk-progress-fill" id="progressFill"></div></div>
+              <p class="bk-receipt-event" id="receiptEventName">Select an event</p>
+              <p class="bk-receipt-venue" id="receiptVenue">Hyderabad</p>
+              <div class="bk-receipt-rows">
+                <div class="bk-receipt-row"><span>Buyer</span><strong id="rName">—</strong></div>
+                <div class="bk-receipt-row"><span>Seats</span><strong id="rSeats">1</strong></div>
+                <div class="bk-receipt-row"><span>Method</span><strong id="rMethod">—</strong></div>
+                <div class="bk-receipt-row"><span>Date</span><strong id="rDate">—</strong></div>
+                <div class="bk-receipt-row"><span>Status</span><span class="bk-status-pill" id="rStatus">⏳ Pending</span></div>
+              </div>
+              <hr class="bk-receipt-divider" />
+              <div class="bk-receipt-total">
+                <span>Total</span>
+                <span class="bk-receipt-total-amt" id="rTotal">₹0</span>
+              </div>
+              <div class="bk-trust">
+                <div class="bk-trust-item"><span>🔒</span><p>Secure Pay</p></div>
+                <div class="bk-trust-item"><span>⚡</span><p>Instant Confirm</p></div>
+                <div class="bk-trust-item"><span>🎫</span><p>E-Ticket</p></div>
+              </div>
+            </div>
+          </aside>
+
         </div>
       </div>
-      <div class="footer-bottom">
-        <span>© 2026 CultureWave. All rights reserved.</span>
-        <span>Built for events, workshops, and restaurant reservations.</span>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-wrap">
+      <div class="footer-branding">
+        <div class="footer-brand">CultureWave</div>
+        <p>Events, workshops, and restaurant bookings in one smooth flow.</p>
+        <span class="footer-tag">Developed by Srisanth Boddu</span>
       </div>
-    </footer>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="features.html">Features</a>
+        <a href="booking.html">Booking</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
+        <a href="refund-policy.html">Refund Policy</a>
+      </div>
+      <div class="footer-contact">
+        <h3>Contact</h3>
+        <a href="tel:+916305183601">6305183601</a>
+        <span>Contact details will be updated from the admin panel.</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CultureWave. All rights reserved.</span>
+      <span>Built for events, workshops, and restaurant reservations.</span>
+    </div>
+  </footer>
 
-    <script>
-      const eventData = {
-        himtex: { name: "HIMTEX 2026", venue: "HITEX Exhibition Centre, Hyderabad", price: 0, emoji: "🏛️" },
-        nullcon: { name: "Nullcon Hyderabad 2026", venue: "Novotel Hyderabad Convention Centre", price: 2499, emoji: "🔐" },
-        sportexpo: { name: "Sport Expo India", venue: "HITEX, Hyderabad", price: 499, emoji: "🏅" },
-        credai: { name: "CREDAI Property Show", venue: "HITEX, Hyderabad", price: 0, emoji: "🏠" },
-        design: { name: "Design Democracy 2026", venue: "Le Hesthia Design LLP, Hyderabad", price: 999, emoji: "🎨" },
-      };
 
-      const fmt = (n) => (n === 0 ? "Free" : "₹" + n.toLocaleString("en-IN"));
-      const sel = document.getElementById("bookEventSelect");
-      const seats = document.getElementById("bookSeats");
-      const ppt = document.getElementById("pricePerTicket");
-      const sc = document.getElementById("seatCount");
-      const sub = document.getElementById("subtotalAmt");
-      const fee = document.getElementById("feeAmt");
-      const grand = document.getElementById("grandAmt");
-      const rTotal = document.getElementById("rTotal");
-      const rSeats = document.getElementById("rSeats");
-      const rName = document.getElementById("rName");
-      const rMethod = document.getElementById("rMethod");
-      const rDate = document.getElementById("rDate");
-      const rEventName = document.getElementById("receiptEventName");
-      const rVenue = document.getElementById("receiptVenue");
-      const rBanner = document.getElementById("receiptBanner");
-      const statusText = document.getElementById("rStatus");
+  <script>
+    /* ── URL PARAMS ── */
+    const urlP = new URLSearchParams(window.location.search);
+    const bookingType = urlP.get("type") || "event"; // "event" | "restaurant"
+    const isRestaurant = bookingType === "restaurant";
 
-      function updateCalc() {
-        const ev = eventData[sel.value];
-        const n = parseInt(seats.value) || 1;
-        const subtotal = ev.price * n;
-        const f = ev.price === 0 ? 0 : Math.round(subtotal * 0.05);
-        const total = subtotal + f;
-        ppt.textContent = fmt(ev.price);
-        sc.textContent = n;
-        sub.textContent = fmt(subtotal);
-        fee.textContent = fmt(f);
-        grand.textContent = fmt(total);
-        rTotal.textContent = fmt(total);
-        rSeats.textContent = n;
-        rEventName.textContent = ev.name;
-        rVenue.textContent = ev.venue;
-        rBanner.textContent = ev.emoji;
-      }
+    /* ── DATA ── */
+    const eventData = {
+      himtex:    { name:"HIMTEX 2026",             venue:"HITEX Exhibition Centre, Hyderabad", price:0,    emoji:"🏛️", sub:"24 Aug · Exhibition" },
+      nullcon:   { name:"Nullcon Hyderabad 2026",   venue:"Novotel Convention Centre, Hyd",    price:2499, emoji:"🔐", sub:"27 Aug · Security" },
+      sportexpo: { name:"Sport Expo India",         venue:"HITEX, Hyderabad",                  price:499,  emoji:"🏅", sub:"28 Aug · Sports Expo" },
+      credai:    { name:"CREDAI Property Show",     venue:"HITEX, Hyderabad",                  price:0,    emoji:"🏠", sub:"28 Aug · Property" },
+      design:    { name:"Design Democracy 2026",    venue:"Le Hesthia Design LLP, Hyderabad",  price:999,  emoji:"🎨", sub:"18 Sep · Design" },
+    };
 
-      sel.addEventListener("change", updateCalc);
-      seats.addEventListener("input", updateCalc);
-      updateCalc();
+    const restaurantData = {
+      grand:    { name:"The Grand Bistro",       venue:"Banjara Hills, Hyderabad",  price:2500, emoji:"🍽️", sub:"Fine Dining · Continental" },
+      skyline:  { name:"Skyline Rooftop Lounge", venue:"Jubilee Hills, Hyderabad",  price:1800, emoji:"🌆", sub:"Rooftop · Pan-Asian" },
+      brew:     { name:"Brew & Bites Cafe",      venue:"Madhapur, Hyderabad",       price:600,  emoji:"☕", sub:"Cafe · Specialty Coffee" },
+      spice:    { name:"Spice Garden Buffet",    venue:"Gachibowli, Hyderabad",     price:1200, emoji:"🍱", sub:"Buffet · Multi-Cuisine" },
+      private:  { name:"The Private Table",      venue:"Film Nagar, Hyderabad",     price:5000, emoji:"🍷", sub:"Private Dining · Chef's Table" },
+      neon:     { name:"Neon Nights Bistro",     venue:"Hitech City, Hyderabad",    price:1500, emoji:"🌃", sub:"Rooftop · Fusion" },
+    };
 
-      document.querySelectorAll(".book-method").forEach((m) => {
-        m.addEventListener("click", () => {
-          document.querySelectorAll(".book-method").forEach((x) => x.classList.remove("selected"));
-          m.classList.add("selected");
-          rMethod.textContent = m.querySelector(".label").textContent;
+    /* if coming from restaurant page with URL params, inject as first item */
+    const urlName  = urlP.get("name");
+    const urlVenue = urlP.get("venue");
+    const urlPrice = parseInt(urlP.get("price")) || 0;
+    const urlEmoji = urlP.get("emoji") || "🍽️";
+    if (isRestaurant && urlName) {
+      restaurantData["_direct"] = { name: urlName, venue: urlVenue || "Hyderabad", price: urlPrice, emoji: urlEmoji, sub: "Table Reservation" };
+    }
+
+    const activeData = isRestaurant ? restaurantData : eventData;
+    let selectedKey  = Object.keys(activeData)[0];
+
+    const fmt = n => n === 0 ? "Free" : "₹" + n.toLocaleString("en-IN");
+
+    /* ── BUILD STEP 1 CARDS ── */
+    function buildCards() {
+      const container = document.getElementById("itemCards");
+      container.innerHTML = "";
+      Object.entries(activeData).forEach(([key, item], i) => {
+        const card = document.createElement("label");
+        card.className = "bk-event-card" + (i === 0 ? " selected" : "");
+        card.dataset.key   = key;
+        card.dataset.price = item.price;
+        card.innerHTML = `
+          <input type="radio" name="itemPick" value="${key}" ${i === 0 ? "checked" : ""} />
+          <div class="bk-event-emoji">${item.emoji}</div>
+          <div class="bk-event-info">
+            <strong>${item.name}</strong>
+            <span>${item.sub}</span>
+          </div>
+          <span class="bk-event-price">${fmt(item.price)}${isRestaurant ? " for two" : ""}</span>
+          <div class="bk-event-check"></div>`;
+        container.appendChild(card);
+      });
+      // re-bind click
+      container.querySelectorAll(".bk-event-card").forEach(card => {
+        card.addEventListener("click", () => {
+          container.querySelectorAll(".bk-event-card").forEach(c => c.classList.remove("selected"));
+          card.classList.add("selected");
+          card.querySelector("input[type=radio]").checked = true;
+          selectedKey = card.dataset.key;
+          updateReceipt();
         });
       });
+    }
 
-      document.getElementById("bookName").addEventListener("input", (e) => {
-        rName.textContent = e.target.value || "—";
+    /* ── ADAPT UI FOR TYPE ── */
+    function adaptUI() {
+      if (isRestaurant) {
+        document.getElementById("step1Title").textContent = "Select a restaurant";
+        document.getElementById("step1Sub").textContent   = "Choose where you'd like to dine.";
+        document.getElementById("seatsLabel").textContent = "Guests";
+        document.getElementById("bookSeats").max = "20";
+        document.getElementById("restaurantFields").style.display = "grid";
+        document.getElementById("specialField").style.display     = "grid";
+        document.getElementById("confirmTypeLabel").textContent   = "Restaurant";
+        document.getElementById("confirmSeatsLabel").textContent  = "Guests";
+        document.getElementById("confirmDateRow").style.display   = "flex";
+        document.getElementById("confirmSpecialRow").style.display= "flex";
+        // set min date to today
+        document.getElementById("bookDate").min = new Date().toISOString().split("T")[0];
+        document.getElementById("bookDate").value = new Date().toISOString().split("T")[0];
+        // stepper label
+        document.querySelector("#tab1 .bk-step-label").textContent = "Restaurant";
+        document.querySelector("#tab2 .bk-step-label").textContent = "Your Details";
+      }
+    }
+
+    /* ── RECEIPT UPDATE ── */
+    function updateReceipt() {
+      const item = activeData[selectedKey];
+      if (!item) return;
+      const n = parseInt(document.getElementById("bookSeats").value) || 1;
+      const subtotal = item.price * n;
+      const fee = item.price === 0 ? 0 : Math.round(subtotal * 0.05);
+      const total = subtotal + fee;
+
+      document.getElementById("pricePerTicket").textContent = fmt(item.price) + (isRestaurant ? " for two" : "");
+      document.getElementById("seatCount").textContent      = n;
+      document.getElementById("subtotalAmt").textContent    = fmt(subtotal);
+      document.getElementById("feeAmt").textContent         = fmt(fee);
+      document.getElementById("grandAmt").textContent       = fmt(total);
+      document.getElementById("receiptBanner").textContent  = item.emoji;
+      document.getElementById("receiptEventName").textContent = item.name;
+      document.getElementById("receiptVenue").textContent   = item.venue;
+      document.getElementById("rSeats").textContent         = n;
+      document.getElementById("rTotal").textContent         = fmt(total);
+    }
+
+    /* ── STEPPER ── */
+    function goStep(n) {
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById("panel" + i).classList.toggle("active", i === n);
+        const tab = document.getElementById("tab" + i);
+        tab.classList.remove("active","done");
+        if (i < n)  tab.classList.add("done");
+        if (i === n) tab.classList.add("active");
+      }
+      for (let i = 1; i <= 3; i++)
+        document.getElementById("conn" + i).classList.toggle("filled", i < n);
+      document.getElementById("progressFill").style.width = (n * 25) + "%";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ── PAYMENT METHOD ── */
+    document.querySelectorAll(".bk-method").forEach(m => {
+      m.addEventListener("click", () => {
+        document.querySelectorAll(".bk-method").forEach(x => x.classList.remove("selected"));
+        m.classList.add("selected");
+        document.getElementById("rMethod").textContent      = m.querySelector(".bk-method-label").textContent;
+        document.getElementById("confirmMethod").textContent = m.querySelector(".bk-method-label").textContent;
       });
+    });
 
-      rDate.textContent = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    document.getElementById("bookSeats").addEventListener("input", updateReceipt);
+    document.getElementById("bookName").addEventListener("input", e => {
+      document.getElementById("rName").textContent      = e.target.value || "—";
+      document.getElementById("confirmName").textContent = e.target.value || "—";
+    });
+    document.getElementById("bookEmail").addEventListener("input", e => {
+      document.getElementById("confirmEmail").textContent = e.target.value || "—";
+    });
+    document.getElementById("rDate").textContent =
+      new Date().toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
 
-      document.getElementById("bookForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        statusText.textContent = "Opening checkout...";
-        statusText.className = "receipt-status";
-        const ev = eventData[sel.value];
-        const payload = {
-          amount: Math.max(1, Math.round((ev.price * (parseInt(seats.value) || 1) + (ev.price === 0 ? 0 : Math.round(ev.price * (parseInt(seats.value) || 1) * 0.05))) * 100)),
-          merchantName: "CultureWave",
-          upiId: "merchant@upi",
-          receipt: `cv_${Date.now()}`,
-          note: `Booking for ${ev.name}`,
-          event: ev,
-          seats: parseInt(seats.value) || 1,
-          method: document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
-          customer: {
-            id: document.getElementById("bookEmail").value.trim() || document.getElementById("bookPhone").value.trim() || "guest",
-            name: document.getElementById("bookName").value.trim() || "Guest",
-            email: document.getElementById("bookEmail").value.trim(),
-            phone: document.getElementById("bookPhone").value.trim(),
+    /* ── NAV ── */
+    document.getElementById("next1").addEventListener("click", () => goStep(2));
+    document.getElementById("back2").addEventListener("click", () => goStep(1));
+
+    document.getElementById("next2").addEventListener("click", () => {
+      const name  = document.getElementById("bookName").value.trim();
+      const email = document.getElementById("bookEmail").value.trim();
+      if (!name || !email) { alert("Please fill in your name and email."); return; }
+      if (isRestaurant && !document.getElementById("bookDate").value) {
+        alert("Please select a date."); return;
+      }
+      updateReceipt();
+      goStep(3);
+    });
+
+    document.getElementById("back3").addEventListener("click", () => goStep(2));
+    document.getElementById("next3").addEventListener("click", () => {
+      const item = activeData[selectedKey];
+      const n    = parseInt(document.getElementById("bookSeats").value) || 1;
+      const subtotal = item.price * n;
+      const fee  = item.price === 0 ? 0 : Math.round(subtotal * 0.05);
+      document.getElementById("confirmEvent").textContent  = item.name;
+      document.getElementById("confirmName").textContent   = document.getElementById("bookName").value || "—";
+      document.getElementById("confirmEmail").textContent  = document.getElementById("bookEmail").value || "—";
+      document.getElementById("confirmSeats").textContent  = n;
+      document.getElementById("confirmTotal").textContent  = fmt(subtotal + fee);
+      if (isRestaurant) {
+        const d = document.getElementById("bookDate").value;
+        const t = document.getElementById("bookTime").value;
+        const sp = document.getElementById("bookSpecial").value;
+        document.getElementById("confirmDateTime").textContent = (d ? new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : "—") + " · " + t;
+        document.getElementById("confirmSpecial").textContent  = sp || "None";
+      }
+      goStep(4);
+    });
+
+    document.getElementById("back4").addEventListener("click", () => goStep(3));
+
+    /* ── RAZORPAY SUBMIT ── */
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const item = activeData[selectedKey];
+      const n    = parseInt(document.getElementById("bookSeats").value) || 1;
+      const subtotal = item.price * n;
+      const fee  = item.price === 0 ? 0 : Math.round(subtotal * 0.05);
+      const total = subtotal + fee;
+      const statusText = document.getElementById("rStatus");
+      statusText.textContent = "Opening checkout...";
+      statusText.className   = "bk-status-pill";
+
+      const dateVal = isRestaurant ? document.getElementById("bookDate").value : "";
+      const timeVal = isRestaurant ? document.getElementById("bookTime").value : "";
+      const special = isRestaurant ? document.getElementById("bookSpecial").value : "";
+
+      const payload = {
+        amount: Math.max(1, Math.round(total * 100)),
+        merchantName: "CultureWave",
+        upiId: "merchant@upi",
+        receipt: "cv_" + Date.now(),
+        note: (isRestaurant ? "Table reservation at " : "Booking for ") + item.name,
+        event: item, seats: n,
+        bookingType,
+        date: dateVal, time: timeVal, specialRequests: special,
+        method: document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
+        customer: {
+          id: document.getElementById("bookEmail").value.trim() || "guest",
+          name: document.getElementById("bookName").value.trim() || "Guest",
+          email: document.getElementById("bookEmail").value.trim(),
+          phone: document.getElementById("bookPhone").value.trim(),
+        },
+        returnUrl: window.location.origin + "/booking.html",
+      };
+
+      fetch("/api/bookings/checkout", {
+        method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload),
+      })
+      .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Checkout failed");
+        if (data.provider !== "razorpay" || !data.razorpayOrderId) throw new Error("Razorpay order not created");
+        const options = {
+          key: data.keyId, amount: data.amount, currency: data.currency || "INR",
+          name: "CultureWave", description: item.name, order_id: data.razorpayOrderId,
+          handler: async function(r) {
+            try {
+              const vRes = await fetch("/api/bookings/verify", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body: JSON.stringify({ razorpay_order_id:r.razorpay_order_id, razorpay_payment_id:r.razorpay_payment_id, razorpay_signature:r.razorpay_signature }),
+              });
+              const vData = await vRes.json();
+              if (!vRes.ok) throw new Error(vData.error || "Verification failed");
+              statusText.textContent = "✅ Confirmed";
+              statusText.className   = "bk-status-pill success";
+              const bid = vData.bookingId || r.razorpay_payment_id || "booking";
+              window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
+                + "&event=" + encodeURIComponent(item.name)
+                + "&amount=" + encodeURIComponent(fmt(total))
+                + "&status=Confirmed"
+                + "&type=" + bookingType
+                + (dateVal ? "&date=" + encodeURIComponent(dateVal) : "")
+                + (timeVal ? "&time=" + encodeURIComponent(timeVal) : "");
+            } catch(err) {
+              statusText.textContent = err.message || "Verification failed";
+              statusText.className   = "bk-status-pill failed";
+            }
           },
-          returnUrl: `${window.location.origin}/booking.html`,
+          prefill: { name:document.getElementById("bookName").value.trim(), email:document.getElementById("bookEmail").value.trim(), contact:document.getElementById("bookPhone").value.trim() },
+          notes: { item:item.name, seats:String(n), method:document.querySelector('input[name="bookMethod"]:checked')?.value||"upi" },
+          theme: { color:"#1242c5" },
+          modal: { ondismiss: function() { statusText.textContent="Checkout closed"; statusText.className="bk-status-pill failed"; } },
         };
+        new Razorpay(options).open();
+      })
+      .catch(err => {
+        document.getElementById("rStatus").textContent = err.message || "Payment unavailable";
+        document.getElementById("rStatus").className   = "bk-status-pill failed";
+      });
+    });
 
-        fetch("/api/bookings/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        })
-          .then(async (response) => {
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || "Booking checkout failed");
-            if (data.provider !== "razorpay" || !data.razorpayOrderId) throw new Error("Razorpay order not created");
-            statusText.textContent = "Opening Razorpay checkout...";
-            statusText.className = "receipt-status";
-            const options = {
-              key: data.keyId,
-              amount: data.amount,
-              currency: data.currency || "INR",
-              name: "CultureWave",
-              description: data.event?.name || ev.name,
-              order_id: data.razorpayOrderId,
-              handler: async function (responseData) {
-                try {
-                  const verifyResponse = await fetch("/api/bookings/verify", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      razorpay_order_id: responseData.razorpay_order_id,
-                      razorpay_payment_id: responseData.razorpay_payment_id,
-                      razorpay_signature: responseData.razorpay_signature,
-                    }),
-                  });
-                  const verifyData = await verifyResponse.json();
-                  if (!verifyResponse.ok) throw new Error(verifyData.error || "Payment verification failed");
-                  statusText.textContent = "Payment confirmed";
-                  statusText.className = "receipt-status success";
-                  const bookingId = verifyData.bookingId || responseData.razorpay_payment_id || "booking";
-                  const eventName = encodeURIComponent(ev.name);
-                  const amountPaid = encodeURIComponent(grand.textContent);
-                  window.location.href = `success.html?bookingId=${encodeURIComponent(bookingId)}&event=${eventName}&amount=${amountPaid}&status=Confirmed`;
-                } catch (err) {
-                  statusText.textContent = err.message || "Verification failed";
-                  statusText.className = "receipt-status failed";
-                }
-              },
-              prefill: {
-                name: document.getElementById("bookName").value.trim(),
-                email: document.getElementById("bookEmail").value.trim(),
-                contact: document.getElementById("bookPhone").value.trim(),
-              },
-              notes: {
-                event: ev.name,
-                seats: String(parseInt(seats.value) || 1),
-                method: document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
-              },
-              theme: {
-                color: "#1242c5",
-              },
-              modal: {
-                ondismiss: function () {
-                  statusText.textContent = "Checkout closed";
-                  statusText.className = "receipt-status failed";
-                },
-              },
-            };
-            const razorpay = new Razorpay(options);
-            razorpay.open();
-          })
-          .catch((error) => {
-            statusText.textContent = error.message || "Payment unavailable";
-            statusText.className = "receipt-status failed";
-          });
-      });
-    </script>
-    <script>
-      const ham = document.getElementById('hamburger');
-      const mNav = document.getElementById('mobileNav');
-      ham.addEventListener('click', () => {
-        ham.classList.toggle('open');
-        mNav.classList.toggle('open');
-        document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
-      });
-      mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        ham.classList.remove('open');
-        mNav.classList.remove('open');
-        document.body.style.overflow = '';
-      }));
-    </script>
-  </body>
+    /* ── HAMBURGER ── */
+    const ham  = document.getElementById("hamburger");
+    const mNav = document.getElementById("mobileNav");
+    ham.addEventListener("click", () => {
+      ham.classList.toggle("open"); mNav.classList.toggle("open");
+      document.body.style.overflow = mNav.classList.contains("open") ? "hidden" : "";
+    });
+    mNav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+      ham.classList.remove("open"); mNav.classList.remove("open"); document.body.style.overflow = "";
+    }));
+
+    /* ── INIT ── */
+    buildCards();
+    adaptUI();
+    updateReceipt();
+  </script>
+</body>
 </html>

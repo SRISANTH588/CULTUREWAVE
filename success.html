@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CultureWave | Booking Confirmed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- QR code library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <!-- html2canvas for download -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body { background: #f0f4ff; }
+
+    /* ── PAGE SHELL ── */
+    .sc-page {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 3rem 1.4rem 5rem;
+    }
+
+    /* ── STATUS BANNER ── */
+    .sc-status-banner {
+      width: 100%;
+      max-width: 680px;
+      border-radius: 28px;
+      padding: 2.2rem 2rem;
+      text-align: center;
+      margin-bottom: 1.8rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .sc-status-banner.success {
+      background: linear-gradient(145deg, #0a0f1e 0%, #0d1f4a 55%, #0f2d6b 100%);
+    }
+    .sc-status-banner.failed {
+      background: linear-gradient(145deg, #1a0a0a 0%, #3b0f0f 100%);
+    }
+    .sc-status-banner::before {
+      content: "";
+      position: absolute; top: -100px; right: -100px;
+      width: 360px; height: 360px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(47,107,255,.28) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .sc-status-banner.failed::before {
+      background: radial-gradient(circle, rgba(239,68,68,.22) 0%, transparent 68%);
+    }
+    .sc-icon-ring {
+      width: 5rem; height: 5rem; border-radius: 50%;
+      display: grid; place-items: center;
+      margin: 0 auto 1.2rem;
+      font-size: 2.2rem;
+      position: relative; z-index: 1;
+    }
+    .sc-status-banner.success .sc-icon-ring {
+      background: rgba(34,197,94,.15);
+      border: 2px solid rgba(34,197,94,.35);
+      box-shadow: 0 0 0 8px rgba(34,197,94,.08);
+    }
+    .sc-status-banner.failed .sc-icon-ring {
+      background: rgba(239,68,68,.15);
+      border: 2px solid rgba(239,68,68,.35);
+      box-shadow: 0 0 0 8px rgba(239,68,68,.08);
+    }
+    .sc-status-banner h1 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800; letter-spacing: -.05em;
+      color: #fff; margin: 0 0 .5rem;
+      position: relative; z-index: 1;
+    }
+    .sc-status-banner p {
+      color: rgba(255,255,255,.55);
+      font-size: .95rem; line-height: 1.6;
+      margin: 0; position: relative; z-index: 1;
+    }
+    .sc-booking-id {
+      display: inline-flex; align-items: center; gap: .5rem;
+      margin-top: 1rem;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: .4rem 1.1rem;
+      font-size: .78rem; font-weight: 800;
+      color: rgba(255,255,255,.7);
+      letter-spacing: .1em;
+      position: relative; z-index: 1;
+    }
+
+    /* ── TICKET CARD ── */
+    .sc-ticket {
+      width: 100%; max-width: 680px;
+      background: #fff;
+      border: 1.5px solid #e2eafc;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(18,66,197,.1);
+    }
+    .sc-ticket-top {
+      background: linear-gradient(135deg, #0a0f1e 0%, #1242c5 60%, #2f6bff 100%);
+      padding: 1.8rem 2rem;
+      display: flex; align-items: center; gap: 1.2rem;
+      position: relative; overflow: hidden;
+    }
+    .sc-ticket-top::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(126,179,255,.2), transparent 55%);
+    }
+    .sc-ticket-emoji {
+      width: 4rem; height: 4rem; border-radius: 18px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      display: grid; place-items: center;
+      font-size: 1.8rem; flex: none;
+      position: relative; z-index: 1;
+    }
+    .sc-ticket-event-info { position: relative; z-index: 1; }
+    .sc-ticket-event-info h2 {
+      font-size: 1.25rem; font-weight: 800;
+      color: #fff; letter-spacing: -.04em;
+      margin: 0 0 .3rem;
+    }
+    .sc-ticket-event-info span {
+      font-size: .82rem; color: rgba(255,255,255,.6);
+      font-weight: 600;
+      display: flex; align-items: center; gap: .3rem;
+    }
+    .sc-ticket-event-info span::before { content: "📍"; font-size: .75rem; }
+
+    /* tear line */
+    .sc-tear {
+      display: flex; align-items: center;
+      border-top: 2px dashed #e2eafc;
+      position: relative;
+    }
+    .sc-tear::before, .sc-tear::after {
+      content: "";
+      width: 1.4rem; height: 1.4rem; border-radius: 50%;
+      background: #f0f4ff;
+      border: 1.5px solid #e2eafc;
+      flex: none;
+      margin-top: -1px;
+    }
+    .sc-tear::before { margin-left: -0.75rem; }
+    .sc-tear::after  { margin-left: auto; margin-right: -0.75rem; }
+
+    /* ticket body */
+    .sc-ticket-body {
+      padding: 1.8rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.6rem;
+      align-items: start;
+    }
+    .sc-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .9rem 1.4rem;
+    }
+    .sc-detail { display: grid; gap: .2rem; }
+    .sc-detail-label {
+      font-size: .68rem; font-weight: 800;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: #9ca3af;
+    }
+    .sc-detail-value {
+      font-size: .95rem; font-weight: 800;
+      color: #0a0f1e; letter-spacing: -.02em;
+    }
+    .sc-detail-value.blue { color: #1242c5; }
+
+    /* QR section */
+    .sc-qr-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: .7rem;
+    }
+    .sc-qr-box {
+      width: 140px; height: 140px;
+      border-radius: 18px;
+      border: 1.5px solid #e2eafc;
+      background: #fff;
+      display: grid; place-items: center;
+      padding: .6rem;
+      box-shadow: 0 4px 16px rgba(18,66,197,.08);
+    }
+    .sc-qr-box canvas { border-radius: 8px; }
+    .sc-qr-label {
+      font-size: .7rem; font-weight: 800;
+      color: #9ca3af; letter-spacing: .1em;
+      text-transform: uppercase; text-align: center;
+    }
+    .sc-qr-scan-note {
+      font-size: .72rem; color: #6b7280;
+      font-weight: 600; text-align: center;
+      max-width: 130px; line-height: 1.4;
+    }
+
+    /* ── ACTION BUTTONS ── */
+    .sc-actions {
+      width: 100%; max-width: 680px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: .8rem;
+      margin-top: 1.4rem;
+    }
+    .sc-btn {
+      min-height: 52px; border-radius: 16px;
+      font-size: .88rem; font-weight: 800;
+      cursor: pointer; border: none;
+      display: flex; align-items: center; justify-content: center;
+      gap: .5rem; transition: transform .15s, box-shadow .15s;
+      text-decoration: none;
+    }
+    .sc-btn:hover { transform: translateY(-2px); }
+    .sc-btn-download {
+      background: linear-gradient(135deg, #2f6bff, #1242c5);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(18,66,197,.28);
+    }
+    .sc-btn-download:hover { box-shadow: 0 12px 30px rgba(18,66,197,.38); }
+    .sc-btn-share {
+      background: #fff; color: #0a0f1e;
+      border: 1.5px solid #dce4f5;
+      box-shadow: 0 4px 12px rgba(18,66,197,.06);
+    }
+    .sc-btn-home {
+      background: #fff; color: #6b7280;
+      border: 1.5px solid #dce4f5;
+    }
+
+    /* failed state actions */
+    .sc-failed-actions {
+      width: 100%; max-width: 680px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: .8rem; margin-top: 1.4rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .sc-page { padding: 2rem 1rem 4rem; }
+      .sc-ticket-body { grid-template-columns: 1fr; }
+      .sc-qr-wrap { flex-direction: row; align-items: flex-start; }
+      .sc-qr-box { width: 110px; height: 110px; }
+      .sc-actions { grid-template-columns: 1fr 1fr; }
+      .sc-btn-home { grid-column: 1 / -1; }
+      .sc-ticket-top { padding: 1.4rem; }
+      .sc-ticket-body { padding: 1.4rem; }
+      .sc-status-banner { padding: 1.8rem 1.4rem; }
+      .sc-details-grid { grid-template-columns: 1fr 1fr; gap: .7rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="nav-wrap">
+      <div class="brand-block">
+        <div class="logo">CultureWave</div>
+        <div class="brand-sub">by OGSHOOTS LUXE</div>
+      </div>
+      <nav class="topnav">
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="booking.html">Booking</a>
+      </nav>
+      <div class="auth-actions">
+        <a class="nav-link" href="login.html">Login</a>
+        <a class="nav-cta" href="booking.html">Book Again</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="mobile-nav" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="events.html">Events</a>
+    <a href="booking.html">Booking</a>
+    <div class="mobile-nav-ctas">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="booking.html">Book Again</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="sc-page" id="scPage">
+
+      <!-- STATUS BANNER -->
+      <div class="sc-status-banner" id="scBanner">
+        <div class="sc-icon-ring" id="scIcon">✅</div>
+        <h1 id="scTitle">Booking Confirmed!</h1>
+        <p id="scSubtitle">Your seat is reserved. Show the QR code at the venue entry.</p>
+        <div class="sc-booking-id" id="scBookingId">Booking ID: —</div>
+      </div>
+
+      <!-- TICKET (shown only on success) -->
+      <div class="sc-ticket" id="scTicket">
+        <div class="sc-ticket-top">
+          <div class="sc-ticket-emoji" id="ticketEmoji">🎟️</div>
+          <div class="sc-ticket-event-info">
+            <h2 id="ticketEvent">Event Name</h2>
+            <span id="ticketVenue">Venue, Hyderabad</span>
+          </div>
+        </div>
+
+        <div class="sc-tear"></div>
+
+        <div class="sc-ticket-body" id="ticketBody">
+          <div class="sc-details-grid">
+            <div class="sc-detail">
+              <span class="sc-detail-label">Booking ID</span>
+              <span class="sc-detail-value blue" id="dBookingId">—</span>
+            </div>
+            <div class="sc-detail">
+              <span class="sc-detail-label">Status</span>
+              <span class="sc-detail-value blue" id="dStatus">Confirmed</span>
+            </div>
+            <div class="sc-detail">
+              <span class="sc-detail-label">Amount Paid</span>
+              <span class="sc-detail-value" id="dAmount">—</span>
+            </div>
+            <div class="sc-detail">
+              <span class="sc-detail-label">Date</span>
+              <span class="sc-detail-value" id="dDate">—</span>
+            </div>
+            <div class="sc-detail">
+              <span class="sc-detail-label" id="dEventLabel">Event</span>
+              <span class="sc-detail-value" id="dEvent">—</span>
+            </div>
+            <div class="sc-detail">
+              <span class="sc-detail-label">Issued by</span>
+              <span class="sc-detail-value">CultureWave</span>
+            </div>
+          </div>
+
+          <div class="sc-qr-wrap">
+            <div class="sc-qr-box">
+              <canvas id="qrCanvas"></canvas>
+            </div>
+            <span class="sc-qr-label">Scan to verify</span>
+            <span class="sc-qr-scan-note" id="qrScanNote">Organizer scans this at entry</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS (success) -->
+      <div class="sc-actions" id="scActions">
+        <button class="sc-btn sc-btn-download" id="btnDownload">⬇️ Download Ticket</button>
+        <button class="sc-btn sc-btn-share"    id="btnShare">🔗 Share</button>
+        <a class="sc-btn sc-btn-home" href="index.html">🏠 Home</a>
+      </div>
+
+      <!-- ACTION BUTTONS (failed) -->
+      <div class="sc-failed-actions" id="scFailedActions" style="display:none;">
+        <a class="sc-btn sc-btn-download" href="booking.html">🔄 Try Again</a>
+        <a class="sc-btn sc-btn-home" href="index.html">🏠 Home</a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-wrap">
+      <div class="footer-branding">
+        <div class="footer-brand">CultureWave</div>
+        <p>Events, workshops, and restaurant bookings in one smooth flow.</p>
+        <span class="footer-tag">Developed by Srisanth Boddu</span>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="booking.html">Booking</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
+        <a href="refund-policy.html">Refund Policy</a>
+      </div>
+      <div class="footer-contact">
+        <h3>Contact</h3>
+        <a href="tel:+916305183601">6305183601</a>
+        <span>Contact details will be updated from the admin panel.</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CultureWave. All rights reserved.</span>
+      <span>Built for events, workshops, and restaurant reservations.</span>
+    </div>
+  </footer>
+
+  <script>
+    /* ── READ URL PARAMS ── */
+    const params    = new URLSearchParams(window.location.search);
+    const bookingId  = params.get("bookingId") || "";
+    const eventName  = params.get("event")     || "Your Booking";
+    const amount     = params.get("amount")    || "—";
+    const status     = (params.get("status")   || "").toLowerCase();
+    const bkType     = params.get("type")      || "event";
+    const bkDate     = params.get("date")      || "";
+    const bkTime     = params.get("time")      || "";
+    const isRestaurant = bkType === "restaurant";
+    const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
+
+    const eventEmojis = {
+      "HIMTEX 2026":"🏛️", "Nullcon Hyderabad 2026":"🔐",
+      "Sport Expo India":"🏅", "CREDAI Property Show":"🏠",
+      "Design Democracy 2026":"🎨",
+      "The Grand Bistro":"🍽️", "Skyline Rooftop Lounge":"🌆",
+      "Brew & Bites Cafe":"☕", "Spice Garden Buffet":"🍱",
+      "The Private Table":"🍷", "Neon Nights Bistro":"🌃",
+    };
+    const eventVenues = {
+      "HIMTEX 2026":"HITEX Exhibition Centre, Hyderabad",
+      "Nullcon Hyderabad 2026":"Novotel Convention Centre, Hyderabad",
+      "Sport Expo India":"HITEX, Hyderabad",
+      "CREDAI Property Show":"HITEX, Hyderabad",
+      "Design Democracy 2026":"Le Hesthia Design LLP, Hyderabad",
+      "The Grand Bistro":"Banjara Hills, Hyderabad",
+      "Skyline Rooftop Lounge":"Jubilee Hills, Hyderabad",
+      "Brew & Bites Cafe":"Madhapur, Hyderabad",
+      "Spice Garden Buffet":"Gachibowli, Hyderabad",
+      "The Private Table":"Film Nagar, Hyderabad",
+      "Neon Nights Bistro":"Hitech City, Hyderabad",
+    };
+
+    const emoji = eventEmojis[eventName] || "🎟️";
+    const venue = eventVenues[eventName] || "Hyderabad";
+    const dateStr = new Date().toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
+    const shortId = bookingId ? bookingId.slice(-10).toUpperCase() : "—";
+
+    /* ── POPULATE ── */
+    if (isSuccess) {
+      // banner
+      document.getElementById("scBanner").classList.add("success");
+      document.getElementById("scIcon").textContent = "✅";
+      document.getElementById("scTitle").textContent = isRestaurant ? "Table Reserved!" : "Booking Confirmed!";
+      document.getElementById("scSubtitle").textContent = isRestaurant
+        ? "Your table is reserved. Show the QR code at the restaurant reception."
+        : "Your seat is reserved. Show the QR code at the venue entry.";
+      document.getElementById("scBookingId").textContent = "Booking ID: " + shortId;
+
+      // ticket top
+      document.getElementById("ticketEmoji").textContent = emoji;
+      document.getElementById("ticketEvent").textContent = eventName;
+      document.getElementById("ticketVenue").textContent = venue;
+
+      // ticket details
+      document.getElementById("dBookingId").textContent = shortId;
+      document.getElementById("dStatus").textContent    = isRestaurant ? "✅ Reserved" : "✅ Confirmed";
+      document.getElementById("dAmount").textContent    = amount;
+      document.getElementById("dDate").textContent      = isRestaurant && bkDate
+        ? new Date(bkDate).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) + (bkTime ? " · " + bkTime : "")
+        : dateStr;
+      document.getElementById("dEvent").textContent     = eventName;
+      if (isRestaurant) {
+        document.getElementById("dEventLabel").textContent = "Restaurant";
+      }
+
+      // QR code — encode booking verification data
+      const qrData = JSON.stringify({ id: bookingId, event: eventName, amount, date: dateStr, issuer: "CultureWave", type: bkType });
+      QRCode.toCanvas(document.getElementById("qrCanvas"), qrData, {
+        width: 120, margin: 1,
+        color: { dark: "#0a0f1e", light: "#ffffff" }
+      });
+      if (isRestaurant) {
+        document.getElementById("qrScanNote").textContent = "Staff scans at reception";
+      }
+
+    } else {
+      // FAILED state
+      document.getElementById("scBanner").classList.add("failed");
+      document.getElementById("scIcon").textContent = "❌";
+      document.getElementById("scTitle").textContent = "Payment Failed";
+      document.getElementById("scSubtitle").textContent = "Your payment could not be processed. Please try again.";
+      document.getElementById("scBookingId").style.display = "none";
+      document.getElementById("scTicket").style.display = "none";
+      document.getElementById("scActions").style.display = "none";
+      document.getElementById("scFailedActions").style.display = "grid";
+    }
+
+    /* ── DOWNLOAD TICKET ── */
+    document.getElementById("btnDownload")?.addEventListener("click", async () => {
+      const btn = document.getElementById("btnDownload");
+      btn.textContent = "⏳ Generating...";
+      btn.disabled = true;
+      try {
+        const canvas = await html2canvas(document.getElementById("scTicket"), {
+          scale: 2, useCORS: true, backgroundColor: "#ffffff",
+          logging: false
+        });
+        const link = document.createElement("a");
+        link.download = `CultureWave-Ticket-${shortId}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch(e) {
+        alert("Download failed. Try a screenshot instead.");
+      }
+      btn.textContent = "⬇️ Download Ticket";
+      btn.disabled = false;
+    });
+
+    /* ── SHARE ── */
+    document.getElementById("btnShare")?.addEventListener("click", async () => {
+      const shareData = {
+        title: "CultureWave Booking Confirmed",
+        text: `I just booked "${eventName}" on CultureWave! Booking ID: ${shortId}`,
+        url: window.location.href,
+      };
+      if (navigator.share) {
+        try { await navigator.share(shareData); } catch(e) { /* dismissed */ }
+      } else {
+        try {
+          await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+          const btn = document.getElementById("btnShare");
+          btn.textContent = "✅ Copied!";
+          setTimeout(() => btn.textContent = "🔗 Share", 2000);
+        } catch(e) {
+          alert("Share link: " + window.location.href);
+        }
+      }
+    });
+
+    /* ── HAMBURGER ── */
+    const ham  = document.getElementById("hamburger");
+    const mNav = document.getElementById("mobileNav");
+    ham.addEventListener("click", () => {
+      ham.classList.toggle("open");
+      mNav.classList.toggle("open");
+      document.body.style.overflow = mNav.classList.contains("open") ? "hidden" : "";
+    });
+    mNav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+      ham.classList.remove("open"); mNav.classList.remove("open"); document.body.style.overflow = "";
+    }));
+  </script>
+</body>
+</html>
