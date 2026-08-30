@@ -74,43 +74,12 @@
           <span class="eyebrow">Featured events</span>
           <h2>Real listings people can book right away.</h2>
         </div>
-        <div class="event-grid event-grid-home">
-          <article class="event-card" data-name="Sunset Music Festival" data-category="music" data-venue="Mumbai">
-            <div class="event-banner banner-a"></div>
-            <div class="event-body">
-              <h3>Sunset Music Festival</h3>
-              <p>Live sets, skyline views, and premium seating options.</p>
-              <div class="event-meta">
-                <span>Mumbai</span>
-                <span>From ₹1,499</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="events.html">View event</a>
-            </div>
-          </article>
-          <article class="event-card" data-name="BuildOps Summit" data-category="business" data-venue="Bengaluru">
-            <div class="event-banner banner-b"></div>
-            <div class="event-body">
-              <h3>BuildOps Summit</h3>
-              <p>Product, operations, and founder sessions with practical takeaways.</p>
-              <div class="event-meta">
-                <span>Bengaluru</span>
-                <span>From ₹2,499</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="events.html">View event</a>
-            </div>
-          </article>
-          <article class="event-card" data-name="Night Food Carnival" data-category="food" data-venue="Delhi">
-            <div class="event-banner banner-c"></div>
-            <div class="event-body">
-              <h3>Night Food Carnival</h3>
-              <p>Curated vendors, tasting passes, and late-night crowd energy.</p>
-              <div class="event-meta">
-                <span>Delhi</span>
-                <span>From ₹899</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="events.html">View event</a>
-            </div>
-          </article>
+        <div class="event-grid event-grid-home" id="indexEventsGrid">
+          <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:#9ca3af;">
+            <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
+            <div style="font-weight:700;">No events yet</div>
+            <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
+          </div>
         </div>
       </section>
 
@@ -119,43 +88,12 @@
           <span class="eyebrow">Featured restaurants</span>
           <h2>Top dining experiences you can book right now.</h2>
         </div>
-        <div class="event-grid event-grid-home">
-          <article class="event-card">
-            <div class="event-banner" style="background:linear-gradient(135deg,#dc2626,#f97316);"></div>
-            <div class="event-body">
-              <h3>The Grand Bistro</h3>
-              <p>Elegant fine dining with curated multi-course menus and panoramic city views.</p>
-              <div class="event-meta">
-                <span>Banjara Hills, Hyd</span>
-                <span>₹2,500 for two</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="restaurants.html">View restaurant</a>
-            </div>
-          </article>
-          <article class="event-card">
-            <div class="event-banner" style="background:linear-gradient(135deg,#7c3aed,#ec4899);"></div>
-            <div class="event-body">
-              <h3>Skyline Rooftop Lounge</h3>
-              <p>Open-air rooftop dining with craft cocktails and stunning sunset views.</p>
-              <div class="event-meta">
-                <span>Jubilee Hills, Hyd</span>
-                <span>₹1,800 for two</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="restaurants.html">View restaurant</a>
-            </div>
-          </article>
-          <article class="event-card">
-            <div class="event-banner" style="background:linear-gradient(135deg,#92400e,#fbbf24);"></div>
-            <div class="event-body">
-              <h3>The Private Table</h3>
-              <p>Exclusive private dining with a personal chef and bespoke curated menus.</p>
-              <div class="event-meta">
-                <span>Film Nagar, Hyd</span>
-                <span>₹5,000 for two</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="restaurants.html">View restaurant</a>
-            </div>
-          </article>
+        <div class="event-grid event-grid-home" id="indexRestaurantsGrid">
+          <div id="indexRestaurantsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:#9ca3af;">
+            <div style="font-size:2.5rem;margin-bottom:.6rem;">🍽️</div>
+            <div style="font-weight:700;">No restaurants yet</div>
+            <div style="font-size:.85rem;margin-top:.3rem;">Listed restaurants will appear here.</div>
+          </div>
         </div>
         <div style="text-align:center;margin-top:2rem;">
           <a class="btn btn-primary" href="restaurants.html">Browse All Restaurants</a>
@@ -368,45 +306,64 @@
       }
       const _idb = firebase.firestore();
       const _banners = ['banner-a','banner-b','banner-c'];
+      const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
       async function loadIndexEvents() {
         try {
-          const snap = await _idb.collection('events')
-            .where('status','==','published')
-            .limit(6)
-            .get();
-          if (snap.empty) return;
-          const grid = document.querySelector('.event-grid-home');
-          if (!grid) return;
-          snap.docs.forEach((doc, i) => {
-            const d = doc.data();
-            const id = doc.id;
-            const exists = Array.from(grid.querySelectorAll('.event-card')).some(c => c.dataset.name === d.name);
-            if (exists) return;
-            const price = d.tickets?.[0]?.price || d.price || 0;
-            const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
-            const bannerStyle = d.coverUrl
-              ? `style="background:url('${d.coverUrl}') center/cover no-repeat;"`
-              : `class="event-banner ${_banners[i % _banners.length]}"`;
-            const article = document.createElement('article');
-            article.className = 'event-card';
-            article.dataset.name = d.name || '';
-            article.innerHTML = `
-              <div class="event-banner ${_banners[i % _banners.length]}" ${d.coverUrl ? `style="background:url('${d.coverUrl}') center/cover no-repeat;"` : ''}></div>
-              <div class="event-body">
-                <h3>${d.name || 'Untitled Event'}</h3>
-                <p>${d.summary || ''}</p>
-                <div class="event-meta">
-                  <span>${d.venueName || d.city || 'TBA'}</span>
-                  <span>${priceStr}</span>
-                </div>
-                <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
-              </div>`;
-            grid.appendChild(article);
-          });
-        } catch(e) { console.warn('Index events:', e.message); }
+          const snap = await _idb.collection('events').where('status','==','published').limit(6).get();
+          const grid = document.getElementById('indexEventsGrid');
+          const empty = document.getElementById('indexEventsEmpty');
+          if (!snap.empty) {
+            empty.style.display = 'none';
+            snap.docs.forEach((doc, i) => {
+              const d = doc.data(), id = doc.id;
+              const price = d.tickets?.[0]?.price || d.price || 0;
+              const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
+              const article = document.createElement('article');
+              article.className = 'event-card';
+              article.innerHTML = `
+                <div class="event-banner ${_banners[i%_banners.length]}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
+                <div class="event-body">
+                  <h3>${d.name||'Untitled'}</h3>
+                  <p>${d.summary||''}</p>
+                  <div class="event-meta"><span>${d.venueName||d.city||'TBA'}</span><span>${priceStr}</span></div>
+                  <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
+                </div>`;
+              grid.appendChild(article);
+            });
+          }
+        } catch(e) { console.warn('Events:', e.message); }
       }
+
+      async function loadIndexRestaurants() {
+        try {
+          const snap = await _idb.collection('restaurants').where('status','==','published').limit(6).get();
+          const grid = document.getElementById('indexRestaurantsGrid');
+          const empty = document.getElementById('indexRestaurantsEmpty');
+          if (!snap.empty) {
+            empty.style.display = 'none';
+            snap.docs.forEach((doc, i) => {
+              const d = doc.data(), id = doc.id;
+              const price = d.priceForTwo || d.price || 0;
+              const priceStr = price ? `\u20b9${Number(price).toLocaleString('en-IN')} for two` : 'See menu';
+              const article = document.createElement('article');
+              article.className = 'event-card';
+              article.innerHTML = `
+                <div class="event-banner" style="${d.coverUrl?`background:url('${d.coverUrl}') center/cover no-repeat`:`background:${_rsBanners[i%_rsBanners.length]}`};"></div>
+                <div class="event-body">
+                  <h3>${d.name||'Restaurant'}</h3>
+                  <p>${d.description||d.summary||''}</p>
+                  <div class="event-meta"><span>${d.area||d.city||'TBA'}</span><span>${priceStr}</span></div>
+                  <a class="btn btn-secondary event-btn" href="restaurants.html">View restaurant</a>
+                </div>`;
+              grid.appendChild(article);
+            });
+          }
+        } catch(e) { console.warn('Restaurants:', e.message); }
+      }
+
       loadIndexEvents();
+      loadIndexRestaurants();
     </script>
     <script>
       const ham = document.getElementById('hamburger');

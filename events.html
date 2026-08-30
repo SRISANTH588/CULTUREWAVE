@@ -378,102 +378,7 @@
       <!-- GRID -->
       <section class="ev-section">
         <div class="ev-grid" id="evGrid">
-
-          <article class="ev-card" data-name="HIMTEX 2026" data-category="exhibition" data-date="2026-08-24">
-            <div class="ev-banner ev-banner-a">
-              <span class="ev-tag">Exhibition</span>
-            </div>
-            <div class="ev-body">
-              <h3>HIMTEX 2026</h3>
-              <p class="ev-venue">HITEX Exhibition Centre, Hyderabad</p>
-              <div class="ev-meta">
-                <span class="ev-pill date">24 Aug</span>
-                <span class="ev-pill">Today</span>
-                <span class="ev-pill">Exhibition</span>
-              </div>
-              <div class="ev-footer">
-                <div class="ev-price"><strong>Free</strong> entry</div>
-                <a class="ev-book" href="booking.html">Book Seats →</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="ev-card" data-name="Nullcon Hyderabad 2026" data-category="security" data-date="2026-08-27">
-            <div class="ev-banner ev-banner-b">
-              <span class="ev-tag">Security</span>
-            </div>
-            <div class="ev-body">
-              <h3>Nullcon Hyderabad 2026</h3>
-              <p class="ev-venue">Novotel Hyderabad Convention Centre & HICC</p>
-              <div class="ev-meta">
-                <span class="ev-pill date">27 Aug</span>
-                <span class="ev-pill">Training</span>
-                <span class="ev-pill">Security</span>
-              </div>
-              <div class="ev-footer">
-                <div class="ev-price"><strong>₹2,499</strong> onwards</div>
-                <a class="ev-book" href="booking.html">Book Seats →</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="ev-card" data-name="Sport Expo India 9th Edition" data-category="expo" data-date="2026-08-28">
-            <div class="ev-banner ev-banner-c">
-              <span class="ev-tag">Sports</span>
-            </div>
-            <div class="ev-body">
-              <h3>Sport Expo India 9th Edition</h3>
-              <p class="ev-venue">HITEX, Hyderabad</p>
-              <div class="ev-meta">
-                <span class="ev-pill date">28 Aug</span>
-                <span class="ev-pill">Expo</span>
-                <span class="ev-pill">Sports</span>
-              </div>
-              <div class="ev-footer">
-                <div class="ev-price"><strong>₹499</strong> onwards</div>
-                <a class="ev-book" href="booking.html">Book Seats →</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="ev-card" data-name="CREDAI Hyderabad Property Show" data-category="expo" data-date="2026-08-28">
-            <div class="ev-banner ev-banner-d">
-              <span class="ev-tag">Property</span>
-            </div>
-            <div class="ev-body">
-              <h3>CREDAI Hyderabad Property Show</h3>
-              <p class="ev-venue">HITEX, Hyderabad</p>
-              <div class="ev-meta">
-                <span class="ev-pill date">28 Aug</span>
-                <span class="ev-pill">Property</span>
-                <span class="ev-pill">Expo</span>
-              </div>
-              <div class="ev-footer">
-                <div class="ev-price"><strong>Free</strong> entry</div>
-                <a class="ev-book" href="booking.html">Book Seats →</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="ev-card" data-name="Design Democracy 2026" data-category="design" data-date="2026-09-18">
-            <div class="ev-banner ev-banner-e">
-              <span class="ev-tag">Design</span>
-            </div>
-            <div class="ev-body">
-              <h3>Design Democracy 2026</h3>
-              <p class="ev-venue">Le Hesthia Design LLP, Hyderabad</p>
-              <div class="ev-meta">
-                <span class="ev-pill date">18 Sep</span>
-                <span class="ev-pill">Design</span>
-                <span class="ev-pill">Creative</span>
-              </div>
-              <div class="ev-footer">
-                <div class="ev-price"><strong>₹999</strong> onwards</div>
-                <a class="ev-book" href="booking.html">Book Seats →</a>
-              </div>
-            </div>
-          </article>
-
+          <div class="ev-empty" id="evEmpty" style="display:none;"><span>🔍</span>No events found.</div>
         </div>
       </section>
     </main>
@@ -518,47 +423,72 @@
         appId: "1:5471814825:web:07e84f2f88486da817d5b8"
       });
       const _db = firebase.firestore();
-
       const banners = ['ev-banner-a','ev-banner-b','ev-banner-c','ev-banner-d','ev-banner-e'];
+      let cards = [];
+
+      const searchInput = document.getElementById('eventSearch');
+      const chips = document.querySelectorAll('.ev-chip');
+      const evCount = document.getElementById('evCount');
+      const evSort = document.getElementById('evSort');
+      const grid = document.getElementById('evGrid');
+      let activeFilter = 'all';
+
+      function filterAndRender() {
+        const q = searchInput.value.toLowerCase();
+        let visible = cards.filter(c => {
+          const matchFilter = activeFilter === 'all' || c.dataset.category === activeFilter;
+          const venueEl = c.querySelector('.ev-venue');
+          const matchSearch = !q || c.dataset.name.toLowerCase().includes(q) || (venueEl && venueEl.textContent.toLowerCase().includes(q));
+          return matchFilter && matchSearch;
+        });
+        if (evSort.value === 'name') visible.sort((a,b) => a.dataset.name.localeCompare(b.dataset.name));
+        else visible.sort((a,b) => (a.dataset.date||'').localeCompare(b.dataset.date||''));
+        cards.forEach(c => c.style.display = 'none');
+        const empty = grid.querySelector('.ev-empty');
+        if (empty) empty.style.display = visible.length === 0 ? '' : 'none';
+        visible.forEach(c => { c.style.display = 'flex'; grid.appendChild(c); });
+        evCount.textContent = visible.length;
+      }
+
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          activeFilter = chip.dataset.filter;
+          filterAndRender();
+        });
+      });
+      searchInput.addEventListener('input', filterAndRender);
+      evSort.addEventListener('change', filterAndRender);
 
       async function loadFirestoreEvents() {
         try {
-          const snap = await _db.collection('events')
-            .where('status','==','published')
-            .limit(30)
-            .get();
-          if (snap.empty) return;
-          const grid = document.getElementById('evGrid');
+          const snap = await _db.collection('events').where('status','==','published').limit(50).get();
+          const empty = grid.querySelector('.ev-empty');
+          if (snap.empty) { if(empty) empty.style.display=''; evCount.textContent=0; return; }
+          if(empty) empty.style.display='none';
           snap.docs.forEach((doc, i) => {
-            const d = doc.data();
-            const id = doc.id;
-            // skip if already a static card with same name
-            const exists = Array.from(document.querySelectorAll('.ev-card')).some(c => c.dataset.name === d.name);
-            if (exists) return;
-            const date = d.startDate || '';
-            const dateLabel = date ? new Date(date + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : 'TBA';
-            const price = d.tickets?.[0]?.price || d.price || 0;
+            const d = doc.data(), id = doc.id;
+            const date = d.startDate||'';
+            const dateLabel = date ? new Date(date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : 'TBA';
+            const price = d.tickets?.[0]?.price||d.price||0;
             const priceStr = price ? `<strong>\u20b9${Number(price).toLocaleString('en-IN')}</strong> onwards` : '<strong>Free</strong> entry';
-            const banner = d.coverUrl
-              ? `<img src="${d.coverUrl}" style="width:100%;height:100%;object-fit:cover;" alt="${d.name}"/>`
-              : '';
-            const bannerClass = banners[i % banners.length];
+            const bannerClass = banners[i%banners.length];
             const article = document.createElement('article');
             article.className = 'ev-card';
-            article.dataset.name = d.name || '';
-            article.dataset.category = (d.category || 'other').toLowerCase();
+            article.dataset.name = d.name||'';
+            article.dataset.category = (d.category||'other').toLowerCase();
             article.dataset.date = date;
             article.innerHTML = `
-              <div class="ev-banner ${bannerClass}">
-                ${banner}
-                <span class="ev-tag">${d.category || 'Event'}</span>
+              <div class="ev-banner ${bannerClass}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} >
+                <span class="ev-tag">${d.category||'Event'}</span>
               </div>
               <div class="ev-body">
-                <h3>${d.name || 'Untitled Event'}</h3>
-                <p class="ev-venue">${d.venueName || d.city || 'Venue TBA'}</p>
+                <h3>${d.name||'Untitled Event'}</h3>
+                <p class="ev-venue">${d.venueName||d.city||'Venue TBA'}</p>
                 <div class="ev-meta">
                   <span class="ev-pill date">${dateLabel}</span>
-                  <span class="ev-pill">${d.category || 'Event'}</span>
+                  <span class="ev-pill">${d.category||'Event'}</span>
                 </div>
                 <div class="ev-footer">
                   <div class="ev-price">${priceStr}</div>
@@ -566,58 +496,12 @@
                 </div>
               </div>`;
             grid.appendChild(article);
-            // add to cards array for filter
             cards.push(article);
           });
-          evCount.textContent = document.querySelectorAll('.ev-card:not([style*="none"])').length;
-        } catch(e) { console.warn('Firestore load:', e.message); }
+          filterAndRender();
+        } catch(e) { console.warn('Firestore:', e.message); }
       }
       loadFirestoreEvents();
-    </script>
-      const searchInput = document.getElementById("eventSearch");
-      const chips = document.querySelectorAll(".ev-chip");
-      const evCount = document.getElementById("evCount");
-      const evSort = document.getElementById("evSort");
-      const grid = document.getElementById("evGrid");
-      let activeFilter = "all";
-
-      function filterAndRender() {
-        const q = searchInput.value.toLowerCase();
-        let visible = cards.filter(c => {
-          const matchFilter = activeFilter === "all" || c.dataset.category === activeFilter;
-          const matchSearch = !q || c.dataset.name.toLowerCase().includes(q) || c.querySelector(".ev-venue").textContent.toLowerCase().includes(q);
-          return matchFilter && matchSearch;
-        });
-
-        if (evSort.value === "name") visible.sort((a, b) => a.dataset.name.localeCompare(b.dataset.name));
-        else visible.sort((a, b) => a.dataset.date.localeCompare(b.dataset.date));
-
-        cards.forEach(c => c.style.display = "none");
-        const empty = grid.querySelector(".ev-empty");
-        if (empty) empty.remove();
-
-        if (visible.length === 0) {
-          const el = document.createElement("div");
-          el.className = "ev-empty";
-          el.innerHTML = "<span>🔍</span>No events found. Try a different search.";
-          grid.appendChild(el);
-        } else {
-          visible.forEach(c => { c.style.display = "flex"; grid.appendChild(c); });
-        }
-        evCount.textContent = visible.length;
-      }
-
-      chips.forEach(chip => {
-        chip.addEventListener("click", () => {
-          chips.forEach(c => c.classList.remove("active"));
-          chip.classList.add("active");
-          activeFilter = chip.dataset.filter;
-          filterAndRender();
-        });
-      });
-
-      searchInput.addEventListener("input", filterAndRender);
-      evSort.addEventListener("change", filterAndRender);
     </script>
     <script>
       const ham = document.getElementById('hamburger');
