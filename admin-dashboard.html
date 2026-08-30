@@ -222,6 +222,7 @@
     <button class="sb-item" data-view="events"><span class="si-icon">📅</span> Events <span class="si-badge green" id="badgeEvents">0</span></button>
     <button class="sb-item" data-view="campaigns"><span class="si-icon">📣</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
     <button class="sb-item" data-view="payments"><span class="si-icon">💳</span> Payments <span class="si-badge" id="badgePayments">0</span></button>
+    <button class="sb-item" data-view="whatsapp"><span class="si-icon">💬</span> WhatsApp <span class="si-badge green" id="badgeWA">0</span></button>
     <button class="sb-item" data-view="refunds"><span class="si-icon">↩️</span> Refunds <span class="si-badge" id="badgeRefunds">0</span></button>
     <button class="sb-item" data-view="website-requests"><span class="si-icon">🌐</span> Website Requests <span class="si-badge orange" id="badgeWebReqs">0</span></button>
   </nav>
@@ -817,7 +818,165 @@
     </div>
   </div>
 
+  <!-- WHATSAPP VIEW -->
+  <div class="view wa-view" data-view="whatsapp">
+    <div class="wa-hero">
+      <div class="wa-hero-left">
+        <div class="wa-eyebrow">💬 WhatsApp Bookings</div>
+        <h2>WhatsApp Dispatch</h2>
+        <p>Send booking confirmations with QR code to organizers and customers.</p>
+        <div class="wa-stats-strip">
+          <div class="wa-stat"><strong id="waTotalBookings">0</strong><span>Bookings</span></div>
+          <div class="wa-stat"><strong id="waSentCount">0</strong><span>Sent</span></div>
+          <div class="wa-stat"><strong id="waPendingCount">0</strong><span>Pending</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wa-filter">
+      <input type="text" id="waSearch" placeholder="Search by name, event, phone…" oninput="filterWA()" />
+      <select id="waTypeFilter" onchange="filterWA()">
+        <option value="">All Types</option>
+        <option value="event">Events</option>
+        <option value="restaurant">Restaurants</option>
+      </select>
+      <select id="waStatusFilter" onchange="filterWA()">
+        <option value="">All Status</option>
+        <option value="paid">Paid</option>
+        <option value="created">Created</option>
+        <option value="refunded">Refunded</option>
+      </select>
+      <span style="font-size:.76rem;color:var(--muted);margin-left:auto;" id="waCount">0 bookings</span>
+    </div>
+
+    <div class="wa-grid" id="waGrid">
+      <div class="wa-empty"><div class="we-icon">💬</div><strong>No bookings yet</strong><p>Bookings will appear here once payments are made.</p></div>
+    </div>
+  </div>
+
 </div><!-- /main -->
+
+<!-- WHATSAPP VIEW CSS & STYLES -->
+  .wa-view { background:#f0f4ff; }
+  .wa-hero {
+    background:linear-gradient(135deg,#075e54 0%,#128c7e 60%,#25d366 100%);
+    border-radius:20px; padding:1.4rem 1.75rem;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:1rem; flex-wrap:wrap; margin-bottom:.25rem;
+  }
+  .wa-hero-left .wa-eyebrow {
+    display:inline-flex; align-items:center; gap:.4rem;
+    background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
+    border-radius:999px; padding:.22rem .7rem;
+    font-size:.63rem; font-weight:800; color:rgba(255,255,255,.9);
+    letter-spacing:.12em; text-transform:uppercase; margin-bottom:.5rem;
+  }
+  .wa-hero-left h2 { font-size:1.35rem; font-weight:800; color:#fff; letter-spacing:-.04em; margin:0 0 .25rem; }
+  .wa-hero-left p  { font-size:.82rem; color:rgba(255,255,255,.7); margin:0; }
+  .wa-stats-strip {
+    display:flex; gap:1.2rem; flex-wrap:wrap; margin-top:.5rem;
+  }
+  .wa-stat { text-align:center; }
+  .wa-stat strong { display:block; font-size:1.4rem; font-weight:800; color:#fff; letter-spacing:-.03em; }
+  .wa-stat span { font-size:.68rem; color:rgba(255,255,255,.6); font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+
+  /* filter bar */
+  .wa-filter { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem; }
+  .wa-filter input, .wa-filter select {
+    border:1px solid var(--border); border-radius:9px;
+    padding:.48rem .75rem; font-size:.8rem; outline:none;
+    background:#fff; font-family:inherit;
+  }
+  .wa-filter input:focus, .wa-filter select:focus { border-color:#25d366; }
+  .wa-filter input { width:220px; }
+
+  /* booking cards */
+  .wa-grid { display:grid; gap:.85rem; }
+  .wa-card {
+    background:#fff; border:1.5px solid #e2eafc;
+    border-radius:20px; overflow:hidden;
+    box-shadow:0 4px 16px rgba(18,66,197,.06);
+    transition:box-shadow .18s;
+  }
+  .wa-card:hover { box-shadow:0 8px 28px rgba(18,66,197,.1); }
+  .wa-card-top {
+    display:flex; align-items:center; gap:1rem;
+    padding:1rem 1.2rem; border-bottom:1px solid #f0f4ff;
+  }
+  .wa-card-emoji {
+    width:3rem; height:3rem; border-radius:14px; flex:none;
+    background:linear-gradient(135deg,#075e54,#25d366);
+    display:grid; place-items:center; font-size:1.4rem;
+  }
+  .wa-card-info { flex:1; min-width:0; }
+  .wa-card-info h3 { font-size:.95rem; font-weight:800; color:#0a0f1e; margin:0 0 .15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wa-card-info p  { font-size:.76rem; color:#6b7280; margin:0; }
+  .wa-card-meta {
+    display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;
+    padding:.6rem 1.2rem; background:#f8faff;
+    border-bottom:1px solid #f0f4ff;
+  }
+  .wa-meta-pill {
+    display:inline-flex; align-items:center; gap:.3rem;
+    background:#fff; border:1px solid #e2eafc;
+    border-radius:999px; padding:.2rem .65rem;
+    font-size:.72rem; font-weight:700; color:#374151;
+  }
+  .wa-meta-pill.green { background:#dcfce7; border-color:#bbf7d0; color:#166534; }
+  .wa-meta-pill.blue  { background:#dbeafe; border-color:#bfdbfe; color:#1e40af; }
+  .wa-meta-pill.orange{ background:#ffedd5; border-color:#fed7aa; color:#9a3412; }
+  .wa-card-body { padding:1rem 1.2rem; }
+  .wa-detail-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:.5rem .8rem;
+    margin-bottom:1rem;
+  }
+  .wa-detail { display:grid; gap:.1rem; }
+  .wa-detail-label { font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:#9ca3af; }
+  .wa-detail-value { font-size:.84rem; font-weight:700; color:#0a0f1e; }
+
+  /* action buttons */
+  .wa-actions { display:flex; gap:.6rem; flex-wrap:wrap; }
+  .wa-btn {
+    flex:1; min-width:140px; min-height:44px;
+    border:none; border-radius:12px;
+    font-size:.82rem; font-weight:800; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:.45rem;
+    transition:transform .15s, box-shadow .15s; text-decoration:none;
+  }
+  .wa-btn:hover { transform:translateY(-1px); }
+  .wa-btn-organizer {
+    background:linear-gradient(135deg,#075e54,#128c7e);
+    color:#fff; box-shadow:0 6px 18px rgba(7,94,84,.3);
+  }
+  .wa-btn-organizer:hover { box-shadow:0 10px 24px rgba(7,94,84,.4); }
+  .wa-btn-customer {
+    background:linear-gradient(135deg,#25d366,#128c7e);
+    color:#fff; box-shadow:0 6px 18px rgba(37,211,102,.3);
+  }
+  .wa-btn-customer:hover { box-shadow:0 10px 24px rgba(37,211,102,.4); }
+  .wa-btn-sent {
+    background:#f0fdf4; color:#166534;
+    border:1.5px solid #bbf7d0;
+    box-shadow:none; flex:none; min-width:auto; padding:0 1rem;
+  }
+  .wa-btn-sent:hover { transform:none; background:#dcfce7; }
+  .wa-sent-badge {
+    display:inline-flex; align-items:center; gap:.3rem;
+    background:#dcfce7; border:1px solid #bbf7d0;
+    border-radius:999px; padding:.22rem .7rem;
+    font-size:.7rem; font-weight:800; color:#166534;
+  }
+  .wa-sent-log {
+    margin-top:.75rem; padding:.65rem .85rem;
+    background:#f0fdf4; border:1px solid #bbf7d0;
+    border-radius:12px; font-size:.76rem; color:#166534;
+    font-weight:600; display:none;
+  }
+  .wa-sent-log.show { display:block; }
+  .wa-empty { text-align:center; padding:3rem 1rem; color:#9ca3af; }
+  .wa-empty .we-icon { font-size:2.8rem; margin-bottom:.6rem; }
+  .wa-empty strong { display:block; font-size:.9rem; color:#374151; margin-bottom:.3rem; }
+</style>
 
 <!-- ══ MODALS ══ -->
 
@@ -967,6 +1126,7 @@ window.showView = function(name) {
   if(name==='analytics') renderAnalytics();
   if(name==='credits') renderCreditsView();
   if(name==='activity') renderActivityLog();
+  if(name==='whatsapp') { syncWABookings(); filterWA(); }
 };
 document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
 
@@ -1520,6 +1680,7 @@ onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200
   document.getElementById('refundPayment').innerHTML = allPayments.map(p=>`<option value="${p.id}">${esc(p.receipt||p.id)} — ${esc(p.status||'created')}</option>`).join('');
   renderPaymentsTable(allPayments);
   renderRefundsTable(allPayments);
+  syncWABookings();
   updateStats();
 });
 
@@ -1635,6 +1796,198 @@ document.getElementById('globalSearch').addEventListener('input', function() {
   if(userMatch){showView('users');document.getElementById('userSearch').value=q;filterUsers();}
   else if(eventMatch){showView('events');document.getElementById('eventSearch').value=q;filterEvents();}
 });
+
+// ── WHATSAPP TAB ──
+let allBookings = []; // combined payments with customer info
+let waSentLog = {}; // { paymentId: { organizer: timestamp, customer: timestamp } }
+
+const waViewTitles = { whatsapp: 'WhatsApp Dispatch' };
+Object.assign(viewTitles, waViewTitles);
+
+function buildWAMessage(p, type) {
+  const id    = (p.receipt || p.id || '').slice(-10).toUpperCase();
+  const event = p.eventName || p.event?.name || 'Booking';
+  const amt   = p.amount ? '\u20b9' + Number(p.amount).toLocaleString('en-IN') : 'Free';
+  const name  = p.customerName || p.customer?.name || 'Guest';
+  const date  = p.createdAt ? (p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt)).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  const seats = p.seats || p.notes?.seats || '1';
+  const bkType = p.bookingType || 'event';
+  const successUrl = window.location.origin + '/success.html?bookingId=' + encodeURIComponent(p.id || id) + '&event=' + encodeURIComponent(event) + '&amount=' + encodeURIComponent(amt) + '&status=Confirmed&type=' + bkType;
+
+  if (type === 'organizer') {
+    return `✅ *New Booking Alert*
+
+🎫 *${event}*
+👤 Guest: ${name}
+🪑 ${bkType === 'restaurant' ? 'Guests' : 'Seats'}: ${seats}
+💰 Amount: ${amt}
+🗓️ Date: ${date}
+🔖 Booking ID: ${id}
+
+📱 *QR Code & Ticket:*
+${successUrl}
+
+_Scan QR at entry to verify this booking._
+
+— CultureWave`;
+  } else {
+    return `🎉 *Booking Confirmed!*
+
+Hi ${name}, your booking is confirmed.
+
+🎫 *${event}*
+🪑 ${bkType === 'restaurant' ? 'Guests' : 'Seats'}: ${seats}
+💰 Amount Paid: ${amt}
+🗓️ Date: ${date}
+🔖 Booking ID: ${id}
+
+📱 *Your E-Ticket & QR Code:*
+${successUrl}
+
+Show this QR code at the ${bkType === 'restaurant' ? 'restaurant reception' : 'venue entry'}.
+
+Thank you for booking with CultureWave! 💙`;
+  }
+}
+
+function renderWAGrid(bookings) {
+  document.getElementById('waCount').textContent = bookings.length + ' bookings';
+  const sent = Object.keys(waSentLog).filter(k => waSentLog[k].organizer || waSentLog[k].customer).length;
+  document.getElementById('waTotalBookings').textContent = allBookings.length;
+  document.getElementById('waSentCount').textContent = sent;
+  document.getElementById('waPendingCount').textContent = allBookings.length - sent;
+  document.getElementById('badgeWA').textContent = allBookings.length - sent;
+
+  const grid = document.getElementById('waGrid');
+  if (!bookings.length) {
+    grid.innerHTML = '<div class="wa-empty"><div class="we-icon">💬</div><strong>No bookings found</strong><p>Bookings will appear here once payments are made.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = bookings.map(p => {
+    const id       = (p.receipt || p.id || '').slice(-10).toUpperCase();
+    const event    = esc(p.eventName || p.event?.name || 'Booking');
+    const name     = esc(p.customerName || p.customer?.name || 'Guest');
+    const email    = esc(p.customerEmail || p.customer?.email || '—');
+    const phone    = (p.customerPhone || p.customer?.phone || '').replace(/[^0-9]/g, '');
+    const orgPhone = (p.organizerPhone || '').replace(/[^0-9]/g, '');
+    const amt      = p.amount ? '₹' + Number(p.amount).toLocaleString('en-IN') : 'Free';
+    const seats    = p.seats || p.notes?.seats || '1';
+    const bkType   = p.bookingType || 'event';
+    const method   = esc(p.method || p.notes?.method || '—');
+    const date     = p.createdAt ? (p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt)).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    const emoji    = bkType === 'restaurant' ? '🍽️' : '🎫';
+    const statusCls = p.status === 'paid' ? 'green' : p.status === 'refunded' ? 'blue' : 'orange';
+    const log      = waSentLog[p.id] || {};
+    const orgSent  = log.organizer ? '✅ Sent ' + new Date(log.organizer).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : null;
+    const custSent = log.customer  ? '✅ Sent ' + new Date(log.customer).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : null;
+
+    const orgMsg   = encodeURIComponent(buildWAMessage(p, 'organizer'));
+    const custMsg  = encodeURIComponent(buildWAMessage(p, 'customer'));
+    const orgHref  = orgPhone  ? `https://wa.me/91${orgPhone}?text=${orgMsg}`  : `https://wa.me/?text=${orgMsg}`;
+    const custHref = phone     ? `https://wa.me/91${phone}?text=${custMsg}`    : `https://wa.me/?text=${custMsg}`;
+
+    return `<div class="wa-card" id="wacard-${p.id}">
+      <div class="wa-card-top">
+        <div class="wa-card-emoji">${emoji}</div>
+        <div class="wa-card-info">
+          <h3>${event}</h3>
+          <p>${name} &bull; ${email}</p>
+        </div>
+        <span class="wa-meta-pill ${statusCls}">${esc(p.status || 'created')}</span>
+      </div>
+      <div class="wa-card-meta">
+        <span class="wa-meta-pill">🔖 ${id}</span>
+        <span class="wa-meta-pill blue">${bkType === 'restaurant' ? '🍽️ Restaurant' : '🎫 Event'}</span>
+        <span class="wa-meta-pill">🪑 ${seats} ${bkType === 'restaurant' ? 'guests' : 'seats'}</span>
+        <span class="wa-meta-pill">💰 ${amt}</span>
+        <span class="wa-meta-pill">🗓️ ${date}</span>
+        <span class="wa-meta-pill">📱 ${method}</span>
+      </div>
+      <div class="wa-card-body">
+        <div class="wa-detail-grid">
+          <div class="wa-detail"><span class="wa-detail-label">Customer Phone</span><span class="wa-detail-value">${phone ? '+91 ' + phone : '—'}</span></div>
+          <div class="wa-detail"><span class="wa-detail-label">Organizer Phone</span><span class="wa-detail-value">${orgPhone ? '+91 ' + orgPhone : '— (not set)'}</span></div>
+          <div class="wa-detail"><span class="wa-detail-label">Email</span><span class="wa-detail-value">${email}</span></div>
+          <div class="wa-detail"><span class="wa-detail-label">Booking Type</span><span class="wa-detail-value">${bkType}</span></div>
+        </div>
+        <div class="wa-actions">
+          <a href="${orgHref}" target="_blank" class="wa-btn wa-btn-organizer" onclick="markWASent('${p.id}','organizer')">
+            💬 Send to Organizer
+          </a>
+          <a href="${custHref}" target="_blank" class="wa-btn wa-btn-customer" onclick="markWASent('${p.id}','customer')">
+            ✅ Confirm to Customer
+          </a>
+          <button class="wa-btn wa-btn-sent" onclick="markWASent('${p.id}','both')">
+            ✔️ Sent
+          </button>
+        </div>
+        <div class="wa-sent-log ${orgSent || custSent ? 'show' : ''}" id="walog-${p.id}">
+          ${orgSent  ? '💬 Organizer: ' + orgSent + '<br>' : ''}
+          ${custSent ? '✅ Customer: '  + custSent : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.markWASent = function(id, who) {
+  if (!waSentLog[id]) waSentLog[id] = {};
+  const now = Date.now();
+  if (who === 'organizer' || who === 'both') waSentLog[id].organizer = now;
+  if (who === 'customer'  || who === 'both') waSentLog[id].customer  = now;
+  // update log display
+  const logEl = document.getElementById('walog-' + id);
+  if (logEl) {
+    const l = waSentLog[id];
+    const orgT  = l.organizer ? '✅ Sent ' + new Date(l.organizer).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : null;
+    const custT = l.customer  ? '✅ Sent ' + new Date(l.customer).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : null;
+    logEl.innerHTML = (orgT  ? '💬 Organizer: ' + orgT  + '<br>' : '') + (custT ? '✅ Customer: ' + custT : '');
+    logEl.classList.add('show');
+  }
+  // update stats
+  const sent = Object.keys(waSentLog).filter(k => waSentLog[k].organizer || waSentLog[k].customer).length;
+  document.getElementById('waSentCount').textContent = sent;
+  document.getElementById('waPendingCount').textContent = allBookings.length - sent;
+  document.getElementById('badgeWA').textContent = allBookings.length - sent;
+  if (who === 'both') showToast('✅ Marked as sent', 'success');
+};
+
+window.filterWA = function() {
+  const q   = document.getElementById('waSearch').value.toLowerCase();
+  const typ = document.getElementById('waTypeFilter').value;
+  const st  = document.getElementById('waStatusFilter').value;
+  renderWAGrid(allBookings.filter(p => {
+    const matchQ  = !q  || (p.eventName||p.event?.name||'').toLowerCase().includes(q)
+                        || (p.customerName||p.customer?.name||'').toLowerCase().includes(q)
+                        || (p.customerPhone||p.customer?.phone||'').includes(q)
+                        || (p.receipt||p.id||'').toLowerCase().includes(q);
+    const matchT  = !typ || (p.bookingType||'event') === typ;
+    const matchSt = !st  || p.status === st;
+    return matchQ && matchT && matchSt;
+  }));
+};
+
+// rebuild allBookings whenever payments update
+function syncWABookings() {
+  allBookings = allPayments.map(p => ({
+    ...p,
+    customerName:  p.customerName  || p.customer?.name  || '',
+    customerEmail: p.customerEmail || p.customer?.email || '',
+    customerPhone: p.customerPhone || p.customer?.phone || '',
+    eventName:     p.eventName     || p.event?.name     || '',
+  }));
+  if (document.querySelector('.view[data-view="whatsapp"].active')) {
+    filterWA();
+  }
+}
+
+// patch the existing payments listener to also sync WA
+const _origPaySnap = window._origPaySnap;
+// We hook into the allPayments update — call syncWABookings after each payment snapshot
+// (already handled: syncWABookings is called from renderPaymentsTable override below)
+
+// ── END WHATSAPP ──
 
 // ── LOGOUT ──
 document.getElementById('logoutBtn').addEventListener('click', async () => {
