@@ -176,45 +176,63 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div class="sb-event-name" id="sbEventName">Loading...</div>
     <span class="sb-event-status draft" id="sbEventStatus">Draft</span>
   </div>
-  <div class="sb-section">Manage</div>
-  <button class="sb-item active" data-panel="bookings" onclick="switchPanel(this,'bookings')">
-    <span class="sb-icon">&#127915;</span>
-    <span><span style="display:block;">Bookings</span><span class="sb-sub">All reservations</span></span>
-  </button>
-  <button class="sb-item" data-panel="checkin" onclick="switchPanel(this,'checkin')">
-    <span class="sb-icon">&#10003;</span>
-    <span><span style="display:block;">Check-In</span><span class="sb-sub">Scan and verify attendees</span></span>
-  </button>
-  <button class="sb-item" data-panel="reminders" onclick="switchPanel(this,'reminders')">
-    <span class="sb-icon">&#128276;</span>
-    <span><span style="display:block;">Reminders</span><span class="sb-sub">Configure customer reminders</span></span>
-  </button>
-  <button class="sb-item" data-panel="postsale" onclick="switchPanel(this,'postsale')">
-    <span class="sb-icon">&#128172;</span>
-    <span><span style="display:block;">Post Sale Communication</span><span class="sb-sub">Configure post sale messages</span></span>
-  </button>
-  <div class="sb-section">Analytics</div>
-  <button class="sb-item" data-panel="analytics" onclick="switchPanel(this,'analytics')">
-    <span class="sb-icon">&#128202;</span>
-    <span><span style="display:block;">Overview</span><span class="sb-sub">All key metrics at a glance</span></span>
-  </button>
-  <button class="sb-item" data-panel="abandoned" onclick="switchPanel(this,'abandoned')">
-    <span class="sb-icon">&#128722;</span>
-    <span><span style="display:block;">Abandoned Carts</span><span class="sb-sub">Started checkout but did not pay</span></span>
-  </button>
-  <div class="sb-section">Event</div>
-  <button class="sb-item" data-panel="details" onclick="switchPanel(this,'details')">
-    <span class="sb-icon">&#128221;</span>
-    <span><span style="display:block;">Event Details</span><span class="sb-sub">Edit event information</span></span>
-  </button>
-  <button class="sb-item" data-panel="tickets" onclick="switchPanel(this,'tickets')">
-    <span class="sb-icon">&#127903;</span>
-    <span><span style="display:block;">Tickets and Pricing</span><span class="sb-sub">Manage ticket types</span></span>
-  </button>
-  <button class="sb-item" data-panel="settings" onclick="switchPanel(this,'settings')">
-    <span class="sb-icon">&#9881;</span>
-    <span><span style="display:block;">Event Settings</span><span class="sb-sub">Visibility and access</span></span>
-  </button>
+  <!-- TOP TABS -->
+  <div style="display:flex;gap:.4rem;padding:.75rem .75rem .4rem;">
+    <button class="sb-tab active" id="tabManage" onclick="switchTab('manage')" style="flex:1;padding:.5rem .4rem;border-radius:8px;font-size:.78rem;font-weight:700;border:1.5px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer;transition:all .15s;">&#127915; Manage</button>
+    <button class="sb-tab" id="tabAnalytics" onclick="switchTab('analytics')" style="flex:1;padding:.5rem .4rem;border-radius:8px;font-size:.78rem;font-weight:700;border:1.5px solid var(--border);background:#fff;color:#495057;cursor:pointer;transition:all .15s;">&#128202; Analytics</button>
+    <button class="sb-tab" id="tabEvent" onclick="switchTab('event')" style="flex:1;padding:.5rem .4rem;border-radius:8px;font-size:.78rem;font-weight:700;border:1.5px solid var(--border);background:#fff;color:#495057;cursor:pointer;transition:all .15s;">&#128221; Event</button>
+  </div>
+
+  <!-- MANAGE SUB-ITEMS -->
+  <div id="sbManage">
+    <div class="sb-section">Bookings &amp; Operations</div>
+    <button class="sb-item active" data-panel="bookings" onclick="switchPanel(this,'bookings')">
+      <span class="sb-icon">&#127915;</span>
+      <span><span style="display:block;">Bookings</span><span class="sb-sub">All reservations</span></span>
+    </button>
+    <button class="sb-item" data-panel="checkin" onclick="switchPanel(this,'checkin')">
+      <span class="sb-icon">&#10003;</span>
+      <span><span style="display:block;">Check-In</span><span class="sb-sub">Scan &amp; verify attendees</span></span>
+    </button>
+    <button class="sb-item" data-panel="reminders" onclick="switchPanel(this,'reminders')">
+      <span class="sb-icon">&#128276;</span>
+      <span><span style="display:block;">Reminders</span><span class="sb-sub">Configure customer reminders</span></span>
+    </button>
+    <button class="sb-item" data-panel="postsale" onclick="switchPanel(this,'postsale')">
+      <span class="sb-icon">&#128172;</span>
+      <span><span style="display:block;">Post Sale Communication</span><span class="sb-sub">Configure post sale messages</span></span>
+    </button>
+  </div>
+
+  <!-- ANALYTICS SUB-ITEMS -->
+  <div id="sbAnalytics" style="display:none;">
+    <div class="sb-section">Insights &amp; Data</div>
+    <button class="sb-item" data-panel="analytics" onclick="switchPanel(this,'analytics')">
+      <span class="sb-icon">&#128202;</span>
+      <span><span style="display:block;">Overview</span><span class="sb-sub">All key metrics at a glance</span></span>
+    </button>
+    <button class="sb-item" data-panel="abandoned" onclick="switchPanel(this,'abandoned')">
+      <span class="sb-icon">&#128722;</span>
+      <span><span style="display:block;">Abandoned Carts</span><span class="sb-sub">Started checkout but did not pay</span></span>
+    </button>
+  </div>
+
+  <!-- EVENT SUB-ITEMS -->
+  <div id="sbEvent" style="display:none;">
+    <div class="sb-section">Event Configuration</div>
+    <button class="sb-item" data-panel="details" onclick="switchPanel(this,'details')">
+      <span class="sb-icon">&#128221;</span>
+      <span><span style="display:block;">Event Details</span><span class="sb-sub">Edit event information</span></span>
+    </button>
+    <button class="sb-item" data-panel="tickets" onclick="switchPanel(this,'tickets')">
+      <span class="sb-icon">&#127903;</span>
+      <span><span style="display:block;">Tickets &amp; Pricing</span><span class="sb-sub">Manage ticket types</span></span>
+    </button>
+    <button class="sb-item" data-panel="settings" onclick="switchPanel(this,'settings')">
+      <span class="sb-icon">&#9881;</span>
+      <span><span style="display:block;">Event Settings</span><span class="sb-sub">Visibility and access</span></span>
+    </button>
+  </div>
 </aside>
 <div class="main">
   <header class="topbar">
@@ -569,6 +587,29 @@ const eventId = params.get('eventId');
 if(!eventId){document.body.innerHTML='<div style="padding:3rem;text-align:center;">No event ID. <a href="premium-client-dashboard.html">Go back</a></div>';}
 
 let eventData=null, allBookings=[], anPeriod=30;
+
+function switchTab(tab){
+  // update tab button styles
+  const tabs={manage:'tabManage',analytics:'tabAnalytics',event:'tabEvent'};
+  Object.entries(tabs).forEach(([key,id])=>{
+    const btn=document.getElementById(id);
+    if(!btn) return;
+    const active=key===tab;
+    btn.style.background=active?'var(--blue)':'#fff';
+    btn.style.color=active?'#fff':'#495057';
+    btn.style.borderColor=active?'var(--blue)':'var(--border)';
+  });
+  // show/hide sub-nav groups
+  const groups={manage:'sbManage',analytics:'sbAnalytics',event:'sbEvent'};
+  Object.entries(groups).forEach(([key,id])=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display=key===tab?'block':'none';
+  });
+  // auto-activate first panel in the tab
+  const defaults={manage:'bookings',analytics:'analytics',event:'details'};
+  const firstBtn=document.querySelector('#sb'+tab.charAt(0).toUpperCase()+tab.slice(1)+' .sb-item');
+  if(firstBtn) switchPanel(firstBtn, defaults[tab]);
+}
 
 function switchPanel(btn,panelId){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
