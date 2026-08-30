@@ -351,9 +351,9 @@
       </div>
     </div>
 
-    <script src="script.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
     <script>
       // Only init if not already initialized
       if (!firebase.apps.length) {
@@ -373,7 +373,6 @@
         try {
           const snap = await _idb.collection('events')
             .where('status','==','published')
-            .orderBy('createdAt','desc')
             .limit(6)
             .get();
           if (snap.empty) return;

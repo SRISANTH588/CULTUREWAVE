@@ -525,7 +525,6 @@
         try {
           const snap = await _db.collection('events')
             .where('status','==','published')
-            .orderBy('createdAt','desc')
             .limit(30)
             .get();
           if (snap.empty) return;
