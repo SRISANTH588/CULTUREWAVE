@@ -301,8 +301,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div style="background:#1a1a2e;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;">
         <div style="font-size:.86rem;font-weight:700;color:#fff;">&#128247; Camera Scanner</div>
         <div style="display:flex;gap:.5rem;">
-          <button id="startScanBtn" onclick="startScanner()" style="padding:.38rem .85rem;border-radius:7px;background:#3b5bdb;color:#fff;font-size:.78rem;font-weight:700;border:0;cursor:pointer;">&#9654; Start</button>
-          <button id="stopScanBtn" onclick="stopScanner()" style="padding:.38rem .85rem;border-radius:7px;background:#c92a2a;color:#fff;font-size:.78rem;font-weight:700;border:0;cursor:pointer;display:none;">&#9646;&#9646; Stop</button>
+          <button id="startScanBtn" onclick="toggleScanner()" style="padding:.38rem 1.1rem;border-radius:7px;background:#3b5bdb;color:#fff;font-size:.82rem;font-weight:700;border:0;cursor:pointer;">&#128247; Scan</button>
         </div>
       </div>
       <div id="qr-reader" style="width:100%;background:#000;"></div>
@@ -753,10 +752,14 @@ document.getElementById('bkSearch').addEventListener('input',renderBookings);
 
 let html5QrCode=null,scannerRunning=false;
 
+window.toggleScanner=async function(){
+  if(scannerRunning) await stopScanner();
+  else await startScanner();
+};
+
 window.startScanner=async function(){
   const statusEl=document.getElementById('scanStatus');
   const startBtn=document.getElementById('startScanBtn');
-  const stopBtn=document.getElementById('stopScanBtn');
   if(scannerRunning) return;
   try{
     html5QrCode=new Html5Qrcode('qr-reader');
@@ -767,8 +770,8 @@ window.startScanner=async function(){
       ()=>{}
     );
     scannerRunning=true;
-    startBtn.style.display='none';
-    stopBtn.style.display='inline-flex';
+    startBtn.style.background='#c92a2a';
+    startBtn.innerHTML='&#9209; Stop Scan';
     statusEl.textContent='Camera active — point at QR code';
     statusEl.style.color='var(--green)';
   }catch(e){
@@ -779,12 +782,11 @@ window.startScanner=async function(){
 
 window.stopScanner=async function(){
   const startBtn=document.getElementById('startScanBtn');
-  const stopBtn=document.getElementById('stopScanBtn');
   const statusEl=document.getElementById('scanStatus');
   if(html5QrCode&&scannerRunning){await html5QrCode.stop();html5QrCode.clear();}
   scannerRunning=false;
-  startBtn.style.display='inline-flex';
-  stopBtn.style.display='none';
+  startBtn.style.background='#3b5bdb';
+  startBtn.innerHTML='&#128247; Scan';
   statusEl.textContent='Scanner stopped';
   statusEl.style.color='var(--muted)';
 };
