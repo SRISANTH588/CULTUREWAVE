@@ -13,18 +13,18 @@
   <script>
     // ── EMAILJS CONFIG ──
     // Replace these with your actual EmailJS credentials
-    const EMAILJS_PUBLIC_KEY   = "YOUR_PUBLIC_KEY";   // from EmailJS dashboard → Account
-    const EMAILJS_SERVICE_ID   = "YOUR_SERVICE_ID";   // from EmailJS dashboard → Email Services
-    const EMAILJS_TEMPLATE_ID  = "YOUR_TEMPLATE_ID";  // from EmailJS dashboard → Email Templates
+    const EMAILJS_PUBLIC_KEY   = "PDb2vpOIeLkbZBBFP";
+    const EMAILJS_SERVICE_ID   = "service_esppdwf";
+    const EMAILJS_TEMPLATE_ID  = "template_caj3zqw";
 
     (function() {
-      if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+      if (EMAILJS_PUBLIC_KEY) {
         emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
       }
     })();
 
     async function sendBookingEmail({ name, email, eventName, amount, seats, bookingId, bookingType, date, time, method }) {
-      if (EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY" || !email) return; // skip if not configured
+      if (!EMAILJS_PUBLIC_KEY || !email) return;
       const isRestaurant = bookingType === "restaurant";
       const successUrl = window.location.origin + "/success.html?bookingId=" + encodeURIComponent(bookingId)
         + "&event=" + encodeURIComponent(eventName)
