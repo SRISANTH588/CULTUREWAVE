@@ -13,7 +13,7 @@
   <!-- html2canvas for download -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
-    body { background: #f0f4ff; }
+    body { background: #f4f8ff; }
 
     /* ── PAGE SHELL ── */
     .sc-page {
@@ -30,23 +30,24 @@
       width: 100%;
       max-width: 680px;
       border-radius: 28px;
-      padding: 2.2rem 2rem;
+      padding: 2.4rem 2rem;
       text-align: center;
       margin-bottom: 1.8rem;
       position: relative;
       overflow: hidden;
     }
     .sc-status-banner.success {
-      background: linear-gradient(145deg, #0a0f1e 0%, #0d1f4a 55%, #0f2d6b 100%);
+      background: linear-gradient(145deg, #0a0f1e 0%, #1242c5 55%, #2f6bff 100%);
+      box-shadow: 0 20px 60px rgba(18,66,197,.3);
     }
     .sc-status-banner.failed {
       background: linear-gradient(145deg, #1a0a0a 0%, #3b0f0f 100%);
     }
     .sc-status-banner::before {
       content: "";
-      position: absolute; top: -100px; right: -100px;
-      width: 360px; height: 360px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(47,107,255,.28) 0%, transparent 68%);
+      position: absolute; top: -80px; right: -80px;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(126,179,255,.25) 0%, transparent 68%);
       pointer-events: none;
     }
     .sc-status-banner.failed::before {
@@ -97,13 +98,13 @@
     .sc-ticket {
       width: 100%; max-width: 680px;
       background: #fff;
-      border: 1.5px solid #e2eafc;
+      border: 1.5px solid #dce4f5;
       border-radius: 28px;
       overflow: hidden;
-      box-shadow: 0 12px 48px rgba(18,66,197,.1);
+      box-shadow: 0 16px 56px rgba(18,66,197,.12);
     }
     .sc-ticket-top {
-      background: linear-gradient(135deg, #0a0f1e 0%, #1242c5 60%, #2f6bff 100%);
+      background: linear-gradient(135deg, #0a0f1e 0%, #1242c5 55%, #2f6bff 100%);
       padding: 1.8rem 2rem;
       display: flex; align-items: center; gap: 1.2rem;
       position: relative; overflow: hidden;
@@ -222,9 +223,9 @@
     .sc-btn-download {
       background: linear-gradient(135deg, #2f6bff, #1242c5);
       color: #fff;
-      box-shadow: 0 8px 24px rgba(18,66,197,.28);
+      box-shadow: 0 8px 24px rgba(18,66,197,.3);
     }
-    .sc-btn-download:hover { box-shadow: 0 12px 30px rgba(18,66,197,.38); }
+    .sc-btn-download:hover { box-shadow: 0 14px 32px rgba(18,66,197,.42); }
     .sc-btn-share {
       background: #fff; color: #0a0f1e;
       border: 1.5px solid #dce4f5;
