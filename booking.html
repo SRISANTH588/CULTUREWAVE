@@ -684,6 +684,10 @@
   <script>
     /* ── URL PARAMS ── */
     const urlP = new URLSearchParams(window.location.search);
+    const eventId = urlP.get("eventId");
+    if (eventId) {
+      window.location.replace("event-booking.html?eventId=" + encodeURIComponent(eventId));
+    }
     const bookingType = urlP.get("type") || "event"; // "event" | "restaurant"
     const isRestaurant = bookingType === "restaurant";
 
