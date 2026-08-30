@@ -297,16 +297,28 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div class="stat-card"><div class="stat-icon green">&#10003;</div><div><div class="stat-label">Checked In</div><div class="stat-val" id="ciCheckedIn">0</div></div></div>
       <div class="stat-card"><div class="stat-icon blue">&#128101;</div><div><div class="stat-label">Total Expected</div><div class="stat-val" id="ciTotal">0</div></div></div>
     </div>
-    <div style="text-align:center;padding:2rem;border:2px dashed var(--border);border-radius:12px;">
-      <div style="font-size:2rem;margin-bottom:.75rem;">&#128247;</div>
-      <div style="font-size:.92rem;font-weight:700;margin-bottom:.4rem;">QR Scanner</div>
-      <div style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;">Use a QR scanner app or enter ticket ID manually</div>
-      <div style="display:flex;gap:.5rem;max-width:360px;margin:0 auto;">
-        <input id="ciInput" type="text" placeholder="Enter ticket ID or scan QR..." style="flex:1;padding:.6rem .85rem;border-radius:8px;border:1px solid var(--border);font:inherit;font-size:.84rem;outline:none;"/>
-        <button onclick="checkInTicket()" style="padding:.6rem 1.1rem;border-radius:8px;background:var(--green);color:#fff;font-weight:700;font-size:.84rem;border:0;cursor:pointer;">Check In</button>
+    <div style="border:2px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem;">
+      <div style="background:#1a1a2e;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:.86rem;font-weight:700;color:#fff;">&#128247; Camera Scanner</div>
+        <div style="display:flex;gap:.5rem;">
+          <button id="startScanBtn" onclick="startScanner()" style="padding:.38rem .85rem;border-radius:7px;background:#3b5bdb;color:#fff;font-size:.78rem;font-weight:700;border:0;cursor:pointer;">&#9654; Start</button>
+          <button id="stopScanBtn" onclick="stopScanner()" style="padding:.38rem .85rem;border-radius:7px;background:#c92a2a;color:#fff;font-size:.78rem;font-weight:700;border:0;cursor:pointer;display:none;">&#9646;&#9646; Stop</button>
+        </div>
+      </div>
+      <div id="qr-reader" style="width:100%;background:#000;"></div>
+      <div id="scanStatus" style="padding:.6rem 1rem;font-size:.8rem;font-weight:600;color:var(--muted);background:#f8f9fa;text-align:center;">Click Start to open camera</div>
+    </div>
+    <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.6rem;">Manual Entry</div>
+      <div style="display:flex;gap:.5rem;">
+        <input id="ciInput" type="text" placeholder="Enter booking ID or ticket ID..." style="flex:1;padding:.6rem .85rem;border-radius:8px;border:1px solid var(--border);font:inherit;font-size:.84rem;outline:none;"/>
+        <button onclick="checkInTicket()" style="padding:.6rem 1.1rem;border-radius:8px;background:var(--green);color:#fff;font-weight:700;font-size:.84rem;border:0;cursor:pointer;white-space:nowrap;">&#10003; Check In</button>
       </div>
     </div>
-    <div style="margin-top:1rem;" id="ciList"></div>
+    <div>
+      <div style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.6rem;">Recent Check-Ins</div>
+      <div id="ciList" style="display:flex;flex-direction:column;gap:.4rem;"></div>
+    </div>
   </div>
 </div>
 
@@ -542,6 +554,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 <div class="toast" id="toast"></div>
 
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -738,16 +751,99 @@ window.exportBookings=function(){
 
 document.getElementById('bkSearch').addEventListener('input',renderBookings);
 
+let html5QrCode=null,scannerRunning=false;
+
+window.startScanner=async function(){
+  const statusEl=document.getElementById('scanStatus');
+  const startBtn=document.getElementById('startScanBtn');
+  const stopBtn=document.getElementById('stopScanBtn');
+  if(scannerRunning) return;
+  try{
+    html5QrCode=new Html5Qrcode('qr-reader');
+    await html5QrCode.start(
+      {facingMode:'environment'},
+      {fps:10,qrbox:{width:250,height:250}},
+      async(decodedText)=>{ if(scannerRunning) await processCheckIn(decodedText.trim()); },
+      ()=>{}
+    );
+    scannerRunning=true;
+    startBtn.style.display='none';
+    stopBtn.style.display='inline-flex';
+    statusEl.textContent='Camera active — point at QR code';
+    statusEl.style.color='var(--green)';
+  }catch(e){
+    statusEl.textContent='Camera error: '+e.message;
+    statusEl.style.color='#c92a2a';
+  }
+};
+
+window.stopScanner=async function(){
+  const startBtn=document.getElementById('startScanBtn');
+  const stopBtn=document.getElementById('stopScanBtn');
+  const statusEl=document.getElementById('scanStatus');
+  if(html5QrCode&&scannerRunning){await html5QrCode.stop();html5QrCode.clear();}
+  scannerRunning=false;
+  startBtn.style.display='inline-flex';
+  stopBtn.style.display='none';
+  statusEl.textContent='Scanner stopped';
+  statusEl.style.color='var(--muted)';
+};
+
+async function processCheckIn(val){
+  const statusEl=document.getElementById('scanStatus');
+  if(!val) return;
+  const b=allBookings.find(x=>x.id===val||x.bookingId===val||x.ticketId===val);
+  if(!b){
+    statusEl.textContent='✗ Not found: '+val;
+    statusEl.style.color='#c92a2a';
+    showToast('Ticket not found: '+val);
+    return;
+  }
+  if(b.checkedIn){
+    const name=b.customer?.name||b.buyerName||'Guest';
+    statusEl.textContent='⚠ Already checked in: '+name;
+    statusEl.style.color='#e67700';
+    showToast('Already checked in: '+name);
+    addCiListItem(b,'duplicate');
+    return;
+  }
+  await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp()});
+  b.checkedIn=true;
+  const name=b.customer?.name||b.buyerName||'Guest';
+  statusEl.textContent='✓ Checked in: '+name;
+  statusEl.style.color='var(--green)';
+  showToast('Checked in: '+name);
+  addCiListItem(b,'success');
+  document.getElementById('ciCheckedIn').textContent=allBookings.filter(x=>x.checkedIn).length;
+}
+
+function addCiListItem(b,type){
+  const name=b.customer?.name||b.buyerName||'Guest';
+  const ticket=b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
+  const time=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  const color=type==='success'?'var(--green)':type==='duplicate'?'#e67700':'#c92a2a';
+  const icon=type==='success'?'✓':type==='duplicate'?'⚠':'✗';
+  const item=document.createElement('div');
+  item.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;border-radius:10px;background:#f8f9fa;border:1px solid var(--border);';
+  item.innerHTML='<div style="width:32px;height:32px;border-radius:50%;background:'+color+';display:grid;place-items:center;font-size:.9rem;color:#fff;flex:none;">'+icon+'</div>'
+    +'<div style="flex:1;"><div style="font-size:.84rem;font-weight:700;">'+esc(name)+'</div><div style="font-size:.72rem;color:var(--muted);">'+esc(ticket)+'</div></div>'
+    +'<div style="font-size:.72rem;color:var(--muted);">'+time+'</div>';
+  const list=document.getElementById('ciList');
+  list.insertBefore(item,list.firstChild);
+  if(list.children.length>10) list.removeChild(list.lastChild);
+}
+
 window.checkInTicket=async function(){
   const val=document.getElementById('ciInput').value.trim();
-  if(!val){showToast('Enter a ticket ID');return;}
-  const b=allBookings.find(x=>x.id===val||x.bookingId===val||x.ticketId===val);
-  if(!b){showToast('Ticket not found');return;}
-  if(b.checkedIn){showToast('Already checked in!');return;}
-  await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp()});
-  showToast('Checked in: '+(b.buyerName||'Guest'));
+  if(!val){showToast('Enter a booking ID');return;}
+  await processCheckIn(val);
   document.getElementById('ciInput').value='';
 };
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const ci=document.getElementById('ciInput');
+  if(ci) ci.addEventListener('keydown',e=>{if(e.key==='Enter') window.checkInTicket();});
+});
 
 function renderAnalytics(){
   const now=new Date();
