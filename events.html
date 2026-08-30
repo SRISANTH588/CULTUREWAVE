@@ -506,8 +506,75 @@
       </div>
     </footer>
 
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script>
-      const cards = Array.from(document.querySelectorAll(".ev-card"));
+      firebase.initializeApp({
+        apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+        authDomain: "ogshootsluxe-36740.firebaseapp.com",
+        projectId: "ogshootsluxe-36740",
+        storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+        messagingSenderId: "5471814825",
+        appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+      });
+      const _db = firebase.firestore();
+
+      const banners = ['ev-banner-a','ev-banner-b','ev-banner-c','ev-banner-d','ev-banner-e'];
+
+      async function loadFirestoreEvents() {
+        try {
+          const snap = await _db.collection('events')
+            .where('status','==','published')
+            .orderBy('createdAt','desc')
+            .limit(30)
+            .get();
+          if (snap.empty) return;
+          const grid = document.getElementById('evGrid');
+          snap.docs.forEach((doc, i) => {
+            const d = doc.data();
+            const id = doc.id;
+            // skip if already a static card with same name
+            const exists = Array.from(document.querySelectorAll('.ev-card')).some(c => c.dataset.name === d.name);
+            if (exists) return;
+            const date = d.startDate || '';
+            const dateLabel = date ? new Date(date + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : 'TBA';
+            const price = d.tickets?.[0]?.price || d.price || 0;
+            const priceStr = price ? `<strong>\u20b9${Number(price).toLocaleString('en-IN')}</strong> onwards` : '<strong>Free</strong> entry';
+            const banner = d.coverUrl
+              ? `<img src="${d.coverUrl}" style="width:100%;height:100%;object-fit:cover;" alt="${d.name}"/>`
+              : '';
+            const bannerClass = banners[i % banners.length];
+            const article = document.createElement('article');
+            article.className = 'ev-card';
+            article.dataset.name = d.name || '';
+            article.dataset.category = (d.category || 'other').toLowerCase();
+            article.dataset.date = date;
+            article.innerHTML = `
+              <div class="ev-banner ${bannerClass}">
+                ${banner}
+                <span class="ev-tag">${d.category || 'Event'}</span>
+              </div>
+              <div class="ev-body">
+                <h3>${d.name || 'Untitled Event'}</h3>
+                <p class="ev-venue">${d.venueName || d.city || 'Venue TBA'}</p>
+                <div class="ev-meta">
+                  <span class="ev-pill date">${dateLabel}</span>
+                  <span class="ev-pill">${d.category || 'Event'}</span>
+                </div>
+                <div class="ev-footer">
+                  <div class="ev-price">${priceStr}</div>
+                  <a class="ev-book" href="event-detail.html?eventId=${id}">View &amp; Book &rarr;</a>
+                </div>
+              </div>`;
+            grid.appendChild(article);
+            // add to cards array for filter
+            cards.push(article);
+          });
+          evCount.textContent = document.querySelectorAll('.ev-card:not([style*="none"])').length;
+        } catch(e) { console.warn('Firestore load:', e.message); }
+      }
+      loadFirestoreEvents();
+    </script>
       const searchInput = document.getElementById("eventSearch");
       const chips = document.querySelectorAll(".ev-chip");
       const evCount = document.getElementById("evCount");

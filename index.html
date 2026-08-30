@@ -352,6 +352,63 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+      // Only init if not already initialized
+      if (!firebase.apps.length) {
+        firebase.initializeApp({
+          apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+          authDomain: "ogshootsluxe-36740.firebaseapp.com",
+          projectId: "ogshootsluxe-36740",
+          storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+          messagingSenderId: "5471814825",
+          appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+        });
+      }
+      const _idb = firebase.firestore();
+      const _banners = ['banner-a','banner-b','banner-c'];
+
+      async function loadIndexEvents() {
+        try {
+          const snap = await _idb.collection('events')
+            .where('status','==','published')
+            .orderBy('createdAt','desc')
+            .limit(6)
+            .get();
+          if (snap.empty) return;
+          const grid = document.querySelector('.event-grid-home');
+          if (!grid) return;
+          snap.docs.forEach((doc, i) => {
+            const d = doc.data();
+            const id = doc.id;
+            const exists = Array.from(grid.querySelectorAll('.event-card')).some(c => c.dataset.name === d.name);
+            if (exists) return;
+            const price = d.tickets?.[0]?.price || d.price || 0;
+            const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
+            const bannerStyle = d.coverUrl
+              ? `style="background:url('${d.coverUrl}') center/cover no-repeat;"`
+              : `class="event-banner ${_banners[i % _banners.length]}"`;
+            const article = document.createElement('article');
+            article.className = 'event-card';
+            article.dataset.name = d.name || '';
+            article.innerHTML = `
+              <div class="event-banner ${_banners[i % _banners.length]}" ${d.coverUrl ? `style="background:url('${d.coverUrl}') center/cover no-repeat;"` : ''}></div>
+              <div class="event-body">
+                <h3>${d.name || 'Untitled Event'}</h3>
+                <p>${d.summary || ''}</p>
+                <div class="event-meta">
+                  <span>${d.venueName || d.city || 'TBA'}</span>
+                  <span>${priceStr}</span>
+                </div>
+                <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
+              </div>`;
+            grid.appendChild(article);
+          });
+        } catch(e) { console.warn('Index events:', e.message); }
+      }
+      loadIndexEvents();
+    </script>
     <script>
       const ham = document.getElementById('hamburger');
       const mNav = document.getElementById('mobileNav');

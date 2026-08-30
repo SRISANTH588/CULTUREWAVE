@@ -2290,7 +2290,7 @@ async function saveEvent(status) {
     coverUrl: document.getElementById('coverUrl').value.trim(),
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
-    customQuestion: document.getElementById('customQ').value.trim(),
+    customQuestion: (document.getElementById('customQ') ? document.getElementById('customQ').value.trim() : ''),
     tickets, coupons, faqs, eventDates,
     ticketMode,
     perDateTickets,
