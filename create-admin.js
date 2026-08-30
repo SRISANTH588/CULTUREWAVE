@@ -1,14 +1,16 @@
-import * as admin from "firebase-admin";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 
 const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 if (!serviceAccountJson) { console.error("Missing FIREBASE_SERVICE_ACCOUNT_JSON."); process.exit(1); }
 
-if (!admin.getApps().length) {
-  admin.initializeApp({ credential: admin.credential.cert(JSON.parse(serviceAccountJson)) });
+if (!getApps().length) {
+  initializeApp({ credential: cert(JSON.parse(serviceAccountJson)) });
 }
 
-const auth = admin.auth();
-const db = admin.firestore();
+const auth = getAuth();
+const db = getFirestore();
 
 const ACCOUNTS = [
   { email: "srisanth@cityvibe.local", password: "SASI@2006", name: "Srisanth", role: "admin" },
