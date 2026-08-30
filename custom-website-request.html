@@ -740,12 +740,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 firebase.initializeApp({
-  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
-  authDomain: "ogshootsluxe-36740.firebaseapp.com",
-  projectId: "ogshootsluxe-36740",
-  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
-  messagingSenderId: "5471814825",
-  appId: "1:5471814825:web:07e84f2f88486da817d5b8",
 });
 const db = firebase.firestore();
 const auth = firebase.auth();
@@ -759,7 +753,7 @@ async function loadUser() {
   try {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (!res.ok) { window.location.href = '/login.html'; return; }
-    const { user } = await res.json();
+    
     uid = user.uid; userName = user.name || '';
     document.getElementById('topAvatar').textContent = (userName || 'U').trim().charAt(0).toUpperCase();
     if (user.email) document.getElementById('contactEmail').value = user.email;

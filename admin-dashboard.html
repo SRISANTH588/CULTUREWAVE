@@ -1075,23 +1075,11 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { app, auth, db, getCurrentUser, logout } from "./firebase.js";
 import {
-  getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
+  collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
   query, orderBy, limit, onSnapshot, serverTimestamp, getDocs, getDoc
-} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-
-const app = initializeApp({
-  apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
-  authDomain:"ogshootsluxe-36740.firebaseapp.com",
-  projectId:"ogshootsluxe-36740",
-  storageBucket:"ogshootsluxe-36740.firebasestorage.app",
-  messagingSenderId:"5471814825",
-  appId:"1:5471814825:web:07e84f2f88486da817d5b8"
-});
-const auth = getAuth(app);
-const db = getFirestore(app);
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[];
@@ -1132,40 +1120,19 @@ document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventList
 
 // ── AUTH BOOTSTRAP ──
 (async function bootstrap() {
-  try {
-    const res = await fetch('/api/auth/me', { credentials:'include' });
-    if(res.ok) {
-      const { user } = await res.json();
-      const init = (user.name||'A').trim().charAt(0).toUpperCase();
-      document.getElementById('adminName').textContent = user.email || 'admin';
-      document.getElementById('sbName').textContent = user.name || 'Admin';
-      document.getElementById('sbAvatar').textContent = init;
-      document.getElementById('topAvatar').textContent = init;
-      const h = new Date().getHours();
-      const greet = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-      document.getElementById('heroGreeting').textContent = greet+', '+(user.name||'Admin')+' 👋';
-      return;
-    }
-  } catch {}
-  // fallback: Firebase Auth (works on file://)
-  auth.onAuthStateChanged(user => {
-    if(user) {
-      const init = (user.displayName||user.email||'A').trim().charAt(0).toUpperCase();
-      document.getElementById('adminName').textContent = user.email||'admin';
-      document.getElementById('sbName').textContent = user.displayName||'Admin';
-      document.getElementById('sbAvatar').textContent = init;
-      document.getElementById('topAvatar').textContent = init;
-    }
-    const h = new Date().getHours();
-    const greet = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-    document.getElementById('heroGreeting').textContent = greet+', Admin 👋';
-  });
+  const user = await getCurrentUser();
+  if (!user) { window.location.href = 'login.html'; return; }
+  const init = (user.name||'A').trim().charAt(0).toUpperCase();
+  document.getElementById('adminName').textContent = user.email || 'admin';
+  document.getElementById('sbName').textContent = user.name || 'Admin';
+  document.getElementById('sbAvatar').textContent = init;
+  document.getElementById('topAvatar').textContent = init;
+  const h = new Date().getHours();
+  const greet = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('heroGreeting').textContent = greet+', '+(user.name||'Admin')+' 👋';
 })();
 
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  await fetch('/api/auth/logout',{method:'POST',credentials:'include'});
-  try { await signOut(auth); } catch {}
-  window.location.href='/login.html';
+document.getElementById('logoutBtn').addEventListener('click', () => logout());
 });
 
 // ── BADGE UPDATER ──
@@ -1990,10 +1957,7 @@ const _origPaySnap = window._origPaySnap;
 // ── END WHATSAPP ──
 
 // ── LOGOUT ──
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  await fetch('/api/auth/logout',{method:'POST',credentials:'include'});
-  try{await signOut(auth);}catch{}
-  window.location.href='/login.html';
+document.getElementById('logoutBtn').addEventListener('click', () => logout());
 });
 
 </script>

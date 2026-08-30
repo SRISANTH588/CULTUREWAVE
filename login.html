@@ -562,21 +562,7 @@
     </div>
 
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-      const app = initializeApp({
-        apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
-        authDomain: "ogshootsluxe-36740.firebaseapp.com",
-        projectId: "ogshootsluxe-36740",
-        storageBucket: "ogshootsluxe-36740.firebasestorage.app",
-        messagingSenderId: "5471814825",
-        appId: "1:5471814825:web:07e84f2f88486da817d5b8"
-      });
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-      const ADMIN_EMAIL = "srisanth@cityvibe.local";
+      import { auth, db, toEmail, getCurrentUser, logout, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, doc, setDoc, getDoc } from "./firebase.js";
 
       const authTabs = document.querySelectorAll("[data-auth-tab]");
       const authForms = document.querySelectorAll("[data-auth-form]");
@@ -608,12 +594,12 @@
         return input.includes("@") ? input : `${input.toLowerCase()}@cityvibe.local`;
       }
 
-      async function getRole(uid, email) {
+      async function getRole(uid) {
         try {
           const snap = await getDoc(doc(db, "users", uid));
           if (snap.exists()) return snap.data().role || "client";
         } catch {}
-        return email === ADMIN_EMAIL ? "admin" : "client";
+        return "client";
       }
 
       function redirect(role) {
@@ -653,7 +639,7 @@
         setStatus("Signing in...", "info");
         try {
           const { user } = await signInWithEmailAndPassword(auth, email, password);
-          const role = await getRole(user.uid, user.email);
+          const role = await getRole(user.uid);
           setStatus("Welcome back! Redirecting...", "success");
           setTimeout(() => redirect(role), 800);
         } catch (err) {

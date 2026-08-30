@@ -2136,21 +2136,11 @@ function switchToolTab(btn, toolId) {
 }
 </script>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { app, auth, db, getCurrentUser, logout } from "./firebase.js";
 import { getFirestore, collection, doc, query, where, orderBy, limit,
          onSnapshot, getDocs, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
-  authDomain:"ogshootsluxe-36740.firebaseapp.com",
-  projectId:"ogshootsluxe-36740",
-  storageBucket:"ogshootsluxe-36740.firebasestorage.app",
-  messagingSenderId:"5471814825",
-  appId:"1:5471814825:web:07e84f2f88486da817d5b8"
 });
-const auth = getAuth(app);
-const db = getFirestore(app);
 window.db = db; window.doc = doc; window.setDoc = setDoc; window.updateDoc = updateDoc;
 
 // ── HELPERS ──
@@ -3021,13 +3011,13 @@ async function loadWhatsAppStats(uid) {
 }
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
-  await fetch('/api/auth/logout',{method:'POST',credentials:'include'});
+  
   try{ await signOut(auth); }catch{}
   location.href='/login.html';
 });
 
 (async () => {
-  const res = await fetch('/api/auth/me',{credentials:'include'});
+  const user = await getCurrentUser();
   if(!res.ok) return location.href='/login.html';
   const {user} = await res.json();
   myUid = user.uid;
