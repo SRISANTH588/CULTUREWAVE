@@ -1075,11 +1075,10 @@
 </div>
 
 <script type="module">
-import { app, auth, db, getCurrentUser, logout } from "./firebase.js";
-import {
+import { app, auth, db, getCurrentUser, logout,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
   query, orderBy, limit, onSnapshot, serverTimestamp, getDocs, getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "./firebase.js";
 
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[];
