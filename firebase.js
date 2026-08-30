@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -14,7 +14,6 @@ const firebaseConfig = {
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-setPersistence(auth, browserLocalPersistence).catch(() => {});
 
 // Convert username → email (supports plain email too)
 function toEmail(input) {
@@ -22,27 +21,24 @@ function toEmail(input) {
 }
 
 // Get current logged-in user with role from Firestore
-function getCurrentUser() {
-  return new Promise((resolve) => {
-    // auth.currentUser is available immediately if session is already loaded
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      unsubscribe();
-      if (!user) return resolve(null);
-      try {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        const data = snap.exists() ? snap.data() : {};
-        resolve({
-          uid: user.uid,
-          email: user.email,
-          name: data.name || user.displayName || user.email,
-          role: data.role || "client",
-          photoURL: user.photoURL || null,
-        });
-      } catch {
-        resolve({ uid: user.uid, email: user.email, name: user.displayName || user.email, role: "client" });
-      }
-    });
-  });
+// Uses authStateReady() to wait until Firebase has fully restored session
+async function getCurrentUser() {
+  await auth.authStateReady();
+  const user = auth.currentUser;
+  if (!user) return null;
+  try {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    const data = snap.exists() ? snap.data() : {};
+    return {
+      uid: user.uid,
+      email: user.email,
+      name: data.name || user.displayName || user.email,
+      role: data.role || "client",
+      photoURL: user.photoURL || null,
+    };
+  } catch {
+    return { uid: user.uid, email: user.email, name: user.displayName || user.email, role: "client" };
+  }
 }
 
 // Redirect to login if not authenticated
