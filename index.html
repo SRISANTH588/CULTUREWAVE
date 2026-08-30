@@ -308,31 +308,49 @@
       const _banners = ['banner-a','banner-b','banner-c'];
       const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
+      function isPublishedEvent(data) {
+        return (data?.status || '').toLowerCase() === 'published';
+      }
+
       async function loadIndexEvents() {
         try {
-          const snap = await _idb.collection('events').where('status','==','published').limit(6).get();
           const grid = document.getElementById('indexEventsGrid');
           const empty = document.getElementById('indexEventsEmpty');
-          if (!snap.empty) {
-            empty.style.display = 'none';
-            snap.docs.forEach((doc, i) => {
-              const d = doc.data(), id = doc.id;
-              const price = d.tickets?.[0]?.price || d.price || 0;
-              const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
-              const article = document.createElement('article');
-              article.className = 'event-card';
-              article.innerHTML = `
-                <div class="event-banner ${_banners[i%_banners.length]}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
-                <div class="event-body">
-                  <h3>${d.name||'Untitled'}</h3>
-                  <p>${d.summary||''}</p>
-                  <div class="event-meta"><span>${d.venueName||d.city||'TBA'}</span><span>${priceStr}</span></div>
-                  <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
-                </div>`;
-              grid.appendChild(article);
-            });
+          const snap = await _idb.collection('events').orderBy('createdAt', 'desc').limit(50).get();
+          const docs = snap.docs
+            .filter((doc) => isPublishedEvent(doc.data()))
+            .slice(0, 6);
+
+          if (!docs.length) {
+            empty.style.display = '';
+            return;
           }
-        } catch(e) { console.warn('Events:', e.message); }
+
+          empty.style.display = 'none';
+          docs.forEach((doc, i) => {
+            const d = doc.data(), id = doc.id;
+            const price = d.tickets?.[0]?.price || d.price || 0;
+            const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
+            let dateLabel = '';
+            if(d.startDate) {
+              try {
+                const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
+                dateLabel = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+              } catch(e){}
+            }
+            const article = document.createElement('article');
+            article.className = 'event-card';
+            article.innerHTML = `
+              <div class="event-banner ${_banners[i%_banners.length]}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
+              <div class="event-body">
+                <h3>${d.name||'Untitled'}</h3>
+                <p>${d.summary||d.description||''}</p>
+                <div class="event-meta"><span>${d.venueName||d.city||'TBA'}</span><span>${dateLabel||priceStr}</span></div>
+                <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
+              </div>`;
+            grid.appendChild(article);
+          });
+        } catch(e) { console.error('Events load error:', e.message, e); }
       }
 
       async function loadIndexRestaurants() {

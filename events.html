@@ -461,15 +461,27 @@
       searchInput.addEventListener('input', filterAndRender);
       evSort.addEventListener('change', filterAndRender);
 
+      function isPublishedEvent(data) {
+        return (data?.status || '').toLowerCase() === 'published';
+      }
+
       async function loadFirestoreEvents() {
         try {
-          const snap = await _db.collection('events').where('status','==','published').limit(50).get();
+          const snap = await _db.collection('events').orderBy('createdAt', 'desc').limit(50).get();
           const empty = grid.querySelector('.ev-empty');
-          if (snap.empty) { if(empty) empty.style.display=''; evCount.textContent=0; return; }
+          const docs = snap.docs.filter(d => isPublishedEvent(d.data()));
+          if (!docs.length) {
+            if(empty) empty.style.display='';
+            evCount.textContent=0;
+            return;
+          }
           if(empty) empty.style.display='none';
-          snap.docs.forEach((doc, i) => {
+          docs.forEach((doc, i) => {
             const d = doc.data(), id = doc.id;
-            const date = d.startDate||'';
+            let date = '';
+            if(d.startDate) {
+              try { date = d.startDate.toDate ? d.startDate.toDate().toISOString().slice(0,10) : String(d.startDate).slice(0,10); } catch(e){}
+            }
             const dateLabel = date ? new Date(date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : 'TBA';
             const price = d.tickets?.[0]?.price||d.price||0;
             const priceStr = price ? `<strong>\u20b9${Number(price).toLocaleString('en-IN')}</strong> onwards` : '<strong>Free</strong> entry';
@@ -499,7 +511,7 @@
             cards.push(article);
           });
           filterAndRender();
-        } catch(e) { console.warn('Firestore:', e.message); }
+        } catch(e) { console.error('Firestore events error:', e.message, e); }
       }
       loadFirestoreEvents();
     </script>
