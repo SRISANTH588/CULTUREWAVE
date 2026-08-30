@@ -58,7 +58,7 @@
     /* EVENT CARD */
     .ev-card{background:#fff;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 4px 20px rgba(18,66,197,.07);transition:transform .2s,box-shadow .2s;cursor:pointer;}
     .ev-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(18,66,197,.14);}
-    .ev-cover{height:160px;background:linear-gradient(135deg,#1454ff,#4c7dff);position:relative;overflow:hidden;}
+    .ev-cover{height:160px;position:relative;overflow:hidden;}
     .ev-cover img{width:100%;height:100%;object-fit:cover;}
     .ev-cover-placeholder{width:100%;height:100%;display:grid;place-items:center;font-size:2.5rem;}
     .ev-status{position:absolute;top:.65rem;left:.65rem;font-size:.65rem;font-weight:900;padding:.22rem .6rem;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;}
@@ -236,8 +236,18 @@ function statusBadge(s){
   return '<span class="ev-status draft">Draft</span>';
 }
 
+const COVER_GRADIENTS = [
+  'linear-gradient(135deg,#0a0f1e,#1242c5,#2f6bff)',
+  'linear-gradient(135deg,#7c3aed,#c084fc)',
+  'linear-gradient(135deg,#0891b2,#67e8f9)',
+  'linear-gradient(135deg,#0d9488,#5eead4)',
+  'linear-gradient(135deg,#dc2626,#f97316)',
+  'linear-gradient(135deg,#92400e,#fbbf24)',
+];
+
 function renderEvents(events){
   const grid = document.getElementById('eventsGrid');
+  grid.innerHTML = '';
   document.getElementById('statEvents').textContent = events.length;
   document.getElementById('statLive').textContent = events.filter(e=>(e.status||'').toLowerCase()==='published').length;
   document.getElementById('eventsSubtitle').textContent = events.length + ' listing' + (events.length!==1?'s':'');
@@ -247,16 +257,18 @@ function renderEvents(events){
     return;
   }
 
-  grid.innerHTML = events.map(ev=>{
+  grid.innerHTML = events.map((ev, i)=>{
+    const gradient = COVER_GRADIENTS[i % COVER_GRADIENTS.length];
     const cover = ev.coverUrl
-      ? `<img src="${esc(ev.coverUrl)}" alt="${esc(ev.coverAlt||ev.name)}" loading="lazy"/>`
+      ? `<img src="${esc(ev.coverUrl)}" alt="${esc(ev.coverAlt||ev.name)}" loading="lazy" onerror="this.style.display='none'"/>`
       : `<div class="ev-cover-placeholder">🎉</div>`;
+    const coverBg = ev.coverUrl ? '' : `style="background:${gradient}"`;
     const editBtn = isOwner
       ? `<a href="event-create.html?eventId=${ev.id}" class="ev-cta" style="background:#fff;color:var(--blue);border:1.5px solid var(--border);box-shadow:none;">Edit</a>`
       : '';
     return `
     <div class="ev-card" onclick="location.href='event-detail.html?eventId=${ev.id}'">
-      <div class="ev-cover">
+      <div class="ev-cover" ${coverBg}>
         ${cover}
         ${isOwner ? statusBadge(ev.status) : ''}
       </div>
