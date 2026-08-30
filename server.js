@@ -598,6 +598,42 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  if (req.method === "POST" && url.pathname === "/api/bookings/free") {
+    try {
+      const body = await readBody(req);
+      const name = String(body.customer?.name || "").trim();
+      const email = String(body.customer?.email || "").trim();
+      const phone = String(body.customer?.phone || "").trim();
+      const bookingId = `bk_${randomUUID().slice(0, 8)}`;
+      const booking = {
+        bookingId,
+        eventId: body.eventId || null,
+        orderId: null,
+        razorpayOrderId: null,
+        paymentId: null,
+        status: "confirmed",
+        event: body.event || {},
+        customer: {
+          id: email || name || "guest",
+          name: name || "Guest",
+          email,
+          phone,
+          ticket: body.ticketName || "General Admission",
+        },
+        amount: 0,
+        currency: "INR",
+        seats: Number(body.seats || 1),
+        method: "free",
+        createdAt: Date.now(),
+        source: "free",
+      };
+      await admin.firestore().collection("bookings").doc(bookingId).set(booking, { merge: true });
+      return send(res, 200, { success: true, bookingId });
+    } catch (error) {
+      return send(res, 400, { success: false, error: error.message || "Could not create free booking" });
+    }
+  }
+
   if (req.method === "POST" && url.pathname === "/api/bookings/verify") {
     try {
       const body = await readBody(req);
