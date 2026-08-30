@@ -435,15 +435,15 @@
           <p>Book events, reserve tables, and manage everything from one premium platform built for India.</p>
           <div class="left-stats">
             <div class="left-stat">
-              <strong>500+</strong>
+              <strong id="statEvents">—</strong>
               <span>Events listed</span>
             </div>
             <div class="left-stat">
-              <strong>12k+</strong>
+              <strong id="statBookings">—</strong>
               <span>Bookings made</span>
             </div>
             <div class="left-stat">
-              <strong>98%</strong>
+              <strong id="statSat">—</strong>
               <span>Satisfaction</span>
             </div>
           </div>
@@ -562,6 +562,38 @@
     </div>
 
     <script type="module">
+      import { db, collection, getDocs, query, where } from "./firebase.js";
+
+      function animateCount(el, target, suffix) {
+        let start = 0;
+        const step = Math.ceil(target / 40);
+        const timer = setInterval(() => {
+          start = Math.min(start + step, target);
+          el.textContent = start >= 1000 ? (start/1000).toFixed(1).replace('.0','') + 'k+' : start + suffix;
+          if (start >= target) clearInterval(timer);
+        }, 35);
+      }
+
+      (async () => {
+        try {
+          const [evSnap, bkSnap, paidSnap] = await Promise.all([
+            getDocs(query(collection(db, 'events'), where('status', '==', 'published'))),
+            getDocs(collection(db, 'bookings')),
+            getDocs(query(collection(db, 'bookings'), where('status', '==', 'confirmed'))),
+          ]);
+          const evCount  = evSnap.size  || 0;
+          const bkCount  = bkSnap.size  || 0;
+          const satPct   = bkCount > 0 ? Math.round((paidSnap.size / bkCount) * 100) : 98;
+          animateCount(document.getElementById('statEvents'),  evCount,  '+');
+          animateCount(document.getElementById('statBookings'), bkCount,  '+');
+          document.getElementById('statSat').textContent = satPct + '%';
+        } catch {
+          document.getElementById('statEvents').textContent  = '—';
+          document.getElementById('statBookings').textContent = '—';
+          document.getElementById('statSat').textContent     = '—';
+        }
+      })();
+
       import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, doc, setDoc, getDoc, collection, query, where, getDocs } from "./firebase.js";
 
       const authTabs = document.querySelectorAll("[data-auth-tab]");
