@@ -309,14 +309,21 @@
       const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
       function isPublishedEvent(data) {
-        return (data?.status || '').toLowerCase() === 'published';
+        const status = String(data?.status || '').toLowerCase();
+        const publicListing = data?.publicListing;
+        return publicListing !== false && ['published', 'live', 'active'].includes(status);
       }
 
       async function loadIndexEvents() {
         try {
           const grid = document.getElementById('indexEventsGrid');
           const empty = document.getElementById('indexEventsEmpty');
-          const snap = await _idb.collection('events').orderBy('createdAt', 'desc').limit(50).get();
+          let snap;
+          try {
+            snap = await _idb.collection('events').orderBy('createdAt', 'desc').limit(100).get();
+          } catch (e) {
+            snap = await _idb.collection('events').limit(100).get();
+          }
           const docs = snap.docs
             .filter((doc) => isPublishedEvent(doc.data()))
             .slice(0, 6);

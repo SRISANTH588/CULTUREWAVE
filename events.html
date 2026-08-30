@@ -462,12 +462,19 @@
       evSort.addEventListener('change', filterAndRender);
 
       function isPublishedEvent(data) {
-        return (data?.status || '').toLowerCase() === 'published';
+        const status = String(data?.status || '').toLowerCase();
+        const publicListing = data?.publicListing;
+        return publicListing !== false && ['published', 'live', 'active'].includes(status);
       }
 
       async function loadFirestoreEvents() {
         try {
-          const snap = await _db.collection('events').orderBy('createdAt', 'desc').limit(50).get();
+          let snap;
+          try {
+            snap = await _db.collection('events').orderBy('createdAt', 'desc').limit(100).get();
+          } catch (e) {
+            snap = await _db.collection('events').limit(100).get();
+          }
           const empty = grid.querySelector('.ev-empty');
           const docs = snap.docs.filter(d => isPublishedEvent(d.data()));
           if (!docs.length) {
