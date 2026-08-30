@@ -332,10 +332,14 @@ async function init(){
   // load organiser profile doc
   const profSnap = await db.collection('organisers').doc(uid).get();
   if(profSnap.exists) renderProfile({uid, ...profSnap.data()});
-  else renderProfile({uid, name: 'Organiser'});
+  else {
+    // fallback to users collection
+    const userSnap = await db.collection('users').doc(uid).get();
+    renderProfile({uid, ...(userSnap.exists ? userSnap.data() : { name: 'Organiser' })});
+  }
 
   // load their published events (+ drafts if owner)
-  let q = db.collection('events').where('ownerId','==',uid).orderBy('createdAt','desc').limit(50);
+  let q = db.collection('events').where('ownerId','==',uid).limit(50);
   const snap = await q.get();
   const events = snap.docs
     .map(d=>({id:d.id,...d.data()}))
