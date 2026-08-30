@@ -561,7 +561,9 @@
       </div>
     </div>
 
-    <script>
+    <script type="module">
+      import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, doc, setDoc, getDoc, collection, query, where, getDocs } from "./firebase.js";
+
       const authTabs = document.querySelectorAll("[data-auth-tab]");
       const authForms = document.querySelectorAll("[data-auth-form]");
       const authStatus = document.getElementById("authStatus");
@@ -584,6 +586,18 @@
       function setStatus(message, kind = "info") {
         authStatus.textContent = message;
         authStatus.dataset.kind = kind;
+      }
+
+      function toFirebaseEmail(input) {
+        return input.includes("@") ? input : `${input.toLowerCase()}@cityvibe.local`;
+      }
+
+      async function getRoleByUid(uid) {
+        try {
+          const snap = await getDoc(doc(db, "users", uid));
+          if (snap.exists()) return snap.data().role || "client";
+        } catch {}
+        return "client";
       }
 
       function redirect(role) {
@@ -617,49 +631,57 @@
 
       document.querySelector("[data-auth-form='login']").addEventListener("submit", async e => {
         e.preventDefault();
-        const username = loginPhone.value.trim();
+        const email = toFirebaseEmail(loginPhone.value.trim());
         const password = loginPassword.value;
-        if (!username || !password) { setStatus("Enter your username and password.", "warning"); return; }
+        if (!email || !password) { setStatus("Enter your username and password.", "warning"); return; }
         setStatus("Signing in...", "info");
         try {
-          const res = await fetch("/api/auth/local-login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-          });
-          const data = await res.json();
-          if (!res.ok) { setStatus(data.error || "Invalid username or password.", "warning"); return; }
+          const { user } = await signInWithEmailAndPassword(auth, email, password);
+          const role = await getRoleByUid(user.uid);
           setStatus("Welcome back! Redirecting...", "success");
-          redirect(data.user.role);
+          redirect(role);
         } catch (err) {
-          setStatus("Network error. Is the server running?", "warning");
+          const msg = ["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found"].includes(err.code)
+            ? "Invalid username or password."
+            : err.message;
+          setStatus(msg, "warning");
         }
       });
 
       document.querySelector("[data-auth-form='signup']").addEventListener("submit", async e => {
         e.preventDefault();
-        const username = signupUsername.value.trim();
+        const email = toFirebaseEmail(signupUsername.value.trim());
         const fullName = signupName.value.trim();
         const password = signupPassword.value;
-        if (!username || !fullName || !password) { setStatus("Fill in all fields.", "warning"); return; }
+        if (!email || !fullName || !password) { setStatus("Fill in all fields.", "warning"); return; }
         setStatus("Creating account...", "info");
         try {
-          const res = await fetch("/api/auth/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, name: fullName, password }),
-          });
-          const data = await res.json();
-          if (!res.ok) { setStatus(data.error || "Registration failed.", "warning"); return; }
+          const { user } = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(user, { displayName: fullName });
+          await setDoc(doc(db, "users", user.uid), { name: fullName, email, role: "client", createdAt: Date.now() });
           setStatus("Account created! Redirecting...", "success");
-          redirect(data.user.role);
+          redirect("client");
         } catch (err) {
-          setStatus("Network error. Is the server running?", "warning");
+          const msg = err.code === "auth/email-already-in-use" ? "Account already exists. Try logging in." : err.message;
+          setStatus(msg, "warning");
         }
       });
 
-      document.getElementById("googleLoginBtn").addEventListener("click", () => {
-        setStatus("Google sign-in is not available in this mode.", "warning");
+      document.getElementById("googleLoginBtn").addEventListener("click", async () => {
+        setStatus("Opening Google sign-in...", "info");
+        try {
+          const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
+          const snap = await getDoc(doc(db, "users", user.uid));
+          if (!snap.exists()) {
+            await setDoc(doc(db, "users", user.uid), { name: user.displayName, email: user.email, role: "client", createdAt: Date.now() });
+          }
+          const role = await getRoleByUid(user.uid);
+          setStatus("Signed in! Redirecting...", "success");
+          redirect(role);
+        } catch (err) {
+          if (err.code !== "auth/popup-closed-by-user") setStatus(err.message, "warning");
+          else setStatus("", "info");
+        }
       });
 
       setMode("login");

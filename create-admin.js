@@ -10,32 +10,30 @@ if (!admin.getApps().length) {
 const auth = admin.auth();
 const db = admin.firestore();
 
-const ADMIN_EMAIL = "admin@cityvibe.com";
-const ADMIN_PASSWORD = "Admin@1234";
+const ACCOUNTS = [
+  { email: "srisanth@cityvibe.local", password: "SASI@2006", name: "Srisanth", role: "admin" },
+  { email: "sasi@cityvibe.local",     password: "sasi",      name: "Sasi",     role: "client" },
+];
 
-async function main() {
-  // 1. Create or get the Auth user
+async function upsertAccount({ email, password, name, role }) {
   let uid;
   try {
-    const existing = await auth.getUserByEmail(ADMIN_EMAIL);
+    const existing = await auth.getUserByEmail(email);
     uid = existing.uid;
-    console.log("Auth user already exists:", uid);
+    console.log(`[exists] ${email} → ${uid}`);
   } catch {
-    const created = await auth.createUser({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD, displayName: "Cityvibe Admin", emailVerified: true });
+    const created = await auth.createUser({ email, password, displayName: name, emailVerified: true });
     uid = created.uid;
-    console.log("Auth user created:", uid);
+    console.log(`[created] ${email} → ${uid}`);
   }
+  await db.collection("users").doc(uid).set({ name, email, role, createdAt: Date.now() }, { merge: true });
+  console.log(`[firestore] users/${uid} role=${role}`);
+}
 
-  // 2. Write/update the Firestore users doc keyed by Auth UID
-  await db.collection("users").doc(uid).set({
-    name: "Cityvibe Admin",
-    email: ADMIN_EMAIL,
-    role: "admin",
-    emailVerified: true,
-    createdAt: Date.now(),
-  }, { merge: true });
-
-  console.log(`Done. Login with: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
+async function main() {
+  for (const account of ACCOUNTS) await upsertAccount(account);
+  console.log("\nDone. Credentials:");
+  ACCOUNTS.forEach(a => console.log(`  ${a.role.padEnd(6)} → ${a.email} / ${a.password}`));
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
