@@ -1105,9 +1105,64 @@ main { max-width: none; margin: 0; padding: 0; }
   font-size: 1.4rem;
 }
 
+/* ── HAMBURGER MENU ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  z-index: 25;
+}
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2.5px;
+  background: #111;
+  border-radius: 2px;
+  transition: all 0.25s ease;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+.mobile-nav {
+  display: none;
+  position: fixed;
+  inset: 0;
+  top: 0;
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(18px);
+  z-index: 22;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem;
+  padding: 2rem;
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav a {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: -0.03em;
+}
+.mobile-nav a:hover { color: var(--blue); }
+.mobile-nav-ctas {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 @media (max-width: 960px) {
   .topnav { display: none; }
+  .hamburger { display: flex; }
   .nav-wrap { justify-content: space-between; }
+  .auth-actions { display: none; }
   .role-grid,
   .event-grid,
   .testimonial-grid,
@@ -1119,22 +1174,19 @@ main { max-width: none; margin: 0; padding: 0; }
   .booking-form {
     grid-template-columns: 1fr;
   }
+  .trust-grid { grid-template-columns: repeat(2, 1fr); }
   .hero-inner,
   .final-cta-inner {
     grid-template-columns: 1fr;
     display: grid;
   }
-  .hero-home {
-    text-align: left;
-  }
+  .hero-home { text-align: left; }
   .receipt-card { position: static; }
   .login-frame { padding: 0.85rem; }
 }
 
 @media (max-width: 640px) {
   main { padding-inline: 1rem; }
-  .nav-cta { padding: 0.8rem 1rem; }
-  .auth-actions { gap: 0.5rem; }
   .footer-wrap,
   .footer-bottom { padding-inline: 1rem; }
   .footer-wrap {
@@ -1144,10 +1196,13 @@ main { max-width: none; margin: 0; padding: 0; }
   }
   .footer-brand { font-size: 1.7rem; }
   .hero { min-height: auto; padding-top: 3rem; }
-  .hero h1 { font-size: clamp(3.1rem, 13vw, 4.9rem); }
-  .hero-home h1 { font-size: clamp(3rem, 12vw, 4.3rem); }
+  .hero h1 { font-size: clamp(2.4rem, 10vw, 4rem); }
+  .hero-home h1 { font-size: clamp(2.2rem, 9.5vw, 3.8rem); }
   .hero-line { white-space: normal; }
+  .hero-copy { font-size: 1rem; }
+  .trust-grid { grid-template-columns: 1fr; }
   .final-cta-inner { padding: 1.4rem; }
+  .final-cta h2 { font-size: clamp(1.6rem, 6vw, 2.4rem); }
   .payment-shell { grid-template-columns: 1fr; }
   .qr-preview { width: 100%; }
   .logo-pill { min-width: 150px; }
@@ -1159,4 +1214,11 @@ main { max-width: none; margin: 0; padding: 0; }
   .premium-btn,
   .google-btn { min-height: 42px; }
   .auth-actions-row { align-items: flex-start; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions .btn { text-align: center; }
+  .events-section { padding-inline: 1rem; }
+  .split-info { padding-inline: 1rem; }
+  .section-head h2 { font-size: clamp(1.6rem, 6vw, 2.4rem); }
+  .event-banner { height: 160px; }
+  .btn { padding: 0.9rem 1.2rem; font-size: 0.95rem; }
 }
