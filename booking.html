@@ -944,18 +944,6 @@
         createFreeBooking(item, n).then(async (bid) => {
           statusText.textContent = "✅ Confirmed";
           statusText.className   = "bk-status-pill success";
-          await sendBookingEmail({
-            name: document.getElementById("bookName").value.trim() || "Guest",
-            email: document.getElementById("bookEmail").value.trim(),
-            eventName: item.name,
-            amount: "Free",
-            seats: String(n),
-            bookingId: bid,
-            bookingType: bookingType,
-            date: "",
-            time: "",
-            method: "free",
-          });
           window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
             + "&event=" + encodeURIComponent(item.name)
             + "&amount=0"
