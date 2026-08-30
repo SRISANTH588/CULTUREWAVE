@@ -641,7 +641,7 @@
           const { user } = await signInWithEmailAndPassword(auth, email, password);
           const role = await getRole(user.uid);
           setStatus("Welcome back! Redirecting...", "success");
-          setTimeout(() => redirect(role), 800);
+          redirect(role);
         } catch (err) {
           const msg = err.code === "auth/invalid-credential" || err.code === "auth/wrong-password" || err.code === "auth/user-not-found"
             ? "Invalid email or password."
@@ -662,7 +662,7 @@
           await updateProfile(user, { displayName: fullName });
           await setDoc(doc(db, "users", user.uid), { name: fullName, email, role: "client", createdAt: Date.now() });
           setStatus("Account created! Redirecting...", "success");
-          setTimeout(() => redirect("client"), 800);
+          redirect("client");
         } catch (err) {
           const msg = err.code === "auth/email-already-in-use" ? "Account already exists. Try logging in." : err.message;
           setStatus(msg, "warning");
@@ -679,7 +679,7 @@
           }
           const role = await getRole(user.uid, user.email);
           setStatus("Signed in! Redirecting...", "success");
-          setTimeout(() => redirect(role), 800);
+          redirect(role);
         } catch (err) {
           if (err.code !== "auth/popup-closed-by-user") setStatus(err.message, "warning");
           else setStatus("", "info");
