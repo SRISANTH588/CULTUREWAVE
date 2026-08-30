@@ -3011,9 +3011,8 @@ async function loadWhatsAppStats(uid) {
 }
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
-  
-  try{ await signOut(auth); }catch{}
-  location.href='/login.html';
+  try { await logout(); } catch {}
+  location.href = 'login.html';
 });
 
 (async () => {
