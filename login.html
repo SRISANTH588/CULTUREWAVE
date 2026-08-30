@@ -483,7 +483,7 @@
               <span class="form-label">Username</span>
               <div class="form-input-wrap">
                 <span class="form-icon">👤</span>
-                <input id="loginPhone" type="text" placeholder="Enter your username" autocomplete="username" />
+                <input id="loginPhone" type="text" placeholder="Email or username" autocomplete="username" />
               </div>
             </div>
 
@@ -562,12 +562,21 @@
     </div>
 
     <script type="module">
-      const apiBase =
-        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-          ? window.location.origin
-          : window.location.origin && window.location.origin !== "null"
-            ? window.location.origin
-            : "http://localhost:3000";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const app = initializeApp({
+        apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+        authDomain: "ogshootsluxe-36740.firebaseapp.com",
+        projectId: "ogshootsluxe-36740",
+        storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+        messagingSenderId: "5471814825",
+        appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+      });
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const ADMIN_EMAIL = "srisanth@cityvibe.local";
 
       const authTabs = document.querySelectorAll("[data-auth-tab]");
       const authForms = document.querySelectorAll("[data-auth-form]");
@@ -580,9 +589,7 @@
       const signupName = document.getElementById("signupName");
       const signupPassword = document.getElementById("signupPassword");
       const signupUsername = document.getElementById("signupUsername");
-      let selectedRole = "client";
 
-      // eye toggle
       document.querySelectorAll(".eye-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           const input = btn.previousElementSibling;
@@ -596,20 +603,26 @@
         authStatus.dataset.kind = kind;
       }
 
-      function getDashboardUrl(role = "client") {
-        return String(role).toLowerCase() === "admin" ? "admin-dashboard.html" : "client-dashboard.html";
+      function toEmail(input) {
+        // if already an email use it, otherwise append domain
+        return input.includes("@") ? input : `${input.toLowerCase()}@cityvibe.local`;
       }
 
-      function goHome(role = selectedRole) {
-        window.location.href = getDashboardUrl(role);
+      async function getRole(uid, email) {
+        try {
+          const snap = await getDoc(doc(db, "users", uid));
+          if (snap.exists()) return snap.data().role || "client";
+        } catch {}
+        return email === ADMIN_EMAIL ? "admin" : "client";
+      }
+
+      function redirect(role) {
+        window.location.href = role === "admin" ? "admin-dashboard.html" : "premium-client-dashboard.html";
       }
 
       function setMode(mode) {
         authTabs.forEach(t => t.classList.toggle("active", t.dataset.authTab === mode));
-        authForms.forEach(f => {
-          const active = f.dataset.authForm === mode;
-          f.hidden = !active;
-        });
+        authForms.forEach(f => { f.hidden = f.dataset.authForm !== mode; });
         if (mode === "login") {
           document.querySelector(".auth-card-head h2").innerHTML = "Welcome <span>back</span> 👋";
           document.querySelector(".auth-card-head p").textContent = "Sign in to your CultureWave account";
@@ -634,50 +647,57 @@
 
       document.querySelector("[data-auth-form='login']").addEventListener("submit", async e => {
         e.preventDefault();
-        const username = loginPhone.value.trim();
+        const email = toEmail(loginPhone.value.trim());
         const password = loginPassword.value;
-        if (!username || !password) { setStatus("Enter your username and password.", "warning"); return; }
+        if (!email || !password) { setStatus("Enter your email and password.", "warning"); return; }
         setStatus("Signing in...", "info");
         try {
-          const res = await fetch(`${apiBase}/api/auth/local-login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-          });
-          if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Login failed"); }
-          const result = await res.json();
-          selectedRole = result.user?.role === "admin" ? "admin" : "client";
-          setStatus(`Welcome back! Redirecting...`, "success");
-          setTimeout(() => goHome(selectedRole), 800);
+          const { user } = await signInWithEmailAndPassword(auth, email, password);
+          const role = await getRole(user.uid, user.email);
+          setStatus("Welcome back! Redirecting...", "success");
+          setTimeout(() => redirect(role), 800);
         } catch (err) {
-          setStatus(err.message || "Login failed. Try again.", "warning");
+          const msg = err.code === "auth/invalid-credential" || err.code === "auth/wrong-password" || err.code === "auth/user-not-found"
+            ? "Invalid email or password."
+            : err.message;
+          setStatus(msg, "warning");
         }
       });
 
       document.querySelector("[data-auth-form='signup']").addEventListener("submit", async e => {
         e.preventDefault();
-        const username = signupUsername.value.trim();
+        const email = toEmail(signupUsername.value.trim());
         const fullName = signupName.value.trim();
         const password = signupPassword.value;
-        if (!username || !fullName || !password) { setStatus("Fill in all fields.", "warning"); return; }
+        if (!email || !fullName || !password) { setStatus("Fill in all fields.", "warning"); return; }
         setStatus("Creating account...", "info");
         try {
-          const res = await fetch(`${apiBase}/api/auth/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, name: fullName, password, role: "client" }),
-          });
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) throw new Error(data.error || "Registration failed");
+          const { user } = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(user, { displayName: fullName });
+          await setDoc(doc(db, "users", user.uid), { name: fullName, email, role: "client", createdAt: Date.now() });
           setStatus("Account created! Redirecting...", "success");
-          setTimeout(() => goHome("client"), 800);
+          setTimeout(() => redirect("client"), 800);
         } catch (err) {
-          setStatus(err.message || "Registration failed. Try again.", "warning");
+          const msg = err.code === "auth/email-already-in-use" ? "Account already exists. Try logging in." : err.message;
+          setStatus(msg, "warning");
         }
       });
 
-      googleLoginBtn.addEventListener("click", () => {
-        setStatus("Google sign-in is not configured in this local build. Use username and password.", "info");
+      googleLoginBtn.addEventListener("click", async () => {
+        setStatus("Opening Google sign-in...", "info");
+        try {
+          const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
+          const snap = await getDoc(doc(db, "users", user.uid));
+          if (!snap.exists()) {
+            await setDoc(doc(db, "users", user.uid), { name: user.displayName, email: user.email, role: "client", createdAt: Date.now() });
+          }
+          const role = await getRole(user.uid, user.email);
+          setStatus("Signed in! Redirecting...", "success");
+          setTimeout(() => redirect(role), 800);
+        } catch (err) {
+          if (err.code !== "auth/popup-closed-by-user") setStatus(err.message, "warning");
+          else setStatus("", "info");
+        }
       });
 
       setMode("login");
