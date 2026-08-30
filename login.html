@@ -372,12 +372,80 @@
       .auth-status[data-kind="warning"] { background: #fef9c3; color: #854d0e; }
       .auth-status[data-kind="info"] { background: #eff6ff; color: #1e40af; }
 
-      .signup-note {
-        font-size: 0.78rem;
-        color: #9ca3af;
-        text-align: center;
-        line-height: 1.5;
+      /* ── PREMIUM SIGNUP ── */
+      [data-auth-form="signup"] {
+        background: linear-gradient(160deg, #0a0f1e 0%, #0d1f4a 60%, #0f2d6b 100%);
+        border-radius: 20px;
+        padding: 1.6rem 1.4rem;
+        border: 1px solid rgba(180,150,80,0.18);
+        box-shadow: 0 0 40px rgba(47,107,255,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
+        gap: 0;
       }
+      [data-auth-form="signup"] .form-field { gap: 0.35rem; margin-bottom: 0.85rem; }
+      [data-auth-form="signup"] .form-label {
+        color: rgba(180,150,80,0.9);
+        letter-spacing: 0.16em;
+        font-size: 0.68rem;
+      }
+      [data-auth-form="signup"] .form-input-wrap {
+        background: rgba(255,255,255,0.04);
+        border: 1.5px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        min-height: 48px;
+      }
+      [data-auth-form="signup"] .form-input-wrap:focus-within {
+        border-color: rgba(180,150,80,0.7);
+        background: rgba(255,255,255,0.07);
+        box-shadow: 0 0 0 3px rgba(180,150,80,0.12), 0 0 16px rgba(180,150,80,0.08);
+      }
+      [data-auth-form="signup"] .form-input-wrap input {
+        color: #fff;
+        font-size: 0.9rem;
+      }
+      [data-auth-form="signup"] .form-input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
+      [data-auth-form="signup"] .form-icon { filter: grayscale(0.2); }
+      [data-auth-form="signup"] .eye-btn { color: rgba(255,255,255,0.35); }
+      [data-auth-form="signup"] .submit-btn {
+        background: linear-gradient(135deg, #c9a84c, #a0722a);
+        box-shadow: 0 8px 24px rgba(180,130,40,0.35);
+        letter-spacing: 0.04em;
+        margin-top: 0.4rem;
+      }
+      [data-auth-form="signup"] .submit-btn:hover {
+        box-shadow: 0 12px 32px rgba(180,130,40,0.5);
+      }
+      .signup-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(180,150,80,0.25), transparent);
+        margin: 0.6rem 0 1rem;
+      }
+      .signup-step2-header { text-align: center; margin-bottom: 1rem; }
+      .signup-step2-icon {
+        width: 3rem; height: 3rem; border-radius: 50%;
+        background: linear-gradient(135deg, rgba(180,150,80,0.2), rgba(180,150,80,0.05));
+        border: 1px solid rgba(180,150,80,0.3);
+        display: grid; place-items: center;
+        font-size: 1.3rem; margin: 0 auto 0.6rem;
+      }
+      .signup-step2-title { font-size: 0.9rem; font-weight: 800; color: #fff; }
+      .signup-step2-sub { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-top: 0.2rem; }
+      .signup-step2-sub strong { color: rgba(180,150,80,0.9); font-weight: 700; }
+      [data-auth-form="signup"] #signupOtp {
+        letter-spacing: 0.4em; font-size: 1.2rem; font-weight: 800; color: #fff;
+      }
+      .otp-actions { display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 0.75rem; }
+      .otp-action-btn {
+        background: none; border: none; font: inherit;
+        font-size: 0.8rem; font-weight: 700; cursor: pointer;
+        padding: 0.2rem 0.5rem; border-radius: 6px; transition: background 0.15s;
+      }
+      .otp-action-btn.gold { color: rgba(180,150,80,0.9); }
+      .otp-action-btn.gold:hover { background: rgba(180,150,80,0.1); }
+      .otp-action-btn.muted { color: rgba(255,255,255,0.35); }
+      .otp-action-btn.muted:hover { background: rgba(255,255,255,0.06); }
+      .otp-dot { color: rgba(255,255,255,0.2); font-size: 0.7rem; }
+      /* whatsapp prefix in signup */
+      [data-auth-form="signup"] .wa-prefix { font-size: .82rem; color: rgba(255,255,255,0.4); padding-right: .3rem; }
 
       .card-footer {
         margin-top: 1.4rem;
@@ -532,7 +600,7 @@
               </div>
 
               <div class="form-field">
-                <span class="form-label">Email <span style="color:var(--blue);font-size:.65rem;font-weight:800;">(OTP will be sent)</span></span>
+                <span class="form-label">Email <span style="color:rgba(180,150,80,0.8);font-size:.63rem;font-weight:800;letter-spacing:.08em;">· OTP VERIFIED</span></span>
                 <div class="form-input-wrap">
                   <span class="form-icon">📧</span>
                   <input id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email" />
@@ -543,7 +611,7 @@
                 <span class="form-label">WhatsApp Number</span>
                 <div class="form-input-wrap">
                   <span class="form-icon">📱</span>
-                  <span style="font-size:.82rem;color:#6b7280;padding-right:.3rem;">+91</span>
+                  <span class="wa-prefix">+91</span>
                   <input id="signupWhatsapp" type="tel" placeholder="9876543210" maxlength="10" autocomplete="tel" />
                 </div>
               </div>
@@ -557,30 +625,33 @@
                 </div>
               </div>
 
-              <button class="submit-btn" type="button" id="sendOtpBtn">Send OTP to Email →</button>
+              <div class="signup-divider"></div>
+              <button class="submit-btn" type="button" id="sendOtpBtn">Send Verification OTP →</button>
             </div>
 
             <!-- STEP 2: OTP Verify -->
             <div id="signupStep2" style="display:none;">
-              <div style="text-align:center;margin-bottom:1rem;">
-                <div style="font-size:2rem;margin-bottom:.4rem;">📧</div>
-                <div style="font-size:.88rem;font-weight:800;color:#0a0f1e;">Check your email</div>
-                <div style="font-size:.78rem;color:#6b7280;margin-top:.25rem;">We sent a 6-digit OTP to <strong id="otpEmailDisplay"></strong></div>
+              <div class="signup-step2-header">
+                <div class="signup-step2-icon">📧</div>
+                <div class="signup-step2-title">Verify your email</div>
+                <div class="signup-step2-sub">6-digit code sent to <strong id="otpEmailDisplay"></strong></div>
               </div>
 
+              <div class="signup-divider"></div>
+
               <div class="form-field">
-                <span class="form-label">Enter OTP</span>
+                <span class="form-label">One-Time Password</span>
                 <div class="form-input-wrap">
                   <span class="form-icon">🔑</span>
-                  <input id="signupOtp" type="text" placeholder="6-digit code" maxlength="6" inputmode="numeric" style="letter-spacing:.3em;font-size:1.1rem;font-weight:800;" />
+                  <input id="signupOtp" type="text" placeholder="· · · · · ·" maxlength="6" inputmode="numeric" />
                 </div>
               </div>
 
               <button class="submit-btn" type="submit">Verify &amp; Create Account →</button>
-              <div style="text-align:center;margin-top:.75rem;">
-                <button type="button" id="resendOtpBtn" style="background:none;border:none;color:var(--blue);font-size:.82rem;font-weight:700;cursor:pointer;">Resend OTP</button>
-                <span style="color:#9ca3af;font-size:.78rem;"> &middot; </span>
-                <button type="button" onclick="document.getElementById('signupStep1').style.display='';document.getElementById('signupStep2').style.display='none';" style="background:none;border:none;color:#6b7280;font-size:.82rem;font-weight:700;cursor:pointer;">Change email</button>
+              <div class="otp-actions">
+                <button type="button" id="resendOtpBtn" class="otp-action-btn gold">Resend OTP</button>
+                <span class="otp-dot">●</span>
+                <button type="button" class="otp-action-btn muted" onclick="document.getElementById('signupStep1').style.display='';document.getElementById('signupStep2').style.display='none';">Change email</button>
               </div>
             </div>
           </form>
