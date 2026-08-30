@@ -373,6 +373,19 @@
       .auth-status[data-kind="info"] { background: #eff6ff; color: #1e40af; }
 
       /* ── PREMIUM SIGNUP ── */
+      .auth-shell.signup-active .auth-right { background: linear-gradient(160deg, #0a0f1e 0%, #0d1f4a 100%); }
+      .auth-shell.signup-active .auth-card { background: transparent; box-shadow: none; border-color: transparent; }
+      .auth-shell.signup-active .auth-tabs { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); }
+      .auth-shell.signup-active .auth-tab { color: rgba(255,255,255,0.4); }
+      .auth-shell.signup-active .auth-tab.active { background: rgba(255,255,255,0.08); color: #fff; box-shadow: none; }
+      .auth-shell.signup-active .auth-card-head h2 { color: #fff; }
+      .auth-shell.signup-active .auth-card-head h2 span { color: rgba(180,150,80,0.9); }
+      .auth-shell.signup-active .auth-card-head p { color: rgba(255,255,255,0.45); }
+      .auth-shell.signup-active .card-footer { color: rgba(255,255,255,0.4); }
+      .auth-shell.signup-active .card-footer a { color: rgba(180,150,80,0.9); }
+      .auth-shell.signup-active .back-home-link { color: rgba(255,255,255,0.25); }
+      .auth-shell.signup-active .back-home-link:hover { color: rgba(180,150,80,0.8); }
+      .auth-shell.signup-active .auth-status[data-kind="info"] { background: rgba(47,107,255,0.12); color: #93b4ff; }
       [data-auth-form="signup"] {
         background: linear-gradient(160deg, #0a0f1e 0%, #0d1f4a 60%, #0f2d6b 100%);
         border-radius: 20px;
@@ -749,6 +762,7 @@
       function setMode(mode) {
         authTabs.forEach(t => t.classList.toggle("active", t.dataset.authTab === mode));
         authForms.forEach(f => { f.hidden = f.dataset.authForm !== mode; });
+        document.querySelector(".auth-shell").classList.toggle("signup-active", mode === "signup");
         if (mode === "login") {
           document.querySelector(".auth-card-head h2").innerHTML = "Welcome <span>back</span> 👋";
           document.querySelector(".auth-card-head p").textContent = "Sign in to your CultureWave account";
