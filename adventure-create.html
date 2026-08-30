@@ -1770,6 +1770,12 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8"
 });
 
 const db = firebase.firestore();
@@ -1777,6 +1783,20 @@ const auth = firebase.auth();
 function serverTimestamp() { return firebase.firestore.FieldValue.serverTimestamp(); }
 function collection(db, name) { return db.collection(name); }
 async function addDoc(ref, data) { return await ref.add(data); }
+
+async function getCurrentUser() {
+  return new Promise(resolve => {
+    const unsub = auth.onAuthStateChanged(async firebaseUser => {
+      unsub();
+      if (!firebaseUser) { resolve(null); return; }
+      try {
+        const snap = await db.collection('users').doc(firebaseUser.uid).get();
+        const data = snap.exists ? snap.data() : {};
+        resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: data.name || firebaseUser.displayName || firebaseUser.email, role: data.role || 'client' });
+      } catch { resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: firebaseUser.displayName || firebaseUser.email, role: 'client' }); }
+    });
+  });
+}
 
 // ── STATE ──
 let currentStep = 0;
@@ -1788,32 +1808,11 @@ let uid = null;
 
 // ── AUTH ──
 async function loadUser() {
-  try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (res.ok) {
-      
-      uid = user.uid;
-      localStorage.setItem('cw_uid', uid);
-      const init = (user.name || 'U').trim().charAt(0).toUpperCase();
-      const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
-      return;
-    }
-  } catch {}
-  // fallback: Firebase Auth (works on file://)
-  await new Promise(resolve => {
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        uid = user.uid;
-        const init = (user.displayName || user.email || 'U').trim().charAt(0).toUpperCase();
-        const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
-      } else {
-        // not signed in via Firebase — try localStorage fallback
-        uid = localStorage.getItem('cw_uid') || ('local_' + Date.now());
-        localStorage.setItem('cw_uid', uid);
-      }
-      resolve();
-    });
-  });
+  const user = await getCurrentUser();
+  if (!user) { window.location.href = 'login.html'; return; }
+  uid = user.uid;
+  const init = (user.name || 'U').trim().charAt(0).toUpperCase();
+  const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
 }
 loadUser();
 
@@ -2828,27 +2827,13 @@ renderRsvpPreview();
 
 // load wallet credits in topbar
 (async function loadWalletBalance() {
-  try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (!res.ok) return;
-    
-    // real-time listener so it updates after purchase
-    db.collection('wallets').doc(user.uid).onSnapshot(doc => {
-      const credits = doc.exists ? (doc.data().credits || 0) : 0;
-      const el = document.getElementById('topCredits');
-      if (el) el.textContent = credits.toLocaleString('en-IN');
-    });
-  } catch(e) {
-    // fallback: firebase auth
-    auth.onAuthStateChanged(user => {
-      if (!user) return;
-      db.collection('wallets').doc(user.uid).onSnapshot(doc => {
-        const credits = doc.exists ? (doc.data().credits || 0) : 0;
-        const el = document.getElementById('topCredits');
-        if (el) el.textContent = credits.toLocaleString('en-IN');
-      });
-    });
-  }
+  const user = await getCurrentUser();
+  if (!user) return;
+  db.collection('wallets').doc(user.uid).onSnapshot(doc => {
+    const credits = doc.exists ? (doc.data().credits || 0) : 0;
+    const el = document.getElementById('topCredits');
+    if (el) el.textContent = credits.toLocaleString('en-IN');
+  });
 })();
 </script>
 
