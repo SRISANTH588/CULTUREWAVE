@@ -902,7 +902,9 @@
           const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
           const snap = await getDoc(doc(db, "users", user.uid));
           if (!snap.exists()) {
-            await setDoc(doc(db, "users", user.uid), { name: user.displayName, email: user.email, role: "client", createdAt: Date.now() });
+            await user.delete();
+            setStatus("No account found. Please sign up with email first.", "warning");
+            return;
           }
           const role = await getRoleByUid(user.uid);
           setStatus("Signed in! Redirecting...", "success");
