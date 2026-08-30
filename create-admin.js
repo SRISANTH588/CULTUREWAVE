@@ -14,7 +14,7 @@ const db = getFirestore();
 
 const ACCOUNTS = [
   { email: "srisanth@cityvibe.local", password: "SASI@2006", name: "Srisanth", role: "admin" },
-  { email: "sasi@cityvibe.local",     password: "sasi",      name: "Sasi",     role: "client" },
+  { email: "sasi@cityvibe.local",     password: "Sasi@123",  name: "Sasi",     role: "client" },
 ];
 
 async function upsertAccount({ email, password, name, role }) {
@@ -22,7 +22,8 @@ async function upsertAccount({ email, password, name, role }) {
   try {
     const existing = await auth.getUserByEmail(email);
     uid = existing.uid;
-    console.log(`[exists] ${email} → ${uid}`);
+    await auth.updateUser(uid, { password, displayName: name });
+    console.log(`[updated] ${email} → ${uid}`);
   } catch {
     const created = await auth.createUser({ email, password, displayName: name, emailVerified: true });
     uid = created.uid;
