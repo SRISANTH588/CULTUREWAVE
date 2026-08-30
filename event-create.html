@@ -1803,6 +1803,95 @@ async function loadUser() {
 }
 loadUser();
 
+// ── PREFILL FOR EDIT MODE ──
+(async function prefillIfEdit() {
+  const params = new URLSearchParams(location.search);
+  const eventId = params.get('eventId');
+  if (!eventId) return;
+  try {
+    const snap = await db.collection('events').doc(eventId).get();
+    if (!snap.exists) return;
+    const d = snap.data();
+    const g = id => document.getElementById(id);
+    const set = (id, val) => { const el = g(id); if (el && val !== undefined && val !== null) el.value = val; };
+    // basic info
+    set('eventName', d.name || '');
+    set('description', d.description || '');
+    if (g('category')) g('category').value = d.category || '';
+    set('tags', Array.isArray(d.tags) ? d.tags.join(', ') : (d.tags || ''));
+    // venue
+    set('venueName', d.venueName || '');
+    set('city', d.city || '');
+    if (g('state')) set('state', d.state || '');
+    if (g('address')) set('address', d.address || '');
+    if (g('mapLink')) set('mapLink', d.mapLink || '');
+    if (g('onlineLink')) set('onlineLink', d.onlineLink || '');
+    if (g('onlinePlatform') && d.onlinePlatform) g('onlinePlatform').value = d.onlinePlatform;
+    // schedule
+    if (Array.isArray(d.eventDates) && d.eventDates.length) {
+      eventDates = d.eventDates;
+      renderDateCards();
+    }
+    set('capacity', d.capacity || '');
+    set('eventDuration', d.duration || '');
+    if (g('regDeadline')) set('regDeadline', d.regDeadline || '');
+    if (g('timezone') && d.timezone) g('timezone').value = d.timezone;
+    // tickets
+    if (Array.isArray(d.tickets) && d.tickets.length) {
+      tickets = d.tickets;
+      renderTickets();
+    }
+    if (d.ticketMode) { ticketMode = d.ticketMode; setTicketMode(d.ticketMode); }
+    if (d.perDateTickets) perDateTickets = d.perDateTickets;
+    // images
+    if (d.coverUrl) {
+      set('coverUrl', d.coverUrl);
+      const prev = g('coverPreview'); if (prev) { prev.src = d.coverUrl; prev.style.display = 'block'; }
+      const ph = g('coverPlaceholder'); if (ph) ph.style.display = 'none';
+    }
+    if (d.cardImgUrl || d.ticketDesign?.cardImg) {
+      const url = d.cardImgUrl || d.ticketDesign?.cardImg;
+      set('cardImgUrl', url);
+      const prev = g('cardImgPreview'); if (prev) { prev.src = url; prev.style.display = 'block'; }
+      const ph = g('cardImgPlaceholder'); if (ph) ph.style.display = 'none';
+    }
+    // ticket design
+    if (d.ticketDesign) {
+      if (g('tdOrgName')) set('tdOrgName', d.ticketDesign.organiserName || '');
+      if (g('tdTagline')) set('tdTagline', d.ticketDesign.tagline || '');
+      if (g('tdFooter')) set('tdFooter', d.ticketDesign.footer || '');
+    }
+    // notes / terms
+    if (g('notes')) set('notes', d.notes || '');
+    if (g('termsText')) set('termsText', d.termsText || '');
+    if (g('refundPolicy')) set('refundPolicy', d.refundPolicy || '');
+    if (g('refundDeadlineDays')) set('refundDeadlineDays', d.refundDeadlineDays || '');
+    if (g('refundPercent')) set('refundPercent', d.refundPercent !== undefined ? d.refundPercent : 100);
+    // toggles
+    const setToggle = (id, val) => { const el = g(id); if (!el) return; if (val) el.classList.add('on'); else el.classList.remove('on'); };
+    setToggle('toggleInvite', d.inviteOnly);
+    setToggle('toggleSoldOut', d.soldOut);
+    setToggle('toggleWaitlist', d.allowWaitlist);
+    setToggle('toggleNotifyWaitlist', d.notifyWaitlist);
+    setToggle('toggleAttendeeCount', d.showAttendeeCount);
+    setToggle('toggleRefunds', d.enableRefunds);
+    setToggle('togglePublicListing', d.publicListing);
+    setToggle('toggleSharing', d.allowSharing);
+    if (g('inviteCode')) set('inviteCode', d.inviteCode || '');
+    if (g('soldOutMsg')) set('soldOutMsg', d.soldOutMsg || '');
+    if (g('videoUrl')) set('videoUrl', d.videoUrl || '');
+    if (g('currency') && d.currency) g('currency').value = d.currency;
+    if (g('feeMode') && d.feeMode) g('feeMode').value = d.feeMode;
+    // update page title to indicate edit mode
+    const titleEl = document.querySelector('h1, .page-title, #pageTitle');
+    if (titleEl) titleEl.textContent = 'Edit Event';
+    document.title = 'Edit Event | CultureWave';
+    updateProgress();
+  } catch(e) {
+    console.warn('Could not prefill event:', e);
+  }
+})();
+
 // ── STEP NAVIGATION ──
 window.goStep = function(n) {
   const panels = document.querySelectorAll('.step-panel');

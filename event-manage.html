@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Manage Event | CultureWave</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --blue:#3b5bdb;--blue-2:#4c6ef5;--blue-light:#e7f5ff;--blue-soft:#f0f4ff;
+  --green:#2f9e44;--green-light:#ebfbee;--orange:#e67700;--orange-light:#fff9db;
+  --red:#c92a2a;--border:#e9ecef;--muted:#868e96;--text:#1a1a2e;--bg:#f8f9fa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+a{text-decoration:none;color:inherit;}
+button{font:inherit;cursor:pointer;border:0;background:none;}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-back{display:flex;align-items:center;gap:.6rem;padding:1rem 1rem .75rem;border-bottom:1px solid var(--border);font-size:.84rem;font-weight:600;color:var(--blue);cursor:pointer;}
+.sb-back:hover{color:var(--blue-2);}
+.sb-event-info{padding:.85rem 1rem;border-bottom:1px solid var(--border);}
+.sb-event-name{font-size:.92rem;font-weight:800;color:var(--text);margin-bottom:.2rem;line-height:1.3;}
+.sb-event-status{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .55rem;border-radius:999px;font-size:.68rem;font-weight:700;}
+.sb-event-status.live{background:var(--green-light);color:var(--green);}
+.sb-event-status.draft{background:#fff9db;color:#e67700;}
+.sb-event-status.archived{background:#f1f3f5;color:#868e96;}
+
+.sb-section{padding:.6rem 1rem .2rem;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#adb5bd;}
+.sb-item{display:flex;align-items:center;gap:.65rem;padding:.55rem .85rem;margin:.1rem .5rem;border-radius:9px;font-size:.84rem;font-weight:500;color:#495057;cursor:pointer;transition:background .12s,color .12s;width:calc(100% - 1rem);text-align:left;}
+.sb-item:hover{background:#f1f3f5;color:var(--text);}
+.sb-item.active{background:var(--blue);color:#fff;font-weight:700;}
+.sb-item .sb-icon{font-size:.9rem;width:20px;text-align:center;flex:none;}
+.sb-item .sb-sub{font-size:.7rem;opacity:.75;display:block;margin-top:.05rem;}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.topbar-left{display:flex;align-items:center;gap:.75rem;}
+.topbar-title{font-size:1rem;font-weight:700;}
+.topbar-sub{font-size:.78rem;color:var(--muted);}
+.topbar-right{display:flex;align-items:center;gap:.6rem;}
+.tb-btn{display:flex;align-items:center;gap:.4rem;padding:.42rem .9rem;border-radius:8px;font-size:.82rem;font-weight:600;border:1px solid var(--border);background:#fff;color:#495057;cursor:pointer;}
+.tb-btn:hover{border-color:var(--blue);color:var(--blue);}
+.tb-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.tb-btn.primary:hover{background:var(--blue-2);}
+.tb-btn.green{background:var(--green);color:#fff;border-color:var(--green);}
+
+.content{flex:1;padding:1.5rem;}
+.panel{display:none;flex-direction:column;gap:1rem;}
+.panel.active{display:flex;}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;display:flex;align-items:center;gap:1rem;}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.2rem;flex:none;}
+.stat-icon.blue{background:#e7f5ff;}
+.stat-icon.green{background:#ebfbee;}
+.stat-icon.purple{background:#f3f0ff;}
+.stat-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.3rem;}
+.stat-val{font-size:1.6rem;font-weight:800;letter-spacing:-.04em;color:var(--text);}
+
+/* CARD */
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+.card-head h2{font-size:.92rem;font-weight:700;}
+.card-head p{font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+
+/* BOOKINGS TABLE */
+.bk-table{width:100%;border-collapse:collapse;}
+.bk-table th{text-align:left;padding:.55rem .85rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border);}
+.bk-table td{padding:.75rem .85rem;font-size:.84rem;color:#334155;border-bottom:1px solid var(--border);}
+.bk-table tr:last-child td{border-bottom:0;}
+.bk-table tr:hover td{background:#f8f9fa;}
+.bk-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:.82rem;font-weight:800;color:#fff;flex:none;}
+.pill{display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:700;}
+.pill.paid{background:#ebfbee;color:var(--green);}
+.pill.pending{background:#fff9db;color:#e67700;}
+.pill.cancelled{background:#fff5f5;color:#c92a2a;}
+.pill.free{background:#f1f3f5;color:#495057;}
+
+/* SEARCH ROW */
+.search-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;}
+.search-box{display:flex;align-items:center;gap:.5rem;padding:.45rem .85rem;border-radius:8px;border:1px solid var(--border);background:#fff;flex:1;max-width:400px;}
+.search-box input{border:0;outline:none;font:inherit;font-size:.82rem;color:var(--text);width:100%;background:none;}
+.export-btn{display:flex;align-items:center;gap:.4rem;padding:.42rem .9rem;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:600;color:#495057;cursor:pointer;margin-left:auto;}
+.export-btn:hover{border-color:var(--blue);color:var(--blue);}
+.bk-count{font-size:.82rem;font-weight:600;color:var(--muted);white-space:nowrap;}
+
+/* ANALYTICS */
+.an-grid-4{display:grid;grid-template-columns:repeat(5,1fr);gap:.65rem;}
+.an-grid-2{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;}
+.an-metric{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;position:relative;overflow:hidden;}
+.an-metric::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;}
+.an-metric.blue::before{background:linear-gradient(90deg,var(--blue),var(--blue-2));}
+.an-metric.green::before{background:linear-gradient(90deg,#2f9e44,#40c057);}
+.an-metric.orange::before{background:linear-gradient(90deg,#e67700,#f59f00);}
+.an-metric.red::before{background:linear-gradient(90deg,#c92a2a,#e03131);}
+.an-metric.purple::before{background:linear-gradient(90deg,#7048e8,#9775fa);}
+.an-metric.teal::before{background:linear-gradient(90deg,#0891b2,#06b6d4);}
+.an-metric-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.35rem;}
+.an-metric-val{font-size:1.4rem;font-weight:800;letter-spacing:-.04em;color:var(--text);}
+.an-metric-sub{font-size:.7rem;color:var(--muted);margin-top:.2rem;}
+.an-metric-sub .up{color:var(--green);font-weight:700;}
+.an-metric-sub .down{color:#c92a2a;font-weight:700;}
+
+/* PERIOD TABS */
+.period-tabs{display:flex;gap:.2rem;background:#f1f3f5;border-radius:7px;padding:.2rem;}
+.period-tab{padding:.28rem .65rem;border-radius:5px;font-size:.74rem;font-weight:600;color:var(--muted);cursor:pointer;border:0;background:none;}
+.period-tab.active{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+/* BAR CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:.35rem;height:120px;padding:.5rem 0 0;}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem;}
+.bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--blue-2),var(--blue));min-height:3px;position:relative;cursor:pointer;}
+.bar-tooltip{position:absolute;top:-26px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:.6rem;font-weight:700;padding:.15rem .4rem;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;}
+.bar:hover .bar-tooltip{opacity:1;}
+.bar-label{font-size:.58rem;color:var(--muted);font-weight:600;text-align:center;}
+
+/* FUNNEL */
+.funnel-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem .75rem;border-radius:8px;margin-bottom:.35rem;}
+.funnel-row.blue-bg{background:#eff6ff;}
+.funnel-row.purple-bg{background:#f5f3ff;}
+.funnel-row.orange-bg{background:#fff7ed;}
+.funnel-row.green-bg{background:#f0fdf4;}
+.funnel-label{font-size:.84rem;font-weight:600;color:var(--text);}
+.funnel-val{font-size:.92rem;font-weight:800;color:var(--blue);}
+.funnel-drop{font-size:.7rem;color:#c92a2a;font-weight:700;margin-top:.1rem;}
+
+/* EVENT DETAILS FORM */
+.pf-form{display:flex;flex-direction:column;gap:.75rem;}
+.pf-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.pf-field{display:flex;flex-direction:column;gap:.3rem;}
+.pf-field label{font-size:.7rem;font-weight:700;color:#495057;text-transform:uppercase;letter-spacing:.05em;}
+.pf-field input,.pf-field textarea,.pf-field select{padding:.6rem .8rem;border-radius:8px;border:1px solid var(--border);font:inherit;font-size:.86rem;color:var(--text);outline:none;}
+.pf-field input:focus,.pf-field textarea:focus,.pf-field select:focus{border-color:var(--blue);}
+.pf-field textarea{min-height:80px;resize:vertical;}
+.save-btn{height:42px;padding:0 1.5rem;background:var(--blue);color:#fff;border:0;border-radius:8px;font-weight:700;font-size:.86rem;cursor:pointer;align-self:flex-start;}
+.save-btn:hover{background:var(--blue-2);}
+
+/* TICKET ROW */
+.ticket-row{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;background:#f8f9fa;}
+.ticket-name{font-size:.86rem;font-weight:700;flex:1;}
+.ticket-price{font-size:.86rem;font-weight:700;color:var(--blue);}
+.ticket-qty{font-size:.78rem;color:var(--muted);}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:#1a1a2e;color:#fff;padding:.6rem 1.2rem;border-radius:8px;font-size:.82rem;font-weight:600;opacity:0;transition:all .25s;z-index:99;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* CHECKIN MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:480px;padding:1.5rem;box-shadow:0 24px 80px rgba(0,0,0,.2);}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.modal-head h3{font-size:1rem;font-weight:800;}
+.modal-close{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:#f8f9fa;display:grid;place-items:center;cursor:pointer;font-size:.9rem;}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .an-grid-4{grid-template-columns:1fr 1fr;}
+  .an-grid-2{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-back" onclick="history.back()">&#8592; Back to Dashboard</div>
+  <div class="sb-event-info">
+    <div class="sb-event-name" id="sbEventName">Loading...</div>
+    <span class="sb-event-status draft" id="sbEventStatus">Draft</span>
+  </div>
+  <div class="sb-section">Manage</div>
+  <button class="sb-item active" data-panel="bookings" onclick="switchPanel(this,'bookings')">
+    <span class="sb-icon">&#127915;</span>
+    <span><span style="display:block;">Bookings</span><span class="sb-sub">All reservations</span></span>
+  </button>
+  <button class="sb-item" data-panel="checkin" onclick="switchPanel(this,'checkin')">
+    <span class="sb-icon">&#10003;</span>
+    <span><span style="display:block;">Check-In</span><span class="sb-sub">Scan and verify attendees</span></span>
+  </button>
+  <button class="sb-item" data-panel="reminders" onclick="switchPanel(this,'reminders')">
+    <span class="sb-icon">&#128276;</span>
+    <span><span style="display:block;">Reminders</span><span class="sb-sub">Configure customer reminders</span></span>
+  </button>
+  <button class="sb-item" data-panel="postsale" onclick="switchPanel(this,'postsale')">
+    <span class="sb-icon">&#128172;</span>
+    <span><span style="display:block;">Post Sale Communication</span><span class="sb-sub">Configure post sale messages</span></span>
+  </button>
+  <div class="sb-section">Analytics</div>
+  <button class="sb-item" data-panel="analytics" onclick="switchPanel(this,'analytics')">
+    <span class="sb-icon">&#128202;</span>
+    <span><span style="display:block;">Overview</span><span class="sb-sub">All key metrics at a glance</span></span>
+  </button>
+  <button class="sb-item" data-panel="abandoned" onclick="switchPanel(this,'abandoned')">
+    <span class="sb-icon">&#128722;</span>
+    <span><span style="display:block;">Abandoned Carts</span><span class="sb-sub">Started checkout but did not pay</span></span>
+  </button>
+  <div class="sb-section">Event</div>
+  <button class="sb-item" data-panel="details" onclick="switchPanel(this,'details')">
+    <span class="sb-icon">&#128221;</span>
+    <span><span style="display:block;">Event Details</span><span class="sb-sub">Edit event information</span></span>
+  </button>
+  <button class="sb-item" data-panel="tickets" onclick="switchPanel(this,'tickets')">
+    <span class="sb-icon">&#127903;</span>
+    <span><span style="display:block;">Tickets and Pricing</span><span class="sb-sub">Manage ticket types</span></span>
+  </button>
+  <button class="sb-item" data-panel="settings" onclick="switchPanel(this,'settings')">
+    <span class="sb-icon">&#9881;</span>
+    <span><span style="display:block;">Event Settings</span><span class="sb-sub">Visibility and access</span></span>
+  </button>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Event Manager</div>
+        <div class="topbar-sub" id="topbarSub">Loading event...</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn" onclick="viewPublicPage()">&#128065; View Page</button>
+      <button class="tb-btn" onclick="shareEvent()">&#128279; Share</button>
+      <button class="tb-btn primary" id="publishBtn" onclick="togglePublish()">Publish</button>
+    </div>
+  </header>
+  <div class="content">
+
+<!-- BOOKINGS PANEL -->
+<div class="panel active" id="panel-bookings">
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">&#128101;</div>
+      <div><div class="stat-label">Total Bookings</div><div class="stat-val" id="bkTotal">0</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">&#8377;</div>
+      <div><div class="stat-label">Total Revenue</div><div class="stat-val" id="bkRevenue">&#8377;0</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">&#127915;</div>
+      <div><div class="stat-label">Total Tickets Sold</div><div class="stat-val" id="bkTickets">0</div></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+    <div class="card">
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;">Top Tickets <span style="float:right;font-weight:400;">by revenue</span></div>
+      <div id="topTicketsEl"><div style="font-size:.82rem;color:var(--muted);">No data yet</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;">Top Sources <span style="float:right;font-weight:400;">by bookings</span></div>
+      <div id="topSourcesEl"><div style="font-size:.82rem;color:var(--muted);">No data yet</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:.85rem 1.1rem;">
+    <div class="search-row">
+      <div class="search-box">
+        <span style="color:var(--muted);">&#128269;</span>
+        <input type="search" id="bkSearch" placeholder="Search by name, phone, or transaction ID..."/>
+      </div>
+      <span class="bk-count" id="bkCountLabel">0 bookings</span>
+      <button class="export-btn" onclick="exportBookings()">&#8681; Export</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="bk-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Ticket</th>
+            <th>Subtotal</th>
+            <th>Booked On</th>
+            <th>Source</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="bkTableBody">
+          <tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--muted);">No bookings yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CHECK-IN PANEL -->
+<div class="panel" id="panel-checkin">
+  <div class="card">
+    <div class="card-head"><div><h2>Check-In</h2><p>Scan QR codes to verify attendees at the door</p></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;">
+      <div class="stat-card"><div class="stat-icon green">&#10003;</div><div><div class="stat-label">Checked In</div><div class="stat-val" id="ciCheckedIn">0</div></div></div>
+      <div class="stat-card"><div class="stat-icon blue">&#128101;</div><div><div class="stat-label">Total Expected</div><div class="stat-val" id="ciTotal">0</div></div></div>
+    </div>
+    <div style="text-align:center;padding:2rem;border:2px dashed var(--border);border-radius:12px;">
+      <div style="font-size:2rem;margin-bottom:.75rem;">&#128247;</div>
+      <div style="font-size:.92rem;font-weight:700;margin-bottom:.4rem;">QR Scanner</div>
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;">Use a QR scanner app or enter ticket ID manually</div>
+      <div style="display:flex;gap:.5rem;max-width:360px;margin:0 auto;">
+        <input id="ciInput" type="text" placeholder="Enter ticket ID or scan QR..." style="flex:1;padding:.6rem .85rem;border-radius:8px;border:1px solid var(--border);font:inherit;font-size:.84rem;outline:none;"/>
+        <button onclick="checkInTicket()" style="padding:.6rem 1.1rem;border-radius:8px;background:var(--green);color:#fff;font-weight:700;font-size:.84rem;border:0;cursor:pointer;">Check In</button>
+      </div>
+    </div>
+    <div style="margin-top:1rem;" id="ciList"></div>
+  </div>
+</div>
+
+<!-- REMINDERS PANEL -->
+<div class="panel" id="panel-reminders">
+  <div class="card">
+    <div class="card-head"><div><h2>Reminders</h2><p>Configure automated reminders for your attendees</p></div></div>
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">24 hours before event</div><div style="font-size:.76rem;color:var(--muted);">Send reminder to all registered attendees</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="rem24h" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#3b5bdb;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">1 hour before event</div><div style="font-size:.76rem;color:var(--muted);">Final reminder with venue/link details</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="rem1h" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Post-event feedback</div><div style="font-size:.76rem;color:var(--muted);">Ask for review 2 hours after event ends</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="remFeedback" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <button onclick="saveReminders()" class="save-btn">Save Reminders</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST SALE PANEL -->
+<div class="panel" id="panel-postsale">
+  <div class="card">
+    <div class="card-head"><div><h2>Post Sale Communication</h2><p>Messages sent automatically after booking</p></div></div>
+    <div class="pf-form">
+      <div class="pf-field"><label>Booking Confirmation Message</label><textarea id="psConfirmMsg" placeholder="Hi {name}, your booking for {event} is confirmed! See you on {date}."></textarea></div>
+      <div class="pf-field"><label>WhatsApp Number (for confirmations)</label><input id="psWaNumber" type="tel" placeholder="+91 XXXXX XXXXX"/></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Send WhatsApp confirmation</div><div style="font-size:.76rem;color:var(--muted);">Auto-send on every new booking (1 credit)</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="psWaToggle" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#25d366;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label>
+      </div>
+      <button onclick="savePostSale()" class="save-btn">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS PANEL -->
+<div class="panel" id="panel-analytics">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;">
+    <div>
+      <div style="font-size:1.3rem;font-weight:800;letter-spacing:-.03em;">Event Insights</div>
+      <div style="font-size:.82rem;color:var(--muted);margin-top:.15rem;">Performance analytics for <span id="anEventName" style="font-weight:700;color:var(--text);">this event</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <div class="period-tabs" id="anPeriodTabs">
+        <button class="period-tab" data-days="7">7 days</button>
+        <button class="period-tab" data-days="14">14 days</button>
+        <button class="period-tab active" data-days="30">30 days</button>
+        <button class="period-tab" data-days="90">90 days</button>
+      </div>
+      <button onclick="loadAnalytics()" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;cursor:pointer;font-size:.9rem;">&#8635;</button>
+    </div>
+  </div>
+  <div style="font-size:.78rem;color:var(--muted);" id="anDateRange">&#128197; Loading...</div>
+
+  <!-- top 5 metrics row -->
+  <div class="an-grid-4">
+    <div class="an-metric blue"><div class="an-metric-label">Page Views</div><div class="an-metric-val" id="anViews">0</div></div>
+    <div class="an-metric purple"><div class="an-metric-label">Book Clicks</div><div class="an-metric-val" id="anClicks">0</div></div>
+    <div class="an-metric orange"><div class="an-metric-label">Checkouts</div><div class="an-metric-val" id="anCheckouts">0</div></div>
+    <div class="an-metric green"><div class="an-metric-label">Successful</div><div class="an-metric-val" id="anSuccess">0</div><div class="an-metric-sub" id="anSuccessRev">&#8377;0</div></div>
+    <div class="an-metric red"><div class="an-metric-label">Failed</div><div class="an-metric-val" id="anFailed" style="color:#c92a2a;">0</div><div class="an-metric-sub" id="anFailedRev">&#8377;0</div></div>
+  </div>
+
+  <!-- second metrics row -->
+  <div class="an-grid-2">
+    <div class="an-metric blue" style="display:flex;align-items:center;gap:.85rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#e7f5ff;display:grid;place-items:center;font-size:1.1rem;flex:none;">&#128200;</div>
+      <div><div class="an-metric-label">Conversion Rate</div><div class="an-metric-val" id="anConvRate">0%</div></div>
+    </div>
+    <div class="an-metric green" style="display:flex;align-items:center;gap:.85rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#ebfbee;display:grid;place-items:center;font-size:1.1rem;flex:none;">&#8377;</div>
+      <div><div class="an-metric-label">Revenue</div><div class="an-metric-val" id="anRevenue">&#8377;0</div></div>
+    </div>
+    <div class="an-metric orange" style="display:flex;align-items:center;gap:.85rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#fff9db;display:grid;place-items:center;font-size:1.1rem;flex:none;">&#128717;</div>
+      <div><div class="an-metric-label">Active Carts</div><div class="an-metric-val" id="anActiveCarts">0</div><div class="an-metric-sub" id="anActiveCartsRev">&#8377;0 pending</div></div>
+    </div>
+    <div class="an-metric" style="display:flex;align-items:center;gap:.85rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#f1f3f5;display:grid;place-items:center;font-size:1.1rem;flex:none;">&#128336;</div>
+      <div><div class="an-metric-label">Expired</div><div class="an-metric-val" id="anExpired">0</div><div class="an-metric-sub" id="anExpiredRev">&#8377;0 lost</div></div>
+    </div>
+  </div>
+
+  <!-- charts row -->
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:.75rem;">
+    <div class="card">
+      <div class="card-head"><div><h2>Views and Conversions</h2><p>Daily trend over the selected period</p></div></div>
+      <div class="bar-chart" id="anBarChart"></div>
+      <div style="display:flex;gap:1rem;margin-top:.6rem;">
+        <div style="display:flex;align-items:center;gap:.35rem;font-size:.74rem;color:#495057;"><div style="width:10px;height:10px;border-radius:2px;background:var(--blue);"></div>Views</div>
+        <div style="display:flex;align-items:center;gap:.35rem;font-size:.74rem;color:#495057;"><div style="width:10px;height:10px;border-radius:2px;background:var(--green);"></div>Bookings</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Conversion Funnel</h2><p>Step-by-step drop-off</p></div></div>
+      <div id="anFunnel">
+        <div class="funnel-row blue-bg"><span class="funnel-label">Page Viewed</span><span class="funnel-val" id="fnViews">0</span></div>
+        <div style="font-size:.72rem;color:#c92a2a;font-weight:700;padding:.1rem .75rem;" id="fnDrop1"></div>
+        <div class="funnel-row purple-bg"><span class="funnel-label">Book Clicked</span><span class="funnel-val" id="fnClicks">0</span></div>
+        <div class="funnel-row purple-bg" style="margin-top:.25rem;"><span class="funnel-label">Ticket Selected</span><span class="funnel-val" id="fnTicketSel">0</span></div>
+        <div class="funnel-row orange-bg" style="margin-top:.25rem;"><span class="funnel-label">Checkout Started</span><span class="funnel-val" id="fnCheckout">0</span></div>
+        <div class="funnel-row green-bg" style="margin-top:.25rem;"><span class="funnel-label">Payment Done</span><span class="funnel-val" id="fnPaid">0</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABANDONED CARTS PANEL -->
+<div class="panel" id="panel-abandoned">
+  <div class="card">
+    <div class="card-head"><div><h2>Abandoned Carts</h2><p>Users who started checkout but did not complete payment</p></div></div>
+    <div id="abandonedList">
+      <div style="text-align:center;padding:3rem;color:var(--muted);font-size:.84rem;">No abandoned carts found</div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT DETAILS PANEL -->
+<div class="panel" id="panel-details">
+  <div class="card">
+    <div class="card-head"><div><h2>Basic Information</h2><p>Edit your event name, description and category</p></div></div>
+    <div class="pf-form">
+      <div class="pf-field"><label>Event Name *</label><input id="detName" type="text" placeholder="Event name"/></div>
+      <div class="pf-field"><label>Description</label><textarea id="detDesc" style="min-height:120px;" placeholder="Describe your event..."></textarea></div>
+      <div class="pf-row">
+        <div class="pf-field"><label>Category</label>
+          <select id="detCategory">
+            <option value="">Select category</option>
+            <option value="music">Music</option>
+            <option value="food">Food and Drink</option>
+            <option value="arts">Arts and Culture</option>
+            <option value="sports">Sports and Fitness</option>
+            <option value="business">Business</option>
+            <option value="education">Education</option>
+            <option value="travel">Travel and Adventure</option>
+            <option value="wellness">Health and Wellness</option>
+            <option value="comedy">Comedy</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="pf-field"><label>Tags (comma separated)</label><input id="detTags" type="text" placeholder="yoga, wellness, retreat"/></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Venue</h2><p>Location details for your event</p></div></div>
+    <div class="pf-form">
+      <div class="pf-row">
+        <div class="pf-field"><label>Venue Name</label><input id="detVenue" type="text" placeholder="e.g. Sea View Hall"/></div>
+        <div class="pf-field"><label>City</label><input id="detCity" type="text" placeholder="e.g. Mumbai"/></div>
+      </div>
+      <div class="pf-row">
+        <div class="pf-field"><label>State</label><input id="detState" type="text" placeholder="State"/></div>
+        <div class="pf-field"><label>Address</label><input id="detAddress" type="text" placeholder="Full address"/></div>
+      </div>
+      <div class="pf-field"><label>Google Maps Link</label><input id="detMapLink" type="url" placeholder="https://maps.google.com/..."/></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Media</h2><p>Cover image and event card</p></div></div>
+    <div class="pf-form">
+      <div class="pf-row">
+        <div class="pf-field"><label>Cover Image URL</label><input id="detCoverUrl" type="url" placeholder="https://..."/></div>
+        <div class="pf-field"><label>Card Image URL</label><input id="detCardUrl" type="url" placeholder="https://..."/></div>
+      </div>
+      <div id="detCoverPreviewWrap" style="display:none;">
+        <img id="detCoverPreview" src="" style="max-width:100%;max-height:200px;border-radius:10px;object-fit:cover;" alt="cover"/>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Additional Info</h2><p>Notes, terms and refund policy</p></div></div>
+    <div class="pf-form">
+      <div class="pf-field"><label>Notes</label><textarea id="detNotes" placeholder="Any additional notes for attendees..."></textarea></div>
+      <div class="pf-field"><label>Terms and Conditions</label><textarea id="detTerms" placeholder="Terms and conditions..."></textarea></div>
+      <div class="pf-row">
+        <div class="pf-field"><label>Refund Policy</label><input id="detRefundPolicy" type="text" placeholder="e.g. No refunds after 48 hours"/></div>
+        <div class="pf-field"><label>Refund Deadline (days)</label><input id="detRefundDays" type="number" placeholder="e.g. 2"/></div>
+      </div>
+    </div>
+  </div>
+  <button class="save-btn" onclick="saveEventDetails()">Save Event Details</button>
+</div>
+
+<!-- TICKETS PANEL -->
+<div class="panel" id="panel-tickets">
+  <div class="card">
+    <div class="card-head"><div><h2>Tickets and Pricing</h2><p>Ticket types for this event</p></div></div>
+    <div id="ticketsList" style="display:flex;flex-direction:column;gap:.6rem;">
+      <div style="text-align:center;padding:2rem;color:var(--muted);font-size:.84rem;border:1px dashed var(--border);border-radius:10px;">No tickets configured</div>
+    </div>
+    <div style="margin-top:1rem;">
+      <a id="editTicketsLink" href="event-create.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:8px;background:var(--blue);color:#fff;font-size:.84rem;font-weight:700;text-decoration:none;">&#9998; Edit Tickets in Full Editor</a>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="panel" id="panel-settings">
+  <div class="card">
+    <div class="card-head"><div><h2>Event Settings</h2><p>Visibility, access and registration options</p></div></div>
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Public Listing</div><div style="font-size:.76rem;color:var(--muted);">Show this event on the public events page</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setPublicListing" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Allow Sharing</div><div style="font-size:.76rem;color:var(--muted);">Let attendees share the event link</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setAllowSharing" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#3b5bdb;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Show Attendee Count</div><div style="font-size:.76rem;color:var(--muted);">Display number of registrations publicly</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setShowCount" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Invite Only</div><div style="font-size:.76rem;color:var(--muted);">Require invite code to register</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setInviteOnly" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <button onclick="saveSettings()" class="save-btn">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+});
+const db = firebase.firestore();
+const auth = firebase.auth();
+function serverTimestamp(){ return firebase.firestore.FieldValue.serverTimestamp(); }
+</script>
+
+<script>
+const esc = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const money = v => '₹' + Number(v||0).toLocaleString('en-IN');
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+const params = new URLSearchParams(location.search);
+const eventId = params.get('eventId');
+if(!eventId){document.body.innerHTML='<div style="padding:3rem;text-align:center;">No event ID. <a href="premium-client-dashboard.html">Go back</a></div>';}
+
+let eventData=null, allBookings=[], anPeriod=30;
+
+function switchPanel(btn,panelId){
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel=document.getElementById('panel-'+panelId);
+  if(panel) panel.classList.add('active');
+}
+
+function avatarColor(name){
+  const colors=['#3b5bdb','#2f9e44','#e67700','#c92a2a','#7048e8','#0891b2','#d6336c'];
+  let h=0;for(let i=0;i<(name||'').length;i++) h=(h+name.charCodeAt(i))%colors.length;
+  return colors[h];
+}
+
+function normStatus(s){const v=(s||'draft').toLowerCase();return v==='published'?'published':v==='archived'?'archived':'unpublished';}
+
+function fmtDate(v){
+  if(!v) return '';
+  try{const d=v.toDate?v.toDate():new Date(v);return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+  catch(e){return String(v);}
+}
+
+async function loadEvent(){
+  if(!eventId) return;
+  const snap=await db.collection('events').doc(eventId).get();
+  if(!snap.exists){showToast('Event not found');return;}
+  eventData={id:snap.id,...snap.data()};
+  renderEventMeta();prefillDetails();prefillSettings();prefillTickets();loadBookings();
+}
+
+function renderEventMeta(){
+  const d=eventData;
+  const name=d.name||'Untitled Event';
+  document.getElementById('sbEventName').textContent=name;
+  document.getElementById('topbarTitle').textContent=name;
+  document.getElementById('topbarSub').textContent=d.city||(d.startDate?fmtDate(d.startDate):'No date set');
+  document.getElementById('anEventName').textContent=name;
+  document.title='Manage: '+name+' | CultureWave';
+  const st=normStatus(d.status);
+  const stEl=document.getElementById('sbEventStatus');
+  stEl.textContent=st==='published'?'Live':st==='archived'?'Archived':'Draft';
+  stEl.className='sb-event-status '+(st==='published'?'live':st==='archived'?'archived':'draft');
+  const pubBtn=document.getElementById('publishBtn');
+  pubBtn.textContent=st==='published'?'Unpublish':'Publish';
+  pubBtn.className='tb-btn '+(st==='published'?'':'primary');
+  const el=document.getElementById('editTicketsLink');
+  if(el) el.href='event-create.html?eventId='+eventId;
+}
+
+window.togglePublish=async function(){
+  if(!eventData) return;
+  const cur=normStatus(eventData.status);
+  const next=cur==='published'?'unpublished':'published';
+  await db.collection('events').doc(eventId).update({status:next,updatedAt:serverTimestamp()});
+  eventData.status=next;renderEventMeta();
+  showToast(next==='published'?'Event published!':'Event unpublished');
+};
+
+window.viewPublicPage=function(){window.open('event-detail.html?eventId='+eventId,'_blank');};
+window.shareEvent=function(){
+  const url=location.origin+'/event-detail.html?eventId='+eventId;
+  navigator.clipboard.writeText(url).then(()=>showToast('Link copied!')).catch(()=>prompt('Copy link:',url));
+};
+
+function loadBookings(){
+  db.collection('bookings').where('eventId','==',eventId).limit(500).onSnapshot(snap=>{
+    allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderBookings();renderBookingStats();renderAnalytics();
+  });
+}
+
+function renderBookingStats(){
+  const paid=allBookings.filter(b=>(b.status||'').toLowerCase()==='paid');
+  const totalRev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
+  const totalTickets=paid.reduce((s,b)=>s+Number(b.tickets||b.seats||1),0);
+  document.getElementById('bkTotal').textContent=allBookings.length;
+  document.getElementById('bkRevenue').textContent=money(totalRev);
+  document.getElementById('bkTickets').textContent=totalTickets;
+  document.getElementById('bkCountLabel').textContent=allBookings.length+' booking'+(allBookings.length!==1?'s':'');
+  document.getElementById('ciTotal').textContent=allBookings.length;
+  document.getElementById('ciCheckedIn').textContent=allBookings.filter(b=>b.checkedIn).length;
+
+  const ticketMap={};
+  paid.forEach(b=>{
+    const tn=b.ticketName||b.ticket||'General';
+    if(!ticketMap[tn]) ticketMap[tn]={rev:0,sold:0,bookings:0};
+    ticketMap[tn].rev+=Number(b.amount||0);
+    ticketMap[tn].sold+=Number(b.tickets||b.seats||1);
+    ticketMap[tn].bookings++;
+  });
+  const topT=Object.entries(ticketMap).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3);
+  const maxR=topT[0]?.[1]?.rev||1;
+  const ttEl=document.getElementById('topTicketsEl');
+  ttEl.innerHTML=topT.length?topT.map(([n,d])=>'<div style="margin-bottom:.65rem;"><div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:600;margin-bottom:.3rem;"><span>'+esc(n)+'</span><span style="color:var(--blue);">'+money(d.rev)+'</span></div><div style="height:5px;border-radius:999px;background:#f1f3f5;overflow:hidden;"><div style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--blue-2));width:'+Math.round(d.rev/maxR*100)+'%;"></div></div><div style="font-size:.72rem;color:var(--muted);margin-top:.2rem;">'+d.sold+' sold &middot; '+d.bookings+' bookings</div></div>').join(''):'<div style="font-size:.82rem;color:var(--muted);">No paid bookings yet</div>';
+
+  const srcMap={};
+  allBookings.forEach(b=>{const src=b.source||b.utm_source||'ORGANIC / DIRECT';if(!srcMap[src])srcMap[src]=0;srcMap[src]++;});
+  const topS=Object.entries(srcMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const maxS=topS[0]?.[1]||1;
+  const tsEl=document.getElementById('topSourcesEl');
+  tsEl.innerHTML=topS.length?topS.map(([s,c])=>'<div style="margin-bottom:.65rem;"><div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:600;margin-bottom:.3rem;"><span>'+esc(s)+'</span><span style="color:var(--muted);font-weight:500;">'+c+' bookings</span></div><div style="height:5px;border-radius:999px;background:#f1f3f5;overflow:hidden;"><div style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--blue-2));width:'+Math.round(c/maxS*100)+'%;"></div></div></div>').join(''):'<div style="font-size:.82rem;color:var(--muted);">No source data yet</div>';
+}
+
+function renderBookings(){
+  const q=(document.getElementById('bkSearch')?.value||'').trim().toLowerCase();
+  let rows=allBookings;
+  if(q) rows=rows.filter(b=>{
+    const n=(b.buyerName||b.customer?.name||'').toLowerCase();
+    const p=(b.buyerPhone||b.customer?.phone||'').toLowerCase();
+    const t=(b.transactionId||b.id||'').toLowerCase();
+    return n.includes(q)||p.includes(q)||t.includes(q);
+  });
+  document.getElementById('bkCountLabel').textContent=rows.length+' booking'+(rows.length!==1?'s':'');
+  const tbody=document.getElementById('bkTableBody');
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--muted);">No bookings found</td></tr>';return;}
+  tbody.innerHTML=rows.map(b=>{
+    const name=b.buyerName||b.customer?.name||'Guest';
+    const phone=b.buyerPhone||b.customer?.phone||'';
+    const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const color=avatarColor(name);
+    const tn=b.ticketName||b.ticket||'General';
+    const tq=b.tickets||b.seats||1;
+    const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'--';
+    const st=(b.status||'pending').toLowerCase();
+    const src=b.source||b.utm_source||'ORGANIC / DIRE...';
+    const sd=b.slotDate||b.eventDate||'';
+    const st2=b.slotTime||b.startTime||'';
+    return '<tr>'
+      +'<td><div style="display:flex;align-items:center;gap:.65rem;"><div class="bk-avatar" style="background:'+color+';">'+esc(initials)+'</div><div><div style="font-weight:700;font-size:.86rem;">'+esc(name)+'</div><div style="font-size:.74rem;color:var(--muted);">'+esc(phone)+'</div></div></div></td>'
+      +'<td><div style="font-weight:600;font-size:.84rem;">'+esc(tn)+'</div><div style="font-size:.74rem;color:var(--muted);">'+tq+' ticket'+(tq>1?'s':'')+(sd?' &middot; '+esc(sd)+(st2?' &middot; '+esc(st2):''):'')+'</div></td>'
+      +'<td style="font-weight:700;">'+(b.amount?money(b.amount):'Free')+'</td>'
+      +'<td><div style="font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:.15rem;">'+esc(src.toUpperCase())+'</div><div style="font-size:.82rem;">'+date+'</div></td>'
+      +'<td><span class="pill '+st+'">'+st+'</span></td>'
+      +'<td><button onclick="openBookingMenu(''+b.id+'')" style="padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:.8rem;">&#8943;</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+window.openBookingMenu=function(id){
+  const b=allBookings.find(x=>x.id===id);
+  if(!b) return;
+  showToast('Booking: '+(b.buyerName||'Guest')+' - '+(b.status||'pending'));
+};
+
+window.exportBookings=function(){
+  const rows=[['Name','Phone','Ticket','Qty','Amount','Status','Date','Source']];
+  allBookings.forEach(b=>{
+    const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN'):'';
+    rows.push([b.buyerName||b.customer?.name||'',b.buyerPhone||b.customer?.phone||'',b.ticketName||b.ticket||'General',b.tickets||b.seats||1,b.amount||0,b.status||'pending',date,b.source||'direct']);
+  });
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv,'+encodeURIComponent(csv);
+  a.download='bookings-'+(eventData?.name||eventId)+'.csv';
+  a.click();
+};
+
+document.getElementById('bkSearch').addEventListener('input',renderBookings);
+
+window.checkInTicket=async function(){
+  const val=document.getElementById('ciInput').value.trim();
+  if(!val){showToast('Enter a ticket ID');return;}
+  const b=allBookings.find(x=>x.id===val||x.ticketId===val);
+  if(!b){showToast('Ticket not found');return;}
+  if(b.checkedIn){showToast('Already checked in!');return;}
+  await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp()});
+  showToast('Checked in: '+(b.buyerName||'Guest'));
+  document.getElementById('ciInput').value='';
+};
+
+function renderAnalytics(){
+  const now=new Date();
+  const cutoff=new Date(now-anPeriod*86400000);
+  const s=cutoff.toLocaleDateString('en-IN',{year:'numeric',month:'2-digit',day:'2-digit'});
+  const e=now.toLocaleDateString('en-IN',{year:'numeric',month:'2-digit',day:'2-digit'});
+  document.getElementById('anDateRange').textContent='&#128197; '+s+' — '+e;
+  const cur=allBookings.filter(b=>{const d=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return d>=cutoff;});
+  const paid=cur.filter(b=>(b.status||'').toLowerCase()==='paid');
+  const failed=cur.filter(b=>(b.status||'').toLowerCase()==='failed');
+  const pending=cur.filter(b=>(b.status||'').toLowerCase()==='pending');
+  const totalRev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
+  const failedRev=failed.reduce((s,b)=>s+Number(b.amount||0),0);
+  const pendingRev=pending.reduce((s,b)=>s+Number(b.amount||0),0);
+  const views=eventData?.analytics?.views||eventData?.views||0;
+  const clicks=eventData?.analytics?.clicks||eventData?.clicks||0;
+  const convRate=views>0?((paid.length/views)*100).toFixed(2)+'%':'0%';
+  document.getElementById('anViews').textContent=views;
+  document.getElementById('anClicks').textContent=clicks;
+  document.getElementById('anCheckouts').textContent=cur.length;
+  document.getElementById('anSuccess').textContent=paid.length;
+  document.getElementById('anSuccessRev').textContent=money(totalRev);
+  document.getElementById('anFailed').textContent=failed.length;
+  document.getElementById('anFailedRev').textContent=money(failedRev);
+  document.getElementById('anConvRate').textContent=convRate;
+  document.getElementById('anRevenue').textContent=money(totalRev);
+  document.getElementById('anActiveCarts').textContent=pending.length;
+  document.getElementById('anActiveCartsRev').textContent=money(pendingRev)+' pending';
+  document.getElementById('anExpired').textContent=0;
+  document.getElementById('anExpiredRev').textContent='₹0 lost';
+  document.getElementById('fnViews').textContent=views;
+  document.getElementById('fnClicks').textContent=clicks;
+  document.getElementById('fnTicketSel').textContent=clicks;
+  document.getElementById('fnCheckout').textContent=cur.length;
+  document.getElementById('fnPaid').textContent=paid.length;
+  const drop1=views>0?Math.round((1-clicks/views)*100):0;
+  document.getElementById('fnDrop1').textContent=drop1>0?'↘ '+drop1+'% drop-off':'';
+  const days=Math.min(anPeriod,14);
+  const labels=[];const bookData=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(now-i*86400000);
+    labels.push(d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}));
+    const ds=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+    const de=new Date(ds.getTime()+86400000);
+    bookData.push(paid.filter(b=>{const bd=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return bd>=ds&&bd<de;}).length);
+  }
+  const maxVal=Math.max(...bookData,1);
+  document.getElementById('anBarChart').innerHTML=labels.map((lbl,i)=>'<div class="bar-wrap"><div class="bar" style="height:'+Math.max(Math.round(bookData[i]/maxVal*100),3)+'px;"><div class="bar-tooltip">'+bookData[i]+' bookings</div></div><div class="bar-label">'+lbl+'</div></div>').join('');
+  const abandonedEl=document.getElementById('abandonedList');
+  if(pending.length){
+    abandonedEl.innerHTML=pending.slice(0,10).map(b=>{
+      const name=b.buyerName||b.customer?.name||'Guest';
+      const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'--';
+      return '<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-bottom:1px solid var(--border);"><div style="width:34px;height:34px;border-radius:50%;background:'+avatarColor(name)+';display:grid;place-items:center;font-size:.78rem;font-weight:800;color:#fff;flex:none;">'+name.slice(0,2).toUpperCase()+'</div><div style="flex:1;"><div style="font-size:.86rem;font-weight:700;">'+esc(name)+'</div><div style="font-size:.74rem;color:var(--muted);">'+date+'</div></div><div style="font-size:.84rem;font-weight:700;color:#e67700;">'+(b.amount?money(b.amount):'--')+'</div><span class="pill pending">pending</span></div>';
+    }).join('');
+  } else {
+    abandonedEl.innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted);font-size:.84rem;">No abandoned carts found</div>';
+  }
+}
+
+document.querySelectorAll('#anPeriodTabs .period-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    anPeriod=Number(btn.dataset.days);
+    document.querySelectorAll('#anPeriodTabs .period-tab').forEach(t=>t.classList.toggle('active',t===btn));
+    renderAnalytics();
+  });
+});
+
+function prefillDetails(){
+  const d=eventData;
+  const g=id=>document.getElementById(id);
+  const set=(id,v)=>{const el=g(id);if(el&&v!==undefined&&v!==null)el.value=v;};
+  set('detName',d.name||'');set('detDesc',d.description||'');
+  if(g('detCategory'))g('detCategory').value=d.category||'';
+  set('detTags',Array.isArray(d.tags)?d.tags.join(', '):(d.tags||''));
+  set('detVenue',d.venueName||'');set('detCity',d.city||'');set('detState',d.state||'');
+  set('detAddress',d.address||'');set('detMapLink',d.mapLink||'');
+  set('detCoverUrl',d.coverUrl||'');set('detCardUrl',d.cardImgUrl||'');
+  set('detNotes',d.notes||'');set('detTerms',d.termsText||'');
+  set('detRefundPolicy',d.refundPolicy||'');set('detRefundDays',d.refundDeadlineDays||'');
+  if(d.coverUrl){const pw=g('detCoverPreviewWrap');if(pw)pw.style.display='block';const pi=g('detCoverPreview');if(pi)pi.src=d.coverUrl;}
+  g('detCoverUrl').addEventListener('input',function(){const pw=document.getElementById('detCoverPreviewWrap');const pi=document.getElementById('detCoverPreview');if(this.value){pw.style.display='block';pi.src=this.value;}else pw.style.display='none';});
+}
+
+window.saveEventDetails=async function(){
+  if(!eventId) return;
+  const g=id=>document.getElementById(id);
+  await db.collection('events').doc(eventId).update({
+    name:g('detName').value.trim(),description:g('detDesc').value.trim(),
+    category:g('detCategory').value,
+    tags:g('detTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    venueName:g('detVenue').value.trim(),city:g('detCity').value.trim(),
+    state:g('detState').value.trim(),address:g('detAddress').value.trim(),
+    mapLink:g('detMapLink').value.trim(),coverUrl:g('detCoverUrl').value.trim(),
+    cardImgUrl:g('detCardUrl').value.trim(),notes:g('detNotes').value.trim(),
+    termsText:g('detTerms').value.trim(),refundPolicy:g('detRefundPolicy').value.trim(),
+    refundDeadlineDays:Number(g('detRefundDays').value||0),updatedAt:serverTimestamp()
+  });
+  showToast('Event details saved!');
+  eventData.name=g('detName').value.trim();
+  renderEventMeta();
+};
+
+function prefillSettings(){
+  const d=eventData;
+  const setChk=(id,v)=>{const el=document.getElementById(id);if(!el)return;el.checked=!!v;const track=el.nextElementSibling;if(track){const thumb=track.querySelector('span');if(v){track.style.background='#3b5bdb';if(thumb)thumb.style.transform='translateX(18px)';}else{track.style.background='#e9ecef';if(thumb)thumb.style.transform='';}}};
+  setChk('setPublicListing',d.publicListing);
+  setChk('setAllowSharing',d.allowSharing!==false);
+  setChk('setShowCount',d.showAttendeeCount);
+  setChk('setInviteOnly',d.inviteOnly);
+}
+
+window.saveSettings=async function(){
+  if(!eventId) return;
+  await db.collection('events').doc(eventId).update({
+    publicListing:document.getElementById('setPublicListing').checked,
+    allowSharing:document.getElementById('setAllowSharing').checked,
+    showAttendeeCount:document.getElementById('setShowCount').checked,
+    inviteOnly:document.getElementById('setInviteOnly').checked,
+    updatedAt:serverTimestamp()
+  });
+  showToast('Settings saved!');
+};
+
+function prefillTickets(){
+  const tickets=eventData?.tickets||[];
+  const el=document.getElementById('ticketsList');
+  if(!tickets.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.84rem;border:1px dashed var(--border);border-radius:10px;">No tickets configured</div>';return;}
+  el.innerHTML=tickets.map(t=>'<div class="ticket-row"><div class="ticket-name">'+esc(t.name||'General')+'</div><div class="ticket-price">'+(t.price?money(t.price):'Free')+'</div><div class="ticket-qty">'+(t.qty?t.qty+' seats':'Unlimited')+'</div></div>').join('');
+}
+
+window.saveReminders=function(){showToast('Reminders saved!');};
+window.savePostSale=function(){showToast('Post sale settings saved!');};
+
+auth.onAuthStateChanged(user=>{
+  if(!user){location.href='login.html';return;}
+  loadEvent();
+});
+</script>
+</body>
+</html>

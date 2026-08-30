@@ -2297,8 +2297,9 @@ function renderEvents() {
         <div class="ev-actions" style="flex-wrap:wrap;gap:.3rem;">
           <button class="ev-act-btn ${isPublished?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${isPublished?'Unpublish':'Publish'}</button>
           <a class="ev-act-btn" href="event-detail.html?eventId=${ev.id}" target="_blank">View</a>
-          <a class="ev-act-btn" href="event-create.html?eventId=${ev.id}">Edit</a>
+          <a class="ev-act-btn" href="event-manage.html?eventId=${ev.id}">Edit</a>
           <button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button>
+          ${st!=='archived'?`<button class="ev-act-btn" onclick="archiveEvent('${ev.id}')" title="Keep as archived">Keep</button>`:''}
         </div>
       </div>`;
     }).join('')}
@@ -2323,6 +2324,19 @@ window.togglePublishEvent = async function(id, currentStatus) {
       updatedAt: serverTimestamp()
     });
     showToast(newStatus === 'published' ? '✅ Event published!' : '🟡 Event unpublished');
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
+};
+
+window.archiveEvent = async function(id) {
+  if(!myUid) { showToast('Not signed in'); return; }
+  try {
+    await updateDoc(doc(db, 'events', id), {
+      status: 'archived',
+      updatedAt: serverTimestamp()
+    });
+    showToast('📦 Event kept (archived)');
   } catch(e) {
     showToast('Error: ' + e.message);
   }
