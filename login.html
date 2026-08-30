@@ -596,6 +596,13 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+      const EMAILJS_PUBLIC_KEY  = "PDb2vpOIeLkbZBBFP";
+      const EMAILJS_SERVICE_ID  = "service_esppdwf";
+      const EMAILJS_OTP_TEMPLATE = "template_caj3zqw";
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    </script>
     <script type="module">
       import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword,
         GoogleAuthProvider, signInWithPopup, updateProfile,
@@ -719,18 +726,22 @@
 
       function generateOtp() { return String(Math.floor(100000 + Math.random() * 900000)); }
 
-      async function sendOtpEmail(email, otp) {
-        // Store OTP in Firestore with 10min expiry
+      async function sendOtpEmail(email, otp, name) {
         await setDoc(doc(db, 'emailOtps', email), {
           otp,
           expiresAt: Date.now() + 10 * 60 * 1000,
           createdAt: Date.now()
         });
-        // Use Firebase Auth: create a temp account, send verification, then we verify OTP client-side
-        // Since we can't send custom email without backend, we use ActionCodeSettings trick:
-        // Instead we store OTP in Firestore and show it — in production connect an email service
-        // For now: show OTP in status so you can test
-        return otp;
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_OTP_TEMPLATE,
+          {
+            to_name:   name || 'User',
+            to_email:  email,
+            otp_code:  otp,
+            reply_to:  'support@culturewave.in',
+          }
+        );
       }
 
       document.getElementById('sendOtpBtn').addEventListener('click', async () => {
@@ -746,11 +757,11 @@
         try {
           pendingOtp = generateOtp();
           pendingOtpEmail = email;
-          await sendOtpEmail(email, pendingOtp);
+          await sendOtpEmail(email, pendingOtp, name);
           document.getElementById('signupStep1').style.display = 'none';
           document.getElementById('signupStep2').style.display = '';
           document.getElementById('otpEmailDisplay').textContent = email;
-          setStatus('OTP sent! Check your email. (Dev mode: OTP is ' + pendingOtp + ')', 'info');
+          setStatus('OTP sent! Check your inbox.', 'success');
         } catch(err) {
           setStatus(err.message, 'warning');
         }
@@ -760,8 +771,8 @@
         if (!pendingOtpEmail) return;
         setStatus('Resending OTP...', 'info');
         pendingOtp = generateOtp();
-        await sendOtpEmail(pendingOtpEmail, pendingOtp);
-        setStatus('OTP resent! (Dev mode: OTP is ' + pendingOtp + ')', 'info');
+        await sendOtpEmail(pendingOtpEmail, pendingOtp, document.getElementById('signupName').value.trim());
+        setStatus('OTP resent! Check your inbox.', 'success');
       });
 
       document.querySelector("[data-auth-form='signup']").addEventListener("submit", async e => {
