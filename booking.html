@@ -726,20 +726,10 @@
       const container = document.getElementById("itemCards");
       container.innerHTML = "";
       if (eventBookingMode) {
-        const item = activeData[selectedKey];
-        if (item) {
-          const card = document.createElement("label");
-          card.className = "bk-event-card selected";
-          card.innerHTML = `
-            <div class="bk-event-emoji">${item.emoji}</div>
-            <div class="bk-event-info">
-              <strong>${item.name}</strong>
-              <span>${item.sub}</span>
-            </div>
-            <span class="bk-event-price">${fmt(item.price)}</span>
-            <div class="bk-event-check"></div>`;
-          container.appendChild(card);
-        }
+        container.innerHTML = `
+          <div class="status" style="margin-top:0;">
+            Loading your selected event...
+          </div>`;
         return;
       }
       Object.entries(activeData).forEach(([key, item], i) => {
@@ -773,10 +763,8 @@
     /* ── ADAPT UI FOR TYPE ── */
     function adaptUI() {
       if (eventBookingMode) {
-        document.getElementById("step1Title").textContent = "Selected event";
-        document.getElementById("step1Sub").textContent   = "This booking is already linked to your event.";
-        document.getElementById("next1").style.display = "none";
-        document.getElementById("back2").style.display = "none";
+        document.getElementById("panel1").style.display = "none";
+        document.getElementById("panel2").style.display = "";
         document.getElementById("step1").textContent = "Event";
         document.getElementById("step1").classList.add("done");
         document.getElementById("step2").classList.add("active");
@@ -1007,25 +995,27 @@
         const snap = await firebase.firestore().collection("events").doc(eventId).get();
         if (snap.exists) {
           const d = snap.data();
-          const price = Array.isArray(d.tickets) && d.tickets.length ? Number(d.tickets[0].price || 0) : Number(d.price || 0);
+          const tickets = Array.isArray(d.tickets) && d.tickets.length ? d.tickets : [];
+          const chosenTicket = tickets.length ? tickets[0] : null;
+          const price = chosenTicket ? Number(chosenTicket.price || 0) : Number(d.price || 0);
           activeData = {
             selected: {
               name: d.name || "Selected Event",
               venue: d.venueName || d.city || "Venue TBA",
               price,
               emoji: "🎪",
-              sub: d.category || "Event Ticket",
+              sub: chosenTicket ? chosenTicket.name : (d.category || "Event Ticket"),
             }
           };
           selectedKey = "selected";
           document.getElementById("step1Title").textContent = d.name || "Selected event";
-          document.getElementById("step1Sub").textContent = "You were sent here from the event page, so the event is already selected.";
+          document.getElementById("step1Sub").textContent = chosenTicket
+            ? "You were sent here from the event page, and the first published ticket is already selected."
+            : "You were sent here from the event page, and the event is already selected.";
           document.getElementById("heroText").textContent = `${d.venueName || d.city || "Event venue"} · booking for ${d.name || "this event"}`;
-          document.getElementById("regBtn")?.remove?.();
         }
-        document.getElementById("itemCards").innerHTML = "";
-        adaptUI();
         buildCards();
+        adaptUI();
         updateReceipt();
         goStep(2);
         return;
