@@ -9,6 +9,49 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // ── EMAILJS CONFIG ──
+    // Replace these with your actual EmailJS credentials
+    const EMAILJS_PUBLIC_KEY   = "YOUR_PUBLIC_KEY";   // from EmailJS dashboard → Account
+    const EMAILJS_SERVICE_ID   = "YOUR_SERVICE_ID";   // from EmailJS dashboard → Email Services
+    const EMAILJS_TEMPLATE_ID  = "YOUR_TEMPLATE_ID";  // from EmailJS dashboard → Email Templates
+
+    (function() {
+      if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      }
+    })();
+
+    async function sendBookingEmail({ name, email, eventName, amount, seats, bookingId, bookingType, date, time, method }) {
+      if (EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY" || !email) return; // skip if not configured
+      const isRestaurant = bookingType === "restaurant";
+      const successUrl = window.location.origin + "/success.html?bookingId=" + encodeURIComponent(bookingId)
+        + "&event=" + encodeURIComponent(eventName)
+        + "&amount=" + encodeURIComponent(amount)
+        + "&status=Confirmed&type=" + bookingType
+        + (date ? "&date=" + encodeURIComponent(date) : "")
+        + (time ? "&time=" + encodeURIComponent(time) : "");
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_name:      name,
+          to_email:     email,
+          event_name:   eventName,
+          booking_id:   bookingId.slice(-10).toUpperCase(),
+          amount:       amount,
+          seats:        seats,
+          seats_label:  isRestaurant ? "Guests" : "Seats",
+          booking_type: isRestaurant ? "Table Reservation" : "Event Booking",
+          date_time:    date ? (new Date(date).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}) + (time ? " at " + time : "")) : new Date().toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}),
+          payment_method: method || "UPI",
+          ticket_url:   successUrl,
+          reply_to:     "support@culturewave.in",
+        });
+      } catch(e) {
+        console.warn("EmailJS send failed:", e);
+      }
+    }
+  </script>
   <style>
     body { background: #f0f4ff; }
 
@@ -880,6 +923,19 @@
               statusText.textContent = "✅ Confirmed";
               statusText.className   = "bk-status-pill success";
               const bid = vData.bookingId || r.razorpay_payment_id || "booking";
+              // ── SEND CONFIRMATION EMAIL ──
+              await sendBookingEmail({
+                name:        document.getElementById("bookName").value.trim() || "Guest",
+                email:       document.getElementById("bookEmail").value.trim(),
+                eventName:   item.name,
+                amount:      fmt(total),
+                seats:       String(n),
+                bookingId:   bid,
+                bookingType: bookingType,
+                date:        dateVal,
+                time:        timeVal,
+                method:      document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
+              });
               window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
                 + "&event=" + encodeURIComponent(item.name)
                 + "&amount=" + encodeURIComponent(fmt(total))
