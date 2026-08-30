@@ -2732,7 +2732,7 @@ document.querySelectorAll('.period-tab').forEach(btn => {
 
 function loadAnalytics(uid) {
   onSnapshot(
-    query(collection(db,'bookings'), where('ownerId','==',uid), orderBy('createdAt','desc'), limit(500)),
+    query(collection(db,'bookings'), where('ownerId','==',uid), limit(500)),
     snap => {
       analyticsBookings = snap.docs.map(d=>({id:d.id,...d.data()}));
       renderAnalytics();
@@ -2742,7 +2742,7 @@ function loadAnalytics(uid) {
 
 function loadFinance(uid) {
   onSnapshot(
-    query(collection(db,'bookings'), where('ownerId','==',uid), orderBy('createdAt','desc'), limit(100)),
+    query(collection(db,'bookings'), where('ownerId','==',uid), limit(100)),
     snap => {
       const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
       allSalesRows = rows;
@@ -2761,7 +2761,7 @@ function loadFinance(uid) {
     }
   );
   onSnapshot(
-    query(collection(db,'payouts'), where('ownerId','==',uid), orderBy('createdAt','desc'), limit(50)),
+    query(collection(db,'payouts'), where('ownerId','==',uid), limit(50)),
     snap => {
       const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
       const totalPaid = rows.filter(r=>(r.status||'')==='paid').reduce((s,r)=>s+Number(r.amount||0),0);
@@ -2945,7 +2945,7 @@ window.renderIgRules = renderIgRules;
 
 async function loadInquiries(uid) {
   onSnapshot(
-    query(collection(db,'inquiries'), where('ownerId','==',uid), orderBy('createdAt','desc'), limit(50)),
+    query(collection(db,'inquiries'), where('ownerId','==',uid), limit(50)),
     snap => {
       const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
       const unread = rows.filter(r=>!r.read).length;
@@ -3029,9 +3029,11 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 
   // load events
   onSnapshot(
-    query(collection(db,'events'), where('ownerId','==',myUid), orderBy('createdAt','desc'), limit(50)),
+    query(collection(db,'events'), where('ownerId','==',myUid), limit(50)),
     snap => {
-      allEvents = snap.docs.map(d=>({id:d.id,...d.data()}));
+      allEvents = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+        const ta = a.createdAt?.seconds||0; const tb = b.createdAt?.seconds||0; return tb-ta;
+      });
       window.allEvents = allEvents;
       renderEvents();
       renderOverview();
