@@ -362,7 +362,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <button class="period-tab active" data-days="30">30 days</button>
         <button class="period-tab" data-days="90">90 days</button>
       </div>
-      <button onclick="loadAnalytics()" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;cursor:pointer;font-size:.9rem;">&#8635;</button>
+      <button onclick="renderAnalytics()" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;cursor:pointer;font-size:.9rem;">&#8635;</button>
     </div>
   </div>
   <div style="font-size:.78rem;color:var(--muted);" id="anDateRange">&#128197; Loading...</div>
@@ -585,6 +585,7 @@ function avatarColor(name){
 }
 
 function normStatus(s){const v=(s||'draft').toLowerCase();return v==='published'?'published':v==='archived'?'archived':'unpublished';}
+function normBookingStatus(s){const v=(s||'pending').toLowerCase();return (v==='confirmed'||v==='paid')?'paid':v;}
 
 function fmtDate(v){
   if(!v) return '';
@@ -635,16 +636,24 @@ window.shareEvent=function(){
 };
 
 function loadBookings(){
-  db.collection('bookings').where('eventId','==',eventId).limit(500).onSnapshot(snap=>{
+  // Try eventId field first, fallback handled in filter
+  db.collection('bookings').limit(500).onSnapshot(snap=>{
+    const all = snap.docs.map(d=>({id:d.id,...d.data()}));
+    // match by eventId OR event.id OR event.eventId
+    allBookings = all.filter(b=>
+      b.eventId===eventId ||
+      b.event?.id===eventId ||
+      b.event?.eventId===eventId
+    );
     allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderBookings();renderBookingStats();renderAnalytics();
   });
 }
 
 function renderBookingStats(){
-  const paid=allBookings.filter(b=>(b.status||'').toLowerCase()==='paid');
+  const paid=allBookings.filter(b=>normBookingStatus(b.status)==='paid');
   const totalRev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
-  const totalTickets=paid.reduce((s,b)=>s+Number(b.tickets||b.seats||1),0);
+  const totalTickets=paid.reduce((s,b)=>s+Number(b.seats||b.tickets||1),0);
   document.getElementById('bkTotal').textContent=allBookings.length;
   document.getElementById('bkRevenue').textContent=money(totalRev);
   document.getElementById('bkTickets').textContent=totalTickets;
@@ -654,10 +663,10 @@ function renderBookingStats(){
 
   const ticketMap={};
   paid.forEach(b=>{
-    const tn=b.ticketName||b.ticket||'General';
+    const tn=b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
     if(!ticketMap[tn]) ticketMap[tn]={rev:0,sold:0,bookings:0};
     ticketMap[tn].rev+=Number(b.amount||0);
-    ticketMap[tn].sold+=Number(b.tickets||b.seats||1);
+    ticketMap[tn].sold+=Number(b.seats||b.tickets||1);
     ticketMap[tn].bookings++;
   });
   const topT=Object.entries(ticketMap).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3);
@@ -677,8 +686,8 @@ function renderBookings(){
   const q=(document.getElementById('bkSearch')?.value||'').trim().toLowerCase();
   let rows=allBookings;
   if(q) rows=rows.filter(b=>{
-    const n=(b.buyerName||b.customer?.name||'').toLowerCase();
-    const p=(b.buyerPhone||b.customer?.phone||'').toLowerCase();
+    const n=(b.customer?.name||b.buyerName||'').toLowerCase();
+    const p=(b.customer?.phone||b.buyerPhone||'').toLowerCase();
     const t=(b.transactionId||b.id||'').toLowerCase();
     return n.includes(q)||p.includes(q)||t.includes(q);
   });
@@ -686,14 +695,14 @@ function renderBookings(){
   const tbody=document.getElementById('bkTableBody');
   if(!rows.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--muted);">No bookings found</td></tr>';return;}
   tbody.innerHTML=rows.map(b=>{
-    const name=b.buyerName||b.customer?.name||'Guest';
-    const phone=b.buyerPhone||b.customer?.phone||'';
+    const name=b.customer?.name||b.buyerName||'Guest';
+    const phone=b.customer?.phone||b.buyerPhone||'';
     const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const color=avatarColor(name);
-    const tn=b.ticketName||b.ticket||'General';
-    const tq=b.tickets||b.seats||1;
+    const tn=b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
+    const tq=b.seats||b.tickets||1;
     const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'--';
-    const st=(b.status||'pending').toLowerCase();
+    const st=normBookingStatus(b.status||'pending');
     const src=b.source||b.utm_source||'ORGANIC / DIRE...';
     const sd=b.slotDate||b.eventDate||'';
     const st2=b.slotTime||b.startTime||'';
@@ -703,7 +712,7 @@ function renderBookings(){
       +'<td style="font-weight:700;">'+(b.amount?money(b.amount):'Free')+'</td>'
       +'<td><div style="font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:.15rem;">'+esc(src.toUpperCase())+'</div><div style="font-size:.82rem;">'+date+'</div></td>'
       +'<td><span class="pill '+st+'">'+st+'</span></td>'
-      +'<td><button onclick="openBookingMenu(''+b.id+'')" style="padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:.8rem;">&#8943;</button></td>'
+      +'<td><button onclick="openBookingMenu(\''+b.id+'\')" style="padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:.8rem;">&#8943;</button></td>'
       +'</tr>';
   }).join('');
 }
@@ -718,7 +727,7 @@ window.exportBookings=function(){
   const rows=[['Name','Phone','Ticket','Qty','Amount','Status','Date','Source']];
   allBookings.forEach(b=>{
     const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN'):'';
-    rows.push([b.buyerName||b.customer?.name||'',b.buyerPhone||b.customer?.phone||'',b.ticketName||b.ticket||'General',b.tickets||b.seats||1,b.amount||0,b.status||'pending',date,b.source||'direct']);
+    rows.push([b.customer?.name||b.buyerName||'',b.customer?.phone||b.buyerPhone||'',b.ticketName||b.customer?.ticket||b.event?.ticketName||'General',b.seats||b.tickets||1,b.amount||0,normBookingStatus(b.status||'pending'),date,b.source||'direct']);
   });
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');
@@ -732,7 +741,7 @@ document.getElementById('bkSearch').addEventListener('input',renderBookings);
 window.checkInTicket=async function(){
   const val=document.getElementById('ciInput').value.trim();
   if(!val){showToast('Enter a ticket ID');return;}
-  const b=allBookings.find(x=>x.id===val||x.ticketId===val);
+  const b=allBookings.find(x=>x.id===val||x.bookingId===val||x.ticketId===val);
   if(!b){showToast('Ticket not found');return;}
   if(b.checkedIn){showToast('Already checked in!');return;}
   await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp()});
@@ -745,11 +754,11 @@ function renderAnalytics(){
   const cutoff=new Date(now-anPeriod*86400000);
   const s=cutoff.toLocaleDateString('en-IN',{year:'numeric',month:'2-digit',day:'2-digit'});
   const e=now.toLocaleDateString('en-IN',{year:'numeric',month:'2-digit',day:'2-digit'});
-  document.getElementById('anDateRange').textContent='&#128197; '+s+' — '+e;
+  document.getElementById('anDateRange').textContent='📅 '+s+' — '+e;
   const cur=allBookings.filter(b=>{const d=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return d>=cutoff;});
-  const paid=cur.filter(b=>(b.status||'').toLowerCase()==='paid');
-  const failed=cur.filter(b=>(b.status||'').toLowerCase()==='failed');
-  const pending=cur.filter(b=>(b.status||'').toLowerCase()==='pending');
+  const paid=cur.filter(b=>normBookingStatus(b.status)==='paid');
+  const failed=cur.filter(b=>normBookingStatus(b.status)==='failed');
+  const pending=cur.filter(b=>normBookingStatus(b.status)==='pending');
   const totalRev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
   const failedRev=failed.reduce((s,b)=>s+Number(b.amount||0),0);
   const pendingRev=pending.reduce((s,b)=>s+Number(b.amount||0),0);
@@ -768,14 +777,14 @@ function renderAnalytics(){
   document.getElementById('anActiveCarts').textContent=pending.length;
   document.getElementById('anActiveCartsRev').textContent=money(pendingRev)+' pending';
   document.getElementById('anExpired').textContent=0;
-  document.getElementById('anExpiredRev').textContent='₹0 lost';
+  document.getElementById('anExpiredRev').textContent=money(0)+' lost';
   document.getElementById('fnViews').textContent=views;
   document.getElementById('fnClicks').textContent=clicks;
   document.getElementById('fnTicketSel').textContent=clicks;
   document.getElementById('fnCheckout').textContent=cur.length;
   document.getElementById('fnPaid').textContent=paid.length;
   const drop1=views>0?Math.round((1-clicks/views)*100):0;
-  document.getElementById('fnDrop1').textContent=drop1>0?'↘ '+drop1+'% drop-off':'';
+  document.getElementById('fnDrop1').textContent=drop1>0?'\u2198 '+drop1+'% drop-off':'';
   const days=Math.min(anPeriod,14);
   const labels=[];const bookData=[];
   for(let i=days-1;i>=0;i--){
@@ -790,7 +799,7 @@ function renderAnalytics(){
   const abandonedEl=document.getElementById('abandonedList');
   if(pending.length){
     abandonedEl.innerHTML=pending.slice(0,10).map(b=>{
-      const name=b.buyerName||b.customer?.name||'Guest';
+      const name=b.customer?.name||b.buyerName||'Guest';
       const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'--';
       return '<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-bottom:1px solid var(--border);"><div style="width:34px;height:34px;border-radius:50%;background:'+avatarColor(name)+';display:grid;place-items:center;font-size:.78rem;font-weight:800;color:#fff;flex:none;">'+name.slice(0,2).toUpperCase()+'</div><div style="flex:1;"><div style="font-size:.86rem;font-weight:700;">'+esc(name)+'</div><div style="font-size:.74rem;color:var(--muted);">'+date+'</div></div><div style="font-size:.84rem;font-weight:700;color:#e67700;">'+(b.amount?money(b.amount):'--')+'</div><span class="pill pending">pending</span></div>';
     }).join('');
