@@ -320,9 +320,13 @@
           const empty = document.getElementById('indexEventsEmpty');
           let snap;
           try {
-            snap = await _idb.collection('events').orderBy('createdAt', 'desc').limit(100).get();
+            snap = await _idb.collection('events').where('status', '==', 'published').orderBy('createdAt', 'desc').limit(100).get();
           } catch (e) {
-            snap = await _idb.collection('events').limit(100).get();
+            try {
+              snap = await _idb.collection('events').where('status', '==', 'published').limit(100).get();
+            } catch (inner) {
+              snap = await _idb.collection('events').limit(100).get();
+            }
           }
           const docs = snap.docs
             .filter((doc) => isPublishedEvent(doc.data()))
