@@ -958,10 +958,11 @@
           });
           window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
             + "&event=" + encodeURIComponent(item.name)
-            + "&amount=Free"
+            + "&amount=0"
             + "&status=Confirmed"
             + "&type=" + bookingType;
         }).catch(err => {
+          console.error("Free booking failed:", err);
           statusText.textContent = err.message || "Could not create free booking";
           statusText.className   = "bk-status-pill failed";
         });
