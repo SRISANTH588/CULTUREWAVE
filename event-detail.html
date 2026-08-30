@@ -7,24 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
   <style>
     :root{--blue:#1242c5;--blue-2:#2f6bff;--green:#10b981;--red:#ef4444;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
+    body{background:#f4f8ff;font-size:14px;}
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:Manrope,sans-serif;background:#f4f8ff;color:var(--text);font-size:14px;}
     a{text-decoration:none;color:inherit;}
     button{font:inherit;cursor:pointer;}
-
-    /* TOP NAV */
-    .topnav{background:rgba(255,255,255,.94);border-bottom:1px solid var(--border);padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;backdrop-filter:blur(18px);box-shadow:0 2px 16px rgba(18,66,197,.06);}
-    .brand{display:flex;align-items:center;gap:.55rem;}
-    .brand-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.9rem;font-weight:900;color:#fff;box-shadow:0 4px 12px rgba(18,66,197,.28);}
-    .brand-name{font-size:1.05rem;font-weight:900;letter-spacing:-.04em;color:var(--text);}
-    .nav-actions{display:flex;gap:.6rem;}
-    .btn{border:0;border-radius:12px;padding:.55rem 1rem;font-weight:800;font-size:.82rem;display:inline-flex;align-items:center;gap:.35rem;cursor:pointer;transition:transform .15s,box-shadow .15s;}
-    .btn-primary{background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;box-shadow:0 6px 18px rgba(18,66,197,.3);}
-    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(18,66,197,.4);}
-    .btn-ghost{background:#fff;color:var(--text);border:1.5px solid var(--border);}
-    .btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
 
     /* LAYOUT */
     .shell{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start;}
@@ -112,14 +101,40 @@
 </head>
 <body>
 
-<nav class="topnav">
-  <a class="brand" href="index.html">
-    <div class="brand-icon">🌊</div>
-    <span class="brand-name">CultureWave</span>
-  </a>
-  <div class="nav-actions">
-    <button class="btn btn-ghost" id="navShareBtn" onclick="openShare()">🔗 Share</button>
-    <a class="btn btn-ghost" id="navEditBtn" href="#" style="display:none;">✏️ Edit Event</a>
+<header class="topbar">
+  <div class="nav-wrap">
+    <div class="brand-block">
+      <div class="logo">CultureWave</div>
+      <div class="brand-sub">by OGSHOOTS LUXE</div>
+    </div>
+    <nav class="topnav">
+      <a href="events.html">Events</a>
+      <a href="restaurants.html">Restaurants</a>
+      <a href="features.html">Features</a>
+      <a href="pricing.html">Pricing</a>
+    </nav>
+    <div class="auth-actions">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="login.html">Get Started</a>
+    </div>
+    <div style="display:flex;gap:.6rem;margin-left:auto;align-items:center;">
+      <button class="btn btn-ghost" id="navShareBtn" onclick="openShare()">🔗 Share</button>
+      <a class="btn btn-ghost" id="navEditBtn" href="#" style="display:none;">✏️ Edit</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <a href="events.html">Events</a>
+  <a href="restaurants.html">Restaurants</a>
+  <a href="features.html">Features</a>
+  <a href="pricing.html">Pricing</a>
+  <div class="mobile-nav-ctas">
+    <a class="nav-link" href="login.html">Login</a>
+    <a class="nav-cta" href="login.html">Get Started</a>
   </div>
 </nav>
 
@@ -409,6 +424,18 @@ async function init(){
 document.getElementById('shareModal').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeShare(); });
 
 init();
+</script>
+<script>
+  const ham = document.getElementById('hamburger');
+  const mNav = document.getElementById('mobileNav');
+  if(ham) ham.addEventListener('click', () => {
+    ham.classList.toggle('open');
+    mNav.classList.toggle('open');
+    document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
+  });
+  if(mNav) mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    ham.classList.remove('open'); mNav.classList.remove('open'); document.body.style.overflow = '';
+  }));
 </script>
 </body>
 </html>

@@ -7,10 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
   <style>
     :root{--blue:#1242c5;--blue-2:#2f6bff;--green:#10b981;--red:#ef4444;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
+    body{background:#f4f8ff;font-size:14px;min-height:100vh;}
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:Manrope,sans-serif;background:#f4f8ff;color:var(--text);font-size:14px;min-height:100vh;}
     a{text-decoration:none;color:inherit;}
     button{font:inherit;cursor:pointer;}
 
@@ -94,6 +95,39 @@
   </style>
 </head>
 <body>
+
+<header class="topbar">
+  <div class="nav-wrap">
+    <div class="brand-block">
+      <div class="logo">CultureWave</div>
+      <div class="brand-sub">by OGSHOOTS LUXE</div>
+    </div>
+    <nav class="topnav">
+      <a href="events.html">Events</a>
+      <a href="restaurants.html">Restaurants</a>
+      <a href="features.html">Features</a>
+      <a href="pricing.html">Pricing</a>
+    </nav>
+    <div class="auth-actions">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="login.html">Get Started</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <a href="events.html">Events</a>
+  <a href="restaurants.html">Restaurants</a>
+  <a href="features.html">Features</a>
+  <a href="pricing.html">Pricing</a>
+  <div class="mobile-nav-ctas">
+    <a class="nav-link" href="login.html">Login</a>
+    <a class="nav-cta" href="login.html">Get Started</a>
+  </div>
+</nav>
 
 <div class="banner">
   <button class="banner-edit" id="bannerEditBtn">✏️ Edit Profile</button>
@@ -310,6 +344,18 @@ async function init(){
 }
 
 init();
+</script>
+<script>
+  const ham = document.getElementById('hamburger');
+  const mNav = document.getElementById('mobileNav');
+  if(ham) ham.addEventListener('click', () => {
+    ham.classList.toggle('open');
+    mNav.classList.toggle('open');
+    document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
+  });
+  if(mNav) mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    ham.classList.remove('open'); mNav.classList.remove('open'); document.body.style.overflow = '';
+  }));
 </script>
 </body>
 </html>
