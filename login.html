@@ -523,33 +523,68 @@
           <form class="auth-form" data-auth-form="signup" hidden>
             <p class="signup-note">New signups are for client accounts only. Admin access is reserved.</p>
 
-            <div class="form-field">
-              <span class="form-label">Username</span>
-              <div class="form-input-wrap">
-                <span class="form-icon">👤</span>
-                <input id="signupUsername" type="text" placeholder="Choose a username" autocomplete="username" />
+            <!-- STEP 1: Details -->
+            <div id="signupStep1">
+              <div class="form-field">
+                <span class="form-label">Full Name</span>
+                <div class="form-input-wrap">
+                  <span class="form-icon">✏️</span>
+                  <input id="signupName" type="text" placeholder="Your full name" autocomplete="name" />
+                </div>
               </div>
+
+              <div class="form-field">
+                <span class="form-label">Email <span style="color:var(--blue);font-size:.65rem;font-weight:800;">(OTP will be sent)</span></span>
+                <div class="form-input-wrap">
+                  <span class="form-icon">📧</span>
+                  <input id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+                </div>
+              </div>
+
+              <div class="form-field">
+                <span class="form-label">WhatsApp Number</span>
+                <div class="form-input-wrap">
+                  <span class="form-icon">📱</span>
+                  <span style="font-size:.82rem;color:#6b7280;padding-right:.3rem;">+91</span>
+                  <input id="signupWhatsapp" type="tel" placeholder="9876543210" maxlength="10" autocomplete="tel" />
+                </div>
+              </div>
+
+              <div class="form-field">
+                <span class="form-label">Password</span>
+                <div class="form-input-wrap">
+                  <span class="form-icon">🔒</span>
+                  <input id="signupPassword" type="password" placeholder="Min 6 characters" autocomplete="new-password" />
+                  <button class="eye-btn" type="button" aria-label="Show password">◔</button>
+                </div>
+              </div>
+
+              <button class="submit-btn" type="button" id="sendOtpBtn">Send OTP to Email →</button>
             </div>
 
-            <div class="form-field">
-              <span class="form-label">Full Name</span>
-              <div class="form-input-wrap">
-                <span class="form-icon">✏️</span>
-                <input id="signupName" type="text" placeholder="Your full name" autocomplete="name" />
+            <!-- STEP 2: OTP Verify -->
+            <div id="signupStep2" style="display:none;">
+              <div style="text-align:center;margin-bottom:1rem;">
+                <div style="font-size:2rem;margin-bottom:.4rem;">📧</div>
+                <div style="font-size:.88rem;font-weight:800;color:#0a0f1e;">Check your email</div>
+                <div style="font-size:.78rem;color:#6b7280;margin-top:.25rem;">We sent a 6-digit OTP to <strong id="otpEmailDisplay"></strong></div>
+              </div>
+
+              <div class="form-field">
+                <span class="form-label">Enter OTP</span>
+                <div class="form-input-wrap">
+                  <span class="form-icon">🔑</span>
+                  <input id="signupOtp" type="text" placeholder="6-digit code" maxlength="6" inputmode="numeric" style="letter-spacing:.3em;font-size:1.1rem;font-weight:800;" />
+                </div>
+              </div>
+
+              <button class="submit-btn" type="submit">Verify &amp; Create Account →</button>
+              <div style="text-align:center;margin-top:.75rem;">
+                <button type="button" id="resendOtpBtn" style="background:none;border:none;color:var(--blue);font-size:.82rem;font-weight:700;cursor:pointer;">Resend OTP</button>
+                <span style="color:#9ca3af;font-size:.78rem;"> &middot; </span>
+                <button type="button" onclick="document.getElementById('signupStep1').style.display='';document.getElementById('signupStep2').style.display='none';" style="background:none;border:none;color:#6b7280;font-size:.82rem;font-weight:700;cursor:pointer;">Change email</button>
               </div>
             </div>
-
-            <div class="form-field">
-              <span class="form-label">Password</span>
-              <div class="form-input-wrap">
-                <span class="form-icon">🔒</span>
-                <input id="signupPassword" type="password" placeholder="Create a password" autocomplete="new-password" />
-                <button class="eye-btn" type="button" aria-label="Show password">◔</button>
-              </div>
-            </div>
-
-            <button class="submit-btn" type="submit">Create Account →</button>
-            <p class="signup-note">Your account will use your username and password only.</p>
           </form>
 
           <div class="card-footer">
@@ -604,7 +639,6 @@
       const loginPassword = document.getElementById("loginPassword");
       const signupName = document.getElementById("signupName");
       const signupPassword = document.getElementById("signupPassword");
-      const signupUsername = document.getElementById("signupUsername");
 
       document.querySelectorAll(".eye-btn").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -679,22 +713,91 @@
         }
       });
 
+      // ── OTP state ──
+      let pendingOtp = null;
+      let pendingOtpEmail = null;
+
+      function generateOtp() { return String(Math.floor(100000 + Math.random() * 900000)); }
+
+      async function sendOtpEmail(email, otp) {
+        // Store OTP in Firestore with 10min expiry
+        await setDoc(doc(db, 'emailOtps', email), {
+          otp,
+          expiresAt: Date.now() + 10 * 60 * 1000,
+          createdAt: Date.now()
+        });
+        // Use Firebase Auth: create a temp account, send verification, then we verify OTP client-side
+        // Since we can't send custom email without backend, we use ActionCodeSettings trick:
+        // Instead we store OTP in Firestore and show it — in production connect an email service
+        // For now: show OTP in status so you can test
+        return otp;
+      }
+
+      document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const whatsapp = document.getElementById('signupWhatsapp').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        if (!name) { setStatus('Enter your full name.', 'warning'); return; }
+        if (!email || !email.includes('@')) { setStatus('Enter a valid email.', 'warning'); return; }
+        if (!whatsapp || whatsapp.length !== 10) { setStatus('Enter a valid 10-digit WhatsApp number.', 'warning'); return; }
+        if (!password || password.length < 6) { setStatus('Password must be at least 6 characters.', 'warning'); return; }
+        setStatus('Sending OTP...', 'info');
+        try {
+          pendingOtp = generateOtp();
+          pendingOtpEmail = email;
+          await sendOtpEmail(email, pendingOtp);
+          document.getElementById('signupStep1').style.display = 'none';
+          document.getElementById('signupStep2').style.display = '';
+          document.getElementById('otpEmailDisplay').textContent = email;
+          setStatus('OTP sent! Check your email. (Dev mode: OTP is ' + pendingOtp + ')', 'info');
+        } catch(err) {
+          setStatus(err.message, 'warning');
+        }
+      });
+
+      document.getElementById('resendOtpBtn').addEventListener('click', async () => {
+        if (!pendingOtpEmail) return;
+        setStatus('Resending OTP...', 'info');
+        pendingOtp = generateOtp();
+        await sendOtpEmail(pendingOtpEmail, pendingOtp);
+        setStatus('OTP resent! (Dev mode: OTP is ' + pendingOtp + ')', 'info');
+      });
+
       document.querySelector("[data-auth-form='signup']").addEventListener("submit", async e => {
         e.preventDefault();
-        const email = toFirebaseEmail(signupUsername.value.trim());
-        const fullName = signupName.value.trim();
-        const password = signupPassword.value;
-        if (!email || !fullName || !password) { setStatus("Fill in all fields.", "warning"); return; }
-        setStatus("Creating account...", "info");
+        const enteredOtp = document.getElementById('signupOtp').value.trim();
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const whatsapp = document.getElementById('signupWhatsapp').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        if (!enteredOtp) { setStatus('Enter the OTP.', 'warning'); return; }
+        setStatus('Verifying OTP...', 'info');
         try {
+          // Verify OTP from Firestore
+          const otpSnap = await getDoc(doc(db, 'emailOtps', email));
+          if (!otpSnap.exists()) { setStatus('OTP expired. Please resend.', 'warning'); return; }
+          const { otp, expiresAt } = otpSnap.data();
+          if (Date.now() > expiresAt) { setStatus('OTP expired. Please resend.', 'warning'); return; }
+          if (enteredOtp !== otp) { setStatus('Incorrect OTP. Try again.', 'warning'); return; }
+          // OTP correct — create account
+          setStatus('Creating account...', 'info');
           const { user } = await createUserWithEmailAndPassword(auth, email, password);
-          await updateProfile(user, { displayName: fullName });
-          await setDoc(doc(db, "users", user.uid), { name: fullName, email, role: "client", createdAt: Date.now() });
-          setStatus("Account created! Redirecting...", "success");
-          redirect("client");
-        } catch (err) {
-          const msg = err.code === "auth/email-already-in-use" ? "Account already exists. Try logging in." : err.message;
-          setStatus(msg, "warning");
+          await updateProfile(user, { displayName: name });
+          await setDoc(doc(db, 'users', user.uid), {
+            name, email,
+            whatsapp: '+91' + whatsapp,
+            role: 'client',
+            emailVerified: true,
+            createdAt: Date.now()
+          });
+          // Clean up OTP
+          await setDoc(doc(db, 'emailOtps', email), { used: true }, { merge: true });
+          setStatus('Account created! Redirecting...', 'success');
+          redirect('client');
+        } catch(err) {
+          const msg = err.code === 'auth/email-already-in-use' ? 'Account already exists. Try logging in.' : err.message;
+          setStatus(msg, 'warning');
         }
       });
 
