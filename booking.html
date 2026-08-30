@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CultureWave | Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+      body { background: #fff; }
+      .book-hero {
+        background: linear-gradient(135deg, #f0f5ff 0%, #e8f0fe 60%, #fff 100%);
+        border-bottom: 1px solid #e2eafc;
+        padding: 3.5rem 0 3rem;
+        text-align: center;
+      }
+      .book-hero-inner { max-width: 700px; margin: 0 auto; padding: 0 1.4rem; }
+      .book-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(18,66,197,0.08);
+        border: 1px solid rgba(18,66,197,0.2);
+        border-radius: 999px;
+        padding: 0.32rem 0.9rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #1242c5;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .book-hero h1 {
+        margin: 0 0 0.8rem;
+        font-size: clamp(2.4rem, 5vw, 3.8rem);
+        font-weight: 800;
+        letter-spacing: -0.06em;
+        color: #0a0f1e;
+      }
+      .book-hero h1 span { color: #1242c5; }
+      .book-hero p { margin: 0; color: #5a6480; font-size: 1rem; line-height: 1.7; }
+      .book-wrap { max-width: 1240px; margin: 0 auto; padding: 0 1.4rem; }
+      .book-section { padding: 3rem 0; }
+      .book-grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.95fr;
+        gap: 1.6rem;
+        align-items: start;
+      }
+      .book-card {
+        border: 1.5px solid #e8edf8;
+        border-radius: 24px;
+        padding: 1.8rem;
+        background: #fff;
+        box-shadow: 0 4px 24px rgba(18,66,197,0.07);
+      }
+      .book-title { font-size: 1.3rem; font-weight: 800; color: #0a0f1e; margin: 0 0 0.3rem; }
+      .book-sub { color: #6b7280; font-size: 0.88rem; margin: 0 0 1.4rem; }
+      .book-form { display: grid; gap: 1rem; }
+      .book-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+      .book-label { display: grid; gap: 0.4rem; }
+      .book-label span {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #5f6f95;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .book-input, .book-select {
+        padding: 0.8rem 1rem;
+        border: 1.5px solid #d0d9f0;
+        border-radius: 12px;
+        background: #f7faff;
+        color: #0f172a;
+        font-size: 0.9rem;
+        font-family: inherit;
+        outline: none;
+      }
+      .book-input:focus, .book-select:focus { border-color: #1242c5; background: #fff; }
+      .book-methods { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+      .book-method {
+        flex: 1;
+        min-width: 80px;
+        border: 1.5px solid #d0d9f0;
+        border-radius: 14px;
+        padding: 0.75rem 0.5rem;
+        background: #f7faff;
+        text-align: center;
+        cursor: pointer;
+      }
+      .book-method input { display: none; }
+      .book-method .icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+      .book-method .label { font-size: 0.78rem; font-weight: 800; color: #4a5580; }
+      .book-method.selected { border-color: #1242c5; background: #f0f5ff; box-shadow: 0 0 0 3px rgba(18,66,197,0.1); }
+      .summary {
+        background: #f7faff;
+        border: 1.5px solid #e2eafc;
+        border-radius: 16px;
+        padding: 1rem 1.2rem;
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.45rem 0;
+        font-size: 0.9rem;
+        color: #374151;
+        font-weight: 600;
+        border-bottom: 1px solid #edf0f8;
+      }
+      .summary-row:last-child { border-bottom: none; }
+      .summary-row.total { font-size: 1rem; font-weight: 800; color: #0a0f1e; }
+      .summary-row.total strong { color: #1242c5; font-size: 1.1rem; }
+      .book-btn {
+        width: 100%;
+        padding: 1rem;
+        border: 0;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1242c5, #2f6bff);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(18,66,197,0.28);
+        margin-top: 0.4rem;
+      }
+      .receipt {
+        border: 1.5px solid #e8edf8;
+        border-radius: 24px;
+        padding: 1.6rem;
+        background: #fff;
+        box-shadow: 0 4px 24px rgba(18,66,197,0.07);
+        position: sticky;
+        top: 5.5rem;
+      }
+      .receipt-banner {
+        height: 110px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1242c5, #4f8ef7);
+        margin-bottom: 1.2rem;
+        display: grid;
+        place-items: center;
+        font-size: 2rem;
+      }
+      .receipt-title { font-size: 1.1rem; font-weight: 800; color: #0a0f1e; margin: 0 0 0.2rem; }
+      .receipt-venue { font-size: 0.82rem; color: #6b7280; font-weight: 600; margin: 0 0 1rem; }
+      .receipt-rows { display: grid; gap: 0.5rem; margin-bottom: 1.2rem; }
+      .receipt-row { display: flex; justify-content: space-between; font-size: 0.88rem; color: #374151; font-weight: 600; }
+      .receipt-row strong { color: #0a0f1e; }
+      .receipt-status { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+      .receipt-status.success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+      .receipt-divider { border: none; border-top: 1.5px dashed #e2eafc; margin: 1rem 0; }
+      .receipt-total { display: flex; justify-content: space-between; font-weight: 800; font-size: 1rem; color: #0a0f1e; }
+      .receipt-total span { color: #1242c5; font-size: 1.15rem; }
+      @media (max-width: 900px) {
+        .book-grid { grid-template-columns: 1fr; }
+        .receipt { position: static; }
+        .book-row { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="nav-wrap">
+        <div class="brand-block">
+          <div class="logo">CultureWave</div>
+          <div class="brand-sub">by OGSHOOTS LUXE</div>
+        </div>
+        <nav class="topnav">
+          <a href="index.html">Home</a>
+          <a href="events.html">Events</a>
+          <a href="features.html">Features</a>
+          <a href="how-it-works.html">How it works</a>
+        </nav>
+        <div class="auth-actions">
+          <a class="nav-link" href="login.html">Login</a>
+          <a class="nav-cta" href="login.html">Get Started</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="book-hero">
+        <div class="book-hero-inner">
+          <div class="book-badge">🎟️ Booking</div>
+          <h1>Book seats <span>instantly</span></h1>
+          <p>Choose an event, add your details, pick a payment method, and confirm your booking in one focused flow.</p>
+        </div>
+      </section>
+
+      <section class="book-section">
+        <div class="book-wrap">
+          <div class="book-grid">
+            <div class="book-card">
+              <p class="book-title">Complete your booking</p>
+              <p class="book-sub">Fill in your details and choose a payment method to confirm your seat.</p>
+              <form class="book-form" id="bookForm">
+                <div class="book-label">
+                  <span>Select Event</span>
+                  <select class="book-select" id="bookEventSelect">
+                    <option value="himtex">HIMTEX 2026 - Free</option>
+                    <option value="nullcon">Nullcon Hyderabad 2026 - ₹2,499</option>
+                    <option value="sportexpo">Sport Expo India - ₹499</option>
+                    <option value="credai">CREDAI Property Show - Free</option>
+                    <option value="design">Design Democracy 2026 - ₹999</option>
+                  </select>
+                </div>
+                <div class="book-row">
+                  <label class="book-label">
+                    <span>Your Name</span>
+                    <input class="book-input" type="text" placeholder="Full name" id="bookName" required />
+                  </label>
+                  <label class="book-label">
+                    <span>Email</span>
+                    <input class="book-input" type="email" placeholder="you@example.com" id="bookEmail" required />
+                  </label>
+                </div>
+                <div class="book-row">
+                  <label class="book-label">
+                    <span>Phone</span>
+                    <input class="book-input" type="tel" placeholder="10-digit number" id="bookPhone" />
+                  </label>
+                  <label class="book-label">
+                    <span>Seats / Passes</span>
+                    <input class="book-input" type="number" min="1" max="10" value="1" id="bookSeats" />
+                  </label>
+                </div>
+                <div class="book-label">
+                  <span>Payment Method</span>
+                  <div class="book-methods">
+                    <label class="book-method selected">
+                      <input type="radio" name="bookMethod" value="upi" checked />
+                      <span class="icon">📱</span>
+                      <span class="label">UPI</span>
+                    </label>
+                    <label class="book-method">
+                      <input type="radio" name="bookMethod" value="qr" />
+                      <span class="icon">📷</span>
+                      <span class="label">QR Scan</span>
+                    </label>
+                    <label class="book-method">
+                      <input type="radio" name="bookMethod" value="card" />
+                      <span class="icon">💳</span>
+                      <span class="label">Card</span>
+                    </label>
+                    <label class="book-method">
+                      <input type="radio" name="bookMethod" value="wallet" />
+                      <span class="icon">👛</span>
+                      <span class="label">Wallet</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="summary">
+                  <div class="summary-row"><span>Ticket price</span><span id="pricePerTicket">₹0</span></div>
+                  <div class="summary-row"><span>Seats</span><span id="seatCount">1</span></div>
+                  <div class="summary-row"><span>Subtotal</span><span id="subtotalAmt">₹0</span></div>
+                  <div class="summary-row"><span>Booking charge</span><span id="feeAmt">₹0</span></div>
+                  <div class="summary-row total"><span>Grand Total</span><strong id="grandAmt">₹0</strong></div>
+                </div>
+                <button class="book-btn" type="submit">Book Now →</button>
+              </form>
+            </div>
+
+            <aside class="receipt">
+              <div class="receipt-banner" id="receiptBanner">🎟️</div>
+              <p class="receipt-title" id="receiptEventName">HIMTEX 2026</p>
+              <p class="receipt-venue" id="receiptVenue">HITEX Exhibition Centre, Hyderabad</p>
+              <div class="receipt-rows">
+                <div class="receipt-row"><span>Buyer</span><strong id="rName">—</strong></div>
+                <div class="receipt-row"><span>Seats</span><strong id="rSeats">1</strong></div>
+                <div class="receipt-row"><span>Method</span><strong id="rMethod">UPI</strong></div>
+                <div class="receipt-row"><span>Date</span><strong id="rDate">—</strong></div>
+                <div class="receipt-row"><span>Status</span><span class="receipt-status" id="rStatus">⏳ Pending</span></div>
+              </div>
+              <hr class="receipt-divider" />
+              <div class="receipt-total"><span>Total</span><span id="rTotal">₹0</span></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-wrap">
+        <div class="footer-branding">
+          <div class="footer-brand">CultureWave</div>
+          <p>Events, workshops, and restaurant bookings in one smooth flow.</p>
+          <span class="footer-tag">Developed by Srisanth Boddu</span>
+        </div>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="events.html">Events</a>
+          <a href="features.html">Features</a>
+          <a href="booking.html">Booking</a>
+          <a href="privacy-policy.html">Privacy Policy</a>
+          <a href="terms-and-conditions.html">Terms & Conditions</a>
+          <a href="refund-policy.html">Refund Policy</a>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact</h3>
+          <a href="tel:+916305183601">6305183601</a>
+          <span>Contact details will be updated from the admin panel.</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 CultureWave. All rights reserved.</span>
+        <span>Built for events, workshops, and restaurant reservations.</span>
+      </div>
+    </footer>
+
+    <script>
+      const eventData = {
+        himtex: { name: "HIMTEX 2026", venue: "HITEX Exhibition Centre, Hyderabad", price: 0, emoji: "🏛️" },
+        nullcon: { name: "Nullcon Hyderabad 2026", venue: "Novotel Hyderabad Convention Centre", price: 2499, emoji: "🔐" },
+        sportexpo: { name: "Sport Expo India", venue: "HITEX, Hyderabad", price: 499, emoji: "🏅" },
+        credai: { name: "CREDAI Property Show", venue: "HITEX, Hyderabad", price: 0, emoji: "🏠" },
+        design: { name: "Design Democracy 2026", venue: "Le Hesthia Design LLP, Hyderabad", price: 999, emoji: "🎨" },
+      };
+
+      const fmt = (n) => (n === 0 ? "Free" : "₹" + n.toLocaleString("en-IN"));
+      const sel = document.getElementById("bookEventSelect");
+      const seats = document.getElementById("bookSeats");
+      const ppt = document.getElementById("pricePerTicket");
+      const sc = document.getElementById("seatCount");
+      const sub = document.getElementById("subtotalAmt");
+      const fee = document.getElementById("feeAmt");
+      const grand = document.getElementById("grandAmt");
+      const rTotal = document.getElementById("rTotal");
+      const rSeats = document.getElementById("rSeats");
+      const rName = document.getElementById("rName");
+      const rMethod = document.getElementById("rMethod");
+      const rDate = document.getElementById("rDate");
+      const rEventName = document.getElementById("receiptEventName");
+      const rVenue = document.getElementById("receiptVenue");
+      const rBanner = document.getElementById("receiptBanner");
+      const statusText = document.getElementById("rStatus");
+
+      function updateCalc() {
+        const ev = eventData[sel.value];
+        const n = parseInt(seats.value) || 1;
+        const subtotal = ev.price * n;
+        const f = ev.price === 0 ? 0 : Math.round(subtotal * 0.05);
+        const total = subtotal + f;
+        ppt.textContent = fmt(ev.price);
+        sc.textContent = n;
+        sub.textContent = fmt(subtotal);
+        fee.textContent = fmt(f);
+        grand.textContent = fmt(total);
+        rTotal.textContent = fmt(total);
+        rSeats.textContent = n;
+        rEventName.textContent = ev.name;
+        rVenue.textContent = ev.venue;
+        rBanner.textContent = ev.emoji;
+      }
+
+      sel.addEventListener("change", updateCalc);
+      seats.addEventListener("input", updateCalc);
+      updateCalc();
+
+      document.querySelectorAll(".book-method").forEach((m) => {
+        m.addEventListener("click", () => {
+          document.querySelectorAll(".book-method").forEach((x) => x.classList.remove("selected"));
+          m.classList.add("selected");
+          rMethod.textContent = m.querySelector(".label").textContent;
+        });
+      });
+
+      document.getElementById("bookName").addEventListener("input", (e) => {
+        rName.textContent = e.target.value || "—";
+      });
+
+      rDate.textContent = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+
+      document.getElementById("bookForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        statusText.textContent = "Opening checkout...";
+        statusText.className = "receipt-status";
+        const ev = eventData[sel.value];
+        const payload = {
+          amount: Math.max(1, Math.round((ev.price * (parseInt(seats.value) || 1) + (ev.price === 0 ? 0 : Math.round(ev.price * (parseInt(seats.value) || 1) * 0.05))) * 100)),
+          merchantName: "CultureWave",
+          upiId: "merchant@upi",
+          receipt: `cv_${Date.now()}`,
+          note: `Booking for ${ev.name}`,
+          event: ev,
+          seats: parseInt(seats.value) || 1,
+          method: document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
+          customer: {
+            id: document.getElementById("bookEmail").value.trim() || document.getElementById("bookPhone").value.trim() || "guest",
+            name: document.getElementById("bookName").value.trim() || "Guest",
+            email: document.getElementById("bookEmail").value.trim(),
+            phone: document.getElementById("bookPhone").value.trim(),
+          },
+          returnUrl: `${window.location.origin}/booking.html`,
+        };
+
+        fetch("/api/bookings/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then(async (response) => {
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Booking checkout failed");
+            if (data.provider !== "razorpay" || !data.razorpayOrderId) throw new Error("Razorpay order not created");
+            statusText.textContent = "Opening Razorpay checkout...";
+            statusText.className = "receipt-status";
+            const options = {
+              key: data.keyId,
+              amount: data.amount,
+              currency: data.currency || "INR",
+              name: "CultureWave",
+              description: data.event?.name || ev.name,
+              order_id: data.razorpayOrderId,
+              handler: async function (responseData) {
+                try {
+                  const verifyResponse = await fetch("/api/bookings/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      razorpay_order_id: responseData.razorpay_order_id,
+                      razorpay_payment_id: responseData.razorpay_payment_id,
+                      razorpay_signature: responseData.razorpay_signature,
+                    }),
+                  });
+                  const verifyData = await verifyResponse.json();
+                  if (!verifyResponse.ok) throw new Error(verifyData.error || "Payment verification failed");
+                  statusText.textContent = "Payment confirmed";
+                  statusText.className = "receipt-status success";
+                  const bookingId = verifyData.bookingId || responseData.razorpay_payment_id || "booking";
+                  const eventName = encodeURIComponent(ev.name);
+                  const amountPaid = encodeURIComponent(grand.textContent);
+                  window.location.href = `success.html?bookingId=${encodeURIComponent(bookingId)}&event=${eventName}&amount=${amountPaid}&status=Confirmed`;
+                } catch (err) {
+                  statusText.textContent = err.message || "Verification failed";
+                  statusText.className = "receipt-status failed";
+                }
+              },
+              prefill: {
+                name: document.getElementById("bookName").value.trim(),
+                email: document.getElementById("bookEmail").value.trim(),
+                contact: document.getElementById("bookPhone").value.trim(),
+              },
+              notes: {
+                event: ev.name,
+                seats: String(parseInt(seats.value) || 1),
+                method: document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
+              },
+              theme: {
+                color: "#1242c5",
+              },
+              modal: {
+                ondismiss: function () {
+                  statusText.textContent = "Checkout closed";
+                  statusText.className = "receipt-status failed";
+                },
+              },
+            };
+            const razorpay = new Razorpay(options);
+            razorpay.open();
+          })
+          .catch((error) => {
+            statusText.textContent = error.message || "Payment unavailable";
+            statusText.className = "receipt-status failed";
+          });
+      });
+    </script>
+  </body>
+</html>

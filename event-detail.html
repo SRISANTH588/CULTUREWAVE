@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Event</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--blue:#1454ff;--blue-2:#4c7dff;--green:#10b981;--red:#ef4444;--border:#dbe4f0;--muted:#64748b;--text:#0f172a;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Manrope,sans-serif;background:#f4f6fb;color:var(--text);font-size:14px;}
+    a{text-decoration:none;color:inherit;}
+    button{font:inherit;cursor:pointer;}
+
+    /* TOP NAV */
+    .topnav{background:#fff;border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);}
+    .brand{display:flex;align-items:center;gap:.55rem;}
+    .brand-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.9rem;font-weight:900;color:#fff;}
+    .brand-name{font-size:1rem;font-weight:900;letter-spacing:-.04em;}
+    .nav-actions{display:flex;gap:.6rem;}
+    .btn{border:0;border-radius:12px;padding:.55rem 1rem;font-weight:800;font-size:.82rem;display:inline-flex;align-items:center;gap:.35rem;cursor:pointer;}
+    .btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff;box-shadow:0 4px 14px rgba(20,84,255,.28);}
+    .btn-ghost{background:#fff;color:var(--text);border:1.5px solid var(--border);}
+    .btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
+
+    /* LAYOUT */
+    .shell{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start;}
+
+    /* COVER */
+    .cover{width:100%;aspect-ratio:16/7;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,#1454ff,#4c7dff,#7c3aed);margin-bottom:1.75rem;position:relative;}
+    .cover img{width:100%;height:100%;object-fit:cover;}
+    .cover-placeholder{width:100%;height:100%;display:grid;place-items:center;font-size:4rem;}
+    .cover-status{position:absolute;top:1rem;left:1rem;font-size:.72rem;font-weight:900;padding:.3rem .75rem;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;}
+    .cover-status.live{background:#dcfce7;color:#166534;}
+    .cover-status.draft{background:#fff7ed;color:#b45309;}
+
+    /* EVENT META */
+    .ev-category{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:900;color:var(--blue);background:#e8f0ff;border-radius:999px;padding:.22rem .65rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;}
+    .ev-title{font-size:2rem;font-weight:900;letter-spacing:-.05em;line-height:1.2;margin-bottom:1rem;}
+    .meta-row{display:flex;align-items:center;gap:.55rem;font-size:.88rem;color:#475569;margin-bottom:.65rem;}
+    .meta-icon{width:34px;height:34px;border-radius:10px;background:#f1f5f9;border:1px solid var(--border);display:grid;place-items:center;font-size:1rem;flex:none;}
+    .meta-row strong{display:block;font-size:.88rem;font-weight:800;color:var(--text);}
+    .meta-row span{font-size:.78rem;color:var(--muted);}
+
+    /* ORGANISER CHIP */
+    .org-chip{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:#fff;border:1px solid var(--border);border-radius:16px;margin:1.5rem 0;cursor:pointer;transition:border-color .2s;}
+    .org-chip:hover{border-color:var(--blue);}
+    .org-avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-weight:900;font-size:1rem;color:#fff;flex:none;}
+    .org-info strong{display:block;font-size:.9rem;font-weight:800;}
+    .org-info span{font-size:.76rem;color:var(--muted);}
+    .org-arrow{margin-left:auto;color:var(--muted);font-size:1.1rem;}
+
+    /* DESCRIPTION */
+    .section-title{font-size:1rem;font-weight:900;letter-spacing:-.03em;margin-bottom:.75rem;padding-top:1.5rem;border-top:1px solid var(--border);}
+    .description{font-size:.9rem;color:#475569;line-height:1.75;white-space:pre-wrap;}
+
+    /* TICKET TYPES */
+    .ticket-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+    .ticket-card.featured{border-color:var(--blue);background:#f0f5ff;}
+    .ticket-name{font-size:.95rem;font-weight:800;}
+    .ticket-desc{font-size:.76rem;color:var(--muted);margin-top:.2rem;}
+    .ticket-price{font-size:1.1rem;font-weight:900;color:var(--text);white-space:nowrap;}
+    .ticket-price small{font-size:.7rem;font-weight:700;color:var(--muted);}
+
+    /* STICKY SIDEBAR */
+    .sidebar{position:sticky;top:80px;display:flex;flex-direction:column;gap:1rem;}
+    .register-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:1.5rem;box-shadow:0 8px 32px rgba(15,23,42,.08);}
+    .reg-price{font-size:1.6rem;font-weight:900;letter-spacing:-.04em;margin-bottom:.25rem;}
+    .reg-price small{font-size:.8rem;font-weight:700;color:var(--muted);}
+    .reg-meta{font-size:.78rem;color:var(--muted);margin-bottom:1.25rem;}
+    .reg-btn{width:100%;height:50px;background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff;border:0;border-radius:14px;font-size:.95rem;font-weight:900;box-shadow:0 6px 20px rgba(20,84,255,.32);margin-bottom:.75rem;transition:transform .15s;}
+    .reg-btn:hover{transform:translateY(-2px);}
+    .reg-share{width:100%;height:42px;background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:14px;font-size:.84rem;font-weight:800;}
+    .reg-share:hover{border-color:var(--blue);color:var(--blue);}
+    .reg-divider{border:0;border-top:1px solid var(--border);margin:.85rem 0;}
+    .reg-detail{display:flex;align-items:center;gap:.6rem;font-size:.8rem;color:#475569;margin-bottom:.55rem;}
+    .reg-detail-icon{font-size:1rem;width:20px;text-align:center;}
+
+    /* SHARE MODAL */
+    .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;place-items:center;z-index:50;padding:1rem;}
+    .modal-bg.open{display:grid;}
+    .modal{background:#fff;border-radius:20px;padding:1.5rem;width:min(480px,100%);box-shadow:0 24px 64px rgba(15,23,42,.2);}
+    .modal h3{font-size:1.1rem;font-weight:900;margin-bottom:1rem;}
+    .share-link{display:flex;gap:.5rem;align-items:center;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:.6rem .85rem;margin-bottom:1rem;}
+    .share-link span{flex:1;font-size:.78rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem;}
+    .share-item{border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;transition:background .15s;}
+    .share-item:hover{background:#f0f5ff;border-color:var(--blue);}
+    .share-item .si-icon{font-size:1.4rem;}
+    .share-item .si-label{font-size:.65rem;font-weight:800;color:var(--muted);margin-top:.2rem;}
+
+    /* SKELETON */
+    .skel{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+    @media(max-width:860px){
+      .shell{grid-template-columns:1fr;}
+      .sidebar{position:static;}
+    }
+    @media(max-width:480px){
+      .ev-title{font-size:1.5rem;}
+      .shell{padding:1rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html">
+    <div class="brand-icon">🌊</div>
+    <span class="brand-name">CultureWave</span>
+  </a>
+  <div class="nav-actions">
+    <button class="btn btn-ghost" id="navShareBtn" onclick="openShare()">🔗 Share</button>
+    <a class="btn btn-ghost" id="navEditBtn" href="#" style="display:none;">✏️ Edit Event</a>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- LEFT COLUMN -->
+  <div>
+    <div class="cover" id="coverEl">
+      <div class="cover-placeholder">🎉</div>
+    </div>
+
+    <div class="ev-category" id="evCategory">🎪 Event</div>
+    <h1 class="ev-title" id="evTitle">Loading event...</h1>
+
+    <div class="meta-row">
+      <div class="meta-icon">📅</div>
+      <div><strong id="evDate">—</strong><span id="evTime"></span></div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-icon">📍</div>
+      <div><strong id="evVenue">—</strong><span id="evCity"></span></div>
+    </div>
+    <div class="meta-row" id="evCapacityRow" style="display:none;">
+      <div class="meta-icon">👥</div>
+      <div><strong id="evCapacity">—</strong><span>Capacity</span></div>
+    </div>
+
+    <!-- ORGANISER -->
+    <div class="org-chip" id="orgChip" onclick="goToProfile()">
+      <div class="org-avatar" id="orgAvatar">🎪</div>
+      <div class="org-info">
+        <strong id="orgName">Organiser</strong>
+        <span>View all events →</span>
+      </div>
+      <span class="org-arrow">›</span>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div id="descSection" style="display:none;">
+      <div class="section-title">About this event</div>
+      <div class="description" id="evDesc"></div>
+    </div>
+
+    <!-- TICKETS -->
+    <div id="ticketsSection" style="display:none;">
+      <div class="section-title">Tickets</div>
+      <div id="ticketsList"></div>
+    </div>
+
+    <!-- FAQS -->
+    <div id="faqsSection" style="display:none;">
+      <div class="section-title">FAQs</div>
+      <div id="faqsList"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="sidebar">
+    <div class="register-card">
+      <div class="reg-price" id="regPrice">Free</div>
+      <div class="reg-meta" id="regMeta">Register to attend</div>
+      <button class="reg-btn" id="regBtn" onclick="register()">Register Now 🎉</button>
+      <button class="reg-share" onclick="openShare()">🔗 Share Event</button>
+      <hr class="reg-divider"/>
+      <div class="reg-detail"><span class="reg-detail-icon">📅</span><span id="sideDate">—</span></div>
+      <div class="reg-detail"><span class="reg-detail-icon">📍</span><span id="sideVenue">—</span></div>
+      <div class="reg-detail" id="sideCapRow" style="display:none;"><span class="reg-detail-icon">👥</span><span id="sideCap">—</span></div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:1rem 1.1rem;">
+      <div style="font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:.65rem;">Organised by</div>
+      <div style="display:flex;align-items:center;gap:.65rem;cursor:pointer;" onclick="goToProfile()">
+        <div class="org-avatar" id="sideOrgAvatar" style="width:38px;height:38px;border-radius:10px;font-size:.9rem;">🎪</div>
+        <div>
+          <div style="font-size:.9rem;font-weight:800;" id="sideOrgName">Organiser</div>
+          <div style="font-size:.74rem;color:var(--muted);">View profile →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-bg" id="shareModal">
+  <div class="modal">
+    <h3>🔗 Share this event</h3>
+    <div class="share-link">
+      <span id="shareUrl">—</span>
+      <button class="btn btn-primary" style="padding:.35rem .75rem;font-size:.74rem;" onclick="copyLink()">Copy</button>
+    </div>
+    <div class="share-grid">
+      <div class="share-item" onclick="shareWA()"><div class="si-icon">💬</div><div class="si-label">WhatsApp</div></div>
+      <div class="share-item" onclick="shareTwitter()"><div class="si-icon">🐦</div><div class="si-label">Twitter</div></div>
+      <div class="share-item" onclick="shareEmail()"><div class="si-icon">✉️</div><div class="si-label">Email</div></div>
+      <div class="share-item" onclick="copyLink()"><div class="si-icon">📋</div><div class="si-label">Copy Link</div></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeShare()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+});
+const db = firebase.firestore();
+
+const params = new URLSearchParams(location.search);
+const eventId = params.get('eventId');
+let evData = {};
+let ownerUid = null;
+
+function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtDate(ts){
+  if(!ts) return 'Date TBA';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+function fmtTime(t){ return t ? t : ''; }
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function getShareUrl(){ return `${location.origin}/event-detail.html?eventId=${eventId}`; }
+
+function openShare(){
+  document.getElementById('shareUrl').textContent = getShareUrl();
+  document.getElementById('shareModal').classList.add('open');
+}
+function closeShare(){ document.getElementById('shareModal').classList.remove('open'); }
+function copyLink(){ navigator.clipboard.writeText(getShareUrl()).then(()=>showToast('Link copied!')); closeShare(); }
+function shareWA(){ window.open(`https://wa.me/?text=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
+function shareTwitter(){ window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this event on CultureWave!')}&url=${encodeURIComponent(getShareUrl())}`, '_blank'); }
+function shareEmail(){ window.open(`mailto:?subject=${encodeURIComponent(evData.name||'Event')}&body=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
+
+function goToProfile(){
+  if(ownerUid) location.href = `client-profile.html?uid=${ownerUid}`;
+}
+
+function register(){
+  if(eventId) location.href = `event-rsvp-form.html?eventId=${eventId}`;
+}
+
+function renderEvent(data){
+  evData = data;
+  ownerUid = data.ownerId;
+  document.title = `${data.name||'Event'} | CultureWave`;
+
+  // cover
+  const coverEl = document.getElementById('coverEl');
+  if(data.coverUrl){
+    coverEl.innerHTML = `<img src="${esc(data.coverUrl)}" alt="${esc(data.coverAlt||data.name)}"/>`;
+  }
+  const norm = (data.status||'draft').toLowerCase();
+  if(norm==='published') coverEl.innerHTML += '<span class="cover-status live">Live</span>';
+  else coverEl.innerHTML += '<span class="cover-status draft">Draft</span>';
+
+  // meta
+  document.getElementById('evCategory').textContent = '🎪 ' + (data.category||'Event');
+  document.getElementById('evTitle').textContent = data.name||'Untitled Event';
+  document.getElementById('evDate').textContent = fmtDate(data.startDate);
+  document.getElementById('evTime').textContent = fmtTime(data.startTime);
+  document.getElementById('evVenue').textContent = data.venueName||'Venue TBA';
+  document.getElementById('evCity').textContent = data.city||'';
+  document.getElementById('sideDate').textContent = fmtDate(data.startDate) + (data.startTime ? ' · '+data.startTime : '');
+  document.getElementById('sideVenue').textContent = (data.venueName||'Venue TBA') + (data.city ? ', '+data.city : '');
+
+  if(data.capacity){
+    document.getElementById('evCapacity').textContent = Number(data.capacity).toLocaleString('en-IN') + ' seats';
+    document.getElementById('evCapacityRow').style.display = 'flex';
+    document.getElementById('sideCap').textContent = Number(data.capacity).toLocaleString('en-IN') + ' capacity';
+    document.getElementById('sideCapRow').style.display = 'flex';
+  }
+
+  // price
+  const price = data.tickets?.[0]?.price || data.price || 0;
+  document.getElementById('regPrice').innerHTML = price ? `₹${Number(price).toLocaleString('en-IN')}<small> onwards</small>` : 'Free';
+  document.getElementById('regMeta').textContent = price ? 'Per person · Taxes may apply' : 'Free to attend';
+
+  // description
+  if(data.description){
+    document.getElementById('evDesc').textContent = data.description;
+    document.getElementById('descSection').style.display = 'block';
+  }
+
+  // tickets
+  const tickets = data.tickets||[];
+  if(tickets.length){
+    document.getElementById('ticketsList').innerHTML = tickets.map((t,i)=>`
+      <div class="ticket-card ${i===0?'featured':''}">
+        <div>
+          <div class="ticket-name">${esc(t.name||'General Admission')}</div>
+          ${t.description?`<div class="ticket-desc">${esc(t.description)}</div>`:''}
+        </div>
+        <div class="ticket-price">${t.price?`₹${Number(t.price).toLocaleString('en-IN')}`:'Free'}<br/><small>${t.available?Number(t.available).toLocaleString('en-IN')+' left':''}</small></div>
+      </div>`).join('');
+    document.getElementById('ticketsSection').style.display = 'block';
+  }
+
+  // faqs
+  const faqs = data.faqs||[];
+  if(faqs.length){
+    document.getElementById('faqsList').innerHTML = faqs.map(f=>`
+      <details style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:.85rem 1rem;margin-bottom:.6rem;">
+        <summary style="font-weight:800;font-size:.9rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+          ${esc(f.question)} <span style="color:var(--muted);font-size:1.1rem;">+</span>
+        </summary>
+        <div style="margin-top:.6rem;font-size:.86rem;color:#475569;line-height:1.65;">${esc(f.answer)}</div>
+      </details>`).join('');
+    document.getElementById('faqsSection').style.display = 'block';
+  }
+
+  // load organiser
+  if(data.ownerId){
+    db.collection('organisers').doc(data.ownerId).get().then(snap=>{
+      const org = snap.exists ? snap.data() : {};
+      const name = org.name || 'Organiser';
+      const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      ['orgAvatar','sideOrgAvatar'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(org.avatarUrl) el.innerHTML = `<img src="${esc(org.avatarUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
+        else el.textContent = initials;
+      });
+      document.getElementById('orgName').textContent = name;
+      document.getElementById('sideOrgName').textContent = name;
+    });
+  }
+}
+
+async function init(){
+  if(!eventId){ document.getElementById('evTitle').textContent='Event not found'; return; }
+
+  // check owner
+  let myUid = null;
+  try{
+    const res = await fetch('/api/auth/me',{credentials:'include'});
+    if(res.ok){ const p = await res.json(); myUid = p.user?.uid; }
+  }catch(e){}
+
+  const snap = await db.collection('events').doc(eventId).get();
+  if(!snap.exists){ document.getElementById('evTitle').textContent='Event not found'; return; }
+
+  const data = {id:snap.id,...snap.data()};
+  renderEvent(data);
+
+  // show edit button if owner
+  if(myUid && myUid === data.ownerId){
+    const editBtn = document.getElementById('navEditBtn');
+    editBtn.href = `event-create.html?eventId=${eventId}`;
+    editBtn.style.display = 'inline-flex';
+  }
+}
+
+// close modal on backdrop click
+document.getElementById('shareModal').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeShare(); });
+
+init();
+</script>
+</body>
+</html>
