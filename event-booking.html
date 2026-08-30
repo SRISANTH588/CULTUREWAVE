@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CultureWave | Event Booking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    :root{--blue:#1242c5;--blue-2:#2f6bff;--bg:#f4f8ff;--text:#0a0f1e;--muted:#64748b;--border:#dce4f5;--green:#10b981;--red:#ef4444;}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Manrope,sans-serif;background:linear-gradient(180deg,#f7faff 0%,#eef4ff 100%);color:var(--text)}
+    a{text-decoration:none;color:inherit}
+    button,input,select,textarea{font:inherit}
+    .wrap{max-width:1180px;margin:0 auto;padding:1.2rem 1.2rem 3rem}
+    .hero{padding:2rem 0 1rem}
+    .badge{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border-radius:999px;background:#e8f0ff;color:var(--blue);font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .hero h1{margin:.9rem 0 .45rem;font-size:clamp(2rem,4vw,3.3rem);line-height:1.02;letter-spacing:-.06em}
+    .hero p{color:var(--muted);max-width:680px;line-height:1.7}
+    .grid{display:grid;grid-template-columns:1.3fr .9fr;gap:1.3rem;align-items:start;margin-top:1.4rem}
+    .card{background:#fff;border:1.5px solid #e2eafc;border-radius:24px;box-shadow:0 10px 34px rgba(18,66,197,.08);overflow:hidden}
+    .card-body{padding:1.3rem}
+    .stepper{display:flex;gap:.4rem;margin-bottom:1rem}
+    .step{flex:1;padding:.65rem .6rem;border-radius:14px;background:#f7faff;border:1px solid #e2eafc;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center}
+    .step.active,.step.done{background:#eef4ff;color:var(--blue);border-color:#cfe0ff}
+    .section-title{font-size:1rem;font-weight:900;margin-bottom:.35rem}
+    .section-sub{font-size:.82rem;color:var(--muted);margin-bottom:1rem}
+    .tickets{display:grid;gap:.7rem}
+    .ticket{display:grid;grid-template-columns:1fr auto;gap:.5rem;padding:1rem 1.05rem;border:1.5px solid #dce4f5;border-radius:18px;background:#f7faff;cursor:pointer}
+    .ticket.selected{border-color:var(--blue);background:#eef4ff;box-shadow:0 0 0 3px rgba(18,66,197,.08)}
+    .ticket h3{font-size:.95rem;font-weight:900}
+    .ticket p{font-size:.76rem;color:var(--muted);margin-top:.2rem;line-height:1.5}
+    .ticket strong{font-size:1rem;align-self:center}
+    .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+    .field{display:grid;gap:.35rem;margin-bottom:.85rem}
+    .field label{font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#5f6f95}
+    .field input,.field select{width:100%;padding:.82rem .95rem;border-radius:14px;border:1.5px solid #dce4f5;background:#f7faff;outline:none}
+    .field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(18,66,197,.08);background:#fff}
+    .actions{display:flex;gap:.7rem;margin-top:.4rem}
+    .btn{border:0;border-radius:14px;padding:.9rem 1.1rem;font-weight:900;cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;box-shadow:0 10px 24px rgba(18,66,197,.24);flex:1}
+    .btn.ghost{background:#fff;border:1.5px solid #dce4f5;color:#49607f}
+    .summary{background:linear-gradient(135deg,#f0f5ff,#eef4ff);border:1.5px solid #dce8ff;border-radius:20px;padding:1rem}
+    .sum-row{display:flex;justify-content:space-between;gap:1rem;padding:.45rem 0;border-bottom:1px solid rgba(18,66,197,.08);font-size:.87rem}
+    .sum-row:last-child{border-bottom:0}
+    .sum-row.total{padding-top:.8rem;font-size:1rem;font-weight:900}
+    .preview-box{margin-top:1rem;background:#0b1224;color:#fff;border-radius:20px;padding:1rem;overflow:hidden}
+    .preview-top{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}
+    .preview-top h3{font-size:1rem;margin-bottom:.25rem}
+    .preview-top p{color:rgba(255,255,255,.66);font-size:.78rem;line-height:1.5}
+    .pill{display:inline-flex;padding:.25rem .6rem;border-radius:999px;background:rgba(255,255,255,.1);font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .qrcode{margin-top:1rem;padding:1rem;background:#fff;border-radius:16px;display:grid;place-items:center;min-height:184px}
+    .qrcode img,.qrcode canvas{border-radius:12px}
+    .muted{color:var(--muted);font-size:.8rem;line-height:1.65}
+    .status{margin-top:1rem;padding:.8rem 1rem;border-radius:14px;background:#f8fafc;border:1px solid #e2e8f0;font-size:.84rem;color:#334155}
+    .status.ok{background:#ecfdf5;border-color:#bbf7d0;color:#166534}
+    .status.bad{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}.field-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="nav-wrap">
+      <div class="brand-block">
+        <div class="logo">CultureWave</div>
+        <div class="brand-sub">by OGSHOOTS LUXE</div>
+      </div>
+      <nav class="topnav">
+        <a href="index.html">Home</a>
+        <a href="events.html">Events</a>
+        <a href="booking.html">Booking</a>
+      </nav>
+      <div class="auth-actions">
+        <a class="nav-link" href="login.html">Login</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <span class="badge">🎟️ Event Booking</span>
+      <h1>Pick a ticket, add your details, then pay or claim a free pass.</h1>
+      <p id="heroText">Loading event details...</p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <div class="card-body">
+          <div class="stepper">
+            <div class="step active" id="step1">1. Tickets</div>
+            <div class="step" id="step2">2. Details</div>
+            <div class="step" id="step3">3. Review</div>
+            <div class="step" id="step4">4. Pay</div>
+          </div>
+
+          <div id="panelTickets">
+            <div class="section-title">Select a ticket</div>
+            <div class="section-sub">These are the ticket types the organiser published for this event.</div>
+            <div class="tickets" id="ticketList"></div>
+            <div class="actions">
+              <button class="btn primary" id="toDetailsBtn">Continue to details</button>
+            </div>
+          </div>
+
+          <div id="panelDetails" style="display:none;">
+            <div class="section-title">Your details</div>
+            <div class="section-sub">We’ll use these to generate your ticket and send the confirmation.</div>
+            <div class="field-grid">
+              <div class="field"><label>Full Name</label><input id="buyerName" type="text" placeholder="Your full name"></div>
+              <div class="field"><label>Email</label><input id="buyerEmail" type="email" placeholder="you@example.com"></div>
+            </div>
+            <div class="field-grid">
+              <div class="field"><label>WhatsApp Number</label><input id="buyerWhatsApp" type="tel" placeholder="+91 98765 43210"></div>
+              <div class="field"><label>Quantity</label><input id="ticketQty" type="number" min="1" value="1"></div>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" id="backToTickets">Back</button>
+              <button class="btn primary" id="toReviewBtn">Continue to review</button>
+            </div>
+          </div>
+
+          <div id="panelReview" style="display:none;">
+            <div class="section-title">Preview your booking</div>
+            <div class="section-sub">Check everything before we start payment or issue the free ticket.</div>
+            <div class="summary">
+              <div class="sum-row"><span>Event</span><strong id="sumEvent">—</strong></div>
+              <div class="sum-row"><span>Ticket</span><strong id="sumTicket">—</strong></div>
+              <div class="sum-row"><span>Buyer</span><strong id="sumName">—</strong></div>
+              <div class="sum-row"><span>Email</span><strong id="sumEmail">—</strong></div>
+              <div class="sum-row"><span>WhatsApp</span><strong id="sumWhatsApp">—</strong></div>
+              <div class="sum-row"><span>Qty</span><strong id="sumQty">1</strong></div>
+              <div class="sum-row"><span>Total</span><strong id="sumTotal">₹0</strong></div>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" id="backToDetails">Back</button>
+              <button class="btn primary" id="toPayBtn">Continue to payment</button>
+            </div>
+          </div>
+
+          <div id="panelPay" style="display:none;">
+            <div class="section-title">Payment</div>
+            <div class="section-sub">Free events are confirmed instantly. Paid events go through checkout.</div>
+            <div class="summary">
+              <div class="sum-row"><span>Amount</span><strong id="payAmount">₹0</strong></div>
+              <div class="sum-row"><span>Status</span><strong id="payStatus">Ready</strong></div>
+            </div>
+            <div class="actions">
+              <button class="btn ghost" id="backToReview">Back</button>
+              <button class="btn primary" id="payBtn">Confirm booking</button>
+            </div>
+            <div class="status" id="bookingMsg">Waiting for confirmation.</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="card-body">
+          <div class="section-title">Booking preview</div>
+          <div class="section-sub">This mirrors the ticket you’ll receive after payment or free confirmation.</div>
+          <div class="preview-box">
+            <div class="preview-top">
+              <div>
+                <span class="pill" id="previewBadge">Ticket</span>
+                <h3 id="previewName">Loading...</h3>
+                <p id="previewMeta">—</p>
+              </div>
+              <div style="font-size:2.4rem" id="previewEmoji">🎫</div>
+            </div>
+            <div class="qrcode" id="qrBox">
+              <div class="muted">QR will appear here after confirmation.</div>
+            </div>
+          </div>
+          <div class="status" id="sidebarStatus">Select a ticket to begin.</div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+        authDomain: "ogshootsluxe-36740.firebaseapp.com",
+        projectId: "ogshootsluxe-36740",
+        storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+        messagingSenderId: "5471814825",
+        appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+      });
+    }
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const params = new URLSearchParams(location.search);
+    const eventId = params.get('eventId');
+    const steps = ['step1','step2','step3','step4'];
+    let eventData = null;
+    let selectedTicketIndex = 0;
+    let currentBooking = null;
+
+    const esc = (v) => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const money = (n) => n === 0 ? 'Free' : '₹' + Number(n || 0).toLocaleString('en-IN');
+    const ticketQrText = (bookingId) => `${location.origin}/success.html?bookingId=${encodeURIComponent(bookingId)}&eventId=${encodeURIComponent(eventId)}`;
+
+    function setStep(n) {
+      steps.forEach((id, idx) => {
+        const el = document.getElementById(id);
+        el.classList.toggle('active', idx === n - 1);
+        el.classList.toggle('done', idx < n - 1);
+      });
+      ['panelTickets','panelDetails','panelReview','panelPay'].forEach((id, idx) => {
+        document.getElementById(id).style.display = idx === n - 1 ? '' : 'none';
+      });
+    }
+
+    function ticketsForEvent(data) {
+      const direct = Array.isArray(data?.tickets) ? data.tickets : [];
+      if (direct.length) return direct;
+      const base = Number(data?.price || 0);
+      return [{ name: 'General Admission', description: 'Default ticket created from event price.', price: base, available: data?.capacity || '' }];
+    }
+
+    function renderTickets() {
+      const list = document.getElementById('ticketList');
+      const tickets = ticketsForEvent(eventData);
+      if (!tickets.length) {
+        list.innerHTML = `<div class="status bad">This event does not have any published tickets yet.</div>`;
+        return;
+      }
+      list.innerHTML = tickets.map((t, i) => `
+        <label class="ticket ${i === selectedTicketIndex ? 'selected' : ''}" data-index="${i}">
+          <div>
+            <h3>${esc(t.name || 'General Admission')}</h3>
+            <p>${esc(t.description || 'Standard event ticket')}</p>
+          </div>
+          <strong>${money(t.price || 0)}</strong>
+        </label>
+      `).join('');
+      list.querySelectorAll('.ticket').forEach(card => {
+        card.addEventListener('click', () => {
+          selectedTicketIndex = Number(card.dataset.index);
+          renderTickets();
+          updatePreview();
+          document.getElementById('sidebarStatus').textContent = 'Ticket selected. Continue to buyer details.';
+        });
+      });
+    }
+
+    function selectedTicket() {
+      return ticketsForEvent(eventData)[selectedTicketIndex] || ticketsForEvent(eventData)[0] || { name:'General Admission', price:0 };
+    }
+
+    function ticketTotal() {
+      const qty = Math.max(1, Number(document.getElementById('ticketQty').value || 1));
+      return qty * Number(selectedTicket().price || 0);
+    }
+
+    function updatePreview() {
+      if (!eventData) return;
+      const ticket = selectedTicket();
+      const qty = Math.max(1, Number(document.getElementById('ticketQty').value || 1));
+      const total = ticketTotal();
+      document.getElementById('previewName').textContent = eventData.name || 'Event';
+      document.getElementById('previewMeta').textContent = `${ticket.name || 'General Admission'} · ${qty} ${qty === 1 ? 'ticket' : 'tickets'} · ${money(total)}`;
+      document.getElementById('previewEmoji').textContent = eventData.category ? '🎪' : '🎫';
+      document.getElementById('previewBadge').textContent = Number(ticket.price || 0) > 0 ? 'Paid Ticket' : 'Free Pass';
+      document.getElementById('sumEvent').textContent = eventData.name || 'Event';
+      document.getElementById('sumTicket').textContent = ticket.name || 'General Admission';
+      document.getElementById('sumName').textContent = document.getElementById('buyerName').value || '—';
+      document.getElementById('sumEmail').textContent = document.getElementById('buyerEmail').value || '—';
+      document.getElementById('sumWhatsApp').textContent = document.getElementById('buyerWhatsApp').value || '—';
+      document.getElementById('sumQty').textContent = qty;
+      document.getElementById('sumTotal').textContent = money(total);
+      document.getElementById('payAmount').textContent = money(total);
+      document.getElementById('payStatus').textContent = total > 0 ? 'Payment required' : 'Free booking';
+      document.getElementById('heroText').textContent = `${eventData.venueName || eventData.city || 'Event venue'} · ${ticket.name || 'General Admission'} · ${money(total)}`;
+    }
+
+    function showStatus(msg, kind='') {
+      const el = document.getElementById('bookingMsg');
+      el.textContent = msg;
+      el.className = 'status' + (kind ? ` ${kind}` : '');
+      document.getElementById('sidebarStatus').textContent = msg;
+    }
+
+    async function loadEvent() {
+      if (!eventId) {
+        showStatus('No event ID found in the URL.', 'bad');
+        document.getElementById('heroText').textContent = 'Missing event ID.';
+        return;
+      }
+      const snap = await db.collection('events').doc(eventId).get();
+      if (!snap.exists) {
+        showStatus('Event not found.', 'bad');
+        document.getElementById('heroText').textContent = 'The requested event could not be found.';
+        return;
+      }
+      eventData = { id: snap.id, ...snap.data() };
+      document.title = `${eventData.name || 'Event'} Booking | CultureWave`;
+      document.getElementById('heroText').textContent = `${eventData.venueName || eventData.city || 'Event venue'} · ${ticketsForEvent(eventData).length} ticket type(s) available`;
+      renderTickets();
+      updatePreview();
+      showStatus('Select a ticket to begin.');
+    }
+
+    async function createFreeBooking() {
+      const ticket = selectedTicket();
+      const qty = Math.max(1, Number(document.getElementById('ticketQty').value || 1));
+      const payload = {
+        eventId,
+        eventName: eventData.name || '',
+        ticketName: ticket.name || 'General Admission',
+        ticketPrice: Number(ticket.price || 0),
+        tickets: qty,
+        amount: 0,
+        status: 'confirmed',
+        source: 'free',
+        customer: {
+          name: document.getElementById('buyerName').value.trim(),
+          email: document.getElementById('buyerEmail').value.trim(),
+          whatsapp: document.getElementById('buyerWhatsApp').value.trim(),
+          phone: document.getElementById('buyerWhatsApp').value.trim(),
+          ticket: ticket.name || 'General Admission',
+        },
+        event: {
+          id: eventId,
+          name: eventData.name || '',
+          venueName: eventData.venueName || '',
+          city: eventData.city || '',
+          category: eventData.category || '',
+        },
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+      const ref = await db.collection('bookings').add(payload);
+      return { bookingId: ref.id, payload };
+    }
+
+    function renderQr(bookingId) {
+      const box = document.getElementById('qrBox');
+      box.innerHTML = '';
+      new QRCode(box, {
+        text: ticketQrText(bookingId),
+        width: 160,
+        height: 160,
+        colorDark: '#0a0f1e',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    async function sendFreeEmail(bookingId) {
+      const to = document.getElementById('buyerEmail').value.trim();
+      const subject = encodeURIComponent(`Your ticket for ${eventData.name || 'CultureWave event'}`);
+      const body = encodeURIComponent(
+        `Your free ticket is confirmed.\n\nEvent: ${eventData.name || ''}\nTicket: ${selectedTicket().name || 'General Admission'}\nBooking ID: ${bookingId}\n\nOpen your ticket: ${ticketQrText(bookingId)}`
+      );
+      if (to) {
+        window.location.href = `mailto:${encodeURIComponent(to)}?subject=${subject}&body=${body}`;
+      }
+    }
+
+    async function handleConfirm() {
+      const name = document.getElementById('buyerName').value.trim();
+      const email = document.getElementById('buyerEmail').value.trim();
+      const whatsapp = document.getElementById('buyerWhatsApp').value.trim();
+      const qty = Math.max(1, Number(document.getElementById('ticketQty').value || 1));
+      if (!name || !email || !whatsapp) {
+        showStatus('Please fill in name, email, and WhatsApp number.', 'bad');
+        setStep(2);
+        return;
+      }
+      const ticket = selectedTicket();
+      const total = Number(ticket.price || 0) * qty;
+      if (total === 0) {
+        showStatus('Creating your free ticket...', '');
+        const { bookingId } = await createFreeBooking();
+        currentBooking = bookingId;
+        renderQr(bookingId);
+        showStatus('Free ticket confirmed. QR generated and email flow opened.', 'ok');
+        await sendFreeEmail(bookingId);
+        return;
+      }
+
+      showStatus('Opening payment checkout...', '');
+      const checkoutRes = await fetch('/api/bookings/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: Math.round(total * 100),
+          merchantName: 'CultureWave',
+          upiId: 'merchant@upi',
+          receipt: 'bk_' + Date.now(),
+          note: `Payment for ${eventData.name || 'event tickets'}`,
+          event: {
+            id: eventId,
+            name: eventData.name || '',
+            venueName: eventData.venueName || '',
+            city: eventData.city || '',
+            category: eventData.category || '',
+            ticketName: ticket.name || 'General Admission',
+          },
+          seats: qty,
+          customer: {
+            id: email,
+            name,
+            email,
+            phone: whatsapp,
+            tickets: qty,
+            method: 'upi',
+            ticket: ticket.name || 'General Admission',
+          },
+          returnUrl: window.location.origin + '/event-booking.html?eventId=' + encodeURIComponent(eventId),
+        })
+      });
+      const checkoutData = await checkoutRes.json();
+      if (!checkoutRes.ok) throw new Error(checkoutData.error || 'Checkout failed');
+
+      if (checkoutData.provider !== 'razorpay' || !checkoutData.razorpayOrderId) {
+        window.location.href = checkoutData.checkoutUrl || ('/pay/' + checkoutData.orderId);
+        return;
+      }
+
+      const options = {
+        key: checkoutData.keyId,
+        amount: checkoutData.amount,
+        currency: checkoutData.currency || 'INR',
+        name: 'CultureWave',
+        description: eventData.name || 'Event booking',
+        order_id: checkoutData.razorpayOrderId,
+        prefill: { name, email, contact: whatsapp },
+        notes: { eventName: eventData.name || '', ticketName: ticket.name || 'General Admission', qty: String(qty) },
+        theme: { color: '#1242c5' },
+        handler: async function(r) {
+          const verifyRes = await fetch('/api/bookings/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: r.razorpay_order_id,
+              razorpay_payment_id: r.razorpay_payment_id,
+              razorpay_signature: r.razorpay_signature
+            })
+          });
+          const verifyData = await verifyRes.json();
+          if (!verifyRes.ok) throw new Error(verifyData.error || 'Payment verification failed');
+          currentBooking = verifyData.bookingId;
+          renderQr(verifyData.bookingId || r.razorpay_payment_id);
+          showStatus('Payment confirmed. Your ticket is ready.', 'ok');
+          window.location.href = 'success.html?bookingId=' + encodeURIComponent(verifyData.bookingId || r.razorpay_payment_id)
+            + '&event=' + encodeURIComponent(eventData.name || '')
+            + '&amount=' + encodeURIComponent(money(total))
+            + '&status=Confirmed&type=event';
+        },
+        modal: { ondismiss: function(){ showStatus('Payment cancelled.', 'bad'); } }
+      };
+      new Razorpay(options).open();
+    }
+
+    document.getElementById('toDetailsBtn').addEventListener('click', () => {
+      if (!selectedTicket()) return;
+      setStep(2);
+      showStatus('Add your attendee details.');
+    });
+    document.getElementById('backToTickets').addEventListener('click', () => setStep(1));
+    document.getElementById('toReviewBtn').addEventListener('click', () => {
+      const name = document.getElementById('buyerName').value.trim();
+      const email = document.getElementById('buyerEmail').value.trim();
+      const whatsapp = document.getElementById('buyerWhatsApp').value.trim();
+      if (!name || !email || !whatsapp) {
+        showStatus('Please fill in name, email, and WhatsApp number.', 'bad');
+        return;
+      }
+      updatePreview();
+      setStep(3);
+      showStatus('Preview your booking before payment.');
+    });
+    document.getElementById('backToDetails').addEventListener('click', () => setStep(2));
+    document.getElementById('toPayBtn').addEventListener('click', () => {
+      updatePreview();
+      setStep(4);
+      showStatus('Ready to confirm booking.');
+    });
+    document.getElementById('backToReview').addEventListener('click', () => setStep(3));
+    document.getElementById('payBtn').addEventListener('click', async () => {
+      try {
+        document.getElementById('payBtn').disabled = true;
+        await handleConfirm();
+      } catch (err) {
+        showStatus(err.message || 'Something went wrong.', 'bad');
+      } finally {
+        document.getElementById('payBtn').disabled = false;
+      }
+    });
+
+    document.getElementById('buyerName').addEventListener('input', updatePreview);
+    document.getElementById('buyerEmail').addEventListener('input', updatePreview);
+    document.getElementById('buyerWhatsApp').addEventListener('input', updatePreview);
+    document.getElementById('ticketQty').addEventListener('input', updatePreview);
+
+    loadEvent().catch(err => {
+      showStatus(err.message || 'Failed to load event.', 'bad');
+    });
+  </script>
+</body>
+</html>
