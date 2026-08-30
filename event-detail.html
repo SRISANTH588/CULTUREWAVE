@@ -307,7 +307,20 @@ function goToProfile(){
 }
 
 function register(){
-  if(eventId) location.href = `booking.html?eventId=${eventId}`;
+  if(!eventId) return;
+  const tickets = Array.isArray(evData.tickets) && evData.tickets.length ? evData.tickets : [];
+  const t = tickets[0] || {};
+  const price = Number(t.price || evData.price || 0);
+  const qs = new URLSearchParams({
+    eventId,
+    eventName: evData.name || '',
+    venueName: evData.venueName || evData.city || '',
+    category: evData.category || '',
+    ticketName: t.name || 'General Admission',
+    ticketPrice: String(price),
+    eventPrice: String(Number(evData.price || 0)),
+  });
+  location.href = `booking.html?${qs.toString()}`;
 }
 
 function renderEvent(data){

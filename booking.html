@@ -699,6 +699,11 @@
     const urlP = new URLSearchParams(window.location.search);
     const eventId = urlP.get("eventId");
     const eventBookingMode = !!eventId;
+    const passedEventName = urlP.get("eventName") || "";
+    const passedVenueName = urlP.get("venueName") || "";
+    const passedCategory = urlP.get("category") || "";
+    const passedTicketName = urlP.get("ticketName") || "";
+    const passedTicketPrice = Number(urlP.get("ticketPrice") || urlP.get("eventPrice") || 0);
     const bookingType = urlP.get("type") || "event"; // "event" | "restaurant"
     const isRestaurant = bookingType === "restaurant";
 
@@ -1056,28 +1061,23 @@
     /* ── INIT ── */
     async function initBooking() {
       if (eventBookingMode) {
-        const snap = await firebase.firestore().collection("events").doc(eventId).get();
-        if (snap.exists) {
-          const d = snap.data();
-          const tickets = Array.isArray(d.tickets) && d.tickets.length ? d.tickets : [];
-          const chosenTicket = tickets.length ? tickets[0] : null;
-          const price = chosenTicket ? Number(chosenTicket.price || 0) : Number(d.price || 0);
-          activeData = {
-            selected: {
-              name: d.name || "Selected Event",
-              venue: d.venueName || d.city || "Venue TBA",
-              price,
-              emoji: "🎪",
-              sub: chosenTicket ? chosenTicket.name : (d.category || "Event Ticket"),
-            }
-          };
-          selectedKey = "selected";
-          document.getElementById("step1Title").textContent = d.name || "Selected event";
-          document.getElementById("step1Sub").textContent = chosenTicket
-            ? "You were sent here from the event page, and the first published ticket is already selected."
-            : "You were sent here from the event page, and the event is already selected.";
-          document.getElementById("heroText").textContent = `${d.venueName || d.city || "Event venue"} · booking for ${d.name || "this event"}`;
-        }
+        const eventName = passedEventName || "Selected event";
+        const venueName = passedVenueName || "Venue TBA";
+        const sub = passedTicketName || passedCategory || "Event Ticket";
+        const price = Number.isFinite(passedTicketPrice) ? passedTicketPrice : 0;
+        activeData = {
+          selected: {
+            name: eventName,
+            venue: venueName,
+            price,
+            emoji: "🎪",
+            sub,
+          }
+        };
+        selectedKey = "selected";
+        document.getElementById("step1Title").textContent = eventName;
+        document.getElementById("step1Sub").textContent = "You were sent here from the event page, and the event is already selected.";
+        document.getElementById("heroText").textContent = `${venueName} · booking for ${eventName}`;
         buildCards();
         adaptUI();
         updateReceipt();
