@@ -809,6 +809,7 @@
       document.getElementById("receiptVenue").textContent   = item.venue;
       document.getElementById("rSeats").textContent         = n;
       document.getElementById("rTotal").textContent         = fmt(total);
+      document.getElementById("submitBtn").textContent      = total === 0 ? "✅ Confirm Free Booking" : "🔒 Book Now &amp; Pay";
     }
 
     /* ── STEPPER ── */
@@ -885,6 +886,37 @@
 
     document.getElementById("back4").addEventListener("click", () => goStep(3));
 
+    async function createFreeBooking(item, n) {
+      const name = document.getElementById("bookName").value.trim();
+      const email = document.getElementById("bookEmail").value.trim();
+      const phone = document.getElementById("bookPhone").value.trim();
+      const ref = await firebase.firestore().collection("bookings").add({
+        eventId: eventId || null,
+        eventName: item.name,
+        ticketName: item.name,
+        amount: 0,
+        status: "confirmed",
+        source: "free",
+        seats: n,
+        method: "free",
+        customer: {
+          id: email || name || "guest",
+          name: name || "Guest",
+          email,
+          phone,
+          ticket: item.name,
+        },
+        event: {
+          id: eventId || null,
+          name: item.name,
+          venueName: item.venue,
+        },
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      return ref.id;
+    }
+
     /* ── RAZORPAY SUBMIT ── */
     document.getElementById("submitBtn").addEventListener("click", () => {
       const item = activeData[selectedKey];
@@ -893,6 +925,37 @@
       const fee  = item.price === 0 ? 0 : Math.round(subtotal * 0.05);
       const total = subtotal + fee;
       const statusText = document.getElementById("rStatus");
+
+      if (total === 0) {
+        statusText.textContent = "Creating free booking...";
+        statusText.className   = "bk-status-pill";
+        createFreeBooking(item, n).then(async (bid) => {
+          statusText.textContent = "✅ Confirmed";
+          statusText.className   = "bk-status-pill success";
+          await sendBookingEmail({
+            name: document.getElementById("bookName").value.trim() || "Guest",
+            email: document.getElementById("bookEmail").value.trim(),
+            eventName: item.name,
+            amount: "Free",
+            seats: String(n),
+            bookingId: bid,
+            bookingType: bookingType,
+            date: "",
+            time: "",
+            method: "free",
+          });
+          window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
+            + "&event=" + encodeURIComponent(item.name)
+            + "&amount=Free"
+            + "&status=Confirmed"
+            + "&type=" + bookingType;
+        }).catch(err => {
+          statusText.textContent = err.message || "Could not create free booking";
+          statusText.className   = "bk-status-pill failed";
+        });
+        return;
+      }
+
       statusText.textContent = "Opening checkout...";
       statusText.className   = "bk-status-pill";
 
