@@ -594,10 +594,17 @@
         return input.includes("@") ? input : `${input.toLowerCase()}@cityvibe.local`;
       }
 
-      async function getRole(uid) {
+      async function getRole(uid, email) {
         try {
           const snap = await getDoc(doc(db, "users", uid));
           if (snap.exists()) return snap.data().role || "client";
+          // fallback: look up by email for seeded accounts
+          if (email) {
+            const { getDocs, collection, query, where } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+            const q = query(collection(db, "users"), where("email", "==", email));
+            const qs = await getDocs(q);
+            if (!qs.empty) return qs.docs[0].data().role || "client";
+          }
         } catch {}
         return "client";
       }
@@ -639,7 +646,7 @@
         setStatus("Signing in...", "info");
         try {
           const { user } = await signInWithEmailAndPassword(auth, email, password);
-          const role = await getRole(user.uid);
+          const role = await getRole(user.uid, user.email);
           setStatus("Welcome back! Redirecting...", "success");
           redirect(role);
         } catch (err) {
