@@ -444,25 +444,28 @@ main { max-width: none; margin: 0; padding: 0; }
   margin-top: 1rem;
 }
 .step {
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  padding: 1.2rem;
+  border: none;
+  border-radius: 18px;
+  padding: 1.1rem 1.3rem;
   display: flex;
-  gap: 0.9rem;
-  align-items: flex-start;
-  background: var(--soft);
+  gap: 1rem;
+  align-items: center;
+  background: #eef2fb;
 }
 .step strong {
-  width: 2rem;
-  height: 2rem;
+  width: 2.2rem;
+  height: 2.2rem;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--blue);
+  background: #1242c5;
   color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
   flex: none;
+  min-width: 2.2rem;
 }
-.step span { color: #555; }
+.step span { color: #374151; font-size: .95rem; line-height: 1.55; }
 
 .benefit-grid,
 .tool-grid,
@@ -472,28 +475,35 @@ main { max-width: none; margin: 0; padding: 0; }
   gap: 1rem;
   margin-top: 1rem;
 }
-.benefit-card,
-.tool-card,
-.faq-card {
-  border: 1px solid var(--line);
-  border-radius: 24px;
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.icon-card {
+  border: 1px solid #e8edf8;
+  border-radius: 20px;
   background: #fff;
-  box-shadow: 0 10px 28px rgba(19, 67, 196, 0.06);
-  padding: 1.35rem;
+  padding: 1.4rem 1.3rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 210px;
 }
-.benefit-card h3,
-.tool-card h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1.08rem;
-  letter-spacing: -0.03em;
+.icon-card .ic {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 12px;
+  background: #f0f2f8;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  flex: none;
+  align-self: flex-start;
+  margin-bottom: auto;
 }
-.benefit-card p,
-.tool-card p,
-.faq-card p {
-  margin: 0;
-  color: #555;
-  line-height: 1.65;
-}
+.icon-card h3 { margin: 1.4rem 0 .4rem; font-size: .98rem; font-weight: 800; color: #0a0f1e; }
+.icon-card p { margin: 0; color: #6b7280; font-size: .88rem; line-height: 1.6; }
 .faq-card summary {
   cursor: pointer;
   font-weight: 800;
