@@ -2136,11 +2136,11 @@ function switchToolTab(btn, toolId) {
 }
 </script>
 <script type="module">
-import { app, auth, db, getCurrentUser, logout } from "./firebase.js";
-import { getFirestore, collection, doc, query, where, orderBy, limit,
-         onSnapshot, getDocs, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { app, auth, db, getCurrentUser, logout,
+  collection, doc, query, where, orderBy, limit,
+  onSnapshot, getDocs, getDoc, setDoc, updateDoc, serverTimestamp
+} from "./firebase.js";
 
-});
 window.db = db; window.doc = doc; window.setDoc = setDoc; window.updateDoc = updateDoc;
 
 // ── HELPERS ──
@@ -3018,10 +3018,8 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 
 (async () => {
   const user = await getCurrentUser();
-  if(!res.ok) return location.href='/login.html';
-  const {user} = await res.json();
+  if (!user) return location.href = 'login.html';
   myUid = user.uid;
-  localStorage.setItem('cw_uid', myUid);
 
   const init = (user.name||'C').trim()[0].toUpperCase();
   ['sideAvatar','topAvatar'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=init; });
