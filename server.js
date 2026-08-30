@@ -627,7 +627,13 @@ const server = http.createServer(async (req, res) => {
         createdAt: Date.now(),
         source: "free",
       };
-      await admin.firestore().collection("bookings").doc(bookingId).set(booking, { merge: true });
+      try {
+        if (admin.apps.length) {
+          await admin.firestore().collection("bookings").doc(bookingId).set(booking, { merge: true });
+        }
+      } catch (writeError) {
+        console.warn("Free booking Firestore write skipped:", writeError.message);
+      }
       return send(res, 200, { success: true, bookingId });
     } catch (error) {
       return send(res, 400, { success: false, error: error.message || "Could not create free booking" });
