@@ -2348,10 +2348,10 @@ async function saveEvent(status) {
     const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
     btn.textContent = 'Saving...';
     btn.disabled = true;
-    await addDoc(collection(db, 'events'), payload);
+    await addDoc(collection(db, 'restaurants'), payload);
     window.location.href = 'premium-client-dashboard.html';
   } catch (err) {
-    alert('Error saving event: ' + err.message);
+    alert('Error saving restaurant: ' + err.message);
     document.getElementById('publishBtn').textContent = 'Publish Listing';
     document.getElementById('publishBtn').disabled = false;
     document.getElementById('saveDraftBtn').textContent = 'Save Draft';

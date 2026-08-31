@@ -471,13 +471,10 @@
         try {
           let snap;
           try {
-            snap = await _db.collection('events').where('status', '==', 'published').orderBy('createdAt', 'desc').limit(100).get();
+            snap = await _db.collection('events').limit(200).get();
           } catch (e) {
-            try {
-              snap = await _db.collection('events').where('status', '==', 'published').limit(100).get();
-            } catch (inner) {
-              snap = await _db.collection('events').limit(100).get();
-            }
+            console.error('Events fetch error:', e);
+            return;
           }
           const empty = grid.querySelector('.ev-empty');
           const docs = snap.docs.filter(d => isPublishedEvent(d.data()));

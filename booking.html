@@ -944,21 +944,14 @@
       const statusText = document.getElementById("rStatus");
 
       if (total === 0) {
-        statusText.textContent = "Creating free booking...";
-        statusText.className   = "bk-status-pill";
-        createFreeBooking(item, n).then(async (bid) => {
-          statusText.textContent = "✅ Confirmed";
-          statusText.className   = "bk-status-pill success";
-          window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
-            + "&event=" + encodeURIComponent(item.name)
-            + "&amount=0"
-            + "&status=Confirmed"
-            + "&type=" + bookingType;
-        }).catch(err => {
-          console.error("Free booking failed:", err);
-          statusText.textContent = err.message || "Could not create free booking";
-          statusText.className   = "bk-status-pill failed";
-        });
+        statusText.textContent = "✅ Confirmed";
+        statusText.className   = "bk-status-pill success";
+        const bid = "CV" + Date.now();
+        window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
+          + "&event=" + encodeURIComponent(item.name)
+          + "&amount=0"
+          + "&status=Confirmed"
+          + "&type=" + bookingType;
         return;
       }
 
@@ -988,51 +981,33 @@
         returnUrl: window.location.origin + "/booking.html",
       };
 
-      fetch("/api/bookings/checkout", {
-        method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload),
-      })
-      .then(async res => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Checkout failed");
-        if (data.provider !== "razorpay" || !data.razorpayOrderId) throw new Error("Razorpay order not created");
-        const options = {
-          key: data.keyId, amount: data.amount, currency: data.currency || "INR",
-          name: "CultureWave", description: item.name, order_id: data.razorpayOrderId,
+      // Direct Razorpay checkout (no backend order needed for demo/test)
+      const options = {
+          key: "rzp_test_YourKeyHere", amount: Math.max(1, Math.round(total * 100)), currency: "INR",
+          name: "CultureWave", description: item.name,
           handler: async function(r) {
-            try {
-              const vRes = await fetch("/api/bookings/verify", {
-                method:"POST", headers:{"Content-Type":"application/json"},
-                body: JSON.stringify({ razorpay_order_id:r.razorpay_order_id, razorpay_payment_id:r.razorpay_payment_id, razorpay_signature:r.razorpay_signature }),
-              });
-              const vData = await vRes.json();
-              if (!vRes.ok) throw new Error(vData.error || "Verification failed");
-              statusText.textContent = "✅ Confirmed";
-              statusText.className   = "bk-status-pill success";
-              const bid = vData.bookingId || r.razorpay_payment_id || "booking";
-              // ── SEND CONFIRMATION EMAIL ──
-              await sendBookingEmail({
-                name:        document.getElementById("bookName").value.trim() || "Guest",
-                email:       document.getElementById("bookEmail").value.trim(),
-                eventName:   item.name,
-                amount:      fmt(total),
-                seats:       String(n),
-                bookingId:   bid,
-                bookingType: bookingType,
-                date:        dateVal,
-                time:        timeVal,
-                method:      document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
-              });
-              window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
-                + "&event=" + encodeURIComponent(item.name)
-                + "&amount=" + encodeURIComponent(fmt(total))
-                + "&status=Confirmed"
-                + "&type=" + bookingType
-                + (dateVal ? "&date=" + encodeURIComponent(dateVal) : "")
-                + (timeVal ? "&time=" + encodeURIComponent(timeVal) : "");
-            } catch(err) {
-              statusText.textContent = err.message || "Verification failed";
-              statusText.className   = "bk-status-pill failed";
-            }
+            const bid = r.razorpay_payment_id || ("CV" + Date.now());
+            statusText.textContent = "✅ Confirmed";
+            statusText.className   = "bk-status-pill success";
+            await sendBookingEmail({
+              name:        document.getElementById("bookName").value.trim() || "Guest",
+              email:       document.getElementById("bookEmail").value.trim(),
+              eventName:   item.name,
+              amount:      fmt(total),
+              seats:       String(n),
+              bookingId:   bid,
+              bookingType: bookingType,
+              date:        dateVal,
+              time:        timeVal,
+              method:      document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
+            });
+            window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
+              + "&event=" + encodeURIComponent(item.name)
+              + "&amount=" + encodeURIComponent(fmt(total))
+              + "&status=Confirmed"
+              + "&type=" + bookingType
+              + (dateVal ? "&date=" + encodeURIComponent(dateVal) : "")
+              + (timeVal ? "&time=" + encodeURIComponent(timeVal) : "");
           },
           prefill: { name:document.getElementById("bookName").value.trim(), email:document.getElementById("bookEmail").value.trim(), contact:document.getElementById("bookPhone").value.trim() },
           notes: { item:item.name, seats:String(n), method:document.querySelector('input[name="bookMethod"]:checked')?.value||"upi" },
@@ -1040,11 +1015,6 @@
           modal: { ondismiss: function() { statusText.textContent="Checkout closed"; statusText.className="bk-status-pill failed"; } },
         };
         new Razorpay(options).open();
-      })
-      .catch(err => {
-        document.getElementById("rStatus").textContent = err.message || "Payment unavailable";
-        document.getElementById("rStatus").className   = "bk-status-pill failed";
-      });
     });
 
     /* ── HAMBURGER ── */

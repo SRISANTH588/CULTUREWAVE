@@ -323,11 +323,15 @@
 
       async function loadRestaurants() {
         try {
-          const snap = await _rsdb.collection('restaurants').where('status','==','published').limit(50).get();
+          const snap = await _rsdb.collection('restaurants').limit(200).get();
           const empty = document.getElementById('rsEmpty');
-          if (snap.empty) { if(empty) empty.style.display=''; rsCount.textContent=0; return; }
+          const published = snap.docs.filter(d => {
+            const s = String(d.data().status || '').toLowerCase();
+            return ['published','live','active'].includes(s);
+          });
+          if (!published.length) { if(empty) empty.style.display=''; rsCount.textContent=0; return; }
           if(empty) empty.style.display='none';
-          snap.docs.forEach((doc, i) => {
+          published.forEach((doc, i) => {
             const d = doc.data(), id = doc.id;
             const price = d.priceForTwo||d.price||0;
             const priceStr = price ? `<strong>\u20b9${Number(price).toLocaleString('en-IN')}</strong> for two` : 'See menu';
