@@ -2747,7 +2747,7 @@ document.querySelectorAll('.period-tab').forEach(btn => {
 
 function loadAnalytics(uid) {
   onSnapshot(
-    query(collection(db,'bookings'), where('ownerId','==',uid), limit(500)),
+    query(collection(db,'bookings'), limit(500)),
     snap => {
       analyticsBookings = snap.docs.map(d=>({id:d.id,...d.data()}));
       renderAnalytics();
@@ -2757,7 +2757,7 @@ function loadAnalytics(uid) {
 
 function loadFinance(uid) {
   onSnapshot(
-    query(collection(db,'bookings'), where('ownerId','==',uid), limit(100)),
+    query(collection(db,'bookings'), limit(500)),
     snap => {
       const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
       allSalesRows = rows;
