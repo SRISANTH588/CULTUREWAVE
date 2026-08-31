@@ -121,15 +121,15 @@
 <!-- Stats -->
 <div class="stats-row">
   <div class="stat-card">
+    <div class="stat-num blue" id="statRegistered">0</div>
+    <div class="stat-label">Registered</div>
+  </div>
+  <div class="stat-card">
     <div class="stat-num green" id="statCheckedIn">0</div>
     <div class="stat-label">Checked In</div>
   </div>
   <div class="stat-card">
-    <div class="stat-num orange" id="statAlready">0</div>
-    <div class="stat-label">Already In</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-num blue" id="statTotal">0</div>
+    <div class="stat-num orange" id="statTotal">0</div>
     <div class="stat-label">Total Scans</div>
   </div>
 </div>
@@ -195,7 +195,19 @@
   let scanner = null;
   let scanning = false;
   let paused = false;
-  let stats = { checkedIn: 0, already: 0, total: 0 };
+  let stats = { total: 0 };
+
+  // ── LOAD LIVE COUNTS FROM FIRESTORE ──
+  function loadLiveCounts() {
+    db.collection('bookings').onSnapshot(snap => {
+      const all = snap.docs.map(d => d.data());
+      const registered = all.length;
+      const checkedIn  = all.filter(d => d.checkedIn).length;
+      document.getElementById('statRegistered').textContent = registered;
+      document.getElementById('statCheckedIn').textContent  = checkedIn;
+    });
+  }
+  loadLiveCounts();
 
   // ── START SCANNER ──
   async function startScanner() {
@@ -301,7 +313,7 @@
           [["Name", name], ["Event", event], ["Booking ID", shortId], ["Checked in at", checkedAt]]
         );
         addLog("yellow", name, event + " · Already checked in");
-        stats.already++; stats.total++; updateStats();
+        stats.total++; updateStats();
         return;
       }
 
@@ -314,7 +326,7 @@
         [["Name", name], ["Event", event], ["Booking ID", shortId], ["Seats", seats], ["Amount", amount], ["Type", type]]
       );
       addLog("green", name, event);
-      stats.checkedIn++; stats.total++; updateStats();
+      stats.total++; updateStats();
 
     } catch (e) {
       showResult("failed", "🚫", "Error: " + e.message, []);
@@ -358,9 +370,7 @@
 
   // ── STATS ──
   function updateStats() {
-    document.getElementById("statCheckedIn").textContent = stats.checkedIn;
-    document.getElementById("statAlready").textContent   = stats.already;
-    document.getElementById("statTotal").textContent     = stats.total;
+    document.getElementById('statTotal').textContent = stats.total;
   }
 
   // ── LOG ──
