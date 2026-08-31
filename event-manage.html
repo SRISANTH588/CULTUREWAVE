@@ -291,34 +291,12 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 <!-- CHECK-IN PANEL -->
 <div class="panel" id="panel-checkin">
-  <div class="card">
-    <div class="card-head"><div><h2>Check-In</h2><p>Scan QR codes to verify attendees at the door</p></div></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;">
-      <div class="stat-card"><div class="stat-icon green">&#10003;</div><div><div class="stat-label">Checked In</div><div class="stat-val" id="ciCheckedIn">0</div></div></div>
-      <div class="stat-card"><div class="stat-icon blue">&#128101;</div><div><div class="stat-label">Total Expected</div><div class="stat-val" id="ciTotal">0</div></div></div>
-    </div>
-    <div style="border:2px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem;">
-      <div style="background:#1a1a2e;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:.86rem;font-weight:700;color:#fff;">&#128247; Camera Scanner</div>
-        <div style="display:flex;gap:.5rem;">
-          <button id="startScanBtn" onclick="toggleScanner()" style="padding:.38rem 1.1rem;border-radius:7px;background:#3b5bdb;color:#fff;font-size:.82rem;font-weight:700;border:0;cursor:pointer;">&#128247; Scan</button>
-        </div>
-      </div>
-      <div id="qr-reader" style="width:100%;background:#000;"></div>
-      <div id="scanStatus" style="padding:.6rem 1rem;font-size:.8rem;font-weight:600;color:var(--muted);background:#f8f9fa;text-align:center;">Click Start to open camera</div>
-    </div>
-    <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1rem;">
-      <div style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.6rem;">Manual Entry</div>
-      <div style="display:flex;gap:.5rem;">
-        <input id="ciInput" type="text" placeholder="Enter booking ID or ticket ID..." style="flex:1;padding:.6rem .85rem;border-radius:8px;border:1px solid var(--border);font:inherit;font-size:.84rem;outline:none;"/>
-        <button onclick="checkInTicket()" style="padding:.6rem 1.1rem;border-radius:8px;background:var(--green);color:#fff;font-weight:700;font-size:.84rem;border:0;cursor:pointer;white-space:nowrap;">&#10003; Check In</button>
-      </div>
-    </div>
-    <div>
-      <div style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.6rem;">Recent Check-Ins</div>
-      <div id="ciList" style="display:flex;flex-direction:column;gap:.4rem;"></div>
-    </div>
-  </div>
+  <iframe
+    src="checkin.html"
+    style="width:100%;height:calc(100vh - 70px);border:none;border-radius:14px;"
+    allow="camera"
+    title="Check-In Scanner"
+  ></iframe>
 </div>
 
 <!-- REMINDERS PANEL -->
