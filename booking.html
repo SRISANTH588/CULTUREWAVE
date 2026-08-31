@@ -969,7 +969,7 @@
     }
 
     /* ── RAZORPAY SUBMIT ── */
-    document.getElementById("submitBtn").addEventListener("click", () => {
+    document.getElementById("submitBtn").addEventListener("click", async () => {
       const item = activeData[selectedKey];
       const n    = parseInt(document.getElementById("bookSeats").value) || 1;
       const subtotal = item.price * n;
