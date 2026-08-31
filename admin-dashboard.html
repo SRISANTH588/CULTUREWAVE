@@ -1878,6 +1878,7 @@ function renderWAGrid(bookings) {
           <div class="wa-detail"><span class="wa-detail-label">Email</span><span class="wa-detail-value">${email}</span></div>
           <div class="wa-detail"><span class="wa-detail-label">Booking Type</span><span class="wa-detail-value">${bkType}</span></div>
         </div>
+        ${p.resendRequested ? `<div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:.6rem .85rem;display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;"><span style="font-size:1rem;">&#128231;</span><div style="flex:1;"><div style="font-size:.82rem;font-weight:700;color:#92400e;">Resend Ticket Requested</div><div style="font-size:.74rem;color:#b45309;">Client requested ticket to be resent to customer via WhatsApp</div></div><button onclick="clearResendFlag('${p.id}')" style="padding:.3rem .7rem;border-radius:7px;border:1px solid #fde68a;background:#fff;font-size:.74rem;font-weight:700;color:#92400e;cursor:pointer;">Done</button></div>` : ''}
         <div class="wa-actions">
           <a href="${orgHref}" target="_blank" class="wa-btn wa-btn-organizer" onclick="markWASent('${p.id}','organizer')">
             💬 Send to Organizer
@@ -1897,6 +1898,14 @@ function renderWAGrid(bookings) {
     </div>`;
   }).join('');
 }
+
+window.clearResendFlag = async function(id) {
+  try {
+    await db.collection('payments').doc(id).update({ resendRequested: false });
+    await db.collection('bookings').doc(id).update({ resendRequested: false }).catch(()=>{});
+    showToast('\u2705 Marked as done', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
 
 window.markWASent = function(id, who) {
   if (!waSentLog[id]) waSentLog[id] = {};

@@ -907,20 +907,19 @@ window.downloadInvoice=function(){
   setTimeout(()=>w.print(),500);
 };
 
-window.resendTicket=function(){
+window.resendTicket=async function(){
   const b=document.getElementById('bookingModal')._currentBooking;
   if(!b) return;
-  const email=b.customerEmail||b.customer?.email||'';
-  const bid=b.id||b.bookingId||'';
-  const event=b.eventName||b.event?.name||'';
-  const amount=b.amount||0;
-  const type=b.bookingType||'event';
-  const url='success.html?bookingId='+encodeURIComponent(bid)
-    +'&event='+encodeURIComponent(event)
-    +'&amount='+encodeURIComponent(amount===0?'0':'\u20b9'+Number(amount).toLocaleString('en-IN'))
-    +'&status=Confirmed&type='+type;
-  window.open(url,'_blank');
-  showToast('Ticket opened in new tab'+(email?' — share link with '+email:''));
+  const btn=document.querySelector('#bookingModal button[onclick="resendTicket()"]');
+  if(btn){btn.textContent='Sending...';btn.disabled=true;}
+  try{
+    const ts=firebase.firestore.FieldValue.serverTimestamp();
+    const update={resendRequested:true,resendRequestedAt:ts};
+    await db.collection('bookings').doc(b.id).update(update).catch(()=>{});
+    await db.collection('payments').doc(b.id).update(update).catch(()=>{});
+    showToast('\u2705 Resend request sent to admin WhatsApp tab');
+  }catch(e){showToast('Error: '+e.message);}
+  if(btn){btn.textContent='\ud83d\udce7 Resend Ticket';btn.disabled=false;}
 };
 
 window.exportBookings=function(){
