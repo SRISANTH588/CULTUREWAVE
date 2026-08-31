@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Check-In Scanner</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+      authDomain: "ogshootsluxe-36740.firebaseapp.com",
+      projectId: "ogshootsluxe-36740",
+      storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+      messagingSenderId: "5471814825",
+      appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+    });
+  </script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Inter,system-ui,sans-serif;background:#0a0f1e;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 3rem;}
+    .logo{font-size:1.1rem;font-weight:800;letter-spacing:-.03em;color:#fff;margin-bottom:2rem;opacity:.7;}
+    .card{background:#111827;border:1px solid #1f2937;border-radius:24px;width:100%;max-width:480px;overflow:hidden;}
+
+    /* header */
+    .card-head{background:linear-gradient(135deg,#1242c5,#2f6bff);padding:1.5rem;text-align:center;}
+    .card-head h1{font-size:1.3rem;font-weight:800;letter-spacing:-.03em;}
+    .card-head p{font-size:.82rem;color:rgba(255,255,255,.65);margin-top:.3rem;}
+
+    /* scanner box */
+    .scanner-wrap{padding:1.25rem;display:flex;flex-direction:column;gap:1rem;}
+    #reader{border-radius:16px;overflow:hidden;background:#000;}
+    #reader video{border-radius:16px;}
+
+    /* manual input */
+    .manual-row{display:flex;gap:.5rem;}
+    .manual-row input{flex:1;padding:.65rem .9rem;border-radius:10px;border:1px solid #374151;background:#1f2937;color:#fff;font-size:.86rem;outline:none;}
+    .manual-row input:focus{border-color:#2f6bff;}
+    .manual-row input::placeholder{color:#6b7280;}
+    .manual-row button{padding:.65rem 1.1rem;border-radius:10px;background:#2f6bff;border:0;color:#fff;font-weight:700;font-size:.84rem;cursor:pointer;white-space:nowrap;}
+    .manual-row button:hover{background:#1242c5;}
+
+    /* result card */
+    .result{border-radius:16px;padding:1.25rem;display:none;flex-direction:column;gap:.75rem;}
+    .result.success{background:#052e16;border:1.5px solid #16a34a;}
+    .result.already{background:#1c1917;border:1.5px solid #f59e0b;}
+    .result.failed{background:#1c0a0a;border:1.5px solid #dc2626;}
+    .result.notfound{background:#1c1917;border:1.5px solid #6b7280;}
+
+    .result-icon{font-size:2.5rem;text-align:center;}
+    .result-title{font-size:1.1rem;font-weight:800;text-align:center;}
+    .result.success .result-title{color:#4ade80;}
+    .result.already .result-title{color:#fbbf24;}
+    .result.failed .result-title{color:#f87171;}
+    .result.notfound .result-title{color:#9ca3af;}
+
+    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+    .result-field{background:rgba(255,255,255,.05);border-radius:10px;padding:.6rem .75rem;}
+    .result-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6b7280;margin-bottom:.2rem;}
+    .result-value{font-size:.88rem;font-weight:700;color:#f9fafb;}
+
+    .scan-again{width:100%;padding:.7rem;border-radius:10px;background:#1f2937;border:1px solid #374151;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;margin-top:.25rem;}
+    .scan-again:hover{background:#374151;}
+
+    /* stats bar */
+    .stats{display:flex;gap:0;border-top:1px solid #1f2937;}
+    .stat{flex:1;padding:.85rem;text-align:center;border-right:1px solid #1f2937;}
+    .stat:last-child{border-right:0;}
+    .stat-num{font-size:1.4rem;font-weight:800;color:#fff;}
+    .stat-num.green{color:#4ade80;}
+    .stat-num.yellow{color:#fbbf24;}
+    .stat-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin-top:.15rem;}
+
+    /* log */
+    .log-wrap{width:100%;max-width:480px;margin-top:1rem;}
+    .log-head{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6b7280;margin-bottom:.5rem;padding:0 .25rem;}
+    .log-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;border-radius:10px;background:#111827;border:1px solid #1f2937;margin-bottom:.4rem;}
+    .log-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+    .log-dot.green{background:#4ade80;}
+    .log-dot.yellow{background:#fbbf24;}
+    .log-dot.red{background:#f87171;}
+    .log-info{flex:1;min-width:0;}
+    .log-info strong{display:block;font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .log-info span{font-size:.72rem;color:#6b7280;}
+    .log-time{font-size:.7rem;color:#4b5563;white-space:nowrap;}
+
+    .scanning-pulse{text-align:center;font-size:.82rem;color:#6b7280;padding:.5rem 0;animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{opacity:.4;}50%{opacity:1;}}
+  </style>
+</head>
+<body>
+
+<div class="logo">CultureWave · Check-In</div>
+
+<div class="card">
+  <div class="card-head">
+    <h1>📷 QR Check-In Scanner</h1>
+    <p>Scan attendee QR code to verify and check in</p>
+  </div>
+
+  <div class="scanner-wrap">
+    <!-- Camera scanner -->
+    <div id="reader"></div>
+    <div class="scanning-pulse" id="scanStatus">Point camera at attendee's QR code…</div>
+
+    <!-- Manual booking ID entry -->
+    <div class="manual-row">
+      <input type="text" id="manualId" placeholder="Or enter Booking ID manually…" />
+      <button onclick="manualLookup()">Check In</button>
+    </div>
+
+    <!-- Result -->
+    <div class="result" id="result">
+      <div class="result-icon" id="resultIcon"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-grid" id="resultGrid"></div>
+      <button class="scan-again" onclick="resetScanner()">🔄 Scan Next</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num green" id="statCheckedIn">0</div><div class="stat-label">Checked In</div></div>
+    <div class="stat"><div class="stat-num yellow" id="statAlready">0</div><div class="stat-label">Already In</div></div>
+    <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Scans</div></div>
+  </div>
+</div>
+
+<!-- Scan log -->
+<div class="log-wrap">
+  <div class="log-head">Recent Scans</div>
+  <div id="scanLog"></div>
+</div>
+
+<script>
+  const db = firebase.firestore();
+  let scanner = null;
+  let scanning = true;
+  let stats = { checkedIn: 0, already: 0, total: 0 };
+
+  // ── START SCANNER ──
+  function startScanner() {
+    scanner = new Html5Qrcode("reader");
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 260, height: 260 } },
+      onScanSuccess,
+      () => {}
+    ).catch(err => {
+      document.getElementById("scanStatus").textContent = "Camera access denied. Use manual entry below.";
+    });
+  }
+
+  function onScanSuccess(text) {
+    if (!scanning) return;
+    scanning = false;
+    processQR(text);
+  }
+
+  // ── PARSE QR ──
+  function parseQR(text) {
+    // QR encodes JSON: { id, event, amount, date, issuer, type }
+    try {
+      const d = JSON.parse(text);
+      return d.id ? d : null;
+    } catch {
+      // maybe plain booking ID
+      return text.trim() ? { id: text.trim() } : null;
+    }
+  }
+
+  // ── PROCESS ──
+  async function processQR(text) {
+    const parsed = parseQR(text);
+    if (!parsed) {
+      showResult("notfound", "❓", "Invalid QR Code", [], "invalid");
+      return;
+    }
+    await checkIn(parsed.id, parsed);
+  }
+
+  async function checkIn(bookingId, qrData) {
+    document.getElementById("scanStatus").textContent = "Looking up booking…";
+    try {
+      // check bookings collection first, then payments
+      let snap = await db.collection("bookings").doc(bookingId).get();
+      if (!snap.exists()) {
+        snap = await db.collection("payments").doc(bookingId).get();
+      }
+
+      if (!snap.exists()) {
+        showResult("notfound", "❌", "Booking Not Found",
+          [["Booking ID", bookingId.slice(-10).toUpperCase()], ["Status", "Not in system"]],
+          "notfound"
+        );
+        addLog("red", bookingId.slice(-10).toUpperCase(), "Not found", "notfound");
+        stats.total++;
+        updateStats();
+        return;
+      }
+
+      const data = snap.data();
+      const shortId = bookingId.slice(-10).toUpperCase();
+      const name = data.customerName || data.customer?.name || "Guest";
+      const event = data.eventName || data.event?.name || "—";
+      const seats = data.seats || "1";
+      const amount = data.amount ? "₹" + Number(data.amount).toLocaleString("en-IN") : "Free";
+      const type = data.bookingType || "event";
+
+      if (data.checkedIn) {
+        const checkedAt = data.checkedInAt?.toDate
+          ? data.checkedInAt.toDate().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+          : "Earlier";
+        showResult("already", "⚠️", "Already Checked In",
+          [["Name", name], ["Event", event], ["Booking ID", shortId], ["Checked in at", checkedAt]],
+          "already"
+        );
+        addLog("yellow", name, event + " · Already checked in", "already");
+        stats.already++;
+        stats.total++;
+        updateStats();
+        return;
+      }
+
+      // ✅ Mark as checked in
+      const ref = snap.ref;
+      await ref.update({
+        checkedIn: true,
+        checkedInAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
+      showResult("success", "✅", "Check-In Successful!",
+        [["Name", name], ["Event", event], ["Booking ID", shortId], ["Seats", seats], ["Amount", amount], ["Type", type]],
+        "success"
+      );
+      addLog("green", name, event, "success");
+      stats.checkedIn++;
+      stats.total++;
+      updateStats();
+
+    } catch (e) {
+      showResult("failed", "🚫", "Error: " + e.message, [], "failed");
+      stats.total++;
+      updateStats();
+    }
+  }
+
+  // ── SHOW RESULT ──
+  function showResult(type, icon, title, fields, cls) {
+    const el = document.getElementById("result");
+    el.className = "result " + type;
+    el.style.display = "flex";
+    document.getElementById("resultIcon").textContent = icon;
+    document.getElementById("resultTitle").textContent = title;
+    document.getElementById("resultGrid").innerHTML = fields.map(([l, v]) =>
+      `<div class="result-field"><div class="result-label">${l}</div><div class="result-value">${v}</div></div>`
+    ).join("");
+    document.getElementById("scanStatus").textContent = "";
+  }
+
+  // ── RESET ──
+  function resetScanner() {
+    document.getElementById("result").style.display = "none";
+    document.getElementById("result").className = "result";
+    document.getElementById("manualId").value = "";
+    document.getElementById("scanStatus").textContent = "Point camera at attendee's QR code…";
+    scanning = true;
+  }
+
+  // ── MANUAL LOOKUP ──
+  async function manualLookup() {
+    const val = document.getElementById("manualId").value.trim();
+    if (!val) return;
+    scanning = false;
+    await checkIn(val, { id: val });
+  }
+  document.getElementById("manualId").addEventListener("keydown", e => {
+    if (e.key === "Enter") manualLookup();
+  });
+
+  // ── STATS ──
+  function updateStats() {
+    document.getElementById("statCheckedIn").textContent = stats.checkedIn;
+    document.getElementById("statAlready").textContent = stats.already;
+    document.getElementById("statTotal").textContent = stats.total;
+  }
+
+  // ── LOG ──
+  function addLog(color, name, sub, type) {
+    const log = document.getElementById("scanLog");
+    const time = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const item = document.createElement("div");
+    item.className = "log-item";
+    item.innerHTML = `
+      <div class="log-dot ${color}"></div>
+      <div class="log-info"><strong>${name}</strong><span>${sub}</span></div>
+      <div class="log-time">${time}</div>`;
+    log.prepend(item);
+    // keep max 20 entries
+    while (log.children.length > 20) log.removeChild(log.lastChild);
+  }
+
+  // start on load
+  startScanner();
+</script>
+</body>
+</html>
