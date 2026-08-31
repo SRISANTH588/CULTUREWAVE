@@ -904,6 +904,40 @@
 
     document.getElementById("back4").addEventListener("click", () => goStep(3));
 
+    async function saveBooking(data) {
+      try {
+        const db = firebase.firestore();
+        const ts = firebase.firestore.FieldValue.serverTimestamp();
+        const bookingDoc = {
+          bookingId:     data.bookingId,
+          eventName:     data.eventName,
+          amount:        data.amount,
+          seats:         data.seats,
+          bookingType:   data.bookingType,
+          status:        data.status,
+          paymentId:     data.paymentId || null,
+          method:        data.method || "upi",
+          customerName:  data.name,
+          customerEmail: data.email,
+          customerPhone: data.phone,
+          date:          data.date || "",
+          time:          data.time || "",
+          createdAt:     ts,
+        };
+        // save to bookings collection
+        await db.collection("bookings").doc(data.bookingId).set(bookingDoc);
+        // save to payments collection (for admin dashboard)
+        await db.collection("payments").doc(data.bookingId).set({
+          ...bookingDoc,
+          receipt:   data.bookingId,
+          eventName: data.eventName,
+          customer: { name: data.name, email: data.email, phone: data.phone },
+        });
+      } catch(e) {
+        console.error("saveBooking error:", e);
+      }
+    }
+
     async function createFreeBooking(item, n) {
       const name = document.getElementById("bookName").value.trim();
       const email = document.getElementById("bookEmail").value.trim();
@@ -947,6 +981,14 @@
         statusText.textContent = "✅ Confirmed";
         statusText.className   = "bk-status-pill success";
         const bid = "CV" + Date.now();
+        await saveBooking({
+          bookingId: bid, eventName: item.name, amount: 0,
+          seats: n, bookingType, status: "confirmed",
+          paymentId: null, method: "free",
+          name: document.getElementById("bookName").value.trim(),
+          email: document.getElementById("bookEmail").value.trim(),
+          phone: document.getElementById("bookPhone").value.trim(),
+        });
         window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
           + "&event=" + encodeURIComponent(item.name)
           + "&amount=0"
@@ -1000,6 +1042,16 @@
               date:        dateVal,
               time:        timeVal,
               method:      document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
+            });
+            await saveBooking({
+              bookingId: bid, eventName: item.name, amount: total,
+              seats: n, bookingType, status: "paid",
+              paymentId: r.razorpay_payment_id || bid,
+              method: document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
+              name: document.getElementById("bookName").value.trim(),
+              email: document.getElementById("bookEmail").value.trim(),
+              phone: document.getElementById("bookPhone").value.trim(),
+              date: dateVal, time: timeVal,
             });
             window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
               + "&event=" + encodeURIComponent(item.name)
