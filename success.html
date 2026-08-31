@@ -464,10 +464,29 @@
 
       // QR code — encode booking verification data
       const qrData = JSON.stringify({ id: bookingId, event: eventName, amount, date: dateStr, issuer: "CultureWave", type: bkType });
-      QRCode.toCanvas(document.getElementById("qrCanvas"), qrData, {
-        width: 120, margin: 1,
-        color: { dark: "#0a0f1e", light: "#ffffff" }
-      });
+      try {
+        QRCode.toCanvas(document.getElementById("qrCanvas"), qrData, {
+          width: 120, margin: 1,
+          color: { dark: "#0a0f1e", light: "#ffffff" }
+        }, function(err) {
+          if (err) {
+            // fallback: use QRCode img tag
+            const img = document.createElement("img");
+            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=" + encodeURIComponent(qrData);
+            img.style.borderRadius = "8px";
+            img.width = 120; img.height = 120;
+            const canvas = document.getElementById("qrCanvas");
+            canvas.parentNode.replaceChild(img, canvas);
+          }
+        });
+      } catch(e) {
+        const img = document.createElement("img");
+        img.src = "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=" + encodeURIComponent(qrData);
+        img.style.borderRadius = "8px";
+        img.width = 120; img.height = 120;
+        const canvas = document.getElementById("qrCanvas");
+        canvas.parentNode.replaceChild(img, canvas);
+      }
       if (isRestaurant) {
         document.getElementById("qrScanNote").textContent = "Staff scans at reception";
       }
