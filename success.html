@@ -508,9 +508,12 @@
       const btn = document.getElementById("btnDownload");
       btn.textContent = "⏳ Generating...";
       btn.disabled = true;
+      // temporarily hide any external <img> (QR fallback) to avoid CORS block
+      const extImgs = document.querySelectorAll("#scTicket img[src^='http']");
+      extImgs.forEach(img => img.style.visibility = "hidden");
       try {
         const canvas = await html2canvas(document.getElementById("scTicket"), {
-          scale: 2, useCORS: true, backgroundColor: "#ffffff",
+          scale: 2, useCORS: true, allowTaint: true, backgroundColor: "#ffffff",
           logging: false
         });
         const link = document.createElement("a");
@@ -518,30 +521,39 @@
         link.href = canvas.toDataURL("image/png");
         link.click();
       } catch(e) {
-        alert("Download failed. Try a screenshot instead.");
+        alert("Download failed. Please take a screenshot instead.");
       }
+      extImgs.forEach(img => img.style.visibility = "");
       btn.textContent = "⬇️ Download Ticket";
       btn.disabled = false;
     });
 
     /* ── SHARE ── */
     document.getElementById("btnShare")?.addEventListener("click", async () => {
-      const shareData = {
-        title: "CultureWave Booking Confirmed",
-        text: `I just booked "${eventName}" on CultureWave! Booking ID: ${shortId}`,
-        url: window.location.href,
-      };
+      const shareText = `I just booked "${eventName}" on CultureWave! Booking ID: ${shortId}`;
+      const shareUrl  = window.location.href;
+      const btn = document.getElementById("btnShare");
       if (navigator.share) {
-        try { await navigator.share(shareData); } catch(e) { /* dismissed */ }
-      } else {
-        try {
-          await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
-          const btn = document.getElementById("btnShare");
-          btn.textContent = "✅ Copied!";
-          setTimeout(() => btn.textContent = "🔗 Share", 2000);
-        } catch(e) {
-          alert("Share link: " + window.location.href);
+        try { await navigator.share({ title: "CultureWave Booking Confirmed", text: shareText, url: shareUrl }); } catch(e) { /* dismissed */ }
+        return;
+      }
+      // clipboard fallback — works on HTTPS; on file:// use textarea trick
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(shareText + "\n" + shareUrl);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = shareText + "\n" + shareUrl;
+          ta.style.cssText = "position:fixed;opacity:0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
         }
+        btn.textContent = "✅ Copied!";
+        setTimeout(() => btn.textContent = "🔗 Share", 2000);
+      } catch(e) {
+        alert("Copy this link:\n" + shareUrl);
       }
     });
 
