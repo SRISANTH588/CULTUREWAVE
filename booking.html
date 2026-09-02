@@ -31,7 +31,7 @@
     const EMAILJS_TEMPLATE_ID  = "template_caj3zqw";
 
     (function() {
-      if (EMAILJS_PUBLIC_KEY) {
+      if (EMAILJS_PUBLIC_KEY && window.emailjs) {
         emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
       }
     })();
@@ -45,6 +45,10 @@
         console.warn("Booking email skipped: customer email is missing.");
         return false;
       }
+      if (!window.emailjs) {
+        console.error("Booking email failed: EmailJS library did not load.");
+        return false;
+      }
       const isRestaurant = bookingType === "restaurant";
       const ticketOrigin = "https://srisanth588.github.io";
       const successUrl = ticketOrigin + "/success.html?bookingId=" + encodeURIComponent(bookingId)
@@ -54,9 +58,11 @@
         + (date ? "&date=" + encodeURIComponent(date) : "")
         + (time ? "&time=" + encodeURIComponent(time) : "");
       try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        const response = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           to_name:      name,
           to_email:     email,
+          recipient_email: email,
+          user_email:   email,
           event_name:   eventName,
           booking_id:   bookingId.slice(-10).toUpperCase(),
           amount:       amount,
@@ -68,9 +74,10 @@
           ticket_url:   successUrl,
           reply_to:     "support@culturewave.in",
         });
+        console.info("Booking confirmation email sent:", response.status, response.text);
         return true;
       } catch(e) {
-        console.warn("EmailJS send failed:", e);
+        console.error("EmailJS send failed:", e?.text || e?.message || e);
         return false;
       }
     }
@@ -1052,6 +1059,16 @@
             const bid = r.razorpay_payment_id || ("CV" + Date.now());
             statusText.textContent = "✅ Confirmed";
             statusText.className   = "bk-status-pill success";
+            await saveBooking({
+              bookingId: bid, eventName: item.name, amount: total,
+              seats: n, bookingType, status: "paid",
+              paymentId: r.razorpay_payment_id || bid,
+              method: document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
+              name: document.getElementById("bookName").value.trim(),
+              email: document.getElementById("bookEmail").value.trim(),
+              phone: document.getElementById("bookPhone").value.trim(),
+              date: dateVal, time: timeVal,
+            });
             await sendBookingEmail({
               name:        document.getElementById("bookName").value.trim() || "Guest",
               email:       document.getElementById("bookEmail").value.trim(),
@@ -1063,16 +1080,6 @@
               date:        dateVal,
               time:        timeVal,
               method:      document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
-            });
-            await saveBooking({
-              bookingId: bid, eventName: item.name, amount: total,
-              seats: n, bookingType, status: "paid",
-              paymentId: r.razorpay_payment_id || bid,
-              method: document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
-              name: document.getElementById("bookName").value.trim(),
-              email: document.getElementById("bookEmail").value.trim(),
-              phone: document.getElementById("bookPhone").value.trim(),
-              date: dateVal, time: timeVal,
             });
             window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
               + "&event=" + encodeURIComponent(item.name)
