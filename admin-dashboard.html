@@ -47,6 +47,12 @@
     .sb-item .si-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:800;padding:.15rem .45rem;border-radius:999px;min-width:18px;text-align:center;}
     .sb-item .si-badge.green{background:var(--green);}
     .sb-item .si-badge.orange{background:var(--orange);}
+    .premium-wrap{position:relative;overflow:hidden;border-radius:20px;}
+    .premium-wrap .premium-gate{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;background:linear-gradient(to bottom,rgba(248,249,250,0) 0%,rgba(248,249,250,.82) 35%,rgba(248,249,250,1) 60%);border-radius:20px;}
+    .premium-wrap .premium-gate .pg-icon{font-size:2.8rem;margin-bottom:.6rem;}
+    .premium-wrap .premium-gate h3{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:.3rem;}
+    .premium-wrap .premium-gate p{font-size:.8rem;color:var(--muted);margin-bottom:1rem;max-width:300px;}
+    .premium-wrap .premium-gate .pg-btn{padding:.55rem 1.4rem;border-radius:10px;border:0;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-weight:800;font-size:.84rem;cursor:pointer;box-shadow:0 4px 14px rgba(217,119,6,.35);}
     .sb-divider{height:1px;background:var(--border);margin:.5rem .6rem;}
     .sb-bottom{margin-top:auto;padding:.75rem .6rem 1rem;border-top:1px solid var(--border);}
     .sb-user-row{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:12px;background:var(--bg);}
@@ -285,6 +291,8 @@
        VIEW: OVERVIEW
   ══════════════════════════════════════════ -->
   <div class="view active" data-view="overview">
+  <div class="premium-wrap">
+  <div class="premium-gate"><div class="pg-icon">👑</div><h3>Premium Feature</h3><p>Overview is available on the Premium plan. Upgrade to unlock full dashboard analytics and insights.</p><button class="pg-btn" onclick="showToast('Contact support to upgrade 🚀','success')">🚀 Upgrade to Premium</button></div>
 
     <!-- Hero Banner -->
     <div style="background:linear-gradient(135deg,#1e3a8a 0%,var(--blue) 50%,var(--blue-2) 100%);border-radius:24px;padding:2rem 2.25rem;position:relative;overflow:hidden;">
@@ -416,12 +424,15 @@
       </div>
     </div>
 
+  </div><!-- /premium-wrap overview -->
   </div>
 
   <!-- ══════════════════════════════════════════
        VIEW: ANALYTICS
   ══════════════════════════════════════════ -->
   <div class="view" data-view="analytics">
+  <div class="premium-wrap">
+  <div class="premium-gate"><div class="pg-icon">👑</div><h3>Premium Feature</h3><p>Analytics is available on the Premium plan. Upgrade to unlock revenue trends, user growth and platform metrics.</p><button class="pg-btn" onclick="showToast('Contact support to upgrade 🚀','success')">🚀 Upgrade to Premium</button></div>
     <div style="background:linear-gradient(135deg,var(--blue) 0%,var(--blue-2) 100%);border-radius:20px;padding:1.4rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
       <div>
         <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.25rem .75rem;font-size:.65rem;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem;">📈 Analytics</div>
@@ -464,6 +475,7 @@
         <div id="webReqSplit" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;"></div>
       </div>
     </div>
+  </div><!-- /premium-wrap analytics -->
   </div>
 
   <!-- ══════════════════════════════════════════
