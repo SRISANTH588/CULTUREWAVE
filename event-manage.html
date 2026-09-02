@@ -1059,11 +1059,18 @@ function processCheckIn(val){
   }
   if(b.checkedIn){
     const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
-    statusEl.textContent='\u26a0 Already checked in: '+name;
-    statusEl.style.color='#e67700';
-    showToast('Already checked in: '+name);
-    addCiListItem(b,'duplicate');
-    stopCiScanner();
+    const email=b.customerEmail||b.customer?.email||b.buyerEmail||'—';
+    const phone=b.customerPhone||b.customer?.phone||b.buyerPhone||'—';
+    document.getElementById('ciConfirmName').textContent=name;
+    document.getElementById('ciConfirmEmail').textContent=email;
+    document.getElementById('ciConfirmPhone').textContent=phone;
+    document.getElementById('ciConfirmModal').querySelector('div').style.background='linear-gradient(135deg,#b45309,#d97706)';
+    document.getElementById('ciConfirmModal').querySelector('div div:first-child').textContent='⚠ Already Checked In';
+    document.getElementById('ciConfirmModal').querySelector('div div:last-child').textContent='This ticket was already used for entry';
+    document.querySelector('[onclick="confirmCiCheckIn()"]').style.display='none';
+    document.querySelector('[onclick="cancelCiConfirm()"]').style.gridColumn='1/-1';
+    document.getElementById('ciConfirmModal').style.display='flex';
+    ciPendingBooking=null;
     return;
   }
   ciPendingBooking=b;
@@ -1077,12 +1084,19 @@ function showCiConfirmModal(b){
   document.getElementById('ciConfirmName').textContent=name;
   document.getElementById('ciConfirmEmail').textContent=email;
   document.getElementById('ciConfirmPhone').textContent=phone;
-  const modal=document.getElementById('ciConfirmModal');
-  modal.style.display='flex';
+  // reset to normal state
+  document.getElementById('ciConfirmModal').querySelector('div').style.background='linear-gradient(135deg,#1242c5,#2f6bff)';
+  document.getElementById('ciConfirmModal').querySelector('div div:first-child').textContent='\u{1F4F7} Confirm Check-In';
+  document.getElementById('ciConfirmModal').querySelector('div div:last-child').textContent='Review customer details before checking in';
+  document.querySelector('[onclick="confirmCiCheckIn()"]').style.display='';
+  document.querySelector('[onclick="cancelCiConfirm()"]').style.gridColumn='';
+  document.getElementById('ciConfirmModal').style.display='flex';
 }
 
 window.cancelCiConfirm=async function(){
   document.getElementById('ciConfirmModal').style.display='none';
+  document.querySelector('[onclick="confirmCiCheckIn()"]').style.display='';
+  document.querySelector('[onclick="cancelCiConfirm()"]').style.gridColumn='';
   ciPendingBooking=null;
   await stopCiScanner();
 };
