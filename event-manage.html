@@ -291,13 +291,72 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 <!-- CHECK-IN PANEL -->
 <div class="panel" id="panel-checkin">
-  <iframe
-    src="checkin.html"
-    style="width:100%;height:calc(100vh - 70px);border:none;border-radius:14px;"
-    allow="camera;microphone"
-    allowusermedia
-    title="Check-In Scanner"
-  ></iframe>
+  <div class="stat-grid" style="grid-template-columns:1fr 1fr;">
+    <div class="stat-card">
+      <div class="stat-icon blue">&#128101;</div>
+      <div><div class="stat-label">Registered</div><div class="stat-val" id="ciTotal">0</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">&#10003;</div>
+      <div><div class="stat-label">Checked In</div><div class="stat-val" id="ciCheckedIn">0</div></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+    <div class="card">
+      <div class="card-head"><div><h2>&#128247; QR Scanner</h2><p>Camera starts automatically — point at ticket QR</p></div></div>
+      <div style="padding:1rem;display:flex;flex-direction:column;gap:.85rem;">
+        <div id="ciScannerBox" style="border:2px dashed var(--border);border-radius:12px;overflow:hidden;background:#f8f9fa;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative;">
+          <div id="qr-reader" style="width:100%;"></div>
+          <div id="ciPlaceholder" style="position:absolute;display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:2rem;">
+            <div style="font-size:2.5rem;">&#128247;</div>
+            <div style="font-size:.86rem;font-weight:600;color:var(--muted);">Click the button below to start scanning</div>
+          </div>
+        </div>
+        <div id="scanStatus" style="text-align:center;font-size:.82rem;font-weight:600;color:var(--muted);">Ready</div>
+        <button id="ciScanBtn" onclick="toggleCiScanner()" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.65rem 1.4rem;border-radius:10px;background:var(--blue);color:#fff;font-weight:700;font-size:.88rem;border:0;cursor:pointer;box-shadow:0 4px 14px rgba(59,91,219,.3);width:100%;">&#128247; Scan QR Code</button>
+        <div style="display:flex;gap:.5rem;">
+          <input id="ciInput" type="text" placeholder="Or type Booking ID manually…" style="flex:1;padding:.6rem .85rem;border-radius:9px;border:1px solid var(--border);font:inherit;font-size:.86rem;outline:none;"/>
+          <button onclick="checkInTicket()" style="padding:.6rem 1rem;border-radius:9px;background:var(--green);border:0;color:#fff;font-weight:700;font-size:.84rem;cursor:pointer;">&#10003; Check</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Recent Check-Ins</h2><p>Live activity</p></div></div>
+      <div id="ciList" style="padding:.75rem;display:flex;flex-direction:column;gap:.4rem;max-height:420px;overflow-y:auto;">
+        <div style="text-align:center;padding:2rem;color:var(--muted);font-size:.82rem;">No check-ins yet</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECK-IN CONFIRM MODAL -->
+<div id="ciConfirmModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.25);">
+    <div style="background:linear-gradient(135deg,#1242c5,#2f6bff);padding:1.25rem 1.5rem;">
+      <div style="font-size:1rem;font-weight:800;color:#fff;">&#128247; Confirm Check-In</div>
+      <div style="font-size:.76rem;color:rgba(255,255,255,.7);margin-top:.2rem;">Review customer details before checking in</div>
+    </div>
+    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.75rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+        <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.65rem .85rem;grid-column:1/-1;">
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Name</div>
+          <div style="font-size:.95rem;font-weight:800;" id="ciConfirmName">—</div>
+        </div>
+        <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.65rem .85rem;grid-column:1/-1;">
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Email</div>
+          <div style="font-size:.88rem;font-weight:700;" id="ciConfirmEmail">—</div>
+        </div>
+        <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.65rem .85rem;grid-column:1/-1;">
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Phone</div>
+          <div style="font-size:.88rem;font-weight:700;" id="ciConfirmPhone">—</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.25rem;">
+        <button onclick="cancelCiConfirm()" style="padding:.7rem;border-radius:9px;background:#fff;border:1.5px solid var(--border);font-weight:700;font-size:.88rem;cursor:pointer;color:#495057;">✕ Cancel</button>
+        <button onclick="confirmCiCheckIn()" style="padding:.7rem;border-radius:9px;background:var(--green);border:0;color:#fff;font-weight:700;font-size:.88rem;cursor:pointer;">✓ Check In</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- REMINDERS PANEL -->
@@ -664,6 +723,8 @@ function switchPanel(btn,panelId){
   btn.classList.add('active');
   const panel=document.getElementById('panel-'+panelId);
   if(panel) panel.classList.add('active');
+  if(panelId==='checkin') ciScanPaused=false;
+  else stopCiScanner();
 }
 
 function avatarColor(name){
@@ -746,8 +807,10 @@ function renderBookingStats(){
   document.getElementById('bkRevenue').textContent=money(totalRev);
   document.getElementById('bkTickets').textContent=totalTickets;
   document.getElementById('bkCountLabel').textContent=allBookings.length+' booking'+(allBookings.length!==1?'s':'');
-  document.getElementById('ciTotal').textContent=allBookings.length;
-  document.getElementById('ciCheckedIn').textContent=allBookings.filter(b=>b.checkedIn).length;
+  const ciTotalEl=document.getElementById('ciTotal');
+  const ciCheckedInEl=document.getElementById('ciCheckedIn');
+  if(ciTotalEl) ciTotalEl.textContent=allBookings.length;
+  if(ciCheckedInEl) ciCheckedInEl.textContent=allBookings.filter(b=>b.checkedIn).length;
 
   const ticketMap={};
   paid.forEach(b=>{
@@ -937,87 +1000,124 @@ window.exportBookings=function(){
 
 document.getElementById('bkSearch').addEventListener('input',renderBookings);
 
-let html5QrCode=null,scannerRunning=false;
+let html5QrCode=null,scannerRunning=false,ciScanPaused=false,ciPendingBooking=null;
 
-window.toggleScanner=async function(){
-  if(scannerRunning) await stopScanner();
-  else await startScanner();
+window.toggleCiScanner=async function(){
+  if(scannerRunning) await stopCiScanner();
+  else await startCiScanner();
 };
 
-window.startScanner=async function(){
+async function startCiScanner(){
   const statusEl=document.getElementById('scanStatus');
-  const startBtn=document.getElementById('startScanBtn');
+  const placeholder=document.getElementById('ciPlaceholder');
   if(scannerRunning) return;
   try{
     html5QrCode=new Html5Qrcode('qr-reader');
     await html5QrCode.start(
       {facingMode:'environment'},
-      {fps:10,qrbox:{width:250,height:250}},
-      async(decodedText)=>{ if(scannerRunning) await processCheckIn(decodedText.trim()); },
+      {fps:10,qrbox:{width:240,height:240}},
+      (text)=>{ if(!ciScanPaused){ ciScanPaused=true; processCheckIn(text.trim()); } },
       ()=>{}
     );
     scannerRunning=true;
-    startBtn.style.background='#c92a2a';
-    startBtn.innerHTML='&#9209; Stop Scan';
-    statusEl.textContent='Camera active — point at QR code';
+    if(placeholder) placeholder.style.display='none';
+    document.getElementById('ciScannerBox').style.background='#000';
+    const btn=document.getElementById('ciScanBtn');
+    if(btn){btn.style.background='#c92a2a';btn.innerHTML='&#9209; Stop Camera';}
+    statusEl.textContent='Scanning… point at QR code';
     statusEl.style.color='var(--green)';
   }catch(e){
+    if(placeholder) placeholder.style.display='none';
     statusEl.textContent='Camera error: '+e.message;
     statusEl.style.color='#c92a2a';
   }
-};
+}
 
-window.stopScanner=async function(){
-  const startBtn=document.getElementById('startScanBtn');
-  const statusEl=document.getElementById('scanStatus');
-  if(html5QrCode&&scannerRunning){await html5QrCode.stop();html5QrCode.clear();}
+async function stopCiScanner(){
+  if(html5QrCode&&scannerRunning){try{await html5QrCode.stop();html5QrCode.clear();}catch(e){}}
   scannerRunning=false;
-  startBtn.style.background='#3b5bdb';
-  startBtn.innerHTML='&#128247; Scan';
-  statusEl.textContent='Scanner stopped';
-  statusEl.style.color='var(--muted)';
-};
+  const placeholder=document.getElementById('ciPlaceholder');
+  const box=document.getElementById('ciScannerBox');
+  if(placeholder){placeholder.style.display='flex';placeholder.querySelector('div:last-child').textContent='Click the button below to start scanning';}
+  if(box) box.style.background='#f8f9fa';
+  const btn=document.getElementById('ciScanBtn');
+  if(btn){btn.style.background='var(--blue)';btn.innerHTML='&#128247; Scan QR Code';}
+  const statusEl=document.getElementById('scanStatus');
+  if(statusEl){statusEl.textContent='Ready';statusEl.style.color='var(--muted)';}
+}
 
-async function processCheckIn(val){
+function processCheckIn(val){
   const statusEl=document.getElementById('scanStatus');
   if(!val) return;
   const b=allBookings.find(x=>x.id===val||x.bookingId===val||x.ticketId===val);
   if(!b){
-    statusEl.textContent='✗ Not found: '+val;
+    statusEl.textContent='\u2717 Not found: '+val;
     statusEl.style.color='#c92a2a';
     showToast('Ticket not found: '+val);
+    stopCiScanner();
     return;
   }
   if(b.checkedIn){
-    const name=b.customer?.name||b.buyerName||'Guest';
-    statusEl.textContent='⚠ Already checked in: '+name;
+    const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
+    statusEl.textContent='\u26a0 Already checked in: '+name;
     statusEl.style.color='#e67700';
     showToast('Already checked in: '+name);
     addCiListItem(b,'duplicate');
+    stopCiScanner();
     return;
   }
+  ciPendingBooking=b;
+  showCiConfirmModal(b);
+}
+
+function showCiConfirmModal(b){
+  const name  = b.customerName||b.customer?.name||b.buyerName||'Guest';
+  const email = b.customerEmail||b.customer?.email||b.buyerEmail||'\u2014';
+  const phone = b.customerPhone||b.customer?.phone||b.buyerPhone||'\u2014';
+  document.getElementById('ciConfirmName').textContent=name;
+  document.getElementById('ciConfirmEmail').textContent=email;
+  document.getElementById('ciConfirmPhone').textContent=phone;
+  const modal=document.getElementById('ciConfirmModal');
+  modal.style.display='flex';
+}
+
+window.cancelCiConfirm=async function(){
+  document.getElementById('ciConfirmModal').style.display='none';
+  ciPendingBooking=null;
+  await stopCiScanner();
+};
+
+window.confirmCiCheckIn=async function(){
+  const b=ciPendingBooking;
+  if(!b) return;
+  document.getElementById('ciConfirmModal').style.display='none';
   await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp()});
   b.checkedIn=true;
-  const name=b.customer?.name||b.buyerName||'Guest';
-  statusEl.textContent='✓ Checked in: '+name;
+  const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
+  const statusEl=document.getElementById('scanStatus');
+  statusEl.textContent='\u2713 Checked in: '+name;
   statusEl.style.color='var(--green)';
   showToast('Checked in: '+name);
   addCiListItem(b,'success');
   document.getElementById('ciCheckedIn').textContent=allBookings.filter(x=>x.checkedIn).length;
-}
+  ciPendingBooking=null;
+  await stopCiScanner();
+};
 
 function addCiListItem(b,type){
-  const name=b.customer?.name||b.buyerName||'Guest';
+  const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
   const ticket=b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
   const time=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
   const color=type==='success'?'var(--green)':type==='duplicate'?'#e67700':'#c92a2a';
-  const icon=type==='success'?'✓':type==='duplicate'?'⚠':'✗';
+  const icon=type==='success'?'\u2713':type==='duplicate'?'\u26a0':'\u2717';
+  const list=document.getElementById('ciList');
+  const empty=list.querySelector('div[style*="text-align:center"]');
+  if(empty) empty.remove();
   const item=document.createElement('div');
   item.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;border-radius:10px;background:#f8f9fa;border:1px solid var(--border);';
   item.innerHTML='<div style="width:32px;height:32px;border-radius:50%;background:'+color+';display:grid;place-items:center;font-size:.9rem;color:#fff;flex:none;">'+icon+'</div>'
     +'<div style="flex:1;"><div style="font-size:.84rem;font-weight:700;">'+esc(name)+'</div><div style="font-size:.72rem;color:var(--muted);">'+esc(ticket)+'</div></div>'
     +'<div style="font-size:.72rem;color:var(--muted);">'+time+'</div>';
-  const list=document.getElementById('ciList');
   list.insertBefore(item,list.firstChild);
   if(list.children.length>10) list.removeChild(list.lastChild);
 }
@@ -1025,7 +1125,8 @@ function addCiListItem(b,type){
 window.checkInTicket=async function(){
   const val=document.getElementById('ciInput').value.trim();
   if(!val){showToast('Enter a booking ID');return;}
-  await processCheckIn(val);
+  ciScanPaused=true;
+  processCheckIn(val);
   document.getElementById('ciInput').value='';
 };
 
