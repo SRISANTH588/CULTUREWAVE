@@ -984,8 +984,7 @@ function loadBookings(){
       b.event?.id===eventId ||
       b.event?.eventId===eventId
     );
-    allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderBookings();renderBookingStats();renderAnalytics();
+    renderBookings();renderBookingStats();renderAnalytics();renderCiRecent();
   });
 }
 
@@ -1204,6 +1203,32 @@ window.ciSwitchTab=function(tab){
   document.getElementById('ciListSearch').style.display=tab==='search'?'block':'none';
 };
 
+function ciDateValue(value){
+  if(!value) return 0;
+  const date=value.toDate?value.toDate():new Date(value);
+  return Number.isNaN(date.getTime())?0:date.getTime();
+}
+
+function renderCiRecent(){
+  const recent=allBookings.filter(b=>b.checkedIn).sort((a,b)=>ciDateValue(b.checkedInDate||b.checkedInAt)-ciDateValue(a.checkedInDate||a.checkedInAt)).slice(0,20);
+  ciRecentItems=recent;
+  const countEl=document.getElementById('ciRecentCount');
+  if(countEl) countEl.textContent=recent.length;
+  const list=document.getElementById('ciListRecent');
+  if(!list) return;
+  if(!recent.length){list.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128100;</div><h3>No check-ins yet</h3><p>Scan QR codes or search attendees to check them in</p></div>';return;}
+  list.innerHTML=recent.map(x=>{
+    const n=x.customerName||x.customer?.name||x.buyerName||'Guest';
+    const e=x.customerEmail||x.customer?.email||x.buyerEmail||'\u2014';
+    const ini=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
+    let h=0;for(let i=0;i<n.length;i++)h=(h+n.charCodeAt(i))%cols.length;
+    const stamp=x.checkedInDate||x.checkedInAt;
+    const date=ciDateValue(stamp)?new Date(ciDateValue(stamp)).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Recently';
+    return '<div class="ci-log-item"><div class="ci-log-avatar" style="background:'+cols[h]+';">'+esc(ini)+'</div><div style="flex:1;min-width:0;"><div class="ci-log-name">'+esc(n)+'</div><div class="ci-log-sub">'+esc(e)+'</div></div><span class="ci-log-badge success">Checked In</span><span class="ci-log-time">'+date+'</span></div>';
+  }).join('');
+}
+
 window.ciSearch=function(){
   const q=document.getElementById('ciSearchInput').value.trim().toLowerCase();
   const listEl=document.getElementById('ciListSearch');
@@ -1346,23 +1371,7 @@ window.confirmCiCheckIn=async function(){
   b.checkedInDate=checkedInDate;
   const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
   showToast('\u2713 Checked in: '+name);
-  ciRecentItems.unshift(b);
-  if(ciRecentItems.length>20) ciRecentItems.pop();
-  const countEl=document.getElementById('ciRecentCount');
-  if(countEl) countEl.textContent=ciRecentItems.length;
-  const list=document.getElementById('ciListRecent');
-  if(list){
-    list.innerHTML=ciRecentItems.map(x=>{
-      const n=x.customerName||x.customer?.name||x.buyerName||'Guest';
-      const e=x.customerEmail||x.customer?.email||x.buyerEmail||'\u2014';
-      const ini=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
-      let h=0;for(let i=0;i<n.length;i++)h=(h+n.charCodeAt(i))%cols.length;
-      const checkDate=x.checkedInDate?new Date(x.checkedInDate):new Date();
-      const time=checkDate.toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-      return '<div class="ci-log-item"><div class="ci-log-avatar" style="background:'+cols[h]+';">'+esc(ini)+'</div><div style="flex:1;min-width:0;"><div class="ci-log-name">'+esc(n)+'</div><div class="ci-log-sub">'+esc(e)+'</div></div><span class="ci-log-badge success">Checked In</span><span class="ci-log-time">'+time+'</span></div>';
-    }).join('');
-  }
+  renderCiRecent();
   const total=allBookings.length;
   const checked=allBookings.filter(x=>x.checkedIn).length;
   const ciCheckedInEl=document.getElementById('ciCheckedIn');
