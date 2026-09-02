@@ -1221,16 +1221,71 @@ main { max-width: none; margin: 0; padding: 0; }
     background: #f8faff;
     box-shadow: 0 6px 16px rgba(18, 66, 197, 0.1);
   }
+  .hamburger.open {
+    border-radius: 50%;
+    background: #fff;
+  }
   .hamburger span { background: var(--blue); }
   .mobile-nav {
     top: 68px;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding: 2.4rem 1rem 2rem;
     background: linear-gradient(160deg, #ffffff 0%, #f4f8ff 100%);
-    gap: 1.25rem;
+    gap: .8rem;
   }
-  .mobile-nav a { font-size: 1.25rem; }
-  .mobile-nav-ctas { margin-top: 0.8rem; }
+  .mobile-nav::before {
+    content: "EXPLORE\A CultureWave";
+    white-space: pre;
+    display: block;
+    margin: 0 .25rem 1.1rem;
+    color: #101828;
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -.05em;
+  }
+  .mobile-nav::first-line {
+    color: var(--blue);
+    font-size: .7rem;
+    letter-spacing: .18em;
+  }
+  .mobile-nav > a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 76px;
+    padding: 1rem 1.1rem;
+    border: 1px solid #d7deec;
+    border-radius: 20px;
+    background: rgba(255,255,255,.82);
+    color: #101828;
+    font-size: 1.08rem;
+    letter-spacing: -.03em;
+    box-shadow: 0 8px 20px rgba(18,66,197,.05);
+  }
+  .mobile-nav > a::after {
+    content: "→";
+    color: var(--blue);
+    font-size: 1.4rem;
+    font-weight: 500;
+  }
+  .mobile-nav > a:nth-of-type(3) {
+    border-color: #9bb7ff;
+    background: linear-gradient(135deg, #eaf1ff 0%, #dbe8ff 100%);
+    box-shadow: 0 12px 24px rgba(18,66,197,.12);
+  }
+  .mobile-nav > a:active { transform: scale(.985); }
+  .mobile-nav-ctas {
+    margin-top: 1rem;
+    padding-top: .4rem;
+    justify-content: stretch;
+  }
   .mobile-nav-ctas .nav-link,
   .mobile-nav-ctas .nav-cta {
+    flex: 1;
     font-size: 0.9rem;
     padding: 0.75rem 1rem;
   }
