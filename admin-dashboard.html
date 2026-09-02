@@ -261,6 +261,10 @@
     .view[data-view="whatsapp"] .wa-card{border:1px solid #dfe7f7;border-radius:17px;box-shadow:0 10px 26px rgba(36,84,214,.07);background:#fff;}.view[data-view="whatsapp"] .wa-toolbar,.view[data-view="whatsapp"] .wa-stat-card{border-color:#dfe7f7;background:#fff;box-shadow:0 8px 22px rgba(36,84,214,.05);}.view[data-view="whatsapp"] .wa-search input,.view[data-view="whatsapp"] .wa-search select{border-color:#dfe7f7;background:#f8faff;}
     @media(max-width:768px){.view[data-view="events"]>.filter-bar,.view[data-view="campaigns"]>.filter-bar,.view[data-view="payments"]>.filter-bar,.view[data-view="refunds"]>.filter-bar,.view[data-view="website-requests"]>.filter-bar{align-items:stretch;}.view[data-view="events"]>.filter-bar input,.view[data-view="campaigns"]>.filter-bar input,.view[data-view="payments"]>.filter-bar input,.view[data-view="website-requests"]>.filter-bar input{min-width:100%;}.view[data-view="events"]>div:first-child,.view[data-view="campaigns"]>div:first-child,.view[data-view="payments"]>div:first-child,.view[data-view="whatsapp"]>div:first-child,.view[data-view="refunds"]>div:first-child,.view[data-view="website-requests"]>div:first-child{padding:1.35rem !important;}}
   </style>
+  <style id="premium-overview-focus">
+    .view[data-view="overview"] .overview-secondary-stat,
+    .view[data-view="overview"] .overview-secondary-action{display:none !important;}
+  </style>
 </head>
 <body>
 
@@ -396,17 +400,17 @@
           <div style="font-size:1.45rem;font-weight:800;color:#93c5fd;letter-spacing:-.03em;" id="statRefunds">0</div>
           <div style="font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.15rem;">Needs action</div>
         </div>
-        <div style="flex:1;min-width:110px;padding:.85rem 1.1rem;border-right:1px solid rgba(255,255,255,.12);">
+        <div class="overview-secondary-stat" style="flex:1;min-width:110px;padding:.85rem 1.1rem;border-right:1px solid rgba(255,255,255,.12);">
           <div style="font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-bottom:.3rem;">Campaigns</div>
           <div style="font-size:1.45rem;font-weight:800;color:#fff;letter-spacing:-.03em;" id="statCampaigns">0</div>
           <div style="font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.15rem;">Active</div>
         </div>
-        <div style="flex:1;min-width:110px;padding:.85rem 1.1rem;border-right:1px solid rgba(255,255,255,.12);">
+        <div class="overview-secondary-stat" style="flex:1;min-width:110px;padding:.85rem 1.1rem;border-right:1px solid rgba(255,255,255,.12);">
           <div style="font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-bottom:.3rem;">Web Requests</div>
           <div style="font-size:1.45rem;font-weight:800;color:#fff;letter-spacing:-.03em;" id="statWebReqs">0</div>
           <div style="font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.15rem;" id="statWebReqsSub">Pending review</div>
         </div>
-        <div style="flex:1;min-width:110px;padding:.85rem 1.1rem;">
+        <div class="overview-secondary-stat" style="flex:1;min-width:110px;padding:.85rem 1.1rem;">
           <div style="font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-bottom:.3rem;">Credits Issued</div>
           <div style="font-size:1.45rem;font-weight:800;color:#fff;letter-spacing:-.03em;" id="statCredits">0</div>
           <div style="font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.15rem;">All wallets</div>
@@ -441,9 +445,9 @@
           <button onclick="openModal('eventModal')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">📅</span><span>Publish Event</span></button>
           <button onclick="openModal('userModal')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">👤</span><span>Edit User</span></button>
           <button onclick="openModal('refundModal')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">↩️</span><span>Process Refund</span></button>
-          <button onclick="showView('website-requests')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">🌐</span><span>Website Requests</span></button>
-          <button onclick="showView('credits')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">💰</span><span>Manage Credits</span></button>
-          <button onclick="showView('campaigns')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">📣</span><span>View Campaigns</span></button>
+          <button class="overview-secondary-action" onclick="showView('website-requests')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">🌐</span><span>Website Requests</span></button>
+          <button class="overview-secondary-action" onclick="showView('credits')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">💰</span><span>Manage Credits</span></button>
+          <button class="overview-secondary-action" onclick="showView('campaigns')" style="display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#eff6ff';this.style.borderColor='#bfdbfe';this.style.color='var(--blue)'" onmouseout="this.style.background='#fff';this.style.borderColor='var(--border)';this.style.color='var(--text)'"><span style="font-size:1.1rem;">📣</span><span>View Campaigns</span></button>
         </div>
       </div>
     </div>
