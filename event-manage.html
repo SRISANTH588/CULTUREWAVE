@@ -905,7 +905,7 @@ const params = new URLSearchParams(location.search);
 const eventId = params.get('eventId');
 if(!eventId){document.body.innerHTML='<div style="padding:3rem;text-align:center;">No event ID. <a href="premium-client-dashboard.html">Go back</a></div>';}
 
-let eventData=null, allBookings=[], anPeriod=30;
+let eventData=null, allBookings=[], allBookingDocs=[], allPaymentBookingDocs=[], anPeriod=30;
 
 function switchPanel(btn,panelId){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
@@ -925,6 +925,10 @@ function avatarColor(name){
 
 function normStatus(s){const v=(s||'draft').toLowerCase();return v==='published'?'published':v==='archived'?'archived':'unpublished';}
 function normBookingStatus(s){const v=(s||'pending').toLowerCase();return (v==='confirmed'||v==='paid')?'paid':v;}
+
+function bookingName(b){return b.customerName||b.customer?.name||b.customer?.fullName||b.buyerName||b.buyer?.name||b.attendeeName||b.fullName||b.name||'Guest';}
+function bookingPhone(b){return b.customerPhone||b.customer?.phone||b.buyerPhone||b.buyer?.phone||b.phone||'';}
+function bookingEmail(b){return b.customerEmail||b.customer?.email||b.buyerEmail||b.buyer?.email||b.email||'\u2014';}
 
 function fmtDate(v){
   if(!v) return '';
@@ -975,19 +979,38 @@ window.shareEvent=function(){
 };
 
 function loadBookings(){
-  // Try eventId field first, fallback handled in filter
+  // Merge booking and payment records because older payment flows may only
+  // have one readable record. Booking IDs keep the merged list unique.
   db.collection('bookings').limit(500).onSnapshot(snap=>{
-    const all = snap.docs.map(d=>({id:d.id,...d.data()}));
+    allBookingDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    syncManagedBookings();
+  });
+  db.collection('payments').limit(500).onSnapshot(snap=>{
+    allPaymentBookingDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    syncManagedBookings();
+  },()=>{});
+}
+
+function syncManagedBookings(){
+    const all = [...allBookingDocs, ...allPaymentBookingDocs];
+    const unique = new Map();
+    all.forEach(b=>{
+      const key=b.bookingId||b.id;
+      if(!unique.has(key)) unique.set(key,b);
+      else {
+        const previous=unique.get(key);
+        unique.set(key,{...previous,...b,customer:{...previous.customer,...b.customer},checkedIn:previous.checkedIn||b.checkedIn,checkedInAt:previous.checkedInAt||b.checkedInAt,checkedInDate:previous.checkedInDate||b.checkedInDate});
+      }
+    });
     const normalizeEventName=value=>String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
     const currentEventName=normalizeEventName(eventData?.name);
     // Match by ID first, then retain older bookings that predate eventId.
-    allBookings = all.filter(b=>{
+    allBookings = [...unique.values()].filter(b=>{
       const bookingEventName=normalizeEventName(b.eventName||b.eventTitle||b.event?.name||b.event?.title||b.title);
       return b.eventId===eventId || b.event?.id===eventId || b.event?.eventId===eventId ||
         (!!currentEventName && bookingEventName===currentEventName);
     });
     renderBookings();renderBookingStats();renderAnalytics();renderCiRecent();
-  });
 }
 
 function renderBookingStats(){
@@ -1031,8 +1054,8 @@ function renderBookings(){
   const q=(document.getElementById('bkSearch')?.value||'').trim().toLowerCase();
   let rows=allBookings;
   if(q) rows=rows.filter(b=>{
-    const n=(b.customer?.name||b.buyerName||'').toLowerCase();
-    const p=(b.customer?.phone||b.buyerPhone||'').toLowerCase();
+    const n=bookingName(b).toLowerCase();
+    const p=bookingPhone(b).toLowerCase();
     const t=(b.transactionId||b.id||'').toLowerCase();
     return n.includes(q)||p.includes(q)||t.includes(q);
   });
@@ -1040,8 +1063,8 @@ function renderBookings(){
   const tbody=document.getElementById('bkTableBody');
   if(!rows.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--muted);">No bookings found</td></tr>';return;}
   tbody.innerHTML=rows.map(b=>{
-    const name=b.customer?.name||b.buyerName||'Guest';
-    const phone=b.customer?.phone||b.buyerPhone||'';
+    const name=bookingName(b);
+    const phone=bookingPhone(b);
     const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const color=avatarColor(name);
     const tn=b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
@@ -1065,9 +1088,9 @@ function renderBookings(){
 window.openBookingMenu=function(id){
   const b=allBookings.find(x=>x.id===id);
   if(!b) return;
-  const name   = b.customerName||b.customer?.name||b.buyerName||'Guest';
-  const phone  = b.customerPhone||b.customer?.phone||b.buyerPhone||'—';
-  const email  = b.customerEmail||b.customer?.email||b.buyerEmail||'—';
+  const name   = bookingName(b);
+  const phone  = bookingPhone(b)||'—';
+  const email  = bookingEmail(b);
   const txnId  = b.paymentId||b.transactionId||b.id||'—';
   const ticket = b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
   const seats  = Number(b.seats||b.tickets||1);
@@ -1114,9 +1137,9 @@ window.openBookingMenu=function(id){
 window.downloadInvoice=function(){
   const b=document.getElementById('bookingModal')._currentBooking;
   if(!b) return;
-  const name   = b.customerName||b.customer?.name||'Guest';
-  const email  = b.customerEmail||b.customer?.email||'—';
-  const phone  = b.customerPhone||b.customer?.phone||'—';
+  const name   = bookingName(b);
+  const email  = bookingEmail(b);
+  const phone  = bookingPhone(b)||'—';
   const txnId  = b.paymentId||b.transactionId||b.id||'—';
   const ticket = b.ticketName||b.customer?.ticket||'General';
   const seats  = Number(b.seats||1);
@@ -1183,7 +1206,7 @@ window.exportBookings=function(){
   const rows=[['Name','Phone','Ticket','Qty','Amount','Status','Date','Source']];
   allBookings.forEach(b=>{
     const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN'):'';
-    rows.push([b.customer?.name||b.buyerName||'',b.customer?.phone||b.buyerPhone||'',b.ticketName||b.customer?.ticket||b.event?.ticketName||'General',b.seats||b.tickets||1,b.amount||0,normBookingStatus(b.status||'pending'),date,b.source||'direct']);
+    rows.push([bookingName(b)==='Guest'?'':bookingName(b),bookingPhone(b),b.ticketName||b.customer?.ticket||b.event?.ticketName||'General',b.seats||b.tickets||1,b.amount||0,normBookingStatus(b.status||'pending'),date,b.source||'direct']);
   });
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');
@@ -1220,8 +1243,8 @@ function renderCiRecent(){
   if(!list) return;
   if(!recent.length){list.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128100;</div><h3>No check-ins yet</h3><p>Scan QR codes or search attendees to check them in</p></div>';return;}
   list.innerHTML=recent.map(x=>{
-    const n=x.customerName||x.customer?.name||x.buyerName||'Guest';
-    const e=x.customerEmail||x.customer?.email||x.buyerEmail||'\u2014';
+    const n=bookingName(x);
+    const e=bookingEmail(x);
     const ini=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
     let h=0;for(let i=0;i<n.length;i++)h=(h+n.charCodeAt(i))%cols.length;
@@ -1237,18 +1260,18 @@ window.ciSearch=function(){
   const countEl=document.getElementById('ciSearchCount');
   if(!q){listEl.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128269;</div><h3>Search Results</h3><p>Type a name, email or phone above</p></div>';countEl.textContent=0;return;}
   const results=allBookings.filter(b=>{
-    const n=(b.customerName||b.customer?.name||b.buyerName||'').toLowerCase();
-    const e=(b.customerEmail||b.customer?.email||b.buyerEmail||'').toLowerCase();
-    const p=(b.customerPhone||b.customer?.phone||b.buyerPhone||'').toLowerCase();
+    const n=bookingName(b).toLowerCase();
+    const e=bookingEmail(b).toLowerCase();
+    const p=bookingPhone(b).toLowerCase();
     return n.includes(q)||e.includes(q)||p.includes(q);
   });
   countEl.textContent=results.length;
   window.ciSwitchTab('search');
   if(!results.length){listEl.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128269;</div><h3>No results</h3><p>No attendees found</p></div>';return;}
   listEl.innerHTML=results.map(b=>{
-    const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
-    const email=b.customerEmail||b.customer?.email||b.buyerEmail||'\u2014';
-    const phone=b.customerPhone||b.customer?.phone||b.buyerPhone||'\u2014';
+    const name=bookingName(b);
+    const email=bookingEmail(b);
+    const phone=bookingPhone(b)||'\u2014';
     const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
     let h=0;for(let i=0;i<name.length;i++)h=(h+name.charCodeAt(i))%cols.length;
@@ -1324,9 +1347,9 @@ window.processCheckIn=function(val){
 };
 
 function showCiModal(b,type){
-  const name=b?(b.customerName||b.customer?.name||b.buyerName||'Guest'):'Unknown ticket';
-  const email=b?(b.customerEmail||b.customer?.email||b.buyerEmail||'\u2014'):'\u2014';
-  const phone=b?(b.customerPhone||b.customer?.phone||b.buyerPhone||'\u2014'):'\u2014';
+  const name=b?bookingName(b):'Unknown ticket';
+  const email=b?bookingEmail(b):'\u2014';
+  const phone=b?(bookingPhone(b)||'\u2014'):'\u2014';
   document.getElementById('ciConfirmName').textContent=name;
   document.getElementById('ciConfirmEmail').textContent=email;
   document.getElementById('ciConfirmPhone').textContent=phone;
@@ -1371,7 +1394,7 @@ window.confirmCiCheckIn=async function(){
   await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp(),checkedInDate});
   b.checkedIn=true;
   b.checkedInDate=checkedInDate;
-  const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
+  const name=bookingName(b);
   showToast('\u2713 Checked in: '+name);
   renderCiRecent();
   const total=allBookings.length;
@@ -1447,7 +1470,7 @@ function renderAnalytics(){
   const abandonedEl=document.getElementById('abandonedList');
   if(pending.length){
     abandonedEl.innerHTML=pending.slice(0,10).map(b=>{
-      const name=b.customer?.name||b.buyerName||'Guest';
+      const name=bookingName(b);
       const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'--';
       return '<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-bottom:1px solid var(--border);"><div style="width:34px;height:34px;border-radius:50%;background:'+avatarColor(name)+';display:grid;place-items:center;font-size:.78rem;font-weight:800;color:#fff;flex:none;">'+name.slice(0,2).toUpperCase()+'</div><div style="flex:1;"><div style="font-size:.86rem;font-weight:700;">'+esc(name)+'</div><div style="font-size:.74rem;color:var(--muted);">'+date+'</div></div><div style="font-size:.84rem;font-weight:700;color:#e67700;">'+(b.amount?money(b.amount):'--')+'</div><span class="pill pending">pending</span></div>';
     }).join('');
