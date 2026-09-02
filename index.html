@@ -395,8 +395,30 @@
         } catch(e) { console.warn('Restaurants:', e.message); }
       }
 
-      loadIndexEvents();
-      loadIndexRestaurants();
+      function startHomeCarousel(id) {
+        const grid = document.getElementById(id);
+        if (!grid) return;
+        let timer;
+        const stop = () => clearInterval(timer);
+        const start = () => {
+          stop();
+          timer = setInterval(() => {
+            const card = grid.querySelector('.event-card');
+            if (!card || grid.scrollWidth <= grid.clientWidth + 4) return;
+            const step = card.getBoundingClientRect().width + 16;
+            const atEnd = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - step / 2;
+            grid.scrollTo({ left: atEnd ? 0 : grid.scrollLeft + step, behavior: 'smooth' });
+          }, 4200);
+        };
+        grid.addEventListener('mouseenter', stop);
+        grid.addEventListener('mouseleave', start);
+        grid.addEventListener('touchstart', stop, { passive: true });
+        grid.addEventListener('touchend', () => setTimeout(start, 2500), { passive: true });
+        start();
+      }
+
+      loadIndexEvents().then(() => startHomeCarousel('indexEventsGrid'));
+      loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
     </script>
     <script>
       const ham = document.getElementById('hamburger');
