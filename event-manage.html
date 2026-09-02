@@ -291,69 +291,147 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 <!-- CHECK-IN PANEL -->
 <div class="panel" id="panel-checkin">
-  <div class="stat-grid" style="grid-template-columns:1fr 1fr;">
-    <div class="stat-card">
-      <div class="stat-icon blue">&#128101;</div>
-      <div><div class="stat-label">Registered</div><div class="stat-val" id="ciTotal">0</div></div>
+  <style>
+    .ci-wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:1.25rem;}
+    .ci-header{display:flex;align-items:flex-start;justify-content:space-between;}
+    .ci-title{font-size:1.4rem;font-weight:800;color:var(--text);letter-spacing:-.02em;}
+    .ci-sub{font-size:.82rem;color:var(--muted);margin-top:.2rem;}
+    .ci-refresh{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;cursor:pointer;font-size:1rem;color:var(--muted);}
+    .ci-refresh:hover{border-color:var(--blue);color:var(--blue);}
+    .ci-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
+    .ci-stat{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;text-align:center;}
+    .ci-stat.checked{border-color:#86efac;}
+    .ci-stat.progress{border-color:#bfdbfe;}
+    .ci-stat-icon{font-size:.82rem;color:var(--muted);margin-bottom:.35rem;display:flex;align-items:center;justify-content:center;gap:.3rem;}
+    .ci-stat.checked .ci-stat-icon{color:var(--green);}
+    .ci-stat.progress .ci-stat-icon{color:var(--blue);}
+    .ci-stat-val{font-size:1.8rem;font-weight:800;letter-spacing:-.04em;color:var(--text);}
+    .ci-stat.checked .ci-stat-val{color:var(--green);}
+    .ci-stat.progress .ci-stat-val{color:var(--blue);}
+    .ci-search-row{display:flex;gap:.6rem;}
+    .ci-search-box{flex:1;display:flex;align-items:center;gap:.6rem;padding:.7rem 1rem;border-radius:10px;border:1.5px solid var(--border);background:#fff;}
+    .ci-search-box input{border:0;outline:none;font:inherit;font-size:.88rem;color:var(--text);width:100%;background:none;}
+    .ci-search-btn{padding:.7rem 1.4rem;border-radius:10px;background:#e8eaf6;border:0;color:var(--blue);font-weight:700;font-size:.86rem;cursor:pointer;}
+    .ci-scan-btn{width:100%;padding:.9rem;border-radius:12px;background:var(--blue);border:0;color:#fff;font-weight:700;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.6rem;box-shadow:0 4px 16px rgba(59,91,219,.3);}
+    .ci-scan-btn.active{background:#c92a2a;box-shadow:0 4px 16px rgba(201,42,42,.3);}
+    .ci-tabs{display:flex;border-bottom:2px solid var(--border);}
+    .ci-tab{padding:.65rem 1.25rem;font-size:.88rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;border-top:0;border-left:0;border-right:0;}
+    .ci-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+    .ci-scanner-box{border-radius:12px;overflow:hidden;background:#000;display:none;}
+    .ci-scanner-box.open{display:block;}
+    #qr-reader video{width:100%!important;}
+    .ci-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 1rem;gap:.75rem;}
+    .ci-empty-icon{width:64px;height:64px;border-radius:50%;background:#f1f3f5;display:grid;place-items:center;font-size:1.6rem;}
+    .ci-empty h3{font-size:.95rem;font-weight:700;color:var(--text);}
+    .ci-empty p{font-size:.82rem;color:var(--muted);}
+    .ci-log-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 0;border-bottom:1px solid var(--border);}
+    .ci-log-item:last-child{border-bottom:0;}
+    .ci-log-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:.82rem;font-weight:800;color:#fff;flex:none;}
+    .ci-log-name{font-size:.86rem;font-weight:700;color:var(--text);}
+    .ci-log-sub{font-size:.74rem;color:var(--muted);}
+    .ci-log-time{font-size:.72rem;color:var(--muted);margin-left:auto;white-space:nowrap;}
+    .ci-log-badge{font-size:.68rem;font-weight:700;padding:.18rem .5rem;border-radius:999px;}
+    .ci-log-badge.success{background:#ebfbee;color:var(--green);}
+    .ci-log-badge.duplicate{background:#fff9db;color:#e67700;}
+  </style>
+
+  <div class="ci-wrap">
+    <!-- Header -->
+    <div class="ci-header">
+      <div>
+        <div class="ci-title">Check-In Attendees</div>
+        <div class="ci-sub" id="ciSubTitle">Scan QR codes or search attendees</div>
+      </div>
+      <button class="ci-refresh" onclick="ciRefresh()" title="Refresh">&#8635;</button>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon green">&#10003;</div>
-      <div><div class="stat-label">Checked In</div><div class="stat-val" id="ciCheckedIn">0</div></div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-    <div class="card">
-      <div class="card-head"><div><h2>&#128247; QR Scanner</h2><p>Camera starts automatically — point at ticket QR</p></div></div>
-      <div style="padding:1rem;display:flex;flex-direction:column;gap:.85rem;">
-        <div id="ciScannerBox" style="border:2px dashed var(--border);border-radius:12px;overflow:hidden;background:#f8f9fa;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative;">
-          <div id="qr-reader" style="width:100%;"></div>
-          <div id="ciPlaceholder" style="position:absolute;display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:2rem;">
-            <div style="font-size:2.5rem;">&#128247;</div>
-            <div style="font-size:.86rem;font-weight:600;color:var(--muted);">Click the button below to start scanning</div>
-          </div>
-        </div>
-        <div id="scanStatus" style="text-align:center;font-size:.82rem;font-weight:600;color:var(--muted);">Ready</div>
-        <button id="ciScanBtn" onclick="toggleCiScanner()" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.65rem 1.4rem;border-radius:10px;background:var(--blue);color:#fff;font-weight:700;font-size:.88rem;border:0;cursor:pointer;box-shadow:0 4px 14px rgba(59,91,219,.3);width:100%;">&#128247; Scan QR Code</button>
-        <div style="display:flex;gap:.5rem;">
-          <input id="ciInput" type="text" placeholder="Or type Booking ID manually…" style="flex:1;padding:.6rem .85rem;border-radius:9px;border:1px solid var(--border);font:inherit;font-size:.86rem;outline:none;"/>
-          <button onclick="checkInTicket()" style="padding:.6rem 1rem;border-radius:9px;background:var(--green);border:0;color:#fff;font-weight:700;font-size:.84rem;cursor:pointer;">&#10003; Check</button>
-        </div>
+
+    <!-- Stats -->
+    <div class="ci-stats">
+      <div class="ci-stat">
+        <div class="ci-stat-icon">&#128101; Registered</div>
+        <div class="ci-stat-val" id="ciTotal">0</div>
+      </div>
+      <div class="ci-stat checked">
+        <div class="ci-stat-icon">&#10003; Checked In</div>
+        <div class="ci-stat-val" id="ciCheckedIn">0</div>
+      </div>
+      <div class="ci-stat progress">
+        <div class="ci-stat-icon">&#8599; Progress</div>
+        <div class="ci-stat-val" id="ciProgress">0%</div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-head"><div><h2>Recent Check-Ins</h2><p>Live activity</p></div></div>
-      <div id="ciList" style="padding:.75rem;display:flex;flex-direction:column;gap:.4rem;max-height:420px;overflow-y:auto;">
-        <div style="text-align:center;padding:2rem;color:var(--muted);font-size:.82rem;">No check-ins yet</div>
+
+    <!-- Search -->
+    <div class="ci-search-row">
+      <div class="ci-search-box">
+        <span style="color:var(--muted);font-size:1rem;">&#128269;</span>
+        <input id="ciSearchInput" type="text" placeholder="Search by name, email, phone..." oninput="ciSearch()"/>
+      </div>
+      <button class="ci-search-btn" onclick="ciSearch()">Search</button>
+    </div>
+
+    <!-- Scan Button -->
+    <button id="ciScanBtn" class="ci-scan-btn" onclick="toggleCiScanner()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1m1-4v1"/></svg>
+      Scan QR Code to Check-in
+    </button>
+
+    <!-- Scanner box (hidden until active) -->
+    <div class="ci-scanner-box" id="ciScannerBox">
+      <div id="qr-reader"></div>
+    </div>
+    <div id="scanStatus" style="text-align:center;font-size:.82rem;font-weight:600;color:var(--muted);display:none;"></div>
+
+    <!-- Tabs -->
+    <div class="ci-tabs">
+      <button class="ci-tab active" id="ciTabRecent" onclick="ciSwitchTab('recent')">Recent Check-ins (<span id="ciRecentCount">0</span>)</button>
+      <button class="ci-tab" id="ciTabSearch" onclick="ciSwitchTab('search')">Search Results (<span id="ciSearchCount">0</span>)</button>
+    </div>
+
+    <!-- Recent Check-ins list -->
+    <div id="ciListRecent">
+      <div class="ci-empty">
+        <div class="ci-empty-icon">&#128100;</div>
+        <h3>No check-ins yet</h3>
+        <p>Scan QR codes or search attendees to check them in</p>
+      </div>
+    </div>
+
+    <!-- Search Results list -->
+    <div id="ciListSearch" style="display:none;">
+      <div class="ci-empty">
+        <div class="ci-empty-icon">&#128269;</div>
+        <h3>Search Results</h3>
+        <p>Type a name, email or phone above to find attendees</p>
       </div>
     </div>
   </div>
 </div>
 
 <!-- CHECK-IN CONFIRM MODAL -->
-<div id="ciConfirmModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:#fff;border-radius:16px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.25);">
-    <div style="background:linear-gradient(135deg,#1242c5,#2f6bff);padding:1.25rem 1.5rem;">
-      <div style="font-size:1rem;font-weight:800;color:#fff;">&#128247; Confirm Check-In</div>
-      <div style="font-size:.76rem;color:rgba(255,255,255,.7);margin-top:.2rem;">Review customer details before checking in</div>
+<div id="ciConfirmModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.2);">
+    <div id="ciModalHeader" style="background:var(--blue);padding:1.5rem;text-align:center;">
+      <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:1.5rem;margin:0 auto .75rem;">&#128100;</div>
+      <div style="font-size:1.05rem;font-weight:800;color:#fff;" id="ciModalTitle">Confirm Check-In</div>
+      <div style="font-size:.76rem;color:rgba(255,255,255,.75);margin-top:.2rem;" id="ciModalSub">Review details before checking in</div>
     </div>
-    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.75rem;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
-        <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.65rem .85rem;grid-column:1/-1;">
-          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Name</div>
-          <div style="font-size:.95rem;font-weight:800;" id="ciConfirmName">—</div>
-        </div>
-        <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.65rem .85rem;grid-column:1/-1;">
-          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Email</div>
-          <div style="font-size:.88rem;font-weight:700;" id="ciConfirmEmail">—</div>
-        </div>
-        <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.65rem .85rem;grid-column:1/-1;">
-          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Phone</div>
-          <div style="font-size:.88rem;font-weight:700;" id="ciConfirmPhone">—</div>
-        </div>
+    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.6rem;">
+      <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Name</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--text);" id="ciConfirmName">—</div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.25rem;">
-        <button onclick="cancelCiConfirm()" style="padding:.7rem;border-radius:9px;background:#fff;border:1.5px solid var(--border);font-weight:700;font-size:.88rem;cursor:pointer;color:#495057;">✕ Cancel</button>
-        <button onclick="confirmCiCheckIn()" style="padding:.7rem;border-radius:9px;background:var(--green);border:0;color:#fff;font-weight:700;font-size:.88rem;cursor:pointer;">✓ Check In</button>
+      <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Email</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--text);" id="ciConfirmEmail">—</div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Phone</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--text);" id="ciConfirmPhone">—</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.25rem;" id="ciModalBtns">
+        <button onclick="cancelCiConfirm()" style="padding:.75rem;border-radius:10px;background:#f1f3f5;border:0;font-weight:700;font-size:.88rem;cursor:pointer;color:#495057;">Cancel</button>
+        <button onclick="confirmCiCheckIn()" id="ciModalCheckInBtn" style="padding:.75rem;border-radius:10px;background:var(--blue);border:0;color:#fff;font-weight:700;font-size:.88rem;cursor:pointer;">Check In</button>
       </div>
     </div>
   </div>
@@ -809,8 +887,11 @@ function renderBookingStats(){
   document.getElementById('bkCountLabel').textContent=allBookings.length+' booking'+(allBookings.length!==1?'s':'');
   const ciTotalEl=document.getElementById('ciTotal');
   const ciCheckedInEl=document.getElementById('ciCheckedIn');
+  const ciProgressEl=document.getElementById('ciProgress');
   if(ciTotalEl) ciTotalEl.textContent=allBookings.length;
-  if(ciCheckedInEl) ciCheckedInEl.textContent=allBookings.filter(b=>b.checkedIn).length;
+  const checkedCount=allBookings.filter(b=>b.checkedIn).length;
+  if(ciCheckedInEl) ciCheckedInEl.textContent=checkedCount;
+  if(ciProgressEl) ciProgressEl.textContent=allBookings.length?Math.round(checkedCount/allBookings.length*100)+'%':'0%';
 
   const ticketMap={};
   paid.forEach(b=>{
@@ -1000,7 +1081,41 @@ window.exportBookings=function(){
 
 document.getElementById('bkSearch').addEventListener('input',renderBookings);
 
-let html5QrCode=null,scannerRunning=false,ciScanPaused=false,ciPendingBooking=null;
+let html5QrCode=null,scannerRunning=false,ciScanPaused=false,ciPendingBooking=null,ciRecentItems=[];
+
+window.ciRefresh=function(){ renderBookingStats(); showToast('Refreshed'); };
+
+window.ciSwitchTab=function(tab){
+  document.getElementById('ciTabRecent').classList.toggle('active',tab==='recent');
+  document.getElementById('ciTabSearch').classList.toggle('active',tab==='search');
+  document.getElementById('ciListRecent').style.display=tab==='recent'?'block':'none';
+  document.getElementById('ciListSearch').style.display=tab==='search'?'block':'none';
+};
+
+window.ciSearch=function(){
+  const q=document.getElementById('ciSearchInput').value.trim().toLowerCase();
+  const listEl=document.getElementById('ciListSearch');
+  const countEl=document.getElementById('ciSearchCount');
+  if(!q){listEl.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128269;</div><h3>Search Results</h3><p>Type a name, email or phone above</p></div>';countEl.textContent=0;return;}
+  const results=allBookings.filter(b=>{
+    const n=(b.customerName||b.customer?.name||b.buyerName||'').toLowerCase();
+    const e=(b.customerEmail||b.customer?.email||b.buyerEmail||'').toLowerCase();
+    const p=(b.customerPhone||b.customer?.phone||b.buyerPhone||'').toLowerCase();
+    return n.includes(q)||e.includes(q)||p.includes(q);
+  });
+  countEl.textContent=results.length;
+  window.ciSwitchTab('search');
+  if(!results.length){listEl.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128269;</div><h3>No results</h3><p>No attendees found</p></div>';return;}
+  listEl.innerHTML=results.map(b=>{
+    const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
+    const email=b.customerEmail||b.customer?.email||b.buyerEmail||'\u2014';
+    const phone=b.customerPhone||b.customer?.phone||b.buyerPhone||'\u2014';
+    const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
+    let h=0;for(let i=0;i<name.length;i++)h=(h+name.charCodeAt(i))%cols.length;
+    return '<div class="ci-log-item"><div class="ci-log-avatar" style="background:'+cols[h]+';">'+esc(ini)+'</div><div style="flex:1;min-width:0;"><div class="ci-log-name">'+esc(name)+'</div><div class="ci-log-sub">'+esc(email)+' &middot; '+esc(phone)+'</div></div>'+(b.checkedIn?'<span class="ci-log-badge duplicate">Already Checked In</span>':'<button onclick="processCheckIn(\''+b.id+'\')" style="padding:.38rem .85rem;border-radius:8px;background:var(--blue);border:0;color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;">Check In</button>')+'</div>';
+  }).join('');
+};
 
 window.toggleCiScanner=async function(){
   if(scannerRunning) await stopCiScanner();
@@ -1009,7 +1124,8 @@ window.toggleCiScanner=async function(){
 
 async function startCiScanner(){
   const statusEl=document.getElementById('scanStatus');
-  const placeholder=document.getElementById('ciPlaceholder');
+  const box=document.getElementById('ciScannerBox');
+  const btn=document.getElementById('ciScanBtn');
   if(scannerRunning) return;
   try{
     html5QrCode=new Html5Qrcode('qr-reader');
@@ -1020,134 +1136,113 @@ async function startCiScanner(){
       ()=>{}
     );
     scannerRunning=true;
-    if(placeholder) placeholder.style.display='none';
-    document.getElementById('ciScannerBox').style.background='#000';
-    const btn=document.getElementById('ciScanBtn');
-    if(btn){btn.style.background='#c92a2a';btn.innerHTML='&#9209; Stop Camera';}
-    statusEl.textContent='Scanning… point at QR code';
-    statusEl.style.color='var(--green)';
+    box.classList.add('open');
+    statusEl.style.display='block';statusEl.textContent='Scanning\u2026 point at QR code';statusEl.style.color='var(--green)';
+    btn.classList.add('active');
+    btn.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1m1-4v1"/></svg> Stop Scanning';
   }catch(e){
-    if(placeholder) placeholder.style.display='none';
-    statusEl.textContent='Camera error: '+e.message;
-    statusEl.style.color='#c92a2a';
+    statusEl.style.display='block';statusEl.textContent='Camera error: '+e.message;statusEl.style.color='#c92a2a';
   }
 }
 
 async function stopCiScanner(){
   if(html5QrCode&&scannerRunning){try{await html5QrCode.stop();html5QrCode.clear();}catch(e){}}
   scannerRunning=false;
-  const placeholder=document.getElementById('ciPlaceholder');
   const box=document.getElementById('ciScannerBox');
-  if(placeholder){placeholder.style.display='flex';placeholder.querySelector('div:last-child').textContent='Click the button below to start scanning';}
-  if(box) box.style.background='#f8f9fa';
   const btn=document.getElementById('ciScanBtn');
-  if(btn){btn.style.background='var(--blue)';btn.innerHTML='&#128247; Scan QR Code';}
   const statusEl=document.getElementById('scanStatus');
-  if(statusEl){statusEl.textContent='Ready';statusEl.style.color='var(--muted)';}
+  if(box) box.classList.remove('open');
+  if(statusEl) statusEl.style.display='none';
+  if(btn){
+    btn.classList.remove('active');
+    btn.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1m1-4v1"/></svg> Scan QR Code to Check-in';
+  }
 }
 
-function processCheckIn(val){
-  const statusEl=document.getElementById('scanStatus');
+window.processCheckIn=function(val){
   if(!val) return;
   const b=allBookings.find(x=>x.id===val||x.bookingId===val||x.ticketId===val);
-  if(!b){
-    statusEl.textContent='\u2717 Not found: '+val;
-    statusEl.style.color='#c92a2a';
-    showToast('Ticket not found: '+val);
-    stopCiScanner();
-    return;
-  }
-  if(b.checkedIn){
-    const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
-    const email=b.customerEmail||b.customer?.email||b.buyerEmail||'—';
-    const phone=b.customerPhone||b.customer?.phone||b.buyerPhone||'—';
-    document.getElementById('ciConfirmName').textContent=name;
-    document.getElementById('ciConfirmEmail').textContent=email;
-    document.getElementById('ciConfirmPhone').textContent=phone;
-    document.getElementById('ciConfirmModal').querySelector('div').style.background='linear-gradient(135deg,#b45309,#d97706)';
-    document.getElementById('ciConfirmModal').querySelector('div div:first-child').textContent='⚠ Already Checked In';
-    document.getElementById('ciConfirmModal').querySelector('div div:last-child').textContent='This ticket was already used for entry';
-    document.querySelector('[onclick="confirmCiCheckIn()"]').style.display='none';
-    document.querySelector('[onclick="cancelCiConfirm()"]').style.gridColumn='1/-1';
-    document.getElementById('ciConfirmModal').style.display='flex';
-    ciPendingBooking=null;
-    return;
-  }
+  if(!b){showToast('Ticket not found');stopCiScanner();return;}
+  if(b.checkedIn){showCiModal(b,'already');stopCiScanner();return;}
   ciPendingBooking=b;
-  showCiConfirmModal(b);
-}
+  showCiModal(b,'confirm');
+};
 
-function showCiConfirmModal(b){
-  const name  = b.customerName||b.customer?.name||b.buyerName||'Guest';
-  const email = b.customerEmail||b.customer?.email||b.buyerEmail||'\u2014';
-  const phone = b.customerPhone||b.customer?.phone||b.buyerPhone||'\u2014';
+function showCiModal(b,type){
+  const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
+  const email=b.customerEmail||b.customer?.email||b.buyerEmail||'\u2014';
+  const phone=b.customerPhone||b.customer?.phone||b.buyerPhone||'\u2014';
   document.getElementById('ciConfirmName').textContent=name;
   document.getElementById('ciConfirmEmail').textContent=email;
   document.getElementById('ciConfirmPhone').textContent=phone;
-  // reset to normal state
-  document.getElementById('ciConfirmModal').querySelector('div').style.background='linear-gradient(135deg,#1242c5,#2f6bff)';
-  document.getElementById('ciConfirmModal').querySelector('div div:first-child').textContent='\u{1F4F7} Confirm Check-In';
-  document.getElementById('ciConfirmModal').querySelector('div div:last-child').textContent='Review customer details before checking in';
-  document.querySelector('[onclick="confirmCiCheckIn()"]').style.display='';
-  document.querySelector('[onclick="cancelCiConfirm()"]').style.gridColumn='';
+  const hdr=document.getElementById('ciModalHeader');
+  const title=document.getElementById('ciModalTitle');
+  const sub=document.getElementById('ciModalSub');
+  const checkBtn=document.getElementById('ciModalCheckInBtn');
+  const cancelBtn=document.querySelector('#ciModalBtns button:first-child');
+  if(type==='already'){
+    hdr.style.background='#d97706';title.textContent='\u26a0 Already Checked In';
+    sub.textContent='This ticket was already used for entry';
+    checkBtn.style.display='none';cancelBtn.style.gridColumn='1/-1';
+  } else {
+    hdr.style.background='var(--blue)';title.textContent='Confirm Check-In';
+    sub.textContent='Review details before checking in';
+    checkBtn.style.display='';cancelBtn.style.gridColumn='';
+  }
   document.getElementById('ciConfirmModal').style.display='flex';
 }
 
 window.cancelCiConfirm=async function(){
   document.getElementById('ciConfirmModal').style.display='none';
-  document.querySelector('[onclick="confirmCiCheckIn()"]').style.display='';
-  document.querySelector('[onclick="cancelCiConfirm()"]').style.gridColumn='';
   ciPendingBooking=null;
   await stopCiScanner();
 };
 
 window.confirmCiCheckIn=async function(){
-  const b=ciPendingBooking;
-  if(!b) return;
+  const b=ciPendingBooking; if(!b) return;
   document.getElementById('ciConfirmModal').style.display='none';
   await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp()});
   b.checkedIn=true;
   const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
-  const statusEl=document.getElementById('scanStatus');
-  statusEl.textContent='\u2713 Checked in: '+name;
-  statusEl.style.color='var(--green)';
-  showToast('Checked in: '+name);
-  addCiListItem(b,'success');
-  document.getElementById('ciCheckedIn').textContent=allBookings.filter(x=>x.checkedIn).length;
+  showToast('\u2713 Checked in: '+name);
+  ciRecentItems.unshift(b);
+  if(ciRecentItems.length>20) ciRecentItems.pop();
+  const countEl=document.getElementById('ciRecentCount');
+  if(countEl) countEl.textContent=ciRecentItems.length;
+  const list=document.getElementById('ciListRecent');
+  if(list){
+    list.innerHTML=ciRecentItems.map(x=>{
+      const n=x.customerName||x.customer?.name||x.buyerName||'Guest';
+      const e=x.customerEmail||x.customer?.email||x.buyerEmail||'\u2014';
+      const ini=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
+      let h=0;for(let i=0;i<n.length;i++)h=(h+n.charCodeAt(i))%cols.length;
+      const time=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      return '<div class="ci-log-item"><div class="ci-log-avatar" style="background:'+cols[h]+';">'+esc(ini)+'</div><div style="flex:1;min-width:0;"><div class="ci-log-name">'+esc(n)+'</div><div class="ci-log-sub">'+esc(e)+'</div></div><span class="ci-log-badge success">Checked In</span><span class="ci-log-time">'+time+'</span></div>';
+    }).join('');
+  }
+  const total=allBookings.length;
+  const checked=allBookings.filter(x=>x.checkedIn).length;
+  const ciCheckedInEl=document.getElementById('ciCheckedIn');
+  const ciProgressEl=document.getElementById('ciProgress');
+  if(ciCheckedInEl) ciCheckedInEl.textContent=checked;
+  if(ciProgressEl) ciProgressEl.textContent=total?Math.round(checked/total*100)+'%':'0%';
   ciPendingBooking=null;
   await stopCiScanner();
 };
 
-function addCiListItem(b,type){
-  const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
-  const ticket=b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
-  const time=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-  const color=type==='success'?'var(--green)':type==='duplicate'?'#e67700':'#c92a2a';
-  const icon=type==='success'?'\u2713':type==='duplicate'?'\u26a0':'\u2717';
-  const list=document.getElementById('ciList');
-  const empty=list.querySelector('div[style*="text-align:center"]');
-  if(empty) empty.remove();
-  const item=document.createElement('div');
-  item.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;border-radius:10px;background:#f8f9fa;border:1px solid var(--border);';
-  item.innerHTML='<div style="width:32px;height:32px;border-radius:50%;background:'+color+';display:grid;place-items:center;font-size:.9rem;color:#fff;flex:none;">'+icon+'</div>'
-    +'<div style="flex:1;"><div style="font-size:.84rem;font-weight:700;">'+esc(name)+'</div><div style="font-size:.72rem;color:var(--muted);">'+esc(ticket)+'</div></div>'
-    +'<div style="font-size:.72rem;color:var(--muted);">'+time+'</div>';
-  list.insertBefore(item,list.firstChild);
-  if(list.children.length>10) list.removeChild(list.lastChild);
-}
-
 window.checkInTicket=async function(){
-  const val=document.getElementById('ciInput').value.trim();
+  const val=document.getElementById('ciSearchInput').value.trim();
   if(!val){showToast('Enter a booking ID');return;}
   ciScanPaused=true;
   processCheckIn(val);
-  document.getElementById('ciInput').value='';
 };
 
 document.addEventListener('DOMContentLoaded',()=>{
-  const ci=document.getElementById('ciInput');
+  const ci=document.getElementById('ciSearchInput');
   if(ci) ci.addEventListener('keydown',e=>{if(e.key==='Enter') window.checkInTicket();});
 });
+
 
 function renderAnalytics(){
   const now=new Date();
