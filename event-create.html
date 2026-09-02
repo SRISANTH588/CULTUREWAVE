@@ -1886,6 +1886,14 @@ loadUser();
     const titleEl = document.querySelector('h1, .page-title, #pageTitle');
     if (titleEl) titleEl.textContent = 'Edit Event';
     document.title = 'Edit Event | CultureWave';
+    // change buttons to Save mode
+    const pubBtn = document.getElementById('publishBtn');
+    const draftBtn = document.getElementById('saveDraftBtn');
+    if (pubBtn) pubBtn.textContent = 'Save Changes';
+    if (draftBtn) draftBtn.textContent = 'Save Draft';
+    // preserve existing status on save
+    const existingStatus = d.status || 'draft';
+    if (pubBtn) pubBtn.onclick = (e) => { e.preventDefault(); saveEvent(existingStatus); };
     updateProgress();
   } catch(e) {
     console.warn('Could not prefill event:', e);
@@ -2420,8 +2428,15 @@ async function saveEvent(status) {
     const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
     btn.textContent = 'Saving...';
     btn.disabled = true;
-    await addDoc(collection(db, 'events'), payload);
-    window.location.href = 'premium-client-dashboard.html';
+    const editId = new URLSearchParams(location.search).get('eventId');
+    if (editId) {
+      const {createdAt, ...updatePayload} = payload;
+      await db.collection('events').doc(editId).update({...updatePayload, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
+      window.location.href = 'event-manage.html?eventId=' + editId;
+    } else {
+      await addDoc(collection(db, 'events'), payload);
+      window.location.href = 'premium-client-dashboard.html';
+    }
   } catch (err) {
     alert('Error saving event: ' + err.message);
     document.getElementById('publishBtn').textContent = 'Publish Event';
