@@ -342,7 +342,8 @@
 
       await snap.ref.update({
         checkedIn: true,
-        checkedInAt: firebase.firestore.FieldValue.serverTimestamp()
+        checkedInAt: firebase.firestore.FieldValue.serverTimestamp(),
+        checkedInDate: new Date().toISOString()
       });
 
       showResult("success", "✅", "Check-In Successful!",

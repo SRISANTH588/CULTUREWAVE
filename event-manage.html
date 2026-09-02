@@ -1340,8 +1340,10 @@ window.cancelCiConfirm=async function(){
 window.confirmCiCheckIn=async function(){
   const b=ciPendingBooking; if(!b) return;
   document.getElementById('ciConfirmModal').style.display='none';
-  await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp()});
+  const checkedInDate=new Date().toISOString();
+  await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp(),checkedInDate});
   b.checkedIn=true;
+  b.checkedInDate=checkedInDate;
   const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
   showToast('\u2713 Checked in: '+name);
   ciRecentItems.unshift(b);
@@ -1356,7 +1358,8 @@ window.confirmCiCheckIn=async function(){
       const ini=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
       const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
       let h=0;for(let i=0;i<n.length;i++)h=(h+n.charCodeAt(i))%cols.length;
-      const time=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      const checkDate=x.checkedInDate?new Date(x.checkedInDate):new Date();
+      const time=checkDate.toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
       return '<div class="ci-log-item"><div class="ci-log-avatar" style="background:'+cols[h]+';">'+esc(ini)+'</div><div style="flex:1;min-width:0;"><div class="ci-log-name">'+esc(n)+'</div><div class="ci-log-sub">'+esc(e)+'</div></div><span class="ci-log-badge success">Checked In</span><span class="ci-log-time">'+time+'</span></div>';
     }).join('');
   }
