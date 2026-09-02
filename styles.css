@@ -1260,7 +1260,21 @@ main { max-width: none; margin: 0; padding: 0; }
     background: #f8faff;
     box-shadow: 0 6px 16px rgba(18, 66, 197, 0.1);
   }
+  .hamburger.open {
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(18,66,197,.16);
+  }
   .hamburger span { background: var(--blue); }
+  body:has(.mobile-nav.open)::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 21;
+    background: rgba(7,24,63,.18);
+    backdrop-filter: blur(3px);
+    pointer-events: none;
+  }
   .mobile-nav {
     left: auto;
     right: 0;
@@ -1407,6 +1421,11 @@ main { max-width: none; margin: 0; padding: 0; }
   .event-grid-home .event-card {
     flex: 0 0 min(84vw, 340px);
     scroll-snap-align: start;
+  }
+  .event-grid-home > [id$="Empty"] {
+    flex: 0 0 100%;
+    width: 100%;
+    text-align: center;
   }
   .icon-grid { grid-template-columns: 1fr; gap: .9rem; }
   #restaurants > div:last-child {
