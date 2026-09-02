@@ -1011,6 +1011,7 @@
       <div class="field"><label>Event Name *</label><input id="evName" type="text" placeholder="Event name" /></div>
       <div class="field"><label>City</label><input id="evCity" type="text" placeholder="City" /></div>
       <div class="field"><label>Price (₹)</label><input id="evPrice" type="number" min="0" placeholder="0" /></div>
+      <div class="field"><label>Organizer Phone *</label><input id="evPhone" type="tel" placeholder="e.g. 9876543210" /></div>
       <div class="field"><label>Category</label><select id="evCategory"><option value="music">Music</option><option value="business">Business</option><option value="food">Food</option><option value="community">Community</option><option value="wellness">Wellness</option><option value="technology">Technology</option></select></div>
       <div class="field"><label>Status</label><select id="evStatus"><option value="published">Published</option><option value="draft">Draft</option></select></div>
       <div class="field"><label>Date</label><input id="evDate" type="date" /></div>
@@ -1296,6 +1297,7 @@ window.editEvent = function(id) {
   document.getElementById('evName').value=e.name||'';
   document.getElementById('evCity').value=e.city||'';
   document.getElementById('evPrice').value=e.price||0;
+  document.getElementById('evPhone').value=e.organizerPhone||'';
   document.getElementById('evCategory').value=e.category||'music';
   document.getElementById('evStatus').value=e.status||'draft';
   document.getElementById('evNotes').value=e.notes||'';
@@ -1714,6 +1716,7 @@ document.getElementById('saveEventBtn').addEventListener('click', async () => {
     await addDoc(collection(db,'events'),{
       name, city:document.getElementById('evCity').value.trim(),
       price:Number(document.getElementById('evPrice').value||0),
+      organizerPhone:document.getElementById('evPhone').value.trim(),
       category:document.getElementById('evCategory').value,
       status:document.getElementById('evStatus').value,
       notes:document.getElementById('evNotes').value.trim(),
@@ -1722,7 +1725,7 @@ document.getElementById('saveEventBtn').addEventListener('click', async () => {
     });
     closeModal('eventModal');
     showToast('✅ Event published','success');
-    ['evName','evCity','evNotes'].forEach(id=>document.getElementById(id).value='');
+    ['evName','evCity','evNotes','evPhone'].forEach(id=>document.getElementById(id).value='');
   } catch(e) { showToast('Error: '+e.message,'error'); }
   btn.textContent='Publish Event'; btn.disabled=false;
 });
