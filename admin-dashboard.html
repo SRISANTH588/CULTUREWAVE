@@ -198,6 +198,57 @@
     @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}.grid-3,.grid-4{grid-template-columns:1fr 1fr;}}
     @media(max-width:768px){.sidebar{display:none;}.stats-grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}.topbar{padding:0 1rem;}.view{padding:1rem;}}
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style id="premium-blue-white-theme">
+    :root{--premium-blue:#2454d6;--premium-blue-dark:#16358e;--premium-ink:#13203b;--premium-muted:#71809b;--premium-line:#dfe7f7;--premium-bg:#f5f8ff;}
+    body{font-family:"DM Sans",sans-serif;background:var(--premium-bg);color:var(--premium-ink);}
+    .sidebar{background:#fff;border-right:1px solid var(--premium-line);box-shadow:8px 0 28px rgba(36,84,214,.06);}
+    .sb-brand{border-bottom:1px solid #e8eefb;padding:1.35rem 1rem 1.1rem;}
+    .sb-logo{background:linear-gradient(135deg,#5c82ff,var(--premium-blue));box-shadow:0 8px 18px rgba(36,84,214,.2);}
+    .sb-brand-row strong{font-family:Manrope;color:var(--premium-ink);}
+    .sb-badge{background:#edf2ff;border-color:#cbd8ff;color:var(--premium-blue);}
+    .sb-admin-name{color:var(--premium-muted);}
+    .sb-section-label{color:#8996ad;}
+    .sb-item{color:#52617d;border-radius:11px;}
+    .sb-item:hover{background:#f0f4ff;color:var(--premium-blue);}
+    .sb-item.active{background:var(--premium-blue);color:#fff;box-shadow:0 8px 18px rgba(36,84,214,.2);}
+    .sb-item .si-badge{background:#edf2ff;color:var(--premium-blue);}.sb-item .si-badge.green{background:#e5f7ed;color:#087443;}.sb-item .si-badge.orange{background:#fff0e8;color:#b94c21;}
+    .sb-divider,.sb-bottom{border-color:#e8eefb;}.sb-user-row{background:#f7f9ff;}.sb-user-info strong{color:var(--premium-ink);}.sb-user-info span{color:var(--premium-muted);}
+    .main{background:var(--premium-bg);}.topbar{background:rgba(255,255,255,.94);border-bottom-color:var(--premium-line);box-shadow:0 8px 24px rgba(36,84,214,.05);}.page-title{font-family:Manrope;color:var(--premium-ink);}
+    .tb-search,.notif-btn,.tb-btn{border-color:var(--premium-line);border-radius:11px;background:#fff;}.tb-btn.primary{background:var(--premium-blue);box-shadow:0 7px 16px rgba(36,84,214,.2);}
+    .view{padding:1.55rem 1.7rem 2.2rem;gap:1.15rem;}
+    .view[data-view="overview"] > div:first-child,.view[data-view="analytics"] > div:first-child,.view[data-view="users"] > div:first-child,.view[data-view="events"] > div:first-child{background:linear-gradient(135deg,#1a3f9f 0%,#2454d6 58%,#5a82ed 100%) !important;border-radius:22px !important;box-shadow:0 16px 34px rgba(36,84,214,.2);}
+    .card,.stat-card{background:#fff;border-color:var(--premium-line);border-radius:17px;box-shadow:0 8px 24px rgba(36,84,214,.055);}
+    .card{padding:1.15rem;}.card-head{border-bottom-color:#edf1f8;}.card-head h2,.section-header h2{font-family:Manrope;letter-spacing:-.045em;color:var(--premium-ink);}.card-head p,.section-header p{color:var(--premium-muted);}
+    .stat-card{padding:1.1rem 1.15rem;}.stat-value{font-family:Manrope;color:var(--premium-ink);}.stat-card:before{height:3px;}.table-wrap{border-color:var(--premium-line);border-radius:13px;}.data-table th{background:#f8faff;border-bottom-color:var(--premium-line);color:var(--premium-muted);}.data-table td{border-bottom-color:#edf1f8;}.data-table tr:hover td{background:#f5f8ff;}
+    .btn{border-color:var(--premium-line);border-radius:10px;transition:transform .18s,box-shadow .18s,background .18s;}.btn:hover{background:#f3f6ff;border-color:#b8c8f7;color:var(--premium-blue);transform:translateY(-1px);}.btn.primary{background:var(--premium-blue);box-shadow:0 7px 16px rgba(36,84,214,.18);}
+    .section-header{background:#fff;border:1px solid var(--premium-line);border-radius:16px;padding:1rem 1.15rem;margin-bottom:0;box-shadow:0 8px 24px rgba(36,84,214,.045);}.filter-bar input,.filter-bar select,.field input,.field select,.field textarea{border-color:var(--premium-line);border-radius:10px;}.modal-overlay{background:rgba(20,45,114,.25);}.modal{border:1px solid #d9e3f8;box-shadow:0 28px 80px rgba(36,84,214,.18);}
+    #liveTag{background:#e8f7ef !important;border-color:#b8e5c9 !important;color:#087443 !important;}
+    @media(max-width:768px){.sidebar{display:flex;min-height:auto;height:auto;position:relative;padding:.75rem;}.sb-brand{padding:.7rem .65rem .75rem}.sb-section-label,.sb-nav,.sb-divider,.sb-bottom{display:none}.topbar{padding:0 1rem;height:64px}.view{padding:1rem}.stats-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+    @media(max-width:460px){.stats-grid{grid-template-columns:1fr}.topbar-right .tb-search{width:145px}.topbar-right .tb-btn{display:none}}
+  </style>
+  <style id="premium-members-content">
+    .view[data-view="users"]{background:linear-gradient(180deg,#f5f8ff 0%,#f9fbff 42%,#f5f8ff 100%);}
+    .view[data-view="users"] > div:first-child{isolation:isolate;min-height:190px;box-shadow:0 18px 40px rgba(36,84,214,.2);}
+    .view[data-view="users"] > div:first-child:after{content:"";position:absolute;right:5%;bottom:-95px;width:245px;height:245px;border:1px solid rgba(255,255,255,.2);border-radius:50%;box-shadow:0 0 0 26px rgba(255,255,255,.05),0 0 0 54px rgba(255,255,255,.035);pointer-events:none;z-index:-1;}
+    .view[data-view="users"] > div:first-child > div:nth-child(3){text-shadow:0 1px 1px rgba(10,36,110,.12);}
+    .view[data-view="users"] > div:nth-child(2){background:transparent !important;border:0 !important;box-shadow:none !important;padding:0 !important;}
+    .view[data-view="users"] > div:nth-child(2)>div{background:#fff;border:1px solid #dfe7f7;border-radius:16px;padding:1.05rem 1.15rem;box-shadow:0 9px 26px rgba(36,84,214,.065);position:relative;overflow:hidden;}
+    .view[data-view="users"] > div:nth-child(2)>div:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue);}
+    .view[data-view="users"] > div:nth-child(2)>div:nth-child(2):before{background:#22a06b;}.view[data-view="users"] > div:nth-child(2)>div:nth-child(3):before{background:#7357d9;}.view[data-view="users"] > div:nth-child(2)>div:nth-child(4):before{background:#e98b3b;}
+    .view[data-view="users"] > div:nth-child(2) .stat-label{font-size:.62rem;color:#7b8496;}.view[data-view="users"] > div:nth-child(2) .stat-value{font-size:1.9rem;color:#13203b;}.view[data-view="users"] > div:nth-child(2) .stat-sub{font-size:.7rem;color:#8b95a8;}
+    .view[data-view="users"] > div:nth-child(3){display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;border:1px solid #dfe7f7 !important;box-shadow:0 9px 26px rgba(36,84,214,.06) !important;padding:.8rem 1rem !important;}
+    .view[data-view="users"] > div:nth-child(3)>div{background:#f7f9ff !important;border-color:#dfe7f7 !important;border-radius:11px !important;}
+    .view[data-view="users"] > div:nth-child(3) input{font-family:"DM Sans",sans-serif;}.view[data-view="users"] > div:nth-child(3) select{color:#344054;border-color:#dfe7f7 !important;border-radius:10px !important;}
+    .view[data-view="users"] > div:nth-child(3) #userCount{background:#edf2ff;color:var(--blue);border-radius:99px;padding:.38rem .7rem;}
+    .view[data-view="users"] > div:nth-child(4){border:1px solid #dfe7f7 !important;box-shadow:0 12px 30px rgba(36,84,214,.07) !important;}
+    .view[data-view="users"] > div:nth-child(4) .table-wrap{border-radius:16px !important;}.view[data-view="users"] > div:nth-child(4) .data-table th{padding:1rem .9rem;background:#f8faff;color:#66738c;}.view[data-view="users"] > div:nth-child(4) .data-table td{padding:.9rem;border-bottom-color:#edf1f8;}.view[data-view="users"] > div:nth-child(4) .data-table tr:hover td{background:#f4f7ff;}
+    .view[data-view="users"] > div:nth-child(4) .data-table td:first-child>div>div:first-child{font-family:Manrope;color:#13203b;}.view[data-view="users"] > div:nth-child(4) .btn-row{gap:.35rem;}.view[data-view="users"] > div:nth-child(4) .btn{box-shadow:none;}.view[data-view="users"] > div:nth-child(4) .btn.primary{box-shadow:0 5px 12px rgba(36,84,214,.15);}
+    @media(max-width:768px){.view[data-view="users"] > div:nth-child(2){grid-template-columns:1fr 1fr !important;}.view[data-view="users"] > div:nth-child(3)>div{min-width:100% !important;}.view[data-view="users"] > div:nth-child(3) select{flex:1;}.view[data-view="users"] > div:nth-child(3) #userCount{margin-left:0 !important;}}
+    @media(max-width:460px){.view[data-view="users"] > div:nth-child(2){grid-template-columns:1fr !important;}.view[data-view="users"] > div:first-child{padding:1.35rem !important;}.view[data-view="users"] > div:first-child button{width:100%;}}
+  </style>
 </head>
 <body>
 
@@ -532,32 +583,53 @@
        VIEW: EVENTS
   ══════════════════════════════════════════ -->
   <div class="view" data-view="events">
-    <div style="background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#3b82f6 100%);border-radius:20px;padding:1.25rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.25rem;">
-      <div>
-        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Live Events</div>
-        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Live Events</div>
-        <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Publish, archive or delete event listings.</div>
+
+    <!-- Hero -->
+    <div style="background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#3b82f6 100%);border-radius:20px;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none;"></div>
+      <div style="position:absolute;bottom:-50px;right:160px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;"></div>
+      <div style="position:relative;">
+        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.25rem .8rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem;">🎪 Live Events</div>
+        <div style="font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;">Live Events</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.75);margin-top:.3rem;">Publish, archive or delete event listings.</div>
       </div>
-      <button class="btn sm" style="background:#fff;color:var(--blue);border:0;font-weight:800;" onclick="openModal('eventModal')">+ New Event</button>
+      <button class="btn sm" style="background:#fff;color:#1d4ed8;border:0;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:.55rem 1.1rem;font-size:.82rem;" onclick="openModal('eventModal')">+ New Event</button>
     </div>
-    <div class="filter-bar">
-      <input type="text" placeholder="Search events..." id="eventSearch" oninput="filterEvents()" />
-      <select id="eventStatusFilter" onchange="filterEvents()">
-        <option value="">All Status</option>
-        <option value="published">Published</option>
-        <option value="draft">Draft</option>
-        <option value="archived">Archived</option>
-      </select>
-      <select id="eventCatFilter" onchange="filterEvents()">
-        <option value="">All Categories</option>
-        <option>Music</option><option>Business</option><option>Food</option><option>Community</option><option>Wellness</option><option>Technology</option>
-      </select>
-      <span style="font-size:.76rem;color:var(--muted);margin-left:auto;" id="eventCount">0 events</span>
+
+    <!-- Stat strip -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;">
+      <div class="stat-card blue"><div class="stat-icon">🎪</div><div class="stat-label">Total Events</div><div class="stat-value" id="evTotal">0</div><div class="stat-sub">All listings</div></div>
+      <div class="stat-card green"><div class="stat-icon">🟢</div><div class="stat-label">Published</div><div class="stat-value" id="evPublished">0</div><div class="stat-sub">Live now</div></div>
+      <div class="stat-card orange"><div class="stat-icon">✏️</div><div class="stat-label">Drafts</div><div class="stat-value" id="evDrafts">0</div><div class="stat-sub">Not live</div></div>
+      <div class="stat-card purple"><div class="stat-icon">💰</div><div class="stat-label">Avg. Price</div><div class="stat-value" id="evAvgPrice">₹0</div><div class="stat-sub">Across events</div></div>
     </div>
-    <div class="card" style="padding:0;">
+
+    <!-- Filter bar -->
+    <div class="card" style="padding:.75rem 1rem;">
+      <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:.5rem;background:#f8faff;border:1px solid #e2e8f0;border-radius:10px;padding:.45rem .85rem;flex:1;min-width:200px;">
+          <span style="color:var(--muted);font-size:.85rem;">🔍</span>
+          <input type="text" placeholder="Search events..." id="eventSearch" oninput="filterEvents()" style="border:0;background:transparent;outline:none;font-size:.82rem;color:var(--text);width:100%;" />
+        </div>
+        <select id="eventStatusFilter" onchange="filterEvents()" style="border:1px solid #e2e8f0;border-radius:9px;padding:.48rem .75rem;font-size:.8rem;outline:none;background:#fff;cursor:pointer;">
+          <option value="">All Status</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+          <option value="archived">Archived</option>
+        </select>
+        <select id="eventCatFilter" onchange="filterEvents()" style="border:1px solid #e2e8f0;border-radius:9px;padding:.48rem .75rem;font-size:.8rem;outline:none;background:#fff;cursor:pointer;">
+          <option value="">All Categories</option>
+          <option>Music</option><option>Business</option><option>Food</option><option>Community</option><option>Wellness</option><option>Technology</option>
+        </select>
+        <span style="font-size:.78rem;color:var(--muted);font-weight:700;margin-left:auto;" id="eventCount">0 events</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card" style="padding:0;overflow:hidden;">
       <div class="table-wrap" style="border:0;border-radius:16px;">
         <table class="data-table">
-          <thead><tr><th>Name</th><th>Category</th><th>City</th><th>Price</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Event</th><th>Category</th><th>City</th><th>Price</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
           <tbody id="eventsTable"></tbody>
         </table>
       </div>
