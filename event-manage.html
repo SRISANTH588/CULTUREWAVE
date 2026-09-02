@@ -292,118 +292,136 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 <!-- CHECK-IN PANEL -->
 <div class="panel" id="panel-checkin">
   <style>
-    .ci-wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:1.25rem;}
-    .ci-header{display:flex;align-items:flex-start;justify-content:space-between;}
-    .ci-title{font-size:1.4rem;font-weight:800;color:var(--text);letter-spacing:-.02em;}
-    .ci-sub{font-size:.82rem;color:var(--muted);margin-top:.2rem;}
-    .ci-refresh{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;cursor:pointer;font-size:1rem;color:var(--muted);}
-    .ci-refresh:hover{border-color:var(--blue);color:var(--blue);}
-    .ci-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
-    .ci-stat{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;text-align:center;}
-    .ci-stat.checked{border-color:#86efac;}
-    .ci-stat.progress{border-color:#bfdbfe;}
-    .ci-stat-icon{font-size:.82rem;color:var(--muted);margin-bottom:.35rem;display:flex;align-items:center;justify-content:center;gap:.3rem;}
-    .ci-stat.checked .ci-stat-icon{color:var(--green);}
-    .ci-stat.progress .ci-stat-icon{color:var(--blue);}
-    .ci-stat-val{font-size:1.8rem;font-weight:800;letter-spacing:-.04em;color:var(--text);}
-    .ci-stat.checked .ci-stat-val{color:var(--green);}
-    .ci-stat.progress .ci-stat-val{color:var(--blue);}
+    .ci-wrap{display:flex;flex-direction:column;gap:1.25rem;}
+    /* hero */
+    .ci-hero{background:linear-gradient(135deg,#0f0c29 0%,#1e1b4b 40%,#3b5bdb 80%,#4c6ef5 100%);border-radius:20px;padding:2rem 2rem 0;position:relative;overflow:hidden;}
+    .ci-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}
+    .ci-hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;}
+    .ci-hero-title{font-size:1.9rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;}
+    .ci-hero-sub{font-size:.84rem;color:rgba(255,255,255,.6);margin-top:.35rem;}
+    .ci-hero-refresh{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;display:grid;place-items:center;cursor:pointer;font-size:1rem;flex:none;}
+    .ci-hero-refresh:hover{background:rgba(255,255,255,.22);}
+    .ci-stats-strip{display:flex;gap:0;margin-top:1.5rem;border-top:1px solid rgba(255,255,255,.1);}
+    .ci-stat-strip-item{flex:1;padding:.85rem 1.1rem;border-right:1px solid rgba(255,255,255,.1);}
+    .ci-stat-strip-item:last-child{border-right:0;}
+    .ci-stat-strip-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:.2rem;}
+    .ci-stat-strip-val{font-size:1.5rem;font-weight:800;color:#fff;}
+    .ci-stat-strip-val.green{color:#4ade80;}
+    .ci-stat-strip-val.blue{color:#93c5fd;}
+    /* body card */
+    .ci-body{background:#fff;border:1px solid var(--border);border-radius:16px;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;}
+    /* search */
     .ci-search-row{display:flex;gap:.6rem;}
-    .ci-search-box{flex:1;display:flex;align-items:center;gap:.6rem;padding:.7rem 1rem;border-radius:10px;border:1.5px solid var(--border);background:#fff;}
+    .ci-search-box{flex:1;display:flex;align-items:center;gap:.6rem;padding:.72rem 1rem;border-radius:10px;border:1.5px solid var(--border);background:#f8f9fa;transition:border-color .15s;}
+    .ci-search-box:focus-within{border-color:var(--blue);background:#fff;}
     .ci-search-box input{border:0;outline:none;font:inherit;font-size:.88rem;color:var(--text);width:100%;background:none;}
-    .ci-search-btn{padding:.7rem 1.4rem;border-radius:10px;background:#e8eaf6;border:0;color:var(--blue);font-weight:700;font-size:.86rem;cursor:pointer;}
-    .ci-scan-btn{width:100%;padding:.9rem;border-radius:12px;background:var(--blue);border:0;color:#fff;font-weight:700;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.6rem;box-shadow:0 4px 16px rgba(59,91,219,.3);}
-    .ci-scan-btn.active{background:#c92a2a;box-shadow:0 4px 16px rgba(201,42,42,.3);}
-    .ci-tabs{display:flex;border-bottom:2px solid var(--border);}
-    .ci-tab{padding:.65rem 1.25rem;font-size:.88rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;border-top:0;border-left:0;border-right:0;}
-    .ci-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
-    .ci-scanner-box{border-radius:12px;overflow:hidden;background:#000;display:none;}
+    .ci-search-btn{padding:.72rem 1.4rem;border-radius:10px;background:var(--blue);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 2px 8px rgba(59,91,219,.25);}
+    .ci-search-btn:hover{background:var(--blue-2);}
+    /* scan btn */
+    .ci-scan-btn{width:100%;padding:1rem;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-2));border:0;color:#fff;font-weight:800;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.65rem;box-shadow:0 6px 20px rgba(59,91,219,.35);letter-spacing:.01em;transition:all .2s;}
+    .ci-scan-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(59,91,219,.45);}
+    .ci-scan-btn.active{background:linear-gradient(135deg,#c92a2a,#e03131);box-shadow:0 6px 20px rgba(201,42,42,.35);}
+    /* scanner */
+    .ci-scanner-box{border-radius:14px;overflow:hidden;background:#000;display:none;border:3px solid var(--blue);}
     .ci-scanner-box.open{display:block;}
     #qr-reader video{width:100%!important;}
-    .ci-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 1rem;gap:.75rem;}
-    .ci-empty-icon{width:64px;height:64px;border-radius:50%;background:#f1f3f5;display:grid;place-items:center;font-size:1.6rem;}
-    .ci-empty h3{font-size:.95rem;font-weight:700;color:var(--text);}
-    .ci-empty p{font-size:.82rem;color:var(--muted);}
-    .ci-log-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 0;border-bottom:1px solid var(--border);}
-    .ci-log-item:last-child{border-bottom:0;}
-    .ci-log-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:.82rem;font-weight:800;color:#fff;flex:none;}
-    .ci-log-name{font-size:.86rem;font-weight:700;color:var(--text);}
-    .ci-log-sub{font-size:.74rem;color:var(--muted);}
-    .ci-log-time{font-size:.72rem;color:var(--muted);margin-left:auto;white-space:nowrap;}
-    .ci-log-badge{font-size:.68rem;font-weight:700;padding:.18rem .5rem;border-radius:999px;}
+    /* tabs */
+    .ci-tabs{display:flex;border-bottom:2px solid var(--border);}
+    .ci-tab{padding:.65rem 1.25rem;font-size:.86rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;background:none;border-top:0;border-left:0;border-right:0;transition:color .15s;}
+    .ci-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+    .ci-tab:hover{color:var(--text);}
+    /* empty */
+    .ci-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 1rem;gap:.75rem;text-align:center;}
+    .ci-empty-icon{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e7f5ff,#f0f4ff);display:grid;place-items:center;font-size:1.8rem;box-shadow:0 4px 16px rgba(59,91,219,.1);}
+    .ci-empty h3{font-size:1rem;font-weight:700;color:var(--text);}
+    .ci-empty p{font-size:.82rem;color:var(--muted);max-width:260px;line-height:1.6;}
+    /* log items */
+    .ci-log-item{display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;border-radius:12px;background:#f8f9fa;border:1px solid var(--border);margin-bottom:.5rem;transition:background .12s;}
+    .ci-log-item:hover{background:#f0f4ff;border-color:rgba(59,91,219,.2);}
+    .ci-log-item:last-child{margin-bottom:0;}
+    .ci-log-avatar{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:.86rem;font-weight:800;color:#fff;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+    .ci-log-name{font-size:.88rem;font-weight:700;color:var(--text);}
+    .ci-log-sub{font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+    .ci-log-time{font-size:.7rem;color:var(--muted);white-space:nowrap;}
+    .ci-log-badge{font-size:.7rem;font-weight:700;padding:.22rem .65rem;border-radius:999px;white-space:nowrap;}
     .ci-log-badge.success{background:#ebfbee;color:var(--green);}
     .ci-log-badge.duplicate{background:#fff9db;color:#e67700;}
+    .ci-checkin-btn{padding:.42rem .9rem;border-radius:8px;background:var(--blue);border:0;color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(59,91,219,.25);}
+    .ci-checkin-btn:hover{background:var(--blue-2);}
   </style>
 
   <div class="ci-wrap">
-    <!-- Header -->
-    <div class="ci-header">
-      <div>
-        <div class="ci-title">Check-In Attendees</div>
-        <div class="ci-sub" id="ciSubTitle">Scan QR codes or search attendees</div>
+
+    <!-- PREMIUM HERO -->
+    <div class="ci-hero">
+      <div class="ci-hero-top">
+        <div>
+          <div class="ci-hero-badge">&#10022; Live Check-In</div>
+          <div class="ci-hero-title">Check-In Attendees</div>
+          <div class="ci-hero-sub" id="ciSubTitle">Scan QR codes or search attendees to verify entry</div>
+        </div>
+        <button class="ci-hero-refresh" onclick="ciRefresh()" title="Refresh">&#8635;</button>
       </div>
-      <button class="ci-refresh" onclick="ciRefresh()" title="Refresh">&#8635;</button>
-    </div>
-
-    <!-- Stats -->
-    <div class="ci-stats">
-      <div class="ci-stat">
-        <div class="ci-stat-icon">&#128101; Registered</div>
-        <div class="ci-stat-val" id="ciTotal">0</div>
-      </div>
-      <div class="ci-stat checked">
-        <div class="ci-stat-icon">&#10003; Checked In</div>
-        <div class="ci-stat-val" id="ciCheckedIn">0</div>
-      </div>
-      <div class="ci-stat progress">
-        <div class="ci-stat-icon">&#8599; Progress</div>
-        <div class="ci-stat-val" id="ciProgress">0%</div>
-      </div>
-    </div>
-
-    <!-- Search -->
-    <div class="ci-search-row">
-      <div class="ci-search-box">
-        <span style="color:var(--muted);font-size:1rem;">&#128269;</span>
-        <input id="ciSearchInput" type="text" placeholder="Search by name, email, phone..." oninput="ciSearch()"/>
-      </div>
-      <button class="ci-search-btn" onclick="ciSearch()">Search</button>
-    </div>
-
-    <!-- Scan Button -->
-    <button id="ciScanBtn" class="ci-scan-btn" onclick="toggleCiScanner()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1m1-4v1"/></svg>
-      Scan QR Code to Check-in
-    </button>
-
-    <!-- Scanner box (hidden until active) -->
-    <div class="ci-scanner-box" id="ciScannerBox">
-      <div id="qr-reader"></div>
-    </div>
-    <div id="scanStatus" style="text-align:center;font-size:.82rem;font-weight:600;color:var(--muted);display:none;"></div>
-
-    <!-- Tabs -->
-    <div class="ci-tabs">
-      <button class="ci-tab active" id="ciTabRecent" onclick="ciSwitchTab('recent')">Recent Check-ins (<span id="ciRecentCount">0</span>)</button>
-      <button class="ci-tab" id="ciTabSearch" onclick="ciSwitchTab('search')">Search Results (<span id="ciSearchCount">0</span>)</button>
-    </div>
-
-    <!-- Recent Check-ins list -->
-    <div id="ciListRecent">
-      <div class="ci-empty">
-        <div class="ci-empty-icon">&#128100;</div>
-        <h3>No check-ins yet</h3>
-        <p>Scan QR codes or search attendees to check them in</p>
+      <div class="ci-stats-strip">
+        <div class="ci-stat-strip-item">
+          <div class="ci-stat-strip-label">&#128101; Registered</div>
+          <div class="ci-stat-strip-val" id="ciTotal">0</div>
+        </div>
+        <div class="ci-stat-strip-item">
+          <div class="ci-stat-strip-label">&#10003; Checked In</div>
+          <div class="ci-stat-strip-val green" id="ciCheckedIn">0</div>
+        </div>
+        <div class="ci-stat-strip-item">
+          <div class="ci-stat-strip-label">&#8599; Progress</div>
+          <div class="ci-stat-strip-val blue" id="ciProgress">0%</div>
+        </div>
+        <div class="ci-stat-strip-item">
+          <div class="ci-stat-strip-label">&#128247; Mode</div>
+          <div style="font-size:.95rem;font-weight:800;color:#fff;">QR + Search</div>
+        </div>
       </div>
     </div>
 
-    <!-- Search Results list -->
-    <div id="ciListSearch" style="display:none;">
-      <div class="ci-empty">
-        <div class="ci-empty-icon">&#128269;</div>
-        <h3>Search Results</h3>
-        <p>Type a name, email or phone above to find attendees</p>
+    <!-- BODY CARD -->
+    <div class="ci-body">
+
+      <div class="ci-search-row">
+        <div class="ci-search-box">
+          <span style="color:var(--muted);font-size:1.05rem;">&#128269;</span>
+          <input id="ciSearchInput" type="text" placeholder="Search by name, email, phone..." oninput="ciSearch()"/>
+        </div>
+        <button class="ci-search-btn" onclick="ciSearch()">Search</button>
       </div>
+
+      <button id="ciScanBtn" class="ci-scan-btn" onclick="toggleCiScanner()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1m1-4v1"/></svg>
+        Scan QR Code to Check-in
+      </button>
+
+      <div class="ci-scanner-box" id="ciScannerBox"><div id="qr-reader"></div></div>
+      <div id="scanStatus" style="display:none;text-align:center;font-size:.82rem;font-weight:600;"></div>
+
+      <div class="ci-tabs">
+        <button class="ci-tab active" id="ciTabRecent" onclick="ciSwitchTab('recent')">Recent Check-ins (<span id="ciRecentCount">0</span>)</button>
+        <button class="ci-tab" id="ciTabSearch" onclick="ciSwitchTab('search')">Search Results (<span id="ciSearchCount">0</span>)</button>
+      </div>
+
+      <div id="ciListRecent">
+        <div class="ci-empty">
+          <div class="ci-empty-icon">&#128100;</div>
+          <h3>No check-ins yet</h3>
+          <p>Scan QR codes or search attendees to check them in</p>
+        </div>
+      </div>
+
+      <div id="ciListSearch" style="display:none;">
+        <div class="ci-empty">
+          <div class="ci-empty-icon">&#128269;</div>
+          <h3>Search Results</h3>
+          <p>Type a name, email or phone above to find attendees</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -411,10 +429,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 <!-- CHECK-IN CONFIRM MODAL -->
 <div id="ciConfirmModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem;">
   <div style="background:#fff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.2);">
-    <div id="ciModalHeader" style="background:var(--blue);padding:1.5rem;text-align:center;">
-      <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:1.5rem;margin:0 auto .75rem;">&#128100;</div>
-      <div style="font-size:1.05rem;font-weight:800;color:#fff;" id="ciModalTitle">Confirm Check-In</div>
-      <div style="font-size:.76rem;color:rgba(255,255,255,.75);margin-top:.2rem;" id="ciModalSub">Review details before checking in</div>
+    <div id="ciModalHeader" style="background:linear-gradient(135deg,#1242c5,#2f6bff);padding:1.75rem 1.5rem 1.25rem;text-align:center;">
+      <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:1.6rem;margin:0 auto .85rem;">&#128100;</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;" id="ciModalTitle">Confirm Check-In</div>
+      <div style="font-size:.78rem;color:rgba(255,255,255,.7);margin-top:.25rem;" id="ciModalSub">Review details before checking in</div>
     </div>
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.6rem;">
       <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
