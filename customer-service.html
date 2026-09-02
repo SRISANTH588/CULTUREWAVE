@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CultureWave | Customer Service</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .support-page{min-height:calc(100vh - 80px);padding:4.5rem 1.4rem 5rem;background:radial-gradient(circle at 12% 0%,#eaf1ff,transparent 30%),linear-gradient(180deg,#fff 0%,#f6f9ff 100%)}
+      .support-wrap{max-width:1040px;margin:0 auto}
+      .support-hero{text-align:center;max-width:680px;margin:0 auto 2.5rem}
+      .support-eyebrow{color:var(--blue);font-size:.72rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+      .support-hero h1{margin:.7rem 0;font-size:clamp(2.4rem,6vw,4.8rem);line-height:.98;letter-spacing:-.07em}
+      .support-hero p{margin:0 auto;color:#63708a;font-size:1rem;line-height:1.7;max-width:570px}
+      .support-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
+      .support-card,.support-form{border:1px solid #dbe6fb;border-radius:22px;background:rgba(255,255,255,.82);box-shadow:0 14px 35px rgba(18,66,197,.08)}
+      .support-card{padding:1.35rem}.support-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#eaf1ff;color:var(--blue);font-size:1.3rem;margin-bottom:1rem}
+      .support-card h2{font-size:1rem;margin-bottom:.35rem}.support-card p{color:#6b7892;font-size:.82rem;line-height:1.6;margin-bottom:1rem}.support-card a{color:var(--blue);font-size:.82rem;font-weight:800}
+      .support-form{padding:1.5rem;max-width:680px;margin:0 auto}.support-form h2{font-size:1.25rem;margin-bottom:.25rem}.support-form>p{color:#6b7892;font-size:.82rem;margin-bottom:1.2rem}.support-fields{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}.support-field{display:grid;gap:.35rem}.support-field.full{grid-column:1/-1}.support-field label{font-size:.72rem;font-weight:800;color:#44516b}.support-field input,.support-field textarea{width:100%;border:1px solid #dbe6fb;border-radius:11px;background:#f8faff;padding:.75rem .8rem;outline:none;color:#172033}.support-field textarea{min-height:110px;resize:vertical}.support-field input:focus,.support-field textarea:focus{border-color:#7fa2f5;box-shadow:0 0 0 3px #eaf1ff}.support-submit{margin-top:1rem;width:100%;border:0;border-radius:12px;padding:.85rem;background:linear-gradient(135deg,#1242c5,#3b72ed);color:#fff;font-weight:800;cursor:pointer;box-shadow:0 10px 22px rgba(18,66,197,.22)}
+      @media(max-width:640px){.support-page{padding:3rem 1rem 4rem}.support-grid{grid-template-columns:1fr}.support-fields{grid-template-columns:1fr}.support-field.full{grid-column:auto}.support-form{padding:1.2rem}}
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="nav-wrap">
+        <div class="brand-block"><div class="logo">CultureWave</div><div class="brand-sub">by OGSHOOTS LUXE</div></div>
+        <nav class="topnav"><a href="index.html">Home</a><a href="events.html">Events</a><a href="features.html">For Organizers</a><a href="pricing.html">Pricing</a><a href="how-it-works.html">How it works</a></nav>
+        <div class="auth-actions"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a></div>
+        <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </header>
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="index.html">Home</a><a href="events.html">Events</a><a href="features.html">For Organizers</a><a href="pricing.html">Pricing</a><a href="how-it-works.html">How it works</a><a href="customer-service.html">Customer Service</a>
+      <div class="mobile-nav-ctas"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a></div>
+    </nav>
+
+    <main class="support-page">
+      <div class="support-wrap">
+        <section class="support-hero"><div class="support-eyebrow">Customer service</div><h1>We are here to help.</h1><p>Whether you are booking a seat or hosting an event, our team is ready to help you move forward with confidence.</p></section>
+        <section class="support-grid">
+          <article class="support-card"><div class="support-icon">💬</div><h2>Chat with us</h2><p>Get quick help with bookings, payments, and account questions.</p><a href="https://wa.me/916305183601" target="_blank" rel="noopener">Message on WhatsApp →</a></article>
+          <article class="support-card"><div class="support-icon">✉️</div><h2>Email support</h2><p>Send the details of your request and our team will follow up.</p><a href="mailto:support@culturewave.in">support@culturewave.in →</a></article>
+          <article class="support-card"><div class="support-icon">🎟️</div><h2>Booking help</h2><p>Keep your booking ID ready so we can resolve your issue faster.</p><a href="booking.html">View booking flow →</a></article>
+        </section>
+        <form class="support-form" id="supportForm"><h2>Send us a message</h2><p>Tell us what you need and we will get back to you.</p><div class="support-fields"><div class="support-field"><label for="supportName">Your name</label><input id="supportName" required /></div><div class="support-field"><label for="supportEmail">Email address</label><input id="supportEmail" type="email" required /></div><div class="support-field full"><label for="supportMessage">How can we help?</label><textarea id="supportMessage" required></textarea></div></div><button class="support-submit" type="submit">Send Support Request</button></form>
+      </div>
+    </main>
+    <footer class="site-footer"><div class="footer-wrap"><div class="footer-branding"><div class="footer-brand">CultureWave</div><p>Events, workshops, and restaurant bookings in one smooth flow.</p><span class="footer-tag">Developed by Srisanth Boddu</span></div><div class="footer-links"><a href="index.html">Home</a><a href="events.html">Events</a><a href="features.html">For Organizers</a><a href="pricing.html">Pricing</a><a href="how-it-works.html">How it works</a><a href="customer-service.html">Customer Service</a></div><div class="footer-contact"><h3>Contact</h3><a href="tel:+916305183601">6305183601</a><span>Support for every booking journey.</span></div></div></footer>
+    <script>
+      const ham=document.getElementById('hamburger'),mNav=document.getElementById('mobileNav');
+      ham.addEventListener('click',()=>{ham.classList.toggle('open');mNav.classList.toggle('open');document.body.style.overflow=mNav.classList.contains('open')?'hidden':'';});
+      mNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ham.classList.remove('open');mNav.classList.remove('open');document.body.style.overflow='';}));
+      document.getElementById('supportForm').addEventListener('submit',e=>{e.preventDefault();const subject=encodeURIComponent('CultureWave customer support request');const body=encodeURIComponent(`Name: ${supportName.value}\nEmail: ${supportEmail.value}\n\n${supportMessage.value}`);window.location.href=`mailto:support@culturewave.in?subject=${subject}&body=${body}`;});
+    </script>
+  </body>
+</html>
