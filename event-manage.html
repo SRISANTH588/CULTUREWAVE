@@ -338,7 +338,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     .ci-scan-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(59,91,219,.45);}
     .ci-scan-btn.active{background:linear-gradient(135deg,#c92a2a,#e03131);box-shadow:0 6px 20px rgba(201,42,42,.35);}
     /* scanner */
-    .ci-scanner-box{border-radius:14px;overflow:hidden;background:#000;display:none;border:3px solid var(--blue);}
+    .ci-scanner-box{display:none!important;}
     .ci-scanner-box.open{display:block;}
     #qr-reader video{width:100%!important;}
     /* tabs */
@@ -364,6 +364,13 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     .ci-log-badge.duplicate{background:#fff9db;color:#e67700;}
     .ci-checkin-btn{padding:.42rem .9rem;border-radius:8px;background:var(--blue);border:0;color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(59,91,219,.25);}
     .ci-checkin-btn:hover{background:var(--blue-2);}
+    .ci-scan-modal-box{max-width:390px;padding:1.1rem;}
+    .ci-modal-camera{background:#0b1224;border-radius:14px;overflow:hidden;border:3px solid var(--blue);min-height:250px;display:flex;align-items:center;justify-content:center;}
+    #ci-modal-reader{width:100%;}
+    #ci-modal-reader video{width:100%!important;display:block;}
+    #ci-modal-reader__scan_region{border:0!important;}
+    .ci-modal-cancel{width:100%;padding:.7rem;border:1px solid var(--border);border-radius:10px;background:#f8f9fa;color:#495057;font-weight:700;font-size:.84rem;cursor:pointer;margin-top:.7rem;}
+    .ci-modal-cancel:hover{background:#f1f3f5;}
   </style>
 
   <div class="ci-wrap">
@@ -442,6 +449,19 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   </div>
 </div>
 
+<!-- QR CAMERA MODAL -->
+<div id="ciScanModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-box ci-scan-modal-box">
+    <div class="modal-head">
+      <div><h3>Scan attendee QR</h3><p style="font-size:.76rem;color:var(--muted);margin-top:.2rem;">Place the ticket inside the frame</p></div>
+      <button class="modal-close" onclick="closeCiScanModal()" aria-label="Close scanner">&#10005;</button>
+    </div>
+    <div class="ci-modal-camera"><div id="ci-modal-reader"></div></div>
+    <div id="ciModalScanStatus" style="text-align:center;font-size:.78rem;color:var(--muted);padding:.7rem 0 .1rem;">Starting camera...</div>
+    <button class="ci-modal-cancel" onclick="closeCiScanModal()">Cancel</button>
+  </div>
+</div>
+
 <!-- CHECK-IN CONFIRM MODAL -->
 <div id="ciConfirmModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem;">
   <div style="background:#fff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.2);">
@@ -463,6 +483,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Phone</div>
         <div style="font-size:.88rem;font-weight:600;color:var(--text);" id="ciConfirmPhone">—</div>
       </div>
+      <div id="ciModalReason" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:.75rem 1rem;color:#9a3412;font-size:.8rem;line-height:1.45;"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.25rem;" id="ciModalBtns">
         <button onclick="cancelCiConfirm()" style="padding:.75rem;border-radius:10px;background:#f1f3f5;border:0;font-weight:700;font-size:.88rem;cursor:pointer;color:#495057;">Cancel</button>
         <button onclick="confirmCiCheckIn()" id="ciModalCheckInBtn" style="padding:.75rem;border-radius:10px;background:var(--blue);border:0;color:#fff;font-weight:700;font-size:.88rem;cursor:pointer;">Check In</button>
@@ -1214,55 +1235,71 @@ window.toggleCiScanner=async function(){
 };
 
 async function startCiScanner(){
-  const statusEl=document.getElementById('scanStatus');
-  const box=document.getElementById('ciScannerBox');
+  const modal=document.getElementById('ciScanModal');
+  const statusEl=document.getElementById('ciModalScanStatus');
   const btn=document.getElementById('ciScanBtn');
   if(scannerRunning) return;
+  ciScanPaused=false;
+  modal.style.display='flex';
+  modal.setAttribute('aria-hidden','false');
+  statusEl.textContent='Starting camera...';
   try{
-    html5QrCode=new Html5Qrcode('qr-reader');
+    html5QrCode=new Html5Qrcode('ci-modal-reader');
     await html5QrCode.start(
       {facingMode:'environment'},
       {fps:10,qrbox:{width:240,height:240}},
-      (text)=>{ if(!ciScanPaused){ ciScanPaused=true; stopCiScanner().then(()=>processCheckIn(text.trim())); } },
+      (text)=>{ if(!ciScanPaused){ ciScanPaused=true; stopCiScanner().then(()=>processCheckIn(text)); } },
       ()=>{}
     );
     scannerRunning=true;
-    box.classList.add('open');
-    statusEl.style.display='block';statusEl.textContent='Scanning\u2026 point at QR code';statusEl.style.color='var(--green)';
-    btn.classList.add('active');
-    btn.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1m1-4v1"/></svg> Stop Scanning';
+    statusEl.textContent='Scanning... point at the QR code';
   }catch(e){
-    statusEl.style.display='block';statusEl.textContent='Camera error: '+e.message;statusEl.style.color='#c92a2a';
+    statusEl.textContent='Camera error: '+e.message;
+    statusEl.style.color='#c92a2a';
+    await closeCiScanModal();
   }
 }
+
+window.closeCiScanModal=async function(){
+  await stopCiScanner();
+  ciScanPaused=false;
+  const modal=document.getElementById('ciScanModal');
+  if(modal){modal.style.display='none';modal.setAttribute('aria-hidden','true');}
+};
 
 async function stopCiScanner(){
   if(html5QrCode&&scannerRunning){try{await html5QrCode.stop();html5QrCode.clear();}catch(e){}}
   scannerRunning=false;
-  const box=document.getElementById('ciScannerBox');
-  const btn=document.getElementById('ciScanBtn');
-  const statusEl=document.getElementById('scanStatus');
-  if(box) box.classList.remove('open');
-  if(statusEl) statusEl.style.display='none';
-  if(btn){
-    btn.classList.remove('active');
-    btn.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1m1-4v1"/></svg> Scan QR Code to Check-in';
-  }
+  html5QrCode=null;
+  const modal=document.getElementById('ciScanModal');
+  if(modal){modal.style.display='none';modal.setAttribute('aria-hidden','true');}
 }
 
 window.processCheckIn=function(val){
-  if(!val) return;
-  const b=allBookings.find(x=>x.id===val||x.bookingId===val||x.ticketId===val);
-  if(!b){showToast('Ticket not found');return;}
+  const raw=String(val||'').replace(/^\uFEFF/,'').trim();
+  if(!raw) return;
+  let ticketId=raw;
+  try{
+    const decoded=decodeURIComponent(raw);
+    try{
+      const data=JSON.parse(decoded);
+      ticketId=data.id||data.bookingId||data.booking_id||data.ticketId||data.booking?.id||'';
+    }catch(_){
+      const url=new URL(decoded);
+      ticketId=url.searchParams.get('bookingId')||url.searchParams.get('booking_id')||url.searchParams.get('id')||decoded;
+    }
+  }catch(_){}
+  const b=allBookings.find(x=>x.id===ticketId||x.bookingId===ticketId||x.ticketId===ticketId);
+  if(!b){showCiModal(null,'invalid');return;}
   if(b.checkedIn){showCiModal(b,'already');return;}
   ciPendingBooking=b;
   showCiModal(b,'confirm');
 };
 
 function showCiModal(b,type){
-  const name=b.customerName||b.customer?.name||b.buyerName||'Guest';
-  const email=b.customerEmail||b.customer?.email||b.buyerEmail||'\u2014';
-  const phone=b.customerPhone||b.customer?.phone||b.buyerPhone||'\u2014';
+  const name=b?(b.customerName||b.customer?.name||b.buyerName||'Guest'):'Unknown ticket';
+  const email=b?(b.customerEmail||b.customer?.email||b.buyerEmail||'\u2014'):'\u2014';
+  const phone=b?(b.customerPhone||b.customer?.phone||b.buyerPhone||'\u2014'):'\u2014';
   document.getElementById('ciConfirmName').textContent=name;
   document.getElementById('ciConfirmEmail').textContent=email;
   document.getElementById('ciConfirmPhone').textContent=phone;
@@ -1271,9 +1308,20 @@ function showCiModal(b,type){
   const sub=document.getElementById('ciModalSub');
   const checkBtn=document.getElementById('ciModalCheckInBtn');
   const cancelBtn=document.querySelector('#ciModalBtns button:first-child');
-  if(type==='already'){
+  const reason=document.getElementById('ciModalReason');
+  reason.style.display='none';
+  reason.textContent='';
+  if(type==='invalid'){
+    hdr.style.background='#c92a2a';title.textContent='Invalid Ticket';
+    sub.textContent='This QR code could not be verified';
+    reason.textContent='Reason: No matching booking was found for this QR code.';
+    reason.style.display='block';
+    checkBtn.style.display='none';cancelBtn.style.gridColumn='1/-1';
+  } else if(type==='already'){
     hdr.style.background='#d97706';title.textContent='\u26a0 Already Checked In';
     sub.textContent='This ticket was already used for entry';
+    reason.textContent='Reason: This ticket has already been checked in and cannot be used again.';
+    reason.style.display='block';
     checkBtn.style.display='none';cancelBtn.style.gridColumn='1/-1';
   } else {
     hdr.style.background='var(--blue)';title.textContent='Confirm Check-In';
