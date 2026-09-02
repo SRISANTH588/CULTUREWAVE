@@ -1276,10 +1276,12 @@ main { max-width: none; margin: 0; padding: 0; }
     pointer-events: none;
   }
   .mobile-nav {
+    top: 68px;
     left: auto;
     right: 0;
     width: 80%;
     max-width: 360px;
+    box-sizing: border-box;
     border-left: 1px solid #dbe6fb;
     box-shadow: -18px 0 40px rgba(18,66,197,.14);
     background:
@@ -1435,6 +1437,13 @@ main { max-width: none; margin: 0; padding: 0; }
   #restaurants > div:last-child .btn {
     width: 100%;
     margin-left: 0 !important;
+  }
+  #restaurants .event-grid-home {
+    min-height: 300px;
+    align-items: center;
+  }
+  #restaurants .event-grid-home > [id$="Empty"] {
+    align-self: center;
   }
   .final-cta-inner { padding: 1.4rem; }
   .final-cta h2 { font-size: clamp(1.6rem, 6vw, 2.4rem); }
