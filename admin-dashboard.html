@@ -15,6 +15,7 @@
       --red:#c92a2a; --border:#f0e6d3; --muted:#92816a;
       --text:#1a1a2e; --bg:#fdf6e3; --sidebar:240px;
       --sb-bg:#1c1008; --sb-border:#2d1a06; --sb-text:#f5e6c8; --sb-muted:#8a6a45;
+      --sidebar:270px;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;display:flex;}
@@ -35,17 +36,17 @@
     }
     .sb-brand{padding:1.2rem 1rem 1rem;border-bottom:1px solid var(--sb-border);}
     .sb-brand-row{display:flex;align-items:center;gap:.65rem;margin-bottom:.5rem;}
-    .sb-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#78350f,#d97706);display:grid;place-items:center;color:#fff;font-weight:800;font-size:1rem;flex:none;box-shadow:0 2px 8px rgba(217,119,6,.4);}
-    .sb-brand-row strong{font-size:1rem;font-weight:800;color:var(--sb-text);letter-spacing:-.03em;}
+    .sb-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#78350f,#d97706);display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.2rem;flex:none;box-shadow:0 2px 8px rgba(217,119,6,.4);}
+    .sb-brand-row strong{font-size:1.1rem;font-weight:800;color:var(--sb-text);letter-spacing:-.03em;}
     .sb-badge{display:inline-flex;align-items:center;gap:.3rem;background:rgba(217,119,6,.15);border:1px solid rgba(217,119,6,.4);border-radius:999px;padding:.2rem .6rem;font-size:.65rem;font-weight:800;color:#fbbf24;letter-spacing:.1em;text-transform:uppercase;}
     .sb-admin-name{font-size:.78rem;color:var(--sb-muted);margin-top:.25rem;}
 
-    .sb-section-label{padding:.9rem 1rem .3rem;font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--sb-muted);}
-    .sb-nav{display:flex;flex-direction:column;gap:.1rem;padding:0 .6rem;}
-    .sb-item{display:flex;align-items:center;gap:.65rem;padding:.65rem .75rem;border-radius:12px;border:0;background:transparent;color:#c4a882;font-weight:700;font-size:.84rem;cursor:pointer;text-align:left;width:100%;transition:all .15s;position:relative;}
+    .sb-section-label{padding:1rem 1rem .35rem;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--sb-muted);}
+    .sb-nav{display:flex;flex-direction:column;gap:.2rem;padding:0 .6rem;}
+    .sb-item{display:flex;align-items:center;gap:.75rem;padding:.75rem .9rem;border-radius:14px;border:0;background:transparent;color:#c4a882;font-weight:700;font-size:.92rem;cursor:pointer;text-align:left;width:100%;transition:all .15s;position:relative;}
     .sb-item:hover{background:rgba(217,119,6,.12);color:#fbbf24;}
-    .sb-item.active{background:rgba(217,119,6,.18);color:#fbbf24;border:1px solid rgba(217,119,6,.35);}
-    .sb-item .si-icon{font-size:1rem;width:20px;text-align:center;flex:none;}
+    .sb-item.active{background:rgba(217,119,6,.2);color:#fbbf24;border:1px solid rgba(217,119,6,.4);box-shadow:0 2px 12px rgba(217,119,6,.15);}
+    .sb-item .si-icon{font-size:1.15rem;width:22px;text-align:center;flex:none;}
     .sb-item .si-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:800;padding:.15rem .45rem;border-radius:999px;min-width:18px;text-align:center;}
     .sb-item .si-badge.green{background:var(--green);}
     .sb-item .si-badge.orange{background:var(--orange);}
@@ -60,9 +61,9 @@
     .main{flex:1;min-width:0;display:flex;flex-direction:column;}
 
     /* ── TOPBAR ── */
-    .topbar{background:var(--sb-bg);border-bottom:1px solid var(--sb-border);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+    .topbar{background:var(--sb-bg);border-bottom:1px solid var(--sb-border);padding:0 1.75rem;height:66px;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 12px rgba(0,0,0,.3);}
     .topbar-left{display:flex;align-items:center;gap:.75rem;}
-    .page-title{font-size:1rem;font-weight:800;letter-spacing:-.03em;color:var(--sb-text);}
+    .page-title{font-size:1.15rem;font-weight:800;letter-spacing:-.03em;color:var(--sb-text);}
     .topbar-right{display:flex;align-items:center;gap:.6rem;}
     .tb-search{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.07);border:1px solid rgba(217,119,6,.25);border-radius:10px;padding:.4rem .75rem;width:220px;}
     .tb-search input{border:0;background:transparent;outline:none;font-size:.82rem;color:var(--sb-text);width:100%;}
@@ -212,34 +213,34 @@
     <div class="sb-admin-name" id="adminName">Loading...</div>
   </div>
 
-  <div class="sb-section-label">Main</div>
+  <div class="sb-section-label">✦ Command Center</div>
   <nav class="sb-nav">
-    <button class="sb-item active" data-view="overview"><span class="si-icon">⊞</span> Overview</button>
-    <button class="sb-item" data-view="analytics"><span class="si-icon">📈</span> Analytics</button>
+    <button class="sb-item active" data-view="overview"><span class="si-icon">🏠</span> Dashboard</button>
+    <button class="sb-item" data-view="analytics"><span class="si-icon">📊</span> Analytics & Insights</button>
   </nav>
 
-  <div class="sb-section-label">Manage</div>
+  <div class="sb-section-label">✦ Manage</div>
   <nav class="sb-nav">
-    <button class="sb-item" data-view="users"><span class="si-icon">👥</span> Users <span class="si-badge" id="badgeUsers">0</span></button>
-    <button class="sb-item" data-view="events"><span class="si-icon">📅</span> Events <span class="si-badge green" id="badgeEvents">0</span></button>
-    <button class="sb-item" data-view="campaigns"><span class="si-icon">📣</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
-    <button class="sb-item" data-view="payments"><span class="si-icon">💳</span> Payments <span class="si-badge" id="badgePayments">0</span></button>
-    <button class="sb-item" data-view="whatsapp"><span class="si-icon">💬</span> WhatsApp <span class="si-badge green" id="badgeWA">0</span></button>
-    <button class="sb-item" data-view="refunds"><span class="si-icon">↩️</span> Refunds <span class="si-badge" id="badgeRefunds">0</span></button>
-    <button class="sb-item" data-view="website-requests"><span class="si-icon">🌐</span> Website Requests <span class="si-badge orange" id="badgeWebReqs">0</span></button>
+    <button class="sb-item" data-view="users"><span class="si-icon">👥</span> Members <span class="si-badge" id="badgeUsers">0</span></button>
+    <button class="sb-item" data-view="events"><span class="si-icon">🎪</span> Live Events <span class="si-badge green" id="badgeEvents">0</span></button>
+    <button class="sb-item" data-view="campaigns"><span class="si-icon">🚀</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
+    <button class="sb-item" data-view="payments"><span class="si-icon">💳</span> Transactions <span class="si-badge" id="badgePayments">0</span></button>
+    <button class="sb-item" data-view="whatsapp"><span class="si-icon">💬</span> WA Dispatch <span class="si-badge green" id="badgeWA">0</span></button>
+    <button class="sb-item" data-view="refunds"><span class="si-icon">🔄</span> Refunds <span class="si-badge" id="badgeRefunds">0</span></button>
+    <button class="sb-item" data-view="website-requests"><span class="si-icon">🌐</span> Web Requests <span class="si-badge orange" id="badgeWebReqs">0</span></button>
   </nav>
 
-  <div class="sb-section-label">Content</div>
+  <div class="sb-section-label">✦ Premium Content</div>
   <nav class="sb-nav">
     <button class="sb-item" data-view="webinars"><span class="si-icon">🎙️</span> Webinars</button>
-    <button class="sb-item" data-view="tours"><span class="si-icon">📍</span> Tours</button>
-    <button class="sb-item" data-view="restaurants"><span class="si-icon">🍽️</span> Restaurants</button>
+    <button class="sb-item" data-view="tours"><span class="si-icon">🗺️</span> Tours & Adventures</button>
+    <button class="sb-item" data-view="restaurants"><span class="si-icon">🍽️</span> Dining & Restaurants</button>
   </nav>
 
-  <div class="sb-section-label">System</div>
+  <div class="sb-section-label">✦ System</div>
   <nav class="sb-nav">
-    <button class="sb-item" data-view="credits"><span class="si-icon">💰</span> Credits & Wallets</button>
-    <button class="sb-item" data-view="activity"><span class="si-icon">🕐</span> Activity Log</button>
+    <button class="sb-item" data-view="credits"><span class="si-icon">🪙</span> Credits & Wallets</button>
+    <button class="sb-item" data-view="activity"><span class="si-icon">📋</span> Activity Log</button>
     <button class="sb-item" data-view="settings"><span class="si-icon">⚙️</span> Settings</button>
     <a class="sb-item" href="checkin.html" target="_blank"><span class="si-icon">📷</span> Check-In Scanner</a>
   </nav>
@@ -429,8 +430,8 @@
       <div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none;"></div>
       <div>
         <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.25rem .75rem;font-size:.65rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem;">👑 Premium Analytics</div>
-        <div style="font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;">Platform Analytics</div>
-        <div style="font-size:.84rem;color:rgba(255,255,255,.7);margin-top:.3rem;">Performance metrics and trends across the platform.</div>
+        <div style="font-size:1.9rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;">Analytics & Insights</div>
+        <div style="font-size:.9rem;color:rgba(255,255,255,.7);margin-top:.3rem;">Performance metrics and trends across the platform.</div>
       </div>
       <div style="display:inline-flex;align-items:center;gap:.35rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.3rem .9rem;font-size:.72rem;font-weight:800;color:#fff;">👑 Premium Feature</div>
     </div>
@@ -477,9 +478,9 @@
   <div class="view" data-view="users">
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.25rem;">
       <div>
-        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Users</div>
-        <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">User Management</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Edit roles, verify accounts, archive or delete users.</div>
+        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Members</div>
+        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Member Management</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Edit roles, verify accounts, archive or delete members.</div>
       </div>
       <button class="btn sm" style="background:#fff;color:#b45309;border:0;font-weight:800;" onclick="openModal('userModal')">+ Edit User</button>
     </div>
@@ -513,9 +514,9 @@
   <div class="view" data-view="events">
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.25rem;">
       <div>
-        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Events</div>
-        <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Events</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Publish, archive or delete event listings.</div>
+        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Live Events</div>
+        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Live Events</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Publish, archive or delete event listings.</div>
       </div>
       <button class="btn sm" style="background:#fff;color:#b45309;border:0;font-weight:800;" onclick="openModal('eventModal')">+ New Event</button>
     </div>
@@ -550,8 +551,8 @@
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.25rem;">
       <div>
         <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Campaigns</div>
-        <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Campaigns</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All influencer campaigns submitted by clients.</div>
+        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Campaigns</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All influencer campaigns submitted by clients.</div>
       </div>
     </div>
     <div class="filter-bar">
@@ -579,9 +580,9 @@
   <div class="view" data-view="payments">
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.25rem;">
       <div>
-        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Payments</div>
-        <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Payments</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All payment transactions across the platform.</div>
+        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Transactions</div>
+        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Transactions</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All payment transactions across the platform.</div>
       </div>
     </div>
     <div class="filter-bar">
@@ -613,8 +614,8 @@
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.25rem;">
       <div>
         <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Refunds</div>
-        <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Refunds</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Manage refund requests and payment reversals.</div>
+        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Refunds</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Manage refund requests and payment reversals.</div>
       </div>
       <button class="btn sm" style="background:#fff;color:#b45309;border:0;font-weight:800;" onclick="openModal('refundModal')">Process Refund</button>
     </div>
@@ -643,9 +644,9 @@
   <div class="view" data-view="website-requests">
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.25rem;">
       <div>
-        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Website Requests</div>
-        <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Custom Website Requests</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Private requests from clients — not publicly listed.</div>
+        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Web Requests</div>
+        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Custom Website Requests</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Private requests from clients — not publicly listed.</div>
       </div>
       <span class="badge orange" id="webReqPendingBadge" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);">0 pending</span>
     </div>
@@ -677,9 +678,9 @@
   ══════════════════════════════════════════ -->
   <div class="view" data-view="webinars">
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;">
-      <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Webinars</div>
-      <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Webinars</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All webinar listings on the platform.</div>
+      <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Premium Content</div>
+      <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Webinars</div>
+      <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All webinar listings on the platform.</div>
     </div>
     <div class="card" style="padding:0;">
       <div class="table-wrap" style="border:0;border-radius:16px;">
@@ -696,9 +697,9 @@
   ══════════════════════════════════════════ -->
   <div class="view" data-view="tours">
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;">
-      <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Tours</div>
-      <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Tours & Adventures</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All tour and adventure listings on the platform.</div>
+      <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Premium Content</div>
+      <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Tours & Adventures</div>
+      <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All tour and adventure listings on the platform.</div>
     </div>
     <div class="card" style="padding:0;">
       <div class="table-wrap" style="border:0;border-radius:16px;">
@@ -715,9 +716,9 @@
   ══════════════════════════════════════════ -->
   <div class="view" data-view="restaurants">
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;">
-      <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Restaurants</div>
-      <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Restaurants</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All restaurant listings on the platform.</div>
+      <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Premium Content</div>
+      <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Dining & Restaurants</div>
+      <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">All restaurant listings on the platform.</div>
     </div>
     <div class="card" style="padding:0;">
       <div class="table-wrap" style="border:0;border-radius:16px;">
@@ -736,8 +737,8 @@
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.25rem;">
       <div>
         <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Credits & Wallets</div>
-        <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Credits & Wallets</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Manage user credit balances across all wallets.</div>
+        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Credits & Wallets</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Manage user credit balances across all wallets.</div>
       </div>
       <button class="btn sm" style="background:#fff;color:#b45309;border:0;font-weight:800;" onclick="openModal('creditModal')">+ Add Credits</button>
     </div>
@@ -762,8 +763,8 @@
   <div class="view" data-view="activity">
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;">
       <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Activity Log</div>
-      <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Activity Log</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Recent platform events and admin actions.</div>
+      <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Activity Log</div>
+      <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Recent platform events and admin actions.</div>
     </div>
     <div class="card">
       <div id="activityLog">
@@ -779,8 +780,8 @@
     <div style="background:linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%);border-radius:20px;padding:1.4rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
       <div>
         <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.25rem .75rem;font-size:.65rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem;">👑 Settings</div>
-        <div style="font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;">Platform Settings</div>
-        <div style="font-size:.84rem;color:rgba(255,255,255,.7);margin-top:.3rem;">Configure platform behaviour and admin preferences.</div>
+        <div style="font-size:1.9rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;">Platform Settings</div>
+        <div style="font-size:.9rem;color:rgba(255,255,255,.7);margin-top:.3rem;">Configure platform behaviour and admin preferences.</div>
       </div>
     </div>
     <div class="grid-2">
@@ -878,7 +879,7 @@
     font-size:.63rem; font-weight:800; color:rgba(255,255,255,.9);
     letter-spacing:.12em; text-transform:uppercase; margin-bottom:.5rem;
   }
-  .wa-hero-left h2 { font-size:1.35rem; font-weight:800; color:#fff; letter-spacing:-.04em; margin:0 0 .25rem; }
+  .wa-hero-left h2 { font-size:1.75rem; font-weight:800; color:#fff; letter-spacing:-.04em; margin:0 0 .25rem; }
   .wa-hero-left p  { font-size:.82rem; color:rgba(255,255,255,.7); margin:0; }
   .wa-stats-strip {
     display:flex; gap:1.2rem; flex-wrap:wrap; margin-top:.5rem;
@@ -1109,10 +1110,10 @@ document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('cli
 
 // ── NAVIGATION ──
 const viewTitles = {
-  overview:'Overview', analytics:'Analytics', users:'Users', events:'Events',
-  campaigns:'Campaigns', payments:'Payments', refunds:'Refunds',
-  'website-requests':'Website Requests', webinars:'Webinars', tours:'Tours',
-  restaurants:'Restaurants', credits:'Credits & Wallets', activity:'Activity Log', settings:'Settings'
+  overview:'Dashboard', analytics:'Analytics & Insights', users:'Member Management', events:'Live Events',
+  campaigns:'Campaigns', payments:'Transactions', refunds:'Refunds',
+  'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
+  restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', settings:'Platform Settings'
 };
 window.showView = function(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===name));
