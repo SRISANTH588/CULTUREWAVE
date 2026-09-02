@@ -910,6 +910,7 @@
         const ts = firebase.firestore.FieldValue.serverTimestamp();
         const bookingDoc = {
           bookingId:     data.bookingId,
+          eventId:       eventId || null,
           eventName:     data.eventName,
           amount:        data.amount,
           seats:         data.seats,

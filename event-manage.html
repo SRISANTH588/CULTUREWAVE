@@ -978,11 +978,13 @@ function loadBookings(){
   // Try eventId field first, fallback handled in filter
   db.collection('bookings').limit(500).onSnapshot(snap=>{
     const all = snap.docs.map(d=>({id:d.id,...d.data()}));
-    // match by eventId OR event.id OR event.eventId
+    const currentEventName=String(eventData?.name||'').trim().toLowerCase();
+    // Match by ID first, then retain older bookings that predate eventId.
     allBookings = all.filter(b=>
       b.eventId===eventId ||
       b.event?.id===eventId ||
-      b.event?.eventId===eventId
+      b.event?.eventId===eventId ||
+      (!!currentEventName && String(b.eventName||b.event?.name||'').trim().toLowerCase()===currentEventName)
     );
     renderBookings();renderBookingStats();renderAnalytics();renderCiRecent();
   });
