@@ -462,15 +462,15 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div style="display:flex;flex-direction:column;gap:.75rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
         <div><div style="font-size:.86rem;font-weight:700;">24 hours before event</div><div style="font-size:.76rem;color:var(--muted);">Send reminder to all registered attendees</div></div>
-        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="rem24h" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#3b5bdb;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label>
+        <div class="tog" id="tog-rem24h" onclick="toggleSwitch('rem24h')" data-on="true" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;"><div class="tog-track" style="position:absolute;inset:0;border-radius:999px;background:#3b5bdb;transition:background .2s;"></div><div class="tog-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;transform:translateX(20px);"></div></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
         <div><div style="font-size:.86rem;font-weight:700;">1 hour before event</div><div style="font-size:.76rem;color:var(--muted);">Final reminder with venue/link details</div></div>
-        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="rem1h" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+        <div class="tog" id="tog-rem1h" onclick="toggleSwitch('rem1h')" data-on="false" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;"><div class="tog-track" style="position:absolute;inset:0;border-radius:999px;background:#e9ecef;transition:background .2s;"></div><div class="tog-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;transform:translateX(0);"></div></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
         <div><div style="font-size:.86rem;font-weight:700;">Post-event feedback</div><div style="font-size:.76rem;color:var(--muted);">Ask for review 2 hours after event ends</div></div>
-        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="remFeedback" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+        <div class="tog" id="tog-remFeedback" onclick="toggleSwitch('remFeedback')" data-on="false" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;"><div class="tog-track" style="position:absolute;inset:0;border-radius:999px;background:#e9ecef;transition:background .2s;"></div><div class="tog-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;transform:translateX(0);"></div></div>
       </div>
       <button onclick="saveReminders()" class="save-btn">Save Reminders</button>
     </div>
@@ -1392,7 +1392,24 @@ function prefillTickets(){
   el.innerHTML=tickets.map(t=>'<div class="ticket-row"><div class="ticket-name">'+esc(t.name||'General')+'</div><div class="ticket-price">'+(t.price?money(t.price):'Free')+'</div><div class="ticket-qty">'+(t.qty?t.qty+' seats':'Unlimited')+'</div></div>').join('');
 }
 
-window.saveReminders=function(){showToast('Reminders saved!');};
+window.toggleSwitch=function(id){
+  const tog=document.getElementById('tog-'+id);
+  if(!tog) return;
+  const on=tog.dataset.on==='true';
+  const newOn=!on;
+  tog.dataset.on=String(newOn);
+  tog.querySelector('.tog-track').style.background=newOn?'#3b5bdb':'#e9ecef';
+  tog.querySelector('.tog-thumb').style.transform=newOn?'translateX(20px)':'translateX(0)';
+};
+
+window.saveReminders=function(){
+  const vals={
+    rem24h: document.getElementById('tog-rem24h')?.dataset.on==='true',
+    rem1h: document.getElementById('tog-rem1h')?.dataset.on==='true',
+    remFeedback: document.getElementById('tog-remFeedback')?.dataset.on==='true'
+  };
+  showToast('Reminders saved!');
+};
 window.savePostSale=function(){showToast('Post sale settings saved!');};
 
 auth.onAuthStateChanged(user=>{
