@@ -2350,10 +2350,16 @@ async function saveEvent(status) {
   const urlKey = document.getElementById('urlKey').value.trim() || slugify(name);
   const summary = document.getElementById('summary').value.trim();
   const description = document.getElementById('description').value.trim();
+  const editId = new URLSearchParams(location.search).get('eventId');
 
-  if (!name || !urlKey || !summary || !description) {
+  if (!name || !urlKey) {
     goStep(0);
-    alert('Please complete Event Name, URL Key, Summary and Description.');
+    alert('Please complete Event Name and URL Key.');
+    return;
+  }
+  if (!editId && (!summary || !description)) {
+    goStep(0);
+    alert('Please complete Summary and Description.');
     return;
   }
   if (!uid) { await loadUser(); }
@@ -2428,7 +2434,6 @@ async function saveEvent(status) {
     const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
     btn.textContent = 'Saving...';
     btn.disabled = true;
-    const editId = new URLSearchParams(location.search).get('eventId');
     if (editId) {
       const {createdAt, ...updatePayload} = payload;
       await db.collection('events').doc(editId).update({...updatePayload, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
