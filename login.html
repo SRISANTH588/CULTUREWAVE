@@ -684,7 +684,7 @@
     <script type="module">
       import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword,
         GoogleAuthProvider, signInWithPopup, updateProfile,
-        doc, setDoc, getDoc, collection, query, where, getDocs } from "./firebase.js";
+        doc, setDoc, getDoc, collection, query, where, getDocs, onSnapshot } from "./firebase.js";
 
       function animateCount(el, target, suffix) {
         let start = 0;
@@ -695,25 +695,29 @@
           if (start >= target) clearInterval(timer);
         }, 35);
       }
-      (async () => {
-        try {
-          const [evSnap, bkSnap, paidSnap] = await Promise.all([
-            getDocs(query(collection(db, 'events'), where('status', '==', 'published'))),
-            getDocs(collection(db, 'bookings')),
-            getDocs(query(collection(db, 'bookings'), where('status', '==', 'confirmed'))),
-          ]);
-          const evCount = evSnap.size || 0;
-          const bkCount = bkSnap.size || 0;
-          const satPct  = bkCount > 0 ? Math.round((paidSnap.size / bkCount) * 100) : 98;
-          animateCount(document.getElementById('statEvents'),  evCount, '+');
-          animateCount(document.getElementById('statBookings'), bkCount, '+');
-          document.getElementById('statSat').textContent = satPct + '%';
-        } catch {
-          document.getElementById('statEvents').textContent  = '—';
-          document.getElementById('statBookings').textContent = '—';
-          document.getElementById('statSat').textContent     = '—';
-        }
-      })();
+      let loginStats = { events: 0, bookings: 0, confirmed: 0 };
+      function renderLoginStats() {
+        const satisfaction = loginStats.bookings > 0
+          ? Math.round((loginStats.confirmed / loginStats.bookings) * 100)
+          : 98;
+        animateCount(document.getElementById('statEvents'), loginStats.events, '+');
+        animateCount(document.getElementById('statBookings'), loginStats.bookings, '+');
+        document.getElementById('statSat').textContent = satisfaction + '%';
+      }
+      function showLoginStatsError() {
+        document.getElementById('statEvents').textContent = '—';
+        document.getElementById('statBookings').textContent = '—';
+        document.getElementById('statSat').textContent = '—';
+      }
+      onSnapshot(query(collection(db, 'events'), where('status', '==', 'published')), snap => {
+        loginStats.events = snap.size || 0;
+        renderLoginStats();
+      }, showLoginStatsError);
+      onSnapshot(collection(db, 'bookings'), snap => {
+        loginStats.bookings = snap.size || 0;
+        loginStats.confirmed = snap.docs.filter(doc => doc.data().status === 'confirmed' || doc.data().status === 'paid').length;
+        renderLoginStats();
+      }, showLoginStatsError);
 
       const authTabs = document.querySelectorAll("[data-auth-tab]");
       const authForms = document.querySelectorAll("[data-auth-form]");
