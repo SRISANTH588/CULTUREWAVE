@@ -1084,7 +1084,7 @@ import { app, auth, db, getCurrentUser, logout,
 
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[];
-let allWebinars=[], allTours=[], allRestaurants=[];
+let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[];
 
 // ── HELPERS ──
 const esc = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -1651,6 +1651,11 @@ onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200
   updateStats();
 });
 
+onSnapshot(query(collection(db,'bookings'),orderBy('createdAt','desc'),limit(500)), snap => {
+  allBookingsCol = snap.docs.map(d=>({id:d.id,...d.data()}));
+  syncWABookings();
+});
+
 onSnapshot(query(collection(db,'campaigns'),orderBy('createdAt','desc'),limit(100)), snap => {
   allCampaigns = snap.docs.map(d=>({id:d.id,...d.data()}));
   renderCampaignsTable(allCampaigns);
@@ -1901,8 +1906,8 @@ function renderWAGrid(bookings) {
 
 window.clearResendFlag = async function(id) {
   try {
-    await db.collection('payments').doc(id).update({ resendRequested: false });
-    await db.collection('bookings').doc(id).update({ resendRequested: false }).catch(()=>{});
+    await updateDoc(doc(db,'payments',id), { resendRequested: false }).catch(()=>{});
+    await updateDoc(doc(db,'bookings',id), { resendRequested: false }).catch(()=>{});
     showToast('\u2705 Marked as done', 'success');
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 };
@@ -1946,7 +1951,10 @@ window.filterWA = function() {
 
 // rebuild allBookings whenever payments update
 function syncWABookings() {
-  allBookings = allPayments.map(p => ({
+  allBookings = [
+    ...allPayments,
+    ...allBookingsCol.filter(b => !allPayments.find(p => p.id === b.id))
+  ].map(p => ({
     ...p,
     customerName:  p.customerName  || p.customer?.name  || '',
     customerEmail: p.customerEmail || p.customer?.email || '',
