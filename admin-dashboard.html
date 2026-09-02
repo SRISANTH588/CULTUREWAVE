@@ -47,6 +47,9 @@
     .sb-item .si-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:800;padding:.15rem .45rem;border-radius:999px;min-width:18px;text-align:center;}
     .sb-item .si-badge.green{background:var(--green);}
     .sb-item .si-badge.orange{background:var(--orange);}
+    .sb-item.premium-locked{opacity:.75;}
+    .sb-item.premium-locked:hover{background:#fffbeb;color:#b45309;border-color:#fde68a;}
+    .si-premium{margin-left:auto;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:.56rem;font-weight:800;padding:.15rem .42rem;border-radius:999px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
     .sb-divider{height:1px;background:var(--border);margin:.5rem .6rem;}
     .sb-bottom{margin-top:auto;padding:.75rem .6rem 1rem;border-top:1px solid var(--border);}
     .sb-user-row{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:12px;background:var(--bg);}
@@ -229,9 +232,9 @@
 
   <div class="sb-section-label">Content</div>
   <nav class="sb-nav">
-    <button class="sb-item" data-view="webinars"><span class="si-icon">🎙️</span> Webinars</button>
-    <button class="sb-item" data-view="tours"><span class="si-icon">📍</span> Tours</button>
-    <button class="sb-item" data-view="restaurants"><span class="si-icon">🍽️</span> Restaurants</button>
+    <button class="sb-item premium-locked" data-view="webinars"><span class="si-icon">🎙️</span> Webinars<span class="si-premium">👑 Premium</span></button>
+    <button class="sb-item premium-locked" data-view="tours"><span class="si-icon">📍</span> Tours<span class="si-premium">👑 Premium</span></button>
+    <button class="sb-item premium-locked" data-view="restaurants"><span class="si-icon">🍽️</span> Restaurants<span class="si-premium">👑 Premium</span></button>
   </nav>
 
   <div class="sb-section-label">System</div>
@@ -982,6 +985,19 @@
 
 <!-- ══ MODALS ══ -->
 
+<!-- Premium Gate Modal -->
+<div class="modal-overlay" id="premiumModal">
+  <div class="modal" style="text-align:center;max-width:400px;">
+    <div style="font-size:3rem;margin-bottom:.6rem;">👑</div>
+    <h3 style="font-size:1.15rem;margin-bottom:.35rem;">Premium Feature</h3>
+    <p style="font-size:.83rem;color:var(--muted);margin-bottom:1.2rem;">The <strong id="premiumFeatureName"></strong> section is available on the Premium plan. Upgrade to unlock Webinars, Tours &amp; Restaurants management.</p>
+    <div style="display:flex;gap:.6rem;justify-content:center;">
+      <button class="btn" onclick="closeModal('premiumModal')">Maybe Later</button>
+      <button class="btn primary" onclick="closeModal('premiumModal');showToast('Contact support to upgrade 🚀','success')">🚀 Upgrade Plan</button>
+    </div>
+  </div>
+</div>
+
 <!-- User Modal -->
 <div class="modal-overlay" id="userModal">
   <div class="modal">
@@ -1108,7 +1124,13 @@ const viewTitles = {
   'website-requests':'Website Requests', webinars:'Webinars', tours:'Tours',
   restaurants:'Restaurants', credits:'Credits & Wallets', activity:'Activity Log', settings:'Settings'
 };
+const premiumViews = new Set(['webinars','tours','restaurants']);
 window.showView = function(name) {
+  if (premiumViews.has(name)) {
+    document.getElementById('premiumFeatureName').textContent = name.charAt(0).toUpperCase()+name.slice(1);
+    openModal('premiumModal');
+    return;
+  }
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===name));
   document.querySelectorAll('.sb-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view===name));
   document.getElementById('pageTitle').textContent = viewTitles[name] || name;
