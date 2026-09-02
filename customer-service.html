@@ -22,6 +22,101 @@
       .support-form{padding:1.5rem;max-width:680px;margin:0 auto}.support-form h2{font-size:1.25rem;margin-bottom:.25rem}.support-form>p{color:#6b7892;font-size:.82rem;margin-bottom:1.2rem}.support-fields{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}.support-field{display:grid;gap:.35rem}.support-field.full{grid-column:1/-1}.support-field label{font-size:.72rem;font-weight:800;color:#44516b}.support-field input,.support-field textarea{width:100%;border:1px solid #dbe6fb;border-radius:11px;background:#f8faff;padding:.75rem .8rem;outline:none;color:#172033}.support-field textarea{min-height:110px;resize:vertical}.support-field input:focus,.support-field textarea:focus{border-color:#7fa2f5;box-shadow:0 0 0 3px #eaf1ff}.support-submit{margin-top:1rem;width:100%;border:0;border-radius:12px;padding:.85rem;background:linear-gradient(135deg,#1242c5,#3b72ed);color:#fff;font-weight:800;cursor:pointer;box-shadow:0 10px 22px rgba(18,66,197,.22)}
       @media(max-width:640px){.support-page{padding:3rem 1rem 4rem}.support-grid{grid-template-columns:1fr}.support-fields{grid-template-columns:1fr}.support-field.full{grid-column:auto}.support-form{padding:1.2rem}}
     </style>
+    <style>
+      .support-page {
+        position: relative;
+        overflow: hidden;
+        padding-top: 5.5rem;
+        background: radial-gradient(circle at 82% 8%, rgba(87, 127, 241, .16), transparent 26%), radial-gradient(circle at 8% 40%, rgba(214, 174, 82, .08), transparent 22%), linear-gradient(180deg, #fafdff 0%, #f3f7ff 100%);
+      }
+      .support-page::before {
+        content: "";
+        position: absolute;
+        top: -11rem;
+        right: -8rem;
+        width: 26rem;
+        height: 26rem;
+        border: 1px solid rgba(18, 66, 197, .1);
+        border-radius: 50%;
+        box-shadow: 0 0 0 2rem rgba(18, 66, 197, .025), 0 0 0 4rem rgba(18, 66, 197, .018);
+        pointer-events: none;
+      }
+      .support-wrap { position: relative; z-index: 1; }
+      .support-hero {
+        max-width: 760px;
+        padding: 3rem 2rem 2.8rem;
+        border: 1px solid rgba(183, 207, 255, .5);
+        border-radius: 30px;
+        background: linear-gradient(135deg, #07183f 0%, #123b9a 65%, #2159d8 100%);
+        box-shadow: 0 24px 55px rgba(18, 66, 197, .2);
+      }
+      .support-eyebrow { color: #d6ae52; }
+      .support-hero h1 { color: #fff; font-size: clamp(2.5rem, 6vw, 4.6rem); }
+      .support-hero p { color: #dce7ff; }
+      .support-status {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        margin-bottom: .8rem;
+        padding: .42rem .75rem;
+        border: 1px solid rgba(255, 255, 255, .2);
+        border-radius: 999px;
+        color: #eaf1ff;
+        background: rgba(255, 255, 255, .1);
+        font-size: .7rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+      .support-status::before {
+        content: "";
+        width: .48rem;
+        height: .48rem;
+        border-radius: 50%;
+        background: #62e394;
+        box-shadow: 0 0 0 .2rem rgba(98, 227, 148, .15);
+      }
+      .support-grid { gap: 1.15rem; }
+      .support-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 220px;
+        padding: 1.5rem;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, .9);
+        box-shadow: 0 16px 35px rgba(18, 66, 197, .09);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      }
+      .support-card::after {
+        content: "";
+        position: absolute;
+        right: -2.5rem;
+        bottom: -3rem;
+        width: 8rem;
+        height: 8rem;
+        border-radius: 50%;
+        background: rgba(234, 241, 255, .8);
+      }
+      .support-card:hover { transform: translateY(-5px); border-color: #9bb8f5; box-shadow: 0 22px 42px rgba(18, 66, 197, .15); }
+      .support-icon { position: relative; z-index: 1; width: 48px; height: 48px; border-radius: 16px; background: linear-gradient(145deg, #eaf1ff, #d8e6ff); box-shadow: inset 0 1px 0 #fff; }
+      .support-card h2, .support-card p, .support-card a { position: relative; z-index: 1; }
+      .support-card h2 { font-size: 1.1rem; }
+      .support-card p { min-height: 52px; }
+      .support-card a { display: inline-flex; align-items: center; gap: .35rem; }
+      .support-form { max-width: 760px; margin-top: 1.4rem; padding: 1.8rem; border-radius: 26px; background: rgba(255, 255, 255, .94); box-shadow: 0 20px 44px rgba(18, 66, 197, .1); }
+      .support-form h2 { font-size: 1.45rem; letter-spacing: -.04em; }
+      .support-field input, .support-field textarea { border-radius: 13px; padding: .85rem .9rem; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
+      .support-field input:hover, .support-field textarea:hover { background: #fff; border-color: #a9c1f3; }
+      .support-submit { min-height: 50px; border-radius: 14px; font-size: .95rem; transition: transform .2s ease, box-shadow .2s ease; }
+      .support-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(18, 66, 197, .3); }
+      @media(max-width:640px) {
+        .support-page { padding-top: 3.5rem; }
+        .support-hero { padding: 2.2rem 1.25rem 2rem; border-radius: 24px; }
+        .support-card { min-height: auto; }
+        .support-card p { min-height: 0; }
+        .support-form { margin-top: .4rem; padding: 1.25rem; border-radius: 22px; }
+      }
+    </style>
   </head>
   <body>
     <header class="topbar">
@@ -39,7 +134,7 @@
 
     <main class="support-page">
       <div class="support-wrap">
-        <section class="support-hero"><div class="support-eyebrow">Customer service</div><h1>We are here to help.</h1><p>Whether you are booking a seat or hosting an event, our team is ready to help you move forward with confidence.</p></section>
+        <section class="support-hero"><div class="support-status">Support team online</div><div class="support-eyebrow">Customer service</div><h1>We are here to help.</h1><p>Whether you are booking a seat or hosting an event, our team is ready to help you move forward with confidence.</p></section>
         <section class="support-grid">
           <article class="support-card"><div class="support-icon">💬</div><h2>Chat with us</h2><p>Get quick help with bookings, payments, and account questions.</p><a href="https://wa.me/916305183601" target="_blank" rel="noopener">Message on WhatsApp →</a></article>
           <article class="support-card"><div class="support-icon">✉️</div><h2>Email support</h2><p>Send the details of your request and our team will follow up.</p><a href="mailto:support.culturewave@gmail.com">support.culturewave@gmail.com →</a></article>
