@@ -1150,7 +1150,7 @@ async function startCiScanner(){
     await html5QrCode.start(
       {facingMode:'environment'},
       {fps:10,qrbox:{width:240,height:240}},
-      (text)=>{ if(!ciScanPaused){ ciScanPaused=true; processCheckIn(text.trim()); } },
+      (text)=>{ if(!ciScanPaused){ ciScanPaused=true; stopCiScanner().then(()=>processCheckIn(text.trim())); } },
       ()=>{}
     );
     scannerRunning=true;
@@ -1180,8 +1180,8 @@ async function stopCiScanner(){
 window.processCheckIn=function(val){
   if(!val) return;
   const b=allBookings.find(x=>x.id===val||x.bookingId===val||x.ticketId===val);
-  if(!b){showToast('Ticket not found');stopCiScanner();return;}
-  if(b.checkedIn){showCiModal(b,'already');stopCiScanner();return;}
+  if(!b){showToast('Ticket not found');return;}
+  if(b.checkedIn){showCiModal(b,'already');return;}
   ciPendingBooking=b;
   showCiModal(b,'confirm');
 };
