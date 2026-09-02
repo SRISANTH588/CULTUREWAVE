@@ -3042,23 +3042,20 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   document.getElementById('sidebarRole').textContent = 'Owner';
   document.getElementById('topName').textContent = 'User';
 
-  // load events — query both ownerId and uid fields to catch all events
-  const seenIds = new Set();
-  function mergeAndRender(snap) {
-    snap.docs.forEach(d => {
-      if(!seenIds.has(d.id)){
-        seenIds.add(d.id);
-        allEvents.push({id:d.id,...d.data()});
-      }
-    });
-    allEvents.sort((a,b)=>{ const ta=a.createdAt?.seconds||0; const tb=b.createdAt?.seconds||0; return tb-ta; });
-    window.allEvents = allEvents;
-    renderEvents();
-    renderOverview();
-    populateIgEventDropdown();
-  }
-  onSnapshot(query(collection(db,'events'), where('ownerId','==',myUid), limit(100)), mergeAndRender);
-  onSnapshot(query(collection(db,'events'), where('uid','==',myUid), limit(100)), mergeAndRender);
+  // load events — fetch all and filter client-side to handle any ownerId mismatch
+  onSnapshot(
+    query(collection(db,'events'), limit(200)),
+    snap => {
+      const all = snap.docs.map(d=>({id:d.id,...d.data()}));
+      const mine = all.filter(e=> e.ownerId===myUid || e.uid===myUid || e.createdBy===myUid);
+      allEvents = (mine.length ? mine : all)
+        .sort((a,b)=>{ const ta=a.createdAt?.seconds||0; const tb=b.createdAt?.seconds||0; return tb-ta; });
+      window.allEvents = allEvents;
+      renderEvents();
+      renderOverview();
+      populateIgEventDropdown();
+    }
+  );
 
   loadProfile(myUid);
   loadFinance(myUid);
