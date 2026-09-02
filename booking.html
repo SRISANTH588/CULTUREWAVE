@@ -37,9 +37,17 @@
     })();
 
     async function sendBookingEmail({ name, email, eventName, amount, seats, bookingId, bookingType, date, time, method }) {
-      if (!EMAILJS_PUBLIC_KEY || !email) return;
+      if (!EMAILJS_PUBLIC_KEY) {
+        console.warn("Booking email skipped: EmailJS public key is missing.");
+        return false;
+      }
+      if (!email) {
+        console.warn("Booking email skipped: customer email is missing.");
+        return false;
+      }
       const isRestaurant = bookingType === "restaurant";
-      const successUrl = window.location.origin + "/success.html?bookingId=" + encodeURIComponent(bookingId)
+      const ticketOrigin = "https://srisanth588.github.io";
+      const successUrl = ticketOrigin + "/success.html?bookingId=" + encodeURIComponent(bookingId)
         + "&event=" + encodeURIComponent(eventName)
         + "&amount=" + encodeURIComponent(amount)
         + "&status=Confirmed&type=" + bookingType
@@ -60,8 +68,10 @@
           ticket_url:   successUrl,
           reply_to:     "support@culturewave.in",
         });
+        return true;
       } catch(e) {
         console.warn("EmailJS send failed:", e);
+        return false;
       }
     }
   </script>
@@ -989,6 +999,16 @@
           name: document.getElementById("bookName").value.trim(),
           email: document.getElementById("bookEmail").value.trim(),
           phone: document.getElementById("bookPhone").value.trim(),
+        });
+        await sendBookingEmail({
+          name:        document.getElementById("bookName").value.trim() || "Guest",
+          email:       document.getElementById("bookEmail").value.trim(),
+          eventName:   item.name,
+          amount:      "Free",
+          seats:       String(n),
+          bookingId:   bid,
+          bookingType: bookingType,
+          method:      "Free booking",
         });
         window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
           + "&event=" + encodeURIComponent(item.name)

@@ -1914,7 +1914,8 @@ function buildWAMessage(p, type) {
   const date  = p.createdAt ? (p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt)).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
   const seats = p.seats || p.notes?.seats || '1';
   const bkType = p.bookingType || 'event';
-  const successUrl = window.location.origin + '/success.html?bookingId=' + encodeURIComponent(p.id || id) + '&event=' + encodeURIComponent(event) + '&amount=' + encodeURIComponent(amt) + '&status=Confirmed&type=' + bkType;
+  const ticketOrigin = 'https://srisanth588.github.io';
+  const successUrl = ticketOrigin + '/success.html?bookingId=' + encodeURIComponent(p.bookingId || p.id || id) + '&event=' + encodeURIComponent(event) + '&amount=' + encodeURIComponent(amt) + '&status=Confirmed&type=' + encodeURIComponent(bkType);
 
   if (type === 'organizer') {
     return `✅ *New Booking Alert*
