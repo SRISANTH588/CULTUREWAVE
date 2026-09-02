@@ -1007,17 +1007,81 @@ main { max-width: none; margin: 0; padding: 0; }
   color: #dce7ff;
   line-height: 1.6;
 }
+.footer-contact .footer-contact-row {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  width: 100%;
+  color: #dce7ff;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.footer-contact .footer-contact-row:hover {
+  color: #fff;
+}
+.footer-contact-icon {
+  display: inline-grid;
+  flex: 0 0 1.7rem;
+  place-items: center;
+  color: #d6ae52 !important;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.footer-socials {
+  display: flex;
+  gap: .7rem;
+  padding-top: .7rem;
+}
+.footer-contact .footer-social-button {
+  display: inline-grid;
+  width: 3.4rem;
+  height: 3.4rem;
+  place-items: center;
+  border: 1px solid rgba(214,174,82,.34);
+  border-radius: 1rem;
+  color: #d6ae52;
+  background: rgba(8,24,60,.18);
+  font-size: 1.65rem;
+  line-height: 1;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease;
+}
+.footer-contact .footer-social-button:hover {
+  transform: translateY(-2px);
+  border-color: #d6ae52;
+  background: rgba(214,174,82,.12);
+}
 .footer-bottom {
   max-width: 1240px;
   margin: 0 auto;
   padding: 1.15rem 1.4rem 1.8rem;
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
   color: #a9c0f5;
   font-size: 0.92rem;
+  line-height: 1.5;
+  text-align: center;
   border-top: 1px solid rgba(183,207,255,.22);
+}
+.footer-heart {
+  color: #d6ae52;
+  font-size: 1.05em;
+}
+.footer-credit {
+  color: #a9c0f5;
+}
+.footer-credit strong {
+  color: #d6ae52;
+  font-weight: 800;
+}
+.footer-owned {
+  color: #d6ae52;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
 }
 .checkout-card, .receipt-card {
   border: 1px solid var(--line);
@@ -1438,6 +1502,23 @@ main { max-width: none; margin: 0; padding: 0; }
     text-align: center;
   }
   .icon-grid { grid-template-columns: 1fr; gap: .9rem; }
+  .why-culturewave-grid,
+  .organizer-tools-grid {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: .15rem .1rem .8rem;
+  }
+  .why-culturewave-grid::-webkit-scrollbar,
+  .organizer-tools-grid::-webkit-scrollbar { display: none; }
+  .why-culturewave-grid .icon-card,
+  .organizer-tools-grid .icon-card {
+    flex: 0 0 min(78vw, 300px);
+    scroll-snap-align: start;
+  }
   #restaurants > div:last-child {
     display: grid;
     gap: .7rem;
