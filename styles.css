@@ -1205,6 +1205,7 @@ main { max-width: none; margin: 0; padding: 0; }
 }
 
 @media (max-width: 640px) {
+  section[id] { scroll-margin-top: 84px; }
   .nav-wrap {
     min-height: 68px;
     padding: 0.8rem 1rem;
@@ -1322,6 +1323,15 @@ main { max-width: none; margin: 0; padding: 0; }
   .hero-line { white-space: normal; }
   .hero-copy { font-size: 1rem; }
   .trust-grid { grid-template-columns: 1fr; }
+  .icon-grid { grid-template-columns: 1fr; gap: .9rem; }
+  #restaurants > div:last-child {
+    display: grid;
+    gap: .7rem;
+  }
+  #restaurants > div:last-child .btn {
+    width: 100%;
+    margin-left: 0 !important;
+  }
   .final-cta-inner { padding: 1.4rem; }
   .final-cta h2 { font-size: clamp(1.6rem, 6vw, 2.4rem); }
   .payment-shell { grid-template-columns: 1fr; }
