@@ -1891,9 +1891,18 @@ loadUser();
     const draftBtn = document.getElementById('saveDraftBtn');
     if (pubBtn) pubBtn.textContent = 'Save Changes';
     if (draftBtn) draftBtn.textContent = 'Save Draft';
-    // preserve existing status on save
+    // preserve existing status on save — remove old listeners by cloning
     const existingStatus = d.status || 'draft';
-    if (pubBtn) pubBtn.onclick = (e) => { e.preventDefault(); saveEvent(existingStatus); };
+    if (pubBtn) {
+      const newPubBtn = pubBtn.cloneNode(true);
+      pubBtn.parentNode.replaceChild(newPubBtn, pubBtn);
+      newPubBtn.addEventListener('click', () => saveEvent(existingStatus));
+    }
+    if (draftBtn) {
+      const newDraftBtn = draftBtn.cloneNode(true);
+      draftBtn.parentNode.replaceChild(newDraftBtn, draftBtn);
+      newDraftBtn.addEventListener('click', () => saveEvent('draft'));
+    }
     updateProgress();
   } catch(e) {
     console.warn('Could not prefill event:', e);
