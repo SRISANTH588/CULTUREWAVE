@@ -264,12 +264,36 @@
 
   // ── PARSE QR ──
   function parseQR(text) {
+    // Tickets may contain JSON, a ticket URL, or a plain booking ID.
+    const raw = String(text || "").replace(/^\uFEFF/, "").trim();
+    if (!raw) return null;
+
+    let value = raw;
+    try { value = decodeURIComponent(raw); } catch (_) { /* Keep the original value. */ }
+
     try {
-      const d = JSON.parse(text);
-      return d.id ? d : null;
-    } catch {
-      return text.trim() ? { id: text.trim() } : null;
+      const data = JSON.parse(value);
+      const id = data.id || data.bookingId || data.booking_id || data.booking?.id;
+      return id ? { ...data, id: String(id).trim() } : null;
+    } catch (_) {
+      try {
+        const url = new URL(value);
+        const id = url.searchParams.get("bookingId") || url.searchParams.get("booking_id") || url.searchParams.get("id");
+        if (id) return { id: id.trim() };
+      } catch (_) { /* Treat it as a plain booking ID below. */ }
+      return { id: value };
     }
+  }
+
+  async function findBooking(bookingId) {
+    const collections = ["bookings", "payments"];
+    for (const name of collections) {
+      const direct = await db.collection(name).doc(bookingId).get();
+      if (direct.exists) return direct;
+      const byField = await db.collection(name).where("bookingId", "==", bookingId).limit(1).get();
+      if (!byField.empty) return byField.docs[0];
+    }
+    return null;
   }
 
   async function processQR(text) {
@@ -285,10 +309,9 @@
   async function checkIn(bookingId, qrData) {
     document.getElementById("scanStatus").textContent = "Looking up booking…";
     try {
-      let snap = await db.collection("bookings").doc(bookingId).get();
-      if (!snap.exists) snap = await db.collection("payments").doc(bookingId).get();
+      const snap = await findBooking(bookingId);
 
-      if (!snap.exists) {
+      if (!snap) {
         showResult("notfound", "❌", "Booking Not Found",
           [["Booking ID", bookingId.slice(-10).toUpperCase()], ["Status", "Not in system"]]
         );
