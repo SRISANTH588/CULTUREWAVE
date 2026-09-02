@@ -215,6 +215,22 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <span class="sb-icon">&#9881;</span>
     <span><span style="display:block;">Event Settings</span><span class="sb-sub">Visibility and access</span></span>
   </button>
+  <div class="sb-section" style="display:flex;align-items:center;justify-content:space-between;">
+    <span>Premium Pages</span>
+    <span style="background:linear-gradient(135deg,#f59f00,#f76707);color:#fff;font-size:.55rem;font-weight:800;padding:.15rem .45rem;border-radius:999px;letter-spacing:.06em;">PRO</span>
+  </div>
+  <button class="sb-item" data-panel="premium-landing" onclick="switchPanel(this,'premium-landing')">
+    <span class="sb-icon">&#127775;</span>
+    <span><span style="display:block;">Landing Page</span><span class="sb-sub">Custom event landing page</span></span>
+  </button>
+  <button class="sb-item" data-panel="premium-email" onclick="switchPanel(this,'premium-email')">
+    <span class="sb-icon">&#128140;</span>
+    <span><span style="display:block;">Email Campaign</span><span class="sb-sub">Send to registered attendees</span></span>
+  </button>
+  <button class="sb-item" data-panel="premium-waitlist" onclick="switchPanel(this,'premium-waitlist')">
+    <span class="sb-icon">&#128203;</span>
+    <span><span style="display:block;">Waitlist</span><span class="sb-sub">Manage overflow registrations</span></span>
+  </button>
 </aside>
 <div class="main">
   <header class="topbar">
@@ -677,6 +693,63 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setInviteOnly" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
       </div>
       <button onclick="saveSettings()" class="save-btn">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM LANDING PAGE PANEL -->
+<div class="panel" id="panel-premium-landing">
+  <div style="background:linear-gradient(135deg,#0f0c29 0%,#1e1b4b 40%,#3b5bdb 80%,#4c6ef5 100%);border-radius:20px;padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;"></div>
+    <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem;">&#127775; Premium Feature</div>
+    <div style="font-size:1.8rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Landing Page</div>
+    <div style="font-size:.86rem;color:rgba(255,255,255,.6);margin-top:.35rem;">Create a stunning custom landing page for your event with your branding.</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Custom Landing Page</h2><p>Design a dedicated page for your event</p></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#e7f5ff,#f0f4ff);display:grid;place-items:center;font-size:1.8rem;">&#127775;</div>
+      <div style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Landing Pages</div>
+      <div style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">Create beautiful custom landing pages with your logo, brand colours and event details.</div>
+      <button onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM EMAIL CAMPAIGN PANEL -->
+<div class="panel" id="panel-premium-email">
+  <div style="background:linear-gradient(135deg,#064e3b 0%,#065f46 40%,#059669 80%,#10b981 100%);border-radius:20px;padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;"></div>
+    <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem;">&#128140; Premium Feature</div>
+    <div style="font-size:1.8rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Email Campaign</div>
+    <div style="font-size:.86rem;color:rgba(255,255,255,.6);margin-top:.35rem;">Send targeted email campaigns to your registered attendees.</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Email Campaign</h2><p>Reach your attendees directly in their inbox</p></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#d1fae5,#a7f3d0);display:grid;place-items:center;font-size:1.8rem;">&#128140;</div>
+      <div style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Email Campaigns</div>
+      <div style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">Send bulk emails, reminders and updates to all your registered attendees in one click.</div>
+      <button onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM WAITLIST PANEL -->
+<div class="panel" id="panel-premium-waitlist">
+  <div style="background:linear-gradient(135deg,#1e0a3c 0%,#4c1d95 40%,#7c3aed 80%,#9333ea 100%);border-radius:20px;padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;"></div>
+    <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem;">&#128203; Premium Feature</div>
+    <div style="font-size:1.8rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Waitlist</div>
+    <div style="font-size:.86rem;color:rgba(255,255,255,.6);margin-top:.35rem;">Automatically manage overflow registrations with a smart waitlist.</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Waitlist Management</h2><p>Handle overflow registrations automatically</p></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#f3e8ff,#ede9fe);display:grid;place-items:center;font-size:1.8rem;">&#128203;</div>
+      <div style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Waitlist</div>
+      <div style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">When your event sells out, automatically add interested attendees to a waitlist and notify them when spots open up.</div>
+      <button onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
     </div>
   </div>
 </div>
