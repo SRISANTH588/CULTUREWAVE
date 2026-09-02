@@ -2250,7 +2250,7 @@ let allEvents = [], activeTab = 'published', myUid = null;
   document.getElementById('emptyCreateBtn').onclick = () => location.href='event-create.html';
 })();
 
-function normStatus(s){ const v=(s||'draft').toLowerCase(); return v==='published'?'published':v==='archived'?'archived':'unpublished'; }
+function normStatus(s){ const v=(s||'draft').toLowerCase(); return (v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished'; }
 
 function renderEvents() {
   const q = document.getElementById('evSearch').value.trim().toLowerCase();
@@ -3042,19 +3042,23 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   document.getElementById('sidebarRole').textContent = 'Owner';
   document.getElementById('topName').textContent = 'User';
 
-  // load events
-  onSnapshot(
-    query(collection(db,'events'), where('ownerId','==',myUid), limit(50)),
-    snap => {
-      allEvents = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
-        const ta = a.createdAt?.seconds||0; const tb = b.createdAt?.seconds||0; return tb-ta;
-      });
-      window.allEvents = allEvents;
-      renderEvents();
-      renderOverview();
-      populateIgEventDropdown();
-    }
-  );
+  // load events — query both ownerId and uid fields to catch all events
+  const seenIds = new Set();
+  function mergeAndRender(snap) {
+    snap.docs.forEach(d => {
+      if(!seenIds.has(d.id)){
+        seenIds.add(d.id);
+        allEvents.push({id:d.id,...d.data()});
+      }
+    });
+    allEvents.sort((a,b)=>{ const ta=a.createdAt?.seconds||0; const tb=b.createdAt?.seconds||0; return tb-ta; });
+    window.allEvents = allEvents;
+    renderEvents();
+    renderOverview();
+    populateIgEventDropdown();
+  }
+  onSnapshot(query(collection(db,'events'), where('ownerId','==',myUid), limit(100)), mergeAndRender);
+  onSnapshot(query(collection(db,'events'), where('uid','==',myUid), limit(100)), mergeAndRender);
 
   loadProfile(myUid);
   loadFinance(myUid);
