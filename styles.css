@@ -1814,3 +1814,107 @@ main { max-width: none; margin: 0; padding: 0; }
   .cat-label { font-size: 1.5rem; }
   .cat-parties .cat-label { font-size: 2rem; }
 }
+
+/* ── SWIGGY-STYLE PROMO BANNERS ── */
+.promo-banners { padding: 2rem 0 3rem; }
+.promo-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.promo-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: 2.4rem 2rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  min-height: 320px;
+  text-decoration: none;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.promo-card:hover { transform: translateY(-4px); box-shadow: 0 28px 56px rgba(0,0,0,.6); }
+
+.promo-booking {
+  background: #fff;
+  color: #080808;
+}
+.promo-organizer {
+  background: #080808;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.promo-text { display: flex; flex-direction: column; gap: .7rem; position: relative; z-index: 1; }
+
+.promo-tag {
+  display: inline-block;
+  padding: .3rem .75rem;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+.promo-booking .promo-tag {
+  background: #080808;
+  color: #fff;
+}
+.promo-organizer .promo-tag {
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.8);
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+.promo-heading {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -.05em;
+}
+.promo-booking .promo-heading { color: #080808; }
+.promo-organizer .promo-heading { color: #fff; }
+
+.promo-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .7rem 1.3rem;
+  border-radius: 999px;
+  font-size: .88rem;
+  font-weight: 800;
+  width: fit-content;
+  transition: gap .2s ease;
+}
+.promo-card:hover .promo-cta { gap: .7rem; }
+.promo-booking .promo-cta {
+  background: #080808;
+  color: #fff;
+}
+.promo-organizer .promo-cta {
+  background: #fff;
+  color: #080808;
+}
+
+.promo-emoji {
+  font-size: 7rem;
+  line-height: 1;
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1rem;
+  opacity: .9;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,.2));
+}
+
+@media (max-width: 640px) {
+  .promo-wrap { grid-template-columns: 1fr; }
+  .promo-card { min-height: 240px; padding: 1.8rem 1.4rem 1.6rem; border-radius: 22px; }
+  .promo-heading { font-size: clamp(1.6rem, 7vw, 2rem); }
+  .promo-emoji { font-size: 5rem; right: 1rem; bottom: .8rem; }
+}
