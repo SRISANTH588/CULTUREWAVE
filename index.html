@@ -36,7 +36,8 @@
       .mobile-bottom-nav{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:24;display:grid;grid-template-columns:repeat(4,1fr);gap:.25rem;padding:.55rem .35rem;border:1px solid #dfe4ed;border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 12px 34px rgba(25,55,110,.18);backdrop-filter:blur(18px);}
       .mobile-bottom-nav a{display:grid;place-items:center;gap:.2rem;padding:.35rem .15rem;border-radius:999px;color:#68738a;font-size:.68rem;font-weight:800;text-decoration:none;}
       .mobile-bottom-nav a:first-child{color:#1d4ed8;background:#eaf2ff;}
-      .mobile-bottom-nav a span{font-size:1.15rem;line-height:1;}
+      .mobile-bottom-nav a strong{font-size:.68rem;font-weight:800;line-height:1.1;}
+      .mobile-bottom-nav .nav-symbol{width:22px;height:22px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8;}
     }
     .city-picker{position:fixed;inset:0;z-index:60;align-items:flex-start;justify-content:center;padding:5vh 1rem;background:rgba(3,8,20,.58);backdrop-filter:blur(10px);}
     .city-picker.open{display:flex;}
@@ -319,7 +320,22 @@
     @media(max-width:700px){
       .hero-home .hero-headline .hero-line-blue{font-size:clamp(1.9rem,9.5vw,3.8rem);line-height:.95;white-space:normal;}
       .hero-home .hero-headline .mobile-break{display:block;}
-      .hero-home .hero-headline{line-height:.9;letter-spacing:-.06em;}
+      .hero-home .hero-headline{display:grid;gap:.1rem;line-height:.86;letter-spacing:-.06em;margin-bottom:1.45rem;}
+      .hero-home .hero-headline .hero-line-blue{line-height:.9;margin-top:-.1rem;}
+      .mobile-nav{z-index:80!important;top:66px!important;right:0!important;width:min(88vw,390px)!important;height:calc(100dvh - 66px)!important;max-height:none!important;padding:1.25rem 1rem 2rem!important;gap:.7rem!important;background:#fff!important;border-left:1px solid #dce4f2!important;box-shadow:-24px 0 60px rgba(15,42,96,.2)!important;}
+      .mobile-nav.open{display:flex!important;visibility:visible!important;transform:translateX(0)!important;}
+      .mobile-nav::before{margin:0 .35rem .45rem!important;color:#0b1220!important;font-size:1.35rem!important;}
+      .mobile-nav > a{min-height:60px!important;padding:.7rem 2.8rem .7rem .8rem!important;border:1px solid #dce4f2!important;border-radius:16px!important;background:linear-gradient(135deg,#fff,#f7faff)!important;color:#0b1220!important;box-shadow:0 8px 20px rgba(25,55,110,.06)!important;}
+      .mobile-nav > a::before{background:#eaf2ff!important;color:#1d4ed8!important;}
+      .mobile-nav > a::after{color:#1d4ed8!important;}
+      .mobile-nav-ctas{margin-top:.35rem!important;padding-top:.9rem!important;border-top:1px solid #e3eaf5!important;}
+      .mobile-nav-ctas::before{color:#68738a!important;}
+      body.dark-mode .mobile-nav{background:#080b12!important;border-color:rgba(59,130,246,.35)!important;box-shadow:-24px 0 60px rgba(0,0,0,.55)!important;}
+      body.dark-mode .mobile-nav::before{color:#fff!important;}
+      body.dark-mode .mobile-nav > a{background:linear-gradient(135deg,#101827,#0d1320)!important;border-color:rgba(59,130,246,.3)!important;color:#fff!important;}
+      body.dark-mode .mobile-nav > a::before{background:#16294d!important;color:#60a5fa!important;}
+      body.dark-mode .mobile-nav > a::after{color:#60a5fa!important;}
+      body.dark-mode .mobile-nav-ctas{border-color:rgba(59,130,246,.25)!important;}
     }
   </style>
 </head>
@@ -366,10 +382,10 @@
 </nav>
 
 <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
-  <a href="index.html"><span>⌂</span>Home</a>
-  <a href="events.html"><span>◉</span>Events</a>
-  <a href="category-sports.html"><span>◌</span>Sports</a>
-  <a href="restaurants.html"><span>▣</span>Restaurants</a>
+  <a href="index.html" aria-current="page"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 20v-6h6v6"/></svg><strong>Home</strong></a>
+  <a href="events.html"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7 3v4M17 3v4M3.5 10h17"/></svg><strong>Events</strong></a>
+  <a href="category-sports.html"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 7.8 3.5 2.5 3.5-2.5M8.5 16.2l3.5-2.5 3.5 2.5M12 10.3v3.4"/></svg><strong>Sports</strong></a>
+  <a href="restaurants.html"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M6 10v11M18 3v18M15 3v6c0 1.7 1.3 3 3 3"/></svg><strong>Restaurants</strong></a>
 </nav>
 
 <div class="city-picker" id="cityPicker" role="dialog" aria-modal="true" aria-labelledby="cityPickerTitle">
@@ -951,16 +967,24 @@
 
   const ham = document.getElementById('hamburger');
   const mNav = document.getElementById('mobileNav');
-  ham.addEventListener('click', () => {
-    ham.classList.toggle('open');
-    mNav.classList.toggle('open');
-    document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
-  });
-  mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  const closeMenu = () => {
     ham.classList.remove('open');
     mNav.classList.remove('open');
+    ham.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
-  }));
+  };
+  ham.addEventListener('click', () => {
+    const isOpen = !mNav.classList.contains('open');
+    ham.classList.toggle('open', isOpen);
+    mNav.classList.toggle('open', isOpen);
+    ham.setAttribute('aria-expanded', String(isOpen));
+    document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
+  });
+  mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', event => { if(event.key === 'Escape' && mNav.classList.contains('open')) closeMenu(); });
+  document.addEventListener('click', event => {
+    if(mNav.classList.contains('open') && !mNav.contains(event.target) && !ham.contains(event.target)) closeMenu();
+  });
 </script>
 </body>
 </html>
