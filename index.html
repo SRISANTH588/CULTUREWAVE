@@ -18,6 +18,10 @@
     .index-mobile-ctas{gap:.65rem;}
     .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
     .index-mobile-ctas .nav-cta{margin-left:0;}
+    @media(max-width:960px){
+      .hamburger{display:flex;flex:none;align-items:center;justify-content:center;width:42px;height:42px;margin-left:.35rem;border:1px solid #dce4f2;border-radius:13px;background:#fff;}
+      .hamburger span{background:#0b1220;}
+    }
 
     /* ── CATEGORY SECTION ── */
     .idx-cat-section{width:100%;max-width:none;padding:3.5rem 0 4rem;background:#0a0a0a;}
@@ -223,6 +227,26 @@
     #events .event-poster-card .event-btn{display:none;}
     @media(max-width:900px){#events .event-grid-home{grid-template-columns:repeat(2,minmax(0,280px));}}
     @media(max-width:700px){#events .event-grid-home{grid-template-columns:1fr;}#events .event-poster-card .event-banner{aspect-ratio:4/5;height:auto;}}
+
+    @media(max-width:700px){
+      .idx-cat-section{padding:2.5rem 1rem 3rem;}
+      .idx-cat-inner{padding:0;}
+      .idx-cat-section .idx-section-title{font-size:clamp(1.8rem,8vw,2.4rem);margin-bottom:1.5rem;}
+      .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;}
+      .idx-cat-section .idx-cat-card{height:190px;padding:.85rem;border-radius:16px;}
+      .idx-cat-section .idx-cat-icon-wrap{top:.7rem;left:.7rem;width:34px;height:34px;border-radius:10px;font-size:1rem;}
+      .idx-cat-section .idx-cat-arrow{top:.7rem;right:.7rem;width:27px;height:27px;font-size:.7rem;}
+      .idx-cat-section .idx-cat-label{font-size:.9rem;}
+      .idx-cat-section .idx-cat-sub{font-size:.62rem;line-height:1.25;}
+      #events{padding:2.75rem 1rem 3.5rem;}
+      #events .idx-feat-inner{padding:0;}
+      #events .idx-feat-head{margin-bottom:1.15rem;}
+      #events .idx-section-title{font-size:clamp(1rem,5.5vw,2.5rem);white-space:nowrap;}
+      #events .event-grid-home{display:flex;gap:1rem;width:100%;overflow-x:auto;overflow-y:hidden;padding:.15rem .1rem .8rem;scroll-snap-type:x mandatory;scrollbar-width:none;}
+      #events .event-grid-home::-webkit-scrollbar{display:none;}
+      #events .event-poster-card{flex:0 0 min(82vw,280px);width:min(82vw,280px);margin:0;scroll-snap-align:start;}
+      .hero-home .hero-tags{display:none;}
+    }
   </style>
 </head>
 <body>
@@ -701,21 +725,26 @@
     const grid = document.getElementById(id);
     if (!grid) return;
     let timer;
+    let resumeTimer;
+    let currentIndex = 0;
     const stop = () => clearInterval(timer);
+    const scheduleResume = () => {
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(start, 2500);
+    };
     const start = () => {
       stop();
       timer = setInterval(() => {
-        const card = grid.querySelector(cardSelector);
-        if (!card || grid.scrollWidth <= grid.clientWidth + 4) return;
-        const step = card.getBoundingClientRect().width + 16;
-        const atEnd = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - step / 2;
-        grid.scrollTo({ left: atEnd ? 0 : grid.scrollLeft + step, behavior: 'smooth' });
+        const cards = Array.from(grid.querySelectorAll(cardSelector));
+        if (cards.length < 2 || grid.scrollWidth <= grid.clientWidth + 4) return;
+        currentIndex = (currentIndex + 1) % cards.length;
+        grid.scrollTo({ left: currentIndex ? cards[currentIndex].offsetLeft : 0, behavior: 'smooth' });
       }, 4200);
     };
     grid.addEventListener('mouseenter', stop);
     grid.addEventListener('mouseleave', start);
     grid.addEventListener('touchstart', stop, { passive: true });
-    grid.addEventListener('touchend', () => setTimeout(start, 2500), { passive: true });
+    grid.addEventListener('touchend', scheduleResume, { passive: true });
     start();
   }
 
