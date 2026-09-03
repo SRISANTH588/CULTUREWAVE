@@ -19,12 +19,6 @@
     .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
     .index-mobile-ctas .nav-cta{margin-left:0;}
 
-    /* ── STATS STRIP ── */
-    .stats-strip{background:#0a0a0a;border-bottom:1px solid rgba(255,255,255,.07);padding:.75rem 0;}
-    .stats-strip-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap;}
-    .stat-item{display:flex;align-items:center;gap:.5rem;color:rgba(255,255,255,.45);font-size:.78rem;font-weight:700;letter-spacing:.04em;}
-    .stat-item strong{color:#fff;}
-
     /* ── CATEGORY SECTION ── */
     .idx-cat-section{padding:3.5rem 0 4rem;background:#0a0a0a;}
     .idx-cat-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
@@ -102,6 +96,82 @@
 
     /* ── SECTION CENTER OVERRIDE ── */
     #restaurants .section-head{text-align:center;}
+
+    /* ── HERO CAROUSEL PREMIUM TREATMENT ── */
+    .hero-home{
+      background:#000;
+    }
+    .hero-home::before{
+      background:
+        radial-gradient(ellipse 42% 34% at 50% 36%,rgba(255,255,255,.09),transparent 70%),
+        radial-gradient(ellipse 70% 46% at 50% 100%,rgba(255,255,255,.035),transparent 72%);
+    }
+    .hero-home .hero-copy-block{position:relative;z-index:1;max-width:1280px;transform:translateY(-6vh);}
+    .hero-home::after{
+      content:"";position:absolute;inset:0;pointer-events:none;opacity:.22;
+      background-image:radial-gradient(rgba(255,255,255,.22) .6px,transparent .6px);
+      background-size:5px 5px;mix-blend-mode:soft-light;
+    }
+    .hero-carousel-wrap{display:none;}
+    .hero-carousel-wrap::before{background:linear-gradient(90deg,#090909 8%,rgba(9,9,9,.78) 38%,transparent);}
+    .hero-carousel-wrap::after{background:linear-gradient(270deg,#090909 8%,rgba(9,9,9,.78) 38%,transparent);}
+    .hero-carousel{gap:1.7rem;padding:1rem 0 1.8rem;}
+    .hc-card{
+      border-radius:26px;background:#151412;
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:0 16px 36px rgba(0,0,0,.32);
+    }
+    .hc-card:hover{border-color:rgba(218,181,111,.38);}
+    .hc-card.active{
+      box-shadow:0 30px 70px rgba(0,0,0,.72),0 0 0 1px rgba(218,181,111,.28),0 0 42px rgba(185,145,77,.12);
+      border-color:rgba(218,181,111,.58);
+    }
+    .hc-poster::after{
+      content:"";position:absolute;inset:0;pointer-events:none;
+      background:linear-gradient(145deg,rgba(255,255,255,.18),transparent 30%,rgba(0,0,0,.22));
+      mix-blend-mode:soft-light;
+    }
+    .hc-poster-icon{font-size:7.2rem;transform:translateY(-.4rem);filter:drop-shadow(0 14px 22px rgba(0,0,0,.38));}
+    .hc-poster-tag{top:1.15rem;left:1.15rem;background:rgba(10,10,10,.52);border:1px solid rgba(255,255,255,.16);}
+    .hc-body{padding:1.2rem 1.3rem 1.45rem;background:linear-gradient(180deg,#171615,#11100f);}
+    .hc-title{font-size:1.03rem;letter-spacing:-.025em;}
+    .hc-meta{color:rgba(255,255,255,.52);letter-spacing:.02em;}
+    .hero-home .hero-pill{
+      border-color:rgba(255,255,255,.24);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.72);box-shadow:none;
+    }
+    .hero-home .hero-kicker{
+      margin-bottom:1.6rem;color:rgba(255,255,255,.72);font-size:.78rem;font-weight:800;
+      letter-spacing:.2em;text-transform:uppercase;
+    }
+    .hero-home .hero-headline{margin:0 auto 2rem;width:min(100%,1200px);font-size:clamp(3.5rem,8vw,7.2rem);line-height:.9;letter-spacing:-.075em;font-weight:900;}
+    .hero-home .hero-headline span{display:block;}
+    .hero-home .hero-headline .hero-line-blue{color:#fff;}
+    .hero-home h1{width:min(100%,1200px);margin-left:auto;margin-right:auto;}
+    .hero-home .hero-line{display:block;white-space:normal;}
+    .hero-home h1{font-size:clamp(3.5rem,8vw,7.2rem);line-height:.88;letter-spacing:-.075em;margin-bottom:2rem;}
+    .hero-home .hero-line-outline{white-space:nowrap;font-size:clamp(2.2rem,7.4vw,7rem);letter-spacing:-.08em;}
+    .hero-home .hero-copy{max-width:620px;margin-left:auto;margin-right:auto;color:rgba(255,255,255,.58);}
+    .hero-home .hero-actions{margin-top:2.5rem;gap:.8rem;}
+    .hero-home .hero-btn-white{box-shadow:0 14px 38px rgba(255,255,255,.12);padding:1.05rem 2.15rem;}
+    .hero-home .hero-btn-ghost{border-color:rgba(255,255,255,.34);color:#fff;}
+    .hero-home .hero-btn-ghost:hover{background:rgba(255,255,255,.08);border-color:#fff;color:#fff;}
+    .hero-home .hero-tags{color:rgba(255,255,255,.5);gap:1.2rem;font-size:.7rem;}
+    .hero-home .hero-tags span{padding:.35rem .7rem;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.035);}
+    #events .idx-feat-head{position:relative;justify-content:center;text-align:center;}
+    #events .idx-feat-head-left{text-align:center;}
+    #events .idx-feat-head .idx-section-title{font-size:clamp(2rem,4.2vw,3.4rem);line-height:1.05;margin-bottom:0;}
+    #events .idx-feat-cta-link{display:block;width:max-content;margin:1.5rem auto 0;}
+    @media(max-width:640px){
+      .hero-home .hero-copy-block{transform:translateY(-3vh);}
+      .hero-home h1{font-size:clamp(3rem,14vw,5rem);line-height:.92;}
+      .hero-home .hero-line-outline{font-size:clamp(1.8rem,9.5vw,3.4rem);}
+      .hero-home .hero-copy{font-size:.98rem;line-height:1.65;}
+      .hero-home .hero-tags{gap:.55rem;}
+      #events .idx-feat-head{align-items:center;}
+      #events .idx-feat-cta-link{margin-top:.9rem;}
+    }
   </style>
 </head>
 <body>
@@ -146,22 +216,22 @@
   <section class="hero hero-home">
     <div class="main-wrap hero-inner">
       <div class="hero-copy-block">
-        <div class="hero-pill">&#9679; Premium Booking Platform &middot; India</div>
-        <h1>
-          <span class="hero-line">Find your next</span><br/>
-          <span class="hero-line hero-line-outline">experience.</span>
+        <div class="hero-kicker">Discover, book, and host</div>
+        <h1 class="hero-headline">
+          <span>Find your next event.</span>
+          <span class="hero-line-blue">Book your place instantly.</span>
         </h1>
         <p class="hero-copy">
-          Discover live events, reserve tables, and book experiences across India &mdash; or list yours and start selling tickets today.
+          Explore live events across India, reserve your spot in seconds, or create an event people can book.
         </p>
         <div class="hero-actions">
-          <a class="btn hero-btn-white" href="booking.html">Explore &amp; Book</a>
-          <a class="btn hero-btn-ghost" href="login.html">List an Event &#8594;</a>
+          <a class="btn hero-btn-white" href="booking.html">Explore experiences</a>
+          <a class="btn hero-btn-ghost" href="events.html">Browse events &#8594;</a>
         </div>
         <div class="hero-tags">
           <span>&#10003; Instant confirmation</span>
-          <span>&#10003; UPI &amp; Cards</span>
-          <span>&#10003; Free to browse</span>
+          <span>&#10003; Secure UPI &amp; card payments</span>
+          <span>&#10003; Handpicked experiences</span>
         </div>
       </div>
     </div>
@@ -243,37 +313,6 @@
     </div>
   </section>
 
-  <!-- STATS STRIP -->
-  <div class="stats-strip">
-    <div class="stats-strip-inner">
-      <div class="stat-item"><strong>500+</strong> Events Listed</div>
-      <div class="stat-item"><strong>120+</strong> Restaurants</div>
-      <div class="stat-item"><strong>10K+</strong> Bookings Made</div>
-      <div class="stat-item"><strong>15+</strong> Cities</div>
-    </div>
-  </div>
-
-
-  <!-- FEATURED EVENTS -->
-  <section class="events-section featured-events idx-feat-section" id="events">
-    <div class="idx-feat-inner">
-      <div class="idx-feat-head">
-        <div class="idx-feat-head-left">
-          <div class="idx-section-label">Featured events</div>
-          <div class="idx-section-title">Real listings people can book right away.</div>
-        </div>
-        <a class="idx-feat-cta-link" href="events.html">Browse all events &#8594;</a>
-      </div>
-      <div class="event-grid event-grid-home" id="indexEventsGrid">
-        <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
-          <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
-          <div style="font-weight:700;">No events yet</div>
-          <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- BROWSE BY CATEGORY -->
   <section class="idx-cat-section">
     <div class="idx-cat-inner">
@@ -326,6 +365,26 @@
           </div>
         </a>
       </div>
+    </div>
+  </section>
+
+  <!-- FEATURED EVENTS -->
+  <section class="events-section featured-events idx-feat-section" id="events">
+    <div class="idx-feat-inner">
+      <div class="idx-feat-head">
+        <div class="idx-feat-head-left">
+          <div class="idx-section-label">Featured events</div>
+          <div class="idx-section-title">Real listings people can book right away.</div>
+        </div>
+      </div>
+      <div class="event-grid event-grid-home" id="indexEventsGrid">
+        <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
+          <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
+          <div style="font-weight:700;">No events yet</div>
+          <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
+        </div>
+      </div>
+      <a class="idx-feat-cta-link" href="events.html">Browse all events &#8594;</a>
     </div>
   </section>
 

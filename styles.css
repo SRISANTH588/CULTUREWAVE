@@ -1549,6 +1549,106 @@ main { max-width: none; margin: 0; padding: 0; }
   .btn { padding: 0.9rem 1.2rem; font-size: 0.95rem; }
 }
 
+/* ── FINAL MOBILE SAFETY PASS ── */
+@media (max-width: 640px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  img,
+  video,
+  iframe,
+  svg {
+    max-width: 100%;
+  }
+
+  .main-wrap,
+  .nav-wrap,
+  .section-inner,
+  .events-section,
+  .category-section,
+  .idx-cat-inner,
+  .idx-feat-inner,
+  .idx-how-inner {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hero-home .hero-copy-block {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hero-home .hero-headline {
+    width: 100%;
+    font-size: clamp(2.7rem, 13vw, 4.5rem);
+    overflow-wrap: normal;
+  }
+
+  .hero-home .hero-headline .hero-line-blue {
+    font-size: clamp(1.35rem, 6.8vw, 3.4rem);
+    white-space: nowrap;
+  }
+
+  .hero-home .hero-copy {
+    width: 100%;
+  }
+
+  .hero-home .hero-actions {
+    width: 100%;
+  }
+
+  .hero-home .hero-actions .btn {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hero-home .hero-tags {
+    align-items: center;
+  }
+
+  .idx-cat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+  }
+
+  .idx-cat-card {
+    min-width: 0;
+    height: 170px;
+    padding: 1rem;
+  }
+
+  .idx-cat-label {
+    font-size: .92rem;
+  }
+
+  .idx-cat-sub {
+    font-size: .66rem;
+  }
+
+  .idx-feat-head .idx-section-title {
+    overflow-wrap: anywhere;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
+  }
+
+  .table-wrap,
+  .table-responsive,
+  .data-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* ── PREMIUM FOOTER ── */
 .site-footer {
   position: relative;
