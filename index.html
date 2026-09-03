@@ -20,7 +20,7 @@
     .index-mobile-ctas .nav-cta{margin-left:0;}
 
     /* ── CATEGORY SECTION ── */
-    .idx-cat-section{padding:3.5rem 0 4rem;background:#0a0a0a;}
+    .idx-cat-section{width:100%;max-width:none;padding:3.5rem 0 4rem;background:#0a0a0a;}
     .idx-cat-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
     .idx-section-label{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.5rem;}
     .idx-section-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;color:#fff;letter-spacing:-.04em;margin:0 0 2rem;}
@@ -64,8 +64,8 @@
     .icc-workshops .idx-cat-bg{background:url('workshop.jpg') center/cover no-repeat;}
     .icc-culinary .idx-cat-bg{background:url('culinary.jpg') center/cover no-repeat;}
     .icc-music .idx-cat-bg{background:url('music.jpg') center/cover no-repeat;}
-    .icc-sports .idx-cat-bg{background:linear-gradient(145deg,#123b73 0%,#38bdf8 100%);}
-    .icc-brewery .idx-cat-bg{background:linear-gradient(145deg,#5b2c06 0%,#d9912b 100%);}
+    .icc-sports .idx-cat-bg{background:url('sports.jpg') center/cover no-repeat;}
+    .icc-community .idx-cat-bg{background:url('community.jpg') center/cover no-repeat;}
     @media(max-width:900px){.idx-cat-grid{grid-template-columns:repeat(3,1fr);}}
     @media(max-width:560px){.idx-cat-grid{grid-template-columns:repeat(2,1fr);}.idx-cat-card{height:160px;}}
 
@@ -143,7 +143,7 @@
       color:rgba(255,255,255,.72);box-shadow:none;
     }
     .hero-home .hero-kicker{
-      margin-bottom:1.6rem;color:rgba(255,255,255,.72);font-size:.78rem;font-weight:800;
+      margin-top:2rem;margin-bottom:1.6rem;color:rgba(255,255,255,.72);font-size:.78rem;font-weight:800;
       letter-spacing:.2em;text-transform:uppercase;
     }
     .hero-home .hero-headline{margin:0 auto 2rem;width:min(100%,1200px);font-size:clamp(3.5rem,8vw,7.2rem);line-height:.9;letter-spacing:-.075em;font-weight:900;}
@@ -182,14 +182,47 @@
     .hero-home{background:linear-gradient(135deg,#fff 0%,#f7faff 60%,#eef4ff 100%);color:#0b1220;}.hero-home::before{background:radial-gradient(ellipse 40% 42% at 18% 55%,rgba(147,197,253,.2),transparent 72%);}.hero-home::after{opacity:.12;background-image:radial-gradient(rgba(29,78,216,.28) .6px,transparent .6px);}
     .hero-home .hero-kicker{color:#1d4ed8;}.hero-home .hero-headline{color:#0b1220;}.hero-home .hero-headline .hero-line-blue{color:#1d4ed8;}.hero-home .hero-copy{color:#526079;}.hero-home .hero-btn-white{background:#1d4ed8;color:#fff;}.hero-home .hero-btn-ghost{border-color:#b9c8e8;color:#1d4ed8;background:#fff;}.hero-home .hero-tags{color:#65728a;}.hero-home .hero-tags span{border-color:#d7e1f3;background:#fff;}
     .idx-cat-section,.idx-feat-section,.idx-how{background:#fff;}.idx-section-label{color:#1d4ed8;}.idx-section-title{color:#0b1220;}.idx-feat-section{border-top:1px solid #edf1f8;}.idx-how{background:#f7f9fd;}.idx-how-card{background:#fff;border-color:#e1e8f4;}.idx-how-title{color:#0b1220;}.idx-how-desc{color:#65728a;}
-    .idx-cat-section .idx-cat-inner{text-align:center;max-width:1420px;}
+    .idx-cat-section .idx-cat-inner{text-align:center;max-width:1600px;}
     .idx-cat-section .idx-section-label,.idx-cat-section .idx-section-title{margin-left:auto;margin-right:auto;}
     .idx-cat-section .idx-section-title{font-size:clamp(2rem,4vw,3.2rem);margin-bottom:2.5rem;}
     .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:1rem;}
-    .idx-cat-section .idx-cat-card{height:260px;}
+    .idx-cat-section .idx-cat-card{height:300px;}
+    .idx-cat-section .idx-cat-label{font-size:1.15rem;}
+    .idx-cat-section .idx-cat-sub{font-size:.78rem;}
     @media(max-width:1100px){.idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
     @media(max-width:900px){.idx-cat-section .idx-cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
     @media(max-width:560px){.idx-cat-section .idx-cat-grid{gap:.75rem;}.idx-cat-section .idx-cat-card{height:170px;}.idx-cat-section .idx-section-title{font-size:2rem;margin-bottom:1.6rem;}}
+
+    /* ── HOMEPAGE EVENT LISTING CARDS ── */
+    #events{width:100%;max-width:none;margin:0;padding:3.5rem 1.4rem 4.5rem;background-color:#fff;background-image:linear-gradient(45deg,rgba(139,44,255,.08) 1px,transparent 1px),linear-gradient(-45deg,rgba(139,44,255,.08) 1px,transparent 1px);background-size:18px 18px;}
+    #events .event-grid-home{display:grid;grid-template-columns:repeat(3,minmax(0,280px));justify-content:start;gap:1rem;overflow:visible;}
+    #events .event-card{display:flex;flex-direction:column;overflow:hidden;border:1px solid #dfe7f3;border-radius:24px;background:#fff;box-shadow:0 14px 32px rgba(25,55,110,.1);}
+    #events .event-banner{height:260px;flex:none;}
+    #events .event-body{padding:1.5rem 1.7rem 1.7rem;background:#fff;}
+    #events .event-body h3{display:-webkit-box;overflow:hidden;margin:0 0 .6rem;color:#0b1220;font-size:1.45rem;line-height:1.15;letter-spacing:-.04em;-webkit-box-orient:vertical;-webkit-line-clamp:1;}
+    #events .event-body p{display:-webkit-box;overflow:hidden;margin:0 0 1.15rem;color:#60708d;font-size:1rem;line-height:1.45;-webkit-box-orient:vertical;-webkit-line-clamp:1;}
+    #events .event-meta{display:flex;align-items:center;justify-content:space-between;gap:1rem;color:#60708d;font-size:1rem;font-weight:800;}
+    #events .event-meta span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    #events .event-btn{display:none;}
+    #events .banner-a{background:linear-gradient(135deg,#1454df,#9bdcff);}
+    #events .banner-b{background:linear-gradient(135deg,#ffb36b,#ff5f87);}
+    #events .banner-c{background:linear-gradient(135deg,#fbe27b,#7a67ff);}
+    @media(max-width:700px){#events .event-grid-home{grid-template-columns:1fr;}#events .event-banner{height:220px;}#events .event-body{padding:1.25rem;}}
+
+    /* ── POSTER EVENT CARDS ── */
+    #events .event-poster-card{overflow:hidden;border:1px solid #e1e4ec;border-radius:22px;background:#fff;box-shadow:0 14px 32px rgba(25,55,110,.1);}
+    #events .event-poster-card .event-banner{height:auto;aspect-ratio:4/5;background-size:cover;background-position:center;}
+    #events .event-poster-card .event-body{padding:1rem 1.1rem 1.1rem;background:#fff;}
+    #events .event-poster-card .event-poster-info{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.8rem;color:#68738a;font-size:.72rem;font-weight:800;white-space:nowrap;}
+    #events .event-poster-card .event-poster-date{color:#8b2cff;overflow:hidden;text-overflow:ellipsis;}
+    #events .event-poster-card .event-poster-location{overflow:hidden;text-overflow:ellipsis;}
+    #events .event-poster-card h3{display:-webkit-box;overflow:hidden;margin:0 0 .35rem;color:#0b1220;font-size:1.05rem;line-height:1.2;letter-spacing:-.035em;-webkit-box-orient:vertical;-webkit-line-clamp:1;}
+    #events .event-poster-card p{display:-webkit-box;overflow:hidden;margin:0 0 .75rem;color:#68738a;font-size:.8rem;line-height:1.35;-webkit-box-orient:vertical;-webkit-line-clamp:1;}
+    #events .event-poster-card .event-poster-price{display:flex;align-items:baseline;gap:.35rem;color:#888;font-size:.8rem;font-weight:700;}
+    #events .event-poster-card .event-poster-price strong{color:#8b2cff;font-size:1rem;font-weight:900;}
+    #events .event-poster-card .event-btn{display:none;}
+    @media(max-width:900px){#events .event-grid-home{grid-template-columns:repeat(2,minmax(0,280px));}}
+    @media(max-width:700px){#events .event-grid-home{grid-template-columns:1fr;}#events .event-poster-card .event-banner{aspect-ratio:4/5;height:auto;}}
   </style>
 </head>
 <body>
@@ -382,13 +415,13 @@
             <span class="idx-cat-sub">Games, fitness &amp; action</span>
           </div>
         </a>
-        <a href="category-brewery.html" class="idx-cat-card icc-brewery">
+        <a href="category-community.html" class="idx-cat-card icc-community">
           <div class="idx-cat-bg"></div>
-          <div class="idx-cat-icon-wrap">🍺</div>
+          <div class="idx-cat-icon-wrap">🤝</div>
           <div class="idx-cat-arrow">↗</div>
           <div class="idx-cat-body">
-            <span class="idx-cat-label">Brewery</span>
-            <span class="idx-cat-sub">Craft pours &amp; good times</span>
+            <span class="idx-cat-label">Community</span>
+            <span class="idx-cat-sub">Meetups, causes &amp; local gatherings</span>
           </div>
         </a>
       </div>
@@ -400,8 +433,8 @@
     <div class="idx-feat-inner">
       <div class="idx-feat-head">
         <div class="idx-feat-head-left">
-          <div class="idx-section-label">Featured events</div>
-          <div class="idx-section-title">Real listings people can book right away.</div>
+          <div class="idx-section-label">Book the Events You Love <span aria-hidden="true">✦</span></div>
+          <div class="idx-section-title">Book It. Love It. Live It.</div>
         </div>
       </div>
       <div class="event-grid event-grid-home" id="indexEventsGrid">
@@ -621,13 +654,14 @@
           } catch(e){}
         }
         const article = document.createElement('article');
-        article.className = 'event-card';
+        article.className = 'event-card event-poster-card';
         article.innerHTML = `
           <div class="event-banner ${_banners[i%_banners.length]}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
           <div class="event-body">
+            <div class="event-poster-info"><span class="event-poster-date">▣ ${dateLabel||'Date TBA'}</span><span class="event-poster-location">⌖ ${d.city||'India'}</span></div>
             <h3>${d.name||'Untitled'}</h3>
             <p>${d.summary||d.description||''}</p>
-            <div class="event-meta"><span>${d.venueName||d.city||'TBA'}</span><span>${dateLabel||priceStr}</span></div>
+            <div class="event-poster-price"><strong>${price ? `₹${Number(price).toLocaleString('en-IN')}` : 'Free'}</strong><span>/ onward</span></div>
             <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
           </div>`;
         grid.appendChild(article);

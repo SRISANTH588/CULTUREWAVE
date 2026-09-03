@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CultureWave | Community</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    :root{--community:#0f766e;--community-light:#5eead4;}
+    body{background:#080f14;color:#fff;}
+    .community-hero{position:relative;min-height:480px;display:flex;align-items:flex-end;overflow:hidden;}
+    .community-hero-bg{position:absolute;inset:0;background:url('community.jpg') center/cover no-repeat;filter:brightness(.42);}
+    .community-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,#080f14 0%,rgba(8,15,20,.52) 52%,transparent 100%);}
+    .community-hero-inner{position:relative;z-index:1;width:100%;max-width:1240px;margin:0 auto;padding:0 1.4rem 3rem;}
+    .community-pill{display:inline-flex;padding:.35rem .9rem;border:1px solid rgba(94,234,212,.4);border-radius:999px;background:rgba(15,118,110,.25);color:var(--community-light);font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+    .community-hero h1{margin:0 0 1rem;font-size:clamp(3.2rem,8vw,6.5rem);font-weight:900;line-height:.9;letter-spacing:-.07em;}
+    .community-hero h1 span{color:var(--community-light);}
+    .community-desc{max-width:560px;margin:0;color:rgba(255,255,255,.62);line-height:1.65;}
+    .community-body{max-width:1240px;margin:0 auto;padding:3rem 1.4rem 5rem;}
+    .community-heading{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;}
+    .community-heading h2{margin:0;font-size:clamp(2rem,4vw,3.4rem);letter-spacing:-.07em;}
+    .community-heading p{margin:0;color:rgba(255,255,255,.48);}
+    .community-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;}
+    .community-card{overflow:hidden;border:1px solid #dfe7f3;border-radius:24px;background:#fff;box-shadow:0 14px 32px rgba(25,55,110,.1);transition:transform .25s,box-shadow .25s,border-color .25s;}
+    .community-card:hover{transform:translateY(-6px);border-color:#d4b5ff;box-shadow:0 22px 42px rgba(0,0,0,.28);}
+    .community-card-banner{position:relative;aspect-ratio:1.9/1;background:linear-gradient(135deg,#0f766e,#5eead4) center/cover;}
+    .community-card-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(15,118,110,.2),rgba(8,15,20,.05));pointer-events:none;}
+    .community-card-body{padding:1.4rem 1.5rem 1.5rem;}
+    .community-card h3{display:-webkit-box;overflow:hidden;margin:0 0 .55rem;color:#0b1220;font-size:1.5rem;line-height:1.15;letter-spacing:-.04em;-webkit-box-orient:vertical;-webkit-line-clamp:1;}
+    .community-card p{display:-webkit-box;overflow:hidden;margin:0 0 1.15rem;color:#60708d;font-size:1rem;line-height:1.45;-webkit-box-orient:vertical;-webkit-line-clamp:1;}
+    .community-card-info{display:flex;align-items:center;justify-content:space-between;gap:1rem;color:#60708d;font-size:1rem;font-weight:800;white-space:nowrap;}
+    .community-card-location,.community-card-date{overflow:hidden;text-overflow:ellipsis;}
+    .community-empty{grid-column:1/-1;padding:4rem 1rem;text-align:center;color:rgba(255,255,255,.35);}
+    .community-empty span{display:block;font-size:3rem;margin-bottom:.8rem;}
+    .community-button{display:inline-flex;margin-top:1.5rem;padding:.75rem 1.1rem;border-radius:999px;background:var(--community);color:#fff;font-weight:800;text-decoration:none;}
+    .community-card .community-button{display:none;}
+    @media(max-width:900px){.community-grid{grid-template-columns:1fr;}}
+    @media(max-width:560px){.community-hero{min-height:400px;}.community-grid{grid-template-columns:1fr;}.community-heading{display:block;}.community-heading p{margin-top:.5rem;}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="nav-wrap">
+    <div class="brand-block"><a class="logo" href="index.html">CultureWave</a><div class="brand-sub">by OGSHOOTS LUXE</div></div>
+    <nav class="topnav"><a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a><a href="how-it-works.html">How it works</a></nav>
+    <div class="auth-actions"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a></div>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div></header>
+  <nav class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a><a href="how-it-works.html">How it works</a><a href="login.html">Get Started</a></nav>
+
+  <section class="community-hero"><div class="community-hero-bg"></div><div class="community-hero-overlay"></div><div class="community-hero-inner">
+    <div class="community-pill">🤝 Community</div>
+    <h1>Meet people.<br/><span>Make a difference.</span></h1>
+    <p class="community-desc">Find meetups, causes, local gatherings, and meaningful experiences that bring people together.</p>
+  </div></section>
+
+  <main class="community-body"><div class="community-heading"><div><h2>Community experiences</h2><p>Discover something meaningful near you.</p></div><a class="community-button" href="events.html">Browse all events</a></div><div class="community-grid" id="communityGrid"><div class="community-empty"><span>🤝</span>Loading community events...</div></div></main>
+
+  <footer class="site-footer"><div class="footer-wrap"><div class="footer-branding"><div class="footer-brand">CultureWave</div><p>Premium events, workshops &amp; restaurant bookings.</p></div><div class="footer-col"><div class="footer-col-title">Explore</div><div class="footer-links"><a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a></div></div><div class="footer-col"><div class="footer-col-title">Support</div><div class="footer-links"><a href="customer-service.html">Customer Service</a><a href="how-it-works.html">How it works</a></div></div></div><div class="footer-divider"></div><div class="footer-bottom"><span>© 2025 OG SHOOTS. All rights reserved.</span><span class="footer-credit">Developed by <strong>Srisanth Boddu</strong></span><span class="footer-owned">Owned by OGSHOOTS LUXE</span></div></footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    if(!firebase.apps.length){firebase.initializeApp({apiKey:'AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI',authDomain:'ogshootsluxe-36740.firebaseapp.com',projectId:'ogshootsluxe-36740',storageBucket:'ogshootsluxe-36740.firebasestorage.app',messagingSenderId:'5471814825',appId:'1:5471814825:web:07e84f2f88486da817d5b8'});}
+    const communityDb=firebase.firestore();
+    function formatCommunityDate(value){
+      if(!value) return 'Date TBA';
+      const date=value.toDate ? value.toDate() : new Date(value);
+      return Number.isNaN(date.getTime()) ? 'Date TBA' : date.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+    }
+    async function loadCommunityEvents(){
+      const grid=document.getElementById('communityGrid');
+      try{
+        const snap=await communityDb.collection('events').limit(200).get();
+        const city=localStorage.getItem('culturewaveCity');
+        const docs=snap.docs.filter(doc=>{const d=doc.data();return String(d.category||'').toLowerCase()==='community'&&(!city||String(d.city||'').toLowerCase()===city.toLowerCase());}).slice(0,12);
+        if(!docs.length){grid.innerHTML='<div class="community-empty"><span>🤝</span>No community events yet.<br/><a class="community-button" href="events.html">Explore all events</a></div>';return;}
+        grid.innerHTML=docs.map(doc=>{const d=doc.data();return `<article class="community-card"><div class="community-card-banner"${d.coverUrl?` style="background-image:url('${d.coverUrl}')"`:''}></div><div class="community-card-body"><h3>${d.name||'Community gathering'}</h3><p>${d.summary||d.description||'Meet, connect, and make an impact.'}</p><div class="community-card-info"><span class="community-card-location">${d.city||d.venueName||'India'}</span><span class="community-card-date">${formatCommunityDate(d.startDate)}</span></div></div></article>`;}).join('');
+      }catch(error){grid.innerHTML='<div class="community-empty"><span>🤝</span>Community events will appear here soon.</div>';}
+    }
+    loadCommunityEvents();
+    document.getElementById('hamburger').addEventListener('click',()=>{document.getElementById('hamburger').classList.toggle('open');document.getElementById('mobileNav').classList.toggle('open');});
+  </script>
+</body>
+</html>
