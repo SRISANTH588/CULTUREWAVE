@@ -64,6 +64,8 @@
     .icc-workshops .idx-cat-bg{background:url('workshop.jpg') center/cover no-repeat;}
     .icc-culinary .idx-cat-bg{background:url('culinary.jpg') center/cover no-repeat;}
     .icc-music .idx-cat-bg{background:url('music.jpg') center/cover no-repeat;}
+    .icc-sports .idx-cat-bg{background:linear-gradient(145deg,#123b73 0%,#38bdf8 100%);}
+    .icc-brewery .idx-cat-bg{background:linear-gradient(145deg,#5b2c06 0%,#d9912b 100%);}
     @media(max-width:900px){.idx-cat-grid{grid-template-columns:repeat(3,1fr);}}
     @media(max-width:560px){.idx-cat-grid{grid-template-columns:repeat(2,1fr);}.idx-cat-card{height:160px;}}
 
@@ -171,6 +173,23 @@
       #events .idx-feat-head{align-items:center;}
       #events .idx-feat-cta-link{margin-top:.9rem;}
     }
+
+    /* Keep the homepage aligned with the site-wide white theme. */
+    body{background:#fff;color:#0b1220;}
+    .topbar{background:rgba(255,255,255,.94);border-bottom-color:#e3eaf5;box-shadow:0 8px 30px rgba(15,42,96,.06);}
+    .logo{color:#0b1220;}.brand-sub{color:#1d4ed8;}.topnav a{color:#52617d;}.topnav a:hover{color:#1d4ed8;background:#eff5ff;}
+    .index-auth-actions{border-color:#dce4f2;background:#f7f9fd;}.index-auth-actions .nav-link{color:#52617d;}.index-auth-actions .nav-cta{background:#1d4ed8;color:#fff;}
+    .hero-home{background:linear-gradient(135deg,#fff 0%,#f7faff 60%,#eef4ff 100%);color:#0b1220;}.hero-home::before{background:radial-gradient(ellipse 40% 42% at 18% 55%,rgba(147,197,253,.2),transparent 72%);}.hero-home::after{opacity:.12;background-image:radial-gradient(rgba(29,78,216,.28) .6px,transparent .6px);}
+    .hero-home .hero-kicker{color:#1d4ed8;}.hero-home .hero-headline{color:#0b1220;}.hero-home .hero-headline .hero-line-blue{color:#1d4ed8;}.hero-home .hero-copy{color:#526079;}.hero-home .hero-btn-white{background:#1d4ed8;color:#fff;}.hero-home .hero-btn-ghost{border-color:#b9c8e8;color:#1d4ed8;background:#fff;}.hero-home .hero-tags{color:#65728a;}.hero-home .hero-tags span{border-color:#d7e1f3;background:#fff;}
+    .idx-cat-section,.idx-feat-section,.idx-how{background:#fff;}.idx-section-label{color:#1d4ed8;}.idx-section-title{color:#0b1220;}.idx-feat-section{border-top:1px solid #edf1f8;}.idx-how{background:#f7f9fd;}.idx-how-card{background:#fff;border-color:#e1e8f4;}.idx-how-title{color:#0b1220;}.idx-how-desc{color:#65728a;}
+    .idx-cat-section .idx-cat-inner{text-align:center;max-width:1420px;}
+    .idx-cat-section .idx-section-label,.idx-cat-section .idx-section-title{margin-left:auto;margin-right:auto;}
+    .idx-cat-section .idx-section-title{font-size:clamp(2rem,4vw,3.2rem);margin-bottom:2.5rem;}
+    .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:1rem;}
+    .idx-cat-section .idx-cat-card{height:260px;}
+    @media(max-width:1100px){.idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+    @media(max-width:900px){.idx-cat-section .idx-cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media(max-width:560px){.idx-cat-section .idx-cat-grid{gap:.75rem;}.idx-cat-section .idx-cat-card{height:170px;}.idx-cat-section .idx-section-title{font-size:2rem;margin-bottom:1.6rem;}}
   </style>
 </head>
 <body>
@@ -221,7 +240,7 @@
           <span class="hero-line-blue">Book your place instantly.</span>
         </h1>
         <p class="hero-copy">
-          Explore live events across India, reserve your spot in seconds, or create an event people can book.
+          Discover live events, book memorable dining experiences, reserve your spot in seconds, or create something people can enjoy.
         </p>
         <div class="hero-actions">
           <a class="btn hero-btn-white" href="booking.html">Explore experiences</a>
@@ -352,6 +371,24 @@
           <div class="idx-cat-body">
             <span class="idx-cat-label">Music</span>
             <span class="idx-cat-sub">Live gigs &amp; concerts</span>
+          </div>
+        </a>
+        <a href="category-sports.html" class="idx-cat-card icc-sports">
+          <div class="idx-cat-bg"></div>
+          <div class="idx-cat-icon-wrap">⚽</div>
+          <div class="idx-cat-arrow">↗</div>
+          <div class="idx-cat-body">
+            <span class="idx-cat-label">Sports</span>
+            <span class="idx-cat-sub">Games, fitness &amp; action</span>
+          </div>
+        </a>
+        <a href="category-brewery.html" class="idx-cat-card icc-brewery">
+          <div class="idx-cat-bg"></div>
+          <div class="idx-cat-icon-wrap">🍺</div>
+          <div class="idx-cat-arrow">↗</div>
+          <div class="idx-cat-body">
+            <span class="idx-cat-label">Brewery</span>
+            <span class="idx-cat-sub">Craft pours &amp; good times</span>
           </div>
         </a>
       </div>
