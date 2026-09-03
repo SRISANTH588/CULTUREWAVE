@@ -1,511 +1,659 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CultureWave | Premium Events & Dining</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-    <style>
-      .index-auth-actions{gap:.5rem;padding:.3rem;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.06);backdrop-filter:blur(12px);}
-      .index-auth-actions .nav-link{padding:.6rem .95rem;border:0;background:transparent;color:rgba(255,255,255,.7);box-shadow:none;font-size:.82rem;}
-      .index-auth-actions .nav-link:hover{background:rgba(255,255,255,.08);color:#fff;}
-      .index-auth-actions .nav-cta{margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff;color:#080808;border-radius:999px;font-weight:800;}
-      .index-auth-actions .nav-cta:hover{transform:translateY(-1px);background:rgba(255,255,255,.9);}
-      .index-mobile-ctas{gap:.65rem;}
-      .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
-      .index-mobile-ctas .nav-cta{margin-left:0;}
-    </style>
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="nav-wrap">
-        <div class="brand-block">
-          <div class="logo">CultureWave</div>
-          <div class="brand-sub">by OGSHOOTS LUXE</div>
-        </div>
-        <nav class="topnav">
-          <a href="events.html">Events</a>
-          <a href="restaurants.html">Restaurants</a>
-          <a href="features.html">For Organizers</a>
-          <a href="how-it-works.html">How it works</a>
-        </nav>
-        <div class="auth-actions index-auth-actions">
-          <a class="nav-link" href="login.html">Login</a>
-          <a class="nav-cta" href="login.html">Get Started</a>
-        </div>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Premium Events &amp; Dining</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    /* ── NAV OVERRIDES ── */
+    .index-auth-actions{gap:.5rem;padding:.3rem;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.06);backdrop-filter:blur(12px);}
+    .index-auth-actions .nav-link{padding:.6rem .95rem;border:0;background:transparent;color:rgba(255,255,255,.7);box-shadow:none;font-size:.82rem;}
+    .index-auth-actions .nav-link:hover{background:rgba(255,255,255,.08);color:#fff;}
+    .index-auth-actions .nav-cta{margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff;color:#080808;border-radius:999px;font-weight:800;}
+    .index-auth-actions .nav-cta:hover{transform:translateY(-1px);background:rgba(255,255,255,.9);}
+    .index-mobile-ctas{gap:.65rem;}
+    .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
+    .index-mobile-ctas .nav-cta{margin-left:0;}
 
-    <nav class="mobile-nav" id="mobileNav">
+    /* ── STATS STRIP ── */
+    .stats-strip{background:#0a0a0a;border-bottom:1px solid rgba(255,255,255,.07);padding:.75rem 0;}
+    .stats-strip-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap;}
+    .stat-item{display:flex;align-items:center;gap:.5rem;color:rgba(255,255,255,.45);font-size:.78rem;font-weight:700;letter-spacing:.04em;}
+    .stat-item strong{color:#fff;}
+
+    /* ── CATEGORY SECTION ── */
+    .idx-cat-section{padding:3.5rem 0 4rem;background:#0a0a0a;}
+    .idx-cat-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
+    .idx-section-label{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.5rem;}
+    .idx-section-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;color:#fff;letter-spacing:-.04em;margin:0 0 2rem;}
+    .idx-cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem;}
+    .idx-cat-card{
+      border-radius:24px;overflow:hidden;position:relative;height:220px;
+      cursor:pointer;text-decoration:none;display:flex;flex-direction:column;
+      justify-content:flex-end;padding:1.2rem;
+      transition:transform .25s,box-shadow .25s;
+      border:1px solid rgba(255,255,255,.07);
+    }
+    .idx-cat-card:hover{transform:translateY(-6px);box-shadow:0 28px 56px rgba(0,0,0,.6);}
+    .idx-cat-card::before{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.82) 0%,rgba(0,0,0,.1) 55%,transparent 100%);
+      z-index:1;
+    }
+    .idx-cat-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .35s;}
+    .idx-cat-card:hover .idx-cat-bg{transform:scale(1.08);}
+    .idx-cat-icon-wrap{
+      position:absolute;top:1rem;left:1rem;z-index:2;
+      width:42px;height:42px;border-radius:12px;
+      background:rgba(255,255,255,.12);backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.18);
+      display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+    }
+    .idx-cat-arrow{
+      position:absolute;top:1rem;right:1rem;z-index:2;
+      width:32px;height:32px;border-radius:999px;
+      background:rgba(255,255,255,.08);backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.12);
+      display:flex;align-items:center;justify-content:center;
+      font-size:.8rem;color:rgba(255,255,255,.5);
+      transition:background .2s,color .2s;
+    }
+    .idx-cat-card:hover .idx-cat-arrow{background:rgba(255,255,255,.2);color:#fff;}
+    .idx-cat-body{position:relative;z-index:2;}
+    .idx-cat-label{display:block;font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.2;}
+    .idx-cat-sub{display:block;font-size:.72rem;font-weight:600;color:rgba(255,255,255,.45);margin-top:.25rem;}
+    .icc-parties .idx-cat-bg{background:url('party.jpg') center/cover no-repeat;}
+    .icc-workshops .idx-cat-bg{background:url('workshop.jpg') center/cover no-repeat;}
+    .icc-culinary .idx-cat-bg{background:url('culinary.jpg') center/cover no-repeat;}
+    .icc-brunch .idx-cat-bg{background:url('brunch.jpg') center/cover no-repeat;}
+    .icc-music .idx-cat-bg{background:url('music.jpg') center/cover no-repeat;}
+    @media(max-width:900px){.idx-cat-grid{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:560px){.idx-cat-grid{grid-template-columns:repeat(2,1fr);}.idx-cat-card{height:160px;}}
+
+    /* ── FEATURED SECTIONS ── */
+    .idx-feat-section{padding:3rem 0 3.5rem;}
+    .idx-feat-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
+    .idx-feat-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.6rem;gap:1rem;flex-wrap:wrap;}
+    .idx-feat-head-left{}
+    .idx-feat-cta-link{font-size:.82rem;font-weight:800;color:rgba(255,255,255,.4);text-decoration:none;white-space:nowrap;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:.45rem 1rem;transition:color .2s,border-color .2s;}
+    .idx-feat-cta-link:hover{color:#fff;border-color:rgba(255,255,255,.35);}
+
+    /* ── PROMO BANNERS ── */
+    .idx-promo{padding:2rem 0 3.5rem;}
+    .idx-promo-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
+
+    /* ── HOW IT WORKS ── */
+    .idx-how{padding:3.5rem 0 4rem;background:#0d0d0d;}
+    .idx-how-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
+    .idx-how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem;}
+    .idx-how-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:1.6rem 1.4rem;}
+    .idx-how-num{font-size:2.5rem;font-weight:900;color:rgba(255,255,255,.08);letter-spacing:-.06em;line-height:1;margin-bottom:.75rem;}
+    .idx-how-icon{font-size:1.6rem;margin-bottom:.75rem;}
+    .idx-how-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:.4rem;}
+    .idx-how-desc{font-size:.84rem;color:rgba(255,255,255,.4);line-height:1.6;}
+    @media(max-width:700px){.idx-how-grid{grid-template-columns:1fr;}}
+
+    /* ── RESTAURANTS CTA BUTTONS ── */
+    .idx-rs-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;}
+
+    /* ── SECTION CENTER OVERRIDE ── */
+    #restaurants .section-head{text-align:center;}
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="nav-wrap">
+    <div class="brand-block">
+      <div class="logo">CultureWave</div>
+      <div class="brand-sub">by OGSHOOTS LUXE</div>
+    </div>
+    <nav class="topnav">
       <a href="events.html">Events</a>
       <a href="restaurants.html">Restaurants</a>
       <a href="features.html">For Organizers</a>
       <a href="how-it-works.html">How it works</a>
-      <a href="customer-service.html">Customer Service</a>
-      <div class="mobile-nav-ctas index-mobile-ctas">
-        <a class="nav-link" href="login.html">Login</a>
-        <a class="nav-cta" href="login.html">Get Started</a>
-      </div>
     </nav>
+    <div class="auth-actions index-auth-actions">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="login.html">Get Started</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
 
-    <main>
-      <section class="hero hero-home">
-        <div class="main-wrap hero-inner">
-          <div class="hero-copy-block">
-            <div class="hero-pill">&#9679; Premium Booking Platform &middot; India</div>
-            <h1>
-              <span class="hero-line">Find your next</span><br />
-              <span class="hero-line hero-line-outline">experience.</span>
-            </h1>
-            <p class="hero-copy">
-              Discover live events, reserve tables, and book experiences across India &mdash; or list yours and start selling tickets today.
-            </p>
-            <div class="hero-actions">
-              <a class="btn hero-btn-white" href="booking.html">Explore &amp; Book</a>
-              <a class="btn hero-btn-ghost" href="login.html">List an Event &#8594;</a>
-            </div>
-            <div class="hero-tags">
-              <span>&#10003; Instant confirmation</span>
-              <span>&#10003; UPI &amp; Cards</span>
-              <span>&#10003; Free to browse</span>
-            </div>
-          </div>
+<nav class="mobile-nav" id="mobileNav">
+  <a href="events.html">Events</a>
+  <a href="restaurants.html">Restaurants</a>
+  <a href="features.html">For Organizers</a>
+  <a href="how-it-works.html">How it works</a>
+  <a href="customer-service.html">Customer Service</a>
+  <div class="mobile-nav-ctas index-mobile-ctas">
+    <a class="nav-link" href="login.html">Login</a>
+    <a class="nav-cta" href="login.html">Get Started</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero hero-home">
+    <div class="main-wrap hero-inner">
+      <div class="hero-copy-block">
+        <div class="hero-pill">&#9679; Premium Booking Platform &middot; India</div>
+        <h1>
+          <span class="hero-line">Find your next</span><br/>
+          <span class="hero-line hero-line-outline">experience.</span>
+        </h1>
+        <p class="hero-copy">
+          Discover live events, reserve tables, and book experiences across India &mdash; or list yours and start selling tickets today.
+        </p>
+        <div class="hero-actions">
+          <a class="btn hero-btn-white" href="booking.html">Explore &amp; Book</a>
+          <a class="btn hero-btn-ghost" href="login.html">List an Event &#8594;</a>
         </div>
-
-        <!-- WORKSHOP CAROUSEL -->
-        <div class="hero-carousel-wrap">
-          <div class="hero-carousel" id="heroCarousel">
-            <div class="hc-card">
-              <div class="hc-poster" style="background:linear-gradient(160deg,#f5c518 0%,#ff9500 100%)">
-                <span class="hc-poster-icon">🎨</span>
-                <div class="hc-poster-tag">Workshop</div>
-              </div>
-              <div class="hc-body">
-                <div class="hc-title">Art &amp; Design Masterclass</div>
-                <div class="hc-meta">Vijayawada &middot; Free</div>
-              </div>
-            </div>
-            <div class="hc-card">
-              <div class="hc-poster" style="background:linear-gradient(160deg,#ff4d2e 0%,#ff9500 100%)">
-                <span class="hc-poster-icon">🍳</span>
-                <div class="hc-poster-tag">Culinary</div>
-              </div>
-              <div class="hc-body">
-                <div class="hc-title">Chef&rsquo;s Table Experience</div>
-                <div class="hc-meta">Hyderabad &middot; &#8377;499</div>
-              </div>
-            </div>
-            <div class="hc-card">
-              <div class="hc-poster" style="background:linear-gradient(160deg,#7c3aed 0%,#ec4899 100%)">
-                <span class="hc-poster-icon">🎵</span>
-                <div class="hc-poster-tag">Music</div>
-              </div>
-              <div class="hc-body">
-                <div class="hc-title">Live Jam Session Night</div>
-                <div class="hc-meta">Bangalore &middot; &#8377;299</div>
-              </div>
-            </div>
-            <div class="hc-card">
-              <div class="hc-poster" style="background:linear-gradient(160deg,#0891b2 0%,#06b6d4 100%)">
-                <span class="hc-poster-icon">💼</span>
-                <div class="hc-poster-tag">Workshop</div>
-              </div>
-              <div class="hc-body">
-                <div class="hc-title">Startup Pitch Workshop</div>
-                <div class="hc-meta">Chennai &middot; Free</div>
-              </div>
-            </div>
-            <div class="hc-card">
-              <div class="hc-poster" style="background:linear-gradient(160deg,#16a34a 0%,#4ade80 100%)">
-                <span class="hc-poster-icon">🧘</span>
-                <div class="hc-poster-tag">Wellness</div>
-              </div>
-              <div class="hc-body">
-                <div class="hc-title">Morning Yoga &amp; Mindfulness</div>
-                <div class="hc-meta">Vijayawada &middot; &#8377;199</div>
-              </div>
-            </div>
-            <div class="hc-card">
-              <div class="hc-poster" style="background:linear-gradient(160deg,#dc2626 0%,#f97316 100%)">
-                <span class="hc-poster-icon">📸</span>
-                <div class="hc-poster-tag">Workshop</div>
-              </div>
-              <div class="hc-body">
-                <div class="hc-title">Photography Bootcamp</div>
-                <div class="hc-meta">Mumbai &middot; &#8377;599</div>
-              </div>
-            </div>
-            <div class="hc-card">
-              <div class="hc-poster" style="background:linear-gradient(160deg,#854d0e 0%,#f5c518 100%)">
-                <span class="hc-poster-icon">🎭</span>
-                <div class="hc-poster-tag">Performing Arts</div>
-              </div>
-              <div class="hc-body">
-                <div class="hc-title">Theatre &amp; Acting Workshop</div>
-                <div class="hc-meta">Delhi &middot; &#8377;399</div>
-              </div>
-            </div>
-          </div>
+        <div class="hero-tags">
+          <span>&#10003; Instant confirmation</span>
+          <span>&#10003; UPI &amp; Cards</span>
+          <span>&#10003; Free to browse</span>
         </div>
-      </section>
-
-
-
-      <section class="events-section featured-events" id="events">
-        <div class="section-head">
-          <span class="eyebrow">Featured events</span>
-          <h2>Real listings people can book right away.</h2>
-        </div>
-        <div class="event-grid event-grid-home" id="indexEventsGrid">
-          <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
-            <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
-            <div style="font-weight:700;">No events yet</div>
-            <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
-          </div>
-        </div>
-      </section>
-
-
-
-      <section class="events-section featured-events" id="restaurants">
-        <div class="section-head">
-          <span class="eyebrow">Featured restaurants</span>
-          <h2>Top dining experiences you can book right now.</h2>
-        </div>
-        <div class="event-grid event-grid-home" id="indexRestaurantsGrid">
-          <div id="indexRestaurantsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
-            <div style="font-size:2.5rem;margin-bottom:.6rem;">🍽️</div>
-            <div style="font-weight:700;">No restaurants yet</div>
-            <div style="font-size:.85rem;margin-top:.3rem;">Listed restaurants will appear here.</div>
-          </div>
-        </div>
-        <div style="text-align:center;margin-top:2rem;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a class="btn hero-btn-white" href="restaurants.html">Browse All Restaurants</a>
-          <a class="btn hero-btn-ghost" href="restaurant-create.html">List Your Restaurant &#8594;</a>
-        </div>
-      </section>
-
-      
-      <section class="promo-banners">
-        <div class="promo-wrap">
-          <a href="booking.html" class="promo-card promo-booking">
-            <div class="promo-text">
-              <div class="promo-tag">For everyone</div>
-              <div class="promo-heading">Book experiences<br>worth showing<br>up for.</div>
-              <div class="promo-cta">Explore &amp; Book &rarr;</div>
-            </div>
-            <div class="promo-emoji">🎟️</div>
-          </a>
-          <a href="features.html" class="promo-card promo-organizer">
-            <div class="promo-text">
-              <div class="promo-tag">For organizers</div>
-              <div class="promo-heading">List your event.<br>Fill every seat.<br>Get paid instantly.</div>
-              <div class="promo-cta">Start listing &rarr;</div>
-            </div>
-            <div class="promo-emoji">🎤</div>
-          </a>
-        </div>
-      </section>
-
-    </main>
-
-    <footer class="site-footer">
-      <div class="footer-glow-top"></div>
-      <div class="footer-wrap">
-
-        <div class="footer-branding">
-          <div class="footer-brand">CultureWave</div>
-          <p>Premium events, workshops &amp; restaurant bookings — all in one seamless flow.</p>
-          <div class="footer-socials">
-            <a class="footer-social-button" href="https://www.instagram.com/weareogshooters?igsi=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-            </a>
-            <a class="footer-social-button" href="mailto:support.culturewave@gmail.com" aria-label="Email">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-            </a>
-            <a class="footer-social-button" href="tel:+916305183601" aria-label="Phone">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            </a>
-          </div>
-        </div>
-
-        <div class="footer-col">
-          <div class="footer-col-title">Explore</div>
-          <div class="footer-links">
-            <a href="events.html">Events</a>
-            <a href="restaurants.html">Restaurants</a>
-            <a href="features.html">For Organizers</a>
-            <a href="how-it-works.html">How it works</a>
-            <a href="booking.html">Book Now</a>
-          </div>
-        </div>
-
-        <div class="footer-col">
-          <div class="footer-col-title">Legal</div>
-          <div class="footer-links">
-            <a href="privacy-policy.html">Privacy Policy</a>
-            <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
-            <a href="refund-policy.html">Refund Policy</a>
-            <a href="customer-service.html">Customer Service</a>
-          </div>
-        </div>
-
-        <div class="footer-contact">
-          <div class="footer-col-title" style="border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.6rem;margin-bottom:.2rem;">Contact</div>
-          <a class="footer-contact-row" href="tel:+916305183601">
-            <span class="footer-contact-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            </span>
-            <span>+91 6305183601</span>
-          </a>
-          <a class="footer-contact-row" href="mailto:support.culturewave@gmail.com">
-            <span class="footer-contact-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-            </span>
-            <span>support.culturewave@gmail.com</span>
-          </a>
-          <a class="footer-contact-row" href="https://www.instagram.com/weareogshooters?igsi=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener">
-            <span class="footer-contact-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-            </span>
-            <span>@weareogshooters</span>
-          </a>
-          <div class="footer-contact-row">
-            <span class="footer-contact-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-            </span>
-            <span>Vijayawada, India</span>
-          </div>
-        </div>
-
-      </div>
-      <div class="footer-divider"></div>
-      <div class="footer-bottom">
-        <span>© 2025 OG SHOOTS. All rights reserved. Made with <span class="footer-heart">♥</span> in India.</span>
-        <span class="footer-credit">Developed by <strong>Srisanth Boddu</strong></span>
-        <span class="footer-owned">Owned by OGSHOOTS LUXE</span>
-      </div>
-    </footer>
-
-    <div class="modal" id="paymentModal" aria-hidden="true">
-      <div class="modal-card">
-        <button class="close-btn" id="closeModal" aria-label="Close">×</button>
-        <span class="eyebrow">Cashfree checkout</span>
-        <h2 id="paymentHeading">Ready for payment</h2>
-        <p id="confirmationText"></p>
-        <div class="payment-shell">
-          <div class="qr-preview" id="qrPreview"></div>
-          <div class="app-links">
-            <a href="#" id="gpayLink">Open Google Pay</a>
-            <a href="#" id="phonePeLink">Open PhonePe</a>
-            <a href="#" id="paytmLink">Open Paytm</a>
-          </div>
-        </div>
-        <div class="confirmation-box">
-          <div><span>Booking code</span><strong id="bookingCode">PP-0000</strong></div>
-          <div><span>Amount</span><strong id="paidAmount">₹0</strong></div>
-          <div><span>Status</span><strong id="liveStatus">Pending</strong></div>
-        </div>
-        <button class="btn btn-primary wide" id="doneBtn">Done</button>
       </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="script.js"></script>
-    <script>
-      // Only init if not already initialized
-      if (!firebase.apps.length) {
-        firebase.initializeApp({
-          apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
-          authDomain: "ogshootsluxe-36740.firebaseapp.com",
-          projectId: "ogshootsluxe-36740",
-          storageBucket: "ogshootsluxe-36740.firebasestorage.app",
-          messagingSenderId: "5471814825",
-          appId: "1:5471814825:web:07e84f2f88486da817d5b8"
-        });
-      }
-      const _idb = firebase.firestore();
-      const _banners = ['banner-a','banner-b','banner-c'];
-      const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
+    <!-- CAROUSEL -->
+    <div class="hero-carousel-wrap">
+      <div class="hero-carousel" id="heroCarousel">
+        <div class="hc-card">
+          <div class="hc-poster" style="background:linear-gradient(160deg,#f5c518 0%,#ff9500 100%)">
+            <span class="hc-poster-icon">🎨</span>
+            <div class="hc-poster-tag">Workshop</div>
+          </div>
+          <div class="hc-body">
+            <div class="hc-title">Art &amp; Design Masterclass</div>
+            <div class="hc-meta">Vijayawada &middot; Free</div>
+          </div>
+        </div>
+        <div class="hc-card">
+          <div class="hc-poster" style="background:linear-gradient(160deg,#ff4d2e 0%,#ff9500 100%)">
+            <span class="hc-poster-icon">🍳</span>
+            <div class="hc-poster-tag">Culinary</div>
+          </div>
+          <div class="hc-body">
+            <div class="hc-title">Chef&rsquo;s Table Experience</div>
+            <div class="hc-meta">Hyderabad &middot; &#8377;499</div>
+          </div>
+        </div>
+        <div class="hc-card">
+          <div class="hc-poster" style="background:linear-gradient(160deg,#7c3aed 0%,#ec4899 100%)">
+            <span class="hc-poster-icon">🎵</span>
+            <div class="hc-poster-tag">Music</div>
+          </div>
+          <div class="hc-body">
+            <div class="hc-title">Live Jam Session Night</div>
+            <div class="hc-meta">Bangalore &middot; &#8377;299</div>
+          </div>
+        </div>
+        <div class="hc-card">
+          <div class="hc-poster" style="background:linear-gradient(160deg,#0891b2 0%,#06b6d4 100%)">
+            <span class="hc-poster-icon">💼</span>
+            <div class="hc-poster-tag">Workshop</div>
+          </div>
+          <div class="hc-body">
+            <div class="hc-title">Startup Pitch Workshop</div>
+            <div class="hc-meta">Chennai &middot; Free</div>
+          </div>
+        </div>
+        <div class="hc-card">
+          <div class="hc-poster" style="background:linear-gradient(160deg,#16a34a 0%,#4ade80 100%)">
+            <span class="hc-poster-icon">🧘</span>
+            <div class="hc-poster-tag">Wellness</div>
+          </div>
+          <div class="hc-body">
+            <div class="hc-title">Morning Yoga &amp; Mindfulness</div>
+            <div class="hc-meta">Vijayawada &middot; &#8377;199</div>
+          </div>
+        </div>
+        <div class="hc-card">
+          <div class="hc-poster" style="background:linear-gradient(160deg,#dc2626 0%,#f97316 100%)">
+            <span class="hc-poster-icon">📸</span>
+            <div class="hc-poster-tag">Workshop</div>
+          </div>
+          <div class="hc-body">
+            <div class="hc-title">Photography Bootcamp</div>
+            <div class="hc-meta">Mumbai &middot; &#8377;599</div>
+          </div>
+        </div>
+        <div class="hc-card">
+          <div class="hc-poster" style="background:linear-gradient(160deg,#854d0e 0%,#f5c518 100%)">
+            <span class="hc-poster-icon">🎭</span>
+            <div class="hc-poster-tag">Performing Arts</div>
+          </div>
+          <div class="hc-body">
+            <div class="hc-title">Theatre &amp; Acting Workshop</div>
+            <div class="hc-meta">Delhi &middot; &#8377;399</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      function isPublishedEvent(data) {
-        const status = String(data?.status || '').toLowerCase();
-        const publicListing = data?.publicListing;
-        return publicListing !== false && ['published', 'live', 'active'].includes(status);
-      }
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stats-strip-inner">
+      <div class="stat-item"><strong>500+</strong> Events Listed</div>
+      <div class="stat-item"><strong>120+</strong> Restaurants</div>
+      <div class="stat-item"><strong>10K+</strong> Bookings Made</div>
+      <div class="stat-item"><strong>15+</strong> Cities</div>
+    </div>
+  </div>
 
-      async function loadIndexEvents() {
-        try {
-          const grid = document.getElementById('indexEventsGrid');
-          const empty = document.getElementById('indexEventsEmpty');
-          let snap;
+
+  <!-- FEATURED EVENTS -->
+  <section class="events-section featured-events idx-feat-section" id="events">
+    <div class="idx-feat-inner">
+      <div class="idx-feat-head">
+        <div class="idx-feat-head-left">
+          <div class="idx-section-label">Featured events</div>
+          <div class="idx-section-title">Real listings people can book right away.</div>
+        </div>
+        <a class="idx-feat-cta-link" href="events.html">Browse all events &#8594;</a>
+      </div>
+      <div class="event-grid event-grid-home" id="indexEventsGrid">
+        <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
+          <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
+          <div style="font-weight:700;">No events yet</div>
+          <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BROWSE BY CATEGORY -->
+  <section class="idx-cat-section">
+    <div class="idx-cat-inner">
+      <div class="idx-section-label">Browse by category</div>
+      <div class="idx-section-title">What are you looking for?</div>
+      <div class="idx-cat-grid">
+        <a href="events.html?cat=parties" class="idx-cat-card icc-parties">
+          <div class="idx-cat-bg"></div>
+          <div class="idx-cat-icon-wrap">🎉</div>
+          <div class="idx-cat-arrow">↗</div>
+          <div class="idx-cat-body">
+            <span class="idx-cat-label">Parties</span>
+            <span class="idx-cat-sub">Nightlife &amp; celebrations</span>
+          </div>
+        </a>
+        <a href="events.html?cat=workshops" class="idx-cat-card icc-workshops">
+          <div class="idx-cat-bg"></div>
+          <div class="idx-cat-icon-wrap">🛠️</div>
+          <div class="idx-cat-arrow">↗</div>
+          <div class="idx-cat-body">
+            <span class="idx-cat-label">Workshops</span>
+            <span class="idx-cat-sub">Learn &amp; grow</span>
+          </div>
+        </a>
+        <a href="events.html?cat=culinary" class="idx-cat-card icc-culinary">
+          <div class="idx-cat-bg"></div>
+          <div class="idx-cat-icon-wrap">🍽️</div>
+          <div class="idx-cat-arrow">↗</div>
+          <div class="idx-cat-body">
+            <span class="idx-cat-label">Culinary</span>
+            <span class="idx-cat-sub">Food &amp; dining events</span>
+          </div>
+        </a>
+        <a href="events.html?cat=brunch" class="idx-cat-card icc-brunch">
+          <div class="idx-cat-bg"></div>
+          <div class="idx-cat-icon-wrap">☕</div>
+          <div class="idx-cat-arrow">↗</div>
+          <div class="idx-cat-body">
+            <span class="idx-cat-label">Brunch</span>
+            <span class="idx-cat-sub">Weekend vibes</span>
+          </div>
+        </a>
+        <a href="events.html?cat=music" class="idx-cat-card icc-music">
+          <div class="idx-cat-bg"></div>
+          <div class="idx-cat-icon-wrap">🎵</div>
+          <div class="idx-cat-arrow">↗</div>
+          <div class="idx-cat-body">
+            <span class="idx-cat-label">Music</span>
+            <span class="idx-cat-sub">Live gigs &amp; concerts</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED RESTAURANTS -->
+  <section class="events-section featured-events idx-feat-section" id="restaurants">
+    <div class="idx-feat-inner">
+      <div class="idx-feat-head" style="justify-content:center;flex-direction:column;align-items:center;text-align:center;">
+        <div class="idx-section-label">Featured restaurants</div>
+        <div class="idx-section-title">Top dining experiences you can book right now.</div>
+      </div>
+      <div class="event-grid event-grid-home" id="indexRestaurantsGrid">
+        <div id="indexRestaurantsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
+          <div style="font-size:2.5rem;margin-bottom:.6rem;">🍽️</div>
+          <div style="font-weight:700;">No restaurants yet</div>
+          <div style="font-size:.85rem;margin-top:.3rem;">Listed restaurants will appear here.</div>
+        </div>
+      </div>
+      <div class="idx-rs-btns">
+        <a class="btn hero-btn-white" href="restaurants.html">Browse All Restaurants</a>
+        <a class="btn hero-btn-ghost" href="restaurant-create.html">List Your Restaurant &#8594;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="idx-how">
+    <div class="idx-how-inner">
+      <div class="idx-section-label">How it works</div>
+      <div class="idx-section-title">Three steps to your next experience.</div>
+      <div class="idx-how-grid">
+        <div class="idx-how-card">
+          <div class="idx-how-num">01</div>
+          <div class="idx-how-icon">🔍</div>
+          <div class="idx-how-title">Discover</div>
+          <div class="idx-how-desc">Browse events, workshops, and restaurants across India. Filter by city, category, or price.</div>
+        </div>
+        <div class="idx-how-card">
+          <div class="idx-how-num">02</div>
+          <div class="idx-how-icon">🎟️</div>
+          <div class="idx-how-title">Book</div>
+          <div class="idx-how-desc">Reserve your spot instantly. Pay securely via UPI, cards, or net banking. Get a QR ticket.</div>
+        </div>
+        <div class="idx-how-card">
+          <div class="idx-how-num">03</div>
+          <div class="idx-how-icon">✨</div>
+          <div class="idx-how-title">Experience</div>
+          <div class="idx-how-desc">Show up, scan your QR, and enjoy. No queues, no hassle — just the experience.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMO BANNERS -->
+  <section class="promo-banners">
+    <div class="promo-wrap">
+      <a href="booking.html" class="promo-card promo-booking">
+        <div class="promo-text">
+          <div class="promo-tag">For everyone</div>
+          <div class="promo-heading">Book experiences<br>worth showing<br>up for.</div>
+          <div class="promo-cta">Explore &amp; Book &rarr;</div>
+        </div>
+        <div class="promo-emoji">🎟️</div>
+      </a>
+      <a href="features.html" class="promo-card promo-organizer">
+        <div class="promo-text">
+          <div class="promo-tag">For organizers</div>
+          <div class="promo-heading">List your event.<br>Fill every seat.<br>Get paid instantly.</div>
+          <div class="promo-cta">Start listing &rarr;</div>
+        </div>
+        <div class="promo-emoji">🎤</div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+
+<footer class="site-footer">
+  <div class="footer-glow-top"></div>
+  <div class="footer-wrap">
+    <div class="footer-branding">
+      <div class="footer-brand">CultureWave</div>
+      <p>Premium events, workshops &amp; restaurant bookings — all in one seamless flow.</p>
+      <div class="footer-socials">
+        <a class="footer-social-button" href="https://www.instagram.com/weareogshooters?igsi=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="footer-social-button" href="mailto:support.culturewave@gmail.com" aria-label="Email">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+        </a>
+        <a class="footer-social-button" href="tel:+916305183601" aria-label="Phone">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Explore</div>
+      <div class="footer-links">
+        <a href="events.html">Events</a>
+        <a href="restaurants.html">Restaurants</a>
+        <a href="features.html">For Organizers</a>
+        <a href="how-it-works.html">How it works</a>
+        <a href="booking.html">Book Now</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
+        <a href="refund-policy.html">Refund Policy</a>
+        <a href="customer-service.html">Customer Service</a>
+      </div>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-col-title" style="border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.6rem;margin-bottom:.2rem;">Contact</div>
+      <a class="footer-contact-row" href="tel:+916305183601">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <span>+91 6305183601</span>
+      </a>
+      <a class="footer-contact-row" href="mailto:support.culturewave@gmail.com">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg></span>
+        <span>support.culturewave@gmail.com</span>
+      </a>
+      <a class="footer-contact-row" href="https://www.instagram.com/weareogshooters?igsi=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span>
+        <span>@weareogshooters</span>
+      </a>
+      <div class="footer-contact-row">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+        <span>Vijayawada, India</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-bottom">
+    <span>© 2025 OG SHOOTS. All rights reserved. Made with <span class="footer-heart">♥</span> in India.</span>
+    <span class="footer-credit">Developed by <strong>Srisanth Boddu</strong></span>
+    <span class="footer-owned">Owned by OGSHOOTS LUXE</span>
+  </div>
+</footer>
+
+
+<div class="modal" id="paymentModal" aria-hidden="true">
+  <div class="modal-card">
+    <button class="close-btn" id="closeModal" aria-label="Close">×</button>
+    <span class="eyebrow">Cashfree checkout</span>
+    <h2 id="paymentHeading">Ready for payment</h2>
+    <p id="confirmationText"></p>
+    <div class="payment-shell">
+      <div class="qr-preview" id="qrPreview"></div>
+      <div class="app-links">
+        <a href="#" id="gpayLink">Open Google Pay</a>
+        <a href="#" id="phonePeLink">Open PhonePe</a>
+        <a href="#" id="paytmLink">Open Paytm</a>
+      </div>
+    </div>
+    <div class="confirmation-box">
+      <div><span>Booking code</span><strong id="bookingCode">PP-0000</strong></div>
+      <div><span>Amount</span><strong id="paidAmount">₹0</strong></div>
+      <div><span>Status</span><strong id="liveStatus">Pending</strong></div>
+    </div>
+    <button class="btn btn-primary wide" id="doneBtn">Done</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="script.js"></script>
+<script>
+  if (!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+      authDomain: "ogshootsluxe-36740.firebaseapp.com",
+      projectId: "ogshootsluxe-36740",
+      storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+      messagingSenderId: "5471814825",
+      appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+    });
+  }
+  const _idb = firebase.firestore();
+  const _banners = ['banner-a','banner-b','banner-c'];
+  const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
+
+  function isPublishedEvent(data) {
+    const status = String(data?.status || '').toLowerCase();
+    return data?.publicListing !== false && ['published','live','active'].includes(status);
+  }
+
+  async function loadIndexEvents() {
+    try {
+      const grid = document.getElementById('indexEventsGrid');
+      const empty = document.getElementById('indexEventsEmpty');
+      const snap = await _idb.collection('events').limit(200).get();
+      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0, 6);
+      if (!docs.length) { empty.style.display = ''; return; }
+      empty.style.display = 'none';
+      docs.forEach((doc, i) => {
+        const d = doc.data(), id = doc.id;
+        const price = d.tickets?.[0]?.price || d.price || 0;
+        const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
+        let dateLabel = '';
+        if (d.startDate) {
           try {
-            snap = await _idb.collection('events').limit(200).get();
-          } catch (e) {
-            console.error('Events load error:', e);
-            return;
-          }
-          const docs = snap.docs
-            .filter((doc) => isPublishedEvent(doc.data()))
-            .slice(0, 6);
-
-          if (!docs.length) {
-            empty.style.display = '';
-            return;
-          }
-
-          empty.style.display = 'none';
-          docs.forEach((doc, i) => {
-            const d = doc.data(), id = doc.id;
-            const price = d.tickets?.[0]?.price || d.price || 0;
-            const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
-            let dateLabel = '';
-            if(d.startDate) {
-              try {
-                const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
-                dateLabel = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-              } catch(e){}
-            }
-            const article = document.createElement('article');
-            article.className = 'event-card';
-            article.innerHTML = `
-              <div class="event-banner ${_banners[i%_banners.length]}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
-              <div class="event-body">
-                <h3>${d.name||'Untitled'}</h3>
-                <p>${d.summary||d.description||''}</p>
-                <div class="event-meta"><span>${d.venueName||d.city||'TBA'}</span><span>${dateLabel||priceStr}</span></div>
-                <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
-              </div>`;
-            grid.appendChild(article);
-          });
-        } catch(e) { console.error('Events load error:', e.message, e); }
-      }
-
-      async function loadIndexRestaurants() {
-        try {
-          const snap = await _idb.collection('restaurants').where('status','==','published').limit(6).get();
-          const grid = document.getElementById('indexRestaurantsGrid');
-          const empty = document.getElementById('indexRestaurantsEmpty');
-          if (!snap.empty) {
-            empty.style.display = 'none';
-            snap.docs.forEach((doc, i) => {
-              const d = doc.data(), id = doc.id;
-              const price = d.priceForTwo || d.price || 0;
-              const priceStr = price ? `\u20b9${Number(price).toLocaleString('en-IN')} for two` : 'See menu';
-              const article = document.createElement('article');
-              article.className = 'event-card';
-              article.innerHTML = `
-                <div class="event-banner" style="${d.coverUrl?`background:url('${d.coverUrl}') center/cover no-repeat`:`background:${_rsBanners[i%_rsBanners.length]}`};"></div>
-                <div class="event-body">
-                  <h3>${d.name||'Restaurant'}</h3>
-                  <p>${d.description||d.summary||''}</p>
-                  <div class="event-meta"><span>${d.area||d.city||'TBA'}</span><span>${priceStr}</span></div>
-                  <a class="btn btn-secondary event-btn" href="restaurants.html">View restaurant</a>
-                </div>`;
-              grid.appendChild(article);
-            });
-          }
-        } catch(e) { console.warn('Restaurants:', e.message); }
-      }
-
-      function startHomeCarousel(id, cardSelector = '.event-card') {
-        const grid = document.getElementById(id);
-        if (!grid) return;
-        let timer;
-        const stop = () => clearInterval(timer);
-        const start = () => {
-          stop();
-          timer = setInterval(() => {
-            const card = grid.querySelector(cardSelector);
-            if (!card || grid.scrollWidth <= grid.clientWidth + 4) return;
-            const step = card.getBoundingClientRect().width + 16;
-            const atEnd = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - step / 2;
-            grid.scrollTo({ left: atEnd ? 0 : grid.scrollLeft + step, behavior: 'smooth' });
-          }, 4200);
-        };
-        grid.addEventListener('mouseenter', stop);
-        grid.addEventListener('mouseleave', start);
-        grid.addEventListener('touchstart', stop, { passive: true });
-        grid.addEventListener('touchend', () => setTimeout(start, 2500), { passive: true });
-        start();
-      }
-
-      loadIndexEvents().then(() => startHomeCarousel('indexEventsGrid'));
-      loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
-      startHomeCarousel('whyCultureWaveGrid', '.icon-card');
-      startHomeCarousel('organizerToolsGrid', '.icon-card');
-    </script>
-    <script>
-      (function() {
-        const carousel = document.getElementById('heroCarousel');
-        if (!carousel) return;
-        const cards = Array.from(carousel.querySelectorAll('.hc-card'));
-        let current = 0;
-        let autoTimer;
-        let dragStartX = 0;
-        let isDragging = false;
-
-        function setActive(idx) {
-          current = (idx + cards.length) % cards.length;
-          cards.forEach((c, i) => c.classList.toggle('active', i === current));
-          // center the active card: shift so active is in middle of 3
-          const cardW = cards[0].offsetWidth + 22; // card + gap
-          const wrapW = carousel.parentElement.offsetWidth;
-          const offset = (current * cardW) - (wrapW / 2) + (cardW / 2);
-          carousel.style.transform = 'translateX(' + (-offset) + 'px)';
+            const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
+            dateLabel = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+          } catch(e){}
         }
-
-        function startAuto() {
-          clearInterval(autoTimer);
-          autoTimer = setInterval(() => setActive(current + 1), 3200);
-        }
-
-        cards.forEach((c, i) => c.addEventListener('click', () => { setActive(i); startAuto(); }));
-
-        carousel.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.pageX; carousel.style.transition = 'none'; });
-        window.addEventListener('mouseup', e => {
-          if (!isDragging) return;
-          isDragging = false;
-          carousel.style.transition = '';
-          const diff = e.pageX - dragStartX;
-          if (Math.abs(diff) > 50) setActive(diff < 0 ? current + 1 : current - 1);
-          else setActive(current);
-          startAuto();
-        });
-        carousel.addEventListener('touchstart', e => { dragStartX = e.touches[0].pageX; }, {passive:true});
-        carousel.addEventListener('touchend', e => {
-          const diff = e.changedTouches[0].pageX - dragStartX;
-          if (Math.abs(diff) > 40) setActive(diff < 0 ? current + 1 : current - 1);
-          startAuto();
-        }, {passive:true});
-
-        setActive(1);
-        startAuto();
-      })();
-    </script>
-    <script>
-      const ham = document.getElementById('hamburger');
-      const mNav = document.getElementById('mobileNav');
-      ham.addEventListener('click', () => {
-        ham.classList.toggle('open');
-        mNav.classList.toggle('open');
-        document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
+        const article = document.createElement('article');
+        article.className = 'event-card';
+        article.innerHTML = `
+          <div class="event-banner ${_banners[i%_banners.length]}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
+          <div class="event-body">
+            <h3>${d.name||'Untitled'}</h3>
+            <p>${d.summary||d.description||''}</p>
+            <div class="event-meta"><span>${d.venueName||d.city||'TBA'}</span><span>${dateLabel||priceStr}</span></div>
+            <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
+          </div>`;
+        grid.appendChild(article);
       });
-      mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        ham.classList.remove('open');
-        mNav.classList.remove('open');
-        document.body.style.overflow = '';
-      }));
-    </script>
-  </body>
+    } catch(e) { console.error('Events load error:', e.message); }
+  }
+
+  async function loadIndexRestaurants() {
+    try {
+      const snap = await _idb.collection('restaurants').where('status','==','published').limit(6).get();
+      const grid = document.getElementById('indexRestaurantsGrid');
+      const empty = document.getElementById('indexRestaurantsEmpty');
+      if (!snap.empty) {
+        empty.style.display = 'none';
+        snap.docs.forEach((doc, i) => {
+          const d = doc.data();
+          const price = d.priceForTwo || d.price || 0;
+          const priceStr = price ? `\u20b9${Number(price).toLocaleString('en-IN')} for two` : 'See menu';
+          const article = document.createElement('article');
+          article.className = 'event-card';
+          article.innerHTML = `
+            <div class="event-banner" style="${d.coverUrl?`background:url('${d.coverUrl}') center/cover no-repeat`:`background:${_rsBanners[i%_rsBanners.length]}`};"></div>
+            <div class="event-body">
+              <h3>${d.name||'Restaurant'}</h3>
+              <p>${d.description||d.summary||''}</p>
+              <div class="event-meta"><span>${d.area||d.city||'TBA'}</span><span>${priceStr}</span></div>
+              <a class="btn btn-secondary event-btn" href="restaurants.html">View restaurant</a>
+            </div>`;
+          grid.appendChild(article);
+        });
+      }
+    } catch(e) { console.warn('Restaurants:', e.message); }
+  }
+
+  function startHomeCarousel(id, cardSelector) {
+    cardSelector = cardSelector || '.event-card';
+    const grid = document.getElementById(id);
+    if (!grid) return;
+    let timer;
+    const stop = () => clearInterval(timer);
+    const start = () => {
+      stop();
+      timer = setInterval(() => {
+        const card = grid.querySelector(cardSelector);
+        if (!card || grid.scrollWidth <= grid.clientWidth + 4) return;
+        const step = card.getBoundingClientRect().width + 16;
+        const atEnd = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - step / 2;
+        grid.scrollTo({ left: atEnd ? 0 : grid.scrollLeft + step, behavior: 'smooth' });
+      }, 4200);
+    };
+    grid.addEventListener('mouseenter', stop);
+    grid.addEventListener('mouseleave', start);
+    grid.addEventListener('touchstart', stop, { passive: true });
+    grid.addEventListener('touchend', () => setTimeout(start, 2500), { passive: true });
+    start();
+  }
+
+  loadIndexEvents().then(() => startHomeCarousel('indexEventsGrid'));
+  loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
+</script>
+<script>
+  (function() {
+    const carousel = document.getElementById('heroCarousel');
+    if (!carousel) return;
+    const cards = Array.from(carousel.querySelectorAll('.hc-card'));
+    let current = 0, autoTimer, dragStartX = 0, isDragging = false;
+    function setActive(idx) {
+      current = (idx + cards.length) % cards.length;
+      cards.forEach((c, i) => c.classList.toggle('active', i === current));
+      const cardW = cards[0].offsetWidth + 22;
+      const wrapW = carousel.parentElement.offsetWidth;
+      const offset = (current * cardW) - (wrapW / 2) + (cardW / 2);
+      carousel.style.transform = 'translateX(' + (-offset) + 'px)';
+    }
+    function startAuto() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => setActive(current + 1), 3200);
+    }
+    cards.forEach((c, i) => c.addEventListener('click', () => { setActive(i); startAuto(); }));
+    carousel.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.pageX; carousel.style.transition = 'none'; });
+    window.addEventListener('mouseup', e => {
+      if (!isDragging) return;
+      isDragging = false;
+      carousel.style.transition = '';
+      const diff = e.pageX - dragStartX;
+      if (Math.abs(diff) > 50) setActive(diff < 0 ? current + 1 : current - 1);
+      else setActive(current);
+      startAuto();
+    });
+    carousel.addEventListener('touchstart', e => { dragStartX = e.touches[0].pageX; }, {passive:true});
+    carousel.addEventListener('touchend', e => {
+      const diff = e.changedTouches[0].pageX - dragStartX;
+      if (Math.abs(diff) > 40) setActive(diff < 0 ? current + 1 : current - 1);
+      startAuto();
+    }, {passive:true});
+    setActive(1);
+    startAuto();
+  })();
+</script>
+<script>
+  const ham = document.getElementById('hamburger');
+  const mNav = document.getElementById('mobileNav');
+  ham.addEventListener('click', () => {
+    ham.classList.toggle('open');
+    mNav.classList.toggle('open');
+    document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
+  });
+  mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    ham.classList.remove('open');
+    mNav.classList.remove('open');
+    document.body.style.overflow = '';
+  }));
+</script>
+</body>
 </html>
