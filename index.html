@@ -20,6 +20,21 @@
       .index-mobile-ctas{gap:.65rem;}
       .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
       .index-mobile-ctas .nav-cta{margin-left:0;}
+      .audience-section{padding:1.5rem 1.4rem 4.5rem;background:linear-gradient(180deg,#f8faff 0%,#fff 100%)}
+      .audience-wrap{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+      .audience-card{position:relative;overflow:hidden;padding:2rem;border:1px solid #dbe6fb;border-radius:26px;background:#fff;box-shadow:0 18px 40px rgba(18,66,197,.08)}
+      .audience-card::after{content:"";position:absolute;right:-4rem;bottom:-5rem;width:13rem;height:13rem;border-radius:50%;background:#eef4ff;pointer-events:none}
+      .audience-card.organizer{background:linear-gradient(145deg,#07183f 0%,#123b9a 100%);border-color:#1e4cba;color:#fff;box-shadow:0 22px 48px rgba(18,66,197,.2)}
+      .audience-card.organizer::after{background:rgba(255,255,255,.08)}
+      .audience-label{position:relative;z-index:1;color:var(--blue);font-size:.68rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+      .audience-card.organizer .audience-label{color:#7eb3ff}
+      .audience-card h2{position:relative;z-index:1;margin:.55rem 0 .45rem;font-size:clamp(1.45rem,3vw,2rem);letter-spacing:-.05em}
+      .audience-card p{position:relative;z-index:1;max-width:28rem;margin:0 0 1.35rem;color:#68758d;line-height:1.65}
+      .audience-card.organizer p{color:#dce7ff}
+      .audience-actions{position:relative;z-index:1;display:flex;gap:.7rem;flex-wrap:wrap}
+      .audience-actions .btn{padding:.8rem 1.1rem;border-radius:14px;font-size:.85rem}
+      .audience-card.organizer .btn-secondary{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff}
+      @media(max-width:640px){.audience-section{padding:0 1rem 3rem}.audience-wrap{grid-template-columns:1fr}.audience-card{padding:1.45rem;border-radius:22px}.audience-actions{display:grid}.audience-actions .btn{width:100%;text-align:center}}
     </style>
   </head>
   <body>
@@ -59,24 +74,29 @@
 
     <main>
       <section class="hero hero-home">
+        <div class="hero-bg-orb orb-1"></div>
+        <div class="hero-bg-orb orb-2"></div>
+        <div class="hero-bg-orb orb-3"></div>
         <div class="main-wrap hero-inner">
           <div class="hero-copy-block">
-            <span class="eyebrow">Discover, book, and host</span>
+            <div class="hero-badge"><span class="hero-badge-dot"></span>Premium Booking Platform · India</div>
             <h1>
-              <span class="hero-line">Find your next event.</span><br />
-              <span class="hero-line">Book your place instantly.</span>
+              <span class="hero-line">Find your next experience.</span><br />
+              <span class="hero-line hero-line-gold">List yours. Let people book.</span>
             </h1>
             <p class="hero-copy">
-              Explore live events across India, reserve your spot in seconds, or create an event people can book.
+              One premium platform for customers to discover and book, and organizers to list, manage, and grow their experiences.
             </p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="login.html">Create an Event</a>
-              <a class="btn btn-secondary" href="booking.html">Browse &amp; Book</a>
+              <a class="btn btn-primary hero-btn-main" href="login.html">List an Experience <span class="btn-arrow">→</span></a>
+              <a class="btn btn-secondary hero-btn-sec" href="booking.html">Explore &amp; Book</a>
             </div>
-            <div class="hero-note">Browse experiences. Book with confidence. Host with ease.</div>
+
           </div>
         </div>
       </section>
+
+
 
       <section class="events-section featured-events" id="events">
         <div class="section-head">
@@ -247,31 +267,78 @@
     </main>
 
     <footer class="site-footer">
+      <div class="footer-glow-top"></div>
       <div class="footer-wrap">
+
         <div class="footer-branding">
           <div class="footer-brand">CultureWave</div>
-          <p>Events, workshops, and restaurant bookings in one smooth flow.</p>
+          <p>Premium events, workshops &amp; restaurant bookings — all in one seamless flow.</p>
+          <div class="footer-socials">
+            <a class="footer-social-button" href="https://www.instagram.com/weareogshooters?igsi=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a class="footer-social-button" href="mailto:support.culturewave@gmail.com" aria-label="Email">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+            </a>
+            <a class="footer-social-button" href="tel:+916305183601" aria-label="Phone">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </a>
+          </div>
         </div>
-        <div class="footer-links">
-          <a href="events.html">Events</a>
-          <a href="restaurants.html">Restaurants</a>
-          <a href="features.html">For Organizers</a>
-          <a href="how-it-works.html">How it works</a>
-          <a href="privacy-policy.html">Privacy Policy</a>
-          <a href="terms-and-conditions.html">Terms & Conditions</a>
-          <a href="refund-policy.html">Refund Policy</a>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Explore</div>
+          <div class="footer-links">
+            <a href="events.html">Events</a>
+            <a href="restaurants.html">Restaurants</a>
+            <a href="features.html">For Organizers</a>
+            <a href="how-it-works.html">How it works</a>
+            <a href="booking.html">Book Now</a>
+          </div>
         </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Legal</div>
+          <div class="footer-links">
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
+            <a href="refund-policy.html">Refund Policy</a>
+            <a href="customer-service.html">Customer Service</a>
+          </div>
+        </div>
+
         <div class="footer-contact">
-          <h3>Connect with us</h3>
-          <a class="footer-contact-row" href="tel:+916305183601"><span class="footer-contact-icon" aria-hidden="true">☎</span><span>6305183601</span></a>
-          <a class="footer-contact-row" href="mailto:support.culturewave@gmail.com"><span class="footer-contact-icon" aria-hidden="true">✉</span><span>support.culturewave@gmail.com</span></a>
-          <a class="footer-contact-row" href="https://www.instagram.com/weareogshooters?igsi=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener"><span class="footer-contact-icon" aria-hidden="true">◎</span><span>@weareogshooters</span></a>
-          <div class="footer-contact-row footer-location"><span class="footer-contact-icon" aria-hidden="true">●</span><span>Vijayawada, India</span></div>
-          <div class="footer-socials"><a class="footer-social-button" href="https://www.instagram.com/weareogshooters?igsi=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram"><span aria-hidden="true">◎</span></a></div>
+          <div class="footer-col-title" style="border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.6rem;margin-bottom:.2rem;">Contact</div>
+          <a class="footer-contact-row" href="tel:+916305183601">
+            <span class="footer-contact-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </span>
+            <span>+91 6305183601</span>
+          </a>
+          <a class="footer-contact-row" href="mailto:support.culturewave@gmail.com">
+            <span class="footer-contact-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+            </span>
+            <span>support.culturewave@gmail.com</span>
+          </a>
+          <a class="footer-contact-row" href="https://www.instagram.com/weareogshooters?igsi=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener">
+            <span class="footer-contact-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            </span>
+            <span>@weareogshooters</span>
+          </a>
+          <div class="footer-contact-row">
+            <span class="footer-contact-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            </span>
+            <span>Vijayawada, India</span>
+          </div>
         </div>
+
       </div>
+      <div class="footer-divider"></div>
       <div class="footer-bottom">
-        <span>© 2025 OG SHOOTS. All rights reserved. Made with <span class="footer-heart" aria-hidden="true">♥</span> in India.</span>
+        <span>© 2025 OG SHOOTS. All rights reserved. Made with <span class="footer-heart">♥</span> in India.</span>
         <span class="footer-credit">Developed by <strong>Srisanth Boddu</strong></span>
         <span class="footer-owned">Owned by OGSHOOTS LUXE</span>
       </div>
