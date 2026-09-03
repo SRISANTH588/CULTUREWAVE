@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Music</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    :root{--accent:#065f46;--accent2:#34d399;}
+    body{background:#080808;}
+    .cat-hero{position:relative;min-height:480px;display:flex;align-items:flex-end;overflow:hidden;}
+    .cat-hero-bg{position:absolute;inset:0;background:url('music.jpg') center/cover no-repeat;filter:brightness(.45);}
+    .cat-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,#080808 0%,rgba(8,8,8,.5) 50%,transparent 100%);}
+    .cat-hero-inner{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 1.4rem 3rem;width:100%;}
+    .cat-pill{display:inline-flex;align-items:center;gap:.4rem;background:rgba(6,95,70,.25);border:1px solid rgba(52,211,153,.3);border-radius:999px;padding:.3rem .9rem;font-size:.72rem;font-weight:800;color:#6ee7b7;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+    .cat-hero h1{font-size:clamp(3rem,8vw,6rem);font-weight:900;letter-spacing:-.06em;line-height:.95;color:#fff;margin:0 0 1rem;}
+    .cat-hero h1 span{background:linear-gradient(135deg,var(--accent2),#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .cat-hero-desc{font-size:1rem;color:rgba(255,255,255,.5);max-width:520px;line-height:1.65;margin-bottom:1.6rem;}
+    .cat-hero-meta{display:flex;gap:1.5rem;flex-wrap:wrap;}
+    .cat-hero-stat{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.35);}
+    .cat-hero-stat strong{color:#fff;font-size:1.1rem;display:block;}
+    .cat-body{max-width:1240px;margin:0 auto;padding:3rem 1.4rem 5rem;}
+    .cat-filter-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:2rem;}
+    .cat-chip{border:1.5px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.45);border-radius:999px;padding:.45rem 1rem;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:inherit;}
+    .cat-chip:hover{border-color:var(--accent2);color:#6ee7b7;}
+    .cat-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(6,95,70,.4);}
+    .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+    .cat-card{background:#111;border:1px solid rgba(255,255,255,.07);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;}
+    .cat-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.5);}
+    .cat-card-banner{height:200px;position:relative;overflow:hidden;}
+    .cat-card-banner-bg{position:absolute;inset:0;background:linear-gradient(135deg,var(--accent),var(--accent2));background-size:cover;background-position:center;transition:transform .3s;}
+    .cat-card:hover .cat-card-banner-bg{transform:scale(1.05);}
+    .cat-card-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.4) 100%);}
+    .cat-card-tag{position:absolute;top:.85rem;left:.85rem;z-index:1;background:rgba(6,95,70,.3);backdrop-filter:blur(8px);border:1px solid rgba(52,211,153,.3);border-radius:999px;padding:.25rem .7rem;font-size:.7rem;font-weight:800;color:#6ee7b7;letter-spacing:.08em;text-transform:uppercase;}
+    .cat-card-body{padding:1.2rem;display:flex;flex-direction:column;gap:.5rem;flex:1;}
+    .cat-card-body h3{margin:0;font-size:1rem;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.3;}
+    .cat-card-venue{font-size:.8rem;color:rgba(255,255,255,.4);font-weight:600;}
+    .cat-card-venue::before{content:"📍 ";}
+    .cat-card-desc{font-size:.82rem;color:rgba(255,255,255,.35);line-height:1.55;margin:0;}
+    .cat-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:.85rem;border-top:1px solid rgba(255,255,255,.07);}
+    .cat-card-price{font-size:.82rem;color:rgba(255,255,255,.4);font-weight:600;}
+    .cat-card-price strong{color:#fff;font-size:.95rem;}
+    .cat-card-btn{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:.55rem 1rem;font-size:.8rem;font-weight:800;cursor:pointer;text-decoration:none;transition:background .18s,transform .15s;box-shadow:0 4px 14px rgba(6,95,70,.3);}
+    .cat-card-btn:hover{background:#047857;transform:translateY(-1px);}
+    .cat-empty{grid-column:1/-1;text-align:center;padding:4rem 1rem;color:rgba(255,255,255,.25);}
+    .cat-empty span{font-size:3rem;display:block;margin-bottom:.8rem;}
+    @media(max-width:900px){.cat-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:560px){.cat-grid{grid-template-columns:1fr;}.cat-hero h1{font-size:3rem;}}
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="nav-wrap">
+    <div class="brand-block"><div class="logo">CultureWave</div><div class="brand-sub">by OGSHOOTS LUXE</div></div>
+    <nav class="topnav">
+      <a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a><a href="how-it-works.html">How it works</a>
+    </nav>
+    <div class="auth-actions"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a></div>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a><a href="how-it-works.html">How it works</a>
+  <div class="mobile-nav-ctas"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a></div>
+</nav>
+
+<section class="cat-hero">
+  <div class="cat-hero-bg"></div>
+  <div class="cat-hero-overlay"></div>
+  <div class="cat-hero-inner">
+    <div class="cat-pill">🎵 Music</div>
+    <h1>Live Gigs &amp;<br/><span>Concerts</span></h1>
+    <p class="cat-hero-desc">From intimate jam sessions to sold-out concerts — find live music events happening near you right now.</p>
+    <div class="cat-hero-meta">
+      <div class="cat-hero-stat"><strong id="statCount">—</strong>Events Listed</div>
+      <div class="cat-hero-stat"><strong>All Genres</strong>Covered</div>
+      <div class="cat-hero-stat"><strong>Free – ₹2500</strong>Price Range</div>
+    </div>
+  </div>
+</section>
+
+<div class="cat-body">
+  <div class="cat-filter-row">
+    <button class="cat-chip active" data-filter="all">All</button>
+    <button class="cat-chip" data-filter="free">Free</button>
+    <button class="cat-chip" data-filter="paid">Paid</button>
+    <button class="cat-chip" data-filter="live">Live</button>
+    <button class="cat-chip" data-filter="concert">Concert</button>
+    <button class="cat-chip" data-filter="jam">Jam Session</button>
+  </div>
+  <div class="cat-grid" id="catGrid">
+    <div class="cat-empty" id="catEmpty"><span>🎵</span>Loading music events…</div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-wrap">
+    <div class="footer-branding"><div class="footer-brand">CultureWave</div><p>Premium events, workshops &amp; restaurant bookings.</p></div>
+    <div class="footer-col"><div class="footer-col-title">Explore</div>
+      <div class="footer-links"><a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a></div>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-bottom">
+    <span>© 2025 OG SHOOTS. All rights reserved.</span>
+    <span class="footer-credit">Developed by <strong>Srisanth Boddu</strong></span>
+    <span class="footer-owned">Owned by OGSHOOTS LUXE</span>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  if(!firebase.apps.length){firebase.initializeApp({apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",authDomain:"ogshootsluxe-36740.firebaseapp.com",projectId:"ogshootsluxe-36740",storageBucket:"ogshootsluxe-36740.firebasestorage.app",messagingSenderId:"5471814825",appId:"1:5471814825:web:07e84f2f88486da817d5b8"});}
+  const db=firebase.firestore();
+  let allCards=[];
+  async function load(){
+    const grid=document.getElementById('catGrid'),empty=document.getElementById('catEmpty');
+    try{
+      const snap=await db.collection('events').limit(200).get();
+      const docs=snap.docs.filter(d=>{
+        const s=String(d.data().status||'').toLowerCase();
+        const cat=String(d.data().category||'').toLowerCase();
+        return ['published','live','active'].includes(s)&&(cat.includes('music')||cat.includes('concert')||cat.includes('gig')||cat.includes('jam'));
+      });
+      document.getElementById('statCount').textContent=docs.length||'0';
+      if(!docs.length){empty.innerHTML='<span>🎵</span>No music events yet. Check back soon!';return;}
+      empty.style.display='none';
+      docs.forEach((doc)=>{
+        const d=doc.data(),id=doc.id;
+        const price=d.tickets?.[0]?.price||d.price||0;
+        const priceStr=price?`<strong>From ₹${Number(price).toLocaleString('en-IN')}</strong>`:'<strong>Free</strong>';
+        let dateLabel='';
+        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');dateLabel=dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}catch(e){}}
+        const card=document.createElement('div');
+        card.className='cat-card';
+        card.dataset.price=price?'paid':'free';
+        card.innerHTML=`
+          <div class="cat-card-banner">
+            <div class="cat-card-banner-bg" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
+            <span class="cat-card-tag">Music</span>
+          </div>
+          <div class="cat-card-body">
+            <h3>${d.name||'Untitled'}</h3>
+            <div class="cat-card-venue">${d.venueName||d.city||'TBA'}${dateLabel?' · '+dateLabel:''}</div>
+            <p class="cat-card-desc">${(d.summary||d.description||'').slice(0,90)}${(d.summary||d.description||'').length>90?'…':''}</p>
+            <div class="cat-card-footer">
+              <div class="cat-card-price">${priceStr}</div>
+              <a class="cat-card-btn" href="event-detail.html?eventId=${id}">Book Now →</a>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+        allCards.push(card);
+      });
+    }catch(e){empty.innerHTML='<span>⚠️</span>Failed to load events.';}
+  }
+  document.querySelectorAll('.cat-chip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      const f=chip.dataset.filter;
+      allCards.forEach(c=>{c.style.display=(f==='all'||c.dataset.price===f)?'':'none';});
+    });
+  });
+  load();
+</script>
+<script>
+  const ham=document.getElementById('hamburger'),mNav=document.getElementById('mobileNav');
+  ham.addEventListener('click',()=>{ham.classList.toggle('open');mNav.classList.toggle('open');document.body.style.overflow=mNav.classList.contains('open')?'hidden':'';});
+  mNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ham.classList.remove('open');mNav.classList.remove('open');document.body.style.overflow='';}));
+</script>
+</body>
+</html>
