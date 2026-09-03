@@ -12,29 +12,14 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <style>
-      .index-auth-actions{gap:.55rem;padding:.28rem;border:1px solid #dbe6fb;border-radius:999px;background:rgba(255,255,255,.72);box-shadow:0 8px 24px rgba(18,66,197,.08);}
-      .index-auth-actions .nav-link{padding:.68rem 1rem;border:0;background:transparent;color:#244064;box-shadow:none;font-size:.82rem;}
-      .index-auth-actions .nav-link:hover{background:#eff5ff;color:#1242c5;}
-      .index-auth-actions .nav-cta{margin-left:0;padding:.7rem 1.12rem;font-size:.82rem;box-shadow:0 8px 18px rgba(18,66,197,.24);}
-      .index-auth-actions .nav-cta:hover{transform:translateY(-1px);box-shadow:0 11px 22px rgba(18,66,197,.3);}
+      .index-auth-actions{gap:.5rem;padding:.3rem;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.06);backdrop-filter:blur(12px);}
+      .index-auth-actions .nav-link{padding:.6rem .95rem;border:0;background:transparent;color:rgba(255,255,255,.7);box-shadow:none;font-size:.82rem;}
+      .index-auth-actions .nav-link:hover{background:rgba(255,255,255,.08);color:#fff;}
+      .index-auth-actions .nav-cta{margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff;color:#080808;border-radius:999px;font-weight:800;}
+      .index-auth-actions .nav-cta:hover{transform:translateY(-1px);background:rgba(255,255,255,.9);}
       .index-mobile-ctas{gap:.65rem;}
       .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
       .index-mobile-ctas .nav-cta{margin-left:0;}
-      .audience-section{padding:1.5rem 1.4rem 4.5rem;background:linear-gradient(180deg,#f8faff 0%,#fff 100%)}
-      .audience-wrap{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
-      .audience-card{position:relative;overflow:hidden;padding:2rem;border:1px solid #dbe6fb;border-radius:26px;background:#fff;box-shadow:0 18px 40px rgba(18,66,197,.08)}
-      .audience-card::after{content:"";position:absolute;right:-4rem;bottom:-5rem;width:13rem;height:13rem;border-radius:50%;background:#eef4ff;pointer-events:none}
-      .audience-card.organizer{background:linear-gradient(145deg,#07183f 0%,#123b9a 100%);border-color:#1e4cba;color:#fff;box-shadow:0 22px 48px rgba(18,66,197,.2)}
-      .audience-card.organizer::after{background:rgba(255,255,255,.08)}
-      .audience-label{position:relative;z-index:1;color:var(--blue);font-size:.68rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-      .audience-card.organizer .audience-label{color:#7eb3ff}
-      .audience-card h2{position:relative;z-index:1;margin:.55rem 0 .45rem;font-size:clamp(1.45rem,3vw,2rem);letter-spacing:-.05em}
-      .audience-card p{position:relative;z-index:1;max-width:28rem;margin:0 0 1.35rem;color:#68758d;line-height:1.65}
-      .audience-card.organizer p{color:#dce7ff}
-      .audience-actions{position:relative;z-index:1;display:flex;gap:.7rem;flex-wrap:wrap}
-      .audience-actions .btn{padding:.8rem 1.1rem;border-radius:14px;font-size:.85rem}
-      .audience-card.organizer .btn-secondary{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff}
-      @media(max-width:640px){.audience-section{padding:0 1rem 3rem}.audience-wrap{grid-template-columns:1fr}.audience-card{padding:1.45rem;border-radius:22px}.audience-actions{display:grid}.audience-actions .btn{width:100%;text-align:center}}
     </style>
   </head>
   <body>
@@ -76,19 +61,23 @@
       <section class="hero hero-home">
         <div class="main-wrap hero-inner">
           <div class="hero-copy-block">
-            <span class="eyebrow">Discover, book, and host</span>
+            <div class="hero-pill">&#9679; Premium Booking Platform &middot; India</div>
             <h1>
-              <span class="hero-line">Find your next event.</span><br />
-              <span class="hero-line">Book your place instantly.</span>
+              <span class="hero-line">Find your next</span><br />
+              <span class="hero-line hero-line-outline">experience.</span>
             </h1>
             <p class="hero-copy">
-              Explore live events across India, reserve your spot in seconds, or create an event people can book.
+              Discover live events, reserve tables, and book experiences across India &mdash; or list yours and start selling tickets today.
             </p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="login.html">Create an Event</a>
-              <a class="btn btn-secondary" href="booking.html">Browse &amp; Book</a>
+              <a class="btn hero-btn-white" href="booking.html">Explore &amp; Book</a>
+              <a class="btn hero-btn-ghost" href="login.html">List an Event &#8594;</a>
             </div>
-            <div class="hero-note">Browse experiences. Book with confidence. Host with ease.</div>
+            <div class="hero-tags">
+              <span>&#10003; Instant confirmation</span>
+              <span>&#10003; UPI &amp; Cards</span>
+              <span>&#10003; Free to browse</span>
+            </div>
           </div>
         </div>
       </section>
@@ -101,7 +90,7 @@
           <h2>Real listings people can book right away.</h2>
         </div>
         <div class="event-grid event-grid-home" id="indexEventsGrid">
-          <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:#9ca3af;">
+          <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
             <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
             <div style="font-weight:700;">No events yet</div>
             <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
@@ -141,15 +130,15 @@
           <h2>Top dining experiences you can book right now.</h2>
         </div>
         <div class="event-grid event-grid-home" id="indexRestaurantsGrid">
-          <div id="indexRestaurantsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:#9ca3af;">
+          <div id="indexRestaurantsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
             <div style="font-size:2.5rem;margin-bottom:.6rem;">🍽️</div>
             <div style="font-weight:700;">No restaurants yet</div>
             <div style="font-size:.85rem;margin-top:.3rem;">Listed restaurants will appear here.</div>
           </div>
         </div>
-        <div style="text-align:center;margin-top:2rem;">
-          <a class="btn btn-primary" href="restaurants.html">Browse All Restaurants</a>
-          <a class="btn btn-secondary" href="restaurant-create.html" style="margin-left:0.75rem;">List Your Restaurant</a>
+        <div style="text-align:center;margin-top:2rem;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <a class="btn hero-btn-white" href="restaurants.html">Browse All Restaurants</a>
+          <a class="btn hero-btn-ghost" href="restaurant-create.html">List Your Restaurant &#8594;</a>
         </div>
       </section>
 
