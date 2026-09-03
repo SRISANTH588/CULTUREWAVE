@@ -24,22 +24,39 @@
       .hamburger.open span{background:#0b1220 !important;}
       .mobile-nav > a{border:1px solid #dce4f2;border-radius:14px;}
     }
-    .mobile-header-actions,.mobile-bottom-nav{display:none;}
+    .mobile-header-actions,.mobile-bottom-nav,.mobile-brand,.city-picker{display:none;}
     @media(max-width:700px){
       body{padding-bottom:84px;}
       .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
-      .topbar .brand-block{flex:0 0 auto;}
-      .topbar .logo{font-size:0;line-height:1;}
-      .topbar .logo:after{content:"✦";font-size:1.7rem;color:#8b2cff;}
-      .topbar .brand-sub{display:none;}
+      .topbar .brand-block{display:none;}
+      .mobile-brand{display:flex;align-items:center;gap:.4rem;color:#8b2cff;font-size:1rem;font-weight:900;letter-spacing:.06em;white-space:nowrap;}
+      .mobile-brand-mark{font-size:1.65rem;line-height:1;}
       .mobile-header-actions{display:flex;align-items:center;gap:.45rem;margin-left:auto;}
-      .mobile-city{border:0;background:transparent;color:#0b1220;font:inherit;font-size:.9rem;font-weight:800;white-space:nowrap;}
+      .mobile-city{border:0;background:transparent;color:#0b1220;font:inherit;font-size:.82rem;font-weight:800;white-space:nowrap;cursor:pointer;}
       .mobile-header-icon{display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#0b1220;font-size:1.35rem;cursor:pointer;}
       .mobile-bottom-nav{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:24;display:grid;grid-template-columns:repeat(4,1fr);gap:.25rem;padding:.55rem .35rem;border:1px solid #dfe4ed;border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 12px 34px rgba(25,55,110,.18);backdrop-filter:blur(18px);}
       .mobile-bottom-nav a{display:grid;place-items:center;gap:.2rem;padding:.35rem .15rem;border-radius:999px;color:#68738a;font-size:.68rem;font-weight:800;text-decoration:none;}
       .mobile-bottom-nav a:first-child{color:#8b2cff;background:#f2eaff;}
       .mobile-bottom-nav a span{font-size:1.15rem;line-height:1;}
     }
+    .city-picker{position:fixed;inset:0;z-index:60;align-items:flex-start;justify-content:center;padding:5vh 1rem;background:rgba(3,8,20,.58);backdrop-filter:blur(10px);}
+    .city-picker.open{display:flex;}
+    .city-picker-panel{width:min(720px,100%);max-height:90vh;overflow:auto;padding:1.5rem;border:1px solid #e3eaf5;border-radius:22px;background:#fff;box-shadow:0 30px 80px rgba(11,30,70,.25);}
+    .city-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .city-picker-head h2{margin:0;color:#0b1220;font-size:clamp(1.6rem,5vw,2.3rem);letter-spacing:-.05em;}
+    .city-picker-close{border:0;background:#f1f5fb;border-radius:50%;width:2.2rem;height:2.2rem;color:#52617d;font-size:1.4rem;cursor:pointer;}
+    .city-picker-search{width:100%;padding:.85rem 1rem;border:1px solid #cbd5e1;border-radius:10px;font:inherit;outline:none;}
+    .city-picker-search:focus{border-color:#8b2cff;box-shadow:0 0 0 3px rgba(139,44,255,.1);}
+    .city-picker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-top:1rem;}
+    .city-picker-option{padding:.8rem .5rem;border:1px solid #e3eaf5;border-radius:10px;background:#f8faff;color:#0b1220;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;}
+    .city-picker-option:hover,.city-picker-option.selected{border-color:#8b2cff;background:#f2eaff;color:#8b2cff;}
+    @media(max-width:560px){.city-picker-grid{grid-template-columns:repeat(2,1fr);}.city-picker-panel{padding:1.1rem;}}
+    .header-dark-mode .topbar{background:#0b1020;border-bottom-color:rgba(255,255,255,.12);}
+    .header-dark-mode .mobile-city,.header-dark-mode .mobile-header-icon{color:#fff;}
+    .header-dark-mode .hero-home{background:linear-gradient(135deg,#0b1020,#16264d)!important;color:#fff;}
+    .header-dark-mode .hero-home .hero-headline,.header-dark-mode .hero-home .hero-copy{color:#fff;}
+    .header-dark-mode .mobile-bottom-nav{background:rgba(11,16,32,.95);border-color:rgba(255,255,255,.16);}
+    .header-dark-mode .mobile-bottom-nav a{color:#cbd5e1;}
 
     /* ── CATEGORY SECTION ── */
     .idx-cat-section{width:100%;max-width:none;padding:3.5rem 0 4rem;background:#0a0a0a;}
@@ -276,6 +293,7 @@
 
 <header class="topbar">
   <div class="nav-wrap">
+    <a class="mobile-brand" href="index.html"><span class="mobile-brand-mark">✦</span><span>CULTUREWAVE</span></a>
     <div class="brand-block">
       <div class="logo">CultureWave</div>
       <div class="brand-sub">by OGSHOOTS LUXE</div>
@@ -287,9 +305,9 @@
       <a href="how-it-works.html">How it works</a>
     </nav>
     <div class="mobile-header-actions">
-      <button class="mobile-city" type="button">Hyderabad⌄</button>
-      <button class="mobile-header-icon" type="button" aria-label="Customer support">◔</button>
-      <button class="mobile-header-icon" type="button" aria-label="Search">⌕</button>
+      <button class="mobile-city" id="mobileCityTrigger" type="button">Hyderabad⌄</button>
+      <button class="mobile-header-icon" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
+      <a class="mobile-header-icon" href="events.html" aria-label="Search events">⌕</a>
     </div>
     <div class="auth-actions index-auth-actions">
       <a class="nav-link" href="login.html">Login</a>
@@ -319,6 +337,14 @@
   <a href="category-sports.html"><span>◌</span>Sports</a>
   <a href="restaurants.html"><span>▣</span>Restaurants</a>
 </nav>
+
+<div class="city-picker" id="cityPicker" role="dialog" aria-modal="true" aria-labelledby="cityPickerTitle">
+  <div class="city-picker-panel">
+    <div class="city-picker-head"><h2 id="cityPickerTitle">Select Your City</h2><button class="city-picker-close" id="cityPickerClose" type="button" aria-label="Close">&times;</button></div>
+    <input class="city-picker-search" id="cityPickerSearch" type="search" placeholder="Search for your city" autocomplete="off"/>
+    <div class="city-picker-grid" id="cityPickerGrid"></div>
+  </div>
+</div>
 
 <main>
 
@@ -826,6 +852,31 @@
   })();
 </script>
 <script>
+  const cityPicker = document.getElementById('cityPicker');
+  const cityPickerGrid = document.getElementById('cityPickerGrid');
+  const cityPickerSearch = document.getElementById('cityPickerSearch');
+  const cities = ['Hyderabad','Vijayawada','Bengaluru','Chennai','Mumbai','Delhi','Pune','Kolkata','Ahmedabad','Surat','Kochi','Goa','Jaipur','Chandigarh','Visakhapatnam','Mysuru'];
+  const renderCityOptions = () => {
+    const query = cityPickerSearch.value.trim().toLowerCase();
+    const selected = localStorage.getItem('culturewaveCity') || 'Hyderabad';
+    const matches = cities.filter(city => city.toLowerCase().includes(query));
+    cityPickerGrid.innerHTML = matches.length ? matches.map(city => `<button class="city-picker-option${city === selected ? ' selected' : ''}" type="button" data-city="${city}">${city}</button>`).join('') : '<div style="grid-column:1/-1;text-align:center;color:#65728a;padding:1.5rem;">No cities found</div>';
+    cityPickerGrid.querySelectorAll('[data-city]').forEach(button => button.addEventListener('click', () => {
+      localStorage.setItem('culturewaveCity', button.dataset.city);
+      document.getElementById('mobileCityTrigger').textContent = button.dataset.city + '⌄';
+      cityPicker.classList.remove('open');
+      document.body.style.overflow = '';
+      window.location.reload();
+    }));
+  };
+  document.getElementById('mobileCityTrigger').addEventListener('click', () => { cityPicker.classList.add('open'); renderCityOptions(); cityPickerSearch.focus(); document.body.style.overflow = 'hidden'; });
+  document.getElementById('cityPickerClose').addEventListener('click', () => { cityPicker.classList.remove('open'); document.body.style.overflow = ''; });
+  cityPicker.addEventListener('click', event => { if(event.target === cityPicker){ cityPicker.classList.remove('open'); document.body.style.overflow = ''; } });
+  cityPickerSearch.addEventListener('input', renderCityOptions);
+  const savedCity = localStorage.getItem('culturewaveCity');
+  if(savedCity) document.getElementById('mobileCityTrigger').textContent = savedCity + '⌄';
+  document.getElementById('themeToggle').addEventListener('click', () => { document.body.classList.toggle('header-dark-mode'); });
+
   const ham = document.getElementById('hamburger');
   const mNav = document.getElementById('mobileNav');
   ham.addEventListener('click', () => {
