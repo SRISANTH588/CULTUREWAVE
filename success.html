@@ -339,7 +339,7 @@
             </div>
             <div class="sc-detail">
               <span class="sc-detail-label">Issued by</span>
-              <span class="sc-detail-value">CultureWave</span>
+              <span class="sc-detail-value" id="dIssuedBy">CultureWave</span>
             </div>
           </div>
 
@@ -457,27 +457,60 @@
         }
         const snap = await firebase.firestore().collection('events').doc(eventId).get();
         if (!snap.exists) return;
-        const design = snap.data().ticketDesign || {};
+        const d = snap.data();
+        const design = d.ticketDesign || {};
+        const g1 = design.gradientStart || '#1242c5';
+        const g2 = design.gradientEnd   || '#2f6bff';
+
+        // Apply gradient to ticket top
         const top = document.querySelector('.sc-ticket-top');
-        if (design.gradientStart && design.gradientEnd && top) {
-          top.style.background = `linear-gradient(135deg,${design.gradientStart},${design.gradientEnd})`;
+        if (top) top.style.background = `linear-gradient(135deg,${g1},${g2})`;
+
+        // Apply logo
+        const logoEl = document.getElementById('ticketEmoji');
+        if (logoEl) {
+          if (design.showLogo !== false && design.logoUrl) {
+            logoEl.textContent = '';
+            const img = document.createElement('img');
+            img.src = design.logoUrl;
+            img.alt = 'Organiser logo';
+            img.crossOrigin = 'anonymous';
+            img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:14px;';
+            logoEl.appendChild(img);
+          } else if (design.showLogo === false) {
+            logoEl.style.display = 'none';
+          }
         }
-        const logo = document.getElementById('ticketEmoji');
-        if (logo && design.showLogo !== false && design.logoUrl) {
-          logo.textContent = '';
-          const img = document.createElement('img');
-          img.src = design.logoUrl; img.alt = 'Organiser logo';
-          img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:14px;';
-          logo.appendChild(img);
+
+        // Apply organiser name to issued-by field
+        if (design.organiserName) {
+          const issuedEl = document.getElementById('dIssuedBy');
+          if (issuedEl) issuedEl.textContent = design.organiserName;
         }
-        if (design.showLogo === false && logo) logo.style.display = 'none';
-        if (design.showVenue === false) document.getElementById('ticketVenue').style.display = 'none';
-        if (design.showQR === false) document.querySelector('.sc-qr-wrap').style.display = 'none';
+
+        // Apply tagline + footer as custom message
         const message = document.getElementById('ticketCustomMessage');
         if (message && (design.tagline || design.footer)) {
           message.textContent = [design.tagline, design.footer].filter(Boolean).join(' · ');
           message.style.display = 'block';
         }
+
+        // Hide QR if disabled
+        if (design.showQR === false) {
+          const qrWrap = document.querySelector('.sc-qr-wrap');
+          if (qrWrap) qrWrap.style.display = 'none';
+        }
+
+        // Hide venue if disabled
+        if (design.showVenue === false) {
+          const venueEl = document.getElementById('ticketVenue');
+          if (venueEl) venueEl.style.display = 'none';
+        }
+
+        // Update venue from event data
+        const venueEl = document.getElementById('ticketVenue');
+        if (venueEl && d.venueName) venueEl.textContent = d.venueName + (d.city ? ', ' + d.city : '');
+
       } catch (error) {
         console.warn('Could not load event ticket design:', error);
       }
@@ -558,12 +591,15 @@
       const btn = document.getElementById("btnDownload");
       btn.textContent = "⏳ Generating...";
       btn.disabled = true;
-      // temporarily hide any external <img> (QR fallback) to avoid CORS block
-      const extImgs = document.querySelectorAll("#scTicket img[src^='http']");
-      extImgs.forEach(img => img.style.visibility = "hidden");
       try {
+        // Wait for all images inside ticket to load
+        const imgs = document.querySelectorAll("#scTicket img");
+        await Promise.all(Array.from(imgs).map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(res => { img.onload = res; img.onerror = res; });
+        }));
         const canvas = await html2canvas(document.getElementById("scTicket"), {
-          scale: 2, useCORS: true, allowTaint: true, backgroundColor: "#ffffff",
+          scale: 2, useCORS: true, allowTaint: false, backgroundColor: "#ffffff",
           logging: false
         });
         const link = document.createElement("a");
@@ -573,7 +609,6 @@
       } catch(e) {
         alert("Download failed. Please take a screenshot instead.");
       }
-      extImgs.forEach(img => img.style.visibility = "");
       btn.textContent = "⬇️ Download Ticket";
       btn.disabled = false;
     });

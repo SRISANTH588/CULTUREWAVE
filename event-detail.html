@@ -334,8 +334,14 @@ let selectedTicketIndex = 0;
 
 function selectTicket(i){
   selectedTicketIndex = i;
-  document.querySelectorAll('.ticket-card').forEach((el,idx)=>{
+  const allCards = document.querySelectorAll('.ticket-card');
+  const td = evData.ticketDesign || {};
+  const g1 = td.gradientStart || '#1242c5';
+  allCards.forEach((el,idx)=>{
     el.classList.toggle('selected', idx === i);
+    el.style.border = idx === i ? `2px solid ${g1}` : '1.5px solid var(--border)';
+    const indicator = el.querySelector('span');
+    if(indicator) indicator.textContent = idx === i ? 'Selected' : 'Click to select';
   });
   const t = (evData.tickets||[])[i] || {};
   const price = Number(t.price || 0);
@@ -404,19 +410,67 @@ function renderEvent(data){
     document.getElementById('descSection').style.display = 'block';
   }
 
-  // tickets
+  // tickets — show designed ticket card
   const tickets = data.tickets||[];
+  const td = data.ticketDesign || {};
+  const g1 = td.gradientStart || '#1242c5';
+  const g2 = td.gradientEnd || '#2f6bff';
+  const logoUrl = td.logoUrl || '';
+  const orgName = td.organiserName || '';
+  const tagline = td.tagline || '';
+  const footer  = td.footer || '';
+  const showQR    = td.showQR    !== false;
+  const showSeat  = td.showSeat  !== false;
+  const showVenue = td.showVenue !== false;
+  const showLogo  = td.showLogo  !== false;
+
   if(tickets.length){
-    document.getElementById('ticketsList').innerHTML = tickets.map((t,i)=>`
-      <div class="ticket-card ${i===0?'selected':''}" onclick="selectTicket(${i})">
-        <div class="ticket-radio"></div>
-        <div style="flex:1;">
-          <div class="ticket-name">${esc(t.name||'General Admission')}</div>
-          ${t.description?`<div class="ticket-desc">${esc(t.description)}</div>`:''}
-          ${t.qty?`<div class="ticket-desc">${Number(t.qty).toLocaleString('en-IN')} seats available</div>`:''}
+    document.getElementById('ticketsList').innerHTML = tickets.map((t,i)=>{
+      const price = t.price ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
+      const firstDate = Array.isArray(data.eventDates) && data.eventDates[0];
+      const dateLabel = firstDate ? new Date(firstDate.date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : (data.startDate ? fmtDate(data.startDate) : 'Date TBA');
+      const venueLabel = data.venueName || data.city || 'Venue TBA';
+      return `
+      <div class="ticket-card ${i===0?'selected':''}" onclick="selectTicket(${i})" style="padding:0;overflow:hidden;border:${i===0?'2px solid '+g1:'1.5px solid var(--border)'}">
+        <!-- Ticket header -->
+        <div style="background:linear-gradient(135deg,${g1},${g2});padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;position:relative;">
+          ${showLogo && logoUrl ? `<img src="${esc(logoUrl)}" style="width:38px;height:38px;border-radius:9px;object-fit:contain;background:rgba(255,255,255,.15);flex:none;"/>` : `<div style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:1.1rem;flex:none;">&#127915;</div>`}
+          <div style="flex:1;">
+            <div style="font-size:.95rem;font-weight:800;color:#fff;letter-spacing:-.02em;">${esc(data.name||'Event')}</div>
+            ${showVenue ? `<div style="font-size:.72rem;color:rgba(255,255,255,.75);margin-top:.15rem;">&#128205; ${esc(venueLabel)}</div>` : ''}
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:.72rem;font-weight:800;color:rgba(255,255,255,.7);background:rgba(255,255,255,.15);border-radius:999px;padding:.18rem .55rem;">${esc(t.name||'General Admission')}</div>
+            ${showSeat ? `<div style="font-size:.65rem;color:rgba(255,255,255,.6);margin-top:.2rem;">Seat #001</div>` : ''}
+          </div>
         </div>
-        <div class="ticket-price">${t.price?`₹${Number(t.price).toLocaleString('en-IN')}`:'Free'}<br/><small>${t.qty?Number(t.qty).toLocaleString('en-IN')+' left':''}</small></div>
-      </div>`).join('');
+        <!-- Tear line -->
+        <div style="display:flex;align-items:center;border-top:2px dashed #e2eafc;position:relative;">
+          <div style="width:1.2rem;height:1.2rem;border-radius:50%;background:#f4f8ff;border:1.5px solid #e2eafc;margin-left:-.65rem;"></div>
+          <div style="flex:1;"></div>
+          <div style="width:1.2rem;height:1.2rem;border-radius:50%;background:#f4f8ff;border:1.5px solid #e2eafc;margin-right:-.65rem;"></div>
+        </div>
+        <!-- Ticket body -->
+        <div style="padding:.85rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#fff;">
+          <div>
+            <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.2rem;">Date</div>
+            <div style="font-size:.88rem;font-weight:800;color:#0a0f1e;">${dateLabel}</div>
+            ${tagline ? `<div style="font-size:.7rem;color:#64748b;font-style:italic;margin-top:.3rem;">${esc(tagline)}</div>` : ''}
+            ${footer ? `<div style="font-size:.65rem;color:#9ca3af;margin-top:.15rem;">${esc(footer)}</div>` : ''}
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:1.1rem;font-weight:900;color:${g1};">${price}</div>
+            ${t.qty ? `<div style="font-size:.7rem;color:#9ca3af;">${Number(t.qty).toLocaleString('en-IN')} seats</div>` : ''}
+            ${showQR ? `<div style="width:44px;height:44px;background:#0a0f1e;border-radius:7px;display:grid;place-items:center;margin-top:.4rem;margin-left:auto;"><svg width="34" height="34" viewBox="0 0 44 44" fill="none"><rect x="0" y="0" width="18" height="18" rx="2" fill="white"/><rect x="4" y="4" width="10" height="10" rx="1" fill="#0f172a"/><rect x="26" y="0" width="18" height="18" rx="2" fill="white"/><rect x="30" y="4" width="10" height="10" rx="1" fill="#0f172a"/><rect x="0" y="26" width="18" height="18" rx="2" fill="white"/><rect x="4" y="30" width="10" height="10" rx="1" fill="#0f172a"/><rect x="26" y="26" width="4" height="4" fill="white"/><rect x="32" y="26" width="4" height="4" fill="white"/><rect x="38" y="26" width="6" height="4" fill="white"/><rect x="26" y="32" width="6" height="4" fill="white"/><rect x="34" y="32" width="4" height="4" fill="white"/></svg></div>` : ''}
+          </div>
+        </div>
+        <!-- Select indicator -->
+        <div style="padding:.5rem 1.1rem;background:#f8fafc;border-top:1px solid #f0f2f8;display:flex;align-items:center;gap:.5rem;">
+          <div class="ticket-radio"></div>
+          <span style="font-size:.74rem;font-weight:700;color:#64748b;">${i===0?'Selected':'Click to select'}</span>
+        </div>
+      </div>`;
+    }).join('');
     document.getElementById('ticketsSection').style.display = 'block';
   }
 
