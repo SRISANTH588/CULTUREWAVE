@@ -2179,6 +2179,7 @@ function updateProgress() {
   updateAlert();
   updateTopTitle();
   markDoneSteps();
+  if (typeof updateTicketPreview === 'function') updateTicketPreview();
   scheduleDraftSave();
 }
 
@@ -2995,6 +2996,10 @@ window.loadTicketBanner = function(input) {
 window.updateTicketPreview = function() {
   const evName = document.getElementById('eventName')?.value.trim() || 'Event Name';
   const venue = document.getElementById('venueName')?.value.trim() || 'Venue';
+  const firstDate = Array.isArray(eventDates) ? eventDates[0] : null;
+  const firstSlot = firstDate?.slots?.[0];
+  const dateText = firstDate?.date ? fmtDate(firstDate.date) : 'Date';
+  const timeText = firstSlot?.start ? fmtTime(firstSlot.start) + (firstSlot.end ? ' - ' + fmtTime(firstSlot.end) : '') : 'Time';
   const tagline = document.getElementById('tdTagline')?.value.trim() || '';
   const footer = document.getElementById('tdFooter')?.value.trim() || '';
   const showQR = document.getElementById('tdShowQR')?.classList.contains('on');
@@ -3003,6 +3008,7 @@ window.updateTicketPreview = function() {
   const showLogo = document.getElementById('tdShowLogo')?.classList.contains('on');
   const el = id => document.getElementById(id);
   if (el('tpEventName')) el('tpEventName').textContent = evName;
+  if (el('tpDate')) el('tpDate').textContent = '\uD83D\uDCC5 ' + dateText + ' · ' + timeText;
   if (el('tpVenue')) { el('tpVenue').style.display = showVenue ? '' : 'none'; el('tpVenue').textContent = '\uD83D\uDCCD ' + venue; }
   if (el('tpSeatBadge')) el('tpSeatBadge').style.display = showSeat ? '' : 'none';
   if (el('tpQRBlock')) el('tpQRBlock').style.display = showQR ? '' : 'none';
