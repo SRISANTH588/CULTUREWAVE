@@ -922,15 +922,30 @@
     <!-- STEP 5: SEATING PLAN -->
     <div class="step-panel" data-panel="4">
       <div class="card">
-        <div class="card-head"><h2>Seating Plan</h2><p>Upload a venue seating map so customers can see where their seats are located.</p></div>
-        <div class="upload-zone" onclick="document.getElementById('seatingPlanInput').click()" style="padding:1.2rem;">
-          <strong style="font-size:0.84rem;">Click to upload seating plan</strong>
-          <span>PNG, JPG &middot; max 5 MB</span>
+        <div class="card-head"><h2>Seating Plan</h2><p>Create a simple seat map here or upload an existing venue plan for customers.</p></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-bottom:1rem;">
+          <button id="seatingBuilderTab" type="button" onclick="setSeatingPlanMode('builder')" style="text-align:left;padding:.9rem;border:2px solid var(--blue);border-radius:14px;background:var(--blue-light);cursor:pointer;color:inherit;"><strong style="display:block;font-size:.84rem;">Create on website</strong><span style="display:block;font-size:.72rem;color:var(--muted);margin-top:.25rem;">Build rows and numbered seats</span></button>
+          <button id="seatingUploadTab" type="button" onclick="setSeatingPlanMode('image')" style="text-align:left;padding:.9rem;border:2px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;color:inherit;"><strong style="display:block;font-size:.84rem;">Upload an image</strong><span style="display:block;font-size:.72rem;color:var(--muted);margin-top:.25rem;">Use a venue map from ImageKit</span></button>
         </div>
-        <input type="file" id="seatingPlanInput" accept="image/*" style="display:none;" onchange="loadSeatingPlan(this)" />
-        <input id="seatingPlanUrl" type="url" placeholder="Or paste seating plan image URL" oninput="syncSeatingPlan()" style="margin-top:.6rem;" />
-        <img id="seatingPlanPreview" src="" alt="Seating plan preview" style="display:none;max-width:100%;max-height:420px;object-fit:contain;margin-top:.75rem;border:1px solid var(--border);border-radius:12px;" />
-        <button id="seatingPlanRemoveBtn" type="button" onclick="removeSeatingPlan()" style="display:none;margin-top:.5rem;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;">Remove seating plan</button>
+        <div id="seatingBuilderPanel">
+          <div class="grid-2" style="margin-bottom:.75rem;">
+            <div class="field"><label for="seatingStageLabel">Stage label</label><input id="seatingStageLabel" value="STAGE" placeholder="e.g. Main Stage" oninput="updateSeatingMeta('stage', this.value)" /></div>
+            <div class="field"><label for="seatingPlanTitle">Plan title</label><input id="seatingPlanTitle" value="Venue Seating Plan" placeholder="e.g. Auditorium Layout" oninput="updateSeatingMeta('title', this.value)" /></div>
+          </div>
+          <div id="seatingRowsList" style="display:flex;flex-direction:column;gap:.55rem;"></div>
+          <button type="button" onclick="addSeatingRow()" style="margin-top:.7rem;background:var(--blue-light);color:var(--blue);border:1px solid rgba(20,84,255,.18);border-radius:9px;padding:.45rem .75rem;font-size:.76rem;font-weight:800;cursor:pointer;">+ Add row</button>
+          <div id="seatingBuilderPreview" style="margin-top:1rem;padding:1rem;border:1px solid var(--border);border-radius:14px;background:#f8faff;"></div>
+        </div>
+        <div id="seatingImagePanel" style="display:none;">
+          <div class="upload-zone" onclick="document.getElementById('seatingPlanInput').click()" style="padding:1.2rem;">
+            <strong style="font-size:0.84rem;">Click to upload seating plan</strong>
+            <span>PNG, JPG &middot; max 5 MB</span>
+          </div>
+          <input type="file" id="seatingPlanInput" accept="image/*" style="display:none;" onchange="loadSeatingPlan(this)" />
+          <input id="seatingPlanUrl" type="url" placeholder="Or paste seating plan image URL" oninput="syncSeatingPlan()" style="margin-top:.6rem;" />
+          <img id="seatingPlanPreview" src="" alt="Seating plan preview" style="display:none;max-width:100%;max-height:420px;object-fit:contain;margin-top:.75rem;border:1px solid var(--border);border-radius:12px;" />
+          <button id="seatingPlanRemoveBtn" type="button" onclick="removeSeatingPlan()" style="display:none;margin-top:.5rem;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;">Remove seating plan</button>
+        </div>
       </div>
       <div class="step-actions">
         <button class="btn-ghost" onclick="goStep(3)">&#8592; Back</button>
@@ -1849,6 +1864,151 @@ let cardImgFile = null;
 let logoFile = null;
 let seatingPlanFile = null;
 let ticketDeliveryMode = 'show';
+let seatingPlanMode = 'builder';
+let seatingPlanLayout = {
+  title: 'Venue Seating Plan',
+  stage: 'STAGE',
+  rows: [],
+};
+let draftSaveTimer = null;
+const localDraftKey = 'culturewave:event-create:draft';
+
+function scheduleDraftSave() {
+  if (new URLSearchParams(location.search).get('eventId')) return;
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(saveLocalDraft, 250);
+}
+
+function saveLocalDraft() {
+  if (new URLSearchParams(location.search).get('eventId')) return;
+  try {
+    const fields = {};
+    document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
+      if (el.type !== 'file') fields[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+    });
+    const toggles = {};
+    document.querySelectorAll('.toggle[id]').forEach(el => { toggles[el.id] = el.classList.contains('on'); });
+    localStorage.setItem(localDraftKey, JSON.stringify({
+      fields, toggles, eventType, eventDates, tickets, coupons, faqs, galleryImages,
+      ticketMode, perDateTickets, ticketDeliveryMode, ticketDesign, rsvpCQs,
+      seatingPlanMode, seatingPlanLayout,
+      savedAt: Date.now(),
+    }));
+  } catch (error) {
+    console.warn('Could not save local event draft:', error);
+  }
+}
+
+function restoreLocalDraft() {
+  if (new URLSearchParams(location.search).get('eventId')) return;
+  try {
+    const raw = localStorage.getItem(localDraftKey);
+    if (!raw) return;
+    const draft = JSON.parse(raw);
+    Object.entries(draft.fields || {}).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el && el.type !== 'file') el[el.type === 'checkbox' ? 'checked' : 'value'] = value;
+    });
+    Object.entries(draft.toggles || {}).forEach(([id, on]) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('on', Boolean(on));
+    });
+    if (draft.eventType) { eventType = draft.eventType; setEventType(eventType); }
+    if (Array.isArray(draft.eventDates)) { eventDates = draft.eventDates; renderDateCards(); }
+    if (Array.isArray(draft.tickets)) { tickets = draft.tickets; renderTickets(); }
+    if (Array.isArray(draft.coupons)) { coupons = draft.coupons; renderCoupons(); }
+    if (Array.isArray(draft.faqs)) { faqs = draft.faqs; renderFaqs(); }
+    if (Array.isArray(draft.galleryImages)) { galleryImages = draft.galleryImages; renderGallery(); }
+    if (draft.ticketMode) setTicketMode(draft.ticketMode);
+    if (draft.perDateTickets) perDateTickets = draft.perDateTickets;
+    if (draft.ticketDeliveryMode) setTicketDelivery(draft.ticketDeliveryMode);
+    if (draft.seatingPlanLayout) seatingPlanLayout = draft.seatingPlanLayout;
+    if (draft.seatingPlanMode) setSeatingPlanMode(draft.seatingPlanMode);
+    if (draft.ticketDesign) {
+      ticketDesign = draft.ticketDesign;
+      applyThemeToPreview(ticketDesign.g1, ticketDesign.g2);
+    }
+    if (Array.isArray(draft.rsvpCQs)) { rsvpCQs = draft.rsvpCQs; renderRsvpCQs(); }
+    showCardImg(document.getElementById('cardImgUrl').value.trim());
+    showCoverPreview(document.getElementById('coverUrl').value.trim());
+    showLogoPreview(document.getElementById('logoUrl').value.trim());
+    showSeatingPlan(document.getElementById('seatingPlanUrl').value.trim());
+    renderSeatingBuilder();
+  } catch (error) {
+    console.warn('Could not restore local event draft:', error);
+  }
+}
+
+function renderSeatingBuilder() {
+  const list = document.getElementById('seatingRowsList');
+  const preview = document.getElementById('seatingBuilderPreview');
+  if (!list || !preview) return;
+  const rows = seatingPlanLayout.rows || [];
+  list.innerHTML = rows.map((row, index) => `
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.55rem;align-items:end;padding:.65rem;border:1px solid var(--border);border-radius:11px;background:#fff;">
+      <div class="field"><label>Row name</label><input value="${row.label || ''}" oninput="updateSeatingRow(${index}, 'label', this.value)" /></div>
+      <div class="field"><label>Seats in row</label><input type="number" min="1" max="100" value="${Number(row.seats || 1)}" oninput="updateSeatingRow(${index}, 'seats', this.value)" /></div>
+      <button type="button" onclick="removeSeatingRow(${index})" style="background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.48rem .6rem;font-weight:800;cursor:pointer;">Remove</button>
+    </div>`).join('');
+  const title = document.getElementById('seatingPlanTitle');
+  const stage = document.getElementById('seatingStageLabel');
+  if (title && title.value !== seatingPlanLayout.title) title.value = seatingPlanLayout.title || 'Venue Seating Plan';
+  if (stage && stage.value !== seatingPlanLayout.stage) stage.value = seatingPlanLayout.stage || 'STAGE';
+  preview.innerHTML = `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${seatingPlanLayout.stage || 'STAGE'}</div>` +
+    (rows.length ? rows.map(row => {
+      const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
+      return `<div style="display:flex;align-items:center;gap:.45rem;margin:.45rem 0;"><span style="width:24px;font-size:.72rem;font-weight:900;color:var(--muted);">${row.label || ''}</span><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.3rem;flex:1;">${Array.from({length: count}, (_, i) => `<span style="display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:#e8efff;color:#1242c5;font-size:.62rem;font-weight:800;">${row.label || ''}${i + 1}</span>`).join('')}</div></div>`;
+    }).join('') : '<p style="text-align:center;color:var(--muted);font-size:.78rem;">Add a row to preview the seating plan.</p>');
+}
+
+window.setSeatingPlanMode = function(mode) {
+  seatingPlanMode = mode === 'image' ? 'image' : 'builder';
+  const builder = document.getElementById('seatingBuilderPanel');
+  const image = document.getElementById('seatingImagePanel');
+  const builderTab = document.getElementById('seatingBuilderTab');
+  const imageTab = document.getElementById('seatingUploadTab');
+  if (builder) builder.style.display = seatingPlanMode === 'builder' ? '' : 'none';
+  if (image) image.style.display = seatingPlanMode === 'image' ? '' : 'none';
+  if (builderTab) { builderTab.style.borderColor = seatingPlanMode === 'builder' ? 'var(--blue)' : 'var(--border)'; builderTab.style.background = seatingPlanMode === 'builder' ? 'var(--blue-light)' : '#fff'; }
+  if (imageTab) { imageTab.style.borderColor = seatingPlanMode === 'image' ? 'var(--blue)' : 'var(--border)'; imageTab.style.background = seatingPlanMode === 'image' ? 'var(--blue-light)' : '#fff'; }
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.updateSeatingRow = function(index, key, value) {
+  if (!seatingPlanLayout.rows[index]) return;
+  seatingPlanLayout.rows[index][key] = key === 'seats' ? Math.max(1, Math.min(100, Number(value) || 1)) : value.trim().slice(0, 12);
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.addSeatingRow = function() {
+  const next = String.fromCharCode(65 + seatingPlanLayout.rows.length);
+  seatingPlanLayout.rows.push({ label: next, seats: 8 });
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.removeSeatingRow = function(index) {
+  seatingPlanLayout.rows.splice(index, 1);
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.updateSeatingMeta = function(key, value) {
+  seatingPlanLayout[key] = value.trim().slice(0, 80);
+  renderSeatingBuilder();
+  updateProgress();
+};
+
+async function uploadSelectedImage(file, folder, urlId, clearPending, render) {
+  try {
+    const url = await uploadImageToImageKit(file, folder);
+    document.getElementById(urlId).value = url;
+    clearPending();
+    render(url);
+    updateProgress();
+    saveLocalDraft();
+  } catch (error) {
+    console.warn('Image upload will retry when the event is saved:', error);
+  }
+}
 
 // ── AUTH ──
 async function loadUser() {
@@ -1910,6 +2070,11 @@ loadUser();
     if (d.seatingPlanUrl) {
       set('seatingPlanUrl', d.seatingPlanUrl);
       showSeatingPlan(d.seatingPlanUrl);
+    }
+    if (d.seatingPlan) {
+      seatingPlanLayout = d.seatingPlan;
+      setSeatingPlanMode(d.seatingPlanMode || 'builder');
+      renderSeatingBuilder();
     }
     if (d.cardImgUrl || d.ticketDesign?.cardImg) {
       const url = d.cardImgUrl || d.ticketDesign?.cardImg;
@@ -2007,6 +2172,7 @@ function updateProgress() {
   updateAlert();
   updateTopTitle();
   markDoneSteps();
+  scheduleDraftSave();
 }
 
 function markDoneSteps() {
@@ -2015,7 +2181,7 @@ function markDoneSteps() {
     document.getElementById('city').value.trim() || document.getElementById('onlineLink').value.trim(),
     document.getElementById('startDate').value,
     tickets.length > 0,
-    document.getElementById('seatingPlanUrl').value.trim() || (document.getElementById('seatingPlanInput').files && document.getElementById('seatingPlanInput').files.length > 0),
+    (seatingPlanMode === 'builder' && seatingPlanLayout.rows && seatingPlanLayout.rows.length > 0) || document.getElementById('seatingPlanUrl').value.trim() || (document.getElementById('seatingPlanInput').files && document.getElementById('seatingPlanInput').files.length > 0),
     document.getElementById('coverUrl').value.trim() || (document.getElementById('coverInput').files && document.getElementById('coverInput').files.length > 0) || galleryImages.length > 0,
     true, true, true, true, true, true, true,
   ];
@@ -2106,6 +2272,7 @@ window.loadCardImg = function(input) {
   const r = new FileReader();
   r.onload = e => { document.getElementById('cardImgUrl').value = ''; showCardImg(e.target.result); };
   r.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-cards', 'cardImgUrl', () => { cardImgFile = null; }, showCardImg);
 };
 window.syncCardImgUrl = function() { showCardImg(document.getElementById('cardImgUrl').value); };
 window.removeCardImg = function() {
@@ -2124,6 +2291,7 @@ window.handleCardImgDrop = function(e) {
   const r = new FileReader();
   r.onload = ev => showCardImg(ev.target.result);
   r.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-cards', 'cardImgUrl', () => { cardImgFile = null; }, showCardImg);
 };
 
 function showLogoPreview(src) {
@@ -2147,6 +2315,7 @@ window.loadLogoFile = function(input) {
   const reader = new FileReader();
   reader.onload = e => { document.getElementById('logoUrl').value = ''; showLogoPreview(e.target.result); };
   reader.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-logos', 'logoUrl', () => { logoFile = null; }, showLogoPreview);
 };
 window.syncLogoUrl = function() { showLogoPreview(document.getElementById('logoUrl').value.trim()); };
 window.removeLogo = function() {
@@ -2168,6 +2337,7 @@ window.loadSeatingPlan = function(input) {
   const reader = new FileReader();
   reader.onload = e => { document.getElementById('seatingPlanUrl').value = ''; showSeatingPlan(e.target.result); };
   reader.readAsDataURL(file);
+  uploadSelectedImage(file, '/seating-plans', 'seatingPlanUrl', () => { seatingPlanFile = null; }, showSeatingPlan);
 };
 window.syncSeatingPlan = function() { showSeatingPlan(document.getElementById('seatingPlanUrl').value.trim()); };
 window.removeSeatingPlan = function() {
@@ -2210,6 +2380,7 @@ window.loadCoverFile = function(input) {
   const r = new FileReader();
   r.onload = e => { document.getElementById('coverUrl').value = ''; showCoverPreview(e.target.result); updateProgress(); };
   r.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-covers', 'coverUrl', () => { coverFile = null; }, showCoverPreview);
 };
 window.syncCoverUrl = function() {
   showCoverPreview(document.getElementById('coverUrl').value);
@@ -2231,6 +2402,7 @@ window.handleCoverDrop = function(e) {
   const r = new FileReader();
   r.onload = ev => { showCoverPreview(ev.target.result); updateProgress(); };
   r.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-covers', 'coverUrl', () => { coverFile = null; }, showCoverPreview);
 };
 
 // ── MEDIA: Gallery ──
@@ -2575,6 +2747,8 @@ async function saveEvent(status) {
     cardImgUrl: document.getElementById('cardImgUrl').value.trim(),
     coverUrl: document.getElementById('coverUrl').value.trim(),
     seatingPlanUrl: document.getElementById('seatingPlanUrl').value.trim(),
+    seatingPlanMode,
+    seatingPlan: seatingPlanMode === 'builder' && seatingPlanLayout.rows.length ? seatingPlanLayout : null,
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
     customQuestion: (document.getElementById('customQ') ? document.getElementById('customQ').value.trim() : ''),
@@ -2623,9 +2797,11 @@ async function saveEvent(status) {
     if (editId) {
       const {createdAt, ...updatePayload} = payload;
       await db.collection('events').doc(editId).update({...updatePayload, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
+      localStorage.removeItem(localDraftKey);
       window.location.href = 'event-manage.html?eventId=' + editId;
     } else {
       await addDoc(collection(db, 'events'), payload);
+      localStorage.removeItem(localDraftKey);
       window.location.href = 'premium-client-dashboard.html';
     }
   } catch (err) {
@@ -3138,6 +3314,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── RSVP step helpers ──
+document.addEventListener('input', scheduleDraftSave);
+document.addEventListener('change', scheduleDraftSave);
+document.addEventListener('click', e => {
+  if (e.target.closest('.toggle')) scheduleDraftSave();
+});
+restoreLocalDraft();
 updateProgress();
 renderRsvpPreview();
 

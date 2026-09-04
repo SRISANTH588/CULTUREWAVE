@@ -1,5 +1,5 @@
 import http from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, access } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHmac, randomUUID } from "node:crypto";
@@ -9,6 +9,20 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const publicDir = __dirname;
 const orders = new Map();
 const sessions = new Map();
+
+// Load local secrets without adding a runtime dependency. Production should
+// provide the same values through the hosting platform environment settings.
+try {
+  await access(join(__dirname, ".env"));
+  const envFile = await readFile(join(__dirname, ".env"), "utf8");
+  for (const line of envFile.split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!match || process.env[match[1]]) continue;
+    process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, "$2");
+  }
+} catch {
+  // Missing .env is expected when the host supplies environment variables.
+}
 
 if (!admin.getApps().length) {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
@@ -417,7 +431,13 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && extname(url.pathname)) {
     try {
       const filePath = join(publicDir, url.pathname.slice(1));
-      const file = await readFile(filePath, "utf8");
+      let file = await readFile(filePath, "utf8");
+      if (!file.includes('firebase-config.js') && file.includes('</head>')) {
+        file = file.replace(
+          '</head>',
+          '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="firebase-config.js"></script></head>'
+        );
+      }
       const contentType = mimeTypes[extname(url.pathname)] || "text/plain; charset=utf-8";
       return send(res, 200, file, { "Content-Type": contentType });
     } catch {

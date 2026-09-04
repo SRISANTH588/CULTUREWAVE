@@ -189,6 +189,7 @@
       <p style="font-size:.84rem;color:#64748b;margin-bottom:.75rem;">See the venue layout before choosing your booking.</p>
       <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:.75rem;overflow:auto;">
         <img id="seatingPlanImage" src="" alt="Event seating plan" style="display:block;width:100%;max-height:620px;object-fit:contain;border-radius:10px;" />
+        <div id="seatingPlanBuilder" style="display:none;"></div>
       </div>
     </div>
 
@@ -314,6 +315,15 @@ function goToProfile(){
   if(ownerUid) location.href = `client-profile.html?uid=${ownerUid}`;
 }
 
+function renderSeatingLayout(layout, target){
+  if(!target) return;
+  const rows = Array.isArray(layout.rows) ? layout.rows : [];
+  target.innerHTML = `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${esc(layout.stage || 'STAGE')}</div>` + rows.map(row => {
+    const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
+    return `<div style="display:flex;align-items:center;gap:.45rem;margin:.45rem 0;min-width:420px;"><span style="width:24px;font-size:.72rem;font-weight:900;color:#64748b;">${esc(row.label || '')}</span><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.3rem;flex:1;">${Array.from({length:count},(_,i)=>`<span style="display:grid;place-items:center;width:30px;height:30px;border-radius:7px;background:#e8efff;color:#1242c5;font-size:.62rem;font-weight:800;">${esc(row.label || '')}${i+1}</span>`).join('')}</div></div>`;
+  }).join('');
+}
+
 function register(){
   if(!eventId) return;
   const tickets = Array.isArray(evData.tickets) && evData.tickets.length ? evData.tickets : [];
@@ -328,6 +338,7 @@ function register(){
     ticketPrice: String(price),
     eventPrice: String(Number(evData.price || 0)),
     seatingPlanUrl: evData.seatingPlanUrl || '',
+    seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
   });
   location.href = `booking.html?${qs.toString()}`;
 }
@@ -390,6 +401,11 @@ function renderEvent(data){
 
   if(data.seatingPlanUrl){
     document.getElementById('seatingPlanImage').src = data.seatingPlanUrl;
+    document.getElementById('seatingPlanSection').style.display = 'block';
+  } else if (data.seatingPlan && Array.isArray(data.seatingPlan.rows)) {
+    renderSeatingLayout(data.seatingPlan, document.getElementById('seatingPlanBuilder'));
+    document.getElementById('seatingPlanImage').style.display = 'none';
+    document.getElementById('seatingPlanBuilder').style.display = 'block';
     document.getElementById('seatingPlanSection').style.display = 'block';
   }
 
