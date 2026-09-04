@@ -324,7 +324,7 @@
       const shortId = bookingId.slice(-10).toUpperCase();
       const name   = data.customerName || data.customer?.name || "Guest";
       const event  = data.eventName    || data.event?.name    || "—";
-      const seats  = data.seats        || "1";
+      const seats  = data.seatIds && data.seatIds.length ? data.seatIds.join(", ") : (data.seats || "1");
       const amount = data.amount ? "₹" + Number(data.amount).toLocaleString("en-IN") : "Free";
       const type   = data.bookingType  || "event";
 
