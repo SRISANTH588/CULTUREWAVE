@@ -12,6 +12,8 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <!-- html2canvas for download -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
     body { background: #f4f8ff; }
 
@@ -341,6 +343,8 @@
             </div>
           </div>
 
+          <div id="ticketCustomMessage" style="display:none;grid-column:1/-1;padding:.75rem 1rem;background:#f8fafc;border-radius:12px;font-size:.78rem;color:#475569;font-style:italic;"></div>
+
           <div class="sc-qr-wrap">
             <div class="sc-qr-box">
               <canvas id="qrCanvas"></canvas>
@@ -405,6 +409,7 @@
     const amount     = params.get("amount")    || "—";
     const status     = (params.get("status")   || "").toLowerCase();
     const bkType     = params.get("type")      || "event";
+    const eventId    = params.get("eventId")  || "";
     const bkDate     = params.get("date")      || "";
     const bkTime     = params.get("time")      || "";
     const isRestaurant = bkType === "restaurant";
@@ -436,6 +441,47 @@
     const venue = eventVenues[eventName] || "Hyderabad";
     const dateStr = new Date().toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
     const shortId = bookingId ? bookingId.slice(-10).toUpperCase() : "—";
+
+    async function applyEventTicketDesign() {
+      if (!eventId || !window.firebase) return;
+      try {
+        if (!firebase.apps.length) {
+          firebase.initializeApp({
+            apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+            authDomain: "ogshootsluxe-36740.firebaseapp.com",
+            projectId: "ogshootsluxe-36740",
+            storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+            messagingSenderId: "5471814825",
+            appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+          });
+        }
+        const snap = await firebase.firestore().collection('events').doc(eventId).get();
+        if (!snap.exists) return;
+        const design = snap.data().ticketDesign || {};
+        const top = document.querySelector('.sc-ticket-top');
+        if (design.gradientStart && design.gradientEnd && top) {
+          top.style.background = `linear-gradient(135deg,${design.gradientStart},${design.gradientEnd})`;
+        }
+        const logo = document.getElementById('ticketEmoji');
+        if (logo && design.showLogo !== false && design.logoUrl) {
+          logo.textContent = '';
+          const img = document.createElement('img');
+          img.src = design.logoUrl; img.alt = 'Organiser logo';
+          img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:14px;';
+          logo.appendChild(img);
+        }
+        if (design.showLogo === false && logo) logo.style.display = 'none';
+        if (design.showVenue === false) document.getElementById('ticketVenue').style.display = 'none';
+        if (design.showQR === false) document.querySelector('.sc-qr-wrap').style.display = 'none';
+        const message = document.getElementById('ticketCustomMessage');
+        if (message && (design.tagline || design.footer)) {
+          message.textContent = [design.tagline, design.footer].filter(Boolean).join(' · ');
+          message.style.display = 'block';
+        }
+      } catch (error) {
+        console.warn('Could not load event ticket design:', error);
+      }
+    }
 
     /* ── POPULATE ── */
     if (isSuccess) {
@@ -493,6 +539,7 @@
       if (isRestaurant) {
         document.getElementById("qrScanNote").textContent = "Staff scans at reception";
       }
+      applyEventTicketDesign();
 
     } else {
       // FAILED state

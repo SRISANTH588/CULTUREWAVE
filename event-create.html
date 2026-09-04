@@ -599,46 +599,51 @@
       </button>
       <button class="step-btn" data-step="4">
         <span class="step-num">5</span>
-        <div class="step-info"><strong>Ticket Design</strong><span>Style & branding</span></div>
+        <div class="step-info"><strong>Seating Plan</strong><span>Venue layout for customers</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="5">
         <span class="step-num">6</span>
-        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
+        <div class="step-info"><strong>Ticket Design</strong><span>Style & branding</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="6">
         <span class="step-num">7</span>
-        <div class="step-info"><strong>RSVP Form</strong><span>Attendee fields</span></div>
+        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="7">
         <span class="step-num">8</span>
-        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
+        <div class="step-info"><strong>RSVP Form</strong><span>Attendee fields</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="8">
         <span class="step-num">9</span>
-        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
+        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="9">
         <span class="step-num">10</span>
-        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
+        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="10">
         <span class="step-num">11</span>
-        <div class="step-info"><strong>Invite Only</strong><span>Access control & guests</span></div>
+        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="11">
         <span class="step-num">12</span>
-        <div class="step-info"><strong>Sold Out</strong><span>Mark & manage sold out</span></div>
+        <div class="step-info"><strong>Invite Only</strong><span>Access control & guests</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="12">
         <span class="step-num">13</span>
+        <div class="step-info"><strong>Sold Out</strong><span>Mark & manage sold out</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="13">
+        <span class="step-num">14</span>
         <div class="step-info"><strong>Settings</strong><span>Access & preferences</span></div>
         <span class="step-check"></span>
       </button>
@@ -907,14 +912,34 @@
           </div>
         </div>
       </div>
+
       <div class="step-actions">
         <button class="btn-ghost" onclick="goStep(2)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
+        <button class="btn-primary" onclick="goStep(4)">Next: Seating Plan &#8594;</button>
       </div>
     </div>
 
-    <!-- STEP 4: TICKET DESIGN -->
+    <!-- STEP 5: SEATING PLAN -->
     <div class="step-panel" data-panel="4">
+      <div class="card">
+        <div class="card-head"><h2>Seating Plan</h2><p>Upload a venue seating map so customers can see where their seats are located.</p></div>
+        <div class="upload-zone" onclick="document.getElementById('seatingPlanInput').click()" style="padding:1.2rem;">
+          <strong style="font-size:0.84rem;">Click to upload seating plan</strong>
+          <span>PNG, JPG &middot; max 5 MB</span>
+        </div>
+        <input type="file" id="seatingPlanInput" accept="image/*" style="display:none;" onchange="loadSeatingPlan(this)" />
+        <input id="seatingPlanUrl" type="url" placeholder="Or paste seating plan image URL" oninput="syncSeatingPlan()" style="margin-top:.6rem;" />
+        <img id="seatingPlanPreview" src="" alt="Seating plan preview" style="display:none;max-width:100%;max-height:420px;object-fit:contain;margin-top:.75rem;border:1px solid var(--border);border-radius:12px;" />
+        <button id="seatingPlanRemoveBtn" type="button" onclick="removeSeatingPlan()" style="display:none;margin-top:.5rem;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;">Remove seating plan</button>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(3)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(5)">Next: Ticket Design &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: TICKET DESIGN -->
+    <div class="step-panel" data-panel="5">
 
       <!-- 3-step process header -->
       <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:none;padding:1.2rem 1.3rem;">
@@ -936,6 +961,21 @@
             <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.5;">Each ticket is generated as a unique image with a QR code and sent via WhatsApp</div>
           </div>
         </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Ticket Delivery</h2><p>Choose how attendees receive the ticket.</p></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;">
+          <button id="ticketDeliveryShow" type="button" onclick="setTicketDelivery('show')" style="text-align:left;padding:1rem;border:2px solid var(--blue);border-radius:14px;background:var(--blue-light);cursor:pointer;color:inherit;">
+            <strong style="display:block;font-size:.86rem;">Show Ticket</strong>
+            <span style="display:block;margin-top:.25rem;font-size:.74rem;color:var(--muted);">Show the designed ticket on success.html after booking.</span>
+          </button>
+          <button id="ticketDeliveryWhatsApp" type="button" onclick="setTicketDelivery('whatsapp')" style="text-align:left;padding:1rem;border:2px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;color:inherit;">
+            <strong style="display:block;font-size:.86rem;">Send on WhatsApp</strong>
+            <span style="display:block;margin-top:.25rem;font-size:.74rem;color:var(--muted);">Send the designed ticket to admin for WhatsApp delivery.</span>
+          </button>
+        </div>
+        <div id="ticketDeliveryNote" style="margin-top:.7rem;font-size:.74rem;color:var(--muted);">Customers will see this ticket design on the booking success page.</div>
       </div>
 
       <!-- STEP 1: Customize -->
@@ -1165,13 +1205,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(3)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
+        <button class="btn-ghost" onclick="goStep(4)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(6)">Next: Media &#8594;</button>
       </div>
     </div>
 
-    <!-- STEP 4: MEDIA -->
-    <div class="step-panel" data-panel="5">
+    <!-- STEP 7: MEDIA -->
+    <div class="step-panel" data-panel="6">
 
       <!-- Card Image -->
       <div class="card">
@@ -1298,13 +1338,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(3)">← Back</button>
-        <button class="btn-primary" onclick="goStep(6)">Next: RSVP Form →</button>
+        <button class="btn-ghost" onclick="goStep(5)">← Back</button>
+        <button class="btn-primary" onclick="goStep(7)">Next: RSVP Form →</button>
       </div>
     </div>
 
-    <!-- STEP 5: RSVP -->
-    <div class="step-panel" data-panel="6">
+    <!-- STEP 7: RSVP -->
+    <div class="step-panel" data-panel="7">
 
       <div style="display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:start;">
 
@@ -1439,13 +1479,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(5)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(7)">Next: Coupons &#8594;</button>
+        <button class="btn-ghost" onclick="goStep(6)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(8)">Next: Coupons &#8594;</button>
       </div>
     </div>
 
-    <!-- STEP 6: COUPONS -->
-    <div class="step-panel" data-panel="7">
+    <!-- STEP 8: COUPONS -->
+    <div class="step-panel" data-panel="8">
       <div class="card">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
           <div><h2>Discount Coupons</h2><p>Create promo codes for your event</p></div>
@@ -1458,13 +1498,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(6)">← Back</button>
-        <button class="btn-primary" onclick="goStep(8)">Next: FAQs →</button>
+        <button class="btn-ghost" onclick="goStep(7)">← Back</button>
+        <button class="btn-primary" onclick="goStep(9)">Next: FAQs →</button>
       </div>
     </div>
 
-    <!-- STEP 7: FAQS -->
-    <div class="step-panel" data-panel="8">
+    <!-- STEP 9: FAQS -->
+    <div class="step-panel" data-panel="9">
       <div class="card">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
           <div><h2>Frequently Asked Questions</h2><p>Help attendees with common queries</p></div>
@@ -1477,13 +1517,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(7)">← Back</button>
-        <button class="btn-primary" onclick="goStep(9)">Next: Settings →</button>
+        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
+        <button class="btn-primary" onclick="goStep(10)">Next: Additional Info →</button>
       </div>
     </div>
 
-    <!-- STEP 8: ADDITIONAL INFO -->
-    <div class="step-panel" data-panel="9">
+    <!-- STEP 10: ADDITIONAL INFO -->
+    <div class="step-panel" data-panel="10">
       <div class="card">
         <div class="card-head"><h2>Terms & Conditions</h2><p>Legal terms attendees must agree to</p></div>
         <div class="field">
@@ -1516,13 +1556,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
-        <button class="btn-primary" onclick="goStep(10)">Next: Invite Only →</button>
+        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
+        <button class="btn-primary" onclick="goStep(11)">Next: Invite Only →</button>
       </div>
     </div>
 
-    <!-- STEP 9: INVITE ONLY -->
-    <div class="step-panel" data-panel="10">
+    <!-- STEP 11: INVITE ONLY -->
+    <div class="step-panel" data-panel="11">
       <div class="card">
         <div class="card-head"><h2>Invite Only Access</h2><p>Restrict who can register for this event</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1553,13 +1593,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
-        <button class="btn-primary" onclick="goStep(11)">Next: Sold Out →</button>
+        <button class="btn-ghost" onclick="goStep(10)">← Back</button>
+        <button class="btn-primary" onclick="goStep(12)">Next: Sold Out →</button>
       </div>
     </div>
 
-    <!-- STEP 10: SOLD OUT -->
-    <div class="step-panel" data-panel="11">
+    <!-- STEP 12: SOLD OUT -->
+    <div class="step-panel" data-panel="12">
       <div class="card">
         <div class="card-head"><h2>Sold Out Status</h2><p>Mark this event as sold out or manage overflow</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1596,13 +1636,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(10)">← Back</button>
-        <button class="btn-primary" onclick="goStep(12)">Next: Settings →</button>
+        <button class="btn-ghost" onclick="goStep(11)">← Back</button>
+        <button class="btn-primary" onclick="goStep(13)">Next: Settings →</button>
       </div>
     </div>
 
-    <!-- STEP 11: SETTINGS -->
-    <div class="step-panel" data-panel="12">
+    <!-- STEP 13: SETTINGS -->
+    <div class="step-panel" data-panel="13">
       <div class="card">
         <div class="card-head"><h2>Visibility & Display</h2><p>Control how your event appears publicly</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1625,7 +1665,7 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(11)">← Back</button>
+        <button class="btn-ghost" onclick="goStep(12)">← Back</button>
         <button class="btn-success" id="createEventBtn">🚀 Create Event</button>
       </div>
     </div>
@@ -1807,6 +1847,8 @@ let uid = null;
 let coverFile = null;
 let cardImgFile = null;
 let logoFile = null;
+let seatingPlanFile = null;
+let ticketDeliveryMode = 'show';
 
 // ── AUTH ──
 async function loadUser() {
@@ -1857,12 +1899,17 @@ loadUser();
       renderTickets();
     }
     if (d.ticketMode) { ticketMode = d.ticketMode; setTicketMode(d.ticketMode); }
+    if (d.ticketDeliveryMode) { ticketDeliveryMode = d.ticketDeliveryMode; setTicketDelivery(d.ticketDeliveryMode); }
     if (d.perDateTickets) perDateTickets = d.perDateTickets;
     // images
     if (d.coverUrl) {
       set('coverUrl', d.coverUrl);
       const prev = g('coverPreview'); if (prev) { prev.src = d.coverUrl; prev.style.display = 'block'; }
       const ph = g('coverPlaceholder'); if (ph) ph.style.display = 'none';
+    }
+    if (d.seatingPlanUrl) {
+      set('seatingPlanUrl', d.seatingPlanUrl);
+      showSeatingPlan(d.seatingPlanUrl);
     }
     if (d.cardImgUrl || d.ticketDesign?.cardImg) {
       const url = d.cardImgUrl || d.ticketDesign?.cardImg;
@@ -1968,6 +2015,7 @@ function markDoneSteps() {
     document.getElementById('city').value.trim() || document.getElementById('onlineLink').value.trim(),
     document.getElementById('startDate').value,
     tickets.length > 0,
+    document.getElementById('seatingPlanUrl').value.trim() || (document.getElementById('seatingPlanInput').files && document.getElementById('seatingPlanInput').files.length > 0),
     document.getElementById('coverUrl').value.trim() || (document.getElementById('coverInput').files && document.getElementById('coverInput').files.length > 0) || galleryImages.length > 0,
     true, true, true, true, true, true, true,
   ];
@@ -2106,6 +2154,39 @@ window.removeLogo = function() {
   document.getElementById('logoUrl').value = '';
   document.getElementById('logoInput').value = '';
   showLogoPreview('');
+};
+
+function showSeatingPlan(src) {
+  const preview = document.getElementById('seatingPlanPreview');
+  const remove = document.getElementById('seatingPlanRemoveBtn');
+  if (preview) { preview.src = src || ''; preview.style.display = src ? 'block' : 'none'; }
+  if (remove) remove.style.display = src ? '' : 'none';
+}
+window.loadSeatingPlan = function(input) {
+  const file = input.files[0]; if (!file) return;
+  seatingPlanFile = file;
+  const reader = new FileReader();
+  reader.onload = e => { document.getElementById('seatingPlanUrl').value = ''; showSeatingPlan(e.target.result); };
+  reader.readAsDataURL(file);
+};
+window.syncSeatingPlan = function() { showSeatingPlan(document.getElementById('seatingPlanUrl').value.trim()); };
+window.removeSeatingPlan = function() {
+  seatingPlanFile = null;
+  document.getElementById('seatingPlanUrl').value = '';
+  document.getElementById('seatingPlanInput').value = '';
+  showSeatingPlan('');
+};
+
+window.setTicketDelivery = function(mode) {
+  ticketDeliveryMode = mode === 'whatsapp' ? 'whatsapp' : 'show';
+  const show = document.getElementById('ticketDeliveryShow');
+  const wa = document.getElementById('ticketDeliveryWhatsApp');
+  const note = document.getElementById('ticketDeliveryNote');
+  if (show) { show.style.borderColor = ticketDeliveryMode === 'show' ? 'var(--blue)' : 'var(--border)'; show.style.background = ticketDeliveryMode === 'show' ? 'var(--blue-light)' : '#fff'; }
+  if (wa) { wa.style.borderColor = ticketDeliveryMode === 'whatsapp' ? '#16a34a' : 'var(--border)'; wa.style.background = ticketDeliveryMode === 'whatsapp' ? '#f0fdf4' : '#fff'; }
+  if (note) note.textContent = ticketDeliveryMode === 'whatsapp'
+    ? 'Admin will receive a pending request with the attendee list and this ticket design.'
+    : 'Customers will see this ticket design on the booking success page.';
 };
 
 // ── MEDIA: Cover ──
@@ -2430,7 +2511,7 @@ async function saveEvent(status) {
   if (!uid) { alert("Please sign in to save."); return; }
 
   const saveButton = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
-  if (cardImgFile || coverFile || logoFile) {
+  if (cardImgFile || coverFile || logoFile || seatingPlanFile) {
     saveButton.textContent = 'Uploading image...';
     saveButton.disabled = true;
     try {
@@ -2451,6 +2532,12 @@ async function saveEvent(status) {
         document.getElementById('logoUrl').value = url;
         showLogoPreview(url);
         logoFile = null;
+      }
+      if (seatingPlanFile) {
+        const url = await uploadImageToImageKit(seatingPlanFile, '/seating-plans');
+        document.getElementById('seatingPlanUrl').value = url;
+        showSeatingPlan(url);
+        seatingPlanFile = null;
       }
     } catch (err) {
       alert('Image upload failed: ' + err.message);
@@ -2487,12 +2574,14 @@ async function saveEvent(status) {
     feeMode: document.getElementById('feeMode').value,
     cardImgUrl: document.getElementById('cardImgUrl').value.trim(),
     coverUrl: document.getElementById('coverUrl').value.trim(),
+    seatingPlanUrl: document.getElementById('seatingPlanUrl').value.trim(),
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
     customQuestion: (document.getElementById('customQ') ? document.getElementById('customQ').value.trim() : ''),
     tickets, coupons, faqs, eventDates,
     ticketMode,
     perDateTickets,
+    ticketDeliveryMode,
     ticketDesign: {
       gradientStart: ticketDesign.g1,
       gradientEnd: ticketDesign.g2,
@@ -2808,19 +2897,58 @@ function updateGenerateStatus() {
     creditSummary.style.display = 'none';
   }
 }
-window.generateTickets = function() {
+window.generateTickets = async function() {
   if (!csvAttendees.length) { alert('Please upload a CSV with attendees first.'); return; }
+  if (ticketDeliveryMode !== 'whatsapp') {
+    alert('Select "Send on WhatsApp" above to send a ticket-generation request to admin.');
+    return;
+  }
   const credits = csvAttendees.length * 2;
   const cost = credits * 2;
   if (!confirm(csvAttendees.length + ' tickets will be sent.\n' + credits + ' credits (' + '\u20b9' + cost + ') will be deducted.\n\nProceed?')) return;
   const btn = document.getElementById('generateBtn');
   btn.textContent = '\u23F3 Generating...';
   btn.disabled = true;
-  setTimeout(() => {
-    btn.textContent = '\u2705 ' + csvAttendees.length + ' Tickets Generated & Sent!';
+  try {
+    if (logoFile) {
+      const logoUrl = await uploadImageToImageKit(logoFile, '/event-logos');
+      document.getElementById('logoUrl').value = logoUrl;
+      showLogoPreview(logoUrl);
+      logoFile = null;
+    }
+  } catch (err) {
+    alert('Logo upload failed: ' + err.message);
+    btn.textContent = '\ud83c\udfab Generate & Send All Tickets';
+    btn.disabled = false;
+    return;
+  }
+  const eventId = new URLSearchParams(location.search).get('eventId') || null;
+  const ticketDesignRequest = {
+    gradientStart: ticketDesign.g1,
+    gradientEnd: ticketDesign.g2,
+    organiserName: document.getElementById('tdOrgName').value.trim(),
+    tagline: document.getElementById('tdTagline').value.trim(),
+    footer: document.getElementById('tdFooter').value.trim(),
+    logoUrl: document.getElementById('logoUrl').value.trim(),
+    showQR: document.getElementById('tdShowQR').classList.contains('on'),
+    showSeat: document.getElementById('tdShowSeat').classList.contains('on'),
+    showVenue: document.getElementById('tdShowVenue').classList.contains('on'),
+    showLogo: document.getElementById('tdShowLogo').classList.contains('on'),
+  };
+  db.collection('ticketRequests').add({
+    requestType: 'whatsapp_ticket_generation', status: 'pending', eventId,
+    eventName: document.getElementById('eventName').value.trim(), ownerId: uid,
+    attendees: csvAttendees, whatsappMessage: document.getElementById('tdWAMsg').value,
+    ticketDesign: ticketDesignRequest, requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }).then(() => {
+    btn.textContent = '\u2705 Request Sent to Admin';
     btn.style.background = 'linear-gradient(135deg,#059669,#34d399)';
     btn.disabled = false;
-  }, 2000);
+  }).catch(err => {
+    alert('Could not send request: ' + err.message);
+    btn.textContent = '\ud83c\udfab Generate & Send All Tickets';
+    btn.disabled = false;
+  });
 };
 
 // ── RSVP preview ──
@@ -2875,10 +3003,10 @@ window.renderRsvpPreview = function() {
   html += rsvpPreviewFieldHtml('&#128100;', 'Full Name', 'text', 'Enter your full name', true);
   html += rsvpPreviewFieldHtml('&#9993;&#65039;', 'Email Address', 'email', 'your@email.com', true);
 
-  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="6"] .toggle[data-field].on');
+  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="7"] .toggle[data-field].on');
   // collect active optional fields from toggles in the RSVP panel
   const activeOpt = [];
-  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
+  document.querySelectorAll('.step-panel[data-panel="7"] .toggle[data-field]').forEach(t => {
     if (t.classList.contains('on')) activeOpt.push(t.dataset.field);
   });
   if (activeOpt.length) {
@@ -2957,7 +3085,7 @@ function renderRsvpCQs() {
 window.rsvpCreate = async function() {
   const btn = event.target; btn.textContent = 'Saving...';
   const rsvpToggles = {};
-  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
+  document.querySelectorAll('.step-panel[data-panel="7"] .toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
   });
   const payload = {

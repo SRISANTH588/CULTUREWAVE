@@ -184,6 +184,14 @@
       <div id="ticketsList"></div>
     </div>
 
+    <div id="seatingPlanSection" style="display:none;">
+      <div class="section-title">Seating Plan</div>
+      <p style="font-size:.84rem;color:#64748b;margin-bottom:.75rem;">See the venue layout before choosing your booking.</p>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:.75rem;overflow:auto;">
+        <img id="seatingPlanImage" src="" alt="Event seating plan" style="display:block;width:100%;max-height:620px;object-fit:contain;border-radius:10px;" />
+      </div>
+    </div>
+
     <!-- FAQS -->
     <div id="faqsSection" style="display:none;">
       <div class="section-title">FAQs</div>
@@ -319,6 +327,7 @@ function register(){
     ticketName: t.name || 'General Admission',
     ticketPrice: String(price),
     eventPrice: String(Number(evData.price || 0)),
+    seatingPlanUrl: evData.seatingPlanUrl || '',
   });
   location.href = `booking.html?${qs.toString()}`;
 }
@@ -377,6 +386,11 @@ function renderEvent(data){
         <div class="ticket-price">${t.price?`₹${Number(t.price).toLocaleString('en-IN')}`:'Free'}<br/><small>${t.available?Number(t.available).toLocaleString('en-IN')+' left':''}</small></div>
       </div>`).join('');
     document.getElementById('ticketsSection').style.display = 'block';
+  }
+
+  if(data.seatingPlanUrl){
+    document.getElementById('seatingPlanImage').src = data.seatingPlanUrl;
+    document.getElementById('seatingPlanSection').style.display = 'block';
   }
 
   // faqs

@@ -36,7 +36,7 @@
       }
     })();
 
-    async function sendBookingEmail({ name, email, eventName, amount, seats, bookingId, bookingType, date, time, method }) {
+    async function sendBookingEmail({ name, email, eventName, amount, seats, bookingId, bookingType, date, time, method, eventId: emailEventId }) {
       if (!EMAILJS_PUBLIC_KEY) {
         console.warn("Booking email skipped: EmailJS public key is missing.");
         return false;
@@ -53,6 +53,7 @@
       const ticketOrigin = "https://srisanth588.github.io";
       const successUrl = ticketOrigin + "/success.html?bookingId=" + encodeURIComponent(bookingId)
         + "&event=" + encodeURIComponent(eventName)
+        + "&eventId=" + encodeURIComponent(emailEventId || '')
         + "&amount=" + encodeURIComponent(amount)
         + "&status=Confirmed&type=" + bookingType
         + (date ? "&date=" + encodeURIComponent(date) : "")
@@ -514,6 +515,11 @@
                 <h2>Your details</h2>
                 <p>We'll send your confirmation to these details.</p>
               </div>
+              <div id="bookingSeatingPlan" style="display:none;margin-bottom:1rem;padding:.85rem;background:#f8fafc;border:1px solid #dce4f5;border-radius:14px;">
+                <div style="font-size:.78rem;font-weight:800;color:#1242c5;margin-bottom:.55rem;">Venue seating plan</div>
+                <img id="bookingSeatingPlanImage" src="" alt="Venue seating plan" style="display:block;width:100%;max-height:300px;object-fit:contain;border-radius:10px;background:#fff;" />
+                <div style="font-size:.72rem;color:#64748b;margin-top:.45rem;">This map shows the venue layout. Your booking currently reserves the number of seats selected below.</div>
+              </div>
               <div class="bk-row">
                 <div class="bk-field">
                   <span class="bk-field-label">Full Name</span>
@@ -725,6 +731,7 @@
     const passedCategory = urlP.get("category") || "";
     const passedTicketName = urlP.get("ticketName") || "";
     const passedTicketPrice = Number(urlP.get("ticketPrice") || urlP.get("eventPrice") || 0);
+    const passedSeatingPlanUrl = urlP.get("seatingPlanUrl") || "";
     const bookingType = urlP.get("type") || "event"; // "event" | "restaurant"
     const isRestaurant = bookingType === "restaurant";
 
@@ -1019,10 +1026,12 @@
           seats:       String(n),
           bookingId:   bid,
           bookingType: bookingType,
+          eventId,
           method:      "Free booking",
         });
         window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
           + "&event=" + encodeURIComponent(item.name)
+          + "&eventId=" + encodeURIComponent(eventId || '')
           + "&amount=0"
           + "&status=Confirmed"
           + "&type=" + bookingType;
@@ -1081,12 +1090,14 @@
               seats:       String(n),
               bookingId:   bid,
               bookingType: bookingType,
+              eventId,
               date:        dateVal,
               time:        timeVal,
               method:      document.querySelector('input[name="bookMethod"]:checked')?.value || "upi",
             });
             window.location.href = "success.html?bookingId=" + encodeURIComponent(bid)
               + "&event=" + encodeURIComponent(item.name)
+              + "&eventId=" + encodeURIComponent(eventId || '')
               + "&amount=" + encodeURIComponent(fmt(total))
               + "&status=Confirmed"
               + "&type=" + bookingType
@@ -1126,12 +1137,17 @@
             price,
             emoji: "🎪",
             sub,
+            seatingPlanUrl: passedSeatingPlanUrl,
           }
         };
         selectedKey = "selected";
         document.getElementById("step1Title").textContent = eventName;
         document.getElementById("step1Sub").textContent = "You were sent here from the event page, and the event is already selected.";
         document.getElementById("heroText").textContent = `${venueName} · booking for ${eventName}`;
+        if (passedSeatingPlanUrl) {
+          document.getElementById("bookingSeatingPlanImage").src = passedSeatingPlanUrl;
+          document.getElementById("bookingSeatingPlan").style.display = "block";
+        }
         buildCards();
         adaptUI();
         updateReceipt();

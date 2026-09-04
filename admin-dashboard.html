@@ -948,6 +948,14 @@
       </div>
     </div>
 
+    <div class="card" style="margin-bottom:1rem;padding:1rem 1.1rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.75rem;">
+        <div><strong style="font-size:.9rem;">Ticket Generation Requests</strong><div style="font-size:.74rem;color:var(--muted);">Organisers requesting designed tickets for WhatsApp delivery</div></div>
+        <span class="badge orange" id="ticketRequestCount">0 pending</span>
+      </div>
+      <div id="ticketRequestList" style="display:grid;gap:.55rem;"><div style="font-size:.78rem;color:var(--muted);">No ticket requests yet.</div></div>
+    </div>
+
     <div class="wa-filter">
       <input type="text" id="waSearch" placeholder="Search by name, event, phone…" oninput="filterWA()" />
       <select id="waTypeFilter" onchange="filterWA()">
@@ -1198,7 +1206,7 @@ import { app, auth, db, getCurrentUser, logout,
 } from "./firebase.js";
 
 // ── STATE ──
-let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[];
+let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[];
 
 // ── HELPERS ──
@@ -1215,6 +1223,31 @@ window.showToast = function(msg, type='') {
 window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+function renderTicketRequests(requests) {
+  const list = document.getElementById('ticketRequestList');
+  const count = document.getElementById('ticketRequestCount');
+  const pending = requests.filter(r => (r.status || 'pending') === 'pending').length;
+  if (count) count.textContent = pending + ' pending';
+  if (!list) return;
+  if (!requests.length) { list.innerHTML = '<div style="font-size:.78rem;color:var(--muted);">No ticket requests yet.</div>'; return; }
+  list.innerHTML = requests.map(r => {
+    const design = r.ticketDesign || {};
+    const status = r.status || 'pending';
+    return `<div style="display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;padding:.7rem .8rem;border:1px solid var(--border);border-radius:11px;background:#f8faff;">
+      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,${esc(design.gradientStart || '#1454ff')},${esc(design.gradientEnd || '#4c7dff')});flex:none;"></div>
+      <div style="flex:1;min-width:180px;"><strong style="font-size:.8rem;">${esc(r.eventName || 'Untitled event')}</strong><div style="font-size:.7rem;color:var(--muted);">${Array.isArray(r.attendees) ? r.attendees.length : 0} attendees · ${fmtDate(r.requestedAt)}</div></div>
+      <span class="badge ${status === 'completed' ? 'green' : status === 'rejected' ? 'red' : 'orange'}">${esc(status)}</span>
+      <select onchange="updateTicketRequestStatus('${r.id}',this.value)" style="border:1px solid var(--border);border-radius:8px;padding:.3rem .45rem;font-size:.72rem;background:#fff;">
+        ${['pending','processing','completed','rejected'].map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
+}
+window.updateTicketRequestStatus = async function(id, status) {
+  await updateDoc(doc(db, 'ticketRequests', id), { status, updatedAt: serverTimestamp() });
+  showToast('Ticket request updated', 'success');
+};
 
 // ── NAVIGATION ──
 const viewTitles = {
@@ -1797,6 +1830,11 @@ onSnapshot(query(collection(db,'websiteRequests'),orderBy('createdAt','desc'),li
   updateStats();
 });
 
+onSnapshot(query(collection(db,'ticketRequests'),orderBy('requestedAt','desc'),limit(100)), snap => {
+  allTicketRequests = snap.docs.map(d => ({id:d.id,...d.data()}));
+  renderTicketRequests(allTicketRequests);
+});
+
 onSnapshot(query(collection(db,'wallets'),limit(200)), snap => {
   allWallets = snap.docs.map(d=>({id:d.id,...d.data()}));
   updateStats();
@@ -1915,7 +1953,7 @@ function buildWAMessage(p, type) {
   const seats = p.seats || p.notes?.seats || '1';
   const bkType = p.bookingType || 'event';
   const ticketOrigin = 'https://srisanth588.github.io';
-  const successUrl = ticketOrigin + '/success.html?bookingId=' + encodeURIComponent(p.bookingId || p.id || id) + '&event=' + encodeURIComponent(event) + '&amount=' + encodeURIComponent(amt) + '&status=Confirmed&type=' + encodeURIComponent(bkType);
+  const successUrl = ticketOrigin + '/success.html?bookingId=' + encodeURIComponent(p.bookingId || p.id || id) + '&event=' + encodeURIComponent(event) + '&eventId=' + encodeURIComponent(p.eventId || '') + '&amount=' + encodeURIComponent(amt) + '&status=Confirmed&type=' + encodeURIComponent(bkType);
 
   if (type === 'organizer') {
     return `✅ *New Booking Alert*
