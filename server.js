@@ -275,14 +275,14 @@ const server = http.createServer(async (req, res) => {
     const publicKey = process.env.IMAGEKIT_PUBLIC_KEY || "";
     const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || "";
     if (!publicKey || !privateKey) {
-      return send(res, 503, { success: false, error: "ImageKit is not configured on the server." });
+    return send(res, 503, { success: false, error: "ImageKit is not configured on the server." }, { "Access-Control-Allow-Origin": "*" });
     }
     const expire = Math.floor(Date.now() / 1000) + 600;
     const token = randomUUID();
     const signature = createHmac("sha1", privateKey)
       .update(token + expire)
       .digest("hex");
-    return send(res, 200, { token, expire, signature, publicKey });
+    return send(res, 200, { token, expire, signature, publicKey }, { "Access-Control-Allow-Origin": "*" });
   }
 
   if (req.method === "POST" && url.pathname === "/api/auth/local-login") {
