@@ -2560,7 +2560,7 @@ window.saveProfile = async function() {
   if(!profileUid) return;
   const btns = document.querySelectorAll('.brand-save-btn');
   btns.forEach(b=>b.textContent='Saving...');
-  await setDoc(doc(db,'organisers',profileUid), {
+  const payload = {
     name: document.getElementById('pfName').value.trim(),
     handle: document.getElementById('pfHandle').value.trim().replace(/^@/,''),
     bio: (document.getElementById('pfBio')||{}).value?.trim()||'',
@@ -2575,7 +2575,12 @@ window.saveProfile = async function() {
     metaPixel: (document.getElementById('pfMetaPixel')||{}).value?.trim()||'',
     gtmId: (document.getElementById('pfGtmId')||{}).value?.trim()||'',
     updatedAt: new Date().toISOString()
-  }, {merge:true});
+  };
+  const coverFile = document.getElementById('coverFileInput')?.files[0];
+  if(coverFile) payload.coverUrl = await uploadImageToImageKit(coverFile, '/profile-covers');
+  const avatarFile = document.getElementById('avatarFileInput')?.files[0];
+  if(avatarFile) payload.avatarUrl = await uploadImageToImageKit(avatarFile, '/profile-avatars');
+  await setDoc(doc(db,'organisers',profileUid), payload, {merge:true});
   btns.forEach(b=>{ b.textContent='✓ Saved!'; setTimeout(()=>b.textContent=b.textContent.includes('Bank')?'Save Bank Details':'✓ Save',2000); });
   showToast('Brand settings saved!');
 };
@@ -3069,6 +3074,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 </script>
 </body>
 
+<script src="imagekit.js"></script>
 <script>
 // ── DM AUTOMATION MODAL (plain script — works on file:// and http://) ──
 var dmCurrentStep = 1;
