@@ -167,6 +167,7 @@
     .mob-info-text-sub{font-size:.84rem;color:#6b7280;margin-top:.1rem;word-break:break-word;overflow-wrap:anywhere;}
     /* mobile organised by + share */
     .mob-section-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:1rem 1.1rem;margin:1.2rem 1rem 0;}
+    @media(min-width:861px){ .mob-section-card{ display:none !important; } }
     .mob-section-label{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:.75rem;}
     .mob-org-row{display:flex;align-items:center;gap:.75rem;cursor:pointer;}
     .mob-org-avatar{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.9rem;font-weight:900;color:#fff;flex:none;overflow:hidden;}
@@ -301,26 +302,6 @@
   </div>
 </div>
 
-<!-- MOBILE ORGANISED BY -->
-<div class="mob-section-card" id="mobOrgCard">
-  <div class="mob-section-label">Organised by</div>
-  <div class="mob-org-row" onclick="goToProfile()">
-    <div class="mob-org-avatar" id="mobOrgAvatar">JN</div>
-    <div>
-      <div class="mob-org-name" id="mobOrgName">Organiser</div>
-      <div class="mob-org-sub">View profile →</div>
-    </div>
-  </div>
-</div>
-
-<!-- MOBILE SHARE -->
-<div class="mob-section-card">
-  <div class="mob-section-label">Share this event</div>
-  <div class="mob-share-grid">
-    <button class="mob-share-btn mob-share-wa" onclick="shareWA()">💬 WhatsApp</button>
-    <button class="mob-share-btn mob-share-copy" onclick="copyLink()">🔗 Copy Link</button>
-  </div>
-</div>
 
 <div class="shell">
   <!-- LEFT -->
@@ -359,6 +340,25 @@
       <div style="border:1px solid var(--border);border-radius:14px;padding:.75rem;overflow:auto;background:#f8faff;">
         <img id="seatingPlanImage" src="" alt="Seating plan" style="display:block;width:100%;max-height:520px;object-fit:contain;border-radius:10px;"/>
         <div id="seatingPlanBuilder" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- MOBILE ORGANISED BY + SHARE (shown on mobile after seating plan) -->
+    <div class="mob-section-card" id="mobOrgCard" style="margin:0 0 1.2rem;">
+      <div class="mob-section-label">Organised by</div>
+      <div class="mob-org-row" onclick="goToProfile()">
+        <div class="mob-org-avatar" id="mobOrgAvatar">JN</div>
+        <div>
+          <div class="mob-org-name" id="mobOrgName">Organiser</div>
+          <div class="mob-org-sub">View profile →</div>
+        </div>
+      </div>
+    </div>
+    <div class="mob-section-card" style="margin:0 0 1.2rem;">
+      <div class="mob-section-label">Share this event</div>
+      <div class="mob-share-grid">
+        <button class="mob-share-btn mob-share-wa" onclick="shareWA()">💬 WhatsApp</button>
+        <button class="mob-share-btn mob-share-copy" onclick="copyLink()">🔗 Copy Link</button>
       </div>
     </div>
 
