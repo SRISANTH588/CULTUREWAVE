@@ -281,7 +281,7 @@
     </div>
 
     <!-- RECEIPT SIDEBAR -->
-    <aside class="bk-receipt">
+    <aside class="bk-receipt" id="bkReceipt" style="display:none;">
       <div class="bk-receipt-banner" id="receiptBanner">🎟️</div>
       <div class="bk-receipt-body">
         <div class="bk-receipt-name" id="rEventName">Select event</div>
@@ -356,6 +356,7 @@ function goStep(n){
     if(i===n) tab.classList.add("active");
   }
   document.querySelector(".bk-trust").style.display = n === 1 ? "none" : "grid";
+  document.getElementById("bkReceipt").style.display = n === 1 ? "none" : "block";
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
