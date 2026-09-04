@@ -501,7 +501,7 @@ function register(){
   location.href = `booking.html?${qs.toString()}`;
 }
 
-function renderEvent(data){
+async function renderEvent(data){
   evData = data;
   ownerUid = data.ownerId;
   document.title = `${data.name||'Event'} | CultureWave`;
@@ -667,7 +667,8 @@ function renderEvent(data){
 
   // load organiser
   if(data.ownerId){
-    db.collection('organisers').doc(data.ownerId).get().then(snap=>{
+    try{
+      const snap = await db.collection('organisers').doc(data.ownerId).get();
       const org = snap.exists ? snap.data() : {};
       const name = org.name || 'Organiser';
       const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
@@ -677,10 +678,11 @@ function renderEvent(data){
         if(org.avatarUrl) el.innerHTML = `<img src="${esc(org.avatarUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
         else el.textContent = initials;
       });
-      document.getElementById('orgName').textContent = name;
-      document.getElementById('sideOrgName').textContent = name;
-      document.getElementById('mobTopOrgName').textContent = name;
-    });
+      ['orgName','sideOrgName','mobTopOrgName'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.textContent = name;
+      });
+    }catch(e){}
   }
 }
 
