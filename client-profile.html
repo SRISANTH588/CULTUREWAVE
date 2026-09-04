@@ -17,7 +17,7 @@
 
     /* HERO BANNER */
     .banner{height:320px;background:linear-gradient(135deg,#0a0f1e 0%,#1242c5 55%,#2f6bff 100%);position:relative;overflow:hidden;}
-    .banner-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35;}
+    .banner-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;}
     .banner::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(47,107,255,.4) 0%,transparent 70%);pointer-events:none;}
     .banner::after{content:'';position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(to bottom,transparent,rgba(10,15,30,.6));pointer-events:none;}
     .banner-edit{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:.4rem .9rem;font-size:.76rem;font-weight:800;backdrop-filter:blur(8px);display:none;cursor:pointer;z-index:2;transition:background .2s;}
@@ -339,9 +339,16 @@ function renderProfile(data){
     avatarEl.textContent = initials;
   }
 
-  // banner cover
+  // banner cover — use bannerUrl or coverUrl from organiser/user data
   const bannerEl = document.getElementById('bannerEl');
-  if(data.bannerUrl) bannerEl.innerHTML += `<img class="banner-img" src="${esc(data.bannerUrl)}" alt="banner"/>`;
+  const bannerSrc = data.bannerUrl || data.coverUrl || '';
+  if(bannerSrc){
+    const img = document.createElement('img');
+    img.className = 'banner-img';
+    img.src = bannerSrc;
+    img.alt = 'banner';
+    bannerEl.appendChild(img);
+  }
 
   document.getElementById('profileName').textContent = data.name||'Organiser';
   document.getElementById('profileHandle').textContent = '@'+(data.handle||data.uid?.slice(0,8)||'organiser');
