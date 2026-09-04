@@ -449,6 +449,11 @@ function updateQtyPrice(){
 
 // ── STEP 2 → 3 ──
 function goStep3(){
+  const hasSeating = document.getElementById("seatingWrap").style.display !== "none";
+  const isImagePlan = hasSeating && document.querySelector("#seatingContainer img");
+  if(hasSeating && !isImagePlan && selectedSeats.length === 0){
+    showToast("Please select at least one seat"); return;
+  }
   const t = tickets[selectedTicketIdx]||{name:"General Admission",price:0};
   document.getElementById("s3Event").textContent = evData.name||passedName||"—";
   document.getElementById("s3Name").textContent = document.getElementById("bookName").value;
