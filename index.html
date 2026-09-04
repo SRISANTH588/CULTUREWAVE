@@ -801,6 +801,7 @@
       empty.style.display = 'none';
       docs.forEach((doc, i) => {
         const d = doc.data(), id = doc.id;
+        const cardImage = d.cardImgUrl || d.coverUrl;
         const price = d.tickets?.[0]?.price || d.price || 0;
         const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
         let dateLabel = '';
@@ -813,7 +814,7 @@
         const article = document.createElement('article');
         article.className = 'event-card event-poster-card';
         article.innerHTML = `
-          <div class="event-banner ${_banners[i%_banners.length]}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
+          <div class="event-banner ${_banners[i%_banners.length]}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} ></div>
           <div class="event-body">
             <div class="event-poster-info"><span class="event-poster-date">▣ ${dateLabel||'Date TBA'}</span><span class="event-poster-location">⌖ ${d.city||'India'}</span></div>
             <h3>${d.name||'Untitled'}</h3>

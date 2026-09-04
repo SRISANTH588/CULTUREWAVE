@@ -140,7 +140,7 @@
         card.dataset.price=price?'paid':'free';
         card.innerHTML=`
           <div class="cat-card-banner">
-            <div class="cat-card-banner-bg" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} ></div>
+            <div class="cat-card-banner-bg" ${(d.cardImgUrl||d.coverUrl)?`style="background:url('${d.cardImgUrl||d.coverUrl}') center/cover no-repeat;"`:''} ></div>
             <span class="cat-card-tag">Workshop</span>
           </div>
           <div class="cat-card-body">

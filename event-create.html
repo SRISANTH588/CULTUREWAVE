@@ -1029,6 +1029,17 @@
         </div>
         <div class="field" style="margin-bottom:0.75rem;"><label for="tdFooter">Footer Note</label><input id="tdFooter" type="text" placeholder="e.g. Non-transferable. Valid ID required." oninput="updateTicketPreview()" /></div>
 
+        <div class="field" style="margin-bottom:0.75rem;">
+          <label for="logoInput">Organiser Logo</label>
+          <div class="upload-zone" onclick="document.getElementById('logoInput').click()" style="padding:1rem;">
+            <strong style="font-size:0.84rem;">Click to upload logo</strong>
+            <span>PNG, JPG &middot; max 5 MB</span>
+          </div>
+          <input type="file" id="logoInput" accept="image/*" style="display:none;" onchange="loadLogoFile(this)" />
+          <input id="logoUrl" type="url" placeholder="Or paste logo image URL" oninput="syncLogoUrl()" style="margin-top:.5rem;" />
+          <button id="logoRemoveBtn" type="button" onclick="removeLogo()" style="display:none;margin-top:.4rem;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;">Remove logo</button>
+        </div>
+
         <!-- Field toggles -->
         <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.4rem;">Toggle Fields</div>
         <div style="display:flex;flex-direction:column;gap:0.35rem;">
@@ -1794,6 +1805,8 @@ let coupons = [];
 let faqs = [];
 let uid = null;
 let coverFile = null;
+let cardImgFile = null;
+let logoFile = null;
 
 // ── AUTH ──
 async function loadUser() {
@@ -1862,6 +1875,10 @@ loadUser();
       if (g('tdOrgName')) set('tdOrgName', d.ticketDesign.organiserName || '');
       if (g('tdTagline')) set('tdTagline', d.ticketDesign.tagline || '');
       if (g('tdFooter')) set('tdFooter', d.ticketDesign.footer || '');
+      if (g('logoUrl') && d.ticketDesign.logoUrl) {
+        set('logoUrl', d.ticketDesign.logoUrl);
+        showLogoPreview(d.ticketDesign.logoUrl);
+      }
     }
     // notes / terms
     if (g('notes')) set('notes', d.notes || '');
@@ -2037,12 +2054,14 @@ function showCardImg(src) {
 }
 window.loadCardImg = function(input) {
   const file = input.files[0]; if (!file) return;
+  cardImgFile = file;
   const r = new FileReader();
   r.onload = e => { document.getElementById('cardImgUrl').value = ''; showCardImg(e.target.result); };
   r.readAsDataURL(file);
 };
 window.syncCardImgUrl = function() { showCardImg(document.getElementById('cardImgUrl').value); };
 window.removeCardImg = function() {
+  cardImgFile = null;
   document.getElementById('cardImgUrl').value = '';
   document.getElementById('cardImgInput').value = '';
   showCardImg('');
@@ -2053,9 +2072,40 @@ window.handleCardImgDrop = function(e) {
   dz.style.borderColor = 'var(--border)'; dz.style.background = 'var(--blue-soft)';
   const file = e.dataTransfer.files[0];
   if (!file || !file.type.startsWith('image/')) return;
+  cardImgFile = file;
   const r = new FileReader();
   r.onload = ev => showCardImg(ev.target.result);
   r.readAsDataURL(file);
+};
+
+function showLogoPreview(src) {
+  const btn = document.getElementById('logoRemoveBtn');
+  const preview = document.getElementById('tpLogo');
+  if (btn) btn.style.display = src ? '' : 'none';
+  if (!preview) return;
+  preview.textContent = '';
+  if (src) {
+    const img = document.createElement('img');
+    img.src = src; img.alt = 'Organiser logo';
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:8px;';
+    preview.appendChild(img);
+  } else {
+    preview.textContent = '\uD83C\uDF9F\uFE0F';
+  }
+}
+window.loadLogoFile = function(input) {
+  const file = input.files[0]; if (!file) return;
+  logoFile = file;
+  const reader = new FileReader();
+  reader.onload = e => { document.getElementById('logoUrl').value = ''; showLogoPreview(e.target.result); };
+  reader.readAsDataURL(file);
+};
+window.syncLogoUrl = function() { showLogoPreview(document.getElementById('logoUrl').value.trim()); };
+window.removeLogo = function() {
+  logoFile = null;
+  document.getElementById('logoUrl').value = '';
+  document.getElementById('logoInput').value = '';
+  showLogoPreview('');
 };
 
 // ── MEDIA: Cover ──
@@ -2380,14 +2430,28 @@ async function saveEvent(status) {
   if (!uid) { alert("Please sign in to save."); return; }
 
   const saveButton = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
-  if (coverFile) {
+  if (cardImgFile || coverFile || logoFile) {
     saveButton.textContent = 'Uploading image...';
     saveButton.disabled = true;
     try {
-      const coverUrl = await uploadImageToImageKit(coverFile);
-      document.getElementById('coverUrl').value = coverUrl;
-      showCoverPreview(coverUrl);
-      coverFile = null;
+      if (cardImgFile) {
+        const url = await uploadImageToImageKit(cardImgFile, '/event-cards');
+        document.getElementById('cardImgUrl').value = url;
+        showCardImg(url);
+        cardImgFile = null;
+      }
+      if (coverFile) {
+        const url = await uploadImageToImageKit(coverFile, '/event-covers');
+        document.getElementById('coverUrl').value = url;
+        showCoverPreview(url);
+        coverFile = null;
+      }
+      if (logoFile) {
+        const url = await uploadImageToImageKit(logoFile, '/event-logos');
+        document.getElementById('logoUrl').value = url;
+        showLogoPreview(url);
+        logoFile = null;
+      }
     } catch (err) {
       alert('Image upload failed: ' + err.message);
       saveButton.textContent = status === 'published' ? 'Publish Event' : 'Save Draft';
@@ -2421,6 +2485,7 @@ async function saveEvent(status) {
     timezone: document.getElementById('timezone').value,
     currency: document.getElementById('currency').value,
     feeMode: document.getElementById('feeMode').value,
+    cardImgUrl: document.getElementById('cardImgUrl').value.trim(),
     coverUrl: document.getElementById('coverUrl').value.trim(),
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
@@ -2438,6 +2503,7 @@ async function saveEvent(status) {
       showSeat: document.getElementById('tdShowSeat').classList.contains('on'),
       showVenue: document.getElementById('tdShowVenue').classList.contains('on'),
       showLogo: document.getElementById('tdShowLogo').classList.contains('on'),
+      logoUrl: document.getElementById('logoUrl').value.trim(),
     },
     notes: document.getElementById('notes').value.trim(),
     termsText: document.getElementById('termsText').value.trim(),

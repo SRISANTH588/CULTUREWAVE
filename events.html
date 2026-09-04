@@ -490,6 +490,7 @@
           if(empty) empty.style.display='none';
           docs.forEach((doc, i) => {
             const d = doc.data(), id = doc.id;
+            const cardImage = d.cardImgUrl || d.coverUrl;
             let date = '';
             if(d.startDate) {
               try { date = d.startDate.toDate ? d.startDate.toDate().toISOString().slice(0,10) : String(d.startDate).slice(0,10); } catch(e){}
@@ -504,7 +505,7 @@
             article.dataset.category = (d.category||'other').toLowerCase();
             article.dataset.date = date;
             article.innerHTML = `
-              <div class="ev-banner ${bannerClass}" ${d.coverUrl?`style="background:url('${d.coverUrl}') center/cover no-repeat;"`:''} >
+              <div class="ev-banner ${bannerClass}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} >
                 <span class="ev-tag">${d.category||'Event'}</span>
               </div>
               <div class="ev-body">
