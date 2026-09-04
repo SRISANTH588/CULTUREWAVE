@@ -30,8 +30,8 @@
     .bk-step.active .bk-step-lbl{color:#fff;}
     .bk-step.done .bk-step-lbl{color:rgba(126,179,255,.7);}
     .bk-conn{flex:none;width:2rem;height:2px;background:rgba(255,255,255,.12);margin-bottom:1rem;}
-    .bk-wrap{max-width:960px;margin:0 auto;padding:2rem 1rem 4rem;}
-    .bk-grid{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;}
+    .bk-wrap{max-width:640px;margin:0 auto;padding:2rem 1rem 4rem;}
+    .bk-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;align-items:start;}
     .bk-panel{display:none;flex-direction:column;gap:1rem;}
     .bk-panel.active{display:flex;}
     .bk-card{background:#fff;border:1px solid var(--border);border-radius:22px;padding:1.6rem;box-shadow:0 4px 24px rgba(18,66,197,.07);}
@@ -357,6 +357,8 @@ function goStep(n){
   }
   document.querySelector(".bk-trust").style.display = n === 1 ? "none" : "grid";
   document.getElementById("bkReceipt").style.display = n === 1 ? "none" : "block";
+  document.querySelector(".bk-grid").style.gridTemplateColumns = n === 1 ? "1fr" : "1fr 320px";
+  document.querySelector(".bk-wrap").style.maxWidth = n === 1 ? "640px" : "960px";
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
