@@ -47,12 +47,16 @@
     .description{font-size:.9rem;color:#475569;line-height:1.75;white-space:pre-wrap;}
 
     /* TICKET TYPES */
-    .ticket-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-    .ticket-card.featured{border-color:var(--blue);background:#f0f5ff;}
+    .ticket-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:border-color .2s,background .2s;}
+    .ticket-card:hover{border-color:var(--blue);}
+    .ticket-card.selected{border-color:var(--blue);background:#f0f5ff;box-shadow:0 0 0 3px rgba(18,66,197,.12);}
     .ticket-name{font-size:.95rem;font-weight:800;}
     .ticket-desc{font-size:.76rem;color:var(--muted);margin-top:.2rem;}
     .ticket-price{font-size:1.1rem;font-weight:900;color:var(--text);white-space:nowrap;}
     .ticket-price small{font-size:.7rem;font-weight:700;color:var(--muted);}
+    .ticket-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:none;display:grid;place-items:center;transition:border-color .2s;}
+    .ticket-card.selected .ticket-radio{border-color:var(--blue);background:var(--blue);}
+    .ticket-card.selected .ticket-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;}
 
     /* STICKY SIDEBAR */
     .sidebar{position:sticky;top:80px;display:flex;flex-direction:column;gap:1rem;}
@@ -326,10 +330,23 @@ function renderSeatingLayout(layout, target){
   }).join('');
 }
 
+let selectedTicketIndex = 0;
+
+function selectTicket(i){
+  selectedTicketIndex = i;
+  document.querySelectorAll('.ticket-card').forEach((el,idx)=>{
+    el.classList.toggle('selected', idx === i);
+  });
+  const t = (evData.tickets||[])[i] || {};
+  const price = Number(t.price || 0);
+  document.getElementById('regPrice').innerHTML = price ? `₹${price.toLocaleString('en-IN')}<small> onwards</small>` : 'Free';
+  document.getElementById('regMeta').textContent = price ? 'Per person · Taxes may apply' : 'Free to attend';
+}
+
 function register(){
   if(!eventId) return;
   const tickets = Array.isArray(evData.tickets) && evData.tickets.length ? evData.tickets : [];
-  const t = tickets[0] || {};
+  const t = tickets[selectedTicketIndex] || tickets[0] || {};
   const price = Number(t.price || evData.price || 0);
   const qs = new URLSearchParams({
     eventId,
@@ -391,12 +408,14 @@ function renderEvent(data){
   const tickets = data.tickets||[];
   if(tickets.length){
     document.getElementById('ticketsList').innerHTML = tickets.map((t,i)=>`
-      <div class="ticket-card ${i===0?'featured':''}">
-        <div>
+      <div class="ticket-card ${i===0?'selected':''}" onclick="selectTicket(${i})">
+        <div class="ticket-radio"></div>
+        <div style="flex:1;">
           <div class="ticket-name">${esc(t.name||'General Admission')}</div>
           ${t.description?`<div class="ticket-desc">${esc(t.description)}</div>`:''}
+          ${t.qty?`<div class="ticket-desc">${Number(t.qty).toLocaleString('en-IN')} seats available</div>`:''}
         </div>
-        <div class="ticket-price">${t.price?`₹${Number(t.price).toLocaleString('en-IN')}`:'Free'}<br/><small>${t.available?Number(t.available).toLocaleString('en-IN')+' left':''}</small></div>
+        <div class="ticket-price">${t.price?`₹${Number(t.price).toLocaleString('en-IN')}`:'Free'}<br/><small>${t.qty?Number(t.qty).toLocaleString('en-IN')+' left':''}</small></div>
       </div>`).join('');
     document.getElementById('ticketsSection').style.display = 'block';
   }
