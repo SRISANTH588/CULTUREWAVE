@@ -155,20 +155,28 @@
       .mob-poster{display:block;width:calc(100% - 2rem);aspect-ratio:3/4;object-fit:cover;margin:1rem auto 0;border-radius:20px;box-shadow:0 8px 32px rgba(18,66,197,.18),0 2px 8px rgba(0,0,0,.12);border:3px solid #fff;outline:1.5px solid var(--border);}
       .mob-event-header{display:block !important;}
     }
-    /* MOBILE EVENT HEADER */
-    .mob-event-header{display:none;padding:1.2rem 1rem 0;background:#fff;}
+    .mob-event-header{display:none;padding:1.2rem 1rem 0;background:#fff;overflow:hidden;}
     .mob-hosted-line{font-size:.88rem;color:#555;margin-bottom:.6rem;}
     .mob-hosted-line a{color:var(--blue);font-weight:700;text-decoration:none;}
-    .mob-event-title{font-size:1.6rem;font-weight:900;color:var(--text);letter-spacing:-.04em;line-height:1.2;margin-bottom:.6rem;}
-    .mob-event-summary{font-size:.92rem;color:#555;line-height:1.6;margin-bottom:1rem;}
-    .mob-info-list{display:flex;flex-direction:column;gap:1rem;margin-top:1.2rem;}
-    .mob-info-row{display:flex;align-items:center;gap:1rem;}
-    .mob-date-box{width:72px;min-width:72px;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.1);flex:none;}
-    .mob-date-box-top{background:var(--blue);color:#fff;font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;text-align:center;padding:.3rem 0;}
-    .mob-date-box-day{background:#fff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;text-align:center;padding:.35rem 0 .4rem;font-size:1.6rem;font-weight:900;color:var(--text);line-height:1;}
-    .mob-info-icon-box{width:56px;min-width:56px;height:56px;border-radius:14px;background:#f3f4f6;display:grid;place-items:center;font-size:1.4rem;flex:none;}
+    .mob-event-title{font-size:1.5rem;font-weight:900;color:var(--text);letter-spacing:-.04em;line-height:1.2;margin-bottom:.6rem;word-break:break-word;}
+    .mob-event-summary{font-size:.92rem;color:#555;line-height:1.6;margin-bottom:1rem;word-break:break-word;}
+    .mob-info-list{display:flex;flex-direction:column;gap:.85rem;margin-top:1.2rem;}
+    .mob-info-row{display:flex;align-items:center;gap:.85rem;overflow:hidden;}
+    .mob-info-icon-box{width:56px;min-width:56px;height:56px;border-radius:14px;background:#f3f4f6;display:grid;place-items:center;flex:none;}
     .mob-info-text-title{font-size:.95rem;font-weight:800;color:var(--text);}
-    .mob-info-text-sub{font-size:.84rem;color:#6b7280;margin-top:.15rem;}
+    .mob-info-text-sub{font-size:.84rem;color:#6b7280;margin-top:.1rem;word-break:break-word;overflow-wrap:anywhere;}
+    /* mobile organised by + share */
+    .mob-section-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:1rem 1.1rem;margin:1.2rem 1rem 0;}
+    .mob-section-label{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:.75rem;}
+    .mob-org-row{display:flex;align-items:center;gap:.75rem;cursor:pointer;}
+    .mob-org-avatar{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.9rem;font-weight:900;color:#fff;flex:none;overflow:hidden;}
+    .mob-org-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
+    .mob-org-name{font-size:.95rem;font-weight:800;color:var(--text);}
+    .mob-org-sub{font-size:.76rem;color:var(--muted);margin-top:.1rem;}
+    .mob-share-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+    .mob-share-btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:12px;font-size:.82rem;font-weight:800;cursor:pointer;border:1px solid;}
+    .mob-share-wa{background:#f0fdf4;border-color:#bbf7d0;color:#166534;}
+    .mob-share-copy{background:#f8faff;border-color:var(--border);color:var(--text);}
   </style>
 </head>
 <body>
@@ -251,11 +259,11 @@
   <div class="mob-info-list">
     <!-- Date -->
     <div class="mob-info-row">
-      <div class="mob-date-box">
-        <div class="mob-date-box-top" id="mobDateMonth">—</div>
-        <div class="mob-date-box-day" id="mobDateDay">—</div>
+      <div class="mob-info-icon-box" style="background:#e8f0ff;flex-direction:column;gap:0;padding:0;overflow:hidden;">
+        <div style="background:var(--blue);color:#fff;font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;width:100%;text-align:center;padding:.22rem 0;" id="mobDateMonth">—</div>
+        <div style="font-size:1.25rem;font-weight:900;color:var(--text);line-height:1;padding:.28rem 0;" id="mobDateDay">—</div>
       </div>
-      <div>
+      <div style="overflow:hidden;">
         <div class="mob-info-text-title" id="mobInfoDate">TBA</div>
         <div class="mob-info-text-sub" id="mobInfoTime"></div>
       </div>
@@ -263,7 +271,7 @@
     <!-- Duration -->
     <div class="mob-info-row" id="mobDurationRow">
       <div class="mob-info-icon-box">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
       <div>
         <div class="mob-info-text-title">Duration</div>
@@ -273,9 +281,9 @@
     <!-- Venue -->
     <div class="mob-info-row">
       <div class="mob-info-icon-box">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
       </div>
-      <div>
+      <div style="overflow:hidden;">
         <div class="mob-info-text-title">Venue</div>
         <div class="mob-info-text-sub" id="mobInfoVenue">TBA</div>
       </div>
@@ -283,13 +291,34 @@
     <!-- Tickets -->
     <div class="mob-info-row" id="mobInfoTicketRow">
       <div class="mob-info-icon-box">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
       </div>
       <div>
         <div class="mob-info-text-title">Tickets from</div>
         <div class="mob-info-text-sub" id="mobInfoTicket">Free</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- MOBILE ORGANISED BY -->
+<div class="mob-section-card" id="mobOrgCard">
+  <div class="mob-section-label">Organised by</div>
+  <div class="mob-org-row" onclick="goToProfile()">
+    <div class="mob-org-avatar" id="mobOrgAvatar">JN</div>
+    <div>
+      <div class="mob-org-name" id="mobOrgName">Organiser</div>
+      <div class="mob-org-sub">View profile →</div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE SHARE -->
+<div class="mob-section-card">
+  <div class="mob-section-label">Share this event</div>
+  <div class="mob-share-grid">
+    <button class="mob-share-btn mob-share-wa" onclick="shareWA()">💬 WhatsApp</button>
+    <button class="mob-share-btn mob-share-copy" onclick="copyLink()">🔗 Copy Link</button>
   </div>
 </div>
 
@@ -700,13 +729,13 @@ async function renderEvent(data){
       const org = snap.exists ? snap.data() : {};
       const name = org.name || data.organiserName || 'Organiser';
       const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      ['orgAvatar','sideOrgAvatar','mobTopAvatar'].forEach(id=>{
+      ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar'].forEach(id=>{
         const el = document.getElementById(id);
         if(!el) return;
         if(org.avatarUrl) el.innerHTML = `<img src="${esc(org.avatarUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
         else el.textContent = initials;
       });
-      ['orgName','sideOrgName','mobTopOrgName','mobHostedName'].forEach(id=>{
+      ['orgName','sideOrgName','mobTopOrgName','mobHostedName','mobOrgName'].forEach(id=>{
         const el = document.getElementById(id);
         if(el) el.textContent = name;
       });
