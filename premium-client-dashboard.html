@@ -2576,10 +2576,20 @@ window.saveProfile = async function() {
     gtmId: (document.getElementById('pfGtmId')||{}).value?.trim()||'',
     updatedAt: new Date().toISOString()
   };
+  async function uploadToCloudinary(file, folder){
+    const form = new FormData();
+    form.append('file', file);
+    form.append('upload_preset', 'culturewave_upload');
+    form.append('folder', folder);
+    const res = await fetch('https://api.cloudinary.com/v1_1/antkxxvq/image/upload', {method:'POST', body:form});
+    const data = await res.json();
+    if(res.ok && data.secure_url) return data.secure_url;
+    throw new Error(data.error?.message || 'Upload failed');
+  }
   const coverFile = document.getElementById('coverFileInput')?.files[0];
-  if(coverFile) payload.coverUrl = await uploadImageToImageKit(coverFile, '/profile-covers');
+  if(coverFile) payload.coverUrl = await uploadToCloudinary(coverFile, 'profile-covers');
   const avatarFile = document.getElementById('avatarFileInput')?.files[0];
-  if(avatarFile) payload.avatarUrl = await uploadImageToImageKit(avatarFile, '/profile-avatars');
+  if(avatarFile) payload.avatarUrl = await uploadToCloudinary(avatarFile, 'profile-avatars');
   await setDoc(doc(db,'organisers',profileUid), payload, {merge:true});
   btns.forEach(b=>{ b.textContent='✓ Saved!'; setTimeout(()=>b.textContent=b.textContent.includes('Bank')?'Save Bank Details':'✓ Save',2000); });
   showToast('Brand settings saved!');
@@ -3074,7 +3084,6 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 </script>
 </body>
 
-<script src="imagekit.js"></script>
 <script>
 // ── DM AUTOMATION MODAL (plain script — works on file:// and http://) ──
 var dmCurrentStep = 1;
