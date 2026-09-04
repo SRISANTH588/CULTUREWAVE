@@ -183,9 +183,6 @@
         <div class="bk-card">
           <h2 id="evNameDisplay">Loading event...</h2>
           <p class="sub" id="evVenueDisplay">—</p>
-          <div id="seatingWrap" style="display:none;">
-            <div class="bk-seating" id="seatingContainer"></div>
-          </div>
         </div>
         <div>
           <button class="bk-btn-next" onclick="goStep2()">Continue → Select Seats</button>
@@ -198,7 +195,10 @@
           <h2>Select Ticket &amp; Seats</h2>
           <p class="sub">Choose your ticket type and number of seats.</p>
           <div id="ticketList"></div>
-          <div class="bk-field" style="margin-top:.75rem;">
+          <div id="seatingWrap" style="display:none;">
+            <div class="bk-seating" id="seatingContainer"></div>
+          </div>
+          <div class="bk-field" style="margin-top:.75rem;" id="qtyField">
             <span class="bk-label">Number of Seats</span>
             <div class="bk-qty">
               <button class="bk-qty-btn" onclick="changeQty(-1)">−</button>
@@ -558,7 +558,7 @@ async function sendEmail(data){
       seats_label: selectedSeats.length ? "Seat Numbers" : "Seats", booking_type: "Event Booking",
       date_time: new Date().toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}),
       payment_method: data.method||"Online",
-      ticket_url: location.origin+"/success.html?bookingId="+encodeURIComponent(data.bookingId)+"&event="+encodeURIComponent(data.eventName)+"&amount="+encodeURIComponent(data.amount)+"&status=Confirmed",
+      ticket_url: "https://srisanth588.github.io/CULTUREWAVE/success.html?bookingId="+encodeURIComponent(data.bookingId)+"&event="+encodeURIComponent(data.eventName)+"&amount="+encodeURIComponent(data.amount)+"&status=Confirmed",
       reply_to: "support.culturewave@gmail.com"
     });
   }catch(e){ console.error("email failed:",e); }
@@ -674,10 +674,12 @@ async function init(){
           img.style = "width:100%;border-radius:10px;";
           document.getElementById("seatingContainer").appendChild(img);
           document.getElementById("seatingWrap").style.display = "";
+          document.getElementById("qtyField").style.display = "none";
         } else if(evData.seatingPlan&&Array.isArray(evData.seatingPlan.rows)){
           await fetchBookedSeats();
           renderSeating(evData.seatingPlan, document.getElementById("seatingContainer"));
           document.getElementById("seatingWrap").style.display = "";
+          document.getElementById("qtyField").style.display = "none";
         }
         // receipt banner
         if(evData.cardImgUrl||evData.coverUrl){
