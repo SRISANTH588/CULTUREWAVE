@@ -365,11 +365,11 @@ function sendOtp(){
   generatedOtp = String(Math.floor(100000+Math.random()*900000));
   emailjs.send(EJ_SVC, EJ_OTP_TPL, {
     to_email: email, to_name: "User",
-    event_name: "Email Verification",
-    booking_id: generatedOtp,
-    amount: "OTP: "+generatedOtp,
-    seats:"—", date_time:"—", payment_method:"—",
-    ticket_url:"#", reply_to:"support.culturewave@gmail.com"
+    otp: generatedOtp,
+    passcode: generatedOtp,
+    message: "Your OTP is: " + generatedOtp,
+    code: generatedOtp,
+    reply_to: "support.culturewave@gmail.com"
   }).then(()=>{
     document.getElementById("otpWrap").style.display="flex";
     showToast("OTP sent to "+email);
