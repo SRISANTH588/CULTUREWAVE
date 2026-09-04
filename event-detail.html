@@ -700,7 +700,7 @@ async function init(){
   if(!snap.exists){ document.getElementById('evTitle').textContent='Event not found'; return; }
 
   const data = {id:snap.id,...snap.data()};
-  renderEvent(data);
+  await renderEvent(data);
 
   // show edit button if owner
   if(myUid && myUid === data.ownerId){
