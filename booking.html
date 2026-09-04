@@ -319,6 +319,7 @@ const db = firebase.firestore();
 const EJ_KEY = "PDb2vpOIeLkbZBBFP";
 const EJ_SVC = "service_esppdwf";
 const EJ_TPL = "template_caj3zqw";
+const EJ_OTP_TPL = "template_8ho2pwf";
 emailjs.init({ publicKey: EJ_KEY });
 
 // ── URL PARAMS ──
@@ -362,7 +363,7 @@ function sendOtp(){
   const email = document.getElementById("bookEmail").value.trim();
   if(!email || !email.includes("@")){ showToast("Enter a valid email first"); return; }
   generatedOtp = String(Math.floor(100000+Math.random()*900000));
-  emailjs.send(EJ_SVC, EJ_TPL, {
+  emailjs.send(EJ_SVC, EJ_OTP_TPL, {
     to_email: email, to_name: "User",
     event_name: "Email Verification",
     booking_id: generatedOtp,
