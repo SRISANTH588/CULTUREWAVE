@@ -53,8 +53,9 @@
     .description{font-size:.92rem;color:#475569;line-height:1.85;white-space:pre-wrap;}
 
     /* ORGANISER */
-    .org-chip{display:flex;align-items:center;gap:.85rem;padding:1rem 1.1rem;background:linear-gradient(135deg,#f8faff,#fff);border:1px solid var(--border);border-radius:16px;cursor:pointer;transition:border-color .2s,box-shadow .2s;}
-    .org-chip:hover{border-color:var(--blue);box-shadow:0 4px 20px rgba(18,66,197,.1);}
+    .org-chip{display:flex;align-items:center;gap:.85rem;padding:1rem 1.1rem;background:linear-gradient(135deg,#eef3ff,#f0f4ff);border:2px solid var(--blue);border-radius:16px;cursor:pointer;transition:border-color .2s,box-shadow .2s;box-shadow:0 4px 18px rgba(18,66,197,.13);}
+    .org-chip:hover{border-color:var(--blue-2);box-shadow:0 6px 24px rgba(18,66,197,.18);}
+    .org-chip-label{font-size:.68rem;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.15rem;}
     .org-avatar{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-weight:900;font-size:1.1rem;color:#fff;flex:none;box-shadow:0 4px 12px rgba(18,66,197,.25);}
     .org-info strong{display:block;font-size:.92rem;font-weight:800;}
     .org-info span{font-size:.76rem;color:var(--muted);margin-top:.1rem;display:block;}
@@ -191,7 +192,7 @@
     <!-- ORGANISER -->
     <div class="org-chip" id="orgChip" onclick="goToProfile()" style="margin-bottom:1.2rem;">
       <div class="org-avatar" id="orgAvatar">🎪</div>
-      <div class="org-info"><strong id="orgName">Organiser</strong><span>View all events →</span></div>
+      <div class="org-info"><div class="org-chip-label">Hosted by</div><strong id="orgName">Organiser</strong><span>View all events →</span></div>
       <span class="org-arrow">›</span>
     </div>
 
@@ -203,7 +204,6 @@
 
     <!-- TICKETS -->
     <div class="section" id="ticketsSection" style="display:none;">
-      <div class="section-title">Choose Your Ticket</div>
       <div id="ticketsList"></div>
     </div>
 
@@ -397,9 +397,10 @@ function renderEvent(data){
   ownerUid = data.ownerId;
   document.title = `${data.name||'Event'} | CultureWave`;
 
-  // hero banner cover
+  // hero banner — use poster (cardImgUrl) not cover
   const hero = document.getElementById('heroBanner');
-  if(data.coverUrl) hero.style.backgroundImage = `url('${esc(data.coverUrl)}')`;
+  const posterSrc = data.cardImgUrl || data.coverUrl;
+  if(posterSrc) hero.style.backgroundImage = `url('${esc(posterSrc)}')`;
   hero.style.backgroundSize = 'cover';
   hero.style.backgroundPosition = 'center';
 
