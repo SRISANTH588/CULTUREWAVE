@@ -590,7 +590,8 @@ async function renderEvent(data){
 
   // highlights strip
   const price0 = (data.tickets||[])[0]?.price || data.price || 0;
-  const durationLabel = data.duration ? data.duration+' Hrs' : '';
+  const mins = Number(data.duration||0);
+  const durationLabel = mins ? (mins >= 60 ? (mins/60 % 1 === 0 ? (mins/60)+' Hrs' : (mins/60).toFixed(1)+' Hrs') : mins+' Mins') : '';
   function fmtShortDate(ts){
     if(!ts) return 'TBA';
     const d = ts.toDate ? ts.toDate() : new Date(ts);
@@ -756,13 +757,13 @@ async function renderEvent(data){
           const u = usnap.data();
           const uname = u.name || u.displayName || 'Organiser';
           const uinitials = uname.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-          ['orgAvatar','sideOrgAvatar','mobTopAvatar'].forEach(id=>{
+          ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar'].forEach(id=>{
             const el = document.getElementById(id);
             if(!el) return;
             if(u.avatarUrl||u.photoURL) el.innerHTML = `<img src="${esc(u.avatarUrl||u.photoURL)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
             else el.textContent = uinitials;
           });
-          ['orgName','sideOrgName','mobTopOrgName'].forEach(id=>{
+          ['orgName','sideOrgName','mobTopOrgName','mobHostedName','mobOrgName'].forEach(id=>{
             const el = document.getElementById(id);
             if(el) el.textContent = uname;
           });
