@@ -291,7 +291,7 @@
         <div class="bk-rrow"><span>Ticket</span><strong id="rTicket">—</strong></div>
         <div class="bk-rrow"><span>Status</span><strong id="rStatus">Pending</strong></div>
         <div class="bk-rtotal"><span>Total</span><span id="rTotal">₹0</span></div>
-        <div class="bk-trust">
+        <div class="bk-trust" style="display:none;">
           <div class="bk-trust-item"><span>🔒</span>Secure Pay</div>
           <div class="bk-trust-item"><span>⚡</span>Instant Confirm</div>
           <div class="bk-trust-item"><span>🎫</span>E-Ticket</div>
@@ -355,6 +355,7 @@ function goStep(n){
     if(i<n) tab.classList.add("done");
     if(i===n) tab.classList.add("active");
   }
+  document.querySelector(".bk-trust").style.display = n === 1 ? "none" : "grid";
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
