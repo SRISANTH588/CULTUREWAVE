@@ -813,6 +813,8 @@
         }
         const article = document.createElement('article');
         article.className = 'event-card event-poster-card';
+        article.style.cursor = 'pointer';
+        article.addEventListener('click', () => window.location.href = `event-detail.html?eventId=${id}`);
         article.innerHTML = `
           <div class="event-banner ${_banners[i%_banners.length]}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} ></div>
           <div class="event-body">
@@ -820,7 +822,6 @@
             <h3>${d.name||'Untitled'}</h3>
             <p>${d.summary||d.description||''}</p>
             <div class="event-poster-price"><strong>${price ? `₹${Number(price).toLocaleString('en-IN')}` : 'Free'}</strong><span>/ onward</span></div>
-            <a class="btn btn-secondary event-btn" href="event-detail.html?eventId=${id}">View event</a>
           </div>`;
         grid.appendChild(article);
       });
