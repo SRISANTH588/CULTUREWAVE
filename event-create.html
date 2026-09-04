@@ -1755,6 +1755,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="imagekit.js"></script>
 <script>
 firebase.initializeApp({
   apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
@@ -1792,6 +1793,7 @@ let tickets = [];
 let coupons = [];
 let faqs = [];
 let uid = null;
+let coverFile = null;
 
 // ── AUTH ──
 async function loadUser() {
@@ -2073,6 +2075,7 @@ function showCoverPreview(src) {
 }
 window.loadCoverFile = function(input) {
   const file = input.files[0]; if (!file) return;
+  coverFile = file;
   const r = new FileReader();
   r.onload = e => { document.getElementById('coverUrl').value = ''; showCoverPreview(e.target.result); updateProgress(); };
   r.readAsDataURL(file);
@@ -2082,6 +2085,7 @@ window.syncCoverUrl = function() {
   updateProgress();
 };
 window.removeCover = function() {
+  coverFile = null;
   document.getElementById('coverUrl').value = '';
   document.getElementById('coverInput').value = '';
   showCoverPreview('');
@@ -2092,6 +2096,7 @@ window.handleCoverDrop = function(e) {
   document.getElementById('coverDropZone').style.borderColor = 'var(--border)';
   const file = e.dataTransfer.files[0];
   if (!file || !file.type.startsWith('image/')) return;
+  coverFile = file;
   const r = new FileReader();
   r.onload = ev => { showCoverPreview(ev.target.result); updateProgress(); };
   r.readAsDataURL(file);
@@ -2374,6 +2379,23 @@ async function saveEvent(status) {
   if (!uid) { await loadUser(); }
   if (!uid) { alert("Please sign in to save."); return; }
 
+  const saveButton = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
+  if (coverFile) {
+    saveButton.textContent = 'Uploading image...';
+    saveButton.disabled = true;
+    try {
+      const coverUrl = await uploadImageToImageKit(coverFile);
+      document.getElementById('coverUrl').value = coverUrl;
+      showCoverPreview(coverUrl);
+      coverFile = null;
+    } catch (err) {
+      alert('Image upload failed: ' + err.message);
+      saveButton.textContent = status === 'published' ? 'Publish Event' : 'Save Draft';
+      saveButton.disabled = false;
+      return;
+    }
+  }
+
   const rsvpToggles = {};
   document.querySelectorAll('.toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
@@ -2440,7 +2462,7 @@ async function saveEvent(status) {
   };
 
   try {
-    const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
+    const btn = saveButton;
     btn.textContent = 'Saving...';
     btn.disabled = true;
     if (editId) {
