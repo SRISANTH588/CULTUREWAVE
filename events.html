@@ -165,21 +165,24 @@
 
       /* ── CARD ── */
       .ev-card {
-        border-radius: 22px;
-        border: 1.5px solid #e8edf8;
-        background: #fff;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(18,66,197,0.06);
+        border: 1px solid #e1e4ec;
+        border-radius: 22px;
+        background: #fff;
+        box-shadow: 0 14px 32px rgba(25,55,110,.1);
         transition: transform 0.2s, box-shadow 0.2s;
         display: flex;
         flex-direction: column;
       }
       .ev-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 16px 40px rgba(18,66,197,0.13);
+        box-shadow: 0 20px 48px rgba(25,55,110,.16);
       }
       .ev-banner {
-        height: 190px;
+        height: auto;
+        aspect-ratio: 4/5;
+        background-size: cover;
+        background-position: center;
         position: relative;
         overflow: hidden;
       }
@@ -188,12 +191,6 @@
       .ev-banner-c { background: linear-gradient(135deg, #0891b2 0%, #67e8f9 100%); }
       .ev-banner-d { background: linear-gradient(135deg, #0d9488 0%, #5eead4 100%); }
       .ev-banner-e { background: linear-gradient(135deg, #1d4ed8 0%, #93c5fd 100%); }
-      .ev-banner::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.28) 100%);
-      }
       .ev-tag {
         position: absolute;
         top: 0.85rem;
@@ -211,77 +208,59 @@
         text-transform: uppercase;
       }
       .ev-body {
-        padding: 1.2rem 1.2rem 1.4rem;
+        padding: 1rem 1.1rem 1.1rem;
+        background: #fff;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
         flex: 1;
       }
-      .ev-body h3 {
-        margin: 0;
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #0a0f1e;
-        letter-spacing: -0.02em;
-        line-height: 1.3;
-      }
-      .ev-venue {
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        color: #6b7280;
-        font-size: 0.82rem;
-        font-weight: 600;
-      }
-      .ev-venue::before { content: "📍"; font-size: 0.75rem; }
-      .ev-meta {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        margin-top: 0.2rem;
-      }
-      .ev-pill {
-        background: #f0f5ff;
-        border: 1px solid #dce8ff;
-        color: #1242c5;
-        border-radius: 999px;
-        padding: 0.22rem 0.65rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-      }
-      .ev-pill.date {
-        background: #fff7ed;
-        border-color: #fed7aa;
-        color: #c2410c;
-      }
-      .ev-footer {
+      .ev-poster-info {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-top: auto;
-        padding-top: 0.8rem;
-        border-top: 1px solid #f0f2f8;
-      }
-      .ev-price {
-        font-size: 0.82rem;
-        color: #6b7280;
-        font-weight: 600;
-      }
-      .ev-price strong { color: #0a0f1e; font-size: 1rem; }
-      .ev-book {
-        background: #1242c5;
-        color: #fff;
-        border: 0;
-        border-radius: 12px;
-        padding: 0.6rem 1.1rem;
-        font-size: 0.82rem;
+        gap: 0.6rem;
+        margin-bottom: 0.8rem;
+        color: #68738a;
+        font-size: 0.72rem;
         font-weight: 800;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background 0.18s, transform 0.15s;
-        box-shadow: 0 4px 12px rgba(18,66,197,0.2);
+        white-space: nowrap;
       }
-      .ev-book:hover { background: #0d36b2; transform: translateY(-1px); }
+      .ev-poster-date { color: #8b2cff; overflow: hidden; text-overflow: ellipsis; }
+      .ev-poster-location { overflow: hidden; text-overflow: ellipsis; }
+      .ev-body h3 {
+        display: -webkit-box;
+        overflow: hidden;
+        margin: 0 0 0.35rem;
+        color: #0b1220;
+        font-size: 1.05rem;
+        line-height: 1.2;
+        letter-spacing: -0.035em;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+      }
+      .ev-body p {
+        display: -webkit-box;
+        overflow: hidden;
+        margin: 0 0 0.75rem;
+        color: #68738a;
+        font-size: 0.8rem;
+        line-height: 1.35;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+      }
+      .ev-poster-price {
+        display: flex;
+        align-items: baseline;
+        gap: 0.35rem;
+        color: #888;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-top: auto;
+      }
+      .ev-poster-price strong { color: #8b2cff; font-size: 1rem; font-weight: 900; }
+      .ev-book {
+        display: none;
+      }
 
       /* ── EMPTY STATE ── */
       .ev-empty {
@@ -505,21 +484,23 @@
             article.dataset.category = (d.category||'other').toLowerCase();
             article.dataset.date = date;
             article.innerHTML = `
+              <a href="event-detail.html?eventId=${id}" style="display:contents;text-decoration:none;">
               <div class="ev-banner ${bannerClass}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} >
                 <span class="ev-tag">${d.category||'Event'}</span>
               </div>
               <div class="ev-body">
+                <div class="ev-poster-info">
+                  <span class="ev-poster-date">▣ ${dateLabel}</span>
+                  <span class="ev-poster-location">⌖ ${d.city||'India'}</span>
+                </div>
                 <h3>${d.name||'Untitled Event'}</h3>
-                <p class="ev-venue">${d.venueName||d.city||'Venue TBA'}</p>
-                <div class="ev-meta">
-                  <span class="ev-pill date">${dateLabel}</span>
-                  <span class="ev-pill">${d.category||'Event'}</span>
+                <p>${d.summary||d.description||''}</p>
+                <div class="ev-poster-price">
+                  <strong>${price ? `₹${Number(price).toLocaleString('en-IN')}` : 'Free'}</strong>
+                  <span>${price ? '/ onward' : 'entry'}</span>
                 </div>
-                <div class="ev-footer">
-                  <div class="ev-price">${priceStr}</div>
-                  <a class="ev-book" href="event-detail.html?eventId=${id}">View &amp; Book &rarr;</a>
-                </div>
-              </div>`;
+              </div>
+              </a>`;
             grid.appendChild(article);
             cards.push(article);
           });
