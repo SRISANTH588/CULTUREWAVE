@@ -111,6 +111,12 @@
       display: flex; align-items: center; gap: 1.2rem;
       position: relative; overflow: hidden;
     }
+    .sc-ticket-cover {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      opacity: 0.18;
+      display: none;
+    }
     .sc-ticket-top::after {
       content: "";
       position: absolute; inset: 0;
@@ -305,7 +311,7 @@
 
       <!-- TICKET (shown only on success) -->
       <div class="sc-ticket" id="scTicket">
-        <div class="sc-ticket-top">
+        <div class="sc-ticket-top"><div class="sc-ticket-cover" id="ticketCoverBg"></div>
           <div class="sc-ticket-emoji" id="ticketEmoji">🎟️</div>
           <div class="sc-ticket-event-info">
             <h2 id="ticketEvent">Event Name</h2>
@@ -461,6 +467,14 @@
         const design = d.ticketDesign || {};
         const g1 = design.gradientStart || '#1242c5';
         const g2 = design.gradientEnd   || '#2f6bff';
+
+        // Apply cover photo as background on ticket top
+        const coverUrl = d.coverUrl || d.cardImgUrl || '';
+        const coverBg = document.getElementById('ticketCoverBg');
+        if (coverBg && coverUrl) {
+          coverBg.style.backgroundImage = `url('${coverUrl}')`;
+          coverBg.style.display = 'block';
+        }
 
         // Apply gradient to ticket top
         const top = document.querySelector('.sc-ticket-top');
