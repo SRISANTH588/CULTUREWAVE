@@ -1,4 +1,4 @@
-// Uploads browser-selected images to ImageKit without exposing the private key.
+// Uploads images to ImageKit (local/npm start) or Cloudinary (GitHub Pages).
 async function uploadImageToImageKit(file, folder = '/event-covers') {
   if (!file || !file.type.startsWith('image/')) {
     throw new Error('Please choose a valid image file.');
@@ -7,40 +7,71 @@ async function uploadImageToImageKit(file, folder = '/event-covers') {
     throw new Error('Image must be 5 MB or smaller.');
   }
 
-  const apiOrigin = window.location.protocol === 'file:' ? 'http://127.0.0.1:3000' : '';
-  let authResponse;
-  let auth;
-  try {
-    authResponse = await fetch(`${apiOrigin}/api/imagekit/auth`);
-    auth = await authResponse.json();
-  } catch {
-    throw new Error('Image upload server is unavailable. Start the app with npm start and refresh this page.');
+  const isGitHubPages = window.location.hostname.endsWith('.github.io');
+
+  // Use ImageKit when running locally with npm start
+  if (!isGitHubPages) {
+    try {
+      const authResponse = await fetch('/api/imagekit/auth');
+      if (authResponse.ok) {
+        const auth = await authResponse.json();
+        if (auth.token && auth.expire && auth.signature) {
+          const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '-')}`;
+          const form = new FormData();
+          form.append('file', file);
+          form.append('fileName', fileName);
+          form.append('folder', folder);
+          form.append('publicKey', auth.publicKey);
+          form.append('token', auth.token);
+          form.append('expire', String(auth.expire));
+          form.append('signature', auth.signature);
+
+          const res = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+            method: 'POST',
+            body: form,
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.url) return data.url;
+        }
+      }
+    } catch (_) {
+      // server not running — fall through to Cloudinary
+    }
   }
-  if (!authResponse.ok) throw new Error(auth.error || 'Could not prepare image upload. Restart the app server and try again.');
+
+  // Cloudinary unsigned upload — works on GitHub Pages for free
+  return await uploadToCloudinary(file, folder);
+}
+
+async function uploadToCloudinary(file, folder) {
+  const CLOUD_NAME = 'antkxxvq';
+  const UPLOAD_PRESET = 'culturewave_upload';
+
+  // Map folder to a Cloudinary folder name
+  const folderMap = {
+    '/event-covers': 'event-covers',
+    '/event-cards': 'event-cards',
+    '/event-logos': 'event-logos',
+    '/event-galleries': 'event-galleries',
+    '/seating-plans': 'seating-plans',
+  };
+  const cloudFolder = folderMap[folder] || 'uploads';
 
   const form = new FormData();
   form.append('file', file);
-  form.append('fileName', `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '-')}`);
-  form.append('folder', folder);
-  form.append('publicKey', auth.publicKey);
-  form.append('token', auth.token);
-  form.append('expire', auth.expire);
-  form.append('signature', auth.signature);
+  form.append('upload_preset', UPLOAD_PRESET);
+  form.append('folder', cloudFolder);
 
-  let uploadResponse;
-  let result;
-  try {
-    uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
-      method: 'POST',
-      body: form,
-    });
-    const responseText = await uploadResponse.text();
-    try { result = JSON.parse(responseText); } catch { result = {}; }
-  } catch {
-    throw new Error('Could not reach ImageKit. Check your internet connection and restart the app server.');
-  }
-  if (!uploadResponse.ok || !result.url) {
-    throw new Error(result.message || result.error || `ImageKit rejected the upload (HTTP ${uploadResponse.status}).`);
-  }
-  return result.url;
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+    method: 'POST',
+    body: form,
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (res.ok && data.secure_url) return data.secure_url;
+
+  throw new Error(
+    data.error?.message || `Image upload failed (${res.status}). Check your Cloudinary upload preset is set to Unsigned.`
+  );
 }
