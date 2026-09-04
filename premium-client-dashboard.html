@@ -2560,6 +2560,7 @@ window.saveProfile = async function() {
   if(!profileUid) return;
   const btns = document.querySelectorAll('.brand-save-btn');
   btns.forEach(b=>b.textContent='Saving...');
+  try{
   const payload = {
     name: document.getElementById('pfName').value.trim(),
     handle: document.getElementById('pfHandle').value.trim().replace(/^@/,''),
@@ -2593,6 +2594,7 @@ window.saveProfile = async function() {
   await setDoc(doc(db,'organisers',profileUid), payload, {merge:true});
   btns.forEach(b=>{ b.textContent='✓ Saved!'; setTimeout(()=>b.textContent=b.textContent.includes('Bank')?'Save Bank Details':'✓ Save',2000); });
   showToast('Brand settings saved!');
+  }catch(err){ console.error('saveProfile error:', err); showToast('Error: '+err.message); btns.forEach(b=>b.textContent='✗ Failed'); }
 };
 
 window.saveBrandBankDetails = async function() {
