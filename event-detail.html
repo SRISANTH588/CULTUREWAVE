@@ -123,45 +123,55 @@
     .mob-register-bar{display:none;}
     @media(max-width:860px){
       .mob-register-bar{display:flex;align-items:center;justify-content:space-between;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:.85rem 1.1rem;z-index:40;box-shadow:0 -4px 20px rgba(18,66,197,.1);gap:1rem;}
-      .mob-reg-price{font-size:1.2rem;font-weight:900;color:var(--text);line-height:1.1;}
-      .mob-reg-price small{font-size:.72rem;font-weight:600;color:var(--muted);display:block;}
+      .mob-reg-left{display:flex;flex-direction:column;gap:.1rem;}
+      .mob-reg-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+      .mob-reg-price{font-size:1.25rem;font-weight:900;color:var(--text);line-height:1;}
       .mob-reg-btn{flex:1;max-width:200px;height:48px;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:14px;font-size:.92rem;font-weight:900;box-shadow:0 6px 18px rgba(18,66,197,.3);}
       .sidebar{display:none;}
       body{padding-bottom:80px;}
-      /* mobile hero: just poster, no text overlay */
       .hero-banner{height:auto;min-height:0;background:none !important;}
       .hero-banner-overlay{display:none;}
       .hero-content{display:none;}
       .hero-badges{top:.7rem;left:.9rem;}
       .hero-edit-btn{top:.7rem;right:.9rem;}
-      /* mobile top bar: organiser name + login */
       .mob-topbar{display:flex !important;}
       .topbar{display:none;}
       .mobile-nav{top:52px;}
     }
-    .mob-topbar{display:none;align-items:center;justify-content:space-between;padding:.65rem 1rem;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30;}
-    .mob-topbar-org{display:flex;align-items:center;gap:.55rem;}
-    .mob-topbar-avatar{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.75rem;font-weight:900;color:#fff;flex:none;}
-    .mob-topbar-name{font-size:.88rem;font-weight:800;color:var(--text);}
-    .mob-topbar-login{height:34px;padding:0 1rem;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:10px;font-size:.78rem;font-weight:800;}
-    /* mobile poster */
+    /* MOBILE TOP BAR */
+    .mob-topbar{display:none;align-items:center;gap:.6rem;padding:.55rem .9rem;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30;}
+    .mob-topbar-home{width:30px;height:30px;display:grid;place-items:center;font-size:1.1rem;flex:none;text-decoration:none;}
+    .mob-topbar-org{display:flex;align-items:center;gap:.45rem;flex:1;min-width:0;cursor:pointer;}
+    .mob-topbar-avatar{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.7rem;font-weight:900;color:#fff;flex:none;overflow:hidden;}
+    .mob-topbar-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
+    .mob-topbar-name{font-size:.84rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .mob-topbar-login{height:32px;padding:0 .9rem;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:9px;font-size:.76rem;font-weight:800;white-space:nowrap;flex:none;}
+    /* MOBILE POSTER */
     .mob-poster{display:none;}
     @media(max-width:860px){
       .mob-poster{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;}
       .mob-event-header{display:block !important;}
     }
-    .mob-event-header{display:none;padding:1rem 1rem .25rem;}
-    .mob-hosted-by{display:flex;align-items:center;gap:.55rem;margin-bottom:.65rem;cursor:pointer;}
-    .mob-hosted-avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.78rem;font-weight:900;color:#fff;flex:none;}
-    .mob-hosted-label{font-size:.62rem;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.07em;}
-    .mob-hosted-name{font-size:.84rem;font-weight:800;color:var(--text);}
-    .mob-event-title{font-size:1.5rem;font-weight:900;color:var(--text);letter-spacing:-.04em;line-height:1.2;margin-bottom:.85rem;}
+    /* MOBILE EVENT HEADER */
+    .mob-event-header{display:none;padding:1rem 1rem .5rem;background:#fff;}
+    .mob-event-title{font-size:1.45rem;font-weight:900;color:var(--text);letter-spacing:-.04em;line-height:1.2;margin-bottom:1rem;}
+    .mob-info-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.5rem;}
+    .mob-info-row{display:flex;align-items:flex-start;gap:.75rem;}
+    .mob-info-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:1rem;flex:none;}
+    .mob-info-icon.blue{background:#e8f0ff;}
+    .mob-info-icon.green{background:#dcfce7;}
+    .mob-info-icon.gold{background:#fef3c7;}
+    .mob-info-icon.purple{background:#f3e8ff;}
+    .mob-info-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+    .mob-info-value{font-size:.9rem;font-weight:800;color:var(--text);margin-top:.1rem;}
+    .mob-info-sub{font-size:.76rem;color:var(--muted);margin-top:.05rem;}
   </style>
 </head>
 <body>
 
 <!-- MOBILE TOP BAR -->
 <div class="mob-topbar" id="mobTopbar">
+  <a class="mob-topbar-home" href="index.html">🏠</a>
   <div class="mob-topbar-org" onclick="goToProfile()">
     <div class="mob-topbar-avatar" id="mobTopAvatar">🎪</div>
     <span class="mob-topbar-name" id="mobTopOrgName">Organiser</span>
@@ -229,16 +239,24 @@
 
 <!-- MOBILE EVENT HEADER -->
 <div class="mob-event-header" id="mobEventHeader">
-  <div class="mob-hosted-by" onclick="goToProfile()">
-    <div class="mob-hosted-avatar" id="mobHostedAvatar">🎪</div>
-    <div><div class="mob-hosted-label">Hosted by</div><div class="mob-hosted-name" id="mobHostedName">Organiser</div></div>
-  </div>
   <div class="mob-event-title" id="mobEvTitle">Loading...</div>
-  <div class="highlights" id="mobHighlights" style="margin-bottom:.5rem;">
-    <div class="hl-card"><div class="hl-icon blue">📅</div><div><div class="hl-label">Date</div><div class="hl-value" id="mobHlDate">TBA</div></div></div>
-    <div class="hl-card"><div class="hl-icon green">📍</div><div><div class="hl-label">Venue</div><div class="hl-value" id="mobHlVenue">TBA</div></div></div>
-    <div class="hl-card"><div class="hl-icon gold">🎫</div><div><div class="hl-label">Tickets from</div><div class="hl-value" id="mobHlPrice">Free</div></div></div>
-    <div class="hl-card"><div class="hl-icon purple">⏱️</div><div><div class="hl-label">Duration</div><div class="hl-value" id="mobHlDuration">TBA</div></div></div>
+  <div class="mob-info-list">
+    <div class="mob-info-row">
+      <div class="mob-info-icon blue">📅</div>
+      <div><div class="mob-info-label">Date &amp; Time</div><div class="mob-info-value" id="mobInfoDate">TBA</div><div class="mob-info-sub" id="mobInfoTime"></div></div>
+    </div>
+    <div class="mob-info-row">
+      <div class="mob-info-icon purple">⏱️</div>
+      <div><div class="mob-info-label">Duration</div><div class="mob-info-value" id="mobInfoDuration">TBA</div></div>
+    </div>
+    <div class="mob-info-row">
+      <div class="mob-info-icon green">📍</div>
+      <div><div class="mob-info-label">Venue</div><div class="mob-info-value" id="mobInfoVenue">TBA</div></div>
+    </div>
+    <div class="mob-info-row" id="mobInfoTicketRow">
+      <div class="mob-info-icon gold">🎫</div>
+      <div><div class="mob-info-label">Tickets from</div><div class="mob-info-value" id="mobInfoTicket">Free</div></div>
+    </div>
   </div>
 </div>
 
@@ -334,7 +352,10 @@
 
 <!-- MOBILE STICKY BOTTOM BAR -->
 <div class="mob-register-bar" id="mobRegBar">
-  <div class="mob-reg-price"><span id="mobRegPrice">Free</span><small id="mobRegMeta">Register to attend</small></div>
+  <div class="mob-reg-left">
+    <span class="mob-reg-label">Basic rate</span>
+    <span class="mob-reg-price" id="mobRegPrice">Free</span>
+  </div>
   <button class="mob-reg-btn" onclick="register()">Register Now 🎉</button>
 </div>
 
@@ -517,18 +538,26 @@ function renderEvent(data){
   // highlights strip
   const price0 = (data.tickets||[])[0]?.price || data.price || 0;
   const durationLabel = data.duration ? data.duration+' hrs' : 'TBA';
+  // short date: "19 Sep, Saturday"
+  function fmtShortDate(ts){
+    if(!ts) return 'TBA';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    const day = d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const weekday = d.toLocaleDateString('en-IN',{weekday:'long'});
+    return day+', '+weekday;
+  }
   document.getElementById('hlDate').textContent = fmtDate(data.startDate);
   document.getElementById('hlVenue').textContent = data.venueName||data.city||'TBA';
   document.getElementById('hlPrice').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
   document.getElementById('hlCap').textContent = data.capacity ? Number(data.capacity).toLocaleString('en-IN')+' seats' : 'Open';
-  // mobile highlights
-  document.getElementById('mobHlDate').textContent = fmtDate(data.startDate);
-  document.getElementById('mobHlVenue').textContent = data.venueName||data.city||'TBA';
-  document.getElementById('mobHlPrice').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
-  document.getElementById('mobHlDuration').textContent = durationLabel;
+  // mobile info rows
+  document.getElementById('mobInfoDate').textContent = fmtShortDate(data.startDate);
+  document.getElementById('mobInfoTime').textContent = data.startTime || '';
+  document.getElementById('mobInfoDuration').textContent = durationLabel;
+  document.getElementById('mobInfoVenue').textContent = (data.venueName||'TBA')+(data.city?', '+data.city:'');
+  document.getElementById('mobInfoTicket').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
   // mobile bottom bar
   document.getElementById('mobRegPrice').innerHTML = price0 ? `₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
-  document.getElementById('mobRegMeta').textContent = price0 ? 'Basic rate · Register now' : 'Free entry';
   // terms & conditions
   if(data.termsText){ document.getElementById('termsText').textContent=data.termsText; document.getElementById('termsSection').style.display='block'; }
   if(data.refundPolicy){ document.getElementById('refundText').textContent=data.refundPolicy; document.getElementById('refundSection').style.display='block'; }
@@ -637,7 +666,7 @@ function renderEvent(data){
       const org = snap.exists ? snap.data() : {};
       const name = org.name || 'Organiser';
       const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobHostedAvatar'].forEach(id=>{
+      ['orgAvatar','sideOrgAvatar','mobTopAvatar'].forEach(id=>{
         const el = document.getElementById(id);
         if(!el) return;
         if(org.avatarUrl) el.innerHTML = `<img src="${esc(org.avatarUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
@@ -646,7 +675,6 @@ function renderEvent(data){
       document.getElementById('orgName').textContent = name;
       document.getElementById('sideOrgName').textContent = name;
       document.getElementById('mobTopOrgName').textContent = name;
-      document.getElementById('mobHostedName').textContent = name;
     });
   }
 }
