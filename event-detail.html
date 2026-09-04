@@ -156,18 +156,19 @@
       .mob-event-header{display:block !important;}
     }
     /* MOBILE EVENT HEADER */
-    .mob-event-header{display:none;padding:1rem 1rem .5rem;background:#fff;}
-    .mob-event-title{font-size:1.45rem;font-weight:900;color:var(--text);letter-spacing:-.04em;line-height:1.2;margin-bottom:1rem;}
-    .mob-info-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.5rem;}
-    .mob-info-row{display:flex;align-items:flex-start;gap:.75rem;}
-    .mob-info-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:1rem;flex:none;}
-    .mob-info-icon.blue{background:#e8f0ff;}
-    .mob-info-icon.green{background:#dcfce7;}
-    .mob-info-icon.gold{background:#fef3c7;}
-    .mob-info-icon.purple{background:#f3e8ff;}
-    .mob-info-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
-    .mob-info-value{font-size:.9rem;font-weight:800;color:var(--text);margin-top:.1rem;}
-    .mob-info-sub{font-size:.76rem;color:var(--muted);margin-top:.05rem;}
+    .mob-event-header{display:none;padding:1.2rem 1rem 0;background:#fff;}
+    .mob-hosted-line{font-size:.88rem;color:#555;margin-bottom:.6rem;}
+    .mob-hosted-line a{color:var(--blue);font-weight:700;text-decoration:none;}
+    .mob-event-title{font-size:1.6rem;font-weight:900;color:var(--text);letter-spacing:-.04em;line-height:1.2;margin-bottom:.6rem;}
+    .mob-event-summary{font-size:.92rem;color:#555;line-height:1.6;margin-bottom:1rem;}
+    .mob-info-list{display:flex;flex-direction:column;gap:1rem;margin-top:1.2rem;}
+    .mob-info-row{display:flex;align-items:center;gap:1rem;}
+    .mob-date-box{width:72px;min-width:72px;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.1);flex:none;}
+    .mob-date-box-top{background:var(--blue);color:#fff;font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;text-align:center;padding:.3rem 0;}
+    .mob-date-box-day{background:#fff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;text-align:center;padding:.35rem 0 .4rem;font-size:1.6rem;font-weight:900;color:var(--text);line-height:1;}
+    .mob-info-icon-box{width:56px;min-width:56px;height:56px;border-radius:14px;background:#f3f4f6;display:grid;place-items:center;font-size:1.4rem;flex:none;}
+    .mob-info-text-title{font-size:.95rem;font-weight:800;color:var(--text);}
+    .mob-info-text-sub{font-size:.84rem;color:#6b7280;margin-top:.15rem;}
   </style>
 </head>
 <body>
@@ -244,23 +245,44 @@
 
 <!-- MOBILE EVENT HEADER -->
 <div class="mob-event-header" id="mobEventHeader">
+  <div class="mob-hosted-line">Hosted by <a onclick="goToProfile();return false;" href="#" id="mobHostedName">Organiser</a></div>
   <div class="mob-event-title" id="mobEvTitle">Loading...</div>
+  <div class="mob-event-summary" id="mobEvSummary"></div>
   <div class="mob-info-list">
+    <!-- Date -->
     <div class="mob-info-row">
-      <div class="mob-info-icon blue">📅</div>
-      <div><div class="mob-info-label">Date &amp; Time</div><div class="mob-info-value" id="mobInfoDate">TBA</div><div class="mob-info-sub" id="mobInfoTime"></div></div>
+      <div class="mob-date-box">
+        <div class="mob-date-box-top" id="mobDateMonth">—</div>
+        <div class="mob-date-box-day" id="mobDateDay">—</div>
+      </div>
+      <div>
+        <div class="mob-info-text-title" id="mobInfoDate">TBA</div>
+        <div class="mob-info-text-sub" id="mobInfoTime"></div>
+      </div>
     </div>
+    <!-- Duration -->
+    <div class="mob-info-row" id="mobDurationRow">
+      <div class="mob-info-icon-box">⏳</div>
+      <div>
+        <div class="mob-info-text-title">Duration</div>
+        <div class="mob-info-text-sub" id="mobInfoDuration">TBA</div>
+      </div>
+    </div>
+    <!-- Venue -->
     <div class="mob-info-row">
-      <div class="mob-info-icon purple">⏱️</div>
-      <div><div class="mob-info-label">Duration</div><div class="mob-info-value" id="mobInfoDuration">TBA</div></div>
+      <div class="mob-info-icon-box">📍</div>
+      <div>
+        <div class="mob-info-text-title">Venue</div>
+        <div class="mob-info-text-sub" id="mobInfoVenue">TBA</div>
+      </div>
     </div>
-    <div class="mob-info-row">
-      <div class="mob-info-icon green">📍</div>
-      <div><div class="mob-info-label">Venue</div><div class="mob-info-value" id="mobInfoVenue">TBA</div></div>
-    </div>
+    <!-- Tickets -->
     <div class="mob-info-row" id="mobInfoTicketRow">
-      <div class="mob-info-icon gold">🎫</div>
-      <div><div class="mob-info-label">Tickets from</div><div class="mob-info-value" id="mobInfoTicket">Free</div></div>
+      <div class="mob-info-icon-box">🎫</div>
+      <div>
+        <div class="mob-info-text-title">Tickets from</div>
+        <div class="mob-info-text-sub" id="mobInfoTicket">Free</div>
+      </div>
     </div>
   </div>
 </div>
@@ -519,50 +541,50 @@ async function renderEvent(data){
 
   // mobile event header
   document.getElementById('mobEvTitle').textContent = data.name||'Untitled Event';
-
-  // badges
-  document.getElementById('evCategory').textContent = '🎪 ' + (data.category||'Event');
-  const norm = (data.status||'draft').toLowerCase();
-  if(norm==='published') document.getElementById('liveBadge').style.display='';
-  else document.getElementById('draftBadge').style.display='';
-  // show premium badge if tickets have VIP or price > 1000
-  const hasVIP = (data.tickets||[]).some(t=>/vip|premium|gold|platinum/i.test(t.name||''));
-  const highPrice = (data.tickets||[]).some(t=>Number(t.price||0)>1000);
-  if(hasVIP || highPrice) document.getElementById('premiumBadge').style.display='';
-
-  // hero text
-  document.getElementById('evTitle').textContent = data.name||'Untitled Event';
-  document.getElementById('evDate').textContent = fmtDate(data.startDate);
-  document.getElementById('evVenue').textContent = data.venueName||'Venue TBA';
-  document.getElementById('evCity').textContent = data.city ? ' · '+data.city : '';
-  if(data.capacity){
-    document.getElementById('evCapacity').textContent = Number(data.capacity).toLocaleString('en-IN')+' seats';
-    document.getElementById('evCapacityRow').style.display='flex';
-  }
+  document.getElementById('mobEvSummary').textContent = data.summary||data.tagline||'';
 
   // highlights strip
   const price0 = (data.tickets||[])[0]?.price || data.price || 0;
-  const durationLabel = data.duration ? data.duration+' hrs' : 'TBA';
-  // short date: "19 Sep, Saturday"
+  const durationLabel = data.duration ? data.duration+' Hrs' : '';
   function fmtShortDate(ts){
     if(!ts) return 'TBA';
     const d = ts.toDate ? ts.toDate() : new Date(ts);
-    const day = d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const day = d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
     const weekday = d.toLocaleDateString('en-IN',{weekday:'long'});
     return day+', '+weekday;
   }
-  document.getElementById('hlDate').textContent = fmtDate(data.startDate);
-  document.getElementById('hlVenue').textContent = data.venueName||data.city||'TBA';
-  document.getElementById('hlPrice').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
-  document.getElementById('hlCap').textContent = data.capacity ? Number(data.capacity).toLocaleString('en-IN')+' seats' : 'Open';
-  // mobile info rows
+  // mobile date box
+  if(data.startDate){
+    const d = data.startDate.toDate ? data.startDate.toDate() : new Date(data.startDate);
+    document.getElementById('mobDateMonth').textContent = d.toLocaleDateString('en-IN',{month:'short'}).toUpperCase();
+    document.getElementById('mobDateDay').textContent = d.toLocaleDateString('en-IN',{day:'2-digit'});
+  }
   document.getElementById('mobInfoDate').textContent = fmtShortDate(data.startDate);
   document.getElementById('mobInfoTime').textContent = data.startTime || '';
-  document.getElementById('mobInfoDuration').textContent = durationLabel;
+  if(durationLabel){ document.getElementById('mobInfoDuration').textContent = durationLabel; }
+  else { document.getElementById('mobDurationRow').style.display='none'; }
   document.getElementById('mobInfoVenue').textContent = (data.venueName||'TBA')+(data.city?', '+data.city:'');
   document.getElementById('mobInfoTicket').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
   // mobile bottom bar
   document.getElementById('mobRegPrice').innerHTML = price0 ? `₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
+
+  // desktop badges + hero
+  document.getElementById('evCategory').textContent = '🎪 ' + (data.category||'Event');
+  const norm = (data.status||'draft').toLowerCase();
+  if(norm==='published') document.getElementById('liveBadge').style.display='';
+  else document.getElementById('draftBadge').style.display='';
+  const hasVIP = (data.tickets||[]).some(t=>/vip|premium|gold|platinum/i.test(t.name||''));
+  const highPrice = (data.tickets||[]).some(t=>Number(t.price||0)>1000);
+  if(hasVIP||highPrice) document.getElementById('premiumBadge').style.display='';
+  document.getElementById('evTitle').textContent = data.name||'Untitled Event';
+  document.getElementById('evDate').textContent = fmtDate(data.startDate);
+  document.getElementById('evVenue').textContent = data.venueName||'Venue TBA';
+  document.getElementById('evCity').textContent = data.city ? ' · '+data.city : '';
+  if(data.capacity){ document.getElementById('evCapacity').textContent = Number(data.capacity).toLocaleString('en-IN')+' seats'; document.getElementById('evCapacityRow').style.display='flex'; }
+  document.getElementById('hlDate').textContent = fmtDate(data.startDate);
+  document.getElementById('hlVenue').textContent = data.venueName||data.city||'TBA';
+  document.getElementById('hlPrice').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
+  document.getElementById('hlCap').textContent = data.capacity ? Number(data.capacity).toLocaleString('en-IN')+' seats' : 'Open';
   // terms & conditions
   if(data.termsText){ document.getElementById('termsText').textContent=data.termsText; document.getElementById('termsSection').style.display='block'; }
   if(data.refundPolicy){ document.getElementById('refundText').textContent=data.refundPolicy; document.getElementById('refundSection').style.display='block'; }
@@ -678,7 +700,7 @@ async function renderEvent(data){
         if(org.avatarUrl) el.innerHTML = `<img src="${esc(org.avatarUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
         else el.textContent = initials;
       });
-      ['orgName','sideOrgName','mobTopOrgName'].forEach(id=>{
+      ['orgName','sideOrgName','mobTopOrgName','mobHostedName'].forEach(id=>{
         const el = document.getElementById(id);
         if(el) el.textContent = name;
       });
