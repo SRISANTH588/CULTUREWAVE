@@ -9,73 +9,91 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="styles.css"/>
   <style>
-    :root{--blue:#1242c5;--blue-2:#2f6bff;--green:#10b981;--red:#ef4444;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
-    body{background:#f4f8ff;font-size:14px;}
+    :root{--blue:#1242c5;--blue-2:#2f6bff;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
     *{box-sizing:border-box;margin:0;padding:0;}
     a{text-decoration:none;color:inherit;}
     button{font:inherit;cursor:pointer;}
+    body{background:#f0f4ff;font-size:14px;}
+
+    /* HERO BANNER */
+    .hero-banner{width:100%;height:420px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0a0f1e,#1242c5,#2f6bff);}
+    .hero-banner img{width:100%;height:100%;object-fit:cover;}
+    .hero-banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,15,30,.15) 0%,rgba(10,15,30,.75) 100%);}
+    .hero-badges{position:absolute;top:1.2rem;left:1.4rem;display:flex;gap:.5rem;flex-wrap:wrap;}
+    .badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:900;padding:.3rem .8rem;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;backdrop-filter:blur(8px);}
+    .badge-live{background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);color:#6ee7b7;}
+    .badge-draft{background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#fcd34d;}
+    .badge-premium{background:linear-gradient(135deg,rgba(245,158,11,.3),rgba(251,191,36,.2));border:1px solid rgba(245,158,11,.5);color:#fcd34d;}
+    .badge-category{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;}
+    .hero-edit-btn{position:absolute;top:1.2rem;right:1.4rem;display:none;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;padding:.4rem .9rem;font-size:.78rem;font-weight:800;backdrop-filter:blur(8px);cursor:pointer;}
+    .hero-content{position:absolute;bottom:0;left:0;right:0;padding:2rem 1.8rem 1.8rem;}
+    .hero-title{font-size:2.4rem;font-weight:900;color:#fff;letter-spacing:-.05em;line-height:1.15;margin-bottom:.75rem;text-shadow:0 2px 12px rgba(0,0,0,.3);}
+    .hero-meta-row{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;}
+    .hero-meta-item{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:rgba(255,255,255,.8);font-weight:600;}
+    .hero-meta-item span{font-size:.9rem;}
 
     /* LAYOUT */
-    .shell{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start;}
+    .shell{max-width:1140px;margin:0 auto;padding:2rem 1.5rem;display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start;}
 
-    /* COVER */
-    .cover{width:100%;aspect-ratio:16/7;border-radius:26px;overflow:hidden;background:linear-gradient(135deg,#0a0f1e,#1242c5,#2f6bff);margin-bottom:1.75rem;position:relative;box-shadow:0 12px 40px rgba(18,66,197,.18);}
-    .cover img{width:100%;height:100%;object-fit:cover;}
-    .cover-placeholder{width:100%;height:100%;display:grid;place-items:center;font-size:4rem;}
-    .cover-status{position:absolute;top:1rem;left:1rem;font-size:.72rem;font-weight:900;padding:.3rem .75rem;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;}
-    .cover-status.live{background:#dcfce7;color:#166534;}
-    .cover-status.draft{background:#fff7ed;color:#b45309;}
+    /* HIGHLIGHTS STRIP */
+    .highlights{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem;}
+    .hl-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:.9rem 1rem;display:flex;align-items:center;gap:.75rem;box-shadow:0 2px 12px rgba(18,66,197,.05);}
+    .hl-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:1.1rem;flex:none;}
+    .hl-icon.blue{background:#e8f0ff;}
+    .hl-icon.green{background:#dcfce7;}
+    .hl-icon.gold{background:#fef3c7;}
+    .hl-icon.purple{background:#f3e8ff;}
+    .hl-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+    .hl-value{font-size:.9rem;font-weight:800;color:var(--text);margin-top:.1rem;}
 
-    /* EVENT META */
-    .ev-category{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:900;color:var(--blue);background:#e8f0ff;border-radius:999px;padding:.22rem .65rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;}
-    .ev-title{font-size:2rem;font-weight:900;letter-spacing:-.05em;line-height:1.2;margin-bottom:1rem;}
-    .meta-row{display:flex;align-items:center;gap:.55rem;font-size:.88rem;color:#475569;margin-bottom:.65rem;}
-    .meta-icon{width:34px;height:34px;border-radius:10px;background:#f1f5f9;border:1px solid var(--border);display:grid;place-items:center;font-size:1rem;flex:none;}
-    .meta-row strong{display:block;font-size:.88rem;font-weight:800;color:var(--text);}
-    .meta-row span{font-size:.78rem;color:var(--muted);}
+    /* SECTION */
+    .section{background:#fff;border:1px solid var(--border);border-radius:20px;padding:1.4rem;margin-bottom:1.2rem;box-shadow:0 2px 12px rgba(18,66,197,.04);}
+    .section-title{font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+    .section-title::before{content:'';width:3px;height:14px;background:linear-gradient(135deg,var(--blue),var(--blue-2));border-radius:999px;}
+    .description{font-size:.92rem;color:#475569;line-height:1.85;white-space:pre-wrap;}
 
-    /* ORGANISER CHIP */
-    .org-chip{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:#fff;border:1px solid var(--border);border-radius:16px;margin:1.5rem 0;cursor:pointer;transition:border-color .2s;}
-    .org-chip:hover{border-color:var(--blue);}
-    .org-avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-weight:900;font-size:1rem;color:#fff;flex:none;}
-    .org-info strong{display:block;font-size:.9rem;font-weight:800;}
-    .org-info span{font-size:.76rem;color:var(--muted);}
-    .org-arrow{margin-left:auto;color:var(--muted);font-size:1.1rem;}
+    /* ORGANISER */
+    .org-chip{display:flex;align-items:center;gap:.85rem;padding:1rem 1.1rem;background:linear-gradient(135deg,#f8faff,#fff);border:1px solid var(--border);border-radius:16px;cursor:pointer;transition:border-color .2s,box-shadow .2s;}
+    .org-chip:hover{border-color:var(--blue);box-shadow:0 4px 20px rgba(18,66,197,.1);}
+    .org-avatar{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-weight:900;font-size:1.1rem;color:#fff;flex:none;box-shadow:0 4px 12px rgba(18,66,197,.25);}
+    .org-info strong{display:block;font-size:.92rem;font-weight:800;}
+    .org-info span{font-size:.76rem;color:var(--muted);margin-top:.1rem;display:block;}
+    .org-arrow{margin-left:auto;color:var(--muted);font-size:1.2rem;}
 
-    /* DESCRIPTION */
-    .section-title{font-size:1rem;font-weight:900;letter-spacing:-.03em;margin-bottom:.75rem;padding-top:1.5rem;border-top:1px solid var(--border);}
-    .description{font-size:.9rem;color:#475569;line-height:1.75;white-space:pre-wrap;}
+    /* META ROWS */
+    .meta-row{display:flex;align-items:center;gap:.75rem;font-size:.88rem;color:#475569;margin-bottom:.75rem;}
+    .meta-icon{width:38px;height:38px;border-radius:11px;background:#f1f5f9;border:1px solid var(--border);display:grid;place-items:center;font-size:1rem;flex:none;}
+    .meta-row strong{display:block;font-size:.9rem;font-weight:800;color:var(--text);}
+    .meta-row span{font-size:.78rem;color:var(--muted);margin-top:.1rem;display:block;}
 
-    /* TICKET TYPES */
-    .ticket-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:border-color .2s,background .2s;}
-    .ticket-card:hover{border-color:var(--blue);}
-    .ticket-card.selected{border-color:var(--blue);background:#f0f5ff;box-shadow:0 0 0 3px rgba(18,66,197,.12);}
-    .ticket-name{font-size:.95rem;font-weight:800;}
-    .ticket-desc{font-size:.76rem;color:var(--muted);margin-top:.2rem;}
-    .ticket-price{font-size:1.1rem;font-weight:900;color:var(--text);white-space:nowrap;}
-    .ticket-price small{font-size:.7rem;font-weight:700;color:var(--muted);}
-    .ticket-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:none;display:grid;place-items:center;transition:border-color .2s;}
+    /* TICKET CARDS */
+    .ticket-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;margin-bottom:.85rem;cursor:pointer;transition:border-color .2s,box-shadow .2s;overflow:hidden;}
+    .ticket-card:hover{border-color:var(--blue);box-shadow:0 4px 20px rgba(18,66,197,.1);}
+    .ticket-card.selected{box-shadow:0 0 0 3px rgba(18,66,197,.15);}
+    .ticket-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:none;display:grid;place-items:center;transition:all .2s;}
     .ticket-card.selected .ticket-radio{border-color:var(--blue);background:var(--blue);}
     .ticket-card.selected .ticket-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;}
+    .ticket-vip-badge{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;font-size:.62rem;font-weight:900;padding:.18rem .55rem;border-radius:999px;letter-spacing:.06em;}
 
-    /* STICKY SIDEBAR */
+    /* SIDEBAR */
     .sidebar{position:sticky;top:80px;display:flex;flex-direction:column;gap:1rem;}
-    .register-card{background:#fff;border:1px solid var(--border);border-radius:22px;padding:1.6rem;box-shadow:0 8px 36px rgba(18,66,197,.1);}
-    .reg-price{font-size:1.7rem;font-weight:900;letter-spacing:-.05em;margin-bottom:.25rem;color:var(--text);}
+    .register-card{background:#fff;border:1px solid var(--border);border-radius:22px;padding:1.6rem;box-shadow:0 8px 36px rgba(18,66,197,.1);overflow:hidden;position:relative;}
+    .register-card::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(47,107,255,.08),transparent 70%);pointer-events:none;}
+    .reg-price{font-size:1.8rem;font-weight:900;letter-spacing:-.05em;margin-bottom:.2rem;color:var(--text);}
     .reg-price small{font-size:.8rem;font-weight:700;color:var(--muted);}
     .reg-meta{font-size:.78rem;color:var(--muted);margin-bottom:1.25rem;}
-    .reg-btn{width:100%;height:52px;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:14px;font-size:.95rem;font-weight:900;box-shadow:0 8px 24px rgba(18,66,197,.32);margin-bottom:.75rem;transition:transform .15s,box-shadow .15s;}
+    .reg-btn{width:100%;height:54px;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:14px;font-size:.95rem;font-weight:900;box-shadow:0 8px 24px rgba(18,66,197,.32);margin-bottom:.75rem;transition:transform .15s,box-shadow .15s;}
     .reg-btn:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(18,66,197,.42);}
     .reg-share{width:100%;height:44px;background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:14px;font-size:.84rem;font-weight:800;transition:border-color .2s,color .2s;}
     .reg-share:hover{border-color:var(--blue);color:var(--blue);}
     .reg-divider{border:0;border-top:1px solid var(--border);margin:.85rem 0;}
-    .reg-detail{display:flex;align-items:center;gap:.6rem;font-size:.8rem;color:#475569;margin-bottom:.55rem;}
-    .reg-detail-icon{font-size:1rem;width:20px;text-align:center;}
+    .reg-detail{display:flex;align-items:center;gap:.65rem;font-size:.8rem;color:#475569;margin-bottom:.6rem;}
+    .reg-detail-icon{font-size:1rem;width:22px;text-align:center;flex:none;}
 
     /* SHARE MODAL */
-    .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;place-items:center;z-index:50;padding:1rem;}
+    .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;place-items:center;z-index:50;padding:1rem;backdrop-filter:blur(4px);}
     .modal-bg.open{display:grid;}
-    .modal{background:#fff;border-radius:20px;padding:1.5rem;width:min(480px,100%);box-shadow:0 24px 64px rgba(15,23,42,.2);}
+    .modal{background:#fff;border-radius:22px;padding:1.6rem;width:min(480px,100%);box-shadow:0 24px 64px rgba(15,23,42,.2);}
     .modal h3{font-size:1.1rem;font-weight:900;margin-bottom:1rem;}
     .share-link{display:flex;gap:.5rem;align-items:center;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:.6rem .85rem;margin-bottom:1rem;}
     .share-link span{flex:1;font-size:.78rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -85,22 +103,20 @@
     .share-item .si-icon{font-size:1.4rem;}
     .share-item .si-label{font-size:.65rem;font-weight:800;color:var(--muted);margin-top:.2rem;}
 
-    /* SKELETON */
-    .skel{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
-    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
     /* TOAST */
     .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
-    @media(max-width:860px){
-      .shell{grid-template-columns:1fr;}
-      .sidebar{position:static;}
-    }
-    @media(max-width:480px){
-      .ev-title{font-size:1.5rem;}
-      .shell{padding:1rem;}
-    }
+    /* FAQ */
+    .faq-item{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:.6rem;}
+    .faq-item summary{font-weight:800;font-size:.9rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:.9rem 1rem;background:#fff;}
+    .faq-item summary:hover{background:#f8faff;}
+    .faq-item[open] summary{border-bottom:1px solid var(--border);color:var(--blue);}
+    .faq-item .faq-ans{padding:.85rem 1rem;font-size:.86rem;color:#475569;line-height:1.7;background:#fff;}
+
+    @media(max-width:860px){.shell{grid-template-columns:1fr;}.sidebar{position:static;}.highlights{grid-template-columns:repeat(2,1fr);}.hero-title{font-size:1.8rem;}}
+    @media(max-width:560px){.highlights{grid-template-columns:1fr 1fr;}.hero-banner{height:300px;}.hero-title{font-size:1.4rem;}.shell{padding:1rem;}}
+    @media(max-width:400px){.highlights{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
@@ -122,8 +138,7 @@
       <a class="nav-cta" href="login.html">Get Started</a>
     </div>
     <div style="display:flex;gap:.6rem;margin-left:auto;align-items:center;">
-      <button class="btn btn-ghost" id="navShareBtn" onclick="openShare()">🔗 Share</button>
-      <a class="btn btn-ghost" id="navEditBtn" href="#" style="display:none;">✏️ Edit</a>
+      <button class="btn btn-ghost" onclick="openShare()">🔗 Share</button>
     </div>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -142,69 +157,75 @@
   </div>
 </nav>
 
+<div class="hero-banner" id="heroBanner">
+  <div class="hero-banner-overlay"></div>
+  <div class="hero-badges">
+    <span class="badge badge-category" id="evCategory">🎪 Event</span>
+    <span class="badge badge-premium" id="premiumBadge" style="display:none;">⭐ Premium Event</span>
+    <span class="badge badge-live" id="liveBadge" style="display:none;">● Live</span>
+    <span class="badge badge-draft" id="draftBadge" style="display:none;">✎ Draft</span>
+  </div>
+  <a class="hero-edit-btn" id="navEditBtn" href="#">✏️ Edit Event</a>
+  <div class="hero-content">
+    <h1 class="hero-title" id="evTitle">Loading event...</h1>
+    <div class="hero-meta-row">
+      <div class="hero-meta-item"><span>📅</span><span id="evDate">—</span></div>
+      <div class="hero-meta-item"><span>📍</span><span id="evVenue">—</span><span id="evCity" style="opacity:.7;"></span></div>
+      <div class="hero-meta-item" id="evCapacityRow" style="display:none;"><span>👥</span><span id="evCapacity">—</span></div>
+    </div>
+  </div>
+</div>
+
 <div class="shell">
-
-  <!-- LEFT COLUMN -->
+  <!-- LEFT -->
   <div>
-    <div class="cover" id="coverEl">
-      <div class="cover-placeholder">🎉</div>
-    </div>
 
-    <div class="ev-category" id="evCategory">🎪 Event</div>
-    <h1 class="ev-title" id="evTitle">Loading event...</h1>
-
-    <div class="meta-row">
-      <div class="meta-icon">📅</div>
-      <div><strong id="evDate">—</strong><span id="evTime"></span></div>
-    </div>
-    <div class="meta-row">
-      <div class="meta-icon">📍</div>
-      <div><strong id="evVenue">—</strong><span id="evCity"></span></div>
-    </div>
-    <div class="meta-row" id="evCapacityRow" style="display:none;">
-      <div class="meta-icon">👥</div>
-      <div><strong id="evCapacity">—</strong><span>Capacity</span></div>
+    <!-- HIGHLIGHTS -->
+    <div class="highlights" id="highlightsStrip">
+      <div class="hl-card"><div class="hl-icon blue">📅</div><div><div class="hl-label">Date</div><div class="hl-value" id="hlDate">TBA</div></div></div>
+      <div class="hl-card"><div class="hl-icon green">📍</div><div><div class="hl-label">Venue</div><div class="hl-value" id="hlVenue">TBA</div></div></div>
+      <div class="hl-card"><div class="hl-icon gold">🎟️</div><div><div class="hl-label">Tickets from</div><div class="hl-value" id="hlPrice">Free</div></div></div>
+      <div class="hl-card"><div class="hl-icon purple">👥</div><div><div class="hl-label">Capacity</div><div class="hl-value" id="hlCap">Open</div></div></div>
     </div>
 
     <!-- ORGANISER -->
-    <div class="org-chip" id="orgChip" onclick="goToProfile()">
+    <div class="org-chip" id="orgChip" onclick="goToProfile()" style="margin-bottom:1.2rem;">
       <div class="org-avatar" id="orgAvatar">🎪</div>
-      <div class="org-info">
-        <strong id="orgName">Organiser</strong>
-        <span>View all events →</span>
-      </div>
+      <div class="org-info"><strong id="orgName">Organiser</strong><span>View all events →</span></div>
       <span class="org-arrow">›</span>
     </div>
 
-    <!-- DESCRIPTION -->
-    <div id="descSection" style="display:none;">
+    <!-- ABOUT -->
+    <div class="section" id="descSection" style="display:none;">
       <div class="section-title">About this event</div>
       <div class="description" id="evDesc"></div>
     </div>
 
     <!-- TICKETS -->
-    <div id="ticketsSection" style="display:none;">
-      <div class="section-title">Tickets</div>
+    <div class="section" id="ticketsSection" style="display:none;">
+      <div class="section-title">Choose Your Ticket</div>
       <div id="ticketsList"></div>
     </div>
 
-    <div id="seatingPlanSection" style="display:none;">
+    <!-- SEATING PLAN -->
+    <div class="section" id="seatingPlanSection" style="display:none;">
       <div class="section-title">Seating Plan</div>
-      <p style="font-size:.84rem;color:#64748b;margin-bottom:.75rem;">See the venue layout before choosing your booking.</p>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:.75rem;overflow:auto;">
-        <img id="seatingPlanImage" src="" alt="Event seating plan" style="display:block;width:100%;max-height:620px;object-fit:contain;border-radius:10px;" />
+      <p style="font-size:.84rem;color:#64748b;margin-bottom:.85rem;">See the venue layout before choosing your seat.</p>
+      <div style="border:1px solid var(--border);border-radius:14px;padding:.75rem;overflow:auto;background:#f8faff;">
+        <img id="seatingPlanImage" src="" alt="Seating plan" style="display:block;width:100%;max-height:520px;object-fit:contain;border-radius:10px;"/>
         <div id="seatingPlanBuilder" style="display:none;"></div>
       </div>
     </div>
 
     <!-- FAQS -->
-    <div id="faqsSection" style="display:none;">
+    <div class="section" id="faqsSection" style="display:none;">
       <div class="section-title">FAQs</div>
       <div id="faqsList"></div>
     </div>
+
   </div>
 
-  <!-- RIGHT SIDEBAR -->
+  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="register-card">
       <div class="reg-price" id="regPrice">Free</div>
@@ -216,19 +237,22 @@
       <div class="reg-detail"><span class="reg-detail-icon">📍</span><span id="sideVenue">—</span></div>
       <div class="reg-detail" id="sideCapRow" style="display:none;"><span class="reg-detail-icon">👥</span><span id="sideCap">—</span></div>
     </div>
-
-    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:1rem 1.1rem;">
-      <div style="font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:.65rem;">Organised by</div>
-      <div style="display:flex;align-items:center;gap:.65rem;cursor:pointer;" onclick="goToProfile()">
-        <div class="org-avatar" id="sideOrgAvatar" style="width:38px;height:38px;border-radius:10px;font-size:.9rem;">🎪</div>
-        <div>
-          <div style="font-size:.9rem;font-weight:800;" id="sideOrgName">Organiser</div>
-          <div style="font-size:.74rem;color:var(--muted);">View profile →</div>
-        </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:18px;padding:1.1rem;">
+      <div style="font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:.75rem;">Organised by</div>
+      <div style="display:flex;align-items:center;gap:.7rem;cursor:pointer;" onclick="goToProfile()">
+        <div class="org-avatar" id="sideOrgAvatar" style="width:40px;height:40px;border-radius:11px;font-size:.95rem;">🎪</div>
+        <div><div style="font-size:.9rem;font-weight:800;" id="sideOrgName">Organiser</div><div style="font-size:.74rem;color:var(--muted);">View profile →</div></div>
+      </div>
+    </div>
+    <!-- SHARE BUTTONS -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:18px;padding:1.1rem;">
+      <div style="font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:.75rem;">Share this event</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+        <button onclick="shareWA()" style="display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem;border-radius:10px;border:1px solid #dcfce7;background:#f0fdf4;color:#166534;font-size:.78rem;font-weight:800;cursor:pointer;">💬 WhatsApp</button>
+        <button onclick="copyLink()" style="display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem;border-radius:10px;border:1px solid var(--border);background:#f8faff;color:var(--text);font-size:.78rem;font-weight:800;cursor:pointer;">🔗 Copy Link</button>
       </div>
     </div>
   </div>
-
 </div>
 
 <!-- SHARE MODAL -->
@@ -373,52 +397,65 @@ function renderEvent(data){
   ownerUid = data.ownerId;
   document.title = `${data.name||'Event'} | CultureWave`;
 
-  // cover
-  const coverEl = document.getElementById('coverEl');
-  if(data.coverUrl){
-    coverEl.innerHTML = `<img src="${esc(data.coverUrl)}" alt="${esc(data.coverAlt||data.name)}"/>`;
-  }
-  const norm = (data.status||'draft').toLowerCase();
-  if(norm==='published') coverEl.innerHTML += '<span class="cover-status live">Live</span>';
-  else coverEl.innerHTML += '<span class="cover-status draft">Draft</span>';
+  // hero banner cover
+  const hero = document.getElementById('heroBanner');
+  if(data.coverUrl) hero.style.backgroundImage = `url('${esc(data.coverUrl)}')`;
+  hero.style.backgroundSize = 'cover';
+  hero.style.backgroundPosition = 'center';
 
-  // meta
+  // badges
   document.getElementById('evCategory').textContent = '🎪 ' + (data.category||'Event');
+  const norm = (data.status||'draft').toLowerCase();
+  if(norm==='published') document.getElementById('liveBadge').style.display='';
+  else document.getElementById('draftBadge').style.display='';
+  // show premium badge if tickets have VIP or price > 1000
+  const hasVIP = (data.tickets||[]).some(t=>/vip|premium|gold|platinum/i.test(t.name||''));
+  const highPrice = (data.tickets||[]).some(t=>Number(t.price||0)>1000);
+  if(hasVIP || highPrice) document.getElementById('premiumBadge').style.display='';
+
+  // hero text
   document.getElementById('evTitle').textContent = data.name||'Untitled Event';
   document.getElementById('evDate').textContent = fmtDate(data.startDate);
-  document.getElementById('evTime').textContent = fmtTime(data.startTime);
   document.getElementById('evVenue').textContent = data.venueName||'Venue TBA';
-  document.getElementById('evCity').textContent = data.city||'';
-  document.getElementById('sideDate').textContent = fmtDate(data.startDate) + (data.startTime ? ' · '+data.startTime : '');
-  document.getElementById('sideVenue').textContent = (data.venueName||'Venue TBA') + (data.city ? ', '+data.city : '');
-
+  document.getElementById('evCity').textContent = data.city ? ' · '+data.city : '';
   if(data.capacity){
-    document.getElementById('evCapacity').textContent = Number(data.capacity).toLocaleString('en-IN') + ' seats';
-    document.getElementById('evCapacityRow').style.display = 'flex';
-    document.getElementById('sideCap').textContent = Number(data.capacity).toLocaleString('en-IN') + ' capacity';
-    document.getElementById('sideCapRow').style.display = 'flex';
+    document.getElementById('evCapacity').textContent = Number(data.capacity).toLocaleString('en-IN')+' seats';
+    document.getElementById('evCapacityRow').style.display='flex';
+  }
+
+  // highlights strip
+  const price0 = (data.tickets||[])[0]?.price || data.price || 0;
+  document.getElementById('hlDate').textContent = fmtDate(data.startDate);
+  document.getElementById('hlVenue').textContent = data.venueName||data.city||'TBA';
+  document.getElementById('hlPrice').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
+  document.getElementById('hlCap').textContent = data.capacity ? Number(data.capacity).toLocaleString('en-IN')+' seats' : 'Open';
+
+  // sidebar
+  document.getElementById('sideDate').textContent = fmtDate(data.startDate)+(data.startTime?' · '+data.startTime:'');
+  document.getElementById('sideVenue').textContent = (data.venueName||'Venue TBA')+(data.city?', '+data.city:'');
+  if(data.capacity){
+    document.getElementById('sideCap').textContent = Number(data.capacity).toLocaleString('en-IN')+' capacity';
+    document.getElementById('sideCapRow').style.display='flex';
   }
 
   // price
-  const price = data.tickets?.[0]?.price || data.price || 0;
-  document.getElementById('regPrice').innerHTML = price ? `₹${Number(price).toLocaleString('en-IN')}<small> onwards</small>` : 'Free';
-  document.getElementById('regMeta').textContent = price ? 'Per person · Taxes may apply' : 'Free to attend';
+  document.getElementById('regPrice').innerHTML = price0 ? `&#8377;${Number(price0).toLocaleString('en-IN')}<small> onwards</small>` : 'Free';
+  document.getElementById('regMeta').textContent = price0 ? 'Per person · Taxes may apply' : 'Free to attend';
 
   // description
   if(data.description){
     document.getElementById('evDesc').textContent = data.description;
-    document.getElementById('descSection').style.display = 'block';
+    document.getElementById('descSection').style.display='block';
   }
 
-  // tickets — show designed ticket card
+  // tickets
   const tickets = data.tickets||[];
-  const td = data.ticketDesign || {};
-  const g1 = td.gradientStart || '#1242c5';
-  const g2 = td.gradientEnd || '#2f6bff';
-  const logoUrl = td.logoUrl || '';
-  const orgName = td.organiserName || '';
-  const tagline = td.tagline || '';
-  const footer  = td.footer || '';
+  const td = data.ticketDesign||{};
+  const g1 = td.gradientStart||'#1242c5';
+  const g2 = td.gradientEnd||'#2f6bff';
+  const logoUrl = td.logoUrl||'';
+  const tagline = td.tagline||'';
+  const footer  = td.footer||'';
   const showQR    = td.showQR    !== false;
   const showSeat  = td.showSeat  !== false;
   const showVenue = td.showVenue !== false;
@@ -426,52 +463,48 @@ function renderEvent(data){
 
   if(tickets.length){
     document.getElementById('ticketsList').innerHTML = tickets.map((t,i)=>{
-      const price = t.price ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
-      const firstDate = Array.isArray(data.eventDates) && data.eventDates[0];
-      const dateLabel = firstDate ? new Date(firstDate.date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : (data.startDate ? fmtDate(data.startDate) : 'Date TBA');
-      const venueLabel = data.venueName || data.city || 'Venue TBA';
+      const priceStr = t.price ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
+      const firstDate = Array.isArray(data.eventDates)&&data.eventDates[0];
+      const dateLabel = firstDate ? new Date(firstDate.date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : fmtDate(data.startDate);
+      const venueLabel = data.venueName||data.city||'Venue TBA';
+      const isVIP = /vip|premium|gold|platinum/i.test(t.name||'');
       return `
-      <div class="ticket-card ${i===0?'selected':''}" onclick="selectTicket(${i})" style="padding:0;overflow:hidden;border:${i===0?'2px solid '+g1:'1.5px solid var(--border)'}">
-        <!-- Ticket header -->
-        <div style="background:linear-gradient(135deg,${g1},${g2});padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;position:relative;">
-          ${showLogo && logoUrl ? `<img src="${esc(logoUrl)}" style="width:38px;height:38px;border-radius:9px;object-fit:contain;background:rgba(255,255,255,.15);flex:none;"/>` : `<div style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:1.1rem;flex:none;">&#127915;</div>`}
+      <div class="ticket-card ${i===0?'selected':''}" onclick="selectTicket(${i})" style="border:${i===0?'2px solid '+g1:'1.5px solid var(--border)'}">
+        <div style="background:linear-gradient(135deg,${g1},${g2});padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;">
+          ${showLogo&&logoUrl?`<img src="${esc(logoUrl)}" style="width:38px;height:38px;border-radius:9px;object-fit:contain;background:rgba(255,255,255,.15);flex:none;"/>`:`<div style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:1.1rem;flex:none;">&#127915;</div>`}
           <div style="flex:1;">
-            <div style="font-size:.95rem;font-weight:800;color:#fff;letter-spacing:-.02em;">${esc(data.name||'Event')}</div>
-            ${showVenue ? `<div style="font-size:.72rem;color:rgba(255,255,255,.75);margin-top:.15rem;">&#128205; ${esc(venueLabel)}</div>` : ''}
+            <div style="display:flex;align-items:center;gap:.5rem;">
+              <div style="font-size:.95rem;font-weight:800;color:#fff;">${esc(t.name||'General Admission')}</div>
+              ${isVIP?'<span class="ticket-vip-badge">VIP</span>':''}
+            </div>
+            ${showVenue?`<div style="font-size:.72rem;color:rgba(255,255,255,.75);margin-top:.15rem;">&#128205; ${esc(venueLabel)}</div>`:''}
           </div>
           <div style="text-align:right;">
-            <div style="font-size:.72rem;font-weight:800;color:rgba(255,255,255,.7);background:rgba(255,255,255,.15);border-radius:999px;padding:.18rem .55rem;">${esc(t.name||'General Admission')}</div>
-            ${showSeat ? `<div style="font-size:.65rem;color:rgba(255,255,255,.6);margin-top:.2rem;">Seat #001</div>` : ''}
+            <div style="font-size:1.1rem;font-weight:900;color:#fff;">${priceStr}</div>
+            ${t.qty?`<div style="font-size:.65rem;color:rgba(255,255,255,.65);">${Number(t.qty).toLocaleString('en-IN')} seats</div>`:''}
           </div>
         </div>
-        <!-- Tear line -->
-        <div style="display:flex;align-items:center;border-top:2px dashed #e2eafc;position:relative;">
-          <div style="width:1.2rem;height:1.2rem;border-radius:50%;background:#f4f8ff;border:1.5px solid #e2eafc;margin-left:-.65rem;"></div>
+        <div style="display:flex;align-items:center;border-top:2px dashed #e2eafc;">
+          <div style="width:1.2rem;height:1.2rem;border-radius:50%;background:#f0f4ff;border:1.5px solid #e2eafc;margin-left:-.65rem;"></div>
           <div style="flex:1;"></div>
-          <div style="width:1.2rem;height:1.2rem;border-radius:50%;background:#f4f8ff;border:1.5px solid #e2eafc;margin-right:-.65rem;"></div>
+          <div style="width:1.2rem;height:1.2rem;border-radius:50%;background:#f0f4ff;border:1.5px solid #e2eafc;margin-right:-.65rem;"></div>
         </div>
-        <!-- Ticket body -->
         <div style="padding:.85rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#fff;">
           <div>
-            <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.2rem;">Date</div>
-            <div style="font-size:.88rem;font-weight:800;color:#0a0f1e;">${dateLabel}</div>
-            ${tagline ? `<div style="font-size:.7rem;color:#64748b;font-style:italic;margin-top:.3rem;">${esc(tagline)}</div>` : ''}
-            ${footer ? `<div style="font-size:.65rem;color:#9ca3af;margin-top:.15rem;">${esc(footer)}</div>` : ''}
+            <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;">Date</div>
+            <div style="font-size:.88rem;font-weight:800;color:#0a0f1e;margin-top:.15rem;">${dateLabel}</div>
+            ${tagline?`<div style="font-size:.7rem;color:#64748b;font-style:italic;margin-top:.25rem;">${esc(tagline)}</div>`:''}
+            ${footer?`<div style="font-size:.65rem;color:#9ca3af;margin-top:.1rem;">${esc(footer)}</div>`:''}
           </div>
-          <div style="text-align:right;">
-            <div style="font-size:1.1rem;font-weight:900;color:${g1};">${price}</div>
-            ${t.qty ? `<div style="font-size:.7rem;color:#9ca3af;">${Number(t.qty).toLocaleString('en-IN')} seats</div>` : ''}
-            ${showQR ? `<div style="width:44px;height:44px;background:#0a0f1e;border-radius:7px;display:grid;place-items:center;margin-top:.4rem;margin-left:auto;"><svg width="34" height="34" viewBox="0 0 44 44" fill="none"><rect x="0" y="0" width="18" height="18" rx="2" fill="white"/><rect x="4" y="4" width="10" height="10" rx="1" fill="#0f172a"/><rect x="26" y="0" width="18" height="18" rx="2" fill="white"/><rect x="30" y="4" width="10" height="10" rx="1" fill="#0f172a"/><rect x="0" y="26" width="18" height="18" rx="2" fill="white"/><rect x="4" y="30" width="10" height="10" rx="1" fill="#0f172a"/><rect x="26" y="26" width="4" height="4" fill="white"/><rect x="32" y="26" width="4" height="4" fill="white"/><rect x="38" y="26" width="6" height="4" fill="white"/><rect x="26" y="32" width="6" height="4" fill="white"/><rect x="34" y="32" width="4" height="4" fill="white"/></svg></div>` : ''}
-          </div>
+          ${showQR?`<div style="width:44px;height:44px;background:#0a0f1e;border-radius:7px;display:grid;place-items:center;"><svg width="34" height="34" viewBox="0 0 44 44" fill="none"><rect x="0" y="0" width="18" height="18" rx="2" fill="white"/><rect x="4" y="4" width="10" height="10" rx="1" fill="#0f172a"/><rect x="26" y="0" width="18" height="18" rx="2" fill="white"/><rect x="30" y="4" width="10" height="10" rx="1" fill="#0f172a"/><rect x="0" y="26" width="18" height="18" rx="2" fill="white"/><rect x="4" y="30" width="10" height="10" rx="1" fill="#0f172a"/><rect x="26" y="26" width="4" height="4" fill="white"/><rect x="32" y="26" width="4" height="4" fill="white"/><rect x="38" y="26" width="6" height="4" fill="white"/><rect x="26" y="32" width="6" height="4" fill="white"/><rect x="34" y="32" width="4" height="4" fill="white"/></svg></div>`:''}
         </div>
-        <!-- Select indicator -->
         <div style="padding:.5rem 1.1rem;background:#f8fafc;border-top:1px solid #f0f2f8;display:flex;align-items:center;gap:.5rem;">
           <div class="ticket-radio"></div>
           <span style="font-size:.74rem;font-weight:700;color:#64748b;">${i===0?'Selected':'Click to select'}</span>
         </div>
       </div>`;
     }).join('');
-    document.getElementById('ticketsSection').style.display = 'block';
+    document.getElementById('ticketsSection').style.display='block';
   }
 
   if(data.seatingPlanUrl){
@@ -488,13 +521,11 @@ function renderEvent(data){
   const faqs = data.faqs||[];
   if(faqs.length){
     document.getElementById('faqsList').innerHTML = faqs.map(f=>`
-      <details style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:.85rem 1rem;margin-bottom:.6rem;">
-        <summary style="font-weight:800;font-size:.9rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
-          ${esc(f.question)} <span style="color:var(--muted);font-size:1.1rem;">+</span>
-        </summary>
-        <div style="margin-top:.6rem;font-size:.86rem;color:#475569;line-height:1.65;">${esc(f.answer)}</div>
+      <details class="faq-item">
+        <summary>${esc(f.question||f.q||'')} <span style="color:var(--muted);font-size:1.1rem;">+</span></summary>
+        <div class="faq-ans">${esc(f.answer||f.a||'')}</div>
       </details>`).join('');
-    document.getElementById('faqsSection').style.display = 'block';
+    document.getElementById('faqsSection').style.display='block';
   }
 
   // load organiser
@@ -533,8 +564,7 @@ async function init(){
   // show edit button if owner
   if(myUid && myUid === data.ownerId){
     const editBtn = document.getElementById('navEditBtn');
-    editBtn.href = `event-create.html?eventId=${eventId}`;
-    editBtn.style.display = 'inline-flex';
+    if(editBtn){ editBtn.href = `event-create.html?eventId=${eventId}`; editBtn.style.display='block'; }
   }
 }
 
