@@ -2588,12 +2588,13 @@ window.saveProfile = async function() {
     throw new Error(data.error?.message || 'Upload failed');
   }
   const coverFile = document.getElementById('coverFileInput')?.files[0];
-  if(coverFile) payload.coverUrl = await uploadToCloudinary(coverFile, 'profile-covers');
+  if(coverFile){ payload.coverUrl = await uploadToCloudinary(coverFile, 'profile-covers'); console.log('coverUrl:', payload.coverUrl); }
   const avatarFile = document.getElementById('avatarFileInput')?.files[0];
-  if(avatarFile) payload.avatarUrl = await uploadToCloudinary(avatarFile, 'profile-avatars');
+  if(avatarFile){ payload.avatarUrl = await uploadToCloudinary(avatarFile, 'profile-avatars'); console.log('avatarUrl:', payload.avatarUrl); }
+  console.log('saving to organisers/', profileUid, payload);
   await setDoc(doc(db,'organisers',profileUid), payload, {merge:true});
   btns.forEach(b=>{ b.textContent='✓ Saved!'; setTimeout(()=>b.textContent=b.textContent.includes('Bank')?'Save Bank Details':'✓ Save',2000); });
-  showToast('Brand settings saved!');
+  showToast('Saved! Avatar: '+(payload.avatarUrl?'✓ uploaded':'not changed'));
   }catch(err){ console.error('saveProfile error:', err); showToast('Error: '+err.message); btns.forEach(b=>b.textContent='✗ Failed'); }
 };
 
