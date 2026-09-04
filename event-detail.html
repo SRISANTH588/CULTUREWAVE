@@ -320,7 +320,9 @@ function renderSeatingLayout(layout, target){
   const rows = Array.isArray(layout.rows) ? layout.rows : [];
   target.innerHTML = `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${esc(layout.stage || 'STAGE')}</div>` + rows.map(row => {
     const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
-    return `<div style="display:flex;align-items:center;gap:.45rem;margin:.45rem 0;min-width:420px;"><span style="width:24px;font-size:.72rem;font-weight:900;color:#64748b;">${esc(row.label || '')}</span><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.3rem;flex:1;">${Array.from({length:count},(_,i)=>`<span style="display:grid;place-items:center;width:30px;height:30px;border-radius:7px;background:#e8efff;color:#1242c5;font-size:.62rem;font-weight:800;">${esc(row.label || '')}${i+1}</span>`).join('')}</div></div>`;
+    const justify = row.align === 'left' ? 'flex-start' : row.align === 'right' ? 'flex-end' : 'center';
+    const sofa = row.seatStyle === 'sofa';
+    return `<div style="margin:.65rem 0;min-width:420px;"><div style="font-size:.64rem;font-weight:800;color:#64748b;margin:0 0 .25rem 29px;">${esc(row.ticketType || 'General Admission')}</div><div style="display:flex;align-items:center;gap:.45rem;"><span style="width:24px;font-size:.72rem;font-weight:900;color:#64748b;">${esc(row.label || '')}</span><div style="display:flex;flex-wrap:wrap;justify-content:${justify};gap:.3rem;flex:1;">${Array.from({length:count},(_,i)=>`<span style="display:grid;place-items:center;width:${sofa ? '58px' : '30px'};height:30px;border-radius:${sofa ? '15px' : '7px'};background:${sofa ? '#fce7f3' : '#e8efff'};color:${sofa ? '#be185d' : '#1242c5'};font-size:.62rem;font-weight:800;">${sofa ? 'Sofa ' : ''}${esc(row.label || '')}${i+1}</span>`).join('')}</div></div></div>`;
   }).join('');
 }
 

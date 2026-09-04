@@ -743,7 +743,9 @@
       if (!target || !layout || !Array.isArray(layout.rows)) return;
       target.innerHTML = `<div style="text-align:center;font-size:.64rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:8px;padding:.45rem;margin-bottom:.7rem;">${layout.stage || "STAGE"}</div>` + layout.rows.map(row => {
         const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
-        return `<div style="display:flex;align-items:center;gap:.35rem;margin:.35rem 0;min-width:360px;"><span style="width:20px;font-size:.68rem;font-weight:900;color:#64748b;">${row.label || ""}</span><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.25rem;flex:1;">${Array.from({length:count},(_,i)=>`<span style="display:grid;place-items:center;width:25px;height:25px;border-radius:6px;background:#e8efff;color:#1242c5;font-size:.55rem;font-weight:800;">${row.label || ""}${i+1}</span>`).join("")}</div></div>`;
+        const justify = row.align === "left" ? "flex-start" : row.align === "right" ? "flex-end" : "center";
+        const sofa = row.seatStyle === "sofa";
+        return `<div style="margin:.55rem 0;min-width:360px;"><div style="font-size:.6rem;font-weight:800;color:#64748b;margin:0 0 .2rem 24px;">${row.ticketType || "General Admission"}</div><div style="display:flex;align-items:center;gap:.35rem;"><span style="width:20px;font-size:.68rem;font-weight:900;color:#64748b;">${row.label || ""}</span><div style="display:flex;flex-wrap:wrap;justify-content:${justify};gap:.25rem;flex:1;">${Array.from({length:count},(_,i)=>`<span style="display:grid;place-items:center;width:${sofa ? "50px" : "25px"};height:25px;border-radius:${sofa ? "13px" : "6px"};background:${sofa ? "#fce7f3" : "#e8efff"};color:${sofa ? "#be185d" : "#1242c5"};font-size:.55rem;font-weight:800;">${sofa ? "Sofa " : ""}${row.label || ""}${i+1}</span>`).join("")}</div></div></div>`;
       }).join("");
       document.getElementById("bookingSeatingPlanImage").style.display = "none";
       target.style.display = "block";

@@ -932,6 +932,7 @@
             <div class="field"><label for="seatingStageLabel">Stage label</label><input id="seatingStageLabel" value="STAGE" placeholder="e.g. Main Stage" oninput="updateSeatingMeta('stage', this.value)" /></div>
             <div class="field"><label for="seatingPlanTitle">Plan title</label><input id="seatingPlanTitle" value="Venue Seating Plan" placeholder="e.g. Auditorium Layout" oninput="updateSeatingMeta('title', this.value)" /></div>
           </div>
+          <div style="font-size:.74rem;color:var(--muted);margin-bottom:.55rem;">For example, add three rows and name each ticket type <strong>VIP</strong>. Each row can use seats or sofas and sit on the left, center, or right.</div>
           <div id="seatingRowsList" style="display:flex;flex-direction:column;gap:.55rem;"></div>
           <button type="button" onclick="addSeatingRow()" style="margin-top:.7rem;background:var(--blue-light);color:var(--blue);border:1px solid rgba(20,84,255,.18);border-radius:9px;padding:.45rem .75rem;font-size:.76rem;font-weight:800;cursor:pointer;">+ Add row</button>
           <div id="seatingBuilderPreview" style="margin-top:1rem;padding:1rem;border:1px solid var(--border);border-radius:14px;background:#f8faff;"></div>
@@ -1945,9 +1946,12 @@ function renderSeatingBuilder() {
   if (!list || !preview) return;
   const rows = seatingPlanLayout.rows || [];
   list.innerHTML = rows.map((row, index) => `
-    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.55rem;align-items:end;padding:.65rem;border:1px solid var(--border);border-radius:11px;background:#fff;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:.55rem;align-items:end;padding:.65rem;border:1px solid var(--border);border-radius:11px;background:#fff;">
       <div class="field"><label>Row name</label><input value="${row.label || ''}" oninput="updateSeatingRow(${index}, 'label', this.value)" /></div>
-      <div class="field"><label>Seats in row</label><input type="number" min="1" max="100" value="${Number(row.seats || 1)}" oninput="updateSeatingRow(${index}, 'seats', this.value)" /></div>
+      <div class="field"><label>Seats / sofas</label><input type="number" min="1" max="100" value="${Number(row.seats || 1)}" oninput="updateSeatingRow(${index}, 'seats', this.value)" /></div>
+      <div class="field"><label>Ticket name</label><input value="${row.ticketType || ''}" placeholder="VIP / Gold" oninput="updateSeatingRow(${index}, 'ticketType', this.value)" /></div>
+      <div class="field"><label>Style</label><select onchange="updateSeatingRow(${index}, 'seatStyle', this.value)"><option value="seat" ${row.seatStyle !== 'sofa' ? 'selected' : ''}>Individual seats</option><option value="sofa" ${row.seatStyle === 'sofa' ? 'selected' : ''}>Sofa</option></select></div>
+      <div class="field"><label>Position</label><select onchange="updateSeatingRow(${index}, 'align', this.value)"><option value="left" ${row.align === 'left' ? 'selected' : ''}>Left</option><option value="center" ${!row.align || row.align === 'center' ? 'selected' : ''}>Center</option><option value="right" ${row.align === 'right' ? 'selected' : ''}>Right</option></select></div>
       <button type="button" onclick="removeSeatingRow(${index})" style="background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.48rem .6rem;font-weight:800;cursor:pointer;">Remove</button>
     </div>`).join('');
   const title = document.getElementById('seatingPlanTitle');
@@ -1957,7 +1961,10 @@ function renderSeatingBuilder() {
   preview.innerHTML = `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${seatingPlanLayout.stage || 'STAGE'}</div>` +
     (rows.length ? rows.map(row => {
       const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
-      return `<div style="display:flex;align-items:center;gap:.45rem;margin:.45rem 0;"><span style="width:24px;font-size:.72rem;font-weight:900;color:var(--muted);">${row.label || ''}</span><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.3rem;flex:1;">${Array.from({length: count}, (_, i) => `<span style="display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:#e8efff;color:#1242c5;font-size:.62rem;font-weight:800;">${row.label || ''}${i + 1}</span>`).join('')}</div></div>`;
+      const justify = row.align === 'left' ? 'flex-start' : row.align === 'right' ? 'flex-end' : 'center';
+      const unitWidth = row.seatStyle === 'sofa' ? '56px' : '26px';
+      const unitRadius = row.seatStyle === 'sofa' ? '14px' : '7px';
+      return `<div style="margin:.65rem 0;"><div style="font-size:.64rem;font-weight:800;color:#64748b;margin:0 0 .25rem 29px;">${row.ticketType || 'General Admission'}</div><div style="display:flex;align-items:center;gap:.45rem;"><span style="width:24px;font-size:.72rem;font-weight:900;color:var(--muted);">${row.label || ''}</span><div style="display:flex;flex-wrap:wrap;justify-content:${justify};gap:.3rem;flex:1;">${Array.from({length: count}, (_, i) => `<span style="display:grid;place-items:center;width:${unitWidth};height:26px;border-radius:${unitRadius};background:${row.seatStyle === 'sofa' ? '#fce7f3' : '#e8efff'};color:${row.seatStyle === 'sofa' ? '#be185d' : '#1242c5'};font-size:.62rem;font-weight:800;">${row.seatStyle === 'sofa' ? 'Sofa ' : ''}${row.label || ''}${i + 1}</span>`).join('')}</div></div></div>`;
     }).join('') : '<p style="text-align:center;color:var(--muted);font-size:.78rem;">Add a row to preview the seating plan.</p>');
 }
 
@@ -1976,13 +1983,13 @@ window.setSeatingPlanMode = function(mode) {
 };
 window.updateSeatingRow = function(index, key, value) {
   if (!seatingPlanLayout.rows[index]) return;
-  seatingPlanLayout.rows[index][key] = key === 'seats' ? Math.max(1, Math.min(100, Number(value) || 1)) : value.trim().slice(0, 12);
+  seatingPlanLayout.rows[index][key] = key === 'seats' ? Math.max(1, Math.min(100, Number(value) || 1)) : value.trim().slice(0, 40);
   renderSeatingBuilder();
   updateProgress();
 };
 window.addSeatingRow = function() {
   const next = String.fromCharCode(65 + seatingPlanLayout.rows.length);
-  seatingPlanLayout.rows.push({ label: next, seats: 8 });
+  seatingPlanLayout.rows.push({ label: next, seats: 8, ticketType: '', seatStyle: 'seat', align: 'center' });
   renderSeatingBuilder();
   updateProgress();
 };
