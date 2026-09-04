@@ -738,6 +738,7 @@ async function renderEvent(data){
     try{
       const snap = await db.collection('organisers').doc(data.ownerId).get();
       const org = snap.exists ? snap.data() : {};
+      console.log('org doc exists:', snap.exists, 'avatarUrl:', org.avatarUrl, 'ownerId:', data.ownerId);
       const name = org.name || data.organiserName || 'Organiser';
       const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
       ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar'].forEach(id=>{
