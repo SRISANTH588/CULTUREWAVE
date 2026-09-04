@@ -342,6 +342,8 @@ let discountAmt = 0;
 let couponApplied = "";
 let emailVerified = false;
 let generatedOtp = "";
+let selectedSeats = [];
+let bookedSeats = [];
 
 function fmt(n){ return n===0?"Free":"₹"+Number(n).toLocaleString("en-IN"); }
 function showToast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2500); }
@@ -535,7 +537,7 @@ async function saveBooking(data){
     const doc = {
       bookingId: data.bookingId, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
-      amount: data.amount, seats: data.seats,
+      amount: data.amount, seats: data.seats, seatIds: data.seatIds||[],
       status: data.status, paymentId: data.paymentId||null,
       customerName: data.name, customerEmail: data.email,
       customerPhone: data.phone, createdAt: ts
@@ -581,7 +583,7 @@ async function submitBooking(){
 
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
-    await saveBooking({ bookingId:bid, eventName, ticketName:t.name, amount:0, seats:qty, status:"confirmed", name, email, phone });
+    await saveBooking({ bookingId:bid, eventName, ticketName:t.name, amount:0, seats:qty, seatIds:selectedSeats, status:"confirmed", name, email, phone });
     await sendEmail({ name, email, eventName, amount:"Free", seats:qty, bookingId:bid, method:"Free" });
     location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId);
     return;
@@ -598,7 +600,7 @@ async function submitBooking(){
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
       document.getElementById("rStatus").textContent = "✅ Confirmed";
-      await saveBooking({ bookingId:pid, eventName, ticketName:t.name, amount:total, seats:qty, status:"paid", paymentId:pid, name, email, phone });
+      await saveBooking({ bookingId:pid, eventName, ticketName:t.name, amount:total, seats:qty, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
       await sendEmail({ name, email, eventName, amount:fmt(total), seats:qty, bookingId:pid, method:"Razorpay" });
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId);
     },
@@ -608,6 +610,15 @@ async function submitBooking(){
 }
 
 // ── SEATING PLAN ──
+async function fetchBookedSeats(){
+  if(!eventId) return;
+  try{
+    const snap = await db.collection("bookings").where("eventId","==",eventId).where("status","in",["confirmed","paid"]).get();
+    bookedSeats = [];
+    snap.forEach(doc=>{ const d=doc.data(); if(Array.isArray(d.seatIds)) bookedSeats.push(...d.seatIds); });
+  }catch(e){ console.error(e); }
+}
+
 function renderSeating(layout, container){
   if(!layout||!Array.isArray(layout.rows)) return;
   container.innerHTML = `<div style="text-align:center;font-size:.64rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:8px;padding:.45rem;margin-bottom:.7rem;">${layout.stage||"STAGE"}</div>`
@@ -615,8 +626,33 @@ function renderSeating(layout, container){
       const count=Math.max(1,Math.min(100,Number(row.seats)||1));
       const justify=row.align==="left"?"flex-start":row.align==="right"?"flex-end":"center";
       const sofa=row.seatStyle==="sofa";
-      return `<div style="margin:.5rem 0;"><div style="font-size:.6rem;font-weight:800;color:#64748b;margin:0 0 .2rem 24px;">${row.ticketType||"General Admission"}</div><div style="display:flex;align-items:center;gap:.35rem;"><span style="width:20px;font-size:.65rem;font-weight:900;color:#64748b;">${row.label||""}</span><div style="display:flex;flex-wrap:wrap;justify-content:${justify};gap:.25rem;flex:1;">${Array.from({length:count},(_,i)=>`<span style="display:grid;place-items:center;width:${sofa?"50px":"26px"};height:26px;border-radius:${sofa?"13px":"6px"};background:${sofa?"#fce7f3":"#e8efff"};color:${sofa?"#be185d":"#1242c5"};font-size:.55rem;font-weight:800;">${sofa?"Sofa ":""}${row.label||""}${i+1}</span>`).join("")}</div></div></div>`;
+      return `<div style="margin:.5rem 0;"><div style="font-size:.6rem;font-weight:800;color:#64748b;margin:0 0 .2rem 24px;">${row.ticketType||"General Admission"}</div><div style="display:flex;align-items:center;gap:.35rem;"><span style="width:20px;font-size:.65rem;font-weight:900;color:#64748b;">${row.label||""}</span><div style="display:flex;flex-wrap:wrap;justify-content:${justify};gap:.25rem;flex:1;">${Array.from({length:count},(_,i)=>{
+        const seatId=(row.label||"")+String(i+1);
+        const isBooked=bookedSeats.includes(seatId);
+        const w=sofa?"50px":"26px"; const br=sofa?"13px":"6px";
+        if(isBooked) return `<span style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:#fee2e2;color:#ef4444;font-size:.5rem;font-weight:800;cursor:not-allowed;" title="Booked">${seatId}<br>🚫</span>`;
+        return `<span id="seat_${seatId}" onclick="toggleSeat('${seatId}','${sofa}')" style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:${sofa?"#fce7f3":"#e8efff"};color:${sofa?"#be185d":"#1242c5"};font-size:.55rem;font-weight:800;cursor:pointer;transition:all .15s;">${sofa?"Sofa ":""} ${seatId}</span>`;
+      }).join("")}</div></div></div>`;
     }).join("");
+}
+
+function toggleSeat(seatId, sofa){
+  const el = document.getElementById("seat_"+seatId);
+  if(!el) return;
+  const idx = selectedSeats.indexOf(seatId);
+  if(idx === -1){
+    selectedSeats.push(seatId);
+    el.style.background = "#1242c5"; el.style.color = "#fff"; el.style.boxShadow = "0 0 0 2px #2f6bff";
+  } else {
+    selectedSeats.splice(idx,1);
+    el.style.background = sofa==="true" ? "#fce7f3" : "#e8efff";
+    el.style.color = sofa==="true" ? "#be185d" : "#1242c5";
+    el.style.boxShadow = "";
+  }
+  qty = selectedSeats.length || 1;
+  document.getElementById("qtyVal").textContent = qty;
+  document.getElementById("rSeats").textContent = qty;
+  updateQtyPrice();
 }
 
 // ── INIT ──
@@ -639,6 +675,7 @@ async function init(){
           document.getElementById("seatingContainer").appendChild(img);
           document.getElementById("seatingWrap").style.display = "";
         } else if(evData.seatingPlan&&Array.isArray(evData.seatingPlan.rows)){
+          await fetchBookedSeats();
           renderSeating(evData.seatingPlan, document.getElementById("seatingContainer"));
           document.getElementById("seatingWrap").style.display = "";
         }
