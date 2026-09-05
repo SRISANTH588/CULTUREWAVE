@@ -56,30 +56,75 @@
       font-weight:900;letter-spacing:-.05em;color:#fff;line-height:1;
     }
 
-    /* CATEGORY CHIPS — only 4 */
+    /* CATEGORY CARDS — same as index page */
     .cp-chips-wrap{
-      background:#000;padding:1rem 1.2rem .8rem;
+      background:#000;padding:1rem 1.2rem 1.2rem;
       border-bottom:1px solid #1a1a1a;
-      position:sticky;top:66px;z-index:10;
     }
     .cp-chips{
-      display:flex;gap:.5rem;
-      overflow-x:auto;scrollbar-width:none;
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:.65rem;
     }
-    .cp-chips::-webkit-scrollbar{display:none;}
+    @media(max-width:700px){
+      .cp-chips{grid-template-columns:repeat(3,1fr);gap:.4rem;}
+    }
     .cp-chip{
-      flex:none;display:flex;align-items:center;gap:.4rem;
-      padding:.5rem 1.1rem;
+      position:relative;
+      height:120px;
+      border-radius:14px;
+      overflow:hidden;
+      display:flex;align-items:flex-start;
       border:1.5px solid rgba(255,255,255,.18);
-      border-radius:999px;background:transparent;
-      color:rgba(255,255,255,.5);
-      font-size:.8rem;font-weight:800;
-      cursor:pointer;font-family:inherit;white-space:nowrap;
-      transition:all .2s;
+      cursor:pointer;font-family:inherit;
+      transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;
+      padding:0;background:#111;
     }
-    .cp-chip:hover{border-color:rgba(255,255,255,.4);color:#fff;}
-    .cp-chip.active{background:#fff;color:#000;border-color:#fff;}
-    .cp-chip-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+    .cp-chip:hover{
+      transform:scale(1.04) translateY(-3px);
+      box-shadow:0 20px 48px rgba(0,0,0,.7);
+      border-color:rgba(255,255,255,.55);
+    }
+    .cp-chip.active{
+      border-color:#fff;
+      box-shadow:0 0 0 2px #fff;
+    }
+    .cp-chip-bg{
+      position:absolute;inset:0;
+      background-size:cover;background-position:center top;
+      transition:transform .4s ease;
+    }
+    .cp-chip:hover .cp-chip-bg{transform:scale(1.08);}
+    .cp-chip::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.1) 60%,transparent 100%);
+      z-index:1;
+    }
+    .cp-chip-label{
+      position:absolute;
+      top:.6rem;left:.65rem;
+      z-index:2;
+      font-size:.72rem;font-weight:900;
+      color:#fff;line-height:1.1;
+      letter-spacing:.05em;text-transform:uppercase;
+      text-shadow:0 2px 8px rgba(0,0,0,.6);
+    }
+    /* colours */
+    .cp-chip[data-cat="all"]     {background:#222;}
+    .cp-chip[data-cat="nightlife"]{background:#0e8fa8;}
+    .cp-chip[data-cat="dining"]  {background:#b71c1c;}
+    .cp-chip[data-cat="workshops"]{background:#b35a00;}
+    .cp-chip[data-cat="music"]   {background:#1b5e20;}
+    /* photos */
+    .cp-chip[data-cat="nightlife"] .cp-chip-bg{background-image:url('party.jpg');}
+    .cp-chip[data-cat="dining"] .cp-chip-bg   {background-image:url('culinary.jpg');}
+    .cp-chip[data-cat="workshops"] .cp-chip-bg{background-image:url('workshop.jpg');}
+    .cp-chip[data-cat="music"] .cp-chip-bg    {background-image:url('music.jpg');}
+    @media(max-width:700px){
+      .cp-chip{height:110px;border-radius:12px;}
+      .cp-chip-label{font-size:.62rem;}
+    }
 
     /* SECTION LABEL */
     .cp-section-head{
@@ -226,18 +271,24 @@
   <!-- 4 CHIPS ONLY -->
   <div class="cp-chips-wrap">
     <div class="cp-chips">
-      <button class="cp-chip active" data-cat="all">All</button>
+      <button class="cp-chip active" data-cat="all">
+        <span class="cp-chip-label">All</span>
+      </button>
       <button class="cp-chip" data-cat="nightlife">
-        <span class="cp-chip-dot" style="background:#0e8fa8"></span>Nightlife
+        <div class="cp-chip-bg"></div>
+        <span class="cp-chip-label">Nightlife</span>
       </button>
       <button class="cp-chip" data-cat="dining">
-        <span class="cp-chip-dot" style="background:#b71c1c"></span>Fine Dining
+        <div class="cp-chip-bg"></div>
+        <span class="cp-chip-label">Fine Dining</span>
       </button>
       <button class="cp-chip" data-cat="workshops">
-        <span class="cp-chip-dot" style="background:#b35a00"></span>Workshops
+        <div class="cp-chip-bg"></div>
+        <span class="cp-chip-label">Workshops</span>
       </button>
       <button class="cp-chip" data-cat="music">
-        <span class="cp-chip-dot" style="background:#1b5e20"></span>Live Music
+        <div class="cp-chip-bg"></div>
+        <span class="cp-chip-label">Live Music</span>
       </button>
     </div>
   </div>
