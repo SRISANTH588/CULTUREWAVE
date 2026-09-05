@@ -94,6 +94,23 @@
     .search-input:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);}
     .search-submit{width:100%;margin-top:.8rem;padding:.85rem;border:0;border-radius:10px;background:#1d4ed8;color:#fff;font:inherit;font-weight:800;cursor:pointer;}
 
+    /* ── HERO SLIDER ── */
+    .hero-slider{position:relative;width:100%;overflow:hidden;background:#000;}
+    .hs-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);will-change:transform;}
+    .hs-slide{flex:0 0 100%;min-height:88vw;max-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem 1.4rem 1.6rem;position:relative;box-sizing:border-box;}
+    @media(min-width:701px){.hs-slide{min-height:60vh;padding:3rem 3rem 2.5rem;}}
+    .hs-slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.1) 60%,transparent 100%);pointer-events:none;}
+    .hs-num{position:absolute;top:1.2rem;right:1.4rem;font-size:3.5rem;font-weight:900;color:rgba(255,255,255,.15);line-height:1;z-index:1;letter-spacing:-.05em;}
+    .hs-content{position:relative;z-index:1;}
+    .hs-tag{display:inline-block;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .8rem;border-radius:999px;margin-bottom:.9rem;}
+    .hs-icon{font-size:3rem;margin-bottom:.6rem;}
+    .hs-title{font-size:clamp(1.6rem,6vw,2.8rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.04em;margin:0 0 .5rem;}
+    .hs-meta{font-size:.88rem;color:rgba(255,255,255,.7);font-weight:600;margin-bottom:1.2rem;}
+    .hs-btn{display:inline-block;background:#fff;color:#0b1220;font-size:.88rem;font-weight:800;padding:.65rem 1.4rem;border-radius:999px;text-decoration:none;}
+    .hs-dots{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.9rem 0 1rem;background:#0b1220;}
+    .hs-dot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.25);border:none;cursor:pointer;padding:0;transition:all .3s;}
+    .hs-dot.active{width:24px;background:#fff;}
+
     /* ── CATEGORY SECTION ── */
     .idx-cat-section{width:100%;max-width:none;padding:3.5rem 0 4rem;background:#0a0a0a;}
     .idx-cat-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
@@ -435,105 +452,81 @@
 
 <main>
 
-  <!-- HERO -->
-  <section class="hero hero-home">
-    <div class="main-wrap hero-inner">
-      <div class="hero-copy-block">
-        <div class="hero-kicker">Discover, book, and host</div>
-        <h1 class="hero-headline">
-          <span>Find your next event.</span>
-          <span class="hero-line-blue">Book your place<br class="mobile-break"/> instantly.</span>
-        </h1>
-        <p class="hero-copy">
-          Discover live events, book memorable dining experiences, reserve your spot in seconds, or create something people can enjoy.
-        </p>
-        <div class="hero-actions">
-          <a class="btn hero-btn-white" href="booking.html">Explore experiences</a>
-          <a class="btn hero-btn-ghost" href="events.html">Browse events &#8594;</a>
+  <!-- HERO SLIDER -->
+  <section class="hero-slider" id="heroSlider">
+    <div class="hs-track" id="hsTrack">
+      <div class="hs-slide" style="background:linear-gradient(160deg,#1242c5,#9bdcff)">
+        <div class="hs-num">01</div>
+        <div class="hs-content">
+          <div class="hs-tag">Workshop</div>
+          <div class="hs-icon">🎨</div>
+          <h2 class="hs-title">Art &amp; Design Masterclass</h2>
+          <div class="hs-meta">Vijayawada &middot; Free</div>
+          <a class="hs-btn" href="events.html">Book Now →</a>
         </div>
-        <div class="hero-tags">
-          <span>&#10003; Instant confirmation</span>
-          <span>&#10003; Secure UPI &amp; card payments</span>
-          <span>&#10003; Handpicked experiences</span>
+      </div>
+      <div class="hs-slide" style="background:linear-gradient(160deg,#ff4d2e,#ff9500)">
+        <div class="hs-num">02</div>
+        <div class="hs-content">
+          <div class="hs-tag">Culinary</div>
+          <div class="hs-icon">🍳</div>
+          <h2 class="hs-title">Chef&rsquo;s Table Experience</h2>
+          <div class="hs-meta">Hyderabad &middot; ₹499</div>
+          <a class="hs-btn" href="events.html">Book Now →</a>
+        </div>
+      </div>
+      <div class="hs-slide" style="background:linear-gradient(160deg,#7c3aed,#ec4899)">
+        <div class="hs-num">03</div>
+        <div class="hs-content">
+          <div class="hs-tag">Music</div>
+          <div class="hs-icon">🎵</div>
+          <h2 class="hs-title">Live Jam Session Night</h2>
+          <div class="hs-meta">Bangalore &middot; ₹299</div>
+          <a class="hs-btn" href="events.html">Book Now →</a>
+        </div>
+      </div>
+      <div class="hs-slide" style="background:linear-gradient(160deg,#0891b2,#06b6d4)">
+        <div class="hs-num">04</div>
+        <div class="hs-content">
+          <div class="hs-tag">Workshop</div>
+          <div class="hs-icon">💼</div>
+          <h2 class="hs-title">Startup Pitch Workshop</h2>
+          <div class="hs-meta">Chennai &middot; Free</div>
+          <a class="hs-btn" href="events.html">Book Now →</a>
+        </div>
+      </div>
+      <div class="hs-slide" style="background:linear-gradient(160deg,#16a34a,#4ade80)">
+        <div class="hs-num">05</div>
+        <div class="hs-content">
+          <div class="hs-tag">Wellness</div>
+          <div class="hs-icon">🧘</div>
+          <h2 class="hs-title">Morning Yoga &amp; Mindfulness</h2>
+          <div class="hs-meta">Vijayawada &middot; ₹199</div>
+          <a class="hs-btn" href="events.html">Book Now →</a>
+        </div>
+      </div>
+      <div class="hs-slide" style="background:linear-gradient(160deg,#dc2626,#f97316)">
+        <div class="hs-num">06</div>
+        <div class="hs-content">
+          <div class="hs-tag">Workshop</div>
+          <div class="hs-icon">📸</div>
+          <h2 class="hs-title">Photography Bootcamp</h2>
+          <div class="hs-meta">Mumbai &middot; ₹599</div>
+          <a class="hs-btn" href="events.html">Book Now →</a>
+        </div>
+      </div>
+      <div class="hs-slide" style="background:linear-gradient(160deg,#854d0e,#f5c518)">
+        <div class="hs-num">07</div>
+        <div class="hs-content">
+          <div class="hs-tag">Performing Arts</div>
+          <div class="hs-icon">🎭</div>
+          <h2 class="hs-title">Theatre &amp; Acting Workshop</h2>
+          <div class="hs-meta">Delhi &middot; ₹399</div>
+          <a class="hs-btn" href="events.html">Book Now →</a>
         </div>
       </div>
     </div>
-
-    <!-- CAROUSEL -->
-    <div class="hero-carousel-wrap">
-      <div class="hero-carousel" id="heroCarousel">
-        <div class="hc-card">
-          <div class="hc-poster" style="background:linear-gradient(160deg,#f5c518 0%,#ff9500 100%)">
-            <span class="hc-poster-icon">🎨</span>
-            <div class="hc-poster-tag">Workshop</div>
-          </div>
-          <div class="hc-body">
-            <div class="hc-title">Art &amp; Design Masterclass</div>
-            <div class="hc-meta">Vijayawada &middot; Free</div>
-          </div>
-        </div>
-        <div class="hc-card">
-          <div class="hc-poster" style="background:linear-gradient(160deg,#ff4d2e 0%,#ff9500 100%)">
-            <span class="hc-poster-icon">🍳</span>
-            <div class="hc-poster-tag">Culinary</div>
-          </div>
-          <div class="hc-body">
-            <div class="hc-title">Chef&rsquo;s Table Experience</div>
-            <div class="hc-meta">Hyderabad &middot; &#8377;499</div>
-          </div>
-        </div>
-        <div class="hc-card">
-          <div class="hc-poster" style="background:linear-gradient(160deg,#7c3aed 0%,#ec4899 100%)">
-            <span class="hc-poster-icon">🎵</span>
-            <div class="hc-poster-tag">Music</div>
-          </div>
-          <div class="hc-body">
-            <div class="hc-title">Live Jam Session Night</div>
-            <div class="hc-meta">Bangalore &middot; &#8377;299</div>
-          </div>
-        </div>
-        <div class="hc-card">
-          <div class="hc-poster" style="background:linear-gradient(160deg,#0891b2 0%,#06b6d4 100%)">
-            <span class="hc-poster-icon">💼</span>
-            <div class="hc-poster-tag">Workshop</div>
-          </div>
-          <div class="hc-body">
-            <div class="hc-title">Startup Pitch Workshop</div>
-            <div class="hc-meta">Chennai &middot; Free</div>
-          </div>
-        </div>
-        <div class="hc-card">
-          <div class="hc-poster" style="background:linear-gradient(160deg,#16a34a 0%,#4ade80 100%)">
-            <span class="hc-poster-icon">🧘</span>
-            <div class="hc-poster-tag">Wellness</div>
-          </div>
-          <div class="hc-body">
-            <div class="hc-title">Morning Yoga &amp; Mindfulness</div>
-            <div class="hc-meta">Vijayawada &middot; &#8377;199</div>
-          </div>
-        </div>
-        <div class="hc-card">
-          <div class="hc-poster" style="background:linear-gradient(160deg,#dc2626 0%,#f97316 100%)">
-            <span class="hc-poster-icon">📸</span>
-            <div class="hc-poster-tag">Workshop</div>
-          </div>
-          <div class="hc-body">
-            <div class="hc-title">Photography Bootcamp</div>
-            <div class="hc-meta">Mumbai &middot; &#8377;599</div>
-          </div>
-        </div>
-        <div class="hc-card">
-          <div class="hc-poster" style="background:linear-gradient(160deg,#854d0e 0%,#f5c518 100%)">
-            <span class="hc-poster-icon">🎭</span>
-            <div class="hc-poster-tag">Performing Arts</div>
-          </div>
-          <div class="hc-body">
-            <div class="hc-title">Theatre &amp; Acting Workshop</div>
-            <div class="hc-meta">Delhi &middot; &#8377;399</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="hs-dots" id="hsDots"></div>
   </section>
 
   <!-- BROWSE BY CATEGORY -->
@@ -990,7 +983,34 @@
   });
 
   (function(){
-    function initHowCarousel(){
+    (function(){
+    var track = document.getElementById('hsTrack');
+    var dotsWrap = document.getElementById('hsDots');
+    if(!track) return;
+    var slides = Array.from(track.querySelectorAll('.hs-slide'));
+    var total = slides.length;
+    var cur = 0, timer;
+    // build dots
+    slides.forEach(function(_,i){
+      var d = document.createElement('button');
+      d.className = 'hs-dot' + (i===0?' active':'');
+      d.addEventListener('click', function(){ go(i); resetTimer(); });
+      dotsWrap.appendChild(d);
+    });
+    function go(i){
+      cur = (i+total)%total;
+      track.style.transform = 'translateX(-'+cur+'00%)';
+      Array.from(dotsWrap.querySelectorAll('.hs-dot')).forEach(function(d,j){ d.classList.toggle('active',j===cur); });
+    }
+    function resetTimer(){ clearInterval(timer); timer = setInterval(function(){ go(cur+1); }, 3500); }
+    // touch swipe
+    var tx=0;
+    track.addEventListener('touchstart',function(e){ tx=e.touches[0].clientX; clearInterval(timer); },{passive:true});
+    track.addEventListener('touchend',function(e){ var dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>40) go(dx<0?cur+1:cur-1); resetTimer(); },{passive:true});
+    resetTimer();
+  })();
+
+  function initHowCarousel(){
       var grid=document.querySelector('.idx-how-grid');
       if(!grid||window.innerWidth>700)return;
       var cards=Array.from(grid.querySelectorAll('.idx-how-card'));
