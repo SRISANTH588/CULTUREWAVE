@@ -68,24 +68,24 @@
       letter-spacing:-.05em;
       line-height:1;
     }
-    .ogp-scroll-wrap{background:#000;}
+    .ogp-scroll-wrap{background:#000;overflow:hidden;}
     .ogp-scroll{
-      display:flex;gap:.75rem;
-      padding:.8rem 1.2rem 1.5rem;
+      display:flex;gap:1rem;
+      padding:.8rem 1.2rem 1.2rem;
       overflow-x:auto;scroll-snap-type:x mandatory;
       scrollbar-width:none;-webkit-overflow-scrolling:touch;
     }
     .ogp-scroll::-webkit-scrollbar{display:none;}
     .ogp-card{
-      flex:0 0 44vw;max-width:185px;
-      border-radius:16px;overflow:hidden;
+      flex:0 0 78vw;max-width:340px;
+      border-radius:20px;overflow:hidden;
       background:#111;
-      border:1px solid rgba(255,255,255,.1);
-      scroll-snap-align:start;cursor:pointer;
+      border:1px solid rgba(255,255,255,.12);
+      scroll-snap-align:center;cursor:pointer;
       text-decoration:none;display:block;
-      transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+      transition:transform .22s ease,box-shadow .22s ease;
     }
-    .ogp-card:hover{transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,0,0,.8);border-color:rgba(255,255,255,.25);}
+    .ogp-card:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(0,0,0,.85);}
     .ogp-poster{
       width:100%;aspect-ratio:3/4;
       background-size:cover;background-position:center;
@@ -93,30 +93,38 @@
     }
     .ogp-poster::after{
       content:"";position:absolute;inset:0;
-      background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 55%);
+      background:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 50%);
     }
+    .ogp-date-badge{
+      position:absolute;top:.75rem;left:.75rem;z-index:2;
+      background:#fff;color:#000;
+      border-radius:10px;padding:.35rem .55rem;
+      text-align:center;min-width:44px;
+      box-shadow:0 2px 8px rgba(0,0,0,.4);
+    }
+    .ogp-date-badge-day{font-size:1.15rem;font-weight:900;line-height:1;}
+    .ogp-date-badge-mon{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-top:.05rem;}
     .ogp-price-badge{
-      position:absolute;bottom:.55rem;left:.55rem;z-index:2;
-      padding:.24rem .65rem;border-radius:999px;
-      font-size:.62rem;font-weight:800;
+      position:absolute;bottom:.7rem;right:.7rem;z-index:2;
+      padding:.28rem .75rem;border-radius:999px;
+      font-size:.65rem;font-weight:800;
     }
     .ogp-price-free{background:#22c55e;color:#fff;}
     .ogp-price-paid{background:#ec4899;color:#fff;}
-    .ogp-info{padding:.65rem .75rem .8rem;background:#111;}
-    .ogp-date{
-      display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;
+    .ogp-info{padding:.85rem 1rem 1rem;background:#111;}
+    .ogp-title-card{font-size:1rem;font-weight:800;color:#fff;line-height:1.25;letter-spacing:-.02em;}
+    .ogp-venue{font-size:.78rem;color:rgba(255,255,255,.45);margin-top:.3rem;font-weight:600;}
+    /* pagination counter */
+    .ogp-counter{
+      text-align:center;padding:.5rem 0 .2rem;
+      font-size:.78rem;font-weight:800;
+      color:rgba(255,255,255,.35);
+      letter-spacing:.06em;
+      background:#000;
     }
-    .ogp-date-box{
-      background:#1e1e1e;border:1px solid rgba(255,255,255,.1);
-      border-radius:7px;padding:.2rem .4rem;
-      text-align:center;min-width:32px;
-    }
-    .ogp-date-day{font-size:.75rem;font-weight:900;color:#fff;line-height:1;}
-    .ogp-date-mon{font-size:.52rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.06em;}
-    .ogp-title-card{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;}
-    .ogp-venue{font-size:.63rem;color:rgba(255,255,255,.35);margin-top:.2rem;font-weight:600;}
+    .ogp-counter span{color:#fff;}
     @media(min-width:700px){
-      .ogp-card{flex:0 0 190px;max-width:210px;}
+      .ogp-card{flex:0 0 300px;max-width:340px;}
       .ogp-title{font-size:clamp(2.2rem,4vw,3.5rem);}
     }
 
@@ -896,6 +904,10 @@
     <div class="ogp-scroll-wrap">
       <div class="ogp-scroll" id="ogpScroll"></div>
     </div>
+    <div class="ogp-counter" id="ogpCounter">&nbsp;</div>
+    <div style="padding:.6rem 1.2rem 1.8rem;display:flex;justify-content:center;background:#000;">
+      <a href="events.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.5rem;border:1px solid rgba(245,197,24,.3);border-radius:999px;color:#f5c518;font-size:.82rem;font-weight:800;text-decoration:none;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(245,197,24,.1)';this.style.borderColor='#f5c518';" onmouseout="this.style.background='';this.style.borderColor='rgba(245,197,24,.3)';">View all picks &#8594;</a>
+    </div>
   </section>
 
   <!-- FEATURED EVENTS -->
@@ -1209,7 +1221,8 @@
       const scroll = document.getElementById('ogpScroll');
       if(!scroll) return;
       if(!docs.length){ scroll.innerHTML='<div style="padding:1.5rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;">No events yet. Check back soon!</div>'; return; }
-      docs.forEach(doc=>{
+      const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)'];
+      docs.forEach((doc,i)=>{
         const d=doc.data(), id=doc.id;
         const img=d.cardImgUrl||d.coverUrl||'';
         const price=d.tickets?.[0]?.price||d.price||0;
@@ -1219,17 +1232,29 @@
         a.className='ogp-card';
         a.href=`event-detail.html?eventId=${id}`;
         a.innerHTML=`
-          <div class="ogp-poster" style="${img?`background-image:url('${img}')`:['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)'][docs.indexOf(doc)%3]}">
+          <div class="ogp-poster" style="${img?`background-image:url('${img}')`:grads[i%3]}">
+            ${day?`<div class="ogp-date-badge"><div class="ogp-date-badge-day">${day}</div><div class="ogp-date-badge-mon">${mon}</div></div>`:''}
             <span class="ogp-price-badge ${price?'ogp-price-paid':'ogp-price-free'}">${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
           </div>
           <div class="ogp-info">
-            ${day?`<div class="ogp-date"><div class="ogp-date-box"><div class="ogp-date-day">${day}</div><div class="ogp-date-mon">${mon}</div></div></div>`:''}
             <div class="ogp-title-card">${d.name||'Untitled'}</div>
             <div class="ogp-venue">${d.venue||d.venueName||d.city||'India'}</div>
           </div>`;
         scroll.appendChild(a);
       });
-    }catch(e){console.warn('OGP:',e.message);}
+      // live counter
+      const counter=document.getElementById('ogpCounter');
+      const total=docs.length;
+      if(counter&&total>1){
+        counter.innerHTML=`<span>1</span>/${total}`;
+        scroll.addEventListener('scroll',()=>{
+          const cards=Array.from(scroll.querySelectorAll('.ogp-card'));
+          let closest=0,minDist=Infinity;
+          cards.forEach((c,i)=>{const d=Math.abs(c.getBoundingClientRect().left-scroll.getBoundingClientRect().left);if(d<minDist){minDist=d;closest=i;}});
+          counter.innerHTML=`<span>${closest+1}</span>/${total}`;
+        },{passive:true});
+      }
+    }catch(e){console.warn('OGP:',e.message);
   })();
 
   // Finest Tables — load dining/restaurant events
