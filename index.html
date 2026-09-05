@@ -6,7 +6,7 @@
   <title>CultureWave | Premium Events &amp; Dining</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="styles.css"/>
   <style>
     *{box-sizing:border-box;}
@@ -64,35 +64,44 @@
     .ogp-head{padding:1.8rem 1.2rem 1.4rem;text-align:center;}
     .ogp-title{
       font-size:clamp(1rem,3.5vw,1.5rem);font-weight:900;
-      letter-spacing:.12em;text-transform:uppercase;
+      letter-spacing:.18em;text-transform:uppercase;
       color:#fff;margin-bottom:.45rem;
+      font-family:'Playfair Display','Didot','Georgia',serif;
     }
     .ogp-tag{
-      font-size:clamp(1.4rem,5vw,2.2rem);
-      font-weight:900;color:#f5c518;
-      letter-spacing:-.02em;text-transform:uppercase;
+      font-size:clamp(1.1rem,4vw,1.9rem);
+      font-weight:700;color:#f5c518;
+      letter-spacing:.04em;text-transform:uppercase;
       line-height:1.1;margin-bottom:0;
+      white-space:nowrap;
+      font-family:'Playfair Display','Didot','Georgia',serif;
+      font-style:italic;
     }
-    /* scroll: peek prev/next cards on sides */
-    .ogp-scroll-wrap{background:#000;}
-    .ogp-scroll{
-      display:flex;gap:.85rem;
-      padding:.4rem 11vw 1rem;
-      overflow-x:auto;scroll-snap-type:x mandatory;
-      scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    /* ── OG PICKS DECK STACK ── */
+    .ogp-scroll-wrap{background:#000;overflow:hidden;}
+    .ogp-deck{
+      position:relative;
+      height:520px;
+      display:flex;align-items:center;justify-content:center;
+      background:#000;
+      touch-action:pan-y;
+      user-select:none;
     }
-    .ogp-scroll::-webkit-scrollbar{display:none;}
     .ogp-card{
-      flex:0 0 78vw;max-width:360px;
+      position:absolute;
+      width:min(72vw,300px);
       border-radius:22px;overflow:hidden;
       background:#1a1a1a;
       border:1px solid rgba(255,255,255,.1);
-      scroll-snap-align:center;cursor:pointer;
+      cursor:pointer;
       text-decoration:none;display:block;
-      transition:transform .25s ease,box-shadow .25s ease;
-      box-shadow:0 8px 32px rgba(0,0,0,.6);
+      box-shadow:0 8px 32px rgba(0,0,0,.7);
+      transition:transform .45s cubic-bezier(.4,0,.2,1),
+                 opacity .45s ease,
+                 z-index 0s .22s;
+      will-change:transform,opacity;
+      transform-origin:bottom center;
     }
-    .ogp-card:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(0,0,0,.9);}
     .ogp-poster{
       width:100%;aspect-ratio:3/4;
       background-size:cover;background-position:center;
@@ -127,26 +136,29 @@
       font-size:.8rem;color:rgba(255,255,255,.45);
       margin-top:.3rem;font-weight:500;
     }
-    /* counter: pill with dots like 1/10 */
+    /* nav arrows */
+    .ogp-nav{
+      position:absolute;top:50%;transform:translateY(-50%);
+      z-index:100;background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.2);
+      color:#fff;width:38px;height:38px;
+      border-radius:50%;display:flex;align-items:center;justify-content:center;
+      cursor:pointer;font-size:1.1rem;
+      transition:background .2s;
+      backdrop-filter:blur(6px);
+    }
+    .ogp-nav:hover{background:rgba(245,197,24,.25);border-color:#f5c518;}
+    .ogp-nav-prev{left:10px;}
+    .ogp-nav-next{right:10px;}
+    /* counter dots */
     .ogp-counter{
       display:flex;align-items:center;justify-content:center;
-      gap:.6rem;padding:.9rem 0 .4rem;
+      gap:.5rem;padding:.9rem 0 .4rem;
       background:#000;
     }
-    .ogp-counter-dot{
-      width:7px;height:7px;border-radius:50%;
-      background:rgba(255,255,255,.25);
-    }
-    .ogp-counter-pill{
-      background:rgba(255,255,255,.15);
-      border-radius:999px;
-      padding:.3rem .85rem;
-      font-size:.8rem;font-weight:800;
-      color:#fff;letter-spacing:.04em;
-    }
     @media(min-width:700px){
-      .ogp-card{flex:0 0 340px;max-width:380px;}
-      .ogp-scroll{padding:.4rem calc(50% - 190px) 1rem;}
+      .ogp-deck{height:560px;}
+      .ogp-card{width:min(60vw,320px);}
       .ogp-title{font-size:clamp(2rem,4vw,3rem);}
     }
 
@@ -296,6 +308,68 @@
       .ft-card{flex:0 0 190px;max-width:210px;}
       .ft-banner{min-height:200px;}
       .ft-heading{font-size:clamp(1.8rem,3.5vw,2.6rem);}
+    }
+
+    /* ── TRENDING NOW AUTO-SCROLL ── */
+    .trending-section{background:#000;padding:1.5rem 0 0;border-top:1px solid rgba(255,255,255,.07);}
+    .trending-head{padding:0 1.2rem .9rem;display:flex;align-items:baseline;gap:.7rem;}
+    .trending-label{font-size:.68rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.35);}
+    .trending-title{font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:#fff;letter-spacing:-.04em;margin:0;}
+    .trending-ticker-wrap{overflow:hidden;position:relative;}
+    .trending-ticker-wrap::before,.trending-ticker-wrap::after{
+      content:"";position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none;
+    }
+    .trending-ticker-wrap::before{left:0;background:linear-gradient(to right,#000,transparent);}
+    .trending-ticker-wrap::after{right:0;background:linear-gradient(to left,#000,transparent);}
+    .trending-ticker{
+      display:flex;gap:.75rem;
+      padding:.4rem 1.2rem 1.2rem;
+      width:max-content;
+      animation:trendingScroll 28s linear infinite;
+    }
+    .trending-ticker:hover{animation-play-state:paused;}
+    @keyframes trendingScroll{
+      0%{transform:translateX(0);}
+      100%{transform:translateX(-50%);}
+    }
+    .tr-card{
+      flex:0 0 150px;width:150px;
+      border-radius:16px;overflow:hidden;
+      background:#111;
+      border:1px solid rgba(255,255,255,.1);
+      text-decoration:none;display:block;
+      transition:transform .22s ease,border-color .22s ease;
+    }
+    .tr-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.3);}
+    .tr-poster{
+      width:100%;aspect-ratio:3/4;
+      background-size:cover;background-position:center;
+      position:relative;
+    }
+    .tr-poster::after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%);
+    }
+    .tr-date-badge{
+      position:absolute;top:.6rem;left:.6rem;z-index:2;
+      background:#fff;color:#000;
+      border-radius:9px;padding:.3rem .5rem;
+      text-align:center;min-width:38px;
+    }
+    .tr-date-day{font-size:1rem;font-weight:900;line-height:1;}
+    .tr-date-mon{font-size:.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+    .tr-price-badge{
+      position:absolute;bottom:.55rem;left:.55rem;z-index:2;
+      padding:.22rem .6rem;border-radius:999px;
+      font-size:.58rem;font-weight:800;
+    }
+    .tr-price-free{background:#22c55e;color:#fff;}
+    .tr-price-paid{background:#ec4899;color:#fff;}
+    .tr-info{padding:.6rem .7rem .75rem;background:#111;}
+    .tr-title{font-size:.72rem;font-weight:800;color:#fff;line-height:1.3;}
+    .tr-venue{font-size:.6rem;color:rgba(255,255,255,.35);margin-top:.2rem;font-weight:600;}
+    @media(min-width:700px){
+      .tr-card{flex:0 0 170px;width:170px;}
     }
 
     /* ── PREMIUM CURATED SECTION ── */
@@ -880,6 +954,17 @@
     </div>
   </section>
 
+  <!-- TRENDING NOW -->
+  <section class="trending-section">
+    <div class="trending-head">
+      <span class="trending-label">Trending Now</span>
+      <div class="trending-title">Hot this week 🔥</div>
+    </div>
+    <div class="trending-ticker-wrap">
+      <div class="trending-ticker" id="trendingTicker"></div>
+    </div>
+  </section>
+
   <!-- HANDPICKED EXPERIENCES -->
   <section class="hpe-section">
     <div class="hpe-banner">
@@ -924,7 +1009,10 @@
       <div class="ogp-tag">✨ WE THINK YOU'LL VIBE WITH THESE</div>
     </div>
     <div class="ogp-scroll-wrap">
-      <div class="ogp-scroll" id="ogpScroll"></div>
+      <div class="ogp-deck" id="ogpDeck">
+        <button class="ogp-nav ogp-nav-prev" id="ogpPrev">&#8592;</button>
+        <button class="ogp-nav ogp-nav-next" id="ogpNext">&#8594;</button>
+      </div>
     </div>
     <div class="ogp-counter" id="ogpCounter">&nbsp;</div>
     <div style="padding:.6rem 1.2rem 1.8rem;display:flex;justify-content:center;background:#000;">
@@ -1232,18 +1320,53 @@
     start();
   }
 
+  // Trending Now ticker
+  (async function loadTrending(){
+    try{
+      const snap = await _idb.collection('events').limit(200).get();
+      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,12);
+      const ticker = document.getElementById('trendingTicker');
+      if(!ticker||!docs.length){ if(ticker) ticker.closest('.trending-section').style.display='none'; return; }
+      const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)','linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
+      function makeCard(doc,i){
+        const d=doc.data(),id=doc.id;
+        const img=d.cardImgUrl||d.coverUrl||'';
+        const price=d.tickets?.[0]?.price||d.price||0;
+        let day='',mon='';
+        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
+        const a=document.createElement('a');
+        a.className='tr-card';
+        a.href=`event-detail.html?eventId=${id}`;
+        a.innerHTML=`
+          <div class="tr-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
+            ${day?`<div class="tr-date-badge"><div class="tr-date-day">${day}</div><div class="tr-date-mon">${mon}</div></div>`:''}
+            <span class="tr-price-badge ${price?'tr-price-paid':'tr-price-free'}">${price?`₹${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+          </div>
+          <div class="tr-info">
+            <div class="tr-title">${d.name||'Untitled'}</div>
+            <div class="tr-venue">${d.venue||d.venueName||d.city||'India'}</div>
+          </div>`;
+        return a;
+      }
+      // render twice for seamless infinite loop
+      docs.forEach((doc,i)=>ticker.appendChild(makeCard(doc,i)));
+      docs.forEach((doc,i)=>ticker.appendChild(makeCard(doc,i)));
+    }catch(e){console.warn('Trending:',e.message);}
+  })();
+
   loadIndexEvents().then(() => startHomeCarousel('indexEventsGrid'));
   loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
 
-  // OG Picks — load all published events
+  // OG Picks — deck stack effect
   (async function loadOGPicks(){
     try{
       const snap = await _idb.collection('events').limit(200).get();
       const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,12);
-      const scroll = document.getElementById('ogpScroll');
-      if(!scroll) return;
-      if(!docs.length){ scroll.innerHTML='<div style="padding:1.5rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;">No events yet. Check back soon!</div>'; return; }
+      const deck = document.getElementById('ogpDeck');
+      if(!deck) return;
+      if(!docs.length){ deck.innerHTML='<div style="padding:1.5rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;">No events yet. Check back soon!</div>'; return; }
       const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)'];
+      const cards=[];
       docs.forEach((doc,i)=>{
         const d=doc.data(), id=doc.id;
         const img=d.cardImgUrl||d.coverUrl||'';
@@ -1262,35 +1385,75 @@
             <div class="ogp-title-card">${d.name||'Untitled'}</div>
             <div class="ogp-venue">${d.venue||d.venueName||d.city||'India'}</div>
           </div>`;
-        scroll.appendChild(a);
+        deck.insertBefore(a, deck.querySelector('.ogp-nav-prev'));
+        cards.push(a);
       });
-      // dots counter + auto-scroll
+      const total=cards.length;
+      let cur=0;
+
+      // position: active=center, prev=left peek, rest=stacked behind right
+      function layout(active){
+        cards.forEach((c,i)=>{
+          const rel = (i - active + total) % total; // 0=active,1=next,2=next+1,...,total-1=prev
+          let tx,ty,scale,opacity,zIdx,rot;
+          if(rel===0){
+            // active card — front center
+            tx=0; ty=0; scale=1; opacity=1; zIdx=total; rot=0;
+          } else if(rel===total-1){
+            // immediately previous — peek left
+            tx=-62; ty=18; scale=.82; opacity=.7; zIdx=total-1; rot=-6;
+          } else {
+            // all upcoming cards — stacked behind, offset right slightly
+            const depth=rel; // 1=just behind, 2=further, etc.
+            const maxStack=Math.min(total-2,4);
+            const d2=Math.min(depth,maxStack);
+            tx= 18*(d2); ty= 10*(d2); scale=1-0.06*d2; opacity=Math.max(0,1-0.18*d2); zIdx=total-depth; rot=3*d2;
+          }
+          c.style.zIndex=zIdx;
+          c.style.transform=`translateX(${tx}%) translateY(${ty}px) scale(${scale}) rotate(${rot}deg)`;
+          c.style.opacity=opacity;
+          c.style.pointerEvents=rel===0?'auto':'none';
+        });
+      }
+
+      function goTo(idx){
+        cur=(idx+total)%total;
+        layout(cur);
+        buildDots(cur);
+      }
+
+      // dots
       const counter=document.getElementById('ogpCounter');
-      const total=docs.length;
-      const allCards=Array.from(scroll.querySelectorAll('.ogp-card'));
       function buildDots(active){
         if(!counter||total<2) return;
-        counter.innerHTML=allCards.map((_,i)=>`<span style="display:inline-block;width:${i===active?'22px':'7px'};height:7px;border-radius:999px;background:${i===active?'#f5c518':'rgba(255,255,255,.25)'};transition:all .3s;"></span>`).join('');
+        counter.innerHTML=cards.map((_,i)=>`<span style="display:inline-block;width:${i===active?'22px':'7px'};height:7px;border-radius:999px;background:${i===active?'#f5c518':'rgba(255,255,255,.25)'};transition:all .3s;"></span>`).join('');
       }
-      buildDots(0);
-      scroll.addEventListener('scroll',()=>{
-        let closest=0,minDist=Infinity;
-        allCards.forEach((c,i)=>{const dist=Math.abs(c.getBoundingClientRect().left-scroll.getBoundingClientRect().left);if(dist<minDist){minDist=dist;closest=i;}});
-        buildDots(closest);
-      },{passive:true});
-      // auto-scroll
-      let ogpIdx=0,ogpTimer;
-      function ogpAutoScroll(){
-        ogpTimer=setInterval(()=>{
-          ogpIdx=(ogpIdx+1)%total;
-          allCards[ogpIdx].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-        },3000);
-      }
-      ogpAutoScroll();
-      scroll.addEventListener('touchstart',()=>clearInterval(ogpTimer),{passive:true});
-      scroll.addEventListener('touchend',()=>ogpAutoScroll(),{passive:true});
-      scroll.addEventListener('mouseenter',()=>clearInterval(ogpTimer));
-      scroll.addEventListener('mouseleave',()=>ogpAutoScroll());
+
+      layout(0); buildDots(0);
+
+      document.getElementById('ogpNext').onclick=e=>{e.preventDefault();goTo(cur+1);};
+      document.getElementById('ogpPrev').onclick=e=>{e.preventDefault();goTo(cur-1);};
+
+      // swipe
+      let tx0=0;
+      deck.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;},{ passive:true });
+      deck.addEventListener('touchend',e=>{
+        const dx=e.changedTouches[0].clientX-tx0;
+        if(Math.abs(dx)>40) goTo(dx<0?cur+1:cur-1);
+      },{ passive:true });
+
+      // auto-advance
+      let ogpTimer=setInterval(()=>goTo(cur+1),3500);
+      deck.addEventListener('touchstart',()=>clearInterval(ogpTimer),{passive:true});
+      deck.addEventListener('mouseenter',()=>clearInterval(ogpTimer));
+      deck.addEventListener('mouseleave',()=>{ ogpTimer=setInterval(()=>goTo(cur+1),3500); });
+
+      // allow click only on active card
+      cards.forEach((c,i)=>{
+        c.addEventListener('click',e=>{
+          if((i-cur+total)%total!==0){ e.preventDefault(); goTo(i); }
+        });
+      });
     }catch(e){console.warn('OGP:',e.message);}
   })();
 
