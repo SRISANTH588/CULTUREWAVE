@@ -1130,7 +1130,7 @@
       }).slice(0,10);
       const scroll = document.getElementById('ftScroll');
       if(!scroll) return;
-      if(!docs.length){ document.querySelector('.ft-section').style.display='none'; return; }
+      if(!docs.length){ scroll.closest('.ft-scroll-wrap').style.display='none'; return; }
       docs.forEach(doc=>{
         const d=doc.data(), id=doc.id;
         const img=d.cardImgUrl||d.coverUrl||'';
@@ -1162,7 +1162,7 @@
       const scroll = document.getElementById('hpeScroll');
       if(!scroll) return;
       if(!docs.length){
-        document.querySelector('.hpe-section').style.display='none'; return;
+        scroll.closest('.hpe-scroll-wrap').style.display='none'; return;
       }
       docs.forEach(doc => {
         const d = doc.data(), id = doc.id;
