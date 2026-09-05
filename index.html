@@ -49,21 +49,32 @@
     }
 
     /* ── OG PICKS ── */
-    .ogp-section{background:#000;padding:2rem 0 0;}
-    .ogp-head{padding:0 1.2rem 1.4rem;text-align:center;}
-    .ogp-tag{
-      font-size:.68rem;font-weight:800;
-      letter-spacing:.16em;text-transform:uppercase;
-      color:#f5c518;margin-bottom:.5rem;
+    .ogp-section{
+      background:#000;
+      padding:0 0 0;
+      border-top:1px solid rgba(255,255,255,.08);
+      position:relative;
     }
+    .ogp-section::before{
+      content:"";
+      display:block;
+      height:2px;
+      background:linear-gradient(90deg,transparent,#f5c518,#fff8d0,#f5c518,transparent);
+    }
+    .ogp-head{padding:1.8rem 1.2rem 1.4rem;text-align:center;}
     .ogp-title{
-      font-size:clamp(1.6rem,6vw,2.6rem);
-      font-weight:900;color:#fff;
-      letter-spacing:.04em;text-transform:uppercase;
-      line-height:1;
+      font-size:clamp(1rem,3.5vw,1.5rem);font-weight:900;
+      letter-spacing:.12em;text-transform:uppercase;
+      color:#fff;margin-bottom:.45rem;
+    }
+    .ogp-tag{
+      font-size:clamp(1.4rem,5vw,2.2rem);
+      font-weight:900;color:#f5c518;
+      letter-spacing:-.02em;text-transform:uppercase;
+      line-height:1.1;margin-bottom:0;
     }
     /* scroll: peek prev/next cards on sides */
-    .ogp-scroll-wrap{background:#000;overflow:hidden;}
+    .ogp-scroll-wrap{background:#000;}
     .ogp-scroll{
       display:flex;gap:.85rem;
       padding:.4rem 11vw 1rem;
@@ -909,8 +920,8 @@
   <!-- OG PICKS -->
   <section class="ogp-section">
     <div class="ogp-head">
-      <div class="ogp-tag">✨ WE THINK YOU'LL VIBE WITH THESE</div>
       <div class="ogp-title">THE OG PICKS</div>
+      <div class="ogp-tag">✨ WE THINK YOU'LL VIBE WITH THESE</div>
     </div>
     <div class="ogp-scroll-wrap">
       <div class="ogp-scroll" id="ogpScroll"></div>
@@ -1253,18 +1264,33 @@
           </div>`;
         scroll.appendChild(a);
       });
-      // live counter
+      // dots counter + auto-scroll
       const counter=document.getElementById('ogpCounter');
       const total=docs.length;
-      if(counter&&total>1){
-        counter.innerHTML=`<span>1</span>/${total}`;
-        scroll.addEventListener('scroll',()=>{
-          const cards=Array.from(scroll.querySelectorAll('.ogp-card'));
-          let closest=0,minDist=Infinity;
-          cards.forEach((c,i)=>{const d=Math.abs(c.getBoundingClientRect().left-scroll.getBoundingClientRect().left);if(d<minDist){minDist=d;closest=i;}});
-          counter.innerHTML=`<span>${closest+1}</span>/${total}`;
-        },{passive:true});
+      const allCards=Array.from(scroll.querySelectorAll('.ogp-card'));
+      function buildDots(active){
+        if(!counter||total<2) return;
+        counter.innerHTML=allCards.map((_,i)=>`<span style="display:inline-block;width:${i===active?'22px':'7px'};height:7px;border-radius:999px;background:${i===active?'#f5c518':'rgba(255,255,255,.25)'};transition:all .3s;"></span>`).join('');
       }
+      buildDots(0);
+      scroll.addEventListener('scroll',()=>{
+        let closest=0,minDist=Infinity;
+        allCards.forEach((c,i)=>{const dist=Math.abs(c.getBoundingClientRect().left-scroll.getBoundingClientRect().left);if(dist<minDist){minDist=dist;closest=i;}});
+        buildDots(closest);
+      },{passive:true});
+      // auto-scroll
+      let ogpIdx=0,ogpTimer;
+      function ogpAutoScroll(){
+        ogpTimer=setInterval(()=>{
+          ogpIdx=(ogpIdx+1)%total;
+          allCards[ogpIdx].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+        },3000);
+      }
+      ogpAutoScroll();
+      scroll.addEventListener('touchstart',()=>clearInterval(ogpTimer),{passive:true});
+      scroll.addEventListener('touchend',()=>ogpAutoScroll(),{passive:true});
+      scroll.addEventListener('mouseenter',()=>clearInterval(ogpTimer));
+      scroll.addEventListener('mouseleave',()=>ogpAutoScroll());
     }catch(e){console.warn('OGP:',e.message);}
   })();
 
@@ -1348,7 +1374,7 @@
           <div class="hpe-info">
             ${day ? `<div class="hpe-date"><div class="hpe-date-box"><div class="hpe-date-day">${day}</div><div class="hpe-date-mon">${mon}</div></div></div>` : ''}
             <div class="hpe-title">${d.name||'Untitled'}</div>
-            <div class="hpe-venue">${d.venue||d.city||'India'}</div>
+            <div class="hpe-venue">${[d.venue||d.venueName,d.city].filter(Boolean).join(' · ')||'India'}</div>
           </div>`;
         scroll.appendChild(a);
       });
