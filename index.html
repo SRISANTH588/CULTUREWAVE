@@ -48,84 +48,95 @@
       .idx-cat-sub{display:none;}
     }
 
-    /* ── HANDPICKED EXPERIENCES ── */
     /* ── OG PICKS ── */
     .ogp-section{background:#000;padding:2rem 0 0;}
-    .ogp-head{
-      padding:0 1.2rem 1.2rem;
-      text-align:center;
-    }
+    .ogp-head{padding:0 1.2rem 1.4rem;text-align:center;}
     .ogp-tag{
       font-size:.68rem;font-weight:800;
       letter-spacing:.16em;text-transform:uppercase;
-      color:#f5c518;
-      margin-bottom:.4rem;
+      color:#f5c518;margin-bottom:.5rem;
     }
     .ogp-title{
-      font-size:clamp(1.8rem,6vw,3rem);
-      font-weight:900;
-      color:#fff;
-      letter-spacing:-.05em;
+      font-size:clamp(1.6rem,6vw,2.6rem);
+      font-weight:900;color:#fff;
+      letter-spacing:.04em;text-transform:uppercase;
       line-height:1;
     }
+    /* scroll: peek prev/next cards on sides */
     .ogp-scroll-wrap{background:#000;overflow:hidden;}
     .ogp-scroll{
-      display:flex;gap:1rem;
-      padding:.8rem 1.2rem 1.2rem;
+      display:flex;gap:.85rem;
+      padding:.4rem 11vw 1rem;
       overflow-x:auto;scroll-snap-type:x mandatory;
       scrollbar-width:none;-webkit-overflow-scrolling:touch;
     }
     .ogp-scroll::-webkit-scrollbar{display:none;}
     .ogp-card{
-      flex:0 0 78vw;max-width:340px;
-      border-radius:20px;overflow:hidden;
-      background:#111;
-      border:1px solid rgba(255,255,255,.12);
+      flex:0 0 78vw;max-width:360px;
+      border-radius:22px;overflow:hidden;
+      background:#1a1a1a;
+      border:1px solid rgba(255,255,255,.1);
       scroll-snap-align:center;cursor:pointer;
       text-decoration:none;display:block;
-      transition:transform .22s ease,box-shadow .22s ease;
+      transition:transform .25s ease,box-shadow .25s ease;
+      box-shadow:0 8px 32px rgba(0,0,0,.6);
     }
-    .ogp-card:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(0,0,0,.85);}
+    .ogp-card:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(0,0,0,.9);}
     .ogp-poster{
       width:100%;aspect-ratio:3/4;
       background-size:cover;background-position:center;
       position:relative;
     }
-    .ogp-poster::after{
-      content:"";position:absolute;inset:0;
-      background:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 50%);
-    }
     .ogp-date-badge{
-      position:absolute;top:.75rem;left:.75rem;z-index:2;
+      position:absolute;top:.85rem;left:.85rem;z-index:2;
       background:#fff;color:#000;
-      border-radius:10px;padding:.35rem .55rem;
-      text-align:center;min-width:44px;
-      box-shadow:0 2px 8px rgba(0,0,0,.4);
+      border-radius:12px;padding:.4rem .65rem;
+      text-align:center;min-width:50px;
+      box-shadow:0 2px 10px rgba(0,0,0,.5);
     }
-    .ogp-date-badge-day{font-size:1.15rem;font-weight:900;line-height:1;}
-    .ogp-date-badge-mon{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-top:.05rem;}
+    .ogp-date-badge-day{font-size:1.3rem;font-weight:900;line-height:1;}
+    .ogp-date-badge-mon{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-top:.1rem;}
     .ogp-price-badge{
-      position:absolute;bottom:.7rem;right:.7rem;z-index:2;
-      padding:.28rem .75rem;border-radius:999px;
+      position:absolute;bottom:.8rem;right:.8rem;z-index:2;
+      padding:.3rem .8rem;border-radius:999px;
       font-size:.65rem;font-weight:800;
     }
     .ogp-price-free{background:#22c55e;color:#fff;}
     .ogp-price-paid{background:#ec4899;color:#fff;}
-    .ogp-info{padding:.85rem 1rem 1rem;background:#111;}
-    .ogp-title-card{font-size:1rem;font-weight:800;color:#fff;line-height:1.25;letter-spacing:-.02em;}
-    .ogp-venue{font-size:.78rem;color:rgba(255,255,255,.45);margin-top:.3rem;font-weight:600;}
-    /* pagination counter */
+    .ogp-info{
+      padding:1rem 1.1rem 1.15rem;
+      background:#1a1a1a;
+      border-top:1px solid rgba(255,255,255,.07);
+    }
+    .ogp-title-card{
+      font-size:1.05rem;font-weight:800;
+      color:#fff;line-height:1.25;letter-spacing:-.02em;
+    }
+    .ogp-venue{
+      font-size:.8rem;color:rgba(255,255,255,.45);
+      margin-top:.3rem;font-weight:500;
+    }
+    /* counter: pill with dots like 1/10 */
     .ogp-counter{
-      text-align:center;padding:.5rem 0 .2rem;
-      font-size:.78rem;font-weight:800;
-      color:rgba(255,255,255,.35);
-      letter-spacing:.06em;
+      display:flex;align-items:center;justify-content:center;
+      gap:.6rem;padding:.9rem 0 .4rem;
       background:#000;
     }
-    .ogp-counter span{color:#fff;}
+    .ogp-counter-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);
+    }
+    .ogp-counter-pill{
+      background:rgba(255,255,255,.15);
+      border-radius:999px;
+      padding:.3rem .85rem;
+      font-size:.8rem;font-weight:800;
+      color:#fff;letter-spacing:.04em;
+    }
     @media(min-width:700px){
-      .ogp-card{flex:0 0 300px;max-width:340px;}
-      .ogp-title{font-size:clamp(2.2rem,4vw,3.5rem);}
+      .ogp-card{flex:0 0 340px;max-width:380px;}
+      .ogp-scroll{padding:.4rem calc(50% - 190px) 1rem;}
+      .ogp-title{font-size:clamp(2rem,4vw,3rem);}
     }
 
     /* ── FINEST TABLES SECTION ── */
@@ -898,13 +909,13 @@
   <!-- OG PICKS -->
   <section class="ogp-section">
     <div class="ogp-head">
-      <div class="ogp-tag">✨ WE THINK YOU'LL VIBE WITH THESE</div>
       <div class="ogp-title">THE OG PICKS</div>
+      <div class="ogp-tag">✨ WE THINK YOU'LL VIBE WITH THESE</div>
     </div>
     <div class="ogp-scroll-wrap">
       <div class="ogp-scroll" id="ogpScroll"></div>
     </div>
-    <div class="ogp-counter" id="ogpCounter">&nbsp;</div>
+    <div class="ogp-counter" id="ogpCounter"></div>
     <div style="padding:.6rem 1.2rem 1.8rem;display:flex;justify-content:center;background:#000;">
       <a href="events.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.5rem;border:1px solid rgba(245,197,24,.3);border-radius:999px;color:#f5c518;font-size:.82rem;font-weight:800;text-decoration:none;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(245,197,24,.1)';this.style.borderColor='#f5c518';" onmouseout="this.style.background='';this.style.borderColor='rgba(245,197,24,.3)';">View all picks &#8594;</a>
     </div>
@@ -1242,16 +1253,26 @@
           </div>`;
         scroll.appendChild(a);
       });
-      // live counter
+      // live counter with pill + dots
       const counter=document.getElementById('ogpCounter');
       const total=docs.length;
-      if(counter&&total>1){
-        counter.innerHTML=`<span>1</span>/${total}`;
+      function renderCounter(idx){
+        if(!counter||total<2) return;
+        counter.innerHTML=`
+          <div class="ogp-counter-dot"></div>
+          <div class="ogp-counter-pill">${idx+1}/${total}</div>
+          <div class="ogp-counter-dot"></div>`;
+      }
+      renderCounter(0);
+      if(total>1){
         scroll.addEventListener('scroll',()=>{
           const cards=Array.from(scroll.querySelectorAll('.ogp-card'));
           let closest=0,minDist=Infinity;
-          cards.forEach((c,i)=>{const d=Math.abs(c.getBoundingClientRect().left-scroll.getBoundingClientRect().left);if(d<minDist){minDist=d;closest=i;}});
-          counter.innerHTML=`<span>${closest+1}</span>/${total}`;
+          cards.forEach((c,i)=>{
+            const dist=Math.abs(c.getBoundingClientRect().left+c.offsetWidth/2-(scroll.getBoundingClientRect().left+scroll.offsetWidth/2));
+            if(dist<minDist){minDist=dist;closest=i;}
+          });
+          renderCounter(closest);
         },{passive:true});
       }
     }catch(e){console.warn('OGP:',e.message);
