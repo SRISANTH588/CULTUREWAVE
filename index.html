@@ -1123,7 +1123,8 @@
   const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
   function isPublishedEvent(data) {
-    return true;
+    const status = String(data?.status || '').toLowerCase();
+    return ['published','live','active'].includes(status);
   }
 
   async function loadIndexEvents() {
