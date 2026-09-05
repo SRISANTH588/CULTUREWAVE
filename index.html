@@ -47,6 +47,78 @@
       .idx-cat-label{font-size:.65rem!important;}
       .idx-cat-sub{display:none;}
     }
+
+    /* ── HANDPICKED EXPERIENCES ── */
+    .hpe-section{background:#000;padding:0 0 2.5rem;}
+    .hpe-banner{
+      width:100%;background:#00c4b4;
+      padding:2rem 1.2rem 1.8rem;
+      position:relative;overflow:hidden;
+    }
+    .hpe-banner::after{
+      content:"✦";position:absolute;right:1.4rem;top:1rem;
+      font-size:1.2rem;color:rgba(255,255,255,.5);
+    }
+    .hpe-banner::before{
+      content:"✦";position:absolute;right:3.2rem;top:2.8rem;
+      font-size:.65rem;color:rgba(255,255,255,.35);
+    }
+    .hpe-heading{
+      font-size:clamp(2.6rem,9vw,4rem);
+      font-weight:900;color:#fff;
+      line-height:.95;letter-spacing:-.04em;
+    }
+    .hpe-heading em{font-style:italic;display:block;}
+    .hpe-sub{
+      margin-top:.7rem;font-size:.85rem;
+      font-weight:700;color:rgba(255,255,255,.8);
+    }
+    .hpe-scroll-wrap{background:#000;}
+    .hpe-scroll{
+      display:flex;gap:.7rem;
+      padding:.9rem 1rem .6rem;
+      overflow-x:auto;scroll-snap-type:x mandatory;
+      scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    }
+    .hpe-scroll::-webkit-scrollbar{display:none;}
+    .hpe-card{
+      flex:0 0 44vw;max-width:190px;
+      border-radius:14px;overflow:hidden;
+      background:#1a1a1a;
+      border:1px solid rgba(255,255,255,.1);
+      scroll-snap-align:start;cursor:pointer;
+      text-decoration:none;display:block;
+      transition:transform .22s ease,box-shadow .22s ease;
+    }
+    .hpe-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.7);}
+    .hpe-poster{
+      width:100%;aspect-ratio:3/4;
+      background-size:cover;background-position:center;
+      position:relative;
+    }
+    .hpe-price-badge{
+      position:absolute;bottom:.5rem;left:.5rem;
+      padding:.22rem .6rem;border-radius:999px;
+      font-size:.62rem;font-weight:800;letter-spacing:.04em;
+    }
+    .hpe-price-free{background:#22c55e;color:#fff;}
+    .hpe-price-paid{background:#ec4899;color:#fff;}
+    .hpe-info{padding:.6rem .7rem .75rem;}
+    .hpe-date{
+      display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;
+    }
+    .hpe-date-box{
+      background:#222;border-radius:6px;
+      padding:.18rem .38rem;text-align:center;min-width:30px;
+    }
+    .hpe-date-day{font-size:.72rem;font-weight:900;color:#fff;line-height:1;}
+    .hpe-date-mon{font-size:.52rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.06em;}
+    .hpe-title{font-size:.72rem;font-weight:800;color:#fff;line-height:1.3;}
+    .hpe-venue{font-size:.62rem;color:#666;margin-top:.18rem;font-weight:600;}
+    @media(min-width:700px){
+      .hpe-card{flex:0 0 200px;max-width:220px;}
+      .hpe-banner{padding:2.8rem 1.4rem 2.2rem;}
+    }
     .mobile-header-actions,.mobile-bottom-nav,.mobile-brand,.city-picker{display:none;}
     @media(max-width:700px){
       .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
@@ -475,6 +547,19 @@
     </div>
   </section>
 
+  <!-- HANDPICKED EXPERIENCES -->
+  <section class="hpe-section">
+    <div class="hpe-banner">
+      <div class="hpe-banner-text">
+        <div class="hpe-heading">Scenes<br><em>worthy</em></div>
+        <div class="hpe-sub">Handpicked Experiences</div>
+      </div>
+    </div>
+    <div class="hpe-scroll-wrap">
+      <div class="hpe-scroll" id="hpeScroll"></div>
+    </div>
+  </section>
+
   <!-- FEATURED EVENTS -->
   <section class="events-section featured-events idx-feat-section" id="events">
     <div class="idx-feat-inner">
@@ -777,6 +862,47 @@
 
   loadIndexEvents().then(() => startHomeCarousel('indexEventsGrid'));
   loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
+
+  // Handpicked Experiences
+  (async function loadHPE(){
+    try{
+      const snap = await _idb.collection('events').limit(200).get();
+      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,10);
+      const scroll = document.getElementById('hpeScroll');
+      if(!scroll) return;
+      if(!docs.length){
+        document.querySelector('.hpe-section').style.display='none'; return;
+      }
+      docs.forEach(doc => {
+        const d = doc.data(), id = doc.id;
+        const img = d.cardImgUrl || d.coverUrl || '';
+        const price = d.tickets?.[0]?.price || d.price || 0;
+        let day='', mon='';
+        if(d.startDate){
+          try{
+            const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
+            day = dt.getDate();
+            mon = dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();
+          }catch(e){}
+        }
+        const badgeClass = price ? 'hpe-price-paid' : 'hpe-price-free';
+        const badgeText = price ? `Starts at \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
+        const a = document.createElement('a');
+        a.className = 'hpe-card';
+        a.href = `event-detail.html?eventId=${id}`;
+        a.innerHTML = `
+          <div class="hpe-poster" style="${img?`background-image:url('${img}')`:'background:linear-gradient(135deg,#1a1a1a,#333)'}">
+            <span class="hpe-price-badge ${badgeClass}">${badgeText}</span>
+          </div>
+          <div class="hpe-info">
+            ${day ? `<div class="hpe-date"><div class="hpe-date-box"><div class="hpe-date-day">${day}</div><div class="hpe-date-mon">${mon}</div></div></div>` : ''}
+            <div class="hpe-title">${d.name||'Untitled'}</div>
+            <div class="hpe-venue">${d.venue||d.city||'India'}</div>
+          </div>`;
+        scroll.appendChild(a);
+      });
+    }catch(e){ console.warn('HPE:', e.message); }
+  })();
 </script>
 <script>
   (function() {
