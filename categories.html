@@ -19,7 +19,6 @@
     .index-auth-actions{gap:.5rem;padding:.3rem;border:1px solid #333!important;border-radius:999px;background:#111!important;}
     .index-auth-actions .nav-link{padding:.6rem .95rem;border:0;background:transparent;color:#aaa!important;font-size:.82rem;}
     .index-auth-actions .nav-cta{margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff!important;color:#000!important;border-radius:999px;font-weight:800;}
-
     @media(max-width:960px){
       .hamburger{display:flex!important;visibility:visible!important;opacity:1!important;flex:none;align-items:center;justify-content:center;width:42px;height:42px;margin-left:.35rem;border:1px solid #333;border-radius:13px;background:#111;}
       .hamburger span{display:block;background:#fff!important;}
@@ -27,8 +26,7 @@
     .mobile-nav{background:#0a0a0a!important;border-left:1px solid #222!important;}
     .mobile-nav>a{background:#111!important;border:1px solid #222!important;color:#fff!important;border-radius:14px;}
     .mobile-nav-ctas{border-top:1px solid #222!important;}
-
-    .mobile-header-actions,.mobile-bottom-nav,.mobile-brand,.city-picker{display:none;}
+    .mobile-header-actions,.mobile-bottom-nav,.mobile-brand{display:none;}
     @media(max-width:700px){
       .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
       .topbar .brand-block{display:none;}
@@ -36,126 +34,163 @@
       .mobile-header-actions{display:flex;align-items:center;gap:.45rem;margin-left:auto;}
       .mobile-bottom-nav{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:24;display:grid;grid-template-columns:repeat(4,1fr);gap:.25rem;padding:.55rem .35rem;border:1px solid #222;border-radius:999px;background:rgba(0,0,0,.94);box-shadow:0 12px 34px rgba(0,0,0,.8);backdrop-filter:blur(18px);}
       .mobile-bottom-nav a{display:grid;place-items:center;gap:.2rem;padding:.35rem .15rem;border-radius:999px;color:#666;font-size:.68rem;font-weight:800;text-decoration:none;}
+      .mobile-bottom-nav a.active-tab{color:#fff;background:#1a1a1a;}
       .mobile-bottom-nav a strong{font-size:.68rem;font-weight:800;line-height:1.1;}
       .mobile-bottom-nav .nav-symbol{width:22px;height:22px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8;}
     }
 
     /* PAGE HERO */
     .cat-page-hero{
-      padding:2.5rem 1.2rem 2rem;
+      padding:2rem 1.2rem 1.5rem;
       background:#000;
       border-bottom:1px solid #1a1a1a;
     }
     .cat-page-back{
       display:inline-flex;align-items:center;gap:.4rem;
       color:rgba(255,255,255,.4);font-size:.78rem;font-weight:700;
-      text-decoration:none;margin-bottom:1rem;
+      text-decoration:none;margin-bottom:.8rem;
       transition:color .2s;
     }
     .cat-page-back:hover{color:#fff;}
     .cat-page-hero h1{
       margin:0;
-      font-size:clamp(2rem,6vw,3.5rem);
+      font-size:clamp(1.8rem,5vw,3rem);
       font-weight:900;letter-spacing:-.05em;
       color:#fff;line-height:1;
     }
     .cat-page-hero p{
-      margin:.5rem 0 0;
-      color:rgba(255,255,255,.4);
-      font-size:.9rem;font-weight:600;
+      margin:.4rem 0 0;
+      color:rgba(255,255,255,.35);
+      font-size:.85rem;font-weight:600;
     }
 
-    /* GRID */
-    .cat-page-wrap{
-      max-width:1240px;margin:0 auto;
-      padding:2rem 1.2rem 3rem;
+    /* CATEGORY CHIPS */
+    .cat-chips-wrap{
+      background:#000;
+      padding:1.2rem 1.2rem .8rem;
+      border-bottom:1px solid #1a1a1a;
+      position:sticky;top:66px;z-index:10;
     }
-    .cat-page-grid{
+    .cat-chips{
+      display:flex;gap:.5rem;
+      overflow-x:auto;scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:.2rem;
+    }
+    .cat-chips::-webkit-scrollbar{display:none;}
+    .cat-chip-btn{
+      flex:none;
+      display:flex;align-items:center;gap:.4rem;
+      padding:.5rem 1rem;
+      border:1.5px solid rgba(255,255,255,.15);
+      border-radius:999px;
+      background:transparent;
+      color:rgba(255,255,255,.5);
+      font-size:.78rem;font-weight:800;
+      cursor:pointer;font-family:inherit;
+      white-space:nowrap;
+      transition:all .2s;
+    }
+    .cat-chip-btn:hover{border-color:rgba(255,255,255,.4);color:#fff;}
+    .cat-chip-btn.active{
+      background:#fff;color:#000;
+      border-color:#fff;
+    }
+    .cat-chip-dot{
+      width:8px;height:8px;border-radius:50%;flex:none;
+    }
+
+    /* RESULTS HEADER */
+    .cat-results-head{
+      max-width:1240px;margin:0 auto;
+      padding:1.5rem 1.2rem .8rem;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .cat-results-title{
+      font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;
+    }
+    .cat-results-count{
+      font-size:.78rem;color:rgba(255,255,255,.35);font-weight:700;
+    }
+
+    /* EVENTS GRID */
+    .cat-events-wrap{
+      max-width:1240px;margin:0 auto;
+      padding:0 1.2rem 3rem;
+    }
+    .cat-events-grid{
       display:grid;
       grid-template-columns:repeat(3,1fr);
       gap:1rem;
     }
-    .cat-page-card{
-      position:relative;
+    .cat-ev-card{
+      background:#111;
+      border:1px solid rgba(255,255,255,.1);
       border-radius:20px;overflow:hidden;
-      aspect-ratio:4/5;
-      display:flex;flex-direction:column;justify-content:flex-end;
-      text-decoration:none;cursor:pointer;
-      border:1.5px solid rgba(255,255,255,.15);
-      transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;
+      cursor:pointer;text-decoration:none;display:block;
+      transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
     }
-    .cat-page-card:hover{
-      transform:translateY(-6px) scale(1.02);
-      box-shadow:0 24px 56px rgba(0,0,0,.8);
-      border-color:rgba(255,255,255,.45);
+    .cat-ev-card:hover{
+      transform:translateY(-5px);
+      box-shadow:0 20px 48px rgba(0,0,0,.7);
+      border-color:rgba(255,255,255,.22);
     }
-    .cat-page-bg{
-      position:absolute;inset:0;
+    .cat-ev-banner{
+      position:relative;
+      aspect-ratio:4/3;
       background-size:cover;background-position:center;
-      transition:transform .4s ease;
+      overflow:hidden;
     }
-    .cat-page-card:hover .cat-page-bg{transform:scale(1.07);}
-    .cat-page-card::after{
+    .cat-ev-banner::after{
       content:"";position:absolute;inset:0;
-      background:linear-gradient(to top,rgba(0,0,0,.8) 0%,rgba(0,0,0,.2) 50%,transparent 100%);
-      z-index:1;
+      background:linear-gradient(to top,rgba(0,0,0,.65) 0%,transparent 60%);
     }
-    .cat-page-body{
-      position:relative;z-index:2;
-      padding:1rem 1.1rem 1.2rem;
+    .cat-ev-badge{
+      position:absolute;top:.6rem;left:.6rem;z-index:2;
+      padding:.22rem .65rem;border-radius:999px;
+      font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+      background:rgba(255,255,255,.15);backdrop-filter:blur(6px);
+      border:1px solid rgba(255,255,255,.2);color:#fff;
     }
-    .cat-page-tag{
-      display:inline-block;
-      padding:.22rem .65rem;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.25);
-      background:rgba(255,255,255,.1);
-      backdrop-filter:blur(6px);
-      color:rgba(255,255,255,.7);
-      font-size:.6rem;font-weight:800;
-      letter-spacing:.1em;text-transform:uppercase;
-      margin-bottom:.5rem;
+    .cat-ev-price-badge{
+      position:absolute;bottom:.6rem;right:.6rem;z-index:2;
+      padding:.22rem .65rem;border-radius:999px;
+      font-size:.65rem;font-weight:800;
     }
-    .cat-page-name{
-      font-size:clamp(1.2rem,3vw,1.6rem);
-      font-weight:900;color:#fff;
-      line-height:1;letter-spacing:-.03em;
-      text-transform:uppercase;
+    .price-free{background:#22c55e;color:#fff;}
+    .price-paid{background:#ec4899;color:#fff;}
+    .cat-ev-body{padding:.9rem 1rem 1rem;}
+    .cat-ev-title{font-size:.92rem;font-weight:800;color:#fff;line-height:1.3;letter-spacing:-.02em;margin:0 0 .3rem;}
+    .cat-ev-meta{font-size:.72rem;color:rgba(255,255,255,.38);font-weight:700;}
+    .cat-ev-footer{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-top:.65rem;padding-top:.65rem;
+      border-top:1px solid rgba(255,255,255,.07);
     }
-    .cat-page-desc{
-      margin-top:.3rem;
-      font-size:.75rem;color:rgba(255,255,255,.5);
-      font-weight:600;line-height:1.4;
+    .cat-ev-price{font-size:.85rem;font-weight:900;color:#fff;}
+    .cat-ev-btn{
+      padding:.38rem .85rem;border-radius:999px;
+      background:#fff;color:#000;
+      font-size:.7rem;font-weight:800;
+      border:0;cursor:pointer;text-decoration:none;
+      transition:background .18s;
     }
+    .cat-ev-btn:hover{background:#e5e5e5;}
 
-    /* colour fallbacks */
-    .cpg-nightlife   {background:#0e8fa8;}
-    .cpg-brunch      {background:#b8860b;}
-    .cpg-dining      {background:#b71c1c;}
-    .cpg-workshops   {background:#b35a00;}
-    .cpg-experiences {background:#00796b;}
-    .cpg-music       {background:#1b5e20;}
-    .cpg-sports      {background:#1a237e;}
-    .cpg-community   {background:#4a148c;}
-    .cpg-adventure   {background:#bf360c;}
-
-    .cpg-nightlife .cat-page-bg   {background-image:url('party.jpg');}
-    .cpg-brunch .cat-page-bg      {background-image:url('brunch.jpg');}
-    .cpg-dining .cat-page-bg      {background-image:url('culinary.jpg');}
-    .cpg-workshops .cat-page-bg   {background-image:url('workshop.jpg');}
-    .cpg-experiences .cat-page-bg {background-image:url('community.jpg');}
-    .cpg-music .cat-page-bg       {background-image:url('music.jpg');}
-    .cpg-sports .cat-page-bg      {background-image:url('sports.jpg');}
-    .cpg-community .cat-page-bg   {background-image:url('community.jpg');}
-    .cpg-adventure .cat-page-bg   {background-image:url('party.jpg');}
-
-    @media(max-width:700px){
-      .cat-page-grid{grid-template-columns:repeat(2,1fr);gap:.65rem;}
-      .cat-page-card{aspect-ratio:3/4;border-radius:16px;}
-      .cat-page-name{font-size:1rem;}
+    /* EMPTY */
+    .cat-empty{
+      grid-column:1/-1;text-align:center;
+      padding:4rem 1rem;color:rgba(255,255,255,.25);
     }
-    @media(max-width:400px){
-      .cat-page-grid{grid-template-columns:repeat(2,1fr);gap:.5rem;}
+    .cat-empty-icon{font-size:3rem;margin-bottom:.8rem;}
+    .cat-empty-msg{font-size:.9rem;font-weight:700;}
+
+    @media(max-width:900px){.cat-events-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:560px){
+      .cat-events-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;}
+      .cat-ev-body{padding:.75rem .8rem .85rem;}
+      .cat-ev-title{font-size:.82rem;}
+      .cat-chips-wrap{top:66px;padding:.9rem 1rem .6rem;}
     }
   </style>
 </head>
@@ -201,106 +236,190 @@
 <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
   <a href="index.html"><svg class="nav-symbol" viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 20v-6h6v6"/></svg><strong>Home</strong></a>
   <a href="events.html"><svg class="nav-symbol" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7 3v4M17 3v4M3.5 10h17"/></svg><strong>Events</strong></a>
-  <a href="categories.html" aria-current="page"><svg class="nav-symbol" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><strong>Categories</strong></a>
-  <a href="restaurants.html"><svg class="nav-symbol" viewBox="0 0 24 24"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M6 10v11M18 3v18M15 3v6c0 1.7 1.3 3 3 3"/></svg><strong>Restaurants</strong></a>
+  <a href="categories.html" class="active-tab"><svg class="nav-symbol" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><strong>Categories</strong></a>
+  <a href="restaurants.html"><svg class="nav-symbol" viewBox="0 0 24 24"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M6 10v11M18 3v18M15 3v6c0 1.7 1.3 3 3 3"/></svg><strong>Dine</strong></a>
 </nav>
 
 <main>
   <div class="cat-page-hero">
     <a class="cat-page-back" href="index.html">&#8592; Back to Home</a>
-    <h1>All Categories</h1>
-    <p>Find exactly what you're in the mood for.</p>
+    <h1 id="pageTitle">All Categories</h1>
+    <p id="pageSubtitle">Find exactly what you're in the mood for.</p>
   </div>
 
-  <div class="cat-page-wrap">
-    <div class="cat-page-grid">
+  <!-- CATEGORY CHIPS -->
+  <div class="cat-chips-wrap">
+    <div class="cat-chips" id="catChips">
+      <button class="cat-chip-btn active" data-cat="all">
+        <span class="cat-chip-dot" style="background:#fff"></span> All
+      </button>
+      <button class="cat-chip-btn" data-cat="nightlife">
+        <span class="cat-chip-dot" style="background:#0e8fa8"></span> Nightlife
+      </button>
+      <button class="cat-chip-btn" data-cat="brunch">
+        <span class="cat-chip-dot" style="background:#b8860b"></span> Brunch &amp; Bites
+      </button>
+      <button class="cat-chip-btn" data-cat="dining">
+        <span class="cat-chip-dot" style="background:#b71c1c"></span> Fine Dining
+      </button>
+      <button class="cat-chip-btn" data-cat="workshops">
+        <span class="cat-chip-dot" style="background:#b35a00"></span> Workshops
+      </button>
+      <button class="cat-chip-btn" data-cat="experiences">
+        <span class="cat-chip-dot" style="background:#00796b"></span> Experiences
+      </button>
+      <button class="cat-chip-btn" data-cat="music">
+        <span class="cat-chip-dot" style="background:#1b5e20"></span> Live Music
+      </button>
+    </div>
+  </div>
 
-      <a href="category-parties.html" class="cat-page-card cpg-nightlife">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">After Dark</span>
-          <div class="cat-page-name">Nightlife</div>
-          <div class="cat-page-desc">Parties, clubs & celebrations</div>
-        </div>
-      </a>
+  <!-- RESULTS -->
+  <div class="cat-results-head">
+    <div class="cat-results-title" id="resultsTitle">All Events</div>
+    <div class="cat-results-count" id="resultsCount"></div>
+  </div>
 
-      <a href="category-brunch.html" class="cat-page-card cpg-brunch">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">Daytime</span>
-          <div class="cat-page-name">Brunch & Bites</div>
-          <div class="cat-page-desc">Lazy mornings & good food</div>
-        </div>
-      </a>
-
-      <a href="category-culinary.html" class="cat-page-card cpg-dining">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">Gourmet</span>
-          <div class="cat-page-name">Fine Dining</div>
-          <div class="cat-page-desc">Curated culinary experiences</div>
-        </div>
-      </a>
-
-      <a href="category-workshops.html" class="cat-page-card cpg-workshops">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">Learn</span>
-          <div class="cat-page-name">Workshops</div>
-          <div class="cat-page-desc">Skills, crafts & masterclasses</div>
-        </div>
-      </a>
-
-      <a href="category-community.html" class="cat-page-card cpg-experiences">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">Unique</span>
-          <div class="cat-page-name">Experiences</div>
-          <div class="cat-page-desc">One-of-a-kind moments</div>
-        </div>
-      </a>
-
-      <a href="category-music.html" class="cat-page-card cpg-music">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">Live</span>
-          <div class="cat-page-name">Live Music</div>
-          <div class="cat-page-desc">Gigs, concerts & open mics</div>
-        </div>
-      </a>
-
-      <a href="category-sports.html" class="cat-page-card cpg-sports">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">Active</span>
-          <div class="cat-page-name">Sports</div>
-          <div class="cat-page-desc">Games, fitness & action</div>
-        </div>
-      </a>
-
-      <a href="category-community.html" class="cat-page-card cpg-community">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">Connect</span>
-          <div class="cat-page-name">Community</div>
-          <div class="cat-page-desc">Meetups, causes & local events</div>
-        </div>
-      </a>
-
-      <a href="events.html" class="cat-page-card cpg-adventure">
-        <div class="cat-page-bg"></div>
-        <div class="cat-page-body">
-          <span class="cat-page-tag">Explore</span>
-          <div class="cat-page-name">Adventure</div>
-          <div class="cat-page-desc">Outdoor & thrill experiences</div>
-        </div>
-      </a>
-
+  <div class="cat-events-wrap">
+    <div class="cat-events-grid" id="catGrid">
+      <div class="cat-empty">
+        <div class="cat-empty-icon">⏳</div>
+        <div class="cat-empty-msg">Loading events…</div>
+      </div>
     </div>
   </div>
 </main>
 
-<script src="script.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  if(!firebase.apps.length){
+    firebase.initializeApp({
+      apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+      authDomain:"ogshootsluxe-36740.firebaseapp.com",
+      projectId:"ogshootsluxe-36740",
+      storageBucket:"ogshootsluxe-36740.firebasestorage.app",
+      messagingSenderId:"5471814825",
+      appId:"1:5471814825:web:07e84f2f88486da817d5b8"
+    });
+  }
+  const db = firebase.firestore();
+
+  // Category keyword map
+  const CAT_MAP = {
+    nightlife:   ['party','parties','nightlife','club','celebrat'],
+    brunch:      ['brunch','breakfast','morning','bites'],
+    dining:      ['culinary','dining','food','gourmet','restaurant','chef'],
+    workshops:   ['workshop','class','learn','craft','skill','masterclass'],
+    experiences: ['experience','community','meetup','social','unique'],
+    music:       ['music','concert','gig','live','band','dj','acoustic']
+  };
+
+  const CHIP_LABELS = {
+    all:'All Events', nightlife:'Nightlife', brunch:'Brunch & Bites',
+    dining:'Fine Dining', workshops:'Workshops', experiences:'Experiences', music:'Live Music'
+  };
+
+  const CHIP_COLORS = {
+    nightlife:'#0e8fa8', brunch:'#b8860b', dining:'#b71c1c',
+    workshops:'#b35a00', experiences:'#00796b', music:'#1b5e20'
+  };
+
+  let allEvents = [];
+  let activeFilter = 'all';
+
+  function matchCat(data, cat) {
+    if(cat === 'all') return true;
+    const keywords = CAT_MAP[cat] || [];
+    const haystack = [data.category||'', data.name||'', data.tags||'', data.description||'']
+      .join(' ').toLowerCase();
+    return keywords.some(k => haystack.includes(k));
+  }
+
+  function renderGrid(filter) {
+    const grid = document.getElementById('catGrid');
+    const resultsTitle = document.getElementById('resultsTitle');
+    const resultsCount = document.getElementById('resultsCount');
+    const filtered = filter === 'all' ? allEvents : allEvents.filter(e => matchCat(e.data, filter));
+
+    resultsTitle.textContent = CHIP_LABELS[filter] || 'All Events';
+    resultsCount.textContent = filtered.length ? `${filtered.length} event${filtered.length>1?'s':''}` : '';
+
+    grid.innerHTML = '';
+    if(!filtered.length){
+      grid.innerHTML = `<div class="cat-empty"><div class="cat-empty-icon">🔍</div><div class="cat-empty-msg">No events found in this category yet.</div></div>`;
+      return;
+    }
+    filtered.forEach(({id, data:d}) => {
+      const img = d.cardImgUrl || d.coverUrl || '';
+      const price = d.tickets?.[0]?.price || d.price || 0;
+      let dateLabel = '';
+      if(d.startDate){
+        try{
+          const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
+          dateLabel = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+        }catch(e){}
+      }
+      const catLabel = filter !== 'all' ? CHIP_LABELS[filter] : (d.category || 'Event');
+      const a = document.createElement('a');
+      a.className = 'cat-ev-card';
+      a.href = `event-detail.html?eventId=${id}`;
+      a.innerHTML = `
+        <div class="cat-ev-banner" style="${img?`background-image:url('${img}')`:filter!=='all'?`background:${CHIP_COLORS[filter]||'#222'}`:'background:linear-gradient(135deg,#1a1a1a,#333)'}">
+          <span class="cat-ev-badge">${catLabel}</span>
+          <span class="cat-ev-price-badge ${price?'price-paid':'price-free'}">${price?'Paid':'Free'}</span>
+        </div>
+        <div class="cat-ev-body">
+          <div class="cat-ev-title">${d.name||'Untitled'}</div>
+          <div class="cat-ev-meta">${dateLabel||'Date TBA'} · ${d.city||'India'}</div>
+          <div class="cat-ev-footer">
+            <div class="cat-ev-price">${price?`₹${Number(price).toLocaleString('en-IN')}`:'Free'}</div>
+            <span class="cat-ev-btn">Book →</span>
+          </div>
+        </div>`;
+      grid.appendChild(a);
+    });
+  }
+
+  async function loadEvents() {
+    try {
+      const snap = await db.collection('events').limit(200).get();
+      allEvents = snap.docs
+        .filter(doc => {
+          const s = String(doc.data().status||'').toLowerCase();
+          return doc.data().publicListing !== false && ['published','live','active'].includes(s);
+        })
+        .map(doc => ({id: doc.id, data: doc.data()}));
+      renderGrid(activeFilter);
+    } catch(e) {
+      document.getElementById('catGrid').innerHTML = `<div class="cat-empty"><div class="cat-empty-icon">⚠️</div><div class="cat-empty-msg">Failed to load events.</div></div>`;
+    }
+  }
+
+  // Chip click
+  document.querySelectorAll('.cat-chip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.cat;
+      renderGrid(activeFilter);
+    });
+  });
+
+  // Read ?cat= from URL (from index page category cards)
+  const urlCat = new URLSearchParams(location.search).get('cat');
+  if(urlCat && urlCat !== 'all'){
+    activeFilter = urlCat;
+    document.querySelectorAll('.cat-chip-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.cat === urlCat);
+    });
+    // Scroll chip into view
+    const activeChip = document.querySelector(`.cat-chip-btn[data-cat="${urlCat}"]`);
+    if(activeChip) activeChip.scrollIntoView({inline:'center', behavior:'smooth'});
+  }
+
+  loadEvents();
+</script>
 <script>
   const ham = document.getElementById('hamburger');
   const mNav = document.getElementById('mobileNav');
