@@ -165,7 +165,11 @@
     .idx-how-icon{font-size:1.6rem;margin-bottom:.75rem;}
     .idx-how-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:.4rem;}
     .idx-how-desc{font-size:.84rem;color:rgba(255,255,255,.4);line-height:1.6;}
-    @media(max-width:700px){.idx-how-grid{grid-template-columns:1fr;}}
+    @media(max-width:700px){
+      .idx-how-grid{display:flex;flex-direction:row;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:1rem;padding-bottom:.8rem;scrollbar-width:none;}
+      .idx-how-grid::-webkit-scrollbar{display:none;}
+      .idx-how-card{flex:0 0 72vw;max-width:260px;scroll-snap-align:center;}
+    }
 
     /* ── RESTAURANTS CTA BUTTONS ── */
     .idx-rs-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;}
@@ -971,6 +975,25 @@
     const query = searchInput.value.trim();
     if(query) window.location.href = 'events.html?search=' + encodeURIComponent(query);
   });
+
+  (function(){
+    function initHowCarousel(){
+      var grid=document.querySelector('.idx-how-grid');
+      if(!grid||window.innerWidth>700)return;
+      var cards=Array.from(grid.querySelectorAll('.idx-how-card'));
+      if(cards.length<2)return;
+      var idx=0,timer,resumeTimer;
+      function scrollTo(i){idx=(i+cards.length)%cards.length;grid.scrollTo({left:cards[idx].offsetLeft-(grid.offsetWidth/2)+(cards[idx].offsetWidth/2),behavior:'smooth'});}
+      function start(){clearInterval(timer);timer=setInterval(function(){scrollTo(idx+1);},2800);}
+      function pause(){clearInterval(timer);}
+      function scheduleResume(){clearTimeout(resumeTimer);resumeTimer=setTimeout(start,2500);}
+      grid.addEventListener('touchstart',pause,{passive:true});
+      grid.addEventListener('touchend',scheduleResume,{passive:true});
+      start();
+    }
+    window.addEventListener('resize',initHowCarousel);
+    initHowCarousel();
+  })();
 
   const themeToggle = document.getElementById('themeToggle');
   const darkModeEnabled = localStorage.getItem('culturewaveDarkMode') === 'true';

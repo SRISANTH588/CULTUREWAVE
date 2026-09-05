@@ -1,0 +1,309 @@
+[debug] [2026-08-31T04:00:31.747Z] ----------------------------------------------------------------------
+[debug] [2026-08-31T04:00:31.748Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only firestore:rules
+[debug] [2026-08-31T04:00:31.748Z] CLI Version:   15.17.0
+[debug] [2026-08-31T04:00:31.748Z] Platform:      darwin
+[debug] [2026-08-31T04:00:31.748Z] Node Version:  v24.11.1
+[debug] [2026-08-31T04:00:31.748Z] Time:          Mon Aug 31 2026 09:30:31 GMT+0530 (India Standard Time)
+[debug] [2026-08-31T04:00:31.748Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-08-31T04:00:32.341Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-31T04:00:32.341Z] > authorizing via signed-in user (ogshootsmedia@gmail.com)
+[debug] [2026-08-31T04:00:32.341Z] [iam] checking project ogshootsluxe-36740 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-08-31T04:00:32.342Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:32.342Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:32.342Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions [none]
+[debug] [2026-08-31T04:00:32.342Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions  x-goog-user-project=ogshootsluxe-36740
+[debug] [2026-08-31T04:00:32.342Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-08-31T04:00:33.979Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions 200
+[debug] [2026-08-31T04:00:33.980Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'ogshootsluxe-36740'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-08-31T04:00:33.983Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:33.983Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:33.983Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) [none]
+[debug] [2026-08-31T04:00:34.516Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) 200
+[debug] [2026-08-31T04:00:34.516Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) {"name":"projects/ogshootsluxe-36740/databases/(default)","uid":"e39eefb4-1ada-473c-b833-518daa05c1d4","createTime":"2026-08-24T11:29:50.089624Z","updateTime":"2026-08-24T11:29:50.089624Z","locationId":"asia-south1","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-08-31T03:00:34.480661Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"j","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","enhancedTextSearchQueryMode":"ENHANCED_QUERY_MODE_ENABLED","etag":"IOrh1sD9yZYDMLKB+diOyJYD"}
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-08-31T04:00:34.519Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:34.519Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:34.519Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test [none]
+[debug] [2026-08-31T04:00:34.519Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test [omitted]
+[debug] [2026-08-31T04:00:36.024Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test 200
+[debug] [2026-08-31T04:00:36.025Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test {}
+[info] ✔  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2026-08-31T04:00:36.027Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:36.027Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:36.027Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases pageSize=10&pageToken=
+[debug] [2026-08-31T04:00:36.578Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases 200
+[debug] [2026-08-31T04:00:36.578Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases {"releases":[{"name":"projects/ogshootsluxe-36740/releases/cloud.firestore","rulesetName":"projects/ogshootsluxe-36740/rulesets/765a5863-2143-4dfb-bc83-a88c45e1002b","createTime":"2026-08-24T11:29:55.819328Z","updateTime":"2026-08-31T03:37:26.182692Z"}]}
+[debug] [2026-08-31T04:00:36.579Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:36.579Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:36.579Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/765a5863-2143-4dfb-bc83-a88c45e1002b [none]
+[debug] [2026-08-31T04:00:38.012Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/765a5863-2143-4dfb-bc83-a88c45e1002b 200
+[debug] [2026-08-31T04:00:38.013Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/765a5863-2143-4dfb-bc83-a88c45e1002b [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2026-08-31T04:00:38.014Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:38.014Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:38.015Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets [none]
+[debug] [2026-08-31T04:00:38.015Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets [omitted]
+[debug] [2026-08-31T04:00:39.439Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets 200
+[debug] [2026-08-31T04:00:39.439Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets {"name":"projects/ogshootsluxe-36740/rulesets/ebc3d52c-f5f9-4de5-a68a-8fdfdd52ef83","source":{"files":[{"content":"rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n\n    // Anyone can write/read their own OTP (needed for signup before auth exists)\n    match /emailOtps/{email} {\n      allow read, write: if true;\n    }\n\n    // Users can read/write their own doc; anyone can create (signup)\n    match /users/{uid} {\n      allow read: if request.auth != null;\n      allow create: if true;\n      allow update, delete: if request.auth != null && request.auth.uid == uid;\n    }\n\n    // Authenticated users can read/write their own data\n    match /events/{id} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n\n    match /bookings/{id} {\n      allow read: if request.auth != null;\n      allow create: if true;\n      allow update, delete: if request.auth != null;\n    }\n\n    match /payments/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /wallets/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /kyc/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /organisers/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /campaigns/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /webinars/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /restaurants/{id} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n\n    match /clientProjects/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    // Admin-only collections — only authenticated users (admin check done in app)\n    match /adminLogs/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /{document=**} {\n      allow read, write: if request.auth != null;\n    }\n  }\n}\n","name":"firestore.rules"}]},"createTime":"2026-08-31T04:00:39.300495Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2026-08-31T04:00:39.439Z] [rules] created ruleset projects/ogshootsluxe-36740/rulesets/ebc3d52c-f5f9-4de5-a68a-8fdfdd52ef83
+[debug] [2026-08-31T04:00:39.440Z] [rules] releasing cloud.firestore with ruleset projects/ogshootsluxe-36740/rulesets/ebc3d52c-f5f9-4de5-a68a-8fdfdd52ef83
+[debug] [2026-08-31T04:00:39.440Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:39.441Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:00:39.441Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore [none]
+[debug] [2026-08-31T04:00:39.441Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore {"release":{"name":"projects/ogshootsluxe-36740/releases/cloud.firestore","rulesetName":"projects/ogshootsluxe-36740/rulesets/ebc3d52c-f5f9-4de5-a68a-8fdfdd52ef83"}}
+[debug] [2026-08-31T04:00:40.903Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore 200
+[debug] [2026-08-31T04:07:23.206Z] ----------------------------------------------------------------------
+[debug] [2026-08-31T04:07:23.207Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only firestore:rules
+[debug] [2026-08-31T04:07:23.208Z] CLI Version:   15.17.0
+[debug] [2026-08-31T04:07:23.208Z] Platform:      darwin
+[debug] [2026-08-31T04:07:23.208Z] Node Version:  v24.11.1
+[debug] [2026-08-31T04:07:23.208Z] Time:          Mon Aug 31 2026 09:37:23 GMT+0530 (India Standard Time)
+[debug] [2026-08-31T04:07:23.208Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-08-31T04:07:23.767Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-31T04:07:23.767Z] > authorizing via signed-in user (ogshootsmedia@gmail.com)
+[debug] [2026-08-31T04:07:23.767Z] [iam] checking project ogshootsluxe-36740 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-08-31T04:07:23.768Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:23.768Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:23.768Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions [none]
+[debug] [2026-08-31T04:07:23.768Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions  x-goog-user-project=ogshootsluxe-36740
+[debug] [2026-08-31T04:07:23.768Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-08-31T04:07:25.499Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions 200
+[debug] [2026-08-31T04:07:25.499Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'ogshootsluxe-36740'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-08-31T04:07:25.502Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:25.502Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:25.502Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) [none]
+[debug] [2026-08-31T04:07:26.004Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) 200
+[debug] [2026-08-31T04:07:26.005Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) {"name":"projects/ogshootsluxe-36740/databases/(default)","uid":"e39eefb4-1ada-473c-b833-518daa05c1d4","createTime":"2026-08-24T11:29:50.089624Z","updateTime":"2026-08-24T11:29:50.089624Z","locationId":"asia-south1","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-08-31T03:07:25.960889Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"j","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","enhancedTextSearchQueryMode":"ENHANCED_QUERY_MODE_ENABLED","etag":"IK3C8YT/yZYDMLKB+diOyJYD"}
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-08-31T04:07:26.007Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:26.007Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:26.007Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test [none]
+[debug] [2026-08-31T04:07:26.007Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test [omitted]
+[debug] [2026-08-31T04:07:27.643Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test 200
+[debug] [2026-08-31T04:07:27.644Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test {}
+[info] ✔  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2026-08-31T04:07:27.645Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:27.645Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:27.645Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases pageSize=10&pageToken=
+[debug] [2026-08-31T04:07:29.078Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases 200
+[debug] [2026-08-31T04:07:29.078Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases {"releases":[{"name":"projects/ogshootsluxe-36740/releases/cloud.firestore","rulesetName":"projects/ogshootsluxe-36740/rulesets/ebc3d52c-f5f9-4de5-a68a-8fdfdd52ef83","createTime":"2026-08-24T11:29:55.819328Z","updateTime":"2026-08-31T04:00:40.725244Z"}]}
+[debug] [2026-08-31T04:07:29.079Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:29.079Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:29.079Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/ebc3d52c-f5f9-4de5-a68a-8fdfdd52ef83 [none]
+[debug] [2026-08-31T04:07:30.473Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/ebc3d52c-f5f9-4de5-a68a-8fdfdd52ef83 200
+[debug] [2026-08-31T04:07:30.474Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/ebc3d52c-f5f9-4de5-a68a-8fdfdd52ef83 [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2026-08-31T04:07:30.476Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:30.476Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:30.476Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets [none]
+[debug] [2026-08-31T04:07:30.476Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets [omitted]
+[debug] [2026-08-31T04:07:31.944Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets 200
+[debug] [2026-08-31T04:07:31.944Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets {"name":"projects/ogshootsluxe-36740/rulesets/e9ef1329-925d-4924-9bb4-6591fcb9eac3","source":{"files":[{"content":"rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n\n    // Anyone can write/read their own OTP (needed for signup before auth exists)\n    match /emailOtps/{email} {\n      allow read, write: if true;\n    }\n\n    // Users can read/write their own doc; anyone can create (signup)\n    match /users/{uid} {\n      allow read: if request.auth != null;\n      allow create: if true;\n      allow update, delete: if request.auth != null && request.auth.uid == uid;\n    }\n\n    // Authenticated users can read/write their own data\n    match /events/{id} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n\n    match /bookings/{id} {\n      allow read: if request.auth != null;\n      allow create: if true;\n      allow update: if true;  // allow check-in scanner to mark checkedIn\n      allow delete: if request.auth != null;\n    }\n\n    match /payments/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /wallets/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /kyc/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /organisers/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /campaigns/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /webinars/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /restaurants/{id} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n\n    match /clientProjects/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    // Admin-only collections — only authenticated users (admin check done in app)\n    match /adminLogs/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /{document=**} {\n      allow read, write: if request.auth != null;\n    }\n  }\n}\n","name":"firestore.rules"}]},"createTime":"2026-08-31T04:07:31.712175Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2026-08-31T04:07:31.944Z] [rules] created ruleset projects/ogshootsluxe-36740/rulesets/e9ef1329-925d-4924-9bb4-6591fcb9eac3
+[debug] [2026-08-31T04:07:31.945Z] [rules] releasing cloud.firestore with ruleset projects/ogshootsluxe-36740/rulesets/e9ef1329-925d-4924-9bb4-6591fcb9eac3
+[debug] [2026-08-31T04:07:31.945Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:31.945Z] Checked if tokens are valid: true, expires at: 1788150875221
+[debug] [2026-08-31T04:07:31.945Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore [none]
+[debug] [2026-08-31T04:07:31.945Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore {"release":{"name":"projects/ogshootsluxe-36740/releases/cloud.firestore","rulesetName":"projects/ogshootsluxe-36740/rulesets/e9ef1329-925d-4924-9bb4-6591fcb9eac3"}}
+[debug] [2026-08-31T04:07:32.356Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore 200
+[debug] [2026-08-31T16:32:53.527Z] ----------------------------------------------------------------------
+[debug] [2026-08-31T16:32:53.528Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only firestore:rules
+[debug] [2026-08-31T16:32:53.528Z] CLI Version:   15.17.0
+[debug] [2026-08-31T16:32:53.528Z] Platform:      darwin
+[debug] [2026-08-31T16:32:53.528Z] Node Version:  v24.11.1
+[debug] [2026-08-31T16:32:53.528Z] Time:          Mon Aug 31 2026 22:02:53 GMT+0530 (India Standard Time)
+[debug] [2026-08-31T16:32:53.528Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-08-31T16:32:54.162Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-31T16:32:54.162Z] > authorizing via signed-in user (ogshootsmedia@gmail.com)
+[debug] [2026-08-31T16:32:54.163Z] [iam] checking project ogshootsluxe-36740 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-08-31T16:32:54.163Z] Checked if tokens are valid: false, expires at: 1788150875221
+[debug] [2026-08-31T16:32:54.163Z] Checked if tokens are valid: false, expires at: 1788150875221
+[debug] [2026-08-31T16:32:54.163Z] > refreshing access token with scopes: []
+[debug] [2026-08-31T16:32:54.164Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-08-31T16:32:54.164Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-08-31T16:32:54.387Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-08-31T16:32:54.387Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-08-31T16:32:54.398Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions [none]
+[debug] [2026-08-31T16:32:54.398Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions  x-goog-user-project=ogshootsluxe-36740
+[debug] [2026-08-31T16:32:54.398Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-08-31T16:32:56.146Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions 200
+[debug] [2026-08-31T16:32:56.147Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'ogshootsluxe-36740'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-08-31T16:32:56.150Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:32:56.150Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:32:56.150Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) [none]
+[debug] [2026-08-31T16:32:56.625Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) 200
+[debug] [2026-08-31T16:32:56.625Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) {"name":"projects/ogshootsluxe-36740/databases/(default)","uid":"e39eefb4-1ada-473c-b833-518daa05c1d4","createTime":"2026-08-24T11:29:50.089624Z","updateTime":"2026-08-24T11:29:50.089624Z","locationId":"asia-south1","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-08-31T15:32:56.745165Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"j","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","enhancedTextSearchQueryMode":"ENHANCED_QUERY_MODE_ENABLED","etag":"IPn2l9aly5YDMLKB+diOyJYD"}
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-08-31T16:32:56.628Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:32:56.628Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:32:56.628Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test [none]
+[debug] [2026-08-31T16:32:56.628Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test [omitted]
+[debug] [2026-08-31T16:32:58.157Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test 200
+[debug] [2026-08-31T16:32:58.157Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test {}
+[info] ✔  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2026-08-31T16:32:58.159Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:32:58.159Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:32:58.159Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases pageSize=10&pageToken=
+[debug] [2026-08-31T16:32:58.759Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases 200
+[debug] [2026-08-31T16:32:58.759Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases {"releases":[{"name":"projects/ogshootsluxe-36740/releases/cloud.firestore","rulesetName":"projects/ogshootsluxe-36740/rulesets/e9ef1329-925d-4924-9bb4-6591fcb9eac3","createTime":"2026-08-24T11:29:55.819328Z","updateTime":"2026-08-31T04:07:32.201817Z"}]}
+[debug] [2026-08-31T16:32:58.760Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:32:58.760Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:32:58.760Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/e9ef1329-925d-4924-9bb4-6591fcb9eac3 [none]
+[debug] [2026-08-31T16:33:00.099Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/e9ef1329-925d-4924-9bb4-6591fcb9eac3 200
+[debug] [2026-08-31T16:33:00.099Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/e9ef1329-925d-4924-9bb4-6591fcb9eac3 [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2026-08-31T16:33:00.101Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:33:00.101Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:33:00.101Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets [none]
+[debug] [2026-08-31T16:33:00.101Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets [omitted]
+[debug] [2026-08-31T16:33:01.615Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets 200
+[debug] [2026-08-31T16:33:01.616Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets {"name":"projects/ogshootsluxe-36740/rulesets/a4a4d9c0-e149-47de-9428-57f30b60801e","source":{"files":[{"content":"rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n\n    // Anyone can write/read their own OTP (needed for signup before auth exists)\n    match /emailOtps/{email} {\n      allow read, write: if true;\n    }\n\n    // Users can read/write their own doc; anyone can create (signup)\n    match /users/{uid} {\n      allow read: if request.auth != null;\n      allow create: if true;\n      allow update, delete: if request.auth != null && request.auth.uid == uid;\n    }\n\n    // Authenticated users can read/write their own data\n    match /events/{id} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n\n    match /bookings/{id} {\n      allow read: if true;\n      allow create: if true;\n      allow update: if true;\n      allow delete: if request.auth != null;\n    }\n\n    match /payments/{id} {\n      allow read: if request.auth != null;\n      allow create: if true;  // allow guest bookings (free + paid) to save\n      allow update, delete: if request.auth != null;\n    }\n\n    match /wallets/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /kyc/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /organisers/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /campaigns/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /webinars/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /restaurants/{id} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n\n    match /clientProjects/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    // Admin-only collections — only authenticated users (admin check done in app)\n    match /adminLogs/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /{document=**} {\n      allow read, write: if request.auth != null;\n    }\n  }\n}\n","name":"firestore.rules"}]},"createTime":"2026-08-31T16:33:01.614159Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2026-08-31T16:33:01.616Z] [rules] created ruleset projects/ogshootsluxe-36740/rulesets/a4a4d9c0-e149-47de-9428-57f30b60801e
+[debug] [2026-08-31T16:33:01.617Z] [rules] releasing cloud.firestore with ruleset projects/ogshootsluxe-36740/rulesets/a4a4d9c0-e149-47de-9428-57f30b60801e
+[debug] [2026-08-31T16:33:01.617Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:33:01.617Z] Checked if tokens are valid: true, expires at: 1788197573388
+[debug] [2026-08-31T16:33:01.618Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore [none]
+[debug] [2026-08-31T16:33:01.618Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore {"release":{"name":"projects/ogshootsluxe-36740/releases/cloud.firestore","rulesetName":"projects/ogshootsluxe-36740/rulesets/a4a4d9c0-e149-47de-9428-57f30b60801e"}}
+[debug] [2026-08-31T16:33:03.058Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore 200
+[debug] [2026-09-04T10:31:21.036Z] ----------------------------------------------------------------------
+[debug] [2026-09-04T10:31:21.037Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only storage
+[debug] [2026-09-04T10:31:21.037Z] CLI Version:   15.17.0
+[debug] [2026-09-04T10:31:21.037Z] Platform:      darwin
+[debug] [2026-09-04T10:31:21.037Z] Node Version:  v24.11.1
+[debug] [2026-09-04T10:31:21.037Z] Time:          Fri Sep 04 2026 16:01:21 GMT+0530 (India Standard Time)
+[debug] [2026-09-04T10:31:21.037Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-09-04T10:31:21.038Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-09-04T10:31:21.676Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-04T10:31:21.677Z] > authorizing via signed-in user (ogshootsmedia@gmail.com)
+[debug] [2026-09-04T10:31:21.677Z] [iam] checking project ogshootsluxe-36740 for permissions ["firebase.projects.get","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2026-09-04T10:31:21.677Z] Checked if tokens are valid: false, expires at: 1788197573388
+[debug] [2026-09-04T10:31:21.677Z] Checked if tokens are valid: false, expires at: 1788197573388
+[debug] [2026-09-04T10:31:21.677Z] > refreshing access token with scopes: []
+[debug] [2026-09-04T10:31:21.677Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-09-04T10:31:21.677Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-09-04T10:31:21.948Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-09-04T10:31:21.948Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-09-04T10:31:21.963Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions [none]
+[debug] [2026-09-04T10:31:21.963Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions  x-goog-user-project=ogshootsluxe-36740
+[debug] [2026-09-04T10:31:21.964Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["firebase.projects.get","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2026-09-04T10:31:22.451Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-09-04T10:31:22.451Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-09-04T10:31:23.659Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions 200
+[debug] [2026-09-04T10:31:23.659Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["firebase.projects.get","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[info] 
+[info] === Deploying to 'ogshootsluxe-36740'...
+[info] 
+[info] i  deploying storage 
+[info] i  storage: ensuring required API firebasestorage.googleapis.com is enabled... 
+[debug] [2026-09-04T10:31:23.663Z] Checked if tokens are valid: true, expires at: 1788521480949
+[debug] [2026-09-04T10:31:23.663Z] Checked if tokens are valid: true, expires at: 1788521480949
+[debug] [2026-09-04T10:31:23.663Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/ogshootsluxe-36740/services/firebasestorage.googleapis.com [none]
+[debug] [2026-09-04T10:31:23.663Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/ogshootsluxe-36740/services/firebasestorage.googleapis.com  x-goog-user-project=ogshootsluxe-36740
+[debug] [2026-09-04T10:31:25.495Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/ogshootsluxe-36740/services/firebasestorage.googleapis.com 200
+[debug] [2026-09-04T10:31:25.495Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/ogshootsluxe-36740/services/firebasestorage.googleapis.com [omitted]
+[warn] ⚠  storage: missing required API firebasestorage.googleapis.com. Enabling now... 
+[debug] [2026-09-04T10:31:25.496Z] Checked if tokens are valid: true, expires at: 1788521480949
+[debug] [2026-09-04T10:31:25.496Z] Checked if tokens are valid: true, expires at: 1788521480949
+[debug] [2026-09-04T10:31:25.497Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/ogshootsluxe-36740/services/firebasestorage.googleapis.com:enable [none]
+[debug] [2026-09-04T10:31:25.497Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/ogshootsluxe-36740/services/firebasestorage.googleapis.com:enable  x-goog-user-project=ogshootsluxe-36740
+[debug] [2026-09-04T10:31:27.323Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/ogshootsluxe-36740/services/firebasestorage.googleapis.com:enable 200
+[debug] [2026-09-04T10:31:27.324Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/ogshootsluxe-36740/services/firebasestorage.googleapis.com:enable [omitted]
+[debug] [2026-09-04T10:31:37.333Z] Checked if tokens are valid: true, expires at: 1788521480949
+[debug] [2026-09-04T10:31:37.333Z] Checked if tokens are valid: true, expires at: 1788521480949
+[debug] [2026-09-04T10:31:37.333Z] >>> [apiv2][query] GET https://firebasestorage.googleapis.com/v1alpha/projects/ogshootsluxe-36740/defaultBucket [none]
+[debug] [2026-09-04T10:31:38.220Z] <<< [apiv2][status] GET https://firebasestorage.googleapis.com/v1alpha/projects/ogshootsluxe-36740/defaultBucket 404
+[debug] [2026-09-04T10:31:38.220Z] <<< [apiv2][body] GET https://firebasestorage.googleapis.com/v1alpha/projects/ogshootsluxe-36740/defaultBucket {"error":{"code":404,"message":"Requested entity was not found.","status":"NOT_FOUND"}}
+[error] 
+[error] Error: Firebase Storage has not been set up on project 'ogshootsluxe-36740'. Go to https://console.firebase.google.com/project/ogshootsluxe-36740/storage and click 'Get Started' to set up Firebase Storage.
+[debug] [2026-09-04T15:19:17.243Z] ----------------------------------------------------------------------
+[debug] [2026-09-04T15:19:17.249Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only firestore:rules
+[debug] [2026-09-04T15:19:17.249Z] CLI Version:   15.17.0
+[debug] [2026-09-04T15:19:17.249Z] Platform:      darwin
+[debug] [2026-09-04T15:19:17.249Z] Node Version:  v24.11.1
+[debug] [2026-09-04T15:19:17.249Z] Time:          Fri Sep 04 2026 20:49:17 GMT+0530 (India Standard Time)
+[debug] [2026-09-04T15:19:17.249Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-09-04T15:19:17.878Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-04T15:19:17.878Z] > authorizing via signed-in user (ogshootsmedia@gmail.com)
+[debug] [2026-09-04T15:19:17.878Z] [iam] checking project ogshootsluxe-36740 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-09-04T15:19:17.879Z] Checked if tokens are valid: false, expires at: 1788521480949
+[debug] [2026-09-04T15:19:17.879Z] Checked if tokens are valid: false, expires at: 1788521480949
+[debug] [2026-09-04T15:19:17.879Z] > refreshing access token with scopes: []
+[debug] [2026-09-04T15:19:17.880Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-09-04T15:19:17.880Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-09-04T15:19:18.215Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-09-04T15:19:18.215Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-09-04T15:19:18.227Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions [none]
+[debug] [2026-09-04T15:19:18.227Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions  x-goog-user-project=ogshootsluxe-36740
+[debug] [2026-09-04T15:19:18.227Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-09-04T15:19:19.892Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions 200
+[debug] [2026-09-04T15:19:19.892Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/ogshootsluxe-36740:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'ogshootsluxe-36740'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-09-04T15:19:19.897Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:19.897Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:19.897Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) [none]
+[debug] [2026-09-04T15:19:20.444Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) 200
+[debug] [2026-09-04T15:19:20.445Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/ogshootsluxe-36740/databases/(default) {"name":"projects/ogshootsluxe-36740/databases/(default)","uid":"e39eefb4-1ada-473c-b833-518daa05c1d4","createTime":"2026-08-24T11:29:50.089624Z","updateTime":"2026-08-24T11:29:50.089624Z","locationId":"asia-south1","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-09-04T14:19:20.513207Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"j","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","enhancedTextSearchQueryMode":"ENHANCED_QUERY_MODE_ENABLED","etag":"IM3CpNec1ZYDMLKB+diOyJYD"}
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-09-04T15:19:20.448Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:20.448Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:20.448Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test [none]
+[debug] [2026-09-04T15:19:20.448Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test [omitted]
+[debug] [2026-09-04T15:19:21.007Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test 200
+[debug] [2026-09-04T15:19:21.008Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740:test {}
+[info] ✔  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2026-09-04T15:19:21.010Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:21.010Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:21.010Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases pageSize=10&pageToken=
+[debug] [2026-09-04T15:19:21.493Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases 200
+[debug] [2026-09-04T15:19:21.493Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases {"releases":[{"name":"projects/ogshootsluxe-36740/releases/cloud.firestore","rulesetName":"projects/ogshootsluxe-36740/rulesets/a4a4d9c0-e149-47de-9428-57f30b60801e","createTime":"2026-08-24T11:29:55.819328Z","updateTime":"2026-08-31T16:33:03.063620Z"}]}
+[debug] [2026-09-04T15:19:21.494Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:21.494Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:21.494Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/a4a4d9c0-e149-47de-9428-57f30b60801e [none]
+[debug] [2026-09-04T15:19:22.853Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/a4a4d9c0-e149-47de-9428-57f30b60801e 200
+[debug] [2026-09-04T15:19:22.853Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets/a4a4d9c0-e149-47de-9428-57f30b60801e [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2026-09-04T15:19:22.855Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:22.855Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:22.855Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets [none]
+[debug] [2026-09-04T15:19:22.855Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets [omitted]
+[debug] [2026-09-04T15:19:24.463Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets 200
+[debug] [2026-09-04T15:19:24.464Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/rulesets {"name":"projects/ogshootsluxe-36740/rulesets/01be751d-38d1-4119-baf6-7e5c975865be","source":{"files":[{"content":"rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n\n    // Anyone can write/read their own OTP (needed for signup before auth exists)\n    match /emailOtps/{email} {\n      allow read, write: if true;\n    }\n\n    // Users can read/write their own doc; anyone can create (signup)\n    match /users/{uid} {\n      allow read: if request.auth != null;\n      allow create: if true;\n      allow update, delete: if request.auth != null && request.auth.uid == uid;\n    }\n\n    // Authenticated users can read/write their own data\n    match /events/{id} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n\n    match /bookings/{id} {\n      allow read: if true;\n      allow create: if true;\n      allow update: if true;\n      allow delete: if request.auth != null;\n    }\n\n    match /payments/{id} {\n      allow read: if request.auth != null;\n      allow create: if true;  // allow guest bookings (free + paid) to save\n      allow update, delete: if request.auth != null;\n    }\n\n    match /wallets/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /kyc/{uid} {\n      allow read, write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /organisers/{uid} {\n      allow read: if true;\n      allow write: if request.auth != null && request.auth.uid == uid;\n    }\n\n    match /campaigns/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /webinars/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /restaurants/{id} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n\n    match /clientProjects/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    // Admin-only collections — only authenticated users (admin check done in app)\n    match /adminLogs/{id} {\n      allow read, write: if request.auth != null;\n    }\n\n    match /{document=**} {\n      allow read, write: if request.auth != null;\n    }\n  }\n}\n","name":"firestore.rules"}]},"createTime":"2026-09-04T15:19:24.332991Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2026-09-04T15:19:24.464Z] [rules] created ruleset projects/ogshootsluxe-36740/rulesets/01be751d-38d1-4119-baf6-7e5c975865be
+[debug] [2026-09-04T15:19:24.465Z] [rules] releasing cloud.firestore with ruleset projects/ogshootsluxe-36740/rulesets/01be751d-38d1-4119-baf6-7e5c975865be
+[debug] [2026-09-04T15:19:24.465Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:24.465Z] Checked if tokens are valid: true, expires at: 1788538757215
+[debug] [2026-09-04T15:19:24.465Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore [none]
+[debug] [2026-09-04T15:19:24.465Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore {"release":{"name":"projects/ogshootsluxe-36740/releases/cloud.firestore","rulesetName":"projects/ogshootsluxe-36740/rulesets/01be751d-38d1-4119-baf6-7e5c975865be"}}
+[debug] [2026-09-04T15:19:25.895Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/ogshootsluxe-36740/releases/cloud.firestore 200
