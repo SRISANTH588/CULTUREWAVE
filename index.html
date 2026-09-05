@@ -909,13 +909,13 @@
   <!-- OG PICKS -->
   <section class="ogp-section">
     <div class="ogp-head">
-      <div class="ogp-title">THE OG PICKS</div>
       <div class="ogp-tag">✨ WE THINK YOU'LL VIBE WITH THESE</div>
+      <div class="ogp-title">THE OG PICKS</div>
     </div>
     <div class="ogp-scroll-wrap">
       <div class="ogp-scroll" id="ogpScroll"></div>
     </div>
-    <div class="ogp-counter" id="ogpCounter"></div>
+    <div class="ogp-counter" id="ogpCounter">&nbsp;</div>
     <div style="padding:.6rem 1.2rem 1.8rem;display:flex;justify-content:center;background:#000;">
       <a href="events.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.5rem;border:1px solid rgba(245,197,24,.3);border-radius:999px;color:#f5c518;font-size:.82rem;font-weight:800;text-decoration:none;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(245,197,24,.1)';this.style.borderColor='#f5c518';" onmouseout="this.style.background='';this.style.borderColor='rgba(245,197,24,.3)';">View all picks &#8594;</a>
     </div>
@@ -1253,26 +1253,16 @@
           </div>`;
         scroll.appendChild(a);
       });
-      // live counter with pill + dots
+      // live counter
       const counter=document.getElementById('ogpCounter');
       const total=docs.length;
-      function renderCounter(idx){
-        if(!counter||total<2) return;
-        counter.innerHTML=`
-          <div class="ogp-counter-dot"></div>
-          <div class="ogp-counter-pill">${idx+1}/${total}</div>
-          <div class="ogp-counter-dot"></div>`;
-      }
-      renderCounter(0);
-      if(total>1){
+      if(counter&&total>1){
+        counter.innerHTML=`<span>1</span>/${total}`;
         scroll.addEventListener('scroll',()=>{
           const cards=Array.from(scroll.querySelectorAll('.ogp-card'));
           let closest=0,minDist=Infinity;
-          cards.forEach((c,i)=>{
-            const dist=Math.abs(c.getBoundingClientRect().left+c.offsetWidth/2-(scroll.getBoundingClientRect().left+scroll.offsetWidth/2));
-            if(dist<minDist){minDist=dist;closest=i;}
-          });
-          renderCounter(closest);
+          cards.forEach((c,i)=>{const d=Math.abs(c.getBoundingClientRect().left-scroll.getBoundingClientRect().left);if(d<minDist){minDist=d;closest=i;}});
+          counter.innerHTML=`<span>${closest+1}</span>/${total}`;
         },{passive:true});
       }
     }catch(e){console.warn('OGP:',e.message);
