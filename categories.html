@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>All Categories | CultureWave</title>
+  <title>Categories | CultureWave</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -13,7 +13,8 @@
     html,body{background:#000!important;color:#fff!important;}
     body{padding-bottom:84px;}
 
-    .topbar{background:#000!important;border-bottom:1px solid #222!important;}
+    /* NAV */
+    .topbar{background:#000!important;border-bottom:1px solid #222!important;box-shadow:none!important;}
     .logo{color:#fff!important;}.brand-sub{color:#888!important;}
     .topnav a{color:#aaa!important;}.topnav a:hover{color:#fff!important;background:#111!important;}
     .index-auth-actions{gap:.5rem;padding:.3rem;border:1px solid #333!important;border-radius:999px;background:#111!important;}
@@ -39,158 +40,134 @@
       .mobile-bottom-nav .nav-symbol{width:22px;height:22px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8;}
     }
 
-    /* PAGE HERO */
-    .cat-page-hero{
-      padding:2rem 1.2rem 1.5rem;
-      background:#000;
-      border-bottom:1px solid #1a1a1a;
+    /* PAGE HEADER */
+    .cp-header{
+      padding:1.8rem 1.2rem 1.2rem;
+      background:#000;border-bottom:1px solid #1a1a1a;
     }
-    .cat-page-back{
+    .cp-back{
       display:inline-flex;align-items:center;gap:.4rem;
       color:rgba(255,255,255,.4);font-size:.78rem;font-weight:700;
-      text-decoration:none;margin-bottom:.8rem;
-      transition:color .2s;
+      text-decoration:none;margin-bottom:.7rem;transition:color .2s;
     }
-    .cat-page-back:hover{color:#fff;}
-    .cat-page-hero h1{
-      margin:0;
-      font-size:clamp(1.8rem,5vw,3rem);
-      font-weight:900;letter-spacing:-.05em;
-      color:#fff;line-height:1;
-    }
-    .cat-page-hero p{
-      margin:.4rem 0 0;
-      color:rgba(255,255,255,.35);
-      font-size:.85rem;font-weight:600;
+    .cp-back:hover{color:#fff;}
+    .cp-header h1{
+      margin:0;font-size:clamp(1.8rem,5vw,2.8rem);
+      font-weight:900;letter-spacing:-.05em;color:#fff;line-height:1;
     }
 
-    /* CATEGORY CHIPS */
-    .cat-chips-wrap{
-      background:#000;
-      padding:1.2rem 1.2rem .8rem;
+    /* CATEGORY CHIPS — only 4 */
+    .cp-chips-wrap{
+      background:#000;padding:1rem 1.2rem .8rem;
       border-bottom:1px solid #1a1a1a;
       position:sticky;top:66px;z-index:10;
     }
-    .cat-chips{
+    .cp-chips{
       display:flex;gap:.5rem;
       overflow-x:auto;scrollbar-width:none;
-      -webkit-overflow-scrolling:touch;
-      padding-bottom:.2rem;
     }
-    .cat-chips::-webkit-scrollbar{display:none;}
-    .cat-chip-btn{
-      flex:none;
-      display:flex;align-items:center;gap:.4rem;
-      padding:.5rem 1rem;
-      border:1.5px solid rgba(255,255,255,.15);
-      border-radius:999px;
-      background:transparent;
+    .cp-chips::-webkit-scrollbar{display:none;}
+    .cp-chip{
+      flex:none;display:flex;align-items:center;gap:.4rem;
+      padding:.5rem 1.1rem;
+      border:1.5px solid rgba(255,255,255,.18);
+      border-radius:999px;background:transparent;
       color:rgba(255,255,255,.5);
-      font-size:.78rem;font-weight:800;
-      cursor:pointer;font-family:inherit;
-      white-space:nowrap;
+      font-size:.8rem;font-weight:800;
+      cursor:pointer;font-family:inherit;white-space:nowrap;
       transition:all .2s;
     }
-    .cat-chip-btn:hover{border-color:rgba(255,255,255,.4);color:#fff;}
-    .cat-chip-btn.active{
-      background:#fff;color:#000;
-      border-color:#fff;
-    }
-    .cat-chip-dot{
-      width:8px;height:8px;border-radius:50%;flex:none;
-    }
+    .cp-chip:hover{border-color:rgba(255,255,255,.4);color:#fff;}
+    .cp-chip.active{background:#fff;color:#000;border-color:#fff;}
+    .cp-chip-dot{width:8px;height:8px;border-radius:50%;flex:none;}
 
-    /* RESULTS HEADER */
-    .cat-results-head{
+    /* SECTION LABEL */
+    .cp-section-head{
       max-width:1240px;margin:0 auto;
-      padding:1.5rem 1.2rem .8rem;
+      padding:1.4rem 1.2rem .6rem;
       display:flex;align-items:center;justify-content:space-between;
     }
-    .cat-results-title{
-      font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;
-    }
-    .cat-results-count{
-      font-size:.78rem;color:rgba(255,255,255,.35);font-weight:700;
-    }
+    .cp-section-title{font-size:1rem;font-weight:800;color:#fff;letter-spacing:-.02em;}
+    .cp-section-count{font-size:.75rem;color:rgba(255,255,255,.3);font-weight:700;}
 
-    /* EVENTS GRID */
-    .cat-events-wrap{
-      max-width:1240px;margin:0 auto;
-      padding:0 1.2rem 3rem;
-    }
-    .cat-events-grid{
+    /* INDEX-STYLE EVENT CARDS */
+    .cp-grid-wrap{max-width:1240px;margin:0 auto;padding:0 1.2rem 3rem;}
+    .cp-grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns:repeat(3,minmax(0,1fr));
       gap:1rem;
     }
-    .cat-ev-card{
+    .cp-card{
       background:#111;
       border:1px solid rgba(255,255,255,.1);
-      border-radius:20px;overflow:hidden;
-      cursor:pointer;text-decoration:none;display:block;
-      transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+      border-radius:22px;overflow:hidden;
+      cursor:pointer;text-decoration:none;display:flex;flex-direction:column;
+      transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
     }
-    .cat-ev-card:hover{
-      transform:translateY(-5px);
-      box-shadow:0 20px 48px rgba(0,0,0,.7);
+    .cp-card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 24px 56px rgba(0,0,0,.75);
       border-color:rgba(255,255,255,.22);
     }
-    .cat-ev-banner{
-      position:relative;
-      aspect-ratio:4/3;
-      background-size:cover;background-position:center;
-      overflow:hidden;
+    .cp-banner{
+      position:relative;height:auto;aspect-ratio:4/5;
+      background-size:cover;background-position:center;overflow:hidden;
     }
-    .cat-ev-banner::after{
+    .cp-banner::after{
       content:"";position:absolute;inset:0;
-      background:linear-gradient(to top,rgba(0,0,0,.65) 0%,transparent 60%);
+      background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.08) 55%,transparent 100%);
+      pointer-events:none;
     }
-    .cat-ev-badge{
-      position:absolute;top:.6rem;left:.6rem;z-index:2;
-      padding:.22rem .65rem;border-radius:999px;
-      font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-      background:rgba(255,255,255,.15);backdrop-filter:blur(6px);
-      border:1px solid rgba(255,255,255,.2);color:#fff;
+    .cp-promoted{
+      position:absolute;top:.65rem;left:.65rem;z-index:2;
+      background:rgba(255,255,255,.15);backdrop-filter:blur(8px);
+      color:#fff;font-size:.62rem;font-weight:800;
+      padding:.28rem .7rem;border-radius:999px;
+      letter-spacing:.06em;border:1px solid rgba(255,255,255,.2);
+      display:flex;align-items:center;gap:.3rem;
     }
-    .cat-ev-price-badge{
+    .cp-price-badge{
       position:absolute;bottom:.6rem;right:.6rem;z-index:2;
       padding:.22rem .65rem;border-radius:999px;
-      font-size:.65rem;font-weight:800;
+      font-size:.62rem;font-weight:800;
     }
-    .price-free{background:#22c55e;color:#fff;}
-    .price-paid{background:#ec4899;color:#fff;}
-    .cat-ev-body{padding:.9rem 1rem 1rem;}
-    .cat-ev-title{font-size:.92rem;font-weight:800;color:#fff;line-height:1.3;letter-spacing:-.02em;margin:0 0 .3rem;}
-    .cat-ev-meta{font-size:.72rem;color:rgba(255,255,255,.38);font-weight:700;}
-    .cat-ev-footer{
-      display:flex;align-items:center;justify-content:space-between;
-      margin-top:.65rem;padding-top:.65rem;
-      border-top:1px solid rgba(255,255,255,.07);
+    .cp-price-free{background:#22c55e;color:#fff;}
+    .cp-price-paid{background:#ec4899;color:#fff;}
+    .cp-body{background:#111;padding:1rem 1.15rem 1.2rem;}
+    .cp-info{
+      display:flex;justify-content:space-between;gap:.4rem;
+      margin-bottom:.3rem;color:rgba(255,255,255,.38);font-size:.72rem;font-weight:700;
     }
-    .cat-ev-price{font-size:.85rem;font-weight:900;color:#fff;}
-    .cat-ev-btn{
-      padding:.38rem .85rem;border-radius:999px;
-      background:#fff;color:#000;
-      font-size:.7rem;font-weight:800;
-      border:0;cursor:pointer;text-decoration:none;
-      transition:background .18s;
+    .cp-title{
+      font-size:1rem;font-weight:800;color:#fff;
+      line-height:1.3;letter-spacing:-.02em;margin:0 0 .25rem;
     }
-    .cat-ev-btn:hover{background:#e5e5e5;}
+    .cp-desc{
+      font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.5;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+      margin:0;
+    }
+    .cp-price-row{
+      display:flex;align-items:baseline;gap:.3rem;
+      margin-top:.6rem;padding-top:.6rem;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .cp-price-strong{color:#fff;font-size:1rem;font-weight:900;letter-spacing:-.02em;}
+    .cp-price-sub{color:rgba(255,255,255,.35);font-size:.75rem;}
 
     /* EMPTY */
-    .cat-empty{
+    .cp-empty{
       grid-column:1/-1;text-align:center;
       padding:4rem 1rem;color:rgba(255,255,255,.25);
     }
-    .cat-empty-icon{font-size:3rem;margin-bottom:.8rem;}
-    .cat-empty-msg{font-size:.9rem;font-weight:700;}
+    .cp-empty-icon{font-size:2.5rem;margin-bottom:.6rem;}
+    .cp-empty-msg{font-size:.88rem;font-weight:700;}
 
-    @media(max-width:900px){.cat-events-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:900px){.cp-grid{grid-template-columns:repeat(2,1fr);}}
     @media(max-width:560px){
-      .cat-events-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;}
-      .cat-ev-body{padding:.75rem .8rem .85rem;}
-      .cat-ev-title{font-size:.82rem;}
-      .cat-chips-wrap{top:66px;padding:.9rem 1rem .6rem;}
+      .cp-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;}
+      .cp-body{padding:.8rem .9rem .9rem;}
+      .cp-title{font-size:.88rem;}
     }
   </style>
 </head>
@@ -210,7 +187,7 @@
       <a href="how-it-works.html">How it works</a>
     </nav>
     <div class="mobile-header-actions">
-      <button class="mobile-header-icon" id="searchToggle" type="button" aria-label="Search">⌕</button>
+      <button class="mobile-header-icon" type="button">⌕</button>
     </div>
     <div class="auth-actions index-auth-actions">
       <a class="nav-link" href="login.html">Login</a>
@@ -233,7 +210,7 @@
   </div>
 </nav>
 
-<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+<nav class="mobile-bottom-nav">
   <a href="index.html"><svg class="nav-symbol" viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 20v-6h6v6"/></svg><strong>Home</strong></a>
   <a href="events.html"><svg class="nav-symbol" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7 3v4M17 3v4M3.5 10h17"/></svg><strong>Events</strong></a>
   <a href="categories.html" class="active-tab"><svg class="nav-symbol" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><strong>Categories</strong></a>
@@ -241,51 +218,38 @@
 </nav>
 
 <main>
-  <div class="cat-page-hero">
-    <a class="cat-page-back" href="index.html">&#8592; Back to Home</a>
+  <div class="cp-header">
+    <a class="cp-back" href="index.html">&#8592; Back to Home</a>
     <h1 id="pageTitle">All Categories</h1>
-    <p id="pageSubtitle">Find exactly what you're in the mood for.</p>
   </div>
 
-  <!-- CATEGORY CHIPS -->
-  <div class="cat-chips-wrap">
-    <div class="cat-chips" id="catChips">
-      <button class="cat-chip-btn active" data-cat="all">
-        <span class="cat-chip-dot" style="background:#fff"></span> All
+  <!-- 4 CHIPS ONLY -->
+  <div class="cp-chips-wrap">
+    <div class="cp-chips">
+      <button class="cp-chip active" data-cat="all">All</button>
+      <button class="cp-chip" data-cat="nightlife">
+        <span class="cp-chip-dot" style="background:#0e8fa8"></span>Nightlife
       </button>
-      <button class="cat-chip-btn" data-cat="nightlife">
-        <span class="cat-chip-dot" style="background:#0e8fa8"></span> Nightlife
+      <button class="cp-chip" data-cat="dining">
+        <span class="cp-chip-dot" style="background:#b71c1c"></span>Fine Dining
       </button>
-      <button class="cat-chip-btn" data-cat="brunch">
-        <span class="cat-chip-dot" style="background:#b8860b"></span> Brunch &amp; Bites
+      <button class="cp-chip" data-cat="workshops">
+        <span class="cp-chip-dot" style="background:#b35a00"></span>Workshops
       </button>
-      <button class="cat-chip-btn" data-cat="dining">
-        <span class="cat-chip-dot" style="background:#b71c1c"></span> Fine Dining
-      </button>
-      <button class="cat-chip-btn" data-cat="workshops">
-        <span class="cat-chip-dot" style="background:#b35a00"></span> Workshops
-      </button>
-      <button class="cat-chip-btn" data-cat="experiences">
-        <span class="cat-chip-dot" style="background:#00796b"></span> Experiences
-      </button>
-      <button class="cat-chip-btn" data-cat="music">
-        <span class="cat-chip-dot" style="background:#1b5e20"></span> Live Music
+      <button class="cp-chip" data-cat="music">
+        <span class="cp-chip-dot" style="background:#1b5e20"></span>Live Music
       </button>
     </div>
   </div>
 
-  <!-- RESULTS -->
-  <div class="cat-results-head">
-    <div class="cat-results-title" id="resultsTitle">All Events</div>
-    <div class="cat-results-count" id="resultsCount"></div>
+  <div class="cp-section-head">
+    <div class="cp-section-title" id="sectionTitle">All Events</div>
+    <div class="cp-section-count" id="sectionCount"></div>
   </div>
 
-  <div class="cat-events-wrap">
-    <div class="cat-events-grid" id="catGrid">
-      <div class="cat-empty">
-        <div class="cat-empty-icon">⏳</div>
-        <div class="cat-empty-msg">Loading events…</div>
-      </div>
+  <div class="cp-grid-wrap">
+    <div class="cp-grid" id="cpGrid">
+      <div class="cp-empty"><div class="cp-empty-icon">⏳</div><div class="cp-empty-msg">Loading…</div></div>
     </div>
   </div>
 </main>
@@ -305,132 +269,95 @@
   }
   const db = firebase.firestore();
 
-  // Category keyword map
   const CAT_MAP = {
-    nightlife:   ['party','parties','nightlife','club','celebrat'],
-    brunch:      ['brunch','breakfast','morning','bites'],
-    dining:      ['culinary','dining','food','gourmet','restaurant','chef'],
-    workshops:   ['workshop','class','learn','craft','skill','masterclass'],
-    experiences: ['experience','community','meetup','social','unique'],
-    music:       ['music','concert','gig','live','band','dj','acoustic']
+    nightlife:  ['party','parties','nightlife','club','celebrat'],
+    dining:     ['culinary','dining','food','gourmet','restaurant','chef'],
+    workshops:  ['workshop','class','learn','craft','skill','masterclass'],
+    music:      ['music','concert','gig','live','band','dj','acoustic']
   };
+  const LABELS = {all:'All Events', nightlife:'Nightlife', dining:'Fine Dining', workshops:'Workshops', music:'Live Music'};
+  const BANNERS = ['linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#6b1a3a,#b71c1c)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
 
-  const CHIP_LABELS = {
-    all:'All Events', nightlife:'Nightlife', brunch:'Brunch & Bites',
-    dining:'Fine Dining', workshops:'Workshops', experiences:'Experiences', music:'Live Music'
-  };
+  let allEvents = [], activeFilter = 'all';
 
-  const CHIP_COLORS = {
-    nightlife:'#0e8fa8', brunch:'#b8860b', dining:'#b71c1c',
-    workshops:'#b35a00', experiences:'#00796b', music:'#1b5e20'
-  };
-
-  let allEvents = [];
-  let activeFilter = 'all';
-
-  function matchCat(data, cat) {
-    if(cat === 'all') return true;
-    const keywords = CAT_MAP[cat] || [];
-    const haystack = [data.category||'', data.name||'', data.tags||'', data.description||'']
-      .join(' ').toLowerCase();
-    return keywords.some(k => haystack.includes(k));
+  function matchCat(d, cat){
+    if(cat==='all') return true;
+    const hay = [d.category||'',d.name||'',d.tags||'',d.description||''].join(' ').toLowerCase();
+    return (CAT_MAP[cat]||[]).some(k=>hay.includes(k));
   }
 
-  function renderGrid(filter) {
-    const grid = document.getElementById('catGrid');
-    const resultsTitle = document.getElementById('resultsTitle');
-    const resultsCount = document.getElementById('resultsCount');
-    const filtered = filter === 'all' ? allEvents : allEvents.filter(e => matchCat(e.data, filter));
-
-    resultsTitle.textContent = CHIP_LABELS[filter] || 'All Events';
-    resultsCount.textContent = filtered.length ? `${filtered.length} event${filtered.length>1?'s':''}` : '';
-
+  function renderGrid(filter){
+    const grid = document.getElementById('cpGrid');
+    const filtered = filter==='all' ? allEvents : allEvents.filter(e=>matchCat(e.data,filter));
+    document.getElementById('sectionTitle').textContent = LABELS[filter]||'All Events';
+    document.getElementById('sectionCount').textContent = filtered.length ? `${filtered.length} event${filtered.length>1?'s':''}` : '';
     grid.innerHTML = '';
     if(!filtered.length){
-      grid.innerHTML = `<div class="cat-empty"><div class="cat-empty-icon">🔍</div><div class="cat-empty-msg">No events found in this category yet.</div></div>`;
+      grid.innerHTML = `<div class="cp-empty"><div class="cp-empty-icon">🔍</div><div class="cp-empty-msg">No events in this category yet.</div></div>`;
       return;
     }
-    filtered.forEach(({id, data:d}) => {
-      const img = d.cardImgUrl || d.coverUrl || '';
-      const price = d.tickets?.[0]?.price || d.price || 0;
-      let dateLabel = '';
-      if(d.startDate){
-        try{
-          const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
-          dateLabel = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-        }catch(e){}
-      }
-      const catLabel = filter !== 'all' ? CHIP_LABELS[filter] : (d.category || 'Event');
+    filtered.forEach(({id,data:d},i)=>{
+      const img = d.cardImgUrl||d.coverUrl||'';
+      const price = d.tickets?.[0]?.price||d.price||0;
+      let dateLabel='';
+      if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');dateLabel=dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});}catch(e){}}
       const a = document.createElement('a');
-      a.className = 'cat-ev-card';
-      a.href = `event-detail.html?eventId=${id}`;
-      a.innerHTML = `
-        <div class="cat-ev-banner" style="${img?`background-image:url('${img}')`:filter!=='all'?`background:${CHIP_COLORS[filter]||'#222'}`:'background:linear-gradient(135deg,#1a1a1a,#333)'}">
-          <span class="cat-ev-badge">${catLabel}</span>
-          <span class="cat-ev-price-badge ${price?'price-paid':'price-free'}">${price?'Paid':'Free'}</span>
+      a.className='cp-card';
+      a.href=`event-detail.html?eventId=${id}`;
+      a.innerHTML=`
+        <div class="cp-banner" style="${img?`background-image:url('${img}')`:BANNERS[i%BANNERS.length]}">
+          <span class="cp-promoted">♦ Promoted</span>
+          <span class="cp-price-badge ${price?'cp-price-paid':'cp-price-free'}">${price?'Paid':'Free'}</span>
         </div>
-        <div class="cat-ev-body">
-          <div class="cat-ev-title">${d.name||'Untitled'}</div>
-          <div class="cat-ev-meta">${dateLabel||'Date TBA'} · ${d.city||'India'}</div>
-          <div class="cat-ev-footer">
-            <div class="cat-ev-price">${price?`₹${Number(price).toLocaleString('en-IN')}`:'Free'}</div>
-            <span class="cat-ev-btn">Book →</span>
+        <div class="cp-body">
+          <div class="cp-info"><span>▣ ${dateLabel||'Date TBA'}</span><span>⌖ ${d.city||'India'}</span></div>
+          <div class="cp-title">${d.name||'Untitled'}</div>
+          <p class="cp-desc">${d.summary||d.description||''}</p>
+          <div class="cp-price-row">
+            <span class="cp-price-strong">${price?`₹${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+            <span class="cp-price-sub">/ onward</span>
           </div>
         </div>`;
       grid.appendChild(a);
     });
   }
 
-  async function loadEvents() {
-    try {
+  async function loadEvents(){
+    try{
       const snap = await db.collection('events').limit(200).get();
       allEvents = snap.docs
-        .filter(doc => {
-          const s = String(doc.data().status||'').toLowerCase();
-          return doc.data().publicListing !== false && ['published','live','active'].includes(s);
-        })
-        .map(doc => ({id: doc.id, data: doc.data()}));
+        .filter(doc=>{const s=String(doc.data().status||'').toLowerCase();return doc.data().publicListing!==false&&['published','live','active'].includes(s);})
+        .map(doc=>({id:doc.id,data:doc.data()}));
       renderGrid(activeFilter);
-    } catch(e) {
-      document.getElementById('catGrid').innerHTML = `<div class="cat-empty"><div class="cat-empty-icon">⚠️</div><div class="cat-empty-msg">Failed to load events.</div></div>`;
+    }catch(e){
+      document.getElementById('cpGrid').innerHTML=`<div class="cp-empty"><div class="cp-empty-icon">⚠️</div><div class="cp-empty-msg">Failed to load events.</div></div>`;
     }
   }
 
-  // Chip click
-  document.querySelectorAll('.cat-chip-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.cat-chip-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.cp-chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.cp-chip').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      activeFilter = btn.dataset.cat;
+      activeFilter=btn.dataset.cat;
       renderGrid(activeFilter);
     });
   });
 
-  // Read ?cat= from URL (from index page category cards)
+  // Auto-select from ?cat= param
   const urlCat = new URLSearchParams(location.search).get('cat');
-  if(urlCat && urlCat !== 'all'){
+  if(urlCat){
     activeFilter = urlCat;
-    document.querySelectorAll('.cat-chip-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.cat === urlCat);
-    });
-    // Scroll chip into view
-    const activeChip = document.querySelector(`.cat-chip-btn[data-cat="${urlCat}"]`);
-    if(activeChip) activeChip.scrollIntoView({inline:'center', behavior:'smooth'});
+    document.querySelectorAll('.cp-chip').forEach(b=>b.classList.toggle('active',b.dataset.cat===urlCat));
+    const chip = document.querySelector(`.cp-chip[data-cat="${urlCat}"]`);
+    if(chip) setTimeout(()=>chip.scrollIntoView({inline:'center',behavior:'smooth'}),100);
   }
 
   loadEvents();
 </script>
 <script>
-  const ham = document.getElementById('hamburger');
-  const mNav = document.getElementById('mobileNav');
-  const closeMenu = () => { ham.classList.remove('open'); mNav.classList.remove('open'); document.body.style.overflow=''; };
-  ham.addEventListener('click', () => {
-    const isOpen = !mNav.classList.contains('open');
-    ham.classList.toggle('open', isOpen);
-    mNav.classList.toggle('open', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  });
-  mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  const ham=document.getElementById('hamburger'),mNav=document.getElementById('mobileNav');
+  ham.addEventListener('click',()=>{const o=!mNav.classList.contains('open');ham.classList.toggle('open',o);mNav.classList.toggle('open',o);document.body.style.overflow=o?'hidden':'';});
+  mNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ham.classList.remove('open');mNav.classList.remove('open');document.body.style.overflow='';}));
 </script>
 </body>
 </html>
