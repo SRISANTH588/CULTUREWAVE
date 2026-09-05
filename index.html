@@ -1130,7 +1130,10 @@
       }).slice(0,10);
       const scroll = document.getElementById('ftScroll');
       if(!scroll) return;
-      if(!docs.length){ scroll.closest('.ft-scroll-wrap').style.display='none'; return; }
+      if(!docs.length){
+        scroll.innerHTML='<div style="padding:2rem 1.2rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;">🍽️ No dining events found right now. Check back soon!</div>';
+        return;
+      }
       docs.forEach(doc=>{
         const d=doc.data(), id=doc.id;
         const img=d.cardImgUrl||d.coverUrl||'';
