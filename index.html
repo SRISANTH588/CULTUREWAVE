@@ -43,8 +43,8 @@
     /* override global 2-col mobile rule for category */
     @media(max-width:640px){
       .idx-cat-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.4rem!important;}
-      .idx-cat-card{min-width:0;height:110px!important;padding:0;border-radius:12px!important;border:1.5px solid rgba(255,255,255,.7)!important;}
-      .idx-cat-label{font-size:.62rem!important;}
+      .idx-cat-card{min-width:0;height:150px!important;padding:0;border-radius:12px!important;border:1.5px solid rgba(255,255,255,.7)!important;}
+      .idx-cat-label{font-size:.72rem!important;}
       .idx-cat-sub{display:none;}
     }
     .mobile-header-actions,.mobile-bottom-nav,.mobile-brand,.city-picker{display:none;}
@@ -342,27 +342,8 @@
       text-transform:uppercase;
       text-shadow:0 2px 8px rgba(0,0,0,.6);
     }
-    /* arrow badge bottom-right */
-    .idx-cat-section .idx-cat-card::before{
-      content:"↗";
-      position:absolute;
-      bottom:.7rem;right:.8rem;
-      z-index:2;
-      width:28px;height:28px;
-      display:grid;place-items:center;
-      border-radius:50%;
-      background:rgba(255,255,255,.18);
-      backdrop-filter:blur(6px);
-      color:#fff;
-      font-size:.8rem;
-      font-weight:900;
-      border:1px solid rgba(255,255,255,.25);
-      transition:background .2s,transform .2s;
-    }
-    .idx-cat-section .idx-cat-card:hover::before{
-      background:rgba(255,255,255,.32);
-      transform:scale(1.15);
-    }
+    /* arrow badge bottom-right — removed */
+    .idx-cat-section .idx-cat-card::before{display:none;}
     /* per-card accent colours */
     .icc-parties  {background:#0e8fa8;}
     .icc-brunch   {background:#b8860b;}
@@ -377,16 +358,14 @@
     .icc-workshops .idx-cat-bg {background-image:url('workshop.jpg');}
     .icc-experiences .idx-cat-bg{background-image:url('community.jpg');}
     .icc-music .idx-cat-bg     {background-image:url('music.jpg');}
-    /* mobile — always 3 columns with white border */
     @media(max-width:600px){
       .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,1fr);gap:.4rem;}
       .idx-cat-section .idx-cat-card{
-        height:110px;
+        height:150px;
         border-radius:12px;
         border:1.5px solid rgba(255,255,255,.7);
       }
-      .idx-cat-section .idx-cat-label{font-size:.62rem;top:.5rem;left:.5rem;}
-      .idx-cat-section .idx-cat-card::before{width:22px;height:22px;font-size:.65rem;bottom:.45rem;right:.45rem;}
+      .idx-cat-section .idx-cat-label{font-size:.72rem;top:.55rem;left:.55rem;}
     }
   </style>
 </head>
