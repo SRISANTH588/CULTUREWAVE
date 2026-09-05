@@ -40,7 +40,13 @@
     .mobile-nav>a::after{color:#888!important;}
     .mobile-nav-ctas{border-top:1px solid #222!important;}
 
-    /* ── MOBILE BOTTOM NAV ── */
+    /* override global 2-col mobile rule for category */
+    @media(max-width:640px){
+      .idx-cat-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.4rem!important;}
+      .idx-cat-card{min-width:0;height:110px!important;padding:0;border-radius:12px!important;border:1.5px solid rgba(255,255,255,.7)!important;}
+      .idx-cat-label{font-size:.62rem!important;}
+      .idx-cat-sub{display:none;}
+    }
     .mobile-header-actions,.mobile-bottom-nav,.mobile-brand,.city-picker{display:none;}
     @media(max-width:700px){
       .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
@@ -301,11 +307,13 @@
       display:block;
       text-decoration:none;
       cursor:pointer;
-      transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s ease;
+      border:1.5px solid rgba(255,255,255,.18);
+      transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s ease,border-color .28s ease;
     }
     .idx-cat-section .idx-cat-card:hover{
       transform:scale(1.04) translateY(-3px);
       box-shadow:0 20px 48px rgba(0,0,0,.7);
+      border-color:rgba(255,255,255,.55);
     }
     /* photo layer */
     .idx-cat-section .idx-cat-bg{
@@ -369,10 +377,16 @@
     .icc-workshops .idx-cat-bg {background-image:url('workshop.jpg');}
     .icc-experiences .idx-cat-bg{background-image:url('community.jpg');}
     .icc-music .idx-cat-bg     {background-image:url('music.jpg');}
+    /* mobile — always 3 columns with white border */
     @media(max-width:600px){
-      .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(2,1fr);gap:.5rem;}
-      .idx-cat-section .idx-cat-card{height:130px;border-radius:14px;}
-      .idx-cat-section .idx-cat-label{font-size:.78rem;}
+      .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,1fr);gap:.4rem;}
+      .idx-cat-section .idx-cat-card{
+        height:110px;
+        border-radius:12px;
+        border:1.5px solid rgba(255,255,255,.7);
+      }
+      .idx-cat-section .idx-cat-label{font-size:.62rem;top:.5rem;left:.5rem;}
+      .idx-cat-section .idx-cat-card::before{width:22px;height:22px;font-size:.65rem;bottom:.45rem;right:.45rem;}
     }
   </style>
 </head>
