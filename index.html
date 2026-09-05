@@ -1124,7 +1124,7 @@
 
   function isPublishedEvent(data) {
     const status = String(data?.status || '').toLowerCase();
-    return data?.publicListing !== false && ['published','live','active'].includes(status);
+    return status !== 'draft' && status !== 'deleted' && status !== 'rejected';
   }
 
   async function loadIndexEvents() {
