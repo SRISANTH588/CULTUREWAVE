@@ -54,51 +54,80 @@
     .ft-banner{
       position:relative;
       width:100%;
-      min-height:200px;
+      min-height:260px;
       overflow:hidden;
       display:flex;
       align-items:flex-end;
     }
     .ft-banner-bg{
       position:absolute;inset:0;
-      background:url('dining-banner.jpg') center/cover no-repeat;
-      /* fallback green like screenshot */
-      background-color:#1a4a2e;
-      transition:transform .4s ease;
+      background:url('banner.jpeg') center/cover no-repeat;
+      transform-origin:center;
+      transition:transform 6s ease;
     }
-    .ft-banner:hover .ft-banner-bg{transform:scale(1.03);}
+    .ft-section:hover .ft-banner-bg{transform:scale(1.04);}
+    /* dark gradient — left heavy so text reads */
     .ft-banner-overlay{
       position:absolute;inset:0;
-      background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.3) 55%,rgba(0,0,0,.05) 100%);
+      background:
+        linear-gradient(to right, rgba(0,0,0,.82) 0%, rgba(0,0,0,.5) 45%, rgba(0,0,0,.1) 100%),
+        linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 50%);
+    }
+    /* gold shimmer line at top */
+    .ft-banner::before{
+      content:"";
+      position:absolute;top:0;left:0;right:0;
+      height:2px;
+      background:linear-gradient(90deg,transparent,#c9a84c,#fff8e1,#c9a84c,transparent);
+      z-index:3;
     }
     .ft-banner-content{
       position:relative;z-index:2;
-      padding:2rem 1.4rem 2rem;
+      padding:2.5rem 1.4rem 2.5rem;
+      max-width:520px;
+    }
+    .ft-eyebrow{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.65rem;font-weight:800;
+      letter-spacing:.2em;text-transform:uppercase;
+      color:rgba(201,168,76,.7);
+      margin-bottom:.8rem;
+    }
+    .ft-eyebrow::before{
+      content:"";
+      display:inline-block;width:20px;height:1px;
+      background:#c9a84c;
     }
     .ft-heading{
-      font-size:clamp(2rem,7vw,3.5rem);
+      font-size:clamp(2.2rem,7vw,4rem);
       font-weight:900;
       color:#c9a84c;
-      line-height:1;
-      letter-spacing:-.03em;
+      line-height:.95;
+      letter-spacing:-.04em;
       text-transform:uppercase;
-      text-shadow:0 2px 12px rgba(0,0,0,.5);
+      margin:0 0 .5rem;
+    }
+    .ft-tagline{
+      font-size:.82rem;
+      color:rgba(255,255,255,.5);
+      font-weight:600;
+      line-height:1.5;
+      margin-bottom:1.4rem;
     }
     .ft-banner-btn{
-      display:inline-flex;align-items:center;gap:.4rem;
-      margin-top:1rem;
-      padding:.5rem 1.2rem;
+      display:inline-flex;align-items:center;gap:.5rem;
+      padding:.65rem 1.5rem;
       border-radius:999px;
       background:rgba(201,168,76,.15);
-      border:1px solid rgba(201,168,76,.4);
+      border:1px solid #c9a84c;
       color:#c9a84c;
-      font-size:.78rem;font-weight:800;
+      font-size:.8rem;font-weight:800;
       text-decoration:none;
-      transition:background .2s,border-color .2s;
+      transition:background .2s,color .2s;
     }
-    .ft-banner-btn:hover{background:rgba(201,168,76,.25);border-color:#c9a84c;}
+    .ft-banner-btn:hover{background:#c9a84c;color:#000;}
     /* scroll cards */
-    .ft-scroll-wrap{background:#000;border-top:1px solid rgba(255,255,255,.06);}
+    .ft-scroll-wrap{background:#000;border-top:1px solid rgba(201,168,76,.15);}
     .ft-scroll{
       display:flex;gap:.75rem;
       padding:1rem 1.2rem .6rem;
@@ -107,15 +136,15 @@
     }
     .ft-scroll::-webkit-scrollbar{display:none;}
     .ft-card{
-      flex:0 0 44vw;max-width:185px;
+      flex:0 0 42vw;max-width:185px;
       border-radius:16px;overflow:hidden;
       background:#111;
-      border:1px solid rgba(255,255,255,.1);
+      border:1px solid rgba(201,168,76,.15);
       scroll-snap-align:start;cursor:pointer;
       text-decoration:none;display:block;
       transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
     }
-    .ft-card:hover{transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,0,0,.8);border-color:rgba(255,255,255,.25);}
+    .ft-card:hover{transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,0,0,.8);border-color:rgba(201,168,76,.4);}
     .ft-poster{
       width:100%;aspect-ratio:3/4;
       background-size:cover;background-position:center;
@@ -137,12 +166,12 @@
       display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;
     }
     .ft-date-box{
-      background:#1e1e1e;border:1px solid rgba(255,255,255,.1);
+      background:#1a1a1a;border:1px solid rgba(201,168,76,.2);
       border-radius:7px;padding:.2rem .4rem;
       text-align:center;min-width:32px;
     }
     .ft-date-day{font-size:.75rem;font-weight:900;color:#fff;line-height:1;}
-    .ft-date-mon{font-size:.52rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.06em;}
+    .ft-date-mon{font-size:.52rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.06em;}
     .ft-title{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;}
     .ft-venue{font-size:.63rem;color:rgba(255,255,255,.35);margin-top:.2rem;font-weight:600;}
     .ft-view-all-wrap{
@@ -153,17 +182,17 @@
     .ft-view-all{
       display:inline-flex;align-items:center;gap:.4rem;
       padding:.55rem 1.5rem;
-      border:1px solid rgba(255,255,255,.2);
+      border:1px solid rgba(201,168,76,.3);
       border-radius:999px;
-      color:#fff;font-size:.82rem;font-weight:800;
+      color:#c9a84c;font-size:.82rem;font-weight:800;
       text-decoration:none;
       transition:background .2s,border-color .2s;
     }
-    .ft-view-all:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5);}
+    .ft-view-all:hover{background:rgba(201,168,76,.1);border-color:#c9a84c;}
     @media(min-width:700px){
       .ft-card{flex:0 0 190px;max-width:210px;}
-      .ft-banner{min-height:260px;}
-      .ft-heading{font-size:clamp(3rem,5vw,4.5rem);}
+      .ft-banner{min-height:340px;}
+      .ft-heading{font-size:clamp(3rem,5vw,5rem);}
     }
 
     /* ── PREMIUM CURATED SECTION ── */
@@ -771,8 +800,10 @@
       <div class="ft-banner-bg"></div>
       <div class="ft-banner-overlay"></div>
       <div class="ft-banner-content">
+        <div class="ft-eyebrow">Fine Dining &amp; Experiences</div>
         <div class="ft-heading">The Finest<br>Tables</div>
-        <a href="restaurants.html" class="ft-banner-btn">Explore &#8594;</a>
+        <div class="ft-tagline">Where every meal becomes a memory.</div>
+        <a href="restaurants.html" class="ft-banner-btn">Reserve a Table &#8594;</a>
       </div>
     </div>
     <div class="ft-scroll-wrap">
