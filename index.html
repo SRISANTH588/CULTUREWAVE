@@ -49,96 +49,158 @@
     }
 
     /* ── HANDPICKED EXPERIENCES ── */
-    .hpe-section{background:#000;padding:0 0 2.5rem;}
-    .hpe-banner{
-      width:100%;background:#000;
-      padding:2rem 1.2rem 1.8rem;
-      position:relative;overflow:hidden;
-      border-top:1px solid rgba(255,255,255,.08);
-      border-bottom:1px solid rgba(255,255,255,.08);
-      display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;
+    /* ── PREMIUM CURATED SECTION ── */
+    .hpe-section{
+      background:#000;
+      padding:0 0 0;
+      position:relative;
     }
-    .hpe-banner::after{
+    /* Full-width premium banner */
+    .hpe-banner{
+      position:relative;
+      width:100%;
+      min-height:220px;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+      padding:2.5rem 1.4rem 2rem;
+      background:linear-gradient(135deg,#0a0a0a 0%,#111 50%,#0d0d0d 100%);
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    /* animated grain texture */
+    .hpe-banner::before{
       content:"";
       position:absolute;inset:0;
-      background:radial-gradient(ellipse 80% 100% at 80% 50%,rgba(255,255,255,.04),transparent);
+      background:
+        radial-gradient(ellipse 60% 80% at 0% 50%,rgba(255,255,255,.06),transparent 60%),
+        radial-gradient(ellipse 40% 60% at 100% 0%,rgba(255,255,255,.04),transparent 55%);
       pointer-events:none;
     }
+    /* decorative large text watermark */
+    .hpe-banner::after{
+      content:"CURATED";
+      position:absolute;
+      right:-1rem;bottom:-1.5rem;
+      font-size:clamp(5rem,18vw,10rem);
+      font-weight:900;
+      letter-spacing:-.06em;
+      color:rgba(255,255,255,.03);
+      line-height:1;
+      pointer-events:none;
+      user-select:none;
+    }
+    .hpe-banner-text{position:relative;z-index:2;}
+    .hpe-eyebrow{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.68rem;font-weight:800;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:rgba(255,255,255,.4);
+      margin-bottom:.8rem;
+    }
+    .hpe-eyebrow::before{
+      content:"";
+      display:inline-block;width:24px;height:1px;
+      background:rgba(255,255,255,.3);
+    }
     .hpe-heading{
-      font-size:clamp(2.6rem,9vw,4rem);
-      font-weight:900;color:#fff;
-      line-height:.95;letter-spacing:-.05em;
+      font-size:clamp(2.8rem,8vw,5rem);
+      font-weight:900;
+      line-height:.92;
+      letter-spacing:-.06em;
+      color:#fff;
+      margin:0;
     }
     .hpe-heading em{
       font-style:italic;
       display:block;
-      -webkit-text-stroke:1.5px #fff;
+      -webkit-text-stroke:1.5px rgba(255,255,255,.6);
       color:transparent;
     }
     .hpe-sub{
-      margin-top:.7rem;font-size:.8rem;
-      font-weight:700;color:rgba(255,255,255,.4);
-      letter-spacing:.12em;text-transform:uppercase;
+      margin-top:.9rem;
+      font-size:.78rem;
+      font-weight:700;
+      color:rgba(255,255,255,.35);
+      letter-spacing:.14em;
+      text-transform:uppercase;
     }
-    .hpe-view-all-wrap{
-      padding:.2rem 1rem 1.5rem;
-      display:flex;justify-content:center;
+    /* scroll strip */
+    .hpe-scroll-wrap{
+      background:#000;
+      border-top:1px solid rgba(255,255,255,.06);
     }
-    .hpe-view-all{
-      display:inline-flex;align-items:center;gap:.35rem;
-      padding:.55rem 1.4rem;
-      border:1px solid rgba(255,255,255,.25);
-      border-radius:999px;
-      color:#fff;font-size:.82rem;font-weight:800;
-      text-decoration:none;white-space:nowrap;
-      transition:background .2s,border-color .2s;
-    }
-    .hpe-view-all:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5);}
-    .hpe-scroll-wrap{background:#000;}
     .hpe-scroll{
-      display:flex;gap:.7rem;
-      padding:.9rem 1rem .6rem;
+      display:flex;gap:.75rem;
+      padding:1.2rem 1.2rem .8rem;
       overflow-x:auto;scroll-snap-type:x mandatory;
       scrollbar-width:none;-webkit-overflow-scrolling:touch;
     }
     .hpe-scroll::-webkit-scrollbar{display:none;}
+    /* premium scroll cards */
     .hpe-card{
-      flex:0 0 44vw;max-width:190px;
-      border-radius:14px;overflow:hidden;
-      background:#1a1a1a;
-      border:1px solid rgba(255,255,255,.1);
+      flex:0 0 42vw;max-width:180px;
+      border-radius:16px;overflow:hidden;
+      background:#111;
+      border:1px solid rgba(255,255,255,.12);
       scroll-snap-align:start;cursor:pointer;
       text-decoration:none;display:block;
-      transition:transform .22s ease,box-shadow .22s ease;
+      transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
     }
-    .hpe-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.7);}
+    .hpe-card:hover{
+      transform:translateY(-5px);
+      box-shadow:0 20px 48px rgba(0,0,0,.8);
+      border-color:rgba(255,255,255,.3);
+    }
     .hpe-poster{
       width:100%;aspect-ratio:3/4;
       background-size:cover;background-position:center;
       position:relative;
     }
+    .hpe-poster::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%);
+    }
     .hpe-price-badge{
-      position:absolute;bottom:.5rem;left:.5rem;
-      padding:.22rem .6rem;border-radius:999px;
+      position:absolute;bottom:.55rem;left:.55rem;z-index:2;
+      padding:.24rem .65rem;border-radius:999px;
       font-size:.62rem;font-weight:800;letter-spacing:.04em;
     }
     .hpe-price-free{background:#22c55e;color:#fff;}
     .hpe-price-paid{background:#ec4899;color:#fff;}
-    .hpe-info{padding:.6rem .7rem .75rem;}
+    .hpe-info{padding:.65rem .75rem .8rem;background:#111;}
     .hpe-date{
-      display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;
+      display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem;
     }
     .hpe-date-box{
-      background:#222;border-radius:6px;
-      padding:.18rem .38rem;text-align:center;min-width:30px;
+      background:#1e1e1e;border:1px solid rgba(255,255,255,.1);
+      border-radius:7px;padding:.2rem .4rem;
+      text-align:center;min-width:32px;
     }
-    .hpe-date-day{font-size:.72rem;font-weight:900;color:#fff;line-height:1;}
-    .hpe-date-mon{font-size:.52rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.06em;}
-    .hpe-title{font-size:.72rem;font-weight:800;color:#fff;line-height:1.3;}
-    .hpe-venue{font-size:.62rem;color:#666;margin-top:.18rem;font-weight:600;}
+    .hpe-date-day{font-size:.75rem;font-weight:900;color:#fff;line-height:1;}
+    .hpe-date-mon{font-size:.52rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.06em;}
+    .hpe-title{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;}
+    .hpe-venue{font-size:.63rem;color:rgba(255,255,255,.35);margin-top:.2rem;font-weight:600;}
+    /* view all */
+    .hpe-view-all-wrap{
+      padding:.8rem 1.2rem 2rem;
+      display:flex;justify-content:center;
+      background:#000;
+    }
+    .hpe-view-all{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.6rem 1.6rem;
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:999px;
+      color:#fff;font-size:.82rem;font-weight:800;
+      text-decoration:none;
+      transition:background .2s,border-color .2s;
+    }
+    .hpe-view-all:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5);}
     @media(min-width:700px){
-      .hpe-card{flex:0 0 200px;max-width:220px;}
-      .hpe-banner{padding:2.8rem 1.4rem 2.2rem;}
+      .hpe-card{flex:0 0 190px;max-width:210px;}
+      .hpe-banner{min-height:260px;padding:3rem 1.4rem 2.5rem;}
+      .hpe-heading{font-size:clamp(3.5rem,6vw,5.5rem);}
     }
     .mobile-header-actions,.mobile-bottom-nav,.mobile-brand,.city-picker{display:none;}
     @media(max-width:700px){
@@ -573,8 +635,9 @@
   <section class="hpe-section">
     <div class="hpe-banner">
       <div class="hpe-banner-text">
+        <div class="hpe-eyebrow">Handpicked Experiences</div>
         <div class="hpe-heading">Curated<br><em>for you</em></div>
-        <div class="hpe-sub">✦ Handpicked Experiences</div>
+        <div class="hpe-sub">✦ Only the best. Every time.</div>
       </div>
     </div>
     <div class="hpe-scroll-wrap">
