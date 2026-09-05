@@ -95,21 +95,21 @@
     .search-submit{width:100%;margin-top:.8rem;padding:.85rem;border:0;border-radius:10px;background:#1d4ed8;color:#fff;font:inherit;font-weight:800;cursor:pointer;}
 
     /* ── HERO SLIDER ── */
-    .hero-slider{position:relative;width:100%;overflow:hidden;background:#000;}
+    .hero-slider{width:100%;background:#f0f4ff;padding:1rem 1.2rem 0;box-sizing:border-box;}
     .hs-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);will-change:transform;}
-    .hs-slide{flex:0 0 100%;min-height:88vw;max-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem 1.4rem 1.6rem;position:relative;box-sizing:border-box;}
-    @media(min-width:701px){.hs-slide{min-height:60vh;padding:3rem 3rem 2.5rem;}}
-    .hs-slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.1) 60%,transparent 100%);pointer-events:none;}
-    .hs-num{position:absolute;top:1.2rem;right:1.4rem;font-size:3.5rem;font-weight:900;color:rgba(255,255,255,.15);line-height:1;z-index:1;letter-spacing:-.05em;}
-    .hs-content{position:relative;z-index:1;}
-    .hs-tag{display:inline-block;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .8rem;border-radius:999px;margin-bottom:.9rem;}
-    .hs-icon{font-size:3rem;margin-bottom:.6rem;}
-    .hs-title{font-size:clamp(1.6rem,6vw,2.8rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.04em;margin:0 0 .5rem;}
-    .hs-meta{font-size:.88rem;color:rgba(255,255,255,.7);font-weight:600;margin-bottom:1.2rem;}
-    .hs-btn{display:inline-block;background:#fff;color:#0b1220;font-size:.88rem;font-weight:800;padding:.65rem 1.4rem;border-radius:999px;text-decoration:none;}
-    .hs-dots{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.9rem 0 1rem;background:#0b1220;}
-    .hs-dot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.25);border:none;cursor:pointer;padding:0;transition:all .3s;}
-    .hs-dot.active{width:24px;background:#fff;}
+    .hs-slide{flex:0 0 100%;box-sizing:border-box;padding:0 .3rem;}
+    .hs-card{border-radius:20px;overflow:hidden;background:#fff;box-shadow:0 8px 32px rgba(0,0,0,.12);}
+    .hs-poster{width:100%;aspect-ratio:3/4;display:block;background-size:cover;background-position:center;position:relative;min-height:320px;overflow:hidden;}
+    .hs-poster-inner{width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:1.2rem;box-sizing:border-box;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%);}
+    .hs-num{position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);color:#fff;font-size:.75rem;font-weight:800;padding:.25rem .6rem;border-radius:999px;letter-spacing:.05em;}
+    .hs-tag{display:inline-block;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .7rem;border-radius:999px;margin-bottom:.5rem;}
+    .hs-info{padding:1rem 1.1rem 1.2rem;background:#fff;}
+    .hs-date{font-size:.78rem;color:#64748b;font-weight:600;margin-bottom:.3rem;}
+    .hs-title{font-size:1rem;font-weight:800;color:#0b1220;line-height:1.25;margin:0 0 .25rem;letter-spacing:-.02em;}
+    .hs-venue{font-size:.8rem;color:#94a3b8;font-weight:500;}
+    .hs-dots{display:flex;align-items:center;justify-content:center;gap:.45rem;padding:.9rem 0 1rem;background:#f0f4ff;}
+    .hs-dot{width:8px;height:8px;border-radius:999px;background:rgba(0,0,0,.18);border:none;cursor:pointer;padding:0;transition:all .3s;}
+    .hs-dot.active{width:24px;background:#1242c5;}
 
     /* ── CATEGORY SECTION ── */
     .idx-cat-section{width:100%;max-width:none;padding:3.5rem 0 4rem;background:#0a0a0a;}
@@ -455,74 +455,116 @@
   <!-- HERO SLIDER -->
   <section class="hero-slider" id="heroSlider">
     <div class="hs-track" id="hsTrack">
-      <div class="hs-slide" style="background:linear-gradient(160deg,#1242c5,#9bdcff)">
-        <div class="hs-num">01</div>
-        <div class="hs-content">
-          <div class="hs-tag">Workshop</div>
-          <div class="hs-icon">🎨</div>
-          <h2 class="hs-title">Art &amp; Design Masterclass</h2>
-          <div class="hs-meta">Vijayawada &middot; Free</div>
-          <a class="hs-btn" href="events.html">Book Now →</a>
+      <div class="hs-slide">
+        <div class="hs-card">
+          <div class="hs-poster" style="background:linear-gradient(160deg,#1242c5,#9bdcff);">
+            <div class="hs-poster-inner">
+              <div class="hs-num">01 / 07</div>
+              <div class="hs-tag">Workshop</div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;z-index:0;">🎨</div>
+          </div>
+          <div class="hs-info">
+            <div class="hs-date">Sep 12 2026 &middot; 6:00 PM</div>
+            <div class="hs-title">Art &amp; Design Masterclass</div>
+            <div class="hs-venue">Vijayawada &middot; Free</div>
+          </div>
         </div>
       </div>
-      <div class="hs-slide" style="background:linear-gradient(160deg,#ff4d2e,#ff9500)">
-        <div class="hs-num">02</div>
-        <div class="hs-content">
-          <div class="hs-tag">Culinary</div>
-          <div class="hs-icon">🍳</div>
-          <h2 class="hs-title">Chef&rsquo;s Table Experience</h2>
-          <div class="hs-meta">Hyderabad &middot; ₹499</div>
-          <a class="hs-btn" href="events.html">Book Now →</a>
+      <div class="hs-slide">
+        <div class="hs-card">
+          <div class="hs-poster" style="background:linear-gradient(160deg,#ff4d2e,#ff9500);">
+            <div class="hs-poster-inner">
+              <div class="hs-num">02 / 07</div>
+              <div class="hs-tag">Culinary</div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;z-index:0;">🍳</div>
+          </div>
+          <div class="hs-info">
+            <div class="hs-date">Sep 15 2026 &middot; 7:30 PM</div>
+            <div class="hs-title">Chef&rsquo;s Table Experience</div>
+            <div class="hs-venue">Hyderabad &middot; ₹499</div>
+          </div>
         </div>
       </div>
-      <div class="hs-slide" style="background:linear-gradient(160deg,#7c3aed,#ec4899)">
-        <div class="hs-num">03</div>
-        <div class="hs-content">
-          <div class="hs-tag">Music</div>
-          <div class="hs-icon">🎵</div>
-          <h2 class="hs-title">Live Jam Session Night</h2>
-          <div class="hs-meta">Bangalore &middot; ₹299</div>
-          <a class="hs-btn" href="events.html">Book Now →</a>
+      <div class="hs-slide">
+        <div class="hs-card">
+          <div class="hs-poster" style="background:linear-gradient(160deg,#7c3aed,#ec4899);">
+            <div class="hs-poster-inner">
+              <div class="hs-num">03 / 07</div>
+              <div class="hs-tag">Music</div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;z-index:0;">🎵</div>
+          </div>
+          <div class="hs-info">
+            <div class="hs-date">Sep 18 2026 &middot; 8:00 PM</div>
+            <div class="hs-title">Live Jam Session Night</div>
+            <div class="hs-venue">Bangalore &middot; ₹299</div>
+          </div>
         </div>
       </div>
-      <div class="hs-slide" style="background:linear-gradient(160deg,#0891b2,#06b6d4)">
-        <div class="hs-num">04</div>
-        <div class="hs-content">
-          <div class="hs-tag">Workshop</div>
-          <div class="hs-icon">💼</div>
-          <h2 class="hs-title">Startup Pitch Workshop</h2>
-          <div class="hs-meta">Chennai &middot; Free</div>
-          <a class="hs-btn" href="events.html">Book Now →</a>
+      <div class="hs-slide">
+        <div class="hs-card">
+          <div class="hs-poster" style="background:linear-gradient(160deg,#0891b2,#06b6d4);">
+            <div class="hs-poster-inner">
+              <div class="hs-num">04 / 07</div>
+              <div class="hs-tag">Workshop</div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;z-index:0;">💼</div>
+          </div>
+          <div class="hs-info">
+            <div class="hs-date">Sep 20 2026 &middot; 5:00 PM</div>
+            <div class="hs-title">Startup Pitch Workshop</div>
+            <div class="hs-venue">Chennai &middot; Free</div>
+          </div>
         </div>
       </div>
-      <div class="hs-slide" style="background:linear-gradient(160deg,#16a34a,#4ade80)">
-        <div class="hs-num">05</div>
-        <div class="hs-content">
-          <div class="hs-tag">Wellness</div>
-          <div class="hs-icon">🧘</div>
-          <h2 class="hs-title">Morning Yoga &amp; Mindfulness</h2>
-          <div class="hs-meta">Vijayawada &middot; ₹199</div>
-          <a class="hs-btn" href="events.html">Book Now →</a>
+      <div class="hs-slide">
+        <div class="hs-card">
+          <div class="hs-poster" style="background:linear-gradient(160deg,#16a34a,#4ade80);">
+            <div class="hs-poster-inner">
+              <div class="hs-num">05 / 07</div>
+              <div class="hs-tag">Wellness</div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;z-index:0;">🧘</div>
+          </div>
+          <div class="hs-info">
+            <div class="hs-date">Sep 22 2026 &middot; 7:00 AM</div>
+            <div class="hs-title">Morning Yoga &amp; Mindfulness</div>
+            <div class="hs-venue">Vijayawada &middot; ₹199</div>
+          </div>
         </div>
       </div>
-      <div class="hs-slide" style="background:linear-gradient(160deg,#dc2626,#f97316)">
-        <div class="hs-num">06</div>
-        <div class="hs-content">
-          <div class="hs-tag">Workshop</div>
-          <div class="hs-icon">📸</div>
-          <h2 class="hs-title">Photography Bootcamp</h2>
-          <div class="hs-meta">Mumbai &middot; ₹599</div>
-          <a class="hs-btn" href="events.html">Book Now →</a>
+      <div class="hs-slide">
+        <div class="hs-card">
+          <div class="hs-poster" style="background:linear-gradient(160deg,#dc2626,#f97316);">
+            <div class="hs-poster-inner">
+              <div class="hs-num">06 / 07</div>
+              <div class="hs-tag">Workshop</div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;z-index:0;">📸</div>
+          </div>
+          <div class="hs-info">
+            <div class="hs-date">Sep 25 2026 &middot; 10:00 AM</div>
+            <div class="hs-title">Photography Bootcamp</div>
+            <div class="hs-venue">Mumbai &middot; ₹599</div>
+          </div>
         </div>
       </div>
-      <div class="hs-slide" style="background:linear-gradient(160deg,#854d0e,#f5c518)">
-        <div class="hs-num">07</div>
-        <div class="hs-content">
-          <div class="hs-tag">Performing Arts</div>
-          <div class="hs-icon">🎭</div>
-          <h2 class="hs-title">Theatre &amp; Acting Workshop</h2>
-          <div class="hs-meta">Delhi &middot; ₹399</div>
-          <a class="hs-btn" href="events.html">Book Now →</a>
+      <div class="hs-slide">
+        <div class="hs-card">
+          <div class="hs-poster" style="background:linear-gradient(160deg,#854d0e,#f5c518);">
+            <div class="hs-poster-inner">
+              <div class="hs-num">07 / 07</div>
+              <div class="hs-tag">Performing Arts</div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;z-index:0;">🎭</div>
+          </div>
+          <div class="hs-info">
+            <div class="hs-date">Sep 28 2026 &middot; 6:30 PM</div>
+            <div class="hs-title">Theatre &amp; Acting Workshop</div>
+            <div class="hs-venue">Delhi &middot; ₹399</div>
+          </div>
         </div>
       </div>
     </div>
