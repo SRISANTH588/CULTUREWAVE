@@ -1131,7 +1131,13 @@
       const scroll = document.getElementById('ftScroll');
       if(!scroll) return;
       if(!docs.length){
-        scroll.innerHTML='<div style="padding:2rem 1.2rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;">🍽️ No dining events found right now. Check back soon!</div>';
+        scroll.innerHTML=`
+          <div style="padding:1.5rem 1.2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:100%;text-align:center;gap:.6rem;">
+            <div style="font-size:2.5rem;">🍽️</div>
+            <div style="font-size:.95rem;font-weight:900;color:#fff;letter-spacing:-.02em;">No dining events</div>
+            <div style="font-size:.78rem;font-weight:600;color:rgba(255,255,255,.4);line-height:1.5;">We're working on bringing the finest<br>tables to you. Check back soon!</div>
+            <a href="restaurants.html" style="margin-top:.4rem;padding:.5rem 1.2rem;border-radius:999px;border:1px solid rgba(201,168,76,.4);color:#c9a84c;font-size:.75rem;font-weight:800;text-decoration:none;">Browse Restaurants →</a>
+          </div>`;
         return;
       }
       docs.forEach(doc=>{
