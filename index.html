@@ -133,19 +133,103 @@
     #events .idx-feat-head .idx-section-title{font-size:clamp(2rem,4.2vw,3.4rem);line-height:1.05;margin-bottom:0;}
     #events .idx-feat-cta-link{display:block;width:max-content;margin:1.5rem auto 0;}
     #events .event-grid-home{display:grid;grid-template-columns:repeat(3,minmax(0,280px));justify-content:start;gap:1rem;}
-    .event-card,.event-poster-card{background:#111!important;border:1px solid #222!important;border-radius:22px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.6)!important;}
-    .event-body,.event-poster-card .event-body{background:#111!important;padding:1rem 1.1rem 1.1rem;}
-    .event-poster-card h3,.event-body h3{color:#fff!important;}
-    .event-poster-card p,.event-body p{color:#888!important;}
-    .event-poster-info,.event-meta{color:#555!important;}
-    .event-poster-date{color:#aaa!important;}
-    .event-poster-price strong{color:#fff!important;}
-    .event-poster-price span{color:#555!important;}
-    .event-banner{position:relative;height:auto;aspect-ratio:4/5;background-size:cover;background-position:center;}
-    .event-promoted-badge{position:absolute;top:.6rem;left:.6rem;background:#fff!important;color:#000!important;font-size:.68rem;font-weight:800;padding:.28rem .65rem;border-radius:999px;letter-spacing:.04em;display:flex;align-items:center;gap:.3rem;}
-    .banner-a{background:linear-gradient(135deg,#1a1a1a,#333)!important;}
-    .banner-b{background:linear-gradient(135deg,#222,#444)!important;}
-    .banner-c{background:linear-gradient(135deg,#111,#2a2a2a)!important;}
+    /* ── PREMIUM EVENT CARDS ── */
+    .event-card,.event-poster-card{
+      background:#111!important;
+      border:1px solid rgba(255,255,255,.1)!important;
+      border-radius:22px;
+      overflow:hidden;
+      box-shadow:0 8px 32px rgba(0,0,0,.55)!important;
+      transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+      cursor:pointer;
+    }
+    .event-card:hover,.event-poster-card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 24px 56px rgba(0,0,0,.75)!important;
+      border-color:rgba(255,255,255,.22)!important;
+    }
+    .event-banner{
+      position:relative;
+      height:auto;
+      aspect-ratio:4/5;
+      background-size:cover;
+      background-position:center;
+      overflow:hidden;
+    }
+    .event-banner::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.08) 55%,transparent 100%);
+      pointer-events:none;
+    }
+    .event-promoted-badge{
+      position:absolute;
+      top:.65rem;
+      left:.65rem;
+      z-index:2;
+      background:rgba(255,255,255,.15)!important;
+      backdrop-filter:blur(8px);
+      color:#fff!important;
+      font-size:.62rem;
+      font-weight:800;
+      padding:.28rem .7rem;
+      border-radius:999px;
+      letter-spacing:.06em;
+      border:1px solid rgba(255,255,255,.2);
+      display:flex;
+      align-items:center;
+      gap:.3rem;
+    }
+    .event-body,.event-poster-card .event-body{
+      background:#111!important;
+      padding:1rem 1.15rem 1.2rem;
+    }
+    .event-poster-card h3,.event-body h3{
+      color:#fff!important;
+      font-size:1rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+      line-height:1.3;
+      margin:0 0 .3rem;
+    }
+    .event-poster-card p,.event-body p{
+      color:rgba(255,255,255,.45)!important;
+      font-size:.8rem;
+      line-height:1.5;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .event-poster-info,.event-meta{
+      display:flex;
+      justify-content:space-between;
+      gap:.4rem;
+      margin:.75rem 0 0;
+      color:rgba(255,255,255,.38)!important;
+      font-size:.72rem;
+      font-weight:700;
+    }
+    .event-poster-date{color:rgba(255,255,255,.5)!important;}
+    .event-poster-price{
+      display:flex;
+      align-items:baseline;
+      gap:.3rem;
+      margin-top:.6rem;
+      padding-top:.6rem;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .event-poster-price strong{
+      color:#fff!important;
+      font-size:1rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+    .event-poster-price span{color:rgba(255,255,255,.35)!important;font-size:.75rem;}
+    .banner-a{background:linear-gradient(135deg,#0d2b6e,#1565c0)!important;}
+    .banner-b{background:linear-gradient(135deg,#6b1a3a,#b71c1c)!important;}
+    .banner-c{background:linear-gradient(135deg,#1a3a1a,#2e7d32)!important;}
     @media(max-width:900px){#events .event-grid-home{grid-template-columns:repeat(2,minmax(0,280px));}}
     @media(max-width:700px){
       #events{padding:2.75rem 1rem 3.5rem;}
