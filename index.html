@@ -303,6 +303,8 @@
     #events .event-poster-card .event-poster-price{display:flex;align-items:baseline;gap:.35rem;color:#888;font-size:.8rem;font-weight:700;}
     #events .event-poster-card .event-poster-price strong{color:#8b2cff;font-size:1rem;font-weight:900;}
     #events .event-poster-card .event-btn{display:none;}
+    .event-banner{position:relative;}
+    .event-promoted-badge{position:absolute;top:.6rem;left:.6rem;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;font-size:.68rem;font-weight:800;padding:.28rem .65rem;border-radius:999px;letter-spacing:.04em;display:flex;align-items:center;gap:.3rem;box-shadow:0 2px 8px rgba(245,158,11,.4);}
     @media(max-width:900px){#events .event-grid-home{grid-template-columns:repeat(2,minmax(0,280px));}}
     @media(max-width:700px){#events .event-grid-home{grid-template-columns:1fr;}#events .event-poster-card .event-banner{aspect-ratio:4/5;height:auto;}}
 
@@ -827,7 +829,9 @@
         article.style.cursor = 'pointer';
         article.addEventListener('click', () => window.location.href = `event-detail.html?eventId=${id}`);
         article.innerHTML = `
-          <div class="event-banner ${_banners[i%_banners.length]}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} ></div>
+          <div class="event-banner ${_banners[i%_banners.length]}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} >
+            <div class="event-promoted-badge">♦ Promoted</div>
+          </div>
           <div class="event-body">
             <div class="event-poster-info"><span class="event-poster-date">▣ ${dateLabel||'Date TBA'}</span><span class="event-poster-location">⌖ ${d.city||'India'}</span></div>
             <h3>${d.name||'Untitled'}</h3>
