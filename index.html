@@ -80,13 +80,17 @@
       font-weight:700;color:rgba(255,255,255,.4);
       letter-spacing:.12em;text-transform:uppercase;
     }
+    .hpe-view-all-wrap{
+      padding:.2rem 1rem 1.5rem;
+      display:flex;justify-content:center;
+    }
     .hpe-view-all{
       display:inline-flex;align-items:center;gap:.35rem;
-      padding:.5rem 1.1rem;
+      padding:.55rem 1.4rem;
       border:1px solid rgba(255,255,255,.25);
       border-radius:999px;
-      color:#fff;font-size:.78rem;font-weight:800;
-      text-decoration:none;white-space:nowrap;flex-shrink:0;
+      color:#fff;font-size:.82rem;font-weight:800;
+      text-decoration:none;white-space:nowrap;
       transition:background .2s,border-color .2s;
     }
     .hpe-view-all:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5);}
@@ -384,22 +388,6 @@
       font-size:clamp(1.6rem,4vw,2.6rem);font-weight:900;color:#fff;
       letter-spacing:-.04em;margin:0 0 1.2rem;line-height:1;
     }
-    .idx-cat-head{
-      display:flex;align-items:flex-end;justify-content:space-between;
-      margin-bottom:1.2rem;
-    }
-    .idx-cat-head .idx-section-title{margin-bottom:0;}
-    .idx-view-all{
-      display:inline-flex;align-items:center;gap:.35rem;
-      padding:.5rem 1.1rem;
-      border:1px solid rgba(255,255,255,.25);
-      border-radius:999px;
-      color:#fff;font-size:.78rem;font-weight:800;
-      text-decoration:none;white-space:nowrap;
-      transition:background .2s,border-color .2s;
-      flex-shrink:0;
-    }
-    .idx-view-all:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5);}
     .idx-cat-section .idx-cat-grid{
       display:grid;
       grid-template-columns:repeat(6,1fr);
@@ -550,13 +538,8 @@
   <!-- BROWSE BY CATEGORY -->
   <section class="idx-cat-section">
     <div class="idx-cat-inner">
-      <div class="idx-cat-head">
-        <div>
-          <div class="idx-section-label">Browse by category</div>
-          <div class="idx-section-title">What are you looking for?</div>
-        </div>
-        <a href="categories.html" class="idx-view-all">View All &#8594;</a>
-      </div>
+      <div class="idx-section-label">Browse by category</div>
+      <div class="idx-section-title">What are you looking for?</div>
       <div class="idx-cat-grid">
         <a href="categories.html?cat=nightlife" class="idx-cat-card icc-parties">
           <div class="idx-cat-bg"></div>
@@ -593,10 +576,12 @@
         <div class="hpe-heading">Curated<br><em>for you</em></div>
         <div class="hpe-sub">✦ Handpicked Experiences</div>
       </div>
-      <a href="events.html" class="hpe-view-all">View All &#8594;</a>
     </div>
     <div class="hpe-scroll-wrap">
       <div class="hpe-scroll" id="hpeScroll"></div>
+    </div>
+    <div class="hpe-view-all-wrap">
+      <a href="categories.html" class="hpe-view-all">View All &#8594;</a>
     </div>
   </section>
 
