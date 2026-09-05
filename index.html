@@ -261,7 +261,7 @@
     .topbar{background:rgba(255,255,255,.94);border-bottom-color:#e3eaf5;box-shadow:0 8px 30px rgba(15,42,96,.06);}
     .logo{color:#0b1220;}.brand-sub{color:#1d4ed8;}.topnav a{color:#52617d;}.topnav a:hover{color:#1d4ed8;background:#eff5ff;}
     .index-auth-actions{border-color:#dce4f2;background:#f7f9fd;}.index-auth-actions .nav-link{color:#52617d;}.index-auth-actions .nav-cta{background:#1d4ed8;color:#fff;}
-    .hero-home{background:#f0f4ff;color:#0b1220;}.hero-home::before{background:none;}.hero-home::after{opacity:.12;background-image:radial-gradient(rgba(29,78,216,.28) .6px,transparent .6px);}
+    .hero-home{background:#f0f4ff;color:#0b1220;overflow:hidden;}.hero-home::before{background:none;}.hero-home::after{opacity:.12;background-image:radial-gradient(rgba(29,78,216,.28) .6px,transparent .6px);}
     .hero-home .hero-kicker{color:#1d4ed8;}.hero-home .hero-headline{color:#0b1220;}.hero-home .hero-headline .hero-line-blue{color:#1d4ed8;}.hero-home .hero-copy{color:#526079;}.hero-home .hero-btn-white{background:#1d4ed8;color:#fff;}.hero-home .hero-btn-ghost{border-color:#b9c8e8;color:#1d4ed8;background:#fff;}.hero-home .hero-tags{color:#65728a;}.hero-home .hero-tags span{border-color:#d7e1f3;background:#fff;}
     .idx-cat-section,.idx-feat-section,.idx-how{background:#fff;}.idx-section-label{color:#1d4ed8;}.idx-section-title{color:#0b1220;}.idx-feat-section{border-top:1px solid #edf1f8;}.idx-how{background:#f7f9fd;}.idx-how-card{background:#f7f9fd;border-color:#e1e8f4;}.idx-how-title{color:#0b1220;}.idx-how-desc{color:#65728a;}
     .idx-cat-section .idx-cat-inner{text-align:center;max-width:1600px;}
@@ -328,15 +328,17 @@
       .hero-home .hero-tags{display:none !important;visibility:hidden !important;height:0 !important;margin:0 !important;overflow:hidden !important;}
     }
     @media(max-width:700px){
-      .hero-home .hero-copy-block{padding:0 1.2rem;}
-      .hero-home h1{font-size:clamp(2.2rem,9vw,3.2rem);line-height:.95;letter-spacing:-.05em;margin-bottom:1.2rem;}
-      .hero-home .hero-headline{display:grid;gap:.2rem;line-height:.95;letter-spacing:-.05em;margin-bottom:1.2rem;text-align:center;justify-items:center;}
-      .hero-home .hero-headline span:first-child{font-size:9.4vw;display:block;width:100%;white-space:nowrap;text-align:center;}
-      .hero-home .hero-headline .hero-line-blue{font-size:clamp(2.6rem,10.5vw,3.8rem);line-height:1;white-space:normal;margin-top:0;}
+      .hero-home .hero-copy-block{padding:0 1.4rem;width:100%;box-sizing:border-box;}
+      .hero-home h1{margin-bottom:1.2rem;}
+      .hero-home .hero-headline{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;margin-bottom:1.2rem;letter-spacing:-.04em;line-height:1;width:100%;}
+      .hero-home .hero-headline span:first-child{font-size:9.4vw;white-space:nowrap;font-weight:900;}
+      .hero-home .hero-headline .hero-line-blue{font-size:10.5vw;white-space:normal;text-align:center;line-height:1.05;}
       .hero-home .hero-headline .mobile-break{display:none;}
-      .hero-home .hero-copy{font-size:.9rem;line-height:1.6;max-width:100%;}
-      .hero-home .hero-actions{flex-direction:column;gap:.7rem;margin-top:1.6rem;}
+      .hero-home .hero-kicker{text-align:center;}
+      .hero-home .hero-copy{font-size:.9rem;line-height:1.6;max-width:100%;text-align:center;}
+      .hero-home .hero-actions{flex-direction:column;gap:.7rem;margin-top:1.6rem;align-items:stretch;}
       .hero-home .hero-actions .btn{width:100%;text-align:center;}
+      .hero-home .hero-tags{display:none !important;}
       .mobile-nav{z-index:80!important;top:66px!important;right:0!important;width:min(88vw,390px)!important;height:calc(100dvh - 66px)!important;max-height:none!important;justify-content:flex-start!important;padding:1.25rem 1rem 2rem!important;gap:.7rem!important;background:#fff!important;border-left:1px solid #dce4f2!important;box-shadow:-24px 0 60px rgba(15,42,96,.2)!important;}
       .mobile-nav.open{display:flex!important;visibility:visible!important;transform:translateX(0)!important;}
       .mobile-nav::before{margin:0 .35rem .45rem!important;color:#0b1220!important;font-size:1.35rem!important;}
