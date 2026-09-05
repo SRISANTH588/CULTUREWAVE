@@ -96,30 +96,28 @@
     .hs-dot.active{width:24px;background:#fff;}
 
     /* ── CATEGORY SECTION ── */
-    .idx-cat-section{width:100%;max-width:none;padding:3.5rem 0 4rem;background:#000;}
-    .idx-cat-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
+    .idx-cat-section{width:100%;max-width:none;padding:1.5rem 0 2rem;background:#000;}
+    .idx-cat-inner{max-width:1240px;margin:0 auto;padding:0 .75rem;}
     .idx-section-label{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#555;margin-bottom:.5rem;}
-    .idx-section-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;color:#fff;letter-spacing:-.04em;margin:0 0 2rem;}
-    .idx-cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem;}
-    .idx-cat-card{border-radius:24px;overflow:hidden;position:relative;height:220px;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;justify-content:flex-end;padding:1.2rem;transition:transform .25s,box-shadow .25s;border:1px solid #222;}
-    .idx-cat-card:hover{transform:translateY(-6px);box-shadow:0 28px 56px rgba(0,0,0,.8);}
-    .idx-cat-card::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.1) 55%,transparent 100%);z-index:1;}
-    .idx-cat-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .35s;}
-    .idx-cat-card:hover .idx-cat-bg{transform:scale(1.08);}
-    .idx-cat-icon-wrap{position:absolute;top:1rem;left:1rem;z-index:2;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
-    .idx-cat-arrow{position:absolute;top:1rem;right:1rem;z-index:2;width:32px;height:32px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:rgba(255,255,255,.5);}
-    .idx-cat-card:hover .idx-cat-arrow{background:rgba(255,255,255,.2);color:#fff;}
-    .idx-cat-body{position:relative;z-index:2;}
-    .idx-cat-label{display:block;font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.2;}
-    .idx-cat-sub{display:block;font-size:.72rem;font-weight:600;color:rgba(255,255,255,.4);margin-top:.25rem;}
-    .icc-parties .idx-cat-bg{background:url('party.jpg') center/cover no-repeat;}
-    .icc-workshops .idx-cat-bg{background:url('workshop.jpg') center/cover no-repeat;}
-    .icc-culinary .idx-cat-bg{background:url('culinary.jpg') center/cover no-repeat;}
-    .icc-music .idx-cat-bg{background:url('music.jpg') center/cover no-repeat;}
-    .icc-sports .idx-cat-bg{background:url('sports.jpg') center/cover no-repeat;}
-    .icc-community .idx-cat-bg{background:url('community.jpg') center/cover no-repeat;}
-    @media(max-width:900px){.idx-cat-grid{grid-template-columns:repeat(3,1fr);}}
-    @media(max-width:560px){.idx-cat-grid{grid-template-columns:repeat(2,1fr);}.idx-cat-card{height:160px;}}
+    .idx-section-title{font-size:clamp(1.4rem,4vw,2.4rem);font-weight:800;color:#fff;letter-spacing:-.04em;margin:0 0 1rem;}
+    .idx-cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;}
+    .idx-cat-card{border-radius:14px;overflow:hidden;position:relative;aspect-ratio:1/1;cursor:pointer;text-decoration:none;display:block;transition:transform .2s;}
+    .idx-cat-card:hover{transform:scale(1.02);}
+    .idx-cat-card::before{display:none;}
+    .idx-cat-bg{position:absolute;inset:0;background-size:cover;background-position:center top;}
+    .idx-cat-icon-wrap{display:none;}
+    .idx-cat-arrow{display:none;}
+    .idx-cat-body{display:none;}
+    .idx-cat-sub{display:none;}
+    .idx-cat-label{position:absolute;top:.6rem;left:.7rem;z-index:2;font-size:clamp(.75rem,3.2vw,1rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:.04em;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.6);}
+    .icc-parties{background:#00b4d8;}.icc-parties .idx-cat-bg{background:url('party.jpg') center top/cover no-repeat;}
+    .icc-brunch{background:#f5c518;}.icc-brunch .idx-cat-bg{background:url('brunch.jpg') center top/cover no-repeat;}
+    .icc-culinary{background:#e63946;}.icc-culinary .idx-cat-bg{background:url('culinary.jpg') center top/cover no-repeat;}
+    .icc-workshops{background:#f4a261;}.icc-workshops .idx-cat-bg{background:url('workshop.jpg') center top/cover no-repeat;}
+    .icc-experiences{background:#2ec4b6;}.icc-experiences .idx-cat-bg{background:url('community.jpg') center top/cover no-repeat;}
+    .icc-community{background:#2ec4b6;}.icc-community .idx-cat-bg{background:url('community.jpg') center top/cover no-repeat;}
+    .icc-music{background:#57cc99;}.icc-music .idx-cat-bg{background:url('music.jpg') center top/cover no-repeat;}
+    .icc-sports{background:#4361ee;}.icc-sports .idx-cat-bg{background:url('sports.jpg') center top/cover no-repeat;}
 
     /* ── FEATURED SECTIONS ── */
     .idx-feat-section{padding:3rem 0 3.5rem;background:#000;border-top:1px solid #1a1a1a;}
@@ -195,29 +193,55 @@
     .hero-btn-ghost{background:transparent!important;border-color:#333!important;color:#fff!important;}
     .idx-rs-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;}
 
-    /* ── CATEGORY MOBILE ── */
-    @media(max-width:700px){
-      .idx-cat-section{padding:2.5rem 1rem 3rem;}
-      .idx-cat-inner{padding:0;}
-      .idx-cat-section .idx-section-title{font-size:clamp(1.8rem,8vw,2.4rem);margin-bottom:1.5rem;}
-      .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;}
-      .idx-cat-section .idx-cat-card{height:190px;padding:.85rem;border-radius:16px;}
-      .idx-cat-section .idx-cat-icon-wrap{top:.7rem;left:.7rem;width:34px;height:34px;border-radius:10px;font-size:1rem;}
-      .idx-cat-section .idx-cat-arrow{top:.7rem;right:.7rem;width:27px;height:27px;font-size:.7rem;}
-      .idx-cat-section .idx-cat-label{font-size:.9rem;}
-      .idx-cat-section .idx-cat-sub{font-size:.62rem;line-height:1.25;}
-      .idx-cat-section .idx-section-title{padding:0 1rem;}
-      .idx-cat-section .idx-section-label{padding:0 1rem;}
+    /* ── CATEGORY GRID — app-style 3-col ── */
+    .idx-cat-section{padding:1.2rem 0 1.5rem;background:#000;}
+    .idx-cat-section .idx-cat-inner{max-width:700px;margin:0 auto;padding:0 .75rem;}
+    .idx-cat-section .idx-section-label{display:none;}
+    .idx-cat-section .idx-section-title{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;margin:0 0 .75rem;text-align:left;}
+    .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,1fr);gap:.5rem;}
+    .idx-cat-section .idx-cat-card{
+      height:130px;
+      border-radius:14px;
+      overflow:hidden;
+      position:relative;
+      display:block;
+      text-decoration:none;
+      cursor:pointer;
     }
+    .idx-cat-section .idx-cat-bg{
+      position:absolute;
+      inset:0;
+      background-size:cover;
+      background-position:center top;
+      opacity:.55;
+    }
+    .idx-cat-section .idx-cat-label{
+      position:absolute;
+      bottom:.6rem;
+      left:.65rem;
+      z-index:2;
+      font-size:.78rem;
+      font-weight:900;
+      color:#fff;
+      line-height:1.15;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      text-shadow:0 1px 4px rgba(0,0,0,.5);
+    }
+    /* per-card accent colours matching the screenshot */
+    .icc-parties{background:#1ab8d8;}
+    .icc-brunch{background:#e8b800;}
+    .icc-culinary{background:#e03030;}
+    .icc-workshops{background:#d4880a;}
+    .icc-experiences{background:#00c4a0;}
+    .icc-music{background:#3dba6a;}
 
-    /* ── CATEGORY DESKTOP ── */
-    .idx-cat-section .idx-cat-inner{text-align:center;max-width:1600px;}
-    .idx-cat-section .idx-section-label,.idx-cat-section .idx-section-title{margin-left:auto;margin-right:auto;}
-    .idx-cat-section .idx-section-title{font-size:clamp(2rem,4vw,3.2rem);margin-bottom:2.5rem;}
-    .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:1rem;}
-    .idx-cat-section .idx-cat-card{height:300px;}
-    @media(max-width:1100px){.idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
-    @media(max-width:900px){.idx-cat-section .idx-cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media(min-width:701px){
+      .idx-cat-section .idx-cat-inner{max-width:1240px;}
+      .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,1fr);gap:.75rem;}
+      .idx-cat-section .idx-cat-card{height:200px;}
+      .idx-cat-section .idx-cat-label{font-size:1rem;bottom:.85rem;left:.9rem;}
+    }
   </style>
 </head>
 <body>
@@ -300,57 +324,27 @@
       <div class="idx-cat-grid">
         <a href="category-parties.html" class="idx-cat-card icc-parties">
           <div class="idx-cat-bg"></div>
-          <div class="idx-cat-icon-wrap">🎉</div>
-          <div class="idx-cat-arrow">↗</div>
-          <div class="idx-cat-body">
-            <span class="idx-cat-label">Parties</span>
-            <span class="idx-cat-sub">Nightlife &amp; celebrations</span>
-          </div>
+          <span class="idx-cat-label">Parties</span>
         </a>
-        <a href="category-workshops.html" class="idx-cat-card icc-workshops">
+        <a href="category-brunch.html" class="idx-cat-card icc-brunch">
           <div class="idx-cat-bg"></div>
-          <div class="idx-cat-icon-wrap">🛠️</div>
-          <div class="idx-cat-arrow">↗</div>
-          <div class="idx-cat-body">
-            <span class="idx-cat-label">Workshops</span>
-            <span class="idx-cat-sub">Learn &amp; grow</span>
-          </div>
+          <span class="idx-cat-label">Brunch</span>
         </a>
         <a href="category-culinary.html" class="idx-cat-card icc-culinary">
           <div class="idx-cat-bg"></div>
-          <div class="idx-cat-icon-wrap">🍽️</div>
-          <div class="idx-cat-arrow">↗</div>
-          <div class="idx-cat-body">
-            <span class="idx-cat-label">Culinary</span>
-            <span class="idx-cat-sub">Food &amp; dining events</span>
-          </div>
+          <span class="idx-cat-label">Culinary</span>
+        </a>
+        <a href="category-workshops.html" class="idx-cat-card icc-workshops">
+          <div class="idx-cat-bg"></div>
+          <span class="idx-cat-label">Work&shy;shops</span>
+        </a>
+        <a href="category-community.html" class="idx-cat-card icc-experiences">
+          <div class="idx-cat-bg"></div>
+          <span class="idx-cat-label">Experiences</span>
         </a>
         <a href="category-music.html" class="idx-cat-card icc-music">
           <div class="idx-cat-bg"></div>
-          <div class="idx-cat-icon-wrap">🎵</div>
-          <div class="idx-cat-arrow">↗</div>
-          <div class="idx-cat-body">
-            <span class="idx-cat-label">Music</span>
-            <span class="idx-cat-sub">Live gigs &amp; concerts</span>
-          </div>
-        </a>
-        <a href="category-sports.html" class="idx-cat-card icc-sports">
-          <div class="idx-cat-bg"></div>
-          <div class="idx-cat-icon-wrap">⚽</div>
-          <div class="idx-cat-arrow">↗</div>
-          <div class="idx-cat-body">
-            <span class="idx-cat-label">Sports</span>
-            <span class="idx-cat-sub">Games, fitness &amp; action</span>
-          </div>
-        </a>
-        <a href="category-community.html" class="idx-cat-card icc-community">
-          <div class="idx-cat-bg"></div>
-          <div class="idx-cat-icon-wrap">🤝</div>
-          <div class="idx-cat-arrow">↗</div>
-          <div class="idx-cat-body">
-            <span class="idx-cat-label">Community</span>
-            <span class="idx-cat-sub">Meetups, causes &amp; local gatherings</span>
-          </div>
+          <span class="idx-cat-label">Music</span>
         </a>
       </div>
     </div>
