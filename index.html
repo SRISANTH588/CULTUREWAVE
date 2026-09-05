@@ -455,7 +455,7 @@
   <!-- HERO SLIDER -->
   <section class="hero-slider" id="heroSlider">
     <div class="hs-track" id="hsTrack"></div>
-    <div class="hs-dots" id="hsDots"><span class="hs-counter" id="hsCounter"></span></div>
+    <div class="hs-dots" id="hsDots"></div>
   </section>
 
   <!-- BROWSE BY CATEGORY -->
@@ -950,9 +950,7 @@
           slide.className = 'hs-slide';
           slide.innerHTML = `<div class="hs-card" onclick="location.href='event-detail.html?eventId=${id}'" style="cursor:pointer">
             <div class="hs-poster" style="${img ? "background:url('" + img + "') center/cover no-repeat" : _bgGrads[i%_bgGrads.length]};">
-              <div class="hs-poster-inner">
-                <div class="hs-tag">${d.category||d.type||'Event'}</div>
-              </div>
+              <div class="hs-poster-inner"></div>
             </div>
             <div class="hs-info">
               <div class="hs-date">${dateStr||'Date TBA'}</div>
@@ -967,8 +965,6 @@
           dot.addEventListener('click', function(){ go(i); resetTimer(); });
           dotsWrap.appendChild(dot);
         });
-        var counter = document.getElementById('hsCounter');
-        if(counter) counter.textContent = '1 / ' + docs.length;
         resetTimer();
       } catch(e) { console.warn('Hero slider:', e.message); }
     }
@@ -978,8 +974,6 @@
       cur = (i + slides.length) % slides.length;
       track.style.transform = 'translateX(-' + cur + '00%)';
       Array.from(dotsWrap.querySelectorAll('.hs-dot')).forEach(function(d,j){ d.classList.toggle('active', j===cur); });
-      var counter = document.getElementById('hsCounter');
-      if(counter) counter.textContent = (cur+1) + ' / ' + slides.length;
     }
     function resetTimer(){ clearInterval(timer); timer = setInterval(function(){ go(cur+1); }, 3500); }
     var tx = 0;
