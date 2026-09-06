@@ -504,11 +504,8 @@
       display:flex;gap:.75rem;
       padding:1.2rem 0 .8rem;
       width:max-content;
+      transition:transform .6s cubic-bezier(.4,0,.2,1);
     }
-    .hpe-scroll.hpe-animating{
-      animation:hpeAutoScroll var(--hpe-dur,30s) linear infinite;
-    }
-    .hpe-scroll.hpe-animating:hover{animation-play-state:paused;}
     @keyframes hpeAutoScroll{
       0%{transform:translateX(0);}
       100%{transform:translateX(-50%);}
@@ -1567,15 +1564,30 @@
           </div>`;
         return a;
       }
-      // duplicate for seamless infinite CSS animation loop
+      // render cards once only
       docs.forEach(doc => scroll.appendChild(makeCard(doc)));
-      docs.forEach(doc => scroll.appendChild(makeCard(doc)));
-      // set animation duration based on card count (4s per card), then start
-      requestAnimationFrame(()=>{
-        const dur = docs.length * 4;
-        scroll.style.setProperty('--hpe-dur', dur + 's');
-        scroll.classList.add('hpe-animating');
-      });
+      const total = docs.length;
+      let hpeIdx = 0;
+      function hpeNext(){
+        hpeIdx = (hpeIdx + 1) % total;
+        const cards = scroll.querySelectorAll('.hpe-card');
+        const cardW = cards[0].offsetWidth + 12; // card width + gap
+        // when we've gone past all, reset to 0 instantly then re-trigger
+        if(hpeIdx === 0){
+          scroll.style.transition = 'none';
+          scroll.style.transform = 'translateX(0)';
+          // force reflow then re-enable transition
+          scroll.offsetHeight;
+          scroll.style.transition = '';
+        } else {
+          scroll.style.transform = `translateX(-${hpeIdx * cardW}px)`;
+        }
+      }
+      let hpeTimer = setInterval(hpeNext, 4000);
+      scroll.addEventListener('mouseenter', ()=>clearInterval(hpeTimer));
+      scroll.addEventListener('mouseleave', ()=>{ hpeTimer = setInterval(hpeNext, 4000); });
+      scroll.addEventListener('touchstart', ()=>clearInterval(hpeTimer), {passive:true});
+      scroll.addEventListener('touchend', ()=>{ hpeTimer = setInterval(hpeNext, 4000); }, {passive:true});
     }catch(e){ console.warn('HPE:', e.message); }
   })();
 </script>
