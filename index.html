@@ -79,31 +79,67 @@
     /* ── OG PICKS DECK ── */
     .ogp-scroll-wrap{
       background:#000;
-      padding:0 1rem 0;
+      overflow:hidden;
       position:relative;
     }
-    /* the deck stage — relative so stacked cards position inside */
     .ogp-deck-stage{
       position:relative;
-      /* height is set by JS after first card renders */
       min-height:200px;
+      /* left padding = peek width so left card edge shows */
+      padding-left:38px;
+      /* right padding = room for folder stack */
+      padding-right:38px;
+      box-sizing:border-box;
     }
-    /* every card sits absolute, stacked */
+    /* active card fills the padded area */
+    .ogp-card-active-wrap{
+      position:relative;
+      width:100%;
+      z-index:10;
+    }
     .ogp-card{
-      position:absolute;
-      top:0; left:0;
+      display:block;
       width:100%;
       border-radius:20px;overflow:hidden;
       background:#1a1a1a;
       border:1.5px solid rgba(255,255,255,.13);
       cursor:pointer;
-      text-decoration:none;display:block;
+      text-decoration:none;
       box-shadow:0 8px 32px rgba(0,0,0,.7);
       transition:transform .42s cubic-bezier(.4,0,.2,1),
-                 opacity .42s ease,
-                 box-shadow .42s ease;
+                 opacity .42s ease;
       will-change:transform,opacity;
-      transform-origin:top left;
+    }
+    /* left peek card — fixed position, only right edge visible */
+    .ogp-peek-left{
+      position:absolute;
+      top:0;
+      left:0;
+      width:calc(100% - 38px);
+      border-radius:20px;overflow:hidden;
+      background:#1a1a1a;
+      border:1.5px solid rgba(255,255,255,.1);
+      box-shadow:0 8px 24px rgba(0,0,0,.6);
+      opacity:.55;
+      /* shift so only ~30px of right edge shows on left */
+      transform:translateX(calc(-100% + 30px));
+      z-index:5;
+      pointer-events:none;
+      transition:opacity .42s;
+    }
+    /* folder stack cards behind active — right side */
+    .ogp-behind{
+      position:absolute;
+      top:0;
+      /* align right edge with active card right edge */
+      right:0;
+      width:calc(100% - 38px);
+      border-radius:20px;overflow:hidden;
+      background:#1a1a1a;
+      border:1.5px solid rgba(255,255,255,.1);
+      box-shadow:0 4px 16px rgba(0,0,0,.5);
+      pointer-events:none;
+      transition:transform .42s cubic-bezier(.4,0,.2,1), opacity .42s;
     }
     .ogp-poster{
       width:100%;aspect-ratio:3/4;
@@ -144,7 +180,6 @@
       font-size:.8rem;color:rgba(255,255,255,.45);
       margin-top:.3rem;font-weight:500;
     }
-    /* counter row */
     .ogp-counter{
       display:flex;align-items:center;justify-content:center;
       gap:.55rem;padding:.9rem 0 .3rem;
@@ -1002,7 +1037,15 @@
       <div class="ogp-tag">✨ WE THINK YOU'LL VIBE WITH THESE</div>
     </div>
     <div class="ogp-scroll-wrap">
-      <div class="ogp-deck-stage" id="ogpDeckStage"></div>
+      <div class="ogp-deck-stage" id="ogpDeckStage">
+        <!-- left peek ghost -->
+        <div class="ogp-peek-left" id="ogpPeekLeft"></div>
+        <!-- folder cards behind (right stack) -->
+        <div class="ogp-behind" id="ogpBehind2" style="transform:translateX(22px) translateY(16px) scale(.93);opacity:.5;z-index:2;"></div>
+        <div class="ogp-behind" id="ogpBehind1" style="transform:translateX(11px) translateY(8px) scale(.965);opacity:.7;z-index:3;"></div>
+        <!-- active card wrapper -->
+        <div class="ogp-card-active-wrap" id="ogpActiveWrap"></div>
+      </div>
     </div>
     <div class="ogp-counter" id="ogpCounter"></div>
     <div style="padding:.6rem 1.2rem 1.8rem;display:flex;justify-content:center;background:#000;">
@@ -1347,33 +1390,35 @@
   loadIndexEvents().then(() => startHomeCarousel('indexEventsGrid'));
   loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
 
-  // OG Picks — deck stack: active card full-width center, next cards peek as stacked folder behind-right
+  // OG Picks — left edge peek + center active + right folder stack
   (async function loadOGPicks(){
     try{
       const snap = await _idb.collection('events').limit(200).get();
       const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,10);
-      const stage = document.getElementById('ogpDeckStage');
-      const counter = document.getElementById('ogpCounter');
-      if(!stage) return;
+      const activeWrap = document.getElementById('ogpActiveWrap');
+      const peekLeft   = document.getElementById('ogpPeekLeft');
+      const behind1    = document.getElementById('ogpBehind1');
+      const behind2    = document.getElementById('ogpBehind2');
+      const stage      = document.getElementById('ogpDeckStage');
+      const counter    = document.getElementById('ogpCounter');
+      if(!activeWrap) return;
+
       if(!docs.length){
-        stage.innerHTML='<div style="padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;text-align:center;">No events yet. Check back soon!</div>';
+        activeWrap.innerHTML='<div style="padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;text-align:center;">No events yet. Check back soon!</div>';
         return;
       }
-      const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)'];
-      const total=docs.length;
-      let cur=0;
-      const cards=[];
 
-      docs.forEach((doc,i)=>{
+      const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)'];
+      const total = docs.length;
+      let cur = 0;
+
+      function cardHTML(doc, i){
         const d=doc.data(), id=doc.id;
         const img=d.cardImgUrl||d.coverUrl||'';
         const price=d.tickets?.[0]?.price||d.price||0;
         let day='',mon='';
         if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
-        const a=document.createElement('a');
-        a.className='ogp-card';
-        a.href=`event-detail.html?eventId=${id}`;
-        a.innerHTML=`
+        return `<a class="ogp-card" href="event-detail.html?eventId=${id}">
           <div class="ogp-poster" style="${img?`background-image:url('${img}')`:grads[i%3]}">
             ${day?`<div class="ogp-date-badge"><div class="ogp-date-badge-day">${day}</div><div class="ogp-date-badge-mon">${mon}</div></div>`:''}
             <span class="ogp-price-badge ${price?'ogp-price-paid':'ogp-price-free'}">${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
@@ -1381,82 +1426,48 @@
           <div class="ogp-info">
             <div class="ogp-title-card">${d.name||'Untitled'}</div>
             <div class="ogp-venue">${d.venue||d.venueName||d.city||'India'}</div>
-          </div>`;
-        stage.appendChild(a);
-        cards.push(a);
-      });
-
-      // Stack offset per layer behind active card
-      // Each card behind peeks: shifted right by ~10px and down by ~8px, scaled slightly smaller
-      const PEEK_X = 11;  // px shift right per layer
-      const PEEK_Y = 8;   // px shift down per layer
-      const PEEK_SCALE = 0.04; // scale reduction per layer
-      const MAX_BEHIND = 3; // how many cards show behind
-
-      function layout(active){
-        // set stage height to match active card
-        const activeH = cards[active].offsetHeight;
-        if(activeH) stage.style.height = (activeH + PEEK_Y * MAX_BEHIND) + 'px';
-
-        cards.forEach((c,i)=>{
-          // rel: 0=active, 1=first behind, 2=second behind, ..., negative=already passed (hide left)
-          const rel = (i - active + total) % total;
-          if(rel === 0){
-            // Active: front, full size, no offset
-            c.style.zIndex = total;
-            c.style.transform = 'translateX(0) translateY(0) scale(1)';
-            c.style.opacity = '1';
-            c.style.pointerEvents = 'auto';
-          } else if(rel <= MAX_BEHIND){
-            // Behind cards: peek right and down, each layer further back
-            const tx = PEEK_X * rel;
-            const ty = PEEK_Y * rel;
-            const sc = 1 - PEEK_SCALE * rel;
-            c.style.zIndex = total - rel;
-            c.style.transform = `translateX(${tx}px) translateY(${ty}px) scale(${sc})`;
-            c.style.opacity = String(1 - 0.15 * rel);
-            c.style.pointerEvents = 'none';
-          } else {
-            // All other cards: hidden behind
-            c.style.zIndex = '0';
-            c.style.transform = `translateX(${PEEK_X*MAX_BEHIND}px) translateY(${PEEK_Y*MAX_BEHIND}px) scale(${1-PEEK_SCALE*MAX_BEHIND})`;
-            c.style.opacity = '0';
-            c.style.pointerEvents = 'none';
-          }
-        });
-      }
-
-      function buildCounter(active){
-        if(!counter) return;
-        const dots = Array.from({length:Math.min(total,3)},(_,i)=>
-          `<span class="ogp-dot${i===0?' active':''}"></span>`
-        ).join('');
-        counter.innerHTML=`<span class="ogp-counter-pill">${active+1}/${total}</span>${dots}`;
+          </div></a>`;
       }
 
       function goTo(idx){
-        cur=(idx+total)%total;
-        layout(cur);
-        buildCounter(cur);
+        cur = (idx + total) % total;
+        const prev = (cur - 1 + total) % total;
+        const next1 = (cur + 1) % total;
+        const next2 = (cur + 2) % total;
+
+        // active card
+        activeWrap.innerHTML = cardHTML(docs[cur], cur);
+
+        // left peek: previous card (only right edge visible via CSS clip)
+        peekLeft.innerHTML = cardHTML(docs[prev], prev);
+
+        // folder behind: next cards
+        behind1.innerHTML = cardHTML(docs[next1], next1);
+        behind2.innerHTML = cardHTML(docs[next2], next2);
+
+        // sync stage height to active card
+        requestAnimationFrame(()=>{
+          const h = activeWrap.offsetHeight;
+          if(h) stage.style.height = h + 'px';
+        });
+
+        // counter
+        if(counter){
+          const dots = Array.from({length:Math.min(total,3)},(_,i)=>
+            `<span class="ogp-dot${i===0?' active':''}"></span>`).join('');
+          counter.innerHTML = `<span class="ogp-counter-pill">${cur+1}/${total}</span>${dots}`;
+        }
       }
 
-      // init after paint so offsetHeight is available
-      requestAnimationFrame(()=>{ layout(0); buildCounter(0); });
+      goTo(0);
 
-      // swipe on stage
+      // swipe
       let tx0=0;
       stage.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;},{passive:true});
       stage.addEventListener('touchend',e=>{
         const dx=e.changedTouches[0].clientX-tx0;
         if(Math.abs(dx)>40){ clearInterval(ogpTimer); goTo(dx<0?cur+1:cur-1); ogpTimer=setInterval(()=>goTo(cur+1),4000); }
       },{passive:true});
-
-      // click active card = navigate; click behind card = bring to front
-      cards.forEach((c,i)=>{
-        c.addEventListener('click',e=>{
-          if(i!==cur){ e.preventDefault(); clearInterval(ogpTimer); goTo(i); ogpTimer=setInterval(()=>goTo(cur+1),4000); }
-        });
-      });
 
       let ogpTimer=setInterval(()=>goTo(cur+1),4000);
       stage.addEventListener('mouseenter',()=>clearInterval(ogpTimer));
