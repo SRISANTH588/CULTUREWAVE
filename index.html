@@ -1304,7 +1304,8 @@
 
   function isPublishedEvent(data) {
     const status = String(data?.status || '').toLowerCase();
-    return ['published','live','active'].includes(status);
+    // show all events except explicitly draft/deleted
+    return !['draft','deleted','rejected','disabled'].includes(status);
   }
 
   async function loadIndexEvents() {
@@ -1313,13 +1314,23 @@
       const empty = document.getElementById('indexEventsEmpty');
       const snap = await _idb.collection('events').limit(200).get();
       const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0, 6);
-      if (!docs.length) { empty.style.display = ''; return; }
+      if (!docs.length) {
+        // fallback: show all events regardless of status
+        const allDocs = snap.docs.slice(0, 6);
+        if(!allDocs.length){ empty.style.display=''; return; }
+        empty.style.display = 'none';
+        allDocs.forEach((doc, i) => renderEventCard(doc, i, grid));
+        return;
+      }
       empty.style.display = 'none';
-      docs.forEach((doc, i) => {
+      docs.forEach((doc, i) => renderEventCard(doc, i, grid));
+    } catch(e) { console.error('Events load error:', e.message); }
+  }
+
+  function renderEventCard(doc, i, grid){
         const d = doc.data(), id = doc.id;
         const cardImage = d.cardImgUrl || d.coverUrl;
         const price = d.tickets?.[0]?.price || d.price || 0;
-        const priceStr = price ? `From \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
         let dateLabel = '';
         if (d.startDate) {
           try {
@@ -1344,8 +1355,6 @@
             </div>
           </div>`;
         grid.appendChild(article);
-      });
-    } catch(e) { console.error('Events load error:', e.message); }
   }
 
   async function loadIndexRestaurants() {
