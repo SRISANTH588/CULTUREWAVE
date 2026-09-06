@@ -669,113 +669,98 @@
     #events .idx-feat-head-left{text-align:center;}
     #events .idx-feat-head .idx-section-title{font-size:clamp(2rem,4.2vw,3.4rem);line-height:1.05;margin-bottom:0;}
     #events .idx-feat-cta-link{display:block;width:max-content;margin:1.5rem auto 0;}
-    #events .event-grid-home{display:grid;grid-template-columns:repeat(3,minmax(0,280px));justify-content:start;gap:1rem;}
-    /* ── PREMIUM EVENT CARDS ── */
+    #events .event-grid-home{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
+    /* ── NEW EVENT CARD STYLE ── */
     .event-card,.event-poster-card{
       background:#111!important;
-      border:1px solid rgba(255,255,255,.1)!important;
-      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08)!important;
+      border-radius:16px;
       overflow:hidden;
-      box-shadow:0 8px 32px rgba(0,0,0,.55)!important;
-      transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
       cursor:pointer;
+      transition:transform .22s ease,box-shadow .22s ease;
     }
     .event-card:hover,.event-poster-card:hover{
-      transform:translateY(-6px);
-      box-shadow:0 24px 56px rgba(0,0,0,.75)!important;
-      border-color:rgba(255,255,255,.22)!important;
+      transform:translateY(-4px);
+      box-shadow:0 16px 40px rgba(0,0,0,.7)!important;
     }
     .event-banner{
       position:relative;
-      height:auto;
-      aspect-ratio:4/5;
+      width:100%;
+      aspect-ratio:1/1;
       background-size:cover;
       background-position:center;
       overflow:hidden;
     }
     .event-banner::after{
       content:"";
-      position:absolute;
-      inset:0;
-      background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.08) 55%,transparent 100%);
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.45) 0%,transparent 50%);
       pointer-events:none;
     }
     .event-promoted-badge{
-      position:absolute;
-      top:.65rem;
-      left:.65rem;
-      z-index:2;
-      background:rgba(255,255,255,.15)!important;
-      backdrop-filter:blur(8px);
-      color:#fff!important;
-      font-size:.62rem;
-      font-weight:800;
-      padding:.28rem .7rem;
-      border-radius:999px;
-      letter-spacing:.06em;
-      border:1px solid rgba(255,255,255,.2);
-      display:flex;
-      align-items:center;
-      gap:.3rem;
+      position:absolute;top:.55rem;left:.55rem;z-index:2;
+      background:#f97316;color:#fff;
+      font-size:.6rem;font-weight:900;
+      padding:.22rem .6rem;border-radius:4px;
+      letter-spacing:.06em;text-transform:uppercase;
     }
+    /* price pill bottom-left on poster */
+    .event-price-pill{
+      position:absolute;bottom:.6rem;left:.6rem;z-index:2;
+      padding:.28rem .75rem;border-radius:999px;
+      font-size:.68rem;font-weight:800;
+      background:#ec4899;color:#fff;
+    }
+    .event-price-pill.free{background:#22c55e;}
     .event-body,.event-poster-card .event-body{
       background:#111!important;
-      padding:1rem 1.15rem 1.2rem;
+      padding:.65rem .75rem .8rem;
+      display:flex;gap:.6rem;align-items:flex-start;
     }
+    /* date box left */
+    .event-date-box{
+      flex-shrink:0;
+      background:#1e1e1e;border-radius:8px;
+      padding:.3rem .45rem;
+      text-align:center;min-width:36px;
+    }
+    .event-date-day{font-size:.95rem;font-weight:900;color:#fff;line-height:1;}
+    .event-date-mon{font-size:.5rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-top:.1rem;}
+    .event-text{flex:1;min-width:0;}
     .event-poster-card h3,.event-body h3{
       color:#fff!important;
-      font-size:1rem;
+      font-size:.82rem;
       font-weight:800;
-      letter-spacing:-.02em;
+      letter-spacing:-.01em;
       line-height:1.3;
-      margin:0 0 .3rem;
-    }
-    .event-poster-card p,.event-body p{
-      color:rgba(255,255,255,.45)!important;
-      font-size:.8rem;
-      line-height:1.5;
+      margin:0 0 .2rem;
       display:-webkit-box;
       -webkit-line-clamp:2;
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
-    .event-poster-info,.event-meta{
-      display:flex;
-      justify-content:space-between;
-      gap:.4rem;
-      margin:.75rem 0 0;
-      color:rgba(255,255,255,.38)!important;
-      font-size:.72rem;
-      font-weight:700;
+    .event-poster-card p,.event-body p{
+      color:rgba(255,255,255,.4)!important;
+      font-size:.7rem;
+      line-height:1.4;
+      margin:0;
+      display:-webkit-box;
+      -webkit-line-clamp:1;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
     }
-    .event-poster-date{color:rgba(255,255,255,.5)!important;}
-    .event-poster-price{
-      display:flex;
-      align-items:baseline;
-      gap:.3rem;
-      margin-top:.6rem;
-      padding-top:.6rem;
-      border-top:1px solid rgba(255,255,255,.08);
-    }
-    .event-poster-price strong{
-      color:#fff!important;
-      font-size:1rem;
-      font-weight:900;
-      letter-spacing:-.02em;
-    }
-    .event-poster-price span{color:rgba(255,255,255,.35)!important;font-size:.75rem;}
+    .event-poster-info,.event-meta{display:none;}
+    .event-poster-price{display:none;}
     .banner-a{background:linear-gradient(135deg,#0d2b6e,#1565c0)!important;}
     .banner-b{background:linear-gradient(135deg,#6b1a3a,#b71c1c)!important;}
     .banner-c{background:linear-gradient(135deg,#1a3a1a,#2e7d32)!important;}
-    @media(max-width:900px){#events .event-grid-home{grid-template-columns:repeat(2,minmax(0,280px));}}
+    @media(max-width:900px){#events .event-grid-home{grid-template-columns:repeat(2,1fr);}}
     @media(max-width:700px){
-      #events{padding:2.75rem 1rem 3.5rem;}
+      #events{padding:2rem 1rem 3rem;}
       #events .idx-feat-inner{padding:0;}
-      #events .idx-feat-head{margin-bottom:1.15rem;}
+      #events .idx-feat-head{margin-bottom:1rem;}
       #events .idx-section-title{font-size:clamp(1rem,5.5vw,2.5rem);white-space:nowrap;}
-      #events .event-grid-home{display:flex;gap:1rem;width:100%;overflow-x:auto;overflow-y:hidden;padding:.15rem .1rem .8rem;scroll-snap-type:x mandatory;scrollbar-width:none;}
-      #events .event-grid-home::-webkit-scrollbar{display:none;}
-      #events .event-poster-card{flex:0 0 min(82vw,280px);width:min(82vw,280px);margin:0;scroll-snap-align:start;}
+      #events .event-grid-home{grid-template-columns:repeat(2,1fr);gap:.6rem;}
     }
 
     /* ── RESTAURANTS ── */
@@ -1414,13 +1399,15 @@
         article.addEventListener('click', () => window.location.href = `event-detail.html?eventId=${id}`);
         article.innerHTML = `
           <div class="event-banner ${_banners[i%_banners.length]}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} >
-            <div class="event-promoted-badge">♦ Promoted</div>
+            <div class="event-promoted-badge">PROMOTED</div>
+            <span class="event-price-pill ${price?'':'free'}">${price?`Starts at \u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
           </div>
           <div class="event-body">
-            <div class="event-poster-info"><span class="event-poster-date">▣ ${dateLabel||'Date TBA'}</span><span class="event-poster-location">⌖ ${d.city||'India'}</span></div>
-            <h3>${d.name||'Untitled'}</h3>
-            <p>${d.summary||d.description||''}</p>
-            <div class="event-poster-price"><strong>${price ? `₹${Number(price).toLocaleString('en-IN')}` : 'Free'}</strong><span>/ onward</span></div>
+            <div class="event-date-box"><div class="event-date-day">${dateLabel?dateLabel.split(' ')[0]:''}</div><div class="event-date-mon">${dateLabel?dateLabel.split(' ')[1]||'':''}</div></div>
+            <div class="event-text">
+              <h3>${d.name||'Untitled'}</h3>
+              <p>${d.venue||d.venueName||d.city||'India'}</p>
+            </div>
           </div>`;
         grid.appendChild(article);
       });
