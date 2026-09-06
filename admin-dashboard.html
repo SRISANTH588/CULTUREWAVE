@@ -197,6 +197,27 @@
     /* ── RESPONSIVE ── */
     @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}.grid-3,.grid-4{grid-template-columns:1fr 1fr;}}
     @media(max-width:768px){.sidebar{display:none;}.stats-grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}.topbar{padding:0 1rem;}.view{padding:1rem;}}
+
+    /* ── MOBILE SIDEBAR ── */
+    .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;backdrop-filter:blur(2px);}
+    .sb-overlay.open{display:block;}
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
+    .hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
+    @media(max-width:768px){
+      body{display:block;}
+      .sidebar{
+        display:flex!important;position:fixed;left:-260px;top:0;width:260px;height:100vh;
+        z-index:50;transition:left .28s cubic-bezier(.4,0,.2,1);
+        box-shadow:none;
+      }
+      .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.25);}
+      .main{margin-left:0;}
+      .hamburger{display:flex;}
+      .stats-grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
+      .topbar{padding:0 1rem;}
+      .view{padding:1rem;}
+    }
+    @media(max-width:460px){.stats-grid{grid-template-columns:1fr}.topbar-right .tb-search{display:none}.topbar-right .tb-btn:not(.primary){display:none}}
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -226,7 +247,7 @@
     .btn{border-color:var(--premium-line);border-radius:10px;transition:transform .18s,box-shadow .18s,background .18s;}.btn:hover{background:#f3f6ff;border-color:#b8c8f7;color:var(--premium-blue);transform:translateY(-1px);}.btn.primary{background:var(--premium-blue);box-shadow:0 7px 16px rgba(36,84,214,.18);}
     .section-header{background:#fff;border:1px solid var(--premium-line);border-radius:16px;padding:1rem 1.15rem;margin-bottom:0;box-shadow:0 8px 24px rgba(36,84,214,.045);}.filter-bar input,.filter-bar select,.field input,.field select,.field textarea{border-color:var(--premium-line);border-radius:10px;}.modal-overlay{background:rgba(20,45,114,.25);}.modal{border:1px solid #d9e3f8;box-shadow:0 28px 80px rgba(36,84,214,.18);}
     #liveTag{background:#e8f7ef !important;border-color:#b8e5c9 !important;color:#087443 !important;}
-    @media(max-width:768px){.sidebar{display:flex;min-height:auto;height:auto;position:relative;padding:.75rem;}.sb-brand{padding:.7rem .65rem .75rem}.sb-section-label,.sb-nav,.sb-divider,.sb-bottom{display:none}.topbar{padding:0 1rem;height:64px}.view{padding:1rem}.stats-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+    @media(max-width:768px){.sidebar{left:-260px;padding:0;}.sidebar.open{left:0;}.sb-section-label,.sb-nav,.sb-divider,.sb-bottom{display:flex!important;}.topbar{padding:0 1rem;height:64px}.view{padding:1rem}.stats-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
     @media(max-width:460px){.stats-grid{grid-template-columns:1fr}.topbar-right .tb-search{width:145px}.topbar-right .tb-btn{display:none}}
   </style>
   <style id="premium-members-content">
@@ -333,6 +354,9 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-left">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
       <span class="page-title" id="pageTitle">Overview</span>
       <span style="font-size:.72rem;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;padding:.2rem .55rem;border-radius:6px;font-weight:700;" id="liveTag">● Live</span>
     </div>
@@ -2145,6 +2169,17 @@ const _origPaySnap = window._origPaySnap;
 // ── LOGOUT ──
 document.getElementById('logoutBtn').addEventListener('click', () => logout());
 
+// Mobile sidebar
+const sidebar = document.querySelector('.sidebar');
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const sbOverlay = document.getElementById('sbOverlay');
+function openSidebar(){ sidebar.classList.add('open'); sbOverlay.classList.add('open'); }
+function closeSidebar(){ sidebar.classList.remove('open'); sbOverlay.classList.remove('open'); }
+hamburgerBtn.addEventListener('click', openSidebar);
+sbOverlay.addEventListener('click', closeSidebar);
+document.querySelectorAll('.sb-item').forEach(item => item.addEventListener('click', closeSidebar));
+
 </script>
+<div class="sb-overlay" id="sbOverlay"></div>
 </body>
 </html>

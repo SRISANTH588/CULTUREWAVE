@@ -438,8 +438,23 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 @media(max-width:900px){
   .layout{grid-template-columns:1fr;}
-  .sidebar{display:none;}
   .metrics{grid-template-columns:1fr 1fr;}
+}
+/* MOBILE SIDEBAR */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;backdrop-filter:blur(2px);}
+.sb-overlay.open{display:block;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
+@media(max-width:900px){
+  .sidebar{
+    display:flex!important;position:fixed;left:-260px;top:0;width:260px;height:100vh;
+    z-index:50;transition:left .28s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;
+  }
+  .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.2);}
+  .hamburger{display:flex;}
+  .metrics{grid-template-columns:1fr 1fr;}
+  .topbar{padding:.75rem 1rem;}
 }
 </style>
 </head>
@@ -504,7 +519,12 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
   <!-- TOPBAR -->
   <header class="topbar">
-    <div class="topbar-title" id="pageTitle">Events</div>
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title" id="pageTitle">Events</div>
+    </div>
     <div class="topbar-right">
       <a class="tb-link" href="index.html" target="_blank">⬡ View website</a>
       <button class="tb-icon-btn" id="notifyBtn">🔔<span class="tb-dot"></span></button>
@@ -3084,7 +3104,20 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   const saved = (()=>{ try{ return localStorage.getItem('cwDashView')||'overview'; }catch{ return 'overview'; }})();
   switchView(saved);
 })();
+
+// Mobile sidebar
+(function(){
+  const sidebar = document.querySelector('.sidebar');
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const sbOverlay = document.getElementById('sbOverlay');
+  function openSidebar(){ sidebar.classList.add('open'); sbOverlay.classList.add('open'); }
+  function closeSidebar(){ sidebar.classList.remove('open'); sbOverlay.classList.remove('open'); }
+  hamburgerBtn.addEventListener('click', openSidebar);
+  sbOverlay.addEventListener('click', closeSidebar);
+  document.querySelectorAll('.sb-item').forEach(item => item.addEventListener('click', closeSidebar));
+})();
 </script>
+<div class="sb-overlay" id="sbOverlay"></div>
 </body>
 
 <script>
