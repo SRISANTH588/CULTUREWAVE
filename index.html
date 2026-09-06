@@ -941,19 +941,30 @@
     }
     .trn-grid{
       display:grid;grid-template-columns:1fr 1fr;
-      gap:.75rem;padding:0 1.2rem;
+      gap:.85rem;padding:0 1.2rem;
     }
     .trn-card{
-      border-radius:16px;overflow:hidden;
+      border-radius:18px;overflow:hidden;
       background:#111;border:1px solid rgba(255,255,255,.1);
       text-decoration:none;display:block;
       transition:transform .2s;
+      position:relative;
     }
     .trn-card:hover{transform:translateY(-4px);}
     .trn-poster{
-      width:100%;aspect-ratio:3/4;
+      width:100%;aspect-ratio:2/3;
       background-size:cover;background-position:center;
       position:relative;
+    }
+    /* big number badge top-left */
+    .trn-num{
+      position:absolute;top:.5rem;left:.6rem;z-index:3;
+      font-size:3.5rem;font-weight:900;line-height:1;
+      color:rgba(255,255,255,.18);
+      font-family:'Barlow Condensed','Impact',sans-serif;
+      letter-spacing:-.04em;
+      pointer-events:none;
+      text-shadow:0 2px 8px rgba(0,0,0,.5);
     }
     .trn-date-badge{
       position:absolute;bottom:.6rem;left:.6rem;z-index:2;
@@ -970,9 +981,9 @@
     }
     .trn-price-free{background:#22c55e;color:#fff;}
     .trn-price-paid{background:#ec4899;color:#fff;}
-    .trn-info{padding:.65rem .75rem .8rem;background:#111;}
-    .trn-title{font-size:.8rem;font-weight:800;color:#fff;line-height:1.3;}
-    .trn-venue{font-size:.65rem;color:rgba(255,255,255,.4);margin-top:.2rem;font-weight:600;}
+    .trn-info{padding:.7rem .85rem .9rem;background:#111;}
+    .trn-title{font-size:.88rem;font-weight:800;color:#fff;line-height:1.3;}
+    .trn-venue{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:.25rem;font-weight:600;}
   </style>
 </head>
 <body>
@@ -1551,6 +1562,7 @@
         a.href=`event-detail.html?eventId=${id}`;
         a.innerHTML=`
           <div class="trn-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
+            <div class="trn-num">${i+1}</div>
             ${day?`<div class="trn-date-badge"><div><div class="trn-badge-day">${day}</div><div class="trn-badge-mon">${mon}</div></div></div>`:''}
             <span class="trn-price-pill ${price?'trn-price-paid':'trn-price-free'}">Starts at ${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
           </div>
