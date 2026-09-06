@@ -61,60 +61,68 @@
       height:2px;
       background:linear-gradient(90deg,transparent,#f5c518,#fff8d0,#f5c518,transparent);
     }
-    .ogp-head{padding:1.8rem 1.2rem 1.4rem;text-align:center;}
+    .ogp-head{padding:1.8rem 1.2rem 1.2rem;text-align:center;}
     .ogp-title{
-      font-size:clamp(1rem,3.5vw,1.5rem);font-weight:900;
+      font-size:clamp(1.4rem,5vw,2rem);font-weight:900;
       letter-spacing:.18em;text-transform:uppercase;
-      color:#fff;margin-bottom:.45rem;
-      font-family:'Playfair Display','Didot','Georgia',serif;
+      color:#fff;margin-bottom:.4rem;
+      font-family:'Manrope','Helvetica Neue',sans-serif;
     }
     .ogp-tag{
-      font-size:clamp(1.1rem,4vw,1.9rem);
-      font-weight:700;color:#f5c518;
-      letter-spacing:.04em;text-transform:uppercase;
-      line-height:1.1;margin-bottom:0;
+      font-size:clamp(.72rem,3vw,.88rem);
+      font-weight:800;color:#f5c518;
+      letter-spacing:.1em;text-transform:uppercase;
+      line-height:1.2;margin-bottom:0;
       white-space:nowrap;
-      font-family:'Playfair Display','Didot','Georgia',serif;
-      font-style:italic;
     }
-    /* ── OG PICKS DECK STACK ── */
-    .ogp-scroll-wrap{background:#000;overflow:hidden;}
-    .ogp-deck{
-      position:relative;
-      height:520px;
-      display:flex;align-items:center;justify-content:center;
+
+    /* ── OG PICKS DECK ── */
+    .ogp-scroll-wrap{
       background:#000;
-      touch-action:pan-y;
-      user-select:none;
+      padding:0 1rem 0;
+      position:relative;
     }
+    /* the deck stage — relative so stacked cards position inside */
+    .ogp-deck-stage{
+      position:relative;
+      /* height is set by JS after first card renders */
+      min-height:200px;
+    }
+    /* every card sits absolute, stacked */
     .ogp-card{
       position:absolute;
-      width:min(72vw,300px);
-      border-radius:22px;overflow:hidden;
+      top:0; left:0;
+      width:100%;
+      border-radius:20px;overflow:hidden;
       background:#1a1a1a;
-      border:1px solid rgba(255,255,255,.1);
+      border:1.5px solid rgba(255,255,255,.13);
       cursor:pointer;
       text-decoration:none;display:block;
       box-shadow:0 8px 32px rgba(0,0,0,.7);
-      transition:transform .45s cubic-bezier(.4,0,.2,1),
-                 opacity .45s ease,
-                 z-index 0s .22s;
+      transition:transform .42s cubic-bezier(.4,0,.2,1),
+                 opacity .42s ease,
+                 box-shadow .42s ease;
       will-change:transform,opacity;
-      transform-origin:bottom center;
+      transform-origin:top left;
     }
     .ogp-poster{
       width:100%;aspect-ratio:3/4;
       background-size:cover;background-position:center;
       position:relative;
     }
+    .ogp-poster::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 45%);
+    }
     .ogp-date-badge{
       position:absolute;top:.85rem;left:.85rem;z-index:2;
       background:#fff;color:#000;
-      border-radius:12px;padding:.4rem .65rem;
-      text-align:center;min-width:50px;
+      border-radius:12px;padding:.45rem .7rem;
+      text-align:center;min-width:52px;
       box-shadow:0 2px 10px rgba(0,0,0,.5);
     }
-    .ogp-date-badge-day{font-size:1.3rem;font-weight:900;line-height:1;}
+    .ogp-date-badge-day{font-size:1.4rem;font-weight:900;line-height:1;}
     .ogp-date-badge-mon{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-top:.1rem;}
     .ogp-price-badge{
       position:absolute;bottom:.8rem;right:.8rem;z-index:2;
@@ -124,7 +132,7 @@
     .ogp-price-free{background:#22c55e;color:#fff;}
     .ogp-price-paid{background:#ec4899;color:#fff;}
     .ogp-info{
-      padding:1rem 1.1rem 1.15rem;
+      padding:1rem 1.15rem 1.2rem;
       background:#1a1a1a;
       border-top:1px solid rgba(255,255,255,.07);
     }
@@ -136,31 +144,25 @@
       font-size:.8rem;color:rgba(255,255,255,.45);
       margin-top:.3rem;font-weight:500;
     }
-    /* nav arrows */
-    .ogp-nav{
-      position:absolute;top:50%;transform:translateY(-50%);
-      z-index:100;background:rgba(255,255,255,.1);
-      border:1px solid rgba(255,255,255,.2);
-      color:#fff;width:38px;height:38px;
-      border-radius:50%;display:flex;align-items:center;justify-content:center;
-      cursor:pointer;font-size:1.1rem;
-      transition:background .2s;
-      backdrop-filter:blur(6px);
-    }
-    .ogp-nav:hover{background:rgba(245,197,24,.25);border-color:#f5c518;}
-    .ogp-nav-prev{left:10px;}
-    .ogp-nav-next{right:10px;}
-    /* counter dots */
+    /* counter row */
     .ogp-counter{
       display:flex;align-items:center;justify-content:center;
-      gap:.5rem;padding:.9rem 0 .4rem;
+      gap:.55rem;padding:.9rem 0 .3rem;
       background:#000;
     }
-    @media(min-width:700px){
-      .ogp-deck{height:560px;}
-      .ogp-card{width:min(60vw,320px);}
-      .ogp-title{font-size:clamp(2rem,4vw,3rem);}
+    .ogp-counter-pill{
+      background:rgba(255,255,255,.12);
+      border-radius:999px;
+      padding:.28rem .85rem;
+      font-size:.78rem;font-weight:800;
+      color:#fff;letter-spacing:.04em;
     }
+    .ogp-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);
+      transition:background .3s;
+    }
+    .ogp-dot.active{background:#fff;}
 
     /* ── FINEST TABLES SECTION ── */
     .ft-section{background:#000;}
@@ -1005,16 +1007,13 @@
   <!-- OG PICKS -->
   <section class="ogp-section">
     <div class="ogp-head">
-      <div class="ogp-title">THE OG PICKS</div>
+      <div class="ogp-title">EDITOR'S PICKS</div>
       <div class="ogp-tag">✨ WE THINK YOU'LL VIBE WITH THESE</div>
     </div>
     <div class="ogp-scroll-wrap">
-      <div class="ogp-deck" id="ogpDeck">
-        <button class="ogp-nav ogp-nav-prev" id="ogpPrev">&#8592;</button>
-        <button class="ogp-nav ogp-nav-next" id="ogpNext">&#8594;</button>
-      </div>
+      <div class="ogp-deck-stage" id="ogpDeckStage"></div>
     </div>
-    <div class="ogp-counter" id="ogpCounter">&nbsp;</div>
+    <div class="ogp-counter" id="ogpCounter"></div>
     <div style="padding:.6rem 1.2rem 1.8rem;display:flex;justify-content:center;background:#000;">
       <a href="events.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.5rem;border:1px solid rgba(245,197,24,.3);border-radius:999px;color:#f5c518;font-size:.82rem;font-weight:800;text-decoration:none;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(245,197,24,.1)';this.style.borderColor='#f5c518';" onmouseout="this.style.background='';this.style.borderColor='rgba(245,197,24,.3)';">View all picks &#8594;</a>
     </div>
@@ -1357,16 +1356,23 @@
   loadIndexEvents().then(() => startHomeCarousel('indexEventsGrid'));
   loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
 
-  // OG Picks — deck stack effect
+  // OG Picks — deck stack: active card full-width center, next cards peek as stacked folder behind-right
   (async function loadOGPicks(){
     try{
       const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,12);
-      const deck = document.getElementById('ogpDeck');
-      if(!deck) return;
-      if(!docs.length){ deck.innerHTML='<div style="padding:1.5rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;">No events yet. Check back soon!</div>'; return; }
+      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,10);
+      const stage = document.getElementById('ogpDeckStage');
+      const counter = document.getElementById('ogpCounter');
+      if(!stage) return;
+      if(!docs.length){
+        stage.innerHTML='<div style="padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;text-align:center;">No events yet. Check back soon!</div>';
+        return;
+      }
       const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)'];
+      const total=docs.length;
+      let cur=0;
       const cards=[];
+
       docs.forEach((doc,i)=>{
         const d=doc.data(), id=doc.id;
         const img=d.cardImgUrl||d.coverUrl||'';
@@ -1385,75 +1391,86 @@
             <div class="ogp-title-card">${d.name||'Untitled'}</div>
             <div class="ogp-venue">${d.venue||d.venueName||d.city||'India'}</div>
           </div>`;
-        deck.insertBefore(a, deck.querySelector('.ogp-nav-prev'));
+        stage.appendChild(a);
         cards.push(a);
       });
-      const total=cards.length;
-      let cur=0;
 
-      // position: active=center, prev=left peek, rest=stacked behind right
+      // Stack offset per layer behind active card
+      // Each card behind peeks: shifted right by ~10px and down by ~8px, scaled slightly smaller
+      const PEEK_X = 11;  // px shift right per layer
+      const PEEK_Y = 8;   // px shift down per layer
+      const PEEK_SCALE = 0.04; // scale reduction per layer
+      const MAX_BEHIND = 3; // how many cards show behind
+
       function layout(active){
+        // set stage height to match active card
+        const activeH = cards[active].offsetHeight;
+        if(activeH) stage.style.height = (activeH + PEEK_Y * MAX_BEHIND) + 'px';
+
         cards.forEach((c,i)=>{
-          const rel = (i - active + total) % total; // 0=active,1=next,2=next+1,...,total-1=prev
-          let tx,ty,scale,opacity,zIdx,rot;
-          if(rel===0){
-            // active card — front center
-            tx=0; ty=0; scale=1; opacity=1; zIdx=total; rot=0;
-          } else if(rel===total-1){
-            // immediately previous — peek left
-            tx=-62; ty=18; scale=.82; opacity=.7; zIdx=total-1; rot=-6;
+          // rel: 0=active, 1=first behind, 2=second behind, ..., negative=already passed (hide left)
+          const rel = (i - active + total) % total;
+          if(rel === 0){
+            // Active: front, full size, no offset
+            c.style.zIndex = total;
+            c.style.transform = 'translateX(0) translateY(0) scale(1)';
+            c.style.opacity = '1';
+            c.style.pointerEvents = 'auto';
+          } else if(rel <= MAX_BEHIND){
+            // Behind cards: peek right and down, each layer further back
+            const tx = PEEK_X * rel;
+            const ty = PEEK_Y * rel;
+            const sc = 1 - PEEK_SCALE * rel;
+            c.style.zIndex = total - rel;
+            c.style.transform = `translateX(${tx}px) translateY(${ty}px) scale(${sc})`;
+            c.style.opacity = String(1 - 0.15 * rel);
+            c.style.pointerEvents = 'none';
           } else {
-            // all upcoming cards — stacked behind, offset right slightly
-            const depth=rel; // 1=just behind, 2=further, etc.
-            const maxStack=Math.min(total-2,4);
-            const d2=Math.min(depth,maxStack);
-            tx= 18*(d2); ty= 10*(d2); scale=1-0.06*d2; opacity=Math.max(0,1-0.18*d2); zIdx=total-depth; rot=3*d2;
+            // All other cards: hidden behind
+            c.style.zIndex = '0';
+            c.style.transform = `translateX(${PEEK_X*MAX_BEHIND}px) translateY(${PEEK_Y*MAX_BEHIND}px) scale(${1-PEEK_SCALE*MAX_BEHIND})`;
+            c.style.opacity = '0';
+            c.style.pointerEvents = 'none';
           }
-          c.style.zIndex=zIdx;
-          c.style.transform=`translateX(${tx}%) translateY(${ty}px) scale(${scale}) rotate(${rot}deg)`;
-          c.style.opacity=opacity;
-          c.style.pointerEvents=rel===0?'auto':'none';
         });
+      }
+
+      function buildCounter(active){
+        if(!counter) return;
+        const dots = Array.from({length:Math.min(total,3)},(_,i)=>
+          `<span class="ogp-dot${i===0?' active':''}"></span>`
+        ).join('');
+        counter.innerHTML=`<span class="ogp-counter-pill">${active+1}/${total}</span>${dots}`;
       }
 
       function goTo(idx){
         cur=(idx+total)%total;
         layout(cur);
-        buildDots(cur);
+        buildCounter(cur);
       }
 
-      // dots
-      const counter=document.getElementById('ogpCounter');
-      function buildDots(active){
-        if(!counter||total<2) return;
-        counter.innerHTML=cards.map((_,i)=>`<span style="display:inline-block;width:${i===active?'22px':'7px'};height:7px;border-radius:999px;background:${i===active?'#f5c518':'rgba(255,255,255,.25)'};transition:all .3s;"></span>`).join('');
-      }
+      // init after paint so offsetHeight is available
+      requestAnimationFrame(()=>{ layout(0); buildCounter(0); });
 
-      layout(0); buildDots(0);
-
-      document.getElementById('ogpNext').onclick=e=>{e.preventDefault();goTo(cur+1);};
-      document.getElementById('ogpPrev').onclick=e=>{e.preventDefault();goTo(cur-1);};
-
-      // swipe
+      // swipe on stage
       let tx0=0;
-      deck.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;},{ passive:true });
-      deck.addEventListener('touchend',e=>{
+      stage.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;},{passive:true});
+      stage.addEventListener('touchend',e=>{
         const dx=e.changedTouches[0].clientX-tx0;
-        if(Math.abs(dx)>40) goTo(dx<0?cur+1:cur-1);
-      },{ passive:true });
+        if(Math.abs(dx)>40){ clearInterval(ogpTimer); goTo(dx<0?cur+1:cur-1); ogpTimer=setInterval(()=>goTo(cur+1),4000); }
+      },{passive:true});
 
-      // auto-advance
-      let ogpTimer=setInterval(()=>goTo(cur+1),3500);
-      deck.addEventListener('touchstart',()=>clearInterval(ogpTimer),{passive:true});
-      deck.addEventListener('mouseenter',()=>clearInterval(ogpTimer));
-      deck.addEventListener('mouseleave',()=>{ ogpTimer=setInterval(()=>goTo(cur+1),3500); });
-
-      // allow click only on active card
+      // click active card = navigate; click behind card = bring to front
       cards.forEach((c,i)=>{
         c.addEventListener('click',e=>{
-          if((i-cur+total)%total!==0){ e.preventDefault(); goTo(i); }
+          if(i!==cur){ e.preventDefault(); clearInterval(ogpTimer); goTo(i); ogpTimer=setInterval(()=>goTo(cur+1),4000); }
         });
       });
+
+      let ogpTimer=setInterval(()=>goTo(cur+1),4000);
+      stage.addEventListener('mouseenter',()=>clearInterval(ogpTimer));
+      stage.addEventListener('mouseleave',()=>{ ogpTimer=setInterval(()=>goTo(cur+1),4000); });
+      window.addEventListener('resize',()=>goTo(cur));
     }catch(e){console.warn('OGP:',e.message);}
   })();
 
