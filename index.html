@@ -504,9 +504,11 @@
       display:flex;gap:.75rem;
       padding:1.2rem 0 .8rem;
       width:max-content;
-      animation:hpeAutoScroll 32s linear infinite;
     }
-    .hpe-scroll:hover{animation-play-state:paused;}
+    .hpe-scroll.hpe-animating{
+      animation:hpeAutoScroll var(--hpe-dur,30s) linear infinite;
+    }
+    .hpe-scroll.hpe-animating:hover{animation-play-state:paused;}
     @keyframes hpeAutoScroll{
       0%{transform:translateX(0);}
       100%{transform:translateX(-50%);}
@@ -1568,6 +1570,12 @@
       // duplicate for seamless infinite CSS animation loop
       docs.forEach(doc => scroll.appendChild(makeCard(doc)));
       docs.forEach(doc => scroll.appendChild(makeCard(doc)));
+      // set animation duration based on card count (4s per card), then start
+      requestAnimationFrame(()=>{
+        const dur = docs.length * 4;
+        scroll.style.setProperty('--hpe-dur', dur + 's');
+        scroll.classList.add('hpe-animating');
+      });
     }catch(e){ console.warn('HPE:', e.message); }
   })();
 </script>
