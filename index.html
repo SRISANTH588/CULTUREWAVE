@@ -900,6 +900,17 @@
     }
     /* ── COMING UP IN A FEW DAYS ── */
     .cup-section{background:#000;padding:1.8rem 0 1.2rem;border-top:1px solid rgba(255,255,255,.07);}
+    /* shared dots */
+    .sec-dots{
+      display:flex;align-items:center;justify-content:center;
+      gap:.45rem;padding:.75rem 0 .2rem;
+    }
+    .sec-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);border:none;padding:0;cursor:pointer;
+      transition:all .3s;
+    }
+    .sec-dot.active{width:20px;border-radius:999px;background:#fff;}
     .cup-head{
       font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
       font-size:clamp(1.3rem,5vw,1.8rem);font-weight:900;
@@ -1161,12 +1172,14 @@
   <section class="cup-section">
     <div class="cup-head">EXPERIENCES YOU'LL LOVE</div>
     <div class="cup-scroll" id="cupScroll"></div>
+    <div class="sec-dots" id="cupDots"></div>
   </section>
 
   <!-- TRENDING RIGHT NOW -->
   <section class="trn-section">
     <div class="trn-head">THE LATEST BUZZ</div>
     <div class="trn-grid" id="trnGrid"></div>
+    <div class="sec-dots" id="trnDots"></div>
   </section>
 
   <!-- FEATURED EVENTS -->
@@ -1441,7 +1454,30 @@
     } catch(e) { console.warn('Restaurants:', e.message); }
   }
 
-  function startHomeCarousel(id, cardSelector) {
+  function initScrollDots(scrollEl, dotsEl, cardSelector){
+    if(!scrollEl||!dotsEl) return;
+    const cards = scrollEl.querySelectorAll(cardSelector);
+    if(cards.length < 2) return;
+    // build dots
+    cards.forEach((_,i)=>{
+      const b=document.createElement('button');
+      b.className='sec-dot'+(i===0?' active':'');
+      b.addEventListener('click',()=>{
+        scrollEl.scrollTo({left:cards[i].offsetLeft - scrollEl.offsetLeft, behavior:'smooth'});
+      });
+      dotsEl.appendChild(b);
+    });
+    // sync on scroll
+    scrollEl.addEventListener('scroll',()=>{
+      const dots=dotsEl.querySelectorAll('.sec-dot');
+      let closest=0, minDist=Infinity;
+      cards.forEach((c,i)=>{
+        const dist=Math.abs(c.getBoundingClientRect().left - scrollEl.getBoundingClientRect().left);
+        if(dist<minDist){minDist=dist;closest=i;}
+      });
+      dots.forEach((d,i)=>d.classList.toggle('active',i===closest));
+    },{passive:true});
+  }
     cardSelector = cardSelector || '.event-card';
     const grid = document.getElementById(id);
     if (!grid) return;
@@ -1542,6 +1578,7 @@
           </div>`;
         scroll.appendChild(a);
       });
+      requestAnimationFrame(()=>initScrollDots(scroll, document.getElementById('cupDots'), '.cup-card'));
     }catch(e){console.warn('CUP:',e.message);}
   })();
 
@@ -1575,6 +1612,7 @@
           </div>`;
         grid.appendChild(a);
       });
+      requestAnimationFrame(()=>initScrollDots(grid, document.getElementById('trnDots'), '.trn-card'));
     }catch(e){console.warn('TRN:',e.message);}
   })();
   loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
