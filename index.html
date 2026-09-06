@@ -1303,7 +1303,9 @@
   const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
   function isPublishedEvent(data) {
-    return true;
+    const status = String(data?.status || '').toLowerCase();
+    const publicListing = data?.publicListing;
+    return publicListing !== false && ['published','live','active'].includes(status);
   }
 
   async function loadIndexEvents() {
@@ -1311,10 +1313,11 @@
       const grid = document.getElementById('indexEventsGrid');
       const empty = document.getElementById('indexEventsEmpty');
       if(!grid) return;
-      const snap = await _idb.collection('events').limit(6).get();
-      if(snap.empty){ empty.style.display=''; return; }
+      const snap = await _idb.collection('events').limit(200).get();
+      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0, 6);
+      if(snap.empty || !docs.length){ empty.style.display=''; return; }
       empty.style.display = 'none';
-      snap.docs.forEach((doc, i) => renderEventCard(doc, i, grid));
+      docs.forEach((doc, i) => renderEventCard(doc, i, grid));
     } catch(e) { console.error('Events load error:', e.message); }
   }
 
@@ -1399,6 +1402,8 @@
       dots.forEach((d,i)=>d.classList.toggle('active',i===closest));
     },{passive:true});
   }
+
+  function initAutoScroll(id, cardSelector) {
     cardSelector = cardSelector || '.event-card';
     const grid = document.getElementById(id);
     if (!grid) return;
