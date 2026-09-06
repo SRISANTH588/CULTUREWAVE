@@ -497,33 +497,36 @@
       position:relative;
     }
     .hpe-scroll-wrap::before,.hpe-scroll-wrap::after{
-      content:"";position:absolute;top:0;bottom:0;width:40px;z-index:2;pointer-events:none;
+      content:"";position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;
     }
-    .hpe-scroll-wrap::before{left:0;background:linear-gradient(to right,#000,transparent);}
-    .hpe-scroll-wrap::after{right:0;background:linear-gradient(to left,#000,transparent);}
+    .hpe-scroll-wrap::before{left:0;background:linear-gradient(to right,#000 30%,transparent);}
+    .hpe-scroll-wrap::after{right:0;background:linear-gradient(to left,#000 30%,transparent);}
     .hpe-scroll{
-      display:flex;gap:.75rem;
-      padding:1.2rem 0 .8rem;
+      display:flex;gap:1rem;
+      padding:1.4rem 0 1rem;
       width:max-content;
-      transition:transform .6s cubic-bezier(.4,0,.2,1);
+      transition:transform .55s cubic-bezier(.4,0,.2,1);
+      will-change:transform;
     }
-    @keyframes hpeAutoScroll{
-      0%{transform:translateX(0);}
-      100%{transform:translateX(-50%);}
-    }
-    /* premium scroll cards */
+    /* centered carousel cards */
     .hpe-card{
-      flex:0 0 42vw;max-width:180px;
+      flex:0 0 62vw;max-width:260px;
       border-radius:16px;overflow:hidden;
       background:#111;
       border:1px solid rgba(255,255,255,.12);
-      scroll-snap-align:start;cursor:pointer;
+      cursor:pointer;
       text-decoration:none;display:block;
-      transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+      transition:transform .4s ease,box-shadow .4s ease,border-color .4s ease,opacity .4s ease;
+      opacity:.45;
+      transform:scale(.88);
+    }
+    .hpe-card.hpe-active{
+      opacity:1;
+      transform:scale(1);
+      border-color:rgba(255,255,255,.35);
+      box-shadow:0 20px 48px rgba(0,0,0,.8);
     }
     .hpe-card:hover{
-      transform:translateY(-5px);
-      box-shadow:0 20px 48px rgba(0,0,0,.8);
       border-color:rgba(255,255,255,.3);
     }
     .hpe-poster{
@@ -573,7 +576,7 @@
     }
     .hpe-view-all:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5);}
     @media(min-width:700px){
-      .hpe-card{flex:0 0 190px;max-width:210px;}
+      .hpe-card{flex:0 0 260px;max-width:280px;}
       .hpe-banner{min-height:260px;padding:3rem 1.4rem 2.5rem;}
       .hpe-heading{font-size:clamp(3.5rem,6vw,5.5rem);}
     }
@@ -1705,28 +1708,41 @@
       }
       // render cards once only
       docs.forEach(doc => scroll.appendChild(makeCard(doc)));
-      const total = docs.length;
+      const cards = Array.from(scroll.querySelectorAll('.hpe-card'));
+      const total = cards.length;
       let hpeIdx = 0;
-      function hpeNext(){
-        hpeIdx = (hpeIdx + 1) % total;
-        const cards = scroll.querySelectorAll('.hpe-card');
-        const cardW = cards[0].offsetWidth + 12; // card width + gap
-        // when we've gone past all, reset to 0 instantly then re-trigger
-        if(hpeIdx === 0){
-          scroll.style.transition = 'none';
-          scroll.style.transform = 'translateX(0)';
-          // force reflow then re-enable transition
-          scroll.offsetHeight;
-          scroll.style.transition = '';
-        } else {
-          scroll.style.transform = `translateX(-${hpeIdx * cardW}px)`;
-        }
+
+      function getCardWidth(){
+        return cards[0].offsetWidth + 16; // card width + gap (1rem)
       }
-      let hpeTimer = setInterval(hpeNext, 4000);
-      scroll.addEventListener('mouseenter', ()=>clearInterval(hpeTimer));
-      scroll.addEventListener('mouseleave', ()=>{ hpeTimer = setInterval(hpeNext, 4000); });
-      scroll.addEventListener('touchstart', ()=>clearInterval(hpeTimer), {passive:true});
-      scroll.addEventListener('touchend', ()=>{ hpeTimer = setInterval(hpeNext, 4000); }, {passive:true});
+
+      function centerOn(idx){
+        hpeIdx = (idx + total) % total;
+        const wrap = scroll.parentElement;
+        const wrapW = wrap.offsetWidth;
+        const cardW = getCardWidth();
+        const offset = hpeIdx * cardW - (wrapW / 2) + (cardW / 2) - 8;
+        scroll.style.transform = `translateX(-${Math.max(0, offset)}px)`;
+        cards.forEach((c, i) => c.classList.toggle('hpe-active', i === hpeIdx));
+      }
+
+      centerOn(0);
+
+      let hpeTimer = setInterval(() => centerOn(hpeIdx + 1), 3500);
+      const pauseTimer = () => clearInterval(hpeTimer);
+      const resumeTimer = () => { hpeTimer = setInterval(() => centerOn(hpeIdx + 1), 3500); };
+
+      scroll.addEventListener('mouseenter', pauseTimer);
+      scroll.addEventListener('mouseleave', resumeTimer);
+      scroll.addEventListener('touchstart', pauseTimer, {passive:true});
+      scroll.addEventListener('touchend', resumeTimer, {passive:true});
+
+      // click on side cards to navigate
+      cards.forEach((card, i) => {
+        card.addEventListener('click', e => {
+          if(i !== hpeIdx){ e.preventDefault(); centerOn(i); }
+        });
+      });
     }catch(e){ console.warn('HPE:', e.message); }
   })();
 </script>
