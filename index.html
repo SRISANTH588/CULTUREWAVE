@@ -1460,7 +1460,8 @@
     }catch(e){console.warn('Trending:',e.message);}
   })();
 
-  loadIndexEvents().then(() => startHomeCarousel('indexEventsGrid'));
+  loadIndexEvents();
+  // loadIndexRestaurants removed (section deleted)
 
   // COMING UP IN A FEW DAYS
   (async function loadComingUp(){
@@ -1536,7 +1537,6 @@
       requestAnimationFrame(()=>initScrollDots(grid, document.getElementById('trnDots'), '.trn-card'));
     }catch(e){console.warn('TRN:',e.message);}
   })();
-  loadIndexRestaurants().then(() => startHomeCarousel('indexRestaurantsGrid'));
 
   // OG Picks — left edge peek + center active + right folder stack
   (async function loadOGPicks(){
