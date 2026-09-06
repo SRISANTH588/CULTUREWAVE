@@ -528,10 +528,17 @@
     }
     /* RESPONSIVE */
     @media (max-width: 900px) {
+      .sidebar { position: fixed; left: -280px; top: 0; height: 100vh; width: 280px; z-index: 50; transition: left .28s cubic-bezier(.4,0,.2,1); }
+      .sidebar.open { left: 0; box-shadow: 8px 0 32px rgba(0,0,0,.15); }
+      .hamburger { display: flex; }
       .layout { grid-template-columns: 1fr; }
       .sidebar { position: static; }
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
     }
+    .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
+    .sb-overlay.open{display:block;}
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
+    .hamburger span{display:block;width:22px;height:2px;background:#333;border-radius:2px;}
     @media (max-width: 600px) {
       .topbar-inner { padding: 0 0.8rem; }
       .layout { padding: 0.7rem; }
@@ -562,6 +569,7 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div style="display:flex;align-items:center;gap:1.2rem;">
+      <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
       <div class="brand">
         <div class="brand-icon">C</div>
         <strong>CultureWave</strong>
@@ -2835,7 +2843,15 @@ renderRsvpPreview();
     if (el) el.textContent = credits.toLocaleString('en-IN');
   });
 })();
-</script>
 
+// Mobile sidebar
+(function(){
+  var sidebar=document.querySelector('.sidebar'),btn=document.getElementById('hamburgerBtn'),overlay=document.getElementById('sbOverlay');
+  if(!btn||!sidebar) return;
+  btn.addEventListener('click',function(){sidebar.classList.add('open');overlay.classList.add('open');});
+  overlay.addEventListener('click',function(){sidebar.classList.remove('open');overlay.classList.remove('open');});
+})();
+</script>
+<div class="sb-overlay" id="sbOverlay"></div>
 </body>
 </html>

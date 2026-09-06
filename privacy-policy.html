@@ -86,9 +86,21 @@
         <div class="auth-actions">
           <a class="nav-link" href="index.html">Home</a>
           <a class="nav-cta" href="login.html">Get Started</a>
-        </div>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </header>
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="index.html">Home</a>
+      <a href="events.html">Events</a>
+      <a href="restaurants.html">Restaurants</a>
+      <a href="how-it-works.html">How it works</a>
+      <div class="mobile-nav-ctas">
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="login.html" class="nav-cta">Get Started</a>
+      </div>
+    </nav>
     <main>
       <section class="legal-hero">
         <div class="legal-wrap">
@@ -203,5 +215,13 @@
     <span class="footer-owned">Owned by OGSHOOTS LUXE</span>
   </div>
 </footer>
-  </body>
+  
+<script>
+(function(){
+  var h=document.getElementById('hamburger'),m=document.getElementById('mobileNav');
+  if(!h||!m) return;
+  h.addEventListener('click',function(){h.classList.toggle('open');m.classList.toggle('open');});
+})();
+</script>
+</body>
 </html>
