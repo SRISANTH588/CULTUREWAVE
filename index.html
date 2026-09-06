@@ -492,14 +492,25 @@
     .hpe-scroll-wrap{
       background:#000;
       border-top:1px solid rgba(255,255,255,.06);
+      overflow:hidden;
+      position:relative;
     }
+    .hpe-scroll-wrap::before,.hpe-scroll-wrap::after{
+      content:"";position:absolute;top:0;bottom:0;width:40px;z-index:2;pointer-events:none;
+    }
+    .hpe-scroll-wrap::before{left:0;background:linear-gradient(to right,#000,transparent);}
+    .hpe-scroll-wrap::after{right:0;background:linear-gradient(to left,#000,transparent);}
     .hpe-scroll{
       display:flex;gap:.75rem;
-      padding:1.2rem 1.2rem .8rem;
-      overflow-x:auto;scroll-snap-type:x mandatory;
-      scrollbar-width:none;-webkit-overflow-scrolling:touch;
+      padding:1.2rem 0 .8rem;
+      width:max-content;
+      animation:hpeAutoScroll 32s linear infinite;
     }
-    .hpe-scroll::-webkit-scrollbar{display:none;}
+    .hpe-scroll:hover{animation-play-state:paused;}
+    @keyframes hpeAutoScroll{
+      0%{transform:translateX(0);}
+      100%{transform:translateX(-50%);}
+    }
     /* premium scroll cards */
     .hpe-card{
       flex:0 0 42vw;max-width:180px;
@@ -1554,26 +1565,9 @@
           </div>`;
         return a;
       }
-      // render cards twice for seamless infinite loop
+      // duplicate for seamless infinite CSS animation loop
       docs.forEach(doc => scroll.appendChild(makeCard(doc)));
       docs.forEach(doc => scroll.appendChild(makeCard(doc)));
-      // auto-scroll
-      let hpeTimer;
-      function startHPEScroll(){
-        hpeTimer = setInterval(()=>{
-          if(scroll.scrollWidth <= scroll.clientWidth + 4) return;
-          scroll.scrollLeft += 1;
-          // seamless reset: when first half scrolled past, jump back
-          if(scroll.scrollLeft >= scroll.scrollWidth / 2){
-            scroll.scrollLeft = 0;
-          }
-        }, 18);
-      }
-      startHPEScroll();
-      scroll.addEventListener('mouseenter', ()=>clearInterval(hpeTimer));
-      scroll.addEventListener('mouseleave', startHPEScroll);
-      scroll.addEventListener('touchstart', ()=>clearInterval(hpeTimer), {passive:true});
-      scroll.addEventListener('touchend', ()=>{ setTimeout(startHPEScroll, 1500); }, {passive:true});
     }catch(e){ console.warn('HPE:', e.message); }
   })();
 </script>
