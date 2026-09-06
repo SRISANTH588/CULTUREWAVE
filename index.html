@@ -81,17 +81,13 @@
       background:#000;
       overflow:hidden;
       position:relative;
+      padding:1rem 0 1.2rem;
     }
+    /* stage: left margin = prev card sliver space, right margin = folder sliver space */
     .ogp-deck-stage{
       position:relative;
-      min-height:200px;
-      /* left padding = peek width so left card edge shows */
-      padding-left:38px;
-      /* right padding = room for folder stack */
-      padding-right:38px;
-      box-sizing:border-box;
+      margin:0 28px 0 36px;
     }
-    /* active card fills the padded area */
     .ogp-card-active-wrap{
       position:relative;
       width:100%;
@@ -106,40 +102,48 @@
       cursor:pointer;
       text-decoration:none;
       box-shadow:0 8px 32px rgba(0,0,0,.7);
-      transition:transform .42s cubic-bezier(.4,0,.2,1),
-                 opacity .42s ease;
-      will-change:transform,opacity;
     }
-    /* left peek card — fixed position, only right edge visible */
+    /* prev card — same size as active, pushed left, only right ~32px sliver visible */
     .ogp-peek-left{
       position:absolute;
-      top:0;
-      left:0;
-      width:calc(100% - 38px);
+      top:4px;
+      right:calc(100% + 4px);
+      width:100%;
       border-radius:20px;overflow:hidden;
       background:#1a1a1a;
       border:1.5px solid rgba(255,255,255,.1);
-      box-shadow:0 8px 24px rgba(0,0,0,.6);
-      opacity:.55;
-      /* shift so only ~30px of right edge shows on left */
-      transform:translateX(calc(-100% + 30px));
+      opacity:.6;
+      pointer-events:none;
       z-index:5;
-      pointer-events:none;
-      transition:opacity .42s;
     }
-    /* folder stack cards behind active — right side */
-    .ogp-behind{
+    /* folder card 1 — directly behind active, only left ~14px sliver peeks right */
+    .ogp-behind1{
       position:absolute;
-      top:0;
-      /* align right edge with active card right edge */
-      right:0;
-      width:calc(100% - 38px);
+      top:0; left:0;
+      width:100%;
       border-radius:20px;overflow:hidden;
-      background:#1a1a1a;
-      border:1.5px solid rgba(255,255,255,.1);
-      box-shadow:0 4px 16px rgba(0,0,0,.5);
+      background:#252525;
+      border:1.5px solid rgba(255,255,255,.09);
+      opacity:.8;
       pointer-events:none;
-      transition:transform .42s cubic-bezier(.4,0,.2,1), opacity .42s;
+      z-index:8;
+      /* show only a thin right sliver beyond the active card */
+      transform:translateX(10px);
+      clip-path:inset(0 0 0 calc(100% - 12px) round 0 20px 20px 0);
+    }
+    /* folder card 2 — further behind, thinner sliver */
+    .ogp-behind2{
+      position:absolute;
+      top:0; left:0;
+      width:100%;
+      border-radius:20px;overflow:hidden;
+      background:#2e2e2e;
+      border:1.5px solid rgba(255,255,255,.06);
+      opacity:.55;
+      pointer-events:none;
+      z-index:7;
+      transform:translateX(20px);
+      clip-path:inset(0 0 0 calc(100% - 10px) round 0 20px 20px 0);
     }
     .ogp-poster{
       width:100%;aspect-ratio:3/4;
@@ -1040,9 +1044,9 @@
       <div class="ogp-deck-stage" id="ogpDeckStage">
         <!-- left peek ghost -->
         <div class="ogp-peek-left" id="ogpPeekLeft"></div>
-        <!-- folder cards behind (right stack) -->
-        <div class="ogp-behind" id="ogpBehind2" style="transform:translateX(22px) translateY(16px) scale(.93);opacity:.5;z-index:2;"></div>
-        <div class="ogp-behind" id="ogpBehind1" style="transform:translateX(11px) translateY(8px) scale(.965);opacity:.7;z-index:3;"></div>
+        <!-- folder cards behind (right stack slivers) -->
+        <div class="ogp-behind2" id="ogpBehind2"></div>
+        <div class="ogp-behind1" id="ogpBehind1"></div>
         <!-- active card wrapper -->
         <div class="ogp-card-active-wrap" id="ogpActiveWrap"></div>
       </div>
