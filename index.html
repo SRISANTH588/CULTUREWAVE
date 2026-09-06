@@ -507,6 +507,7 @@
       width:max-content;
       transition:transform .55s cubic-bezier(.4,0,.2,1);
       will-change:transform;
+      box-sizing:content-box;
     }
     /* centered carousel cards */
     .hpe-card{
@@ -1716,17 +1717,26 @@
         return cards[0].offsetWidth + 16; // card width + gap (1rem)
       }
 
-      function centerOn(idx){
-        hpeIdx = (idx + total) % total;
+      function setPadding(){
         const wrap = scroll.parentElement;
         const wrapW = wrap.offsetWidth;
+        const cardW = cards[0].offsetWidth;
+        const side = Math.floor((wrapW - cardW) / 2);
+        scroll.style.paddingLeft = side + 'px';
+        scroll.style.paddingRight = side + 'px';
+      }
+
+      function centerOn(idx){
+        hpeIdx = (idx + total) % total;
         const cardW = getCardWidth();
-        const offset = hpeIdx * cardW - (wrapW / 2) + (cardW / 2) - 8;
-        scroll.style.transform = `translateX(-${Math.max(0, offset)}px)`;
+        const offset = hpeIdx * cardW;
+        scroll.style.transform = `translateX(-${offset}px)`;
         cards.forEach((c, i) => c.classList.toggle('hpe-active', i === hpeIdx));
       }
 
+      setPadding();
       centerOn(0);
+      window.addEventListener('resize', () => { setPadding(); centerOn(hpeIdx); });
 
       let hpeTimer = setInterval(() => centerOn(hpeIdx + 1), 3500);
       const pauseTimer = () => clearInterval(hpeTimer);
