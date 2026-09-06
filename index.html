@@ -1177,7 +1177,7 @@
         </div>
       </div>
       <div class="event-grid event-grid-home" id="indexEventsGrid">
-        <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);">
+        <div id="indexEventsEmpty" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);display:none;">
           <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
           <div style="font-weight:700;">No events yet</div>
           <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
@@ -1303,27 +1303,18 @@
   const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
   function isPublishedEvent(data) {
-    const status = String(data?.status || '').toLowerCase();
-    // show all events except explicitly draft/deleted
-    return !['draft','deleted','rejected','disabled'].includes(status);
+    return true;
   }
 
   async function loadIndexEvents() {
     try {
       const grid = document.getElementById('indexEventsGrid');
       const empty = document.getElementById('indexEventsEmpty');
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0, 6);
-      if (!docs.length) {
-        // fallback: show all events regardless of status
-        const allDocs = snap.docs.slice(0, 6);
-        if(!allDocs.length){ empty.style.display=''; return; }
-        empty.style.display = 'none';
-        allDocs.forEach((doc, i) => renderEventCard(doc, i, grid));
-        return;
-      }
+      if(!grid) return;
+      const snap = await _idb.collection('events').limit(6).get();
+      if(snap.empty){ empty.style.display=''; return; }
       empty.style.display = 'none';
-      docs.forEach((doc, i) => renderEventCard(doc, i, grid));
+      snap.docs.forEach((doc, i) => renderEventCard(doc, i, grid));
     } catch(e) { console.error('Events load error:', e.message); }
   }
 
@@ -1470,7 +1461,7 @@
   })();
 
   loadIndexEvents();
-  // loadIndexRestaurants removed (section deleted)
+  document.addEventListener('DOMContentLoaded', loadIndexEvents);
 
   // COMING UP IN A FEW DAYS
   (async function loadComingUp(){
