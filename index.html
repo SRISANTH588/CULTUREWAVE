@@ -1533,37 +1533,47 @@
       const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,10);
       const scroll = document.getElementById('hpeScroll');
       if(!scroll) return;
-      if(!docs.length){
-        scroll.closest('.hpe-scroll-wrap').style.display='none'; return;
-      }
-      docs.forEach(doc => {
+      if(!docs.length){ scroll.closest('.hpe-scroll-wrap').style.display='none'; return; }
+      function makeCard(doc){
         const d = doc.data(), id = doc.id;
         const img = d.cardImgUrl || d.coverUrl || '';
         const price = d.tickets?.[0]?.price || d.price || 0;
         let day='', mon='';
-        if(d.startDate){
-          try{
-            const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
-            day = dt.getDate();
-            mon = dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();
-          }catch(e){}
-        }
-        const badgeClass = price ? 'hpe-price-paid' : 'hpe-price-free';
-        const badgeText = price ? `Starts at \u20b9${Number(price).toLocaleString('en-IN')}` : 'Free';
+        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
         const a = document.createElement('a');
         a.className = 'hpe-card';
         a.href = `event-detail.html?eventId=${id}`;
         a.innerHTML = `
           <div class="hpe-poster" style="${img?`background-image:url('${img}')`:'background:linear-gradient(135deg,#1a1a1a,#333)'}">
-            <span class="hpe-price-badge ${badgeClass}">${badgeText}</span>
+            <span class="hpe-price-badge ${price?'hpe-price-paid':'hpe-price-free'}">${price?`Starts at \u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
           </div>
           <div class="hpe-info">
-            ${day ? `<div class="hpe-date"><div class="hpe-date-box"><div class="hpe-date-day">${day}</div><div class="hpe-date-mon">${mon}</div></div></div>` : ''}
+            ${day?`<div class="hpe-date"><div class="hpe-date-box"><div class="hpe-date-day">${day}</div><div class="hpe-date-mon">${mon}</div></div></div>`:''}
             <div class="hpe-title">${d.name||'Untitled'}</div>
             <div class="hpe-venue">${[d.venue||d.venueName,d.city].filter(Boolean).join(' · ')||'India'}</div>
           </div>`;
-        scroll.appendChild(a);
-      });
+        return a;
+      }
+      // render cards twice for seamless infinite loop
+      docs.forEach(doc => scroll.appendChild(makeCard(doc)));
+      docs.forEach(doc => scroll.appendChild(makeCard(doc)));
+      // auto-scroll
+      let hpeTimer;
+      function startHPEScroll(){
+        hpeTimer = setInterval(()=>{
+          if(scroll.scrollWidth <= scroll.clientWidth + 4) return;
+          scroll.scrollLeft += 1;
+          // seamless reset: when first half scrolled past, jump back
+          if(scroll.scrollLeft >= scroll.scrollWidth / 2){
+            scroll.scrollLeft = 0;
+          }
+        }, 18);
+      }
+      startHPEScroll();
+      scroll.addEventListener('mouseenter', ()=>clearInterval(hpeTimer));
+      scroll.addEventListener('mouseleave', startHPEScroll);
+      scroll.addEventListener('touchstart', ()=>clearInterval(hpeTimer), {passive:true});
+      scroll.addEventListener('touchend', ()=>{ setTimeout(startHPEScroll, 1500); }, {passive:true});
     }catch(e){ console.warn('HPE:', e.message); }
   })();
 </script>
