@@ -581,6 +581,27 @@
       .hpe-banner{min-height:260px;padding:3rem 1.4rem 2.5rem;}
       .hpe-heading{font-size:clamp(3.5rem,6vw,5.5rem);}
     }
+    /* ── DESKTOP BREAKPOINTS ── */
+    @media(min-width:900px){
+      /* Section inner wrappers */
+      .trn-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
+      .trn-head{padding:0 0 1rem;}
+      .trn-grid{padding:.4rem 0 1rem;}
+      /* trn cards fixed size on desktop */
+      .trn-card{flex:0 0 200px;max-width:200px;}
+      /* ev-grid 4 columns on desktop */
+      .ev-grid{grid-template-columns:repeat(4,1fr);gap:1rem;padding:.5rem 0 1.4rem;}
+      #events.trn-section{padding-left:0;padding-right:0;}
+      /* cup section */
+      .cup-head{padding:0 0 .9rem;}
+      .cup-scroll{padding:.4rem 0 1rem;}
+      /* hpe section */
+      .hpe-scroll-wrap{max-width:1240px;margin:0 auto;}
+    }
+    @media(min-width:1100px){
+      .trn-card{flex:0 0 220px;max-width:220px;}
+      .ev-grid{grid-template-columns:repeat(4,1fr);}
+    }
     .mobile-header-actions,.mobile-bottom-nav,.mobile-brand,.city-picker{display:none;}
     @media(max-width:700px){
       .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
@@ -931,6 +952,7 @@
 
     /* ── TRENDING RIGHT NOW ── */
     .trn-section{background:#000;padding:1.8rem 0 2rem;border-top:1px solid rgba(255,255,255,.07);}
+    .trn-inner{max-width:1240px;margin:0 auto;}
     #events.trn-section{border:none;padding-top:2.2rem;padding-left:0;padding-right:0;}
     .ev-grid{
       display:grid;
@@ -1211,20 +1233,25 @@
 
   <!-- COMING UP IN A FEW DAYS -->
   <section class="cup-section">
+    <div class="trn-inner">
     <div class="cup-head">EXPERIENCES YOU'LL LOVE</div>
     <div class="cup-scroll" id="cupScroll"></div>
     <div class="sec-dots" id="cupDots"></div>
+    </div>
   </section>
 
   <!-- TRENDING RIGHT NOW -->
   <section class="trn-section">
+    <div class="trn-inner">
     <div class="trn-head">THE LATEST BUZZ 🔥</div>
     <div class="trn-grid" id="trnGrid"></div>
     <div class="sec-dots" id="trnDots"></div>
+    </div>
   </section>
 
   <!-- FEATURED EVENTS -->
   <section class="trn-section" id="events">
+    <div class="trn-inner">
     <div class="trn-head"><span style="font-size:.72rem;font-weight:800;letter-spacing:.14em;color:rgba(255,255,255,.45);display:block;margin-bottom:.4rem;">BOOK THE EVENTS YOU LOVE ✦</span>Book It. Love It. Live It.</div>
     <div class="ev-grid" id="indexEventsGrid">
       <div id="indexEventsEmpty" style="text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);display:none;min-width:200px;">
@@ -1233,8 +1260,9 @@
         <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
       </div>
     </div>
-    <div style="padding:.6rem 1.2rem 1.8rem;display:flex;justify-content:center;background:#000;">
+    <div style="padding:.6rem 0 1.8rem;display:flex;justify-content:center;background:#000;">
       <a href="events.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.5rem;border:1px solid rgba(255,255,255,.2);border-radius:999px;color:#fff;font-size:.82rem;font-weight:800;text-decoration:none;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.borderColor='rgba(255,255,255,.5)';" onmouseout="this.style.background='';this.style.borderColor='rgba(255,255,255,.2)';">Browse all events &#8594;</a>
+    </div>
     </div>
   </section>
 
