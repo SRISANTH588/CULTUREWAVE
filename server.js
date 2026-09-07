@@ -761,6 +761,67 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
   }
 
+  // ── WHATSAPP OTP ──
+  if (req.method === "POST" && url.pathname === "/api/whatsapp/send-otp") {
+    try {
+      const body = await readBody(req);
+      const phone = String(body.phone || "").trim();
+      const name  = String(body.name  || "User").trim();
+      if (!phone) return send(res, 400, { success: false, error: "Phone number required" });
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const expiresAt = Date.now() + 10 * 60 * 1000;
+      if (admin.apps.length) {
+        await admin.firestore().collection("whatsappOtps").doc(phone).set({ otp, expiresAt, name, createdAt: Date.now() });
+      }
+      // Send via WhatsApp Business API if configured, else log for manual send
+      const waToken   = process.env.WHATSAPP_TOKEN || "";
+      const waPhoneId = process.env.WHATSAPP_PHONE_ID || "";
+      if (waToken && waPhoneId) {
+        const to = phone.replace(/\D/g, "");
+        await fetch(`https://graph.facebook.com/v19.0/${waPhoneId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${waToken}` },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            to,
+            type: "text",
+            text: { body: `Hi ${name}! Your CultureWave OTP is *${otp}*. Valid for 10 minutes. Do not share this with anyone.` }
+          })
+        });
+      } else {
+        console.log(`[WhatsApp OTP] To: ${phone} | Name: ${name} | OTP: ${otp}`);
+      }
+      return send(res, 200, { success: true });
+    } catch (error) {
+      return send(res, 500, { success: false, error: error.message });
+    }
+  }
+
+  // ── WHATSAPP BOOKING CONFIRMATION ──
+  if (req.method === "POST" && url.pathname === "/api/whatsapp/booking-confirm") {
+    try {
+      const body = await readBody(req);
+      const { phone, name, eventName, date, bookingId, amount } = body;
+      if (!phone) return send(res, 400, { success: false, error: "Phone required" });
+      const msg = `Hi ${name||'there'}! 🎉 Your booking is confirmed!\n\n🎟 *${eventName||'Event'}*\n📅 ${date||''}\n🔖 Booking ID: ${bookingId||''}\n💰 Amount: ${amount?'₹'+amount:'Free'}\n\nSee you there! — CultureWave`;
+      const waToken   = process.env.WHATSAPP_TOKEN || "";
+      const waPhoneId = process.env.WHATSAPP_PHONE_ID || "";
+      if (waToken && waPhoneId) {
+        const to = phone.replace(/\D/g, "");
+        await fetch(`https://graph.facebook.com/v19.0/${waPhoneId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${waToken}` },
+          body: JSON.stringify({ messaging_product: "whatsapp", to, type: "text", text: { body: msg } })
+        });
+      } else {
+        console.log(`[WhatsApp Booking] To: ${phone} | ${msg}`);
+      }
+      return send(res, 200, { success: true });
+    } catch (error) {
+      return send(res, 500, { success: false, error: error.message });
+    }
+  }
+
   // ── INSTAGRAM OAUTH ──
   if (req.method === "GET" && url.pathname === "/api/instagram/connect") {
     const session = requireSession(req);

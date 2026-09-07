@@ -2740,7 +2740,7 @@ async function saveEvent(status) {
   });
 
   const payload = {
-    ownerId: uid, name, urlKey, summary, description,
+    ownerId: uid, organiserId: uid, name, urlKey, summary, description,
     category: document.getElementById('category').value,
     tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
     eventType,
@@ -2817,7 +2817,8 @@ async function saveEvent(status) {
     } else {
       await addDoc(collection(db, 'events'), payload);
       localStorage.removeItem(localDraftKey);
-      window.location.href = 'premium-client-dashboard.html';
+      const fromParam = new URLSearchParams(location.search).get('from');
+      window.location.href = fromParam === 'nightlife' ? 'dashboard-nightlife.html' : 'dashboard-brunch.html';
     }
   } catch (err) {
     alert('Error saving event: ' + err.message);

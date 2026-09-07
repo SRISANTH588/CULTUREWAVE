@@ -609,15 +609,7 @@
               </div>
 
               <div class="form-field">
-                <span class="form-label">Email <span style="color:rgba(180,150,80,0.8);font-size:.63rem;font-weight:800;letter-spacing:.08em;">· OTP VERIFIED</span></span>
-                <div class="form-input-wrap">
-                  <span class="form-icon">📧</span>
-                  <input id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email" />
-                </div>
-              </div>
-
-              <div class="form-field">
-                <span class="form-label">WhatsApp Number</span>
+                <span class="form-label">WhatsApp Number <span style="color:rgba(180,150,80,0.8);font-size:.63rem;font-weight:800;letter-spacing:.08em;">· OTP VERIFIED</span></span>
                 <div class="form-input-wrap">
                   <span class="form-icon">📱</span>
                   <span class="wa-prefix">+91</span>
@@ -641,9 +633,9 @@
             <!-- STEP 2: OTP Verify -->
             <div id="signupStep2" style="display:none;">
               <div class="signup-step2-header">
-                <div class="signup-step2-icon">📧</div>
-                <div class="signup-step2-title">Verify your email</div>
-                <div class="signup-step2-sub">6-digit code sent to <strong id="otpEmailDisplay"></strong></div>
+                <div class="signup-step2-icon">📱</div>
+                <div class="signup-step2-title">Verify your WhatsApp</div>
+                <div class="signup-step2-sub">6-digit OTP sent to <strong id="otpEmailDisplay"></strong></div>
               </div>
 
               <div class="signup-divider"></div>
@@ -674,13 +666,6 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script>
-      const EMAILJS_PUBLIC_KEY  = "PDb2vpOIeLkbZBBFP";
-      const EMAILJS_SERVICE_ID  = "service_esppdwf";
-      const EMAILJS_OTP_TEMPLATE = "template_8ho2pwf";
-      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-    </script>
     <script type="module">
       import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword,
         GoogleAuthProvider, signInWithPopup, updateProfile,
@@ -755,7 +740,14 @@
       }
 
       function redirect(role) {
-        window.location.href = role === "admin" ? "admin-dashboard.html" : "premium-client-dashboard.html";
+        // Check if coming from event-type-select with a specific dashboard
+        const params = new URLSearchParams(location.search);
+        const dash = params.get('dash') || sessionStorage.getItem('cw_lister_dash');
+        const listerRole = params.get('role') || sessionStorage.getItem('cw_lister_role');
+        try { sessionStorage.removeItem('cw_lister_cat'); sessionStorage.removeItem('cw_lister_dash'); sessionStorage.removeItem('cw_lister_role'); } catch(e) {}
+        if (role === 'admin') { window.location.href = 'admin-dashboard.html'; return; }
+        if (dash && listerRole !== 'customer') { window.location.href = dash; return; }
+        window.location.href = 'premium-client-dashboard.html';
       }
 
       function setMode(mode) {
@@ -803,91 +795,64 @@
         }
       });
 
-      // ── OTP state ──
-      let pendingOtp = null;
-      let pendingOtpEmail = null;
-
-      function generateOtp() { return String(Math.floor(100000 + Math.random() * 900000)); }
-
-      async function sendOtpEmail(email, otp, name) {
-        await setDoc(doc(db, 'emailOtps', email), {
-          otp,
-          expiresAt: Date.now() + 10 * 60 * 1000,
-          createdAt: Date.now()
-        });
-        await emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_OTP_TEMPLATE,
-          {
-            to_name:   name || 'User',
-            to_email:  email,
-            otp_code:  otp,
-            reply_to:  'support.culturewave@gmail.com',
-          }
-        );
-      }
-
       document.getElementById('sendOtpBtn').addEventListener('click', async () => {
         const name = document.getElementById('signupName').value.trim();
-        const email = document.getElementById('signupEmail').value.trim();
+        const email = document.getElementById('signupEmail') ? document.getElementById('signupEmail').value.trim() : '';
         const whatsapp = document.getElementById('signupWhatsapp').value.trim();
         const password = document.getElementById('signupPassword').value;
         if (!name) { setStatus('Enter your full name.', 'warning'); return; }
         if (!email || !email.includes('@')) { setStatus('Enter a valid email.', 'warning'); return; }
         if (!whatsapp || whatsapp.length !== 10) { setStatus('Enter a valid 10-digit WhatsApp number.', 'warning'); return; }
         if (!password || password.length < 6) { setStatus('Password must be at least 6 characters.', 'warning'); return; }
-        setStatus('Sending OTP...', 'info');
+        setStatus('Sending OTP to your WhatsApp…', 'info');
         try {
-          pendingOtp = generateOtp();
-          pendingOtpEmail = email;
-          await sendOtpEmail(email, pendingOtp, name);
+          const res = await fetch('/api/whatsapp/send-otp', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ phone: '+91'+whatsapp, name }) });
+          const data = await res.json();
+          if (!data.success) throw new Error(data.error || 'Failed to send OTP');
           document.getElementById('signupStep1').style.display = 'none';
           document.getElementById('signupStep2').style.display = '';
-          document.getElementById('otpEmailDisplay').textContent = email;
-          setStatus('OTP sent! Check your inbox.', 'success');
+          document.getElementById('otpEmailDisplay').textContent = '+91 ' + whatsapp;
+          setStatus('OTP sent to your WhatsApp!', 'success');
         } catch(err) {
           setStatus(err.message, 'warning');
         }
       });
 
       document.getElementById('resendOtpBtn').addEventListener('click', async () => {
-        if (!pendingOtpEmail) return;
-        setStatus('Resending OTP...', 'info');
-        pendingOtp = generateOtp();
-        await sendOtpEmail(pendingOtpEmail, pendingOtp, document.getElementById('signupName').value.trim());
-        setStatus('OTP resent! Check your inbox.', 'success');
+        const whatsapp = document.getElementById('signupWhatsapp').value.trim();
+        const name = document.getElementById('signupName').value.trim();
+        if (!whatsapp) return;
+        setStatus('Resending OTP…', 'info');
+        const res = await fetch('/api/whatsapp/send-otp', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ phone: '+91'+whatsapp, name }) });
+        const data = await res.json();
+        setStatus(data.success ? 'OTP resent to your WhatsApp!' : 'Failed to resend.', data.success ? 'success' : 'warning');
       });
 
       document.querySelector("[data-auth-form='signup']").addEventListener("submit", async e => {
         e.preventDefault();
         const enteredOtp = document.getElementById('signupOtp').value.trim();
         const name = document.getElementById('signupName').value.trim();
-        const email = document.getElementById('signupEmail').value.trim();
+        const email = document.getElementById('signupEmail') ? document.getElementById('signupEmail').value.trim() : (document.getElementById('signupName').value.trim().toLowerCase().replace(/\s/g,'') + '@culturewave.user');
         const whatsapp = document.getElementById('signupWhatsapp').value.trim();
         const password = document.getElementById('signupPassword').value;
         if (!enteredOtp) { setStatus('Enter the OTP.', 'warning'); return; }
-        setStatus('Verifying OTP...', 'info');
+        setStatus('Verifying OTP…', 'info');
         try {
-          // Verify OTP from Firestore
-          const otpSnap = await getDoc(doc(db, 'emailOtps', email));
+          const otpSnap = await getDoc(doc(db, 'whatsappOtps', '+91' + whatsapp));
           if (!otpSnap.exists()) { setStatus('OTP expired. Please resend.', 'warning'); return; }
           const { otp, expiresAt } = otpSnap.data();
           if (Date.now() > expiresAt) { setStatus('OTP expired. Please resend.', 'warning'); return; }
           if (enteredOtp !== otp) { setStatus('Incorrect OTP. Try again.', 'warning'); return; }
-          // OTP correct — create account
-          setStatus('Creating account...', 'info');
+          setStatus('Creating account…', 'info');
           const { user } = await createUserWithEmailAndPassword(auth, email, password);
           await updateProfile(user, { displayName: name });
           await setDoc(doc(db, 'users', user.uid), {
             name, email,
             whatsapp: '+91' + whatsapp,
             role: 'client',
-            emailVerified: true,
             createdAt: Date.now()
           });
-          // Clean up OTP
-          await setDoc(doc(db, 'emailOtps', email), { used: true }, { merge: true });
-          setStatus('Account created! Redirecting...', 'success');
+          setStatus('Account created! Redirecting…', 'success');
           redirect('client');
         } catch(err) {
           const msg = err.code === 'auth/email-already-in-use' ? 'Account already exists. Try logging in.' : err.message;
@@ -915,6 +880,8 @@
       });
 
       setMode("login");
+      // auto-open signup tab if coming from event-type-select
+      if(new URLSearchParams(location.search).get('tab')==='signup') setMode('signup');
     </script>
   </body>
 </html>

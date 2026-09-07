@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CultureWave | List Your Event</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;font-family:Manrope,sans-serif;background:#05080f;color:#fff;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+button{font:inherit;cursor:pointer;border:0;background:none;}
+
+/* ── AMBIENT BG ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%,rgba(18,66,197,.18) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%,rgba(124,58,237,.14) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(47,107,255,.06) 0%,transparent 70%);
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 2rem;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  backdrop-filter:blur(12px);
+  background:rgba(5,8,15,.7);
+}
+.logo{font-size:1.2rem;font-weight:900;letter-spacing:-.04em;}
+.logo span{
+  background:linear-gradient(90deg,#7eb3ff,#a78bfa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.topbar-right{display:flex;align-items:center;gap:.75rem;}
+.back-btn{
+  font-size:.78rem;font-weight:700;color:rgba(255,255,255,.4);
+  padding:.38rem .9rem;border:1px solid rgba(255,255,255,.1);
+  border-radius:999px;transition:all .2s;
+}
+.back-btn:hover{color:#fff;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.05);}
+.login-btn{
+  font-size:.78rem;font-weight:800;color:#fff;
+  padding:.4rem 1rem;border-radius:999px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  transition:all .2s;
+}
+.login-btn:hover{background:rgba(255,255,255,.14);}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:1;
+  text-align:center;padding:3.5rem 1.5rem 2rem;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(126,179,255,.08);
+  border:1px solid rgba(126,179,255,.2);
+  border-radius:999px;padding:.32rem 1rem;
+  font-size:.65rem;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:#7eb3ff;margin-bottom:1.2rem;
+}
+.hero-badge::before{content:'✦';font-size:.6rem;}
+.hero h1{
+  font-size:clamp(2rem,5vw,3.2rem);font-weight:900;
+  letter-spacing:-.06em;line-height:1.05;margin-bottom:.7rem;
+}
+.hero h1 .grad{
+  background:linear-gradient(135deg,#fff 0%,#7eb3ff 50%,#a78bfa 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{font-size:.92rem;color:rgba(255,255,255,.38);max-width:440px;margin:0 auto;line-height:1.7;}
+
+/* ── STEP BAR ── */
+.stepbar{
+  position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  gap:.5rem;padding:1rem 1.5rem .5rem;
+}
+.stp{display:flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.2);}
+.stp.active{color:#7eb3ff;}
+.stp.done{color:#4ade80;}
+.stp-n{
+  width:22px;height:22px;border-radius:50%;
+  border:1.5px solid currentColor;
+  display:grid;place-items:center;
+  font-size:.6rem;font-weight:900;flex:none;
+}
+.stp.active .stp-n{background:rgba(126,179,255,.15);}
+.stp.done .stp-n{background:rgba(74,222,128,.15);}
+.stp-line{width:36px;height:1px;background:rgba(255,255,255,.08);}
+
+/* ── PANELS ── */
+.panel{display:none;position:relative;z-index:1;}
+.panel.on{display:block;}
+
+/* ══ STEP 1: CATEGORY ══ */
+.cat-section{max-width:960px;margin:0 auto;padding:1.8rem 1.4rem 1rem;}
+.cat-hint{
+  text-align:center;font-size:.78rem;font-weight:600;
+  color:rgba(255,255,255,.28);margin-bottom:1.4rem;
+  letter-spacing:.02em;
+}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;}
+@media(max-width:580px){.cat-grid{grid-template-columns:repeat(2,1fr);gap:.55rem;}}
+
+.cat-card{
+  position:relative;border-radius:20px;overflow:hidden;
+  aspect-ratio:3/2;cursor:pointer;
+  border:1.5px solid rgba(255,255,255,.08);
+  transition:transform .25s cubic-bezier(.4,0,.2,1),border-color .25s,box-shadow .25s;
+}
+.cat-card:hover{
+  transform:translateY(-5px) scale(1.02);
+  border-color:rgba(255,255,255,.3);
+  box-shadow:0 24px 56px rgba(0,0,0,.7);
+}
+.cat-card.sel{
+  border-color:#7eb3ff;
+  box-shadow:0 0 0 3px rgba(126,179,255,.25),0 20px 48px rgba(0,0,0,.6);
+}
+.cat-bg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  transition:transform .4s ease;
+}
+.cat-card:hover .cat-bg,.cat-card.sel .cat-bg{transform:scale(1.08);}
+.cat-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.15) 65%,transparent 100%);
+}
+.cat-glow{
+  position:absolute;inset:0;opacity:0;
+  transition:opacity .3s;
+}
+.cat-card.sel .cat-glow,.cat-card:hover .cat-glow{opacity:1;}
+.cat-emoji{position:absolute;top:.8rem;left:.85rem;z-index:3;font-size:1.5rem;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));}
+.cat-name{
+  position:absolute;bottom:.75rem;left:.85rem;z-index:3;
+  font-size:.85rem;font-weight:900;letter-spacing:.04em;
+  text-transform:uppercase;
+  text-shadow:0 2px 8px rgba(0,0,0,.8);
+}
+.cat-sub{
+  position:absolute;bottom:.3rem;left:.85rem;z-index:3;
+  font-size:.6rem;font-weight:600;color:rgba(255,255,255,.5);
+  letter-spacing:.04em;
+}
+.cat-tick{
+  position:absolute;top:.65rem;right:.65rem;z-index:4;
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,#7eb3ff,#a78bfa);
+  display:none;place-items:center;
+  font-size:.65rem;color:#000;font-weight:900;
+  box-shadow:0 2px 8px rgba(126,179,255,.5);
+}
+.cat-card.sel .cat-tick{display:grid;}
+
+/* per-category photo + glow */
+.cat-nightlife .cat-bg{background-image:url('party.jpg');background-color:#0a1a2e;}
+.cat-nightlife .cat-glow{background:radial-gradient(ellipse at 30% 80%,rgba(124,58,237,.35),transparent 60%);}
+.cat-brunch .cat-bg{background-image:url('brunch.jpg');background-color:#3a1f00;}
+.cat-brunch .cat-glow{background:radial-gradient(ellipse at 30% 80%,rgba(217,119,6,.35),transparent 60%);}
+.cat-dining .cat-bg{background-image:url('culinary.jpg');background-color:#2a0000;}
+.cat-dining .cat-glow{background:radial-gradient(ellipse at 30% 80%,rgba(220,38,38,.3),transparent 60%);}
+.cat-workshops .cat-bg{background-image:url('workshop.jpg');background-color:#2a1200;}
+.cat-workshops .cat-glow{background:radial-gradient(ellipse at 30% 80%,rgba(234,88,12,.3),transparent 60%);}
+.cat-experiences .cat-bg{background-image:url('community.jpg');background-color:#001a16;}
+.cat-experiences .cat-glow{background:radial-gradient(ellipse at 30% 80%,rgba(5,150,105,.3),transparent 60%);}
+.cat-music .cat-bg{background-image:url('music.jpg');background-color:#001a08;}
+.cat-music .cat-glow{background:radial-gradient(ellipse at 30% 80%,rgba(22,163,74,.3),transparent 60%);}
+
+/* ── CTA ── */
+.cta-wrap{max-width:500px;margin:1.2rem auto 0;padding:0 1.4rem 3rem;}
+.cta-btn{
+  width:100%;min-height:52px;border-radius:14px;
+  background:linear-gradient(135deg,#2f6bff,#1242c5);
+  color:#fff;font-size:.92rem;font-weight:800;
+  box-shadow:0 8px 28px rgba(18,66,197,.4);
+  transition:transform .15s,box-shadow .15s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  letter-spacing:-.01em;
+}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(18,66,197,.5);}
+.cta-btn:active{transform:translateY(0);}
+.cta-btn:disabled{opacity:.25;cursor:not-allowed;transform:none;box-shadow:none;}
+.back-link{
+  display:block;text-align:center;margin-top:.65rem;
+  font-size:.78rem;font-weight:700;color:rgba(255,255,255,.25);cursor:pointer;
+  transition:color .2s;
+}
+.back-link:hover{color:rgba(255,255,255,.55);}
+
+/* ══ STEP 2: INFO ══ */
+.info-wrap{max-width:800px;margin:0 auto;padding:1.6rem 1.4rem;}
+
+/* banner */
+.info-banner{
+  border-radius:22px;overflow:hidden;position:relative;
+  height:180px;margin-bottom:1.6rem;
+  border:1px solid rgba(255,255,255,.08);
+}
+.info-banner-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+.info-banner-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.25) 100%);
+}
+.info-banner-content{position:absolute;inset:0;z-index:2;display:flex;align-items:flex-end;padding:1.2rem 1.4rem;}
+.info-banner-emoji{font-size:2.2rem;margin-right:.75rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6));}
+.info-banner-text{}
+.info-banner-title{font-size:1.5rem;font-weight:900;letter-spacing:-.05em;color:#fff;line-height:1;}
+.info-banner-sub{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:.25rem;}
+
+/* section label */
+.sec-lbl{
+  font-size:.6rem;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(255,255,255,.25);
+  margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;
+}
+.sec-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06);}
+
+/* event type pills */
+.ev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin-bottom:1.8rem;}
+@media(min-width:520px){.ev-grid{grid-template-columns:repeat(3,1fr);}}
+.ev-pill{
+  display:flex;align-items:center;gap:.55rem;
+  padding:.6rem .85rem;border-radius:12px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  font-size:.78rem;font-weight:700;color:rgba(255,255,255,.7);
+  transition:background .18s,border-color .18s;
+}
+.ev-pill:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);}
+.ev-pill-icon{font-size:1.05rem;flex:none;}
+
+/* feature cards */
+.feat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:1.8rem;}
+@media(min-width:520px){.feat-grid{grid-template-columns:repeat(3,1fr);}}
+.feat-card{
+  padding:.9rem 1rem;border-radius:14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  transition:background .18s,border-color .18s;
+}
+.feat-card:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);}
+.feat-icon{font-size:1.2rem;margin-bottom:.4rem;}
+.feat-name{font-size:.8rem;font-weight:800;color:#fff;margin-bottom:.15rem;}
+.feat-desc{font-size:.68rem;color:rgba(255,255,255,.35);line-height:1.45;}
+
+/* role cards */
+.role-grid{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1rem;}
+.role-card{
+  display:flex;align-items:center;gap:.9rem;
+  padding:.95rem 1.1rem;border-radius:16px;
+  border:1.5px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  cursor:pointer;transition:border-color .18s,background .18s,transform .18s;
+}
+.role-card:hover{
+  border-color:rgba(255,255,255,.2);
+  background:rgba(255,255,255,.06);
+  transform:translateX(3px);
+}
+.role-card.sel{
+  border-color:#7eb3ff;
+  background:rgba(126,179,255,.07);
+  transform:translateX(3px);
+}
+.role-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:grid;place-items:center;font-size:1.25rem;flex:none;
+}
+.ri-c{background:linear-gradient(135deg,#1242c5,#2f6bff);}
+.ri-o{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+.ri-a{background:linear-gradient(135deg,#b45309,#f59e0b);}
+.role-info strong{display:block;font-size:.88rem;font-weight:800;color:#fff;margin-bottom:.12rem;}
+.role-info span{font-size:.73rem;color:rgba(255,255,255,.35);}
+.role-arr{margin-left:auto;color:rgba(255,255,255,.18);font-size:1.1rem;transition:color .18s;}
+.role-card.sel .role-arr,.role-card:hover .role-arr{color:#7eb3ff;}
+
+/* ── MOBILE ── */
+@media(max-width:480px){
+  .topbar{padding:.9rem 1.1rem;}
+  .hero{padding:2.5rem 1.1rem 1.5rem;}
+  .cat-section{padding:1.2rem .9rem .8rem;}
+  .info-wrap{padding:1.2rem .9rem;}
+  .info-banner{height:140px;}
+  .info-banner-title{font-size:1.2rem;}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">Culture<span>Wave</span></div>
+  <div class="topbar-right">
+    <a class="back-btn" href="index.html">← Home</a>
+    <a class="login-btn" href="login.html">Login</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">List Your Event</div>
+  <h1>Choose your <span class="grad">category</span><br/>see what you get</h1>
+  <p>Pick the type that fits your event — we'll show you exactly what events you can list and every feature you unlock.</p>
+</div>
+
+<div class="stepbar">
+  <div class="stp active" id="s1"><div class="stp-n">1</div> Category</div>
+  <div class="stp-line"></div>
+  <div class="stp" id="s2"><div class="stp-n">2</div> Events &amp; Features</div>
+  <div class="stp-line"></div>
+  <div class="stp" id="s3"><div class="stp-n">3</div> Login</div>
+</div>
+
+<div class="panel on" id="p1">
+  <div class="cat-section">
+    <div class="cat-hint">Tap the category that best matches your event</div>
+    <div class="cat-grid">
+      <div class="cat-card cat-nightlife" data-cat="nightlife" onclick="pickCat(this)">
+        <div class="cat-bg"></div><div class="cat-overlay"></div><div class="cat-glow"></div>
+        <span class="cat-emoji">🌙</span><span class="cat-name">Nightlife</span>
+        <span class="cat-sub">Parties · Clubs · DJ Nights</span><span class="cat-tick">✓</span>
+      </div>
+      <div class="cat-card cat-brunch" data-cat="brunch" onclick="pickCat(this)">
+        <div class="cat-bg"></div><div class="cat-overlay"></div><div class="cat-glow"></div>
+        <span class="cat-emoji">🥂</span><span class="cat-name">Brunch &amp; Bites</span>
+        <span class="cat-sub">Brunches · Pop-ups · Food</span><span class="cat-tick">✓</span>
+      </div>
+      <div class="cat-card cat-dining" data-cat="dining" onclick="pickCat(this)">
+        <div class="cat-bg"></div><div class="cat-overlay"></div><div class="cat-glow"></div>
+        <span class="cat-emoji">🍽</span><span class="cat-name">Fine Dining</span>
+        <span class="cat-sub">Chef's Table · Tasting Menus</span><span class="cat-tick">✓</span>
+      </div>
+      <div class="cat-card cat-workshops" data-cat="workshops" onclick="pickCat(this)">
+        <div class="cat-bg"></div><div class="cat-overlay"></div><div class="cat-glow"></div>
+        <span class="cat-emoji">🎨</span><span class="cat-name">Workshops</span>
+        <span class="cat-sub">Classes · Skills · Learning</span><span class="cat-tick">✓</span>
+      </div>
+      <div class="cat-card cat-experiences" data-cat="experiences" onclick="pickCat(this)">
+        <div class="cat-bg"></div><div class="cat-overlay"></div><div class="cat-glow"></div>
+        <span class="cat-emoji">🌿</span><span class="cat-name">Experiences</span>
+        <span class="cat-sub">Trips · Retreats · Culture</span><span class="cat-tick">✓</span>
+      </div>
+      <div class="cat-card cat-music" data-cat="music" onclick="pickCat(this)">
+        <div class="cat-bg"></div><div class="cat-overlay"></div><div class="cat-glow"></div>
+        <span class="cat-emoji">🎸</span><span class="cat-name">Live Music</span>
+        <span class="cat-sub">Concerts · Open Mics · Gigs</span><span class="cat-tick">✓</span>
+      </div>
+    </div>
+  </div>
+  <div class="cta-wrap">
+    <button class="cta-btn" id="s1btn" disabled onclick="goStep2()">See Events &amp; Features →</button>
+  </div>
+</div>
+
+<div class="panel" id="p2">
+  <div class="info-wrap">
+    <div class="info-banner">
+      <div class="info-banner-bg" id="infoBg"></div>
+      <div class="info-banner-overlay"></div>
+      <div class="info-banner-content">
+        <div class="info-banner-emoji" id="infoEmoji"></div>
+        <div class="info-banner-text">
+          <div class="info-banner-title" id="infoTitle"></div>
+          <div class="info-banner-sub" id="infoSub"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-lbl">Events you can list</div>
+    <div class="ev-grid" id="evGrid"></div>
+    <div class="sec-lbl">What you get on your dashboard</div>
+    <div class="feat-grid" id="featGrid"></div>
+    <div class="sec-lbl">Already have an account?</div>
+    <a href="login.html" style="display:flex;align-items:center;gap:.9rem;padding:.95rem 1.1rem;border-radius:16px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);text-decoration:none;margin-bottom:1.4rem;transition:border-color .18s,background .18s;" onmouseover="this.style.borderColor='rgba(255,255,255,.28)';this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.background='rgba(255,255,255,.03)'">
+      <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#1242c5,#2f6bff);display:grid;place-items:center;font-size:1.2rem;flex:none;">🔑</div>
+      <div>
+        <div style="font-size:.88rem;font-weight:800;color:#fff;margin-bottom:.1rem;">Previous Client / Customer / Admin</div>
+        <div style="font-size:.73rem;color:rgba(255,255,255,.38);">Already have an account? Login here</div>
+      </div>
+      <span style="margin-left:auto;color:rgba(255,255,255,.3);font-size:1.1rem;">›</span>
+    </a>
+
+  </div>
+  <div class="cta-wrap">
+    <button class="cta-btn" id="s2btn" onclick="goSignup()">Create My Lister Account →</button>
+    <span class="back-link" onclick="goBack()">← Change category</span>
+  </div>
+</div>
+
+<script>
+var D={
+  nightlife:{emoji:'🌙',title:'Nightlife',sub:'Parties, club nights, DJ sets & late-night experiences',bg:'party.jpg',dash:'dashboard-nightlife.html',
+    events:[['🎉','Party / Club Night'],['🎧','DJ Night / Rave'],['🍸','Bar Takeover'],['🥃','Cocktail Night'],['🎊','Theme Party'],['🌃','Rooftop Night Out']],
+    feats:[['🎟','Ticket Sales','Sell tickets with UPI & QR'],['📊','Analytics','Track bookings & revenue'],['💬','WhatsApp Alerts','Auto-confirm attendees'],['📸','Instagram Auto-reply','DM booking links on comment'],['📷','Check-in Scanner','QR scan at entry'],['🏦','Payouts','Weekly bank transfers']]},
+  brunch:{emoji:'🥂',title:'Brunch & Bites',sub:'Brunches, pop-ups, food events & dining experiences',bg:'brunch.jpg',dash:'dashboard-brunch.html',
+    events:[['🥂','Bottomless Brunch'],['☕','Pop-up Café'],['🍳','Dining Experience'],['🧇','Weekend Brunch'],['🥗','Food Festival Stall'],['🍰','Dessert Pop-up']],
+    feats:[['🎟','Ticket Sales','Sell seats & covers'],['📊','Analytics','Revenue & booking trends'],['💬','WhatsApp Alerts','Booking confirmations'],['📸','Instagram Auto-reply','Auto-send booking links'],['🪑','Table Management','Track covers & capacity'],['🏦','Payouts','Weekly bank transfers']]},
+  dining:{emoji:'🍽',title:'Fine Dining',sub:"Chef's tables, tasting menus & exclusive dining events",bg:'culinary.jpg',dash:'dashboard-restaurant.html',
+    events:[['👨\u200d🍳',"Chef's Table"],['🍷','Wine Pairing Dinner'],['🥩','Tasting Menu Night'],['🕯','Private Dining'],['🍣','Omakase Experience'],['🎂','Special Occasion Dinner']],
+    feats:[['🎟','Reservation System','Manage covers & seatings'],['📊','Analytics','Revenue & guest insights'],['💬','WhatsApp Confirmations','Auto-send booking details'],['📸','Instagram Growth','Auto-reply with booking link'],['🧾','GST Invoicing','Auto-generate tax invoices'],['🏦','Payouts','Weekly bank transfers']]},
+  workshops:{emoji:'🎨',title:'Workshops',sub:'Skill classes, creative workshops & learning sessions',bg:'workshop.jpg',dash:'dashboard-brunch.html',
+    events:[['🎨','Art & Craft Workshop'],['🍳','Cooking / Baking Class'],['📸','Photography Workshop'],['🧘','Yoga / Wellness Class'],['💻','Tech / Skill Workshop'],['🎭','Acting / Dance Class']],
+    feats:[['🎟','Seat Booking','Sell spots per session'],['📊','Analytics','Attendance & revenue'],['💬','WhatsApp Reminders','Auto-remind attendees'],['📋','Survey Forms','Collect feedback post-class'],['📸','Instagram Auto-reply','Share class details via DM'],['🏦','Payouts','Weekly bank transfers']]},
+  experiences:{emoji:'🌿',title:'Experiences',sub:'Outdoor trips, wellness retreats & cultural events',bg:'community.jpg',dash:'dashboard-nightlife.html',
+    events:[['🏕','Camping / Trek'],['🧘','Wellness Retreat'],['🎭','Cultural Event'],['🚣','Adventure Activity'],['🌅','Sunrise Experience'],['🎪','Community Gathering']],
+    feats:[['🎟','Ticket Sales','Sell spots for your experience'],['📊','Analytics','Bookings & revenue tracking'],['💬','WhatsApp Updates','Send trip details & reminders'],['📋','Survey Forms','Pre-event registration forms'],['📷','Check-in Scanner','QR scan at entry'],['🏦','Payouts','Weekly bank transfers']]},
+  music:{emoji:'🎸',title:'Live Music',sub:'Concerts, open mics, jam sessions & live performances',bg:'music.jpg',dash:'dashboard-nightlife.html',
+    events:[['🎸','Live Band / Concert'],['🎤','Open Mic Night'],['🎻','Classical / Jazz Show'],['🥁','Jam Session'],['🎹','Acoustic Set'],['🎺','Music Festival Stage']],
+    feats:[['🎟','Ticket Sales','General & VIP ticket tiers'],['📊','Analytics','Sales & attendance data'],['💬','WhatsApp Alerts','Booking confirmations'],['📸','Instagram Auto-reply','Auto-DM booking links'],['📷','Check-in Scanner','Fast QR entry at door'],['🏦','Payouts','Weekly bank transfers']]}
+};
+var selCat=null;
+function pickCat(el){document.querySelectorAll('.cat-card').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');selCat=el.dataset.cat;document.getElementById('s1btn').disabled=false;}
+function goStep2(){
+  if(!selCat)return;
+  var d=D[selCat];
+  document.getElementById('infoBg').style.cssText='background-image:url("'+d.bg+'");background-size:cover;background-position:center;';
+  document.getElementById('infoEmoji').textContent=d.emoji;
+  document.getElementById('infoTitle').textContent=d.title;
+  document.getElementById('infoSub').textContent=d.sub;
+  document.getElementById('evGrid').innerHTML=d.events.map(function(e){return'<div class="ev-pill"><span class="ev-pill-icon">'+e[0]+'</span>'+e[1]+'</div>';}).join('');
+  document.getElementById('featGrid').innerHTML=d.feats.map(function(f){return'<div class="feat-card"><div class="feat-icon">'+f[0]+'</div><div class="feat-name">'+f[1]+'</div><div class="feat-desc">'+f[2]+'</div></div>';}).join('');
+  document.getElementById('p1').classList.remove('on');
+  document.getElementById('p2').classList.add('on');
+  mark('s1','done');mark('s2','active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goBack(){
+  document.getElementById('p2').classList.remove('on');
+  document.getElementById('p1').classList.add('on');
+  mark('s2','');mark('s1','active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goSignup(){
+  if(!selCat)return;
+  var dash=D[selCat].dash;
+  try{sessionStorage.setItem('cw_lister_cat',selCat);sessionStorage.setItem('cw_lister_dash',dash);sessionStorage.setItem('cw_lister_role','client');}catch(e){}
+  mark('s2','done');mark('s3','active');
+  window.location.href='signup-lister.html?category='+encodeURIComponent(selCat)+'&dash='+encodeURIComponent(dash);
+}
+function mark(id,state){
+  var el=document.getElementById(id);
+  el.classList.remove('active','done');
+  if(state)el.classList.add(state);
+  var n=el.querySelector('.stp-n');
+  if(state==='done')n.textContent='✓';
+  else if(id==='s1')n.textContent='1';
+  else if(id==='s2')n.textContent='2';
+  else if(id==='s3')n.textContent='3';
+}
+</script>
+</body>
+</html>

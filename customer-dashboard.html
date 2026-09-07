@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CultureWave | My Bookings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+:root{
+  --p:#1242c5;--p2:#2f6bff;--plight:#e8f0ff;--psoft:#f0f5ff;
+  --border:#dce4f5;--muted:#64748b;--text:#0a0f1e;--bg:#f4f8ff;--sidebar-w:240px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button{font:inherit;cursor:pointer;border:0;background:none;}
+.layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh;}
+.sidebar{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sb-brand{padding:1.2rem 1rem 1rem;border-bottom:1px solid var(--border);}
+.sb-brand-logo{font-size:1.3rem;font-weight:800;color:var(--p);letter-spacing:-.04em;font-style:italic;}
+.sb-brand-sub{font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:.15rem;}
+.sb-user{margin:.75rem .65rem .5rem;padding:.65rem .75rem;border-radius:12px;background:var(--psoft);border:1px solid var(--border);display:flex;align-items:center;gap:.6rem;}
+.sb-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1242c5,#2f6bff);display:grid;place-items:center;font-weight:700;font-size:.9rem;color:#fff;flex:none;}
+.sb-user-info strong{display:block;font-size:.84rem;font-weight:700;color:#0a0f1e;}
+.sb-user-info small{font-size:.72rem;color:var(--muted);}
+.sb-nav{flex:1;padding:.5rem .65rem;display:flex;flex-direction:column;gap:.05rem;}
+.sb-section-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#93c5fd;padding:.8rem .4rem .3rem;}
+.sb-item{display:flex;align-items:center;gap:.6rem;padding:.58rem .75rem;border-radius:10px;font-size:.84rem;font-weight:500;color:#6b7280;cursor:pointer;transition:background .12s,color .12s;width:100%;text-align:left;}
+.sb-item:hover{background:var(--psoft);color:var(--p);}
+.sb-item.active{background:linear-gradient(135deg,#1242c5,#2f6bff);color:#fff;font-weight:600;}
+.sb-icon{font-size:.9rem;width:18px;text-align:center;flex:none;}
+.sb-badge{margin-left:auto;background:#ef4444;color:#fff;font-size:.6rem;font-weight:800;padding:.1rem .4rem;border-radius:999px;min-width:18px;text-align:center;}
+.sb-item.active .sb-badge{background:rgba(255,255,255,.3);}
+.sb-footer{padding:.75rem .65rem;border-top:1px solid var(--border);}
+.main{display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.topbar-title{font-size:1rem;font-weight:700;color:#0a0f1e;}
+.topbar-right{display:flex;align-items:center;gap:.75rem;}
+.tb-icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;font-size:.9rem;cursor:pointer;position:relative;}
+.tb-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:#ef4444;border:1.5px solid #fff;}
+.tb-user-btn{display:flex;align-items:center;gap:.5rem;padding:.35rem .65rem .35rem .4rem;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;}
+.tb-user-avatar{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#1242c5,#2f6bff);display:grid;place-items:center;font-weight:700;font-size:.72rem;color:#fff;}
+.tb-user-name{font-size:.82rem;font-weight:600;color:#0a0f1e;}
+.content{flex:1;}
+.view{display:none;flex-direction:column;}
+.view.active{display:flex;}
+.page-body{padding:1.5rem;display:flex;flex-direction:column;gap:1rem;}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+.card-head h2{font-size:.92rem;font-weight:700;color:#0a0f1e;}
+.card-head p{font-size:.74rem;color:#9ca3af;margin-top:.1rem;}
+/* HERO HEADER */
+.hero-hdr{background:linear-gradient(135deg,#0a0f1e 0%,#1242c5 55%,#2f6bff 100%);border-radius:20px;padding:1.75rem 2rem;margin:1.5rem 1.5rem 0;position:relative;overflow:hidden;}
+.hero-hdr::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .8rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;}
+.hero-title{font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.04em;margin-bottom:.3rem;}
+.hero-sub{font-size:.84rem;color:rgba(255,255,255,.6);}
+.hero-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.12);margin-top:1.25rem;}
+.hero-stat{flex:1;padding:.75rem 1rem;border-right:1px solid rgba(255,255,255,.1);}
+.hero-stat:last-child{border-right:0;}
+.hero-stat-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.4);margin-bottom:.2rem;}
+.hero-stat-val{font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:-.04em;}
+.hero-stat-val.g{color:#4ade80;}
+.hero-stat-val.y{color:#fbbf24;}
+/* BOOKING CARD */
+.bk-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:box-shadow .15s;}
+.bk-card:hover{box-shadow:0 4px 20px rgba(18,66,197,.1);}
+.bk-card-top{background:linear-gradient(135deg,#0a0f1e,#1242c5,#2f6bff);padding:1rem 1.2rem;display:flex;align-items:center;gap:.85rem;position:relative;overflow:hidden;}
+.bk-card-top::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(126,179,255,.2),transparent 55%);}
+.bk-card-emoji{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);display:grid;place-items:center;font-size:1.4rem;flex:none;position:relative;z-index:1;}
+.bk-card-info{flex:1;position:relative;z-index:1;}
+.bk-card-name{font-size:.92rem;font-weight:800;color:#fff;letter-spacing:-.02em;}
+.bk-card-venue{font-size:.74rem;color:rgba(255,255,255,.6);margin-top:.15rem;}
+.bk-card-status{position:relative;z-index:1;}
+.status-pill{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .7rem;border-radius:999px;font-size:.7rem;font-weight:700;}
+.status-pill.confirmed{background:#dcfce7;color:#16a34a;}
+.status-pill.paid{background:#dcfce7;color:#16a34a;}
+.status-pill.pending{background:#fef9c3;color:#854d0e;}
+.status-pill.cancelled{background:#fee2e2;color:#991b1b;}
+.bk-card-body{padding:1rem 1.2rem;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.75rem;align-items:center;}
+.bk-detail-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:.2rem;}
+.bk-detail-val{font-size:.86rem;font-weight:700;color:#0a0f1e;}
+.bk-detail-val.blue{color:var(--p);}
+.bk-card-actions{display:flex;gap:.4rem;flex-wrap:wrap;}
+.bk-act-btn{padding:.32rem .7rem;border-radius:8px;font-size:.74rem;font-weight:600;border:1px solid var(--border);background:#fff;color:#6b7280;cursor:pointer;transition:all .12s;}
+.bk-act-btn:hover{border-color:var(--p);color:var(--p);}
+.bk-act-btn.danger{border-color:#fca5a5;color:#dc2626;}
+.bk-act-btn.danger:hover{background:#fef2f2;}
+.bk-act-btn.primary{background:linear-gradient(135deg,#1242c5,#2f6bff);color:#fff;border-color:var(--p);}
+/* QR MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;place-items:center;z-index:100;padding:1rem;}
+.modal-overlay.open{display:grid;}
+.modal{background:#fff;border-radius:24px;padding:1.5rem;width:min(420px,100%);box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-ticket{border-radius:18px;overflow:hidden;border:1.5px solid var(--border);}
+.modal-ticket-top{background:linear-gradient(135deg,#0a0f1e,#1242c5,#2f6bff);padding:1.2rem;text-align:center;}
+.modal-ticket-top h3{font-size:1rem;font-weight:800;color:#fff;margin-bottom:.2rem;}
+.modal-ticket-top p{font-size:.76rem;color:rgba(255,255,255,.6);}
+.modal-tear{border-top:2px dashed var(--border);position:relative;}
+.modal-tear::before,.modal-tear::after{content:'';width:1.2rem;height:1.2rem;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);position:absolute;top:50%;transform:translateY(-50%);}
+.modal-tear::before{left:-.65rem;}
+.modal-tear::after{right:-.65rem;}
+.modal-ticket-body{padding:1.2rem;display:flex;flex-direction:column;align-items:center;gap:.75rem;}
+.modal-qr-box{width:160px;height:160px;border-radius:16px;border:1.5px solid var(--border);background:#fff;display:grid;place-items:center;padding:.5rem;box-shadow:0 4px 16px rgba(18,66,197,.08);}
+.modal-detail-row{display:flex;justify-content:space-between;width:100%;font-size:.82rem;padding:.35rem 0;border-bottom:1px solid #f0f4ff;}
+.modal-detail-row:last-child{border-bottom:0;}
+.modal-detail-row span:first-child{color:var(--muted);font-weight:600;}
+.modal-detail-row span:last-child{font-weight:700;color:#0a0f1e;}
+.modal-actions{display:flex;gap:.5rem;margin-top:1rem;}
+.modal-btn{flex:1;height:44px;border-radius:12px;font-size:.84rem;font-weight:700;cursor:pointer;border:0;display:flex;align-items:center;justify-content:center;gap:.4rem;}
+.modal-btn.primary{background:linear-gradient(135deg,#1242c5,#2f6bff);color:#fff;}
+.modal-btn.ghost{background:#fff;border:1.5px solid var(--border);color:#6b7280;}
+.modal-btn.danger{background:#fef2f2;border:1.5px solid #fca5a5;color:#dc2626;}
+/* UPCOMING EVENTS */
+.ev-card{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;gap:0;}
+.ev-card-img{width:90px;min-height:90px;background:linear-gradient(135deg,#0a0f1e,#1242c5);display:grid;place-items:center;font-size:2rem;flex:none;}
+.ev-card-body{padding:.85rem 1rem;flex:1;}
+.ev-card-name{font-size:.88rem;font-weight:700;color:#0a0f1e;margin-bottom:.2rem;}
+.ev-card-meta{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.ev-card-price{font-size:.82rem;font-weight:800;color:var(--p);}
+.ev-card-btn{display:flex;align-items:center;padding:.85rem 1rem;}
+/* NOTIFICATION */
+.notif-item{display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1rem;border-radius:12px;background:var(--psoft);border:1px solid var(--border);margin-bottom:.5rem;}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--p);flex:none;margin-top:.3rem;}
+.notif-dot.read{background:#d1d5db;}
+.notif-content strong{display:block;font-size:.84rem;font-weight:700;color:#0a0f1e;}
+.notif-content span{font-size:.74rem;color:var(--muted);}
+.notif-time{font-size:.68rem;color:#9ca3af;white-space:nowrap;margin-left:auto;}
+/* SUPPORT */
+.support-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.2rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:box-shadow .12s;}
+.support-card:hover{box-shadow:0 4px 16px rgba(18,66,197,.1);border-color:var(--p);}
+.support-icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:1.4rem;flex:none;}
+/* REFUND */
+.refund-step{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 0;border-bottom:1px solid var(--border);}
+.refund-step:last-child{border-bottom:0;}
+.refund-step-num{width:28px;height:28px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;font-size:.72rem;font-weight:800;flex:none;}
+/* TABS */
+.tabs{display:flex;gap:.25rem;background:var(--plight);border-radius:10px;padding:.25rem;}
+.tab{padding:.4rem .9rem;border-radius:8px;font-size:.82rem;font-weight:500;color:var(--p);cursor:pointer;display:flex;align-items:center;gap:.4rem;border:0;background:none;}
+.tab.active{background:#fff;color:#0a0f1e;font-weight:700;box-shadow:0 1px 4px rgba(18,66,197,.15);}
+.tab-count{font-size:.68rem;font-weight:700;background:var(--border);color:var(--p);padding:.1rem .4rem;border-radius:999px;}
+.tab.active .tab-count{background:var(--p);color:#fff;}
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:#0a0f1e;color:#fff;padding:.65rem 1.3rem;border-radius:10px;font-size:.82rem;font-weight:600;opacity:0;transition:all .25s;z-index:200;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+/* HAMBURGER */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
+.sb-overlay.open{display:block;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
+.hamburger span{display:block;width:22px;height:2px;background:#0a0f1e;border-radius:2px;}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:fixed;left:-260px;top:0;width:260px;height:100vh;z-index:50;transition:left .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+  .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.15);}
+  .hamburger{display:flex;}
+  .bk-card-body{grid-template-columns:1fr 1fr;}
+  .hero-stats{overflow-x:auto;}
+  .hero-stat{min-width:100px;}
+  .topbar{padding:.75rem 1rem;}
+  .hero-hdr{margin:.75rem .75rem 0;padding:1.25rem 1.2rem;}
+  .hero-title{font-size:1.3rem;}
+}
+@media(max-width:560px){
+  .bk-card-body{grid-template-columns:1fr;}
+  .page-body{padding:1rem;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-logo">CultureWave</div>
+    <div class="sb-brand-sub">My Account</div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sideAvatar">U</div>
+    <div class="sb-user-info"><strong id="sidebarName">Guest</strong><small id="sidebarEmail">Loading...</small></div>
+  </div>
+  <nav class="sb-nav">
+    <button class="sb-item active" data-view="bookings"><span class="sb-icon">🎟️</span> My Bookings <span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></button>
+    <button class="sb-item" data-view="upcoming"><span class="sb-icon">📅</span> Upcoming Events</button>
+    <button class="sb-item" data-view="notifications"><span class="sb-icon">🔔</span> Notifications <span class="sb-badge" id="notifBadge" style="display:none;">0</span></button>
+    <div class="sb-section-label">Help</div>
+    <button class="sb-item" data-view="support"><span class="sb-icon">💬</span> Customer Support</button>
+    <button class="sb-item" data-view="refunds"><span class="sb-icon">💸</span> Refund Policy</button>
+    <div class="sb-section-label">Account</div>
+    <button class="sb-item" data-view="profile"><span class="sb-icon">👤</span> My Profile</button>
+    <button class="sb-item" id="logoutBtn"><span class="sb-icon">⏻</span> Logout</button>
+  </nav>
+  <div class="sb-footer">
+    <div style="background:linear-gradient(135deg,#0a0f1e,#1242c5);border-radius:12px;padding:.85rem 1rem;color:#fff;">
+      <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.6;margin-bottom:.2rem;">Need Help?</div>
+      <div style="font-size:.84rem;font-weight:700;margin-bottom:.4rem;">Contact Support</div>
+      <a href="https://wa.me/916305183601" target="_blank" style="display:flex;align-items:center;gap:.4rem;padding:.38rem .75rem;border-radius:8px;background:rgba(255,255,255,.15);color:#fff;font-size:.76rem;font-weight:700;text-decoration:none;">💬 WhatsApp Us</a>
+    </div>
+  </div>
+</aside>
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+      <div class="topbar-title" id="pageTitle">🎟️ My Bookings</div>
+    </div>
+    <div class="topbar-right">
+      <a href="events.html" style="font-size:.82rem;font-weight:500;color:#6b7280;">⬡ Browse Events</a>
+      <button class="tb-icon-btn" id="notifBtn" onclick="switchView('notifications')">🔔<span class="tb-dot" id="notifDot" style="display:none;"></span></button>
+      <button class="tb-user-btn" onclick="switchView('profile')">
+        <div class="tb-user-avatar" id="topAvatar">U</div>
+        <span class="tb-user-name" id="topName">User</span>
+      </button>
+    </div>
+  </header>
+  <div class="content">

@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CultureWave | Create Lister Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;font-family:Manrope,sans-serif;background:#05080f;color:#fff;}
+a{text-decoration:none;color:inherit;}
+button,input{font:inherit;cursor:pointer;border:0;background:none;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 10% 0%,rgba(18,66,197,.2) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 90% 100%,rgba(124,58,237,.14) 0%,transparent 55%);}
+
+.shell{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+@media(max-width:860px){.shell{grid-template-columns:1fr;}}
+
+/* LEFT */
+.left{position:relative;z-index:1;background:linear-gradient(145deg,#05080f 0%,#0a1428 40%,#0d1f4a 100%);display:flex;flex-direction:column;justify-content:space-between;padding:2.5rem 3rem;overflow:hidden;}
+.left::before{content:'';position:absolute;top:-100px;right:-100px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(47,107,255,.22) 0%,transparent 70%);pointer-events:none;}
+.left::after{content:'';position:absolute;bottom:-80px;left:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(18,66,197,.16) 0%,transparent 70%);pointer-events:none;}
+.left-logo{position:relative;z-index:1;}
+.left-logo-name{font-size:1.7rem;font-weight:900;letter-spacing:-.04em;color:#fff;}
+.left-logo-name span{background:linear-gradient(90deg,#7eb3ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.left-logo-sub{font-size:.62rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:.2rem;}
+.left-hero{position:relative;z-index:1;}
+.left-cat-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:.32rem .9rem;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:1rem;}
+.left-hero h1{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;letter-spacing:-.06em;line-height:1.05;color:#fff;margin-bottom:.8rem;}
+.left-hero h1 span{background:linear-gradient(135deg,#7eb3ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.left-hero p{font-size:.9rem;color:rgba(255,255,255,.45);line-height:1.7;max-width:360px;margin-bottom:2rem;}
+.left-features{display:flex;flex-direction:column;gap:.65rem;}
+.left-feat{display:flex;align-items:center;gap:.75rem;padding:.7rem .9rem;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);}
+.left-feat-icon{font-size:1.1rem;flex:none;}
+.left-feat-text{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.75);}
+.left-bottom{position:relative;z-index:1;}
+.left-login-note{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);}
+.left-login-note span{font-size:.8rem;color:rgba(255,255,255,.45);}
+.left-login-note a{font-size:.82rem;font-weight:800;color:#7eb3ff;padding:.35rem .85rem;border-radius:8px;background:rgba(126,179,255,.1);border:1px solid rgba(126,179,255,.2);transition:background .2s;}
+.left-login-note a:hover{background:rgba(126,179,255,.2);}
+@media(max-width:860px){.left{display:none;}}
+
+/* RIGHT */
+.right{position:relative;z-index:1;background:#f4f7ff;display:flex;align-items:center;justify-content:center;padding:2rem 1.5rem;}
+@media(max-width:860px){.right{min-height:100vh;background:linear-gradient(160deg,#05080f 0%,#0d1f4a 100%);padding:2rem 1.2rem;}}
+
+.card{width:min(440px,100%);background:#fff;border-radius:28px;padding:2.2rem 2rem;box-shadow:0 24px 60px rgba(18,66,197,.1),0 4px 16px rgba(0,0,0,.04);border:1px solid rgba(18,66,197,.08);}
+@media(max-width:860px){.card{background:rgba(255,255,255,.97);box-shadow:0 32px 80px rgba(0,0,0,.4);}}
+
+.card-cat-pill{display:inline-flex;align-items:center;gap:.4rem;background:#f0f5ff;border:1px solid #dce8ff;border-radius:999px;padding:.28rem .85rem;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#1242c5;margin-bottom:1rem;}
+.card-head h2{font-size:1.6rem;font-weight:900;letter-spacing:-.05em;color:#0a0f1e;margin-bottom:.25rem;}
+.card-head h2 span{color:#1242c5;}
+.card-head p{font-size:.84rem;color:#6b7280;margin-bottom:1.2rem;}
+
+.status{font-size:.8rem;min-height:1.1rem;text-align:center;padding:.38rem .6rem;border-radius:8px;color:#6b7280;margin-bottom:.5rem;}
+.status[data-k="success"]{background:#dcfce7;color:#166534;}
+.status[data-k="warning"]{background:#fef9c3;color:#854d0e;}
+.status[data-k="info"]{background:#eff6ff;color:#1e40af;}
+
+.form{display:flex;flex-direction:column;gap:.85rem;}
+.field{display:flex;flex-direction:column;gap:.35rem;}
+.field-label{font-size:.68rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#5f6f95;}
+.input-wrap{display:flex;align-items:center;gap:.55rem;padding:0 .9rem;min-height:50px;border-radius:13px;border:1.5px solid #dce4f5;background:#f7faff;transition:border-color .2s,box-shadow .2s;}
+.input-wrap:focus-within{border-color:#1242c5;background:#fff;box-shadow:0 0 0 3px rgba(18,66,197,.08);}
+.input-wrap input{flex:1;border:0;outline:0;background:transparent;color:#0a0f1e;font-size:.9rem;}
+.input-wrap input::placeholder{color:#b0bcd4;}
+.input-icon{font-size:.95rem;flex:none;}
+.wa-pre{font-size:.8rem;color:#6b7280;padding-right:.25rem;}
+.eye{color:#94a3b8;font-size:.82rem;padding:0;line-height:1;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(18,66,197,.15),transparent);margin:.1rem 0 .4rem;}
+
+.submit-btn{width:100%;min-height:50px;border-radius:13px;background:linear-gradient(135deg,#2f6bff,#1242c5);color:#fff;font-size:.92rem;font-weight:800;box-shadow:0 8px 24px rgba(18,66,197,.3);transition:transform .15s,box-shadow .15s;letter-spacing:-.01em;}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(18,66,197,.4);}
+.submit-btn:active{transform:translateY(0);}
+
+.otp-header{text-align:center;margin-bottom:1rem;}
+.otp-icon{width:3rem;height:3rem;border-radius:50%;background:linear-gradient(135deg,rgba(18,66,197,.12),rgba(47,107,255,.06));border:1px solid rgba(18,66,197,.2);display:grid;place-items:center;font-size:1.3rem;margin:0 auto .6rem;}
+.otp-title{font-size:.92rem;font-weight:800;color:#0a0f1e;}
+.otp-sub{font-size:.75rem;color:#6b7280;margin-top:.2rem;}
+.otp-sub strong{color:#1242c5;}
+#otpInput{letter-spacing:.4em;font-size:1.2rem;font-weight:800;text-align:center;}
+.otp-actions{display:flex;justify-content:center;align-items:center;gap:.5rem;margin-top:.6rem;}
+.otp-btn{font-size:.78rem;font-weight:700;padding:.2rem .5rem;border-radius:6px;transition:background .15s;}
+.otp-btn.blue{color:#1242c5;}.otp-btn.blue:hover{background:#f0f5ff;}
+.otp-btn.grey{color:#6b7280;}.otp-btn.grey:hover{background:#f3f4f6;}
+.otp-dot{color:#d1d5db;font-size:.65rem;}
+.card-footer{margin-top:1.2rem;text-align:center;font-size:.82rem;color:#6b7280;}
+.card-footer a{color:#1242c5;font-weight:800;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="left">
+  <div class="left-logo">
+    <div class="left-logo-name">Culture<span>Wave</span></div>
+    <div class="left-logo-sub">by OGSHOOTS LUXE</div>
+  </div>
+  <div class="left-hero">
+    <div class="left-cat-badge" id="leftBadge">✦ New Lister</div>
+    <h1>Start listing<br/><span id="leftCatName">your events</span><br/>today.</h1>
+    <p>Create your free account and get access to your personalised dashboard, ticket sales, analytics and more.</p>
+    <div class="left-features">
+      <div class="left-feat"><span class="left-feat-icon">🎟</span><span class="left-feat-text">Sell tickets with UPI &amp; QR</span></div>
+      <div class="left-feat"><span class="left-feat-icon">📊</span><span class="left-feat-text">Real-time analytics &amp; revenue</span></div>
+      <div class="left-feat"><span class="left-feat-icon">💬</span><span class="left-feat-text">WhatsApp booking confirmations</span></div>
+      <div class="left-feat"><span class="left-feat-icon">🏦</span><span class="left-feat-text">Weekly bank payouts</span></div>
+    </div>
+  </div>
+  <div class="left-bottom">
+    <div class="left-login-note">
+      <span>Already have an account?</span>
+      <a href="login.html">Login →</a>
+    </div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="card">
+
+    <!-- STEP 1 -->
+    <div id="step1">
+      <div class="card-cat-pill" id="cardPill">✦ New Lister</div>
+      <div class="card-head">
+        <h2>Create your <span>account</span></h2>
+        <p>Fill in your details — we'll verify your email with an OTP.</p>
+      </div>
+      <div class="status" id="st1"></div>
+      <div class="form">
+        <div class="field">
+          <span class="field-label">Full Name</span>
+          <div class="input-wrap"><span class="input-icon">✏️</span><input id="fname" type="text" placeholder="Your full name" autocomplete="name"/></div>
+        </div>
+        <div class="field">
+          <span class="field-label">Email <span style="font-size:.6rem;color:#1242c5;font-weight:800;letter-spacing:.06em;">· OTP VERIFIED</span></span>
+          <div class="input-wrap"><span class="input-icon">📧</span><input id="femail" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+        </div>
+        <div class="field">
+          <span class="field-label">WhatsApp Number</span>
+          <div class="input-wrap"><span class="input-icon">📱</span><span class="wa-pre">+91</span><input id="fphone" type="tel" placeholder="9876543210" maxlength="10" autocomplete="tel"/></div>
+        </div>
+        <div class="field">
+          <span class="field-label">Password</span>
+          <div class="input-wrap"><span class="input-icon">🔒</span><input id="fpass" type="password" placeholder="Min 6 characters" autocomplete="new-password"/><button class="eye" type="button" onclick="toggleEye(this)">◔</button></div>
+        </div>
+        <div class="divider"></div>
+        <button class="submit-btn" type="button" onclick="sendOtp()">Send Verification OTP →</button>
+      </div>
+      <div class="card-footer">Already have an account? <a href="login.html">Login here</a></div>
+    </div>
+
+    <!-- STEP 2: OTP -->
+    <div id="step2" style="display:none;">
+      <div class="status" id="st2"></div>
+      <div class="otp-header">
+        <div class="otp-icon">📱</div>
+        <div class="otp-title">Verify your WhatsApp</div>
+        <div class="otp-sub">6-digit OTP sent to <strong id="otpPhoneShow"></strong></div>
+      </div>
+      <div class="divider"></div>
+      <div class="form">
+        <div class="field">
+          <span class="field-label">One-Time Password</span>
+          <div class="input-wrap"><span class="input-icon">🔑</span><input id="otpInput" type="text" placeholder="· · · · · ·" maxlength="6" inputmode="numeric"/></div>
+        </div>
+        <button class="submit-btn" type="button" onclick="verifyAndCreate()">Verify &amp; Create Account →</button>
+        <div class="otp-actions">
+          <button class="otp-btn blue" type="button" onclick="resendOtp()">Resend OTP</button>
+          <span class="otp-dot">●</span>
+          <button class="otp-btn grey" type="button" onclick="backToStep1()">Change email</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+var params=new URLSearchParams(location.search);
+var CAT  = params.get('category') || sessionStorage.getItem('cw_lister_cat') || '';
+var DASH = params.get('dash')     || sessionStorage.getItem('cw_lister_dash') || 'premium-client-dashboard.html';
+
+var CAT_LABELS={nightlife:'🌙 Nightlife',brunch:'🥂 Brunch & Bites',dining:'🍽 Fine Dining',workshops:'🎨 Workshops',experiences:'🌿 Experiences',music:'🎸 Live Music'};
+var CAT_NAMES={nightlife:'Nightlife Events',brunch:'Brunch & Bites',dining:'Fine Dining',workshops:'Workshops',experiences:'Experiences',music:'Live Music'};
+var label=CAT_LABELS[CAT]||'✦ New Lister';
+document.getElementById('leftBadge').textContent=label;
+document.getElementById('leftCatName').textContent=CAT_NAMES[CAT]||'your events';
+document.getElementById('cardPill').textContent=label;
+
+function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=msg;el.dataset.k=k||'';}
+function toggleEye(btn){var i=btn.previousElementSibling;i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'◔':'◉';}
+
+async function sendOtp(){
+  var name=document.getElementById('fname').value.trim();
+  var email=document.getElementById('femail').value.trim();
+  var phone=document.getElementById('fphone').value.trim();
+  var pass=document.getElementById('fpass').value;
+  if(!name){setStatus('Enter your full name.','warning','st1');return;}
+  if(!email||!email.includes('@')){setStatus('Enter a valid email.','warning','st1');return;}
+  if(!phone||phone.length!==10){setStatus('Enter a valid 10-digit WhatsApp number.','warning','st1');return;}
+  if(!pass||pass.length<6){setStatus('Password must be at least 6 characters.','warning','st1');return;}
+  setStatus('Sending OTP to your WhatsApp…','info','st1');
+  try{
+    var res=await fetch('/api/whatsapp/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:'+91'+phone,name:name})});
+    var data=await res.json();
+    if(!data.success)throw new Error(data.error||'Failed to send OTP');
+    document.getElementById('otpPhoneShow').textContent='+91 '+phone;
+    document.getElementById('step1').style.display='none';
+    document.getElementById('step2').style.display='';
+    setStatus('OTP sent to your WhatsApp! Check your messages.','success','st2');
+  }catch(e){setStatus(e.message||'Failed to send OTP.','warning','st1');}
+}
+
+async function resendOtp(){
+  var phone=document.getElementById('fphone').value.trim();
+  var name=document.getElementById('fname').value.trim();
+  setStatus('Resending OTP…','info','st2');
+  try{
+    var res=await fetch('/api/whatsapp/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:'+91'+phone,name:name})});
+    var data=await res.json();
+    if(!data.success)throw new Error(data.error||'Failed');
+    setStatus('OTP resent to your WhatsApp!','success','st2');
+  }catch(e){setStatus('Failed to resend.','warning','st2');}
+}
+
+function backToStep1(){
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step1').style.display='';
+}
+</script>
+<script type="module">
+import{auth,db,createUserWithEmailAndPassword,updateProfile,doc,setDoc,getDoc,serverTimestamp}from'./firebase.js';
+
+window.verifyAndCreate=async function(){
+  var entered=document.getElementById('otpInput').value.trim();
+  var phone=document.getElementById('fphone').value.trim();
+  if(!entered){setStatus('Enter the OTP.','warning','st2');return;}
+  setStatus('Verifying OTP…','info','st2');
+  // verify from Firestore
+  var snap=await getDoc(doc(db,'whatsappOtps','+91'+phone));
+  if(!snap.exists()){setStatus('OTP expired. Please resend.','warning','st2');return;}
+  var d=snap.data();
+  if(Date.now()>d.expiresAt){setStatus('OTP expired. Please resend.','warning','st2');return;}
+  if(entered!==d.otp){setStatus('Incorrect OTP. Try again.','warning','st2');return;}
+
+  var name=document.getElementById('fname').value.trim();
+  var email=document.getElementById('femail').value.trim();
+  var pass=document.getElementById('fpass').value;
+  setStatus('Creating your account…','info','st2');
+  try{
+    var cred=await createUserWithEmailAndPassword(auth,email,pass);
+    await updateProfile(cred.user,{displayName:name});
+    await setDoc(doc(db,'users',cred.user.uid),{
+      name,email,
+      whatsapp:'+91'+phone,
+      role:'client',
+      category:CAT,
+      dashboard:DASH,
+      createdAt:serverTimestamp()
+    });
+    try{sessionStorage.removeItem('cw_lister_cat');sessionStorage.removeItem('cw_lister_dash');sessionStorage.removeItem('cw_lister_role');}catch(e){}
+    setStatus('Account created! Taking you to your dashboard…','success','st2');
+    setTimeout(function(){window.location.href=DASH;},1000);
+  }catch(e){
+    var msg=e.code==='auth/email-already-in-use'?'Account already exists. <a href="login.html" style="color:#1242c5;font-weight:800;">Login here →</a>':e.message;
+    document.getElementById('st2').innerHTML=msg;
+    document.getElementById('st2').dataset.k='warning';
+  }
+};
+</script>
+</body>
+</html>

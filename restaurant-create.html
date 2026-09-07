@@ -619,47 +619,47 @@
       </button>
       <button class="step-btn" data-step="3">
         <span class="step-num">4</span>
-        <div class="step-info"><strong>Tickets</strong><span>Pricing & availability</span></div>
+        <div class="step-info"><strong>Tables</strong><span>Table types & seating</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="4">
         <span class="step-num">5</span>
-        <div class="step-info"><strong>Ticket Design</strong><span>Style & branding</span></div>
+        <div class="step-info"><strong>Packages</strong><span>Pricing & availability</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="5">
         <span class="step-num">6</span>
-        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
+        <div class="step-info"><strong>Ticket Design</strong><span>Style & branding</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="6">
         <span class="step-num">7</span>
-        <div class="step-info"><strong>Booking Form</strong><span>Guest fields</span></div>
+        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="7">
         <span class="step-num">8</span>
-        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
+        <div class="step-info"><strong>Booking Form</strong><span>Guest fields</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="8">
         <span class="step-num">9</span>
-        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
+        <div class="step-info"><strong>WhatsApp Alerts</strong><span>Owner notifications</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="9">
         <span class="step-num">10</span>
-        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
+        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="10">
         <span class="step-num">11</span>
-        <div class="step-info"><strong>Invite Only</strong><span>Access control & guests</span></div>
+        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="11">
         <span class="step-num">12</span>
-        <div class="step-info"><strong>Sold Out</strong><span>Mark & manage sold out</span></div>
+        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="12">
@@ -731,7 +731,7 @@
         </div>
       </div>
       <div class="step-actions">
-        <a class="btn-ghost" href="premium-client-dashboard.html">← Back to Restaurant</a>
+        <a class="btn-ghost" href="dashboard-restaurant.html">← Back to Restaurant</a>
         <button class="btn-primary" onclick="goStep(1)">Next: Location →</button>
       </div>
     </div>
@@ -875,19 +875,65 @@
       </div>
     </div>
 
-    <!-- STEP 3: TICKETS -->
+    <!-- STEP 3: TABLES -->
     <div class="step-panel" data-panel="3">
+      <div class="card">
+        <div class="card-head"><h2>🪑 Table Setup</h2><p>Define your table types, sizes and seating capacity</p></div>
+        <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem;">
+          <div style="font-size:.84rem;font-weight:700;color:#991b1b;margin-bottom:.25rem;">💡 How tables work</div>
+          <div style="font-size:.76rem;color:#b91c1c;line-height:1.7;">Add each table type (e.g. Table for 2, Table for 4, Private Booth). Guests will choose a table type when booking. A small booking fee is collected online to confirm the reservation — the main bill is settled at the restaurant.</div>
+        </div>
+        <div id="tableList" style="display:flex;flex-direction:column;gap:.5rem;"></div>
+        <button class="btn-primary" style="margin-top:.75rem;font-size:.78rem;padding:.45rem .85rem;" onclick="openTableModal()">+ Add Table Type</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>🏛️ Seating Arrangement</h2><p>Describe your restaurant layout for guests</p></div>
+        <div class="grid-2">
+          <div class="field"><label for="totalTables">Total Tables</label><input id="totalTables" type="number" min="1" placeholder="e.g. 20"/></div>
+          <div class="field"><label for="totalSeats">Total Seating Capacity</label><input id="totalSeats" type="number" min="1" placeholder="e.g. 80"/></div>
+        </div>
+        <div class="field" style="margin-top:.75rem;"><label for="seatingNotes">Seating Notes</label><input id="seatingNotes" type="text" placeholder="e.g. Rooftop seating available, indoor AC section, private dining room"/></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>💳 Booking Fee</h2><p>A small fee collected online to confirm the reservation</p></div>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:.85rem 1rem;margin-bottom:.75rem;">
+          <div style="font-size:.86rem;font-weight:700;color:#c2410c;margin-bottom:.2rem;">💰 Pay at Restaurant Model</div>
+          <div style="font-size:.78rem;color:#ea580c;line-height:1.6;">The main dining bill is paid at the restaurant. A small booking fee is collected online per reservation to confirm the table — this is deducted from the final bill at the restaurant.</div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="bookingFeeType">Booking Fee Type</label>
+            <select id="bookingFeeType" onchange="updateBookingFeePreview()">
+              <option value="fixed">Fixed amount per booking</option>
+              <option value="per_person">Per person</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="bookingFeeAmount">Booking Fee Amount (₹)</label>
+            <input id="bookingFeeAmount" type="number" min="0" placeholder="e.g. 99" oninput="updateBookingFeePreview()"/>
+          </div>
+        </div>
+        <div id="bookingFeePreview" style="margin-top:.75rem;padding:.75rem 1rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:10px;font-size:.82rem;color:#475569;">Enter a booking fee amount to see the preview.</div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(2)">← Back</button>
+        <button class="btn-primary" onclick="goStep(4)">Next: Packages →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: PACKAGES -->
+    <div class="step-panel" data-panel="4">
 
       <!-- Mode toggle -->
       <div class="card">
-        <div style="font-size:0.96rem;font-weight:800;margin-bottom:0.75rem;">&#127915; Pricing &amp; Packages</div>
+        <div style="font-size:0.96rem;font-weight:800;margin-bottom:0.75rem;">🍽️ Dining Packages</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
           <div id="ticketModeShared" onclick="setTicketMode('shared')" style="cursor:pointer;padding:0.85rem;border-radius:14px;border:2px solid var(--blue);background:var(--blue-light);">
-            <div style="font-size:0.9rem;font-weight:800;color:var(--blue);">&#9989; Same for all dates</div>
+            <div style="font-size:0.9rem;font-weight:800;color:var(--blue);">✅ Same for all dates</div>
             <div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem;">One set of packages applies to every dining slot</div>
           </div>
           <div id="ticketModePerDate" onclick="setTicketMode('perdate')" style="cursor:pointer;padding:0.85rem;border-radius:14px;border:2px solid var(--border);background:#fff;">
-            <div style="font-size:0.9rem;font-weight:800;color:#475569;">&#127914; Different per date</div>
+            <div style="font-size:0.9rem;font-weight:800;color:#475569;">🎭 Different per date</div>
             <div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem;">Set separate packages for each dining date</div>
           </div>
         </div>
@@ -913,33 +959,28 @@
       </div>
 
       <div class="card">
-        <div class="card-head"><h2>Pricing Settings</h2><p>Configure fees and payment options</p></div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="currency">Currency</label>
-            <select id="currency">
-              <option value="INR">&#8377; INR</option>
-              <option value="USD">$ USD</option>
-              <option value="EUR">&euro; EUR</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="feeMode">Platform Fee</label>
-            <select id="feeMode">
-              <option value="absorb">I absorb the fee</option>
-              <option value="pass">Pass to guest</option>
-            </select>
-          </div>
+        <div class="card-head"><h2>Payment Settings</h2><p>Main bill is paid at the restaurant</p></div>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:.85rem 1rem;margin-bottom:.75rem;">
+          <div style="font-size:.86rem;font-weight:700;color:#c2410c;">🍽️ Pay at Restaurant</div>
+          <div style="font-size:.78rem;color:#ea580c;margin-top:.2rem;line-height:1.6;">Guests pay the full dining bill at the restaurant. Only the booking fee is collected online to secure the reservation.</div>
+        </div>
+        <div class="field">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="INR">₹ INR</option>
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
+          </select>
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(2)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
+        <button class="btn-ghost" onclick="goStep(3)">← Back</button>
+        <button class="btn-primary" onclick="goStep(5)">Next: Ticket Design →</button>
       </div>
     </div>
 
-    <!-- STEP 4: TICKET DESIGN -->
-    <div class="step-panel" data-panel="4">
+    <!-- STEP 5: TICKET DESIGN -->
+    <div class="step-panel" data-panel="5">
 
       <!-- 3-step process header -->
       <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:none;padding:1.2rem 1.3rem;">
@@ -1179,13 +1220,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(3)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
+        <button class="btn-ghost" onclick="goStep(4)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(6)">Next: Media &#8594;</button>
       </div>
     </div>
 
     <!-- STEP 4: MEDIA -->
-    <div class="step-panel" data-panel="5">
+    <div class="step-panel" data-panel="6">
 
       <!-- Card Image -->
       <div class="card">
@@ -1312,13 +1353,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(3)">← Back</button>
-        <button class="btn-primary" onclick="goStep(6)">Next: RSVP Form →</button>
+        <button class="btn-ghost" onclick="goStep(5)">← Back</button>
+        <button class="btn-primary" onclick="goStep(7)">Next: Booking Form →</button>
       </div>
     </div>
 
     <!-- STEP 5: RSVP -->
-    <div class="step-panel" data-panel="6">
+    <div class="step-panel" data-panel="7">
 
       <div style="display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:start;">
 
@@ -1453,13 +1494,78 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(5)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(7)">Next: Coupons &#8594;</button>
+        <button class="btn-ghost" onclick="goStep(6)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(8)">Next: WhatsApp Alerts &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 8: WHATSAPP ALERTS -->
+    <div class="step-panel" data-panel="8">
+      <div class="card">
+        <div class="card-head"><h2>&#128242; Owner WhatsApp Alerts</h2><p>Get notified on WhatsApp every time a guest makes a reservation</p></div>
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:.85rem 1rem;margin-bottom:.75rem;">
+          <div style="font-size:.86rem;font-weight:700;color:#166534;">&#9989; Instant booking notifications</div>
+          <div style="font-size:.78rem;color:#15803d;margin-top:.2rem;line-height:1.6;">Every time a guest books a table, you'll receive a WhatsApp message with their full details — name, phone, date, time, table type, number of guests and any special requests.</div>
+        </div>
+        <div class="field" style="margin-bottom:.75rem;">
+          <label for="ownerWhatsapp">Your WhatsApp Number <span style="color:var(--red);">*</span></label>
+          <input id="ownerWhatsapp" type="tel" placeholder="+91 XXXXX XXXXX" />
+          <span class="field-hint">Booking details will be sent to this number instantly</span>
+        </div>
+        <div class="field" style="margin-bottom:.75rem;">
+          <label for="ownerWATemplate">Booking Alert Message Template</label>
+          <textarea id="ownerWATemplate" style="min-height:130px;">&#127869; New Table Booking!
+
+Restaurant: {{restaurant}}
+Guest: {{name}}
+Phone: {{phone}}
+Date: {{date}}
+Time: {{time}}
+Table: {{table_type}}
+Guests: {{guests}}
+Special Requests: {{special_requests}}
+Booking Fee Paid: {{booking_fee}}
+
+Please confirm the reservation. &#128205;</textarea>
+          <span class="field-hint">Use {{name}}, {{phone}}, {{date}}, {{time}}, {{table_type}}, {{guests}}, {{special_requests}}, {{booking_fee}}, {{restaurant}} as placeholders</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <div class="toggle-row">
+            <div><strong>&#128242; Send WhatsApp on every booking</strong><span>Instant alert when a guest confirms a reservation</span></div>
+            <button class="toggle on" id="ownerWAEnabled" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><strong>&#128241; Also send SMS backup</strong><span>Fallback SMS if WhatsApp is unavailable</span></div>
+            <button class="toggle" id="ownerSMSEnabled" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>&#128231; Guest Confirmation</h2><p>Message sent to the guest after booking</p></div>
+        <div class="field">
+          <label for="guestWATemplate">Guest WhatsApp Confirmation</label>
+          <textarea id="guestWATemplate" style="min-height:110px;">Hi {{name}}! &#127869;
+
+Your table at {{restaurant}} is confirmed!
+
+&#128197; Date: {{date}}
+&#8987; Time: {{time}}
+&#129106; Table: {{table_type}} ({{guests}} guests)
+&#128205; {{address}}
+
+Booking Fee Paid: {{booking_fee}} (deducted from your bill)
+
+See you soon! &#127860;</textarea>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(7)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(9)">Next: Coupons &#8594;</button>
       </div>
     </div>
 
     <!-- STEP 6: COUPONS -->
-    <div class="step-panel" data-panel="7">
+    <div class="step-panel" data-panel="9">
       <div class="card">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
           <div><h2>Discount Coupons</h2><p>Create promo codes for your event</p></div>
@@ -1472,13 +1578,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(6)">← Back</button>
-        <button class="btn-primary" onclick="goStep(8)">Next: FAQs →</button>
+        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
+        <button class="btn-primary" onclick="goStep(10)">Next: FAQs →</button>
       </div>
     </div>
 
     <!-- STEP 7: FAQS -->
-    <div class="step-panel" data-panel="8">
+    <div class="step-panel" data-panel="10">
       <div class="card">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
           <div><h2>Frequently Asked Questions</h2><p>Help attendees with common queries</p></div>
@@ -1491,13 +1597,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(7)">← Back</button>
-        <button class="btn-primary" onclick="goStep(9)">Next: Settings →</button>
+        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
+        <button class="btn-primary" onclick="goStep(11)">Next: Settings →</button>
       </div>
     </div>
 
     <!-- STEP 8: ADDITIONAL INFO -->
-    <div class="step-panel" data-panel="9">
+    <div class="step-panel" data-panel="11">
       <div class="card">
         <div class="card-head"><h2>Terms & Conditions</h2><p>Legal terms attendees must agree to</p></div>
         <div class="field">
@@ -1527,86 +1633,6 @@
         <div class="field">
           <label for="notes">Notes for Attendees</label>
           <textarea id="notes" placeholder="Dress code: smart casual. Parking available at basement. Please arrive 10 mins early. Cancellation 24hrs prior..."></textarea>
-        </div>
-      </div>
-      <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
-        <button class="btn-primary" onclick="goStep(10)">Next: Invite Only →</button>
-      </div>
-    </div>
-
-    <!-- STEP 9: INVITE ONLY -->
-    <div class="step-panel" data-panel="10">
-      <div class="card">
-        <div class="card-head"><h2>Invite Only Access</h2><p>Restrict who can book this dining experience</p></div>
-        <div style="display:flex;flex-direction:column;gap:0.5rem;">
-          <div class="toggle-row">
-            <div><strong>🔒 Enable Invite Only</strong><span>Only guests with an invite link or code can register</span></div>
-            <button class="toggle" id="toggleInvite" onclick="this.classList.toggle('on')"></button>
-          </div>
-          <div class="toggle-row">
-            <div><strong>🔗 Generate Invite Link</strong><span>Share a private link with selected guests</span></div>
-            <button class="toggle" id="toggleInviteLink" onclick="this.classList.toggle('on')"></button>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>Guest List</h2><p>Add email addresses of invited guests</p></div>
-        <div class="field">
-          <label for="guestEmails">Guest Emails</label>
-          <textarea id="guestEmails" style="min-height:100px;" placeholder="one@email.com&#10;two@email.com&#10;three@email.com"></textarea>
-          <span class="field-hint">One email per line. Guests will receive an invite email.</span>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>Invite Code</h2><p>Set a secret code guests must enter to register</p></div>
-        <div class="field">
-          <label for="inviteCode">Invite Code</label>
-          <input id="inviteCode" type="text" placeholder="e.g. VIP2025" />
-          <span class="field-hint">Leave blank to not require a code</span>
-        </div>
-      </div>
-      <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
-        <button class="btn-primary" onclick="goStep(11)">Next: Sold Out →</button>
-      </div>
-    </div>
-
-    <!-- STEP 10: SOLD OUT -->
-    <div class="step-panel" data-panel="11">
-      <div class="card">
-        <div class="card-head"><h2>Fully Booked Status</h2><p>Mark this dining slot as fully booked</p></div>
-        <div style="display:flex;flex-direction:column;gap:0.5rem;">
-          <div class="toggle-row" style="border:1px solid #fca5a5;background:#fef2f2;">
-            <div><strong style="color:#991b1b;">⛔ Mark as Sold Out</strong><span>Registrations will be closed immediately</span></div>
-            <button class="toggle" id="toggleSoldOut" onclick="this.classList.toggle('on')"></button>
-          </div>
-          <div class="toggle-row">
-            <div><strong>📋 Enable Waitlist</strong><span>Collect waitlist registrations when sold out</span></div>
-            <button class="toggle" id="toggleWaitlist" onclick="this.classList.toggle('on')"></button>
-          </div>
-          <div class="toggle-row">
-            <div><strong>🔔 Notify Waitlist</strong><span>Auto-notify waitlisted guests if spots open up</span></div>
-            <button class="toggle" id="toggleNotifyWaitlist" onclick="this.classList.toggle('on')"></button>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>Fully Booked Message</h2><p>Shown when the dining slot is fully booked</p></div>
-        <div class="field">
-          <label for="soldOutMsg">Message</label>
-          <textarea id="soldOutMsg" style="min-height:80px;" placeholder="This dining slot is fully booked. Join the waitlist to be notified if a table becomes available."></textarea>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>Overflow Options</h2><p>What happens when capacity is reached</p></div>
-        <div class="field">
-          <label for="overflowAction">When capacity is full</label>
-          <select id="overflowAction">
-            <option value="close">Close registrations</option>
-            <option value="waitlist">Move to waitlist</option>
-            <option value="notify">Show sold out & notify me</option>
-          </select>
         </div>
       </div>
       <div class="step-actions">
@@ -1646,6 +1672,27 @@
 
   </div><!-- /content -->
 </div><!-- /layout -->
+
+<!-- TABLE MODAL -->
+<div class="modal-overlay" id="tableModal">
+  <div class="modal" style="width:min(500px,100%);">
+    <h3>&#129106; Add Table Type</h3>
+    <div style="display:flex;flex-direction:column;gap:0.65rem;">
+      <div class="field"><label for="tblName">Table Name <span class="req">*</span></label><input id="tblName" type="text" placeholder="e.g. Table for 2, Corner Booth, Private Room"/></div>
+      <div class="field"><label for="tblDesc">Description</label><input id="tblDesc" type="text" placeholder="e.g. Romantic window seat, outdoor terrace"/></div>
+      <div class="grid-3">
+        <div class="field"><label for="tblSeats">Seats <span class="req">*</span></label><input id="tblSeats" type="number" min="1" placeholder="e.g. 2"/></div>
+        <div class="field"><label for="tblCount">No. of Tables</label><input id="tblCount" type="number" min="1" placeholder="e.g. 5"/></div>
+        <div class="field"><label for="tblMinSpend">Min. Spend (&#8377;)</label><input id="tblMinSpend" type="number" min="0" placeholder="e.g. 500"/></div>
+      </div>
+      <div class="field"><label for="tblLocation">Location / Section</label><select id="tblLocation"><option value="">Select section</option><option>Indoor</option><option>Outdoor</option><option>Rooftop</option><option>Private Room</option><option>Bar Area</option><option>Window Seat</option><option>Terrace</option></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeTableModal()">Cancel</button>
+      <button class="btn-primary" onclick="addTable()">Add Table</button>
+    </div>
+  </div>
+</div>
 
 <!-- ADD DATE MODAL -->
 <div class="modal-overlay" id="addDateModal">
@@ -2293,7 +2340,7 @@ async function saveEvent(status) {
   });
 
   const payload = {
-    ownerId: uid, name, urlKey, summary, description,
+    ownerId: uid, organiserId: uid, name, urlKey, summary, description,
     category: document.getElementById('category').value,
     tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
     eventType,
@@ -2311,38 +2358,28 @@ async function saveEvent(status) {
     regDeadline: document.getElementById('regDeadline').value,
     timezone: document.getElementById('timezone').value,
     currency: document.getElementById('currency').value,
-    feeMode: document.getElementById('feeMode').value,
+    feeMode: 'restaurant',
+    platformFeePercent: 4.6,
+    payAtRestaurant: true,
+    bookingFeeType: document.getElementById('bookingFeeType').value,
+    bookingFeeAmount: Number(document.getElementById('bookingFeeAmount').value || 0),
+    tables,
+    totalTables: Number(document.getElementById('totalTables').value || 0),
+    totalSeats: Number(document.getElementById('totalSeats').value || 0),
+    seatingNotes: document.getElementById('seatingNotes').value.trim(),
+    ownerWhatsapp: document.getElementById('ownerWhatsapp').value.trim(),
+    ownerWAEnabled: document.getElementById('ownerWAEnabled').classList.contains('on'),
+    ownerWATemplate: document.getElementById('ownerWATemplate').value.trim(),
+    guestWATemplate: document.getElementById('guestWATemplate').value.trim(),
     coverUrl: document.getElementById('coverUrl').value.trim(),
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
-    customQuestion: document.getElementById('customQ').value.trim(),
     tickets, coupons, faqs, eventDates,
     ticketMode,
     perDateTickets,
-    ticketDesign: {
-      gradientStart: ticketDesign.g1,
-      gradientEnd: ticketDesign.g2,
-      organiserName: document.getElementById('tdOrgName').value.trim(),
-      tagline: document.getElementById('tdTagline').value.trim(),
-      footer: document.getElementById('tdFooter').value.trim(),
-      showQR: document.getElementById('tdShowQR').classList.contains('on'),
-      showSeat: document.getElementById('tdShowSeat').classList.contains('on'),
-      showVenue: document.getElementById('tdShowVenue').classList.contains('on'),
-      showLogo: document.getElementById('tdShowLogo').classList.contains('on'),
-    },
     notes: document.getElementById('notes').value.trim(),
     termsText: document.getElementById('termsText').value.trim(),
     refundPolicy: document.getElementById('refundPolicy').value.trim(),
-    refundDeadlineDays: Number(document.getElementById('refundDeadlineDays').value || 0),
-    refundPercent: Number(document.getElementById('refundPercent').value || 100),
-    inviteOnly: document.getElementById('toggleInvite').classList.contains('on'),
-    inviteCode: document.getElementById('inviteCode').value.trim(),
-    guestEmails: document.getElementById('guestEmails').value.split('\n').map(e => e.trim()).filter(Boolean),
-    soldOut: document.getElementById('toggleSoldOut').classList.contains('on'),
-    soldOutMsg: document.getElementById('soldOutMsg').value.trim(),
-    allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on'),
-    notifyWaitlist: document.getElementById('toggleNotifyWaitlist').classList.contains('on'),
-    overflowAction: document.getElementById('overflowAction').value,
     showAttendeeCount: document.getElementById('toggleAttendeeCount').classList.contains('on'),
     enableRefunds: document.getElementById('toggleRefunds').classList.contains('on'),
     publicListing: document.getElementById('togglePublicListing').classList.contains('on'),
@@ -2357,7 +2394,7 @@ async function saveEvent(status) {
     btn.textContent = 'Saving...';
     btn.disabled = true;
     await addDoc(collection(db, 'restaurants'), payload);
-    window.location.href = 'premium-client-dashboard.html';
+    window.location.href = 'dashboard-restaurant.html';
   } catch (err) {
     alert('Error saving restaurant: ' + err.message);
     document.getElementById('publishBtn').textContent = 'Publish Listing';
@@ -2694,10 +2731,10 @@ window.renderRsvpPreview = function() {
   html += rsvpPreviewFieldHtml('&#128100;', 'Full Name', 'text', 'Enter your full name', true);
   html += rsvpPreviewFieldHtml('&#9993;&#65039;', 'Email Address', 'email', 'your@email.com', true);
 
-  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="6"] .toggle[data-field].on');
+  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="7"] .toggle[data-field].on');
   // collect active optional fields from toggles in the RSVP panel
   const activeOpt = [];
-  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
+  document.querySelectorAll('.step-panel[data-panel="7"] .toggle[data-field]').forEach(t => {
     if (t.classList.contains('on')) activeOpt.push(t.dataset.field);
   });
   if (activeOpt.length) {
@@ -2776,7 +2813,7 @@ function renderRsvpCQs() {
 window.rsvpCreate = async function() {
   const btn = event.target; btn.textContent = 'Saving...';
   const rsvpToggles = {};
-  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
+  document.querySelectorAll('.step-panel[data-panel="7"] .toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
   });
   const payload = {
@@ -2827,6 +2864,60 @@ document.addEventListener('DOMContentLoaded', () => {
   const el = document.getElementById('rsvpShareModalEl');
   if (el) el.addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
 });
+
+// ── TABLES ──
+let tables = [];
+window.openTableModal = () => document.getElementById('tableModal').classList.add('open');
+window.closeTableModal = () => {
+  document.getElementById('tableModal').classList.remove('open');
+  ['tblName','tblDesc','tblSeats','tblCount','tblMinSpend'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('tblLocation').value='';
+};
+window.addTable = () => {
+  const name = document.getElementById('tblName').value.trim();
+  const seats = Number(document.getElementById('tblSeats').value || 0);
+  if (!name) { alert('Table name is required.'); return; }
+  if (!seats) { alert('Number of seats is required.'); return; }
+  tables.push({
+    name, seats,
+    count: Number(document.getElementById('tblCount').value || 1),
+    minSpend: Number(document.getElementById('tblMinSpend').value || 0),
+    desc: document.getElementById('tblDesc').value.trim(),
+    location: document.getElementById('tblLocation').value,
+  });
+  renderTables();
+  closeTableModal();
+};
+function renderTables() {
+  const list = document.getElementById('tableList');
+  if (!list) return;
+  if (!tables.length) {
+    list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:0.84rem;border:1px dashed var(--border);border-radius:12px;">No tables added yet. Click "+ Add Table Type" to define your seating.</div>';
+    return;
+  }
+  list.innerHTML = tables.map((t, i) => `
+    <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem .85rem;border-radius:12px;background:var(--blue-soft);border:1px solid var(--border);">
+      <span style="font-size:1.2rem;">&#129106;</span>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:.86rem;">${t.name}</div>
+        <div style="font-size:.74rem;color:var(--muted);margin-top:.1rem;">${t.seats} seats &middot; ${t.count} table${t.count!==1?'s':''} ${t.location?'&middot; '+t.location:''} ${t.minSpend?'&middot; Min &#8377;'+t.minSpend.toLocaleString('en-IN'):''}</div>
+        ${t.desc?`<div style="font-size:.72rem;color:#9ca3af;">${t.desc}</div>`:''}
+      </div>
+      <button class="tr-del" onclick="removeTable(${i})">&#10005;</button>
+    </div>`).join('');
+}
+window.removeTable = i => { tables.splice(i, 1); renderTables(); };
+document.getElementById('tableModal').addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+
+// ── BOOKING FEE PREVIEW ──
+window.updateBookingFeePreview = function() {
+  const type = document.getElementById('bookingFeeType').value;
+  const amount = Number(document.getElementById('bookingFeeAmount').value || 0);
+  const preview = document.getElementById('bookingFeePreview');
+  if (!amount) { preview.textContent = 'Enter a booking fee amount to see the preview.'; return; }
+  const label = type === 'per_person' ? 'per person' : 'per booking';
+  preview.innerHTML = `<strong>&#8377;${amount.toLocaleString('en-IN')} ${label}</strong> collected online to confirm the reservation. This amount is deducted from the guest's final bill at the restaurant.`;
+};
 
 // ── RSVP step helpers ──
 updateProgress();
