@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CultureWave | 🎨 Workshops Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --p:#0d9488;--p2:#14b8a6;--plight:#ccfbf1;--psoft:#f0fdfa;
+  --border:#99f6e4;--muted:#0d9488;--text:#1a1a2e;--bg:#f0fdfa;--sidebar-w:250px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button{font:inherit;cursor:pointer;border:0;background:none;}
+.layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh;}
+.sidebar{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sb-brand{padding:1.2rem 1rem 1rem;border-bottom:1px solid var(--border);}
+.sb-brand-logo{font-size:1.4rem;font-weight:800;color:var(--p);letter-spacing:-.04em;font-style:italic;}
+.sb-brand-cat{font-size:.68rem;font-weight:700;color:var(--p2);letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem;}
+.sb-user{margin:.75rem .65rem .5rem;padding:.65rem .75rem;border-radius:12px;background:var(--psoft);border:1px solid var(--border);display:flex;align-items:center;gap:.6rem;cursor:pointer;}
+.sb-user:hover{background:var(--plight);}
+.sb-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#0d9488,#14b8a6);display:grid;place-items:center;font-weight:700;font-size:.9rem;color:#fff;flex:none;}
+.sb-user-info strong{display:block;font-size:.84rem;font-weight:700;color:#1a1a2e;}
+.sb-user-info small{font-size:.72rem;color:var(--p);}
+.sb-user-crown{margin-left:auto;}
+.sb-nav{flex:1;padding:.5rem .65rem;display:flex;flex-direction:column;gap:.05rem;}
+.sb-section-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#2dd4bf;padding:.8rem .4rem .3rem;}
+.sb-item{display:flex;align-items:center;gap:.6rem;padding:.58rem .75rem;border-radius:10px;font-size:.84rem;font-weight:500;color:#6b7280;cursor:pointer;transition:background .12s,color .12s;width:100%;text-align:left;}
+.sb-item:hover{background:var(--psoft);color:var(--p);}
+.sb-item.active{background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-weight:600;}
+.sb-icon{font-size:.9rem;width:18px;text-align:center;flex:none;}
+.sb-footer{padding:.75rem .65rem;border-top:1px solid var(--border);}
+.sb-upgrade{border-radius:14px;padding:.9rem 1rem;background:linear-gradient(135deg,#134e4a,#0d9488,#14b8a6);color:#fff;}
+.sb-upgrade-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;}
+.sb-upgrade-plan{font-size:.95rem;font-weight:800;margin-bottom:.5rem;}
+.sb-upgrade-btn{width:100%;padding:.44rem;border-radius:8px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:700;font-size:.78rem;cursor:pointer;}
+.sb-upgrade-btn:hover{background:rgba(255,255,255,.3);}
+.main{display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.topbar-title{font-size:1rem;font-weight:700;color:#1a1a2e;}
+.topbar-right{display:flex;align-items:center;gap:.75rem;}
+.tb-icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;font-size:.9rem;cursor:pointer;position:relative;}
+.tb-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:#f59f00;border:1.5px solid #fff;}
+.tb-user-btn{display:flex;align-items:center;gap:.5rem;padding:.35rem .65rem .35rem .4rem;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;}
+.tb-user-avatar{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#0d9488,#14b8a6);display:grid;place-items:center;font-weight:700;font-size:.72rem;color:#fff;}
+.tb-user-name{font-size:.82rem;font-weight:600;color:#1a1a2e;}
+.tb-link{font-size:.82rem;font-weight:500;color:#6b7280;}
+.tb-link:hover{color:var(--p);}
+.content{flex:1;}
+.view{display:none;flex-direction:column;gap:0;}
+.view.active{display:flex;}
+/* PREMIUM HEADER */
+.prem-hdr{
+  background:linear-gradient(135deg,#042f2e 0%,#134e4a 35%,#0f766e 65%,#0d9488 85%,#14b8a6 100%);
+  border-radius:20px;
+  padding:2rem 2rem 0;
+  position:relative;
+  overflow:hidden;
+  margin:1.5rem 1.5rem 0;
+}
+.prem-hdr::before{content:'';position:absolute;top:-40px;right:-40px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none;}
+.prem-hdr::after{content:'';position:absolute;bottom:-60px;right:120px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.03);pointer-events:none;}
+.prem-hdr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.prem-hdr-left{display:flex;flex-direction:column;}
+.prem-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.28rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.95);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem;width:fit-content;}
+.prem-title{font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;margin-bottom:.4rem;}
+.prem-sub{font-size:.88rem;color:rgba(255,255,255,.6);max-width:460px;line-height:1.6;}
+.prem-actions{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding-top:.25rem;}
+.prem-btn-ghost{display:flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:9px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;}
+.prem-btn-ghost:hover{background:rgba(255,255,255,.25);}
+.prem-btn-white{display:flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:9px;background:#fff;border:0;color:#0f766e;font-size:.84rem;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);}
+.prem-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.15);}
+.prem-stat{flex:1;padding:.9rem 1.2rem;border-right:1px solid rgba(255,255,255,.12);}
+.prem-stat:last-child{border-right:0;}
+.prem-stat-lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.45);margin-bottom:.25rem;}
+.prem-stat-val{font-size:1.4rem;font-weight:800;color:#fff;letter-spacing:-.04em;}
+.prem-stat-val.g{color:#4ade80;}
+.prem-stat-val.y{color:#fde68a;}
+/* PAGE BODY */
+.page-body{padding:1rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1rem;}
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+.card-head h2{font-size:.92rem;font-weight:700;color:#1a1a2e;}
+.card-head p{font-size:.74rem;color:#9ca3af;margin-top:.1rem;}
+.card-link{font-size:.78rem;font-weight:600;color:var(--p);}
+/* TABS */
+.tabs{display:flex;gap:.25rem;background:var(--plight);border-radius:10px;padding:.25rem;}
+.tab{padding:.4rem .9rem;border-radius:8px;font-size:.82rem;font-weight:500;color:var(--p);cursor:pointer;display:flex;align-items:center;gap:.4rem;border:0;background:none;}
+.tab.active{background:#fff;color:#1a1a2e;font-weight:700;box-shadow:0 1px 4px rgba(13,148,136,.15);}
+.tab-count{font-size:.68rem;font-weight:700;background:var(--border);color:var(--p);padding:.1rem .4rem;border-radius:999px;}
+.tab.active .tab-count{background:var(--p);color:#fff;}
+/* SEARCH */
+.search-box{display:flex;align-items:center;gap:.5rem;padding:.44rem .9rem;border-radius:10px;border:1px solid var(--border);background:#fff;min-width:200px;}
+.search-box input{border:0;outline:none;font:inherit;font-size:.82rem;color:#1a1a2e;width:100%;background:none;}
+.refresh-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;font-size:.9rem;cursor:pointer;color:var(--p);}
+/* EVENTS TABLE */
+.events-table{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.ev-table-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.4fr;padding:.65rem 1.1rem;border-bottom:1px solid var(--border);background:var(--psoft);}
+.ev-table-head span{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0f766e;}
+.ev-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.4fr;padding:.8rem 1.1rem;border-bottom:1px solid var(--plight);align-items:center;transition:background .1s;}
+.ev-row:last-child{border-bottom:0;}
+.ev-row:hover{background:var(--psoft);}
+.ev-name{font-size:.86rem;font-weight:600;color:#1a1a2e;}
+.ev-sub{font-size:.74rem;color:#9ca3af;margin-top:.1rem;}
+.status-pill{display:inline-flex;align-items:center;gap:.3rem;padding:.24rem .65rem;border-radius:999px;font-size:.72rem;font-weight:700;}
+.status-pill.live{background:#dcfce7;color:#16a34a;}
+.status-pill.draft{background:var(--plight);color:#0f766e;}
+.status-pill.archived{background:#f3f4f6;color:#6b7280;}
+.ev-actions{display:flex;gap:.4rem;flex-wrap:wrap;}
+.ev-act-btn{padding:.3rem .65rem;border-radius:7px;font-size:.74rem;font-weight:600;border:1px solid var(--border);background:#fff;color:#6b7280;cursor:pointer;}
+.ev-act-btn:hover{border-color:var(--p);color:var(--p);}
+.ev-act-btn.primary{background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border-color:var(--p);}
+/* ANALYTICS */
+.an-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;}
+.an-metric{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.2rem;position:relative;overflow:hidden;}
+.an-metric::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+.an-metric.amber::before{background:linear-gradient(90deg,#0d9488,#14b8a6);}
+.an-metric.green::before{background:linear-gradient(90deg,#16a34a,#22c55e);}
+.an-metric.orange::before{background:linear-gradient(90deg,#ea580c,#f97316);}
+.an-metric.yellow::before{background:linear-gradient(90deg,#ca8a04,#eab308);}
+.an-metric-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9ca3af;margin-bottom:.4rem;}
+.an-metric-val{font-size:1.55rem;font-weight:900;letter-spacing:-.04em;color:#1a1a2e;line-height:1;}
+.an-metric-sub{font-size:.72rem;color:#9ca3af;margin-top:.3rem;}
+.an-metric-sub .up{color:#16a34a;font-weight:700;}
+.an-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.bar-chart{display:flex;align-items:flex-end;gap:.4rem;height:130px;padding:.5rem 0 0;}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+.bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#14b8a6,#0d9488);min-height:4px;cursor:pointer;}
+.bar-label{font-size:.6rem;color:#9ca3af;font-weight:600;text-align:center;}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--plight);}
+.stat-row:last-child{border-bottom:0;}
+.stat-row-label{font-size:.82rem;color:#6b7280;display:flex;align-items:center;gap:.5rem;}
+.stat-row-val{font-size:.88rem;font-weight:700;color:#1a1a2e;}
+.period-tabs{display:flex;gap:.2rem;background:var(--plight);border-radius:8px;padding:.2rem;}
+.period-tab{padding:.3rem .7rem;border-radius:6px;font-size:.74rem;font-weight:600;color:#0f766e;cursor:pointer;border:0;background:none;}
+.period-tab.active{background:#fff;color:#1a1a2e;box-shadow:0 1px 3px rgba(13,148,136,.15);}
+/* FINANCE */
+.fin-table{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.fin-table-head{display:flex;padding:.65rem 1.1rem;border-bottom:1px solid var(--border);background:var(--psoft);}
+.fin-table-head span{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#0f766e;}
+/* PROFILE */
+.pf-field{display:flex;flex-direction:column;gap:.3rem;}
+.pf-field label{font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;}
+.pf-field input,.pf-field textarea,.pf-field select{padding:.62rem .85rem;border-radius:9px;border:1px solid var(--border);font:inherit;font-size:.86rem;color:#1a1a2e;outline:none;background:#fff;}
+.pf-field input:focus,.pf-field textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(13,148,136,.1);}
+.pf-field textarea{min-height:80px;resize:vertical;}
+.brand-save-btn{height:42px;padding:0 1.5rem;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;align-self:flex-start;box-shadow:0 2px 8px rgba(13,148,136,.3);}
+.pf-link-bar{background:var(--psoft);border:1px solid var(--border);border-radius:12px;padding:.9rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.pf-link-url{font-size:.8rem;font-weight:600;color:var(--p);word-break:break-all;}
+.pf-copy{padding:.38rem .8rem;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--p);font-weight:700;font-size:.76rem;cursor:pointer;white-space:nowrap;}
+.brand-layout{display:grid;grid-template-columns:210px 1fr;gap:1rem;align-items:start;}
+.brand-sidenav{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;position:sticky;top:70px;}
+.brand-sidenav-section{padding:.6rem .7rem .25rem;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#2dd4bf;}
+.brand-sidenav-item{display:flex;align-items:center;gap:.55rem;padding:.54rem .8rem;font-size:.83rem;font-weight:500;color:#6b7280;cursor:pointer;border-radius:9px;margin:.1rem .4rem;transition:background .12s,color .12s;border:0;background:none;width:calc(100% - .8rem);text-align:left;}
+.brand-sidenav-item:hover{background:var(--psoft);color:var(--p);}
+.brand-sidenav-item.active{background:var(--psoft);color:var(--p);font-weight:700;}
+.brand-sidenav-divider{height:1px;background:var(--border);margin:.4rem 0;}
+.brand-panel{display:none;flex-direction:column;gap:1rem;}
+.cover-upload{width:100%;height:160px;border-radius:12px;border:2px dashed var(--border);background:var(--psoft);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;}
+.cover-upload:hover{border-color:var(--p);}
+.cover-upload img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;}
+.avatar-upload{width:88px;height:88px;border-radius:16px;border:3px solid #fff;background:linear-gradient(135deg,#0d9488,#14b8a6);display:grid;place-items:center;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(13,148,136,.3);flex:none;}
+.avatar-upload img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:13px;}
+.avatar-upload-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:grid;place-items:center;opacity:0;transition:opacity .15s;border-radius:13px;font-size:1.1rem;}
+.avatar-upload:hover .avatar-upload-overlay{opacity:1;}
+.url-prefix{padding:.62rem .8rem;background:var(--psoft);border:1px solid var(--border);border-right:0;border-radius:9px 0 0 9px;font-size:.84rem;color:#0f766e;white-space:nowrap;}
+.url-input{flex:1;padding:.62rem .85rem;border:1px solid var(--border);border-radius:0 9px 9px 0;font:inherit;font-size:.84rem;color:#1a1a2e;outline:none;background:#fff;}
+.url-input:focus{border-color:var(--p);}
+.alert-bar{border-radius:12px;padding:.85rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.alert-bar.amber{background:var(--plight);border:1px solid var(--border);}
+.alert-bar.blue{background:#eff6ff;border:1px solid #bfdbfe;}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:#1a1a2e;color:#fff;padding:.65rem 1.3rem;border-radius:10px;font-size:.82rem;font-weight:600;opacity:0;transition:all .25s;z-index:99;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
+.sb-overlay.open{display:block;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
+.hamburger span{display:block;width:22px;height:2px;background:#1a1a2e;border-radius:2px;}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:flex!important;position:fixed;left:-260px;top:0;width:260px;height:100vh;z-index:50;transition:left .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+  .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.15);}
+  .hamburger{display:flex;}
+  .an-metrics{grid-template-columns:1fr 1fr;}
+  .an-grid{grid-template-columns:1fr;}
+  .brand-layout{grid-template-columns:1fr;}
+  .topbar{padding:.75rem 1rem;}
+  .prem-hdr{margin:.75rem .75rem 0;padding:1.5rem 1.2rem 0;border-radius:14px;}
+  .prem-title{font-size:1.6rem;}
+  .prem-hdr-top{flex-direction:column;gap:.75rem;}
+  .prem-stats{overflow-x:auto;}
+  .prem-stat{min-width:120px;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-logo">CultureWave</div>
+    <div class="sb-brand-cat">🎨 Workshops</div>
+  </div>
+  <div class="sb-user" onclick="switchView('personal-info')">
+    <div class="sb-avatar" id="sideAvatar">W</div>
+    <div class="sb-user-info"><strong id="sidebarName">Client</strong><small>Workshop Host</small></div>
+    <span class="sb-user-crown">👑</span>
+  </div>
+  <nav class="sb-nav">
+    <button class="sb-item active" data-view="overview"><span class="sb-icon">⊞</span> Dashboard</button>
+    <button class="sb-item" data-view="analytics"><span class="sb-icon">📈</span> Analytics</button>
+    <div class="sb-section-label">Money</div>
+    <button class="sb-item" data-view="payouts"><span class="sb-icon">🏦</span> Payouts</button>
+    <button class="sb-item" data-view="sales"><span class="sb-icon">💰</span> Sales Summary</button>
+    <div class="sb-section-label">Payment Pages</div>
+    <button class="sb-item" data-view="events"><span class="sb-icon">🎨</span> Workshop Events</button>
+    <button class="sb-item" data-view="popups"><span class="sb-icon">🖌</span> Art & Craft Classes</button>
+    <button class="sb-item" data-view="dining"><span class="sb-icon">🍳</span> Cooking Classes</button>
+    <div class="sb-section-label">Tools</div>
+    <button class="sb-item" data-view="instagram"><span class="sb-icon">📸</span> Instagram</button>
+    <button class="sb-item" data-view="whatsapp"><span class="sb-icon">💬</span> WhatsApp</button>
+    <button class="sb-item" data-view="surveys"><span class="sb-icon">📋</span> Survey Forms</button>
+    <button class="sb-item" data-view="inquiries"><span class="sb-icon">✉</span> Inquiries</button>
+    <a class="sb-item" href="checkin.html" target="_blank"><span class="sb-icon">📷</span> Check-In Scanner</a>
+    <button class="sb-item" onclick="location.href='https://wa.me/916305183601?text='+encodeURIComponent('Hi CultureWave! I need help with my Workshops dashboard. 🎨')"><span class="sb-icon">💬</span> Contact Us</button>
+    <div class="sb-section-label">Account</div>
+    <button class="sb-item" data-view="personal-info"><span class="sb-icon">🪪</span> Brand & Profile</button>
+    <button class="sb-item" data-view="settings"><span class="sb-icon">⚙</span> Settings</button>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-upgrade">
+      <div class="sb-upgrade-label">Current Plan</div>
+      <div class="sb-upgrade-plan">🎨 Workshops Plan</div>
+      <button class="sb-upgrade-btn" onclick="location.href='pricing.html'">Upgrade for more features</button>
+    </div>
+  </div>
+</aside>
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+      <div class="topbar-title" id="pageTitle">🎨 Workshops Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <a class="tb-link" href="index.html" target="_blank">⬡ View website</a>
+      <button class="tb-icon-btn">🔔<span class="tb-dot"></span></button>
+      <button class="tb-user-btn" onclick="switchView('personal-info')">
+        <div class="tb-user-avatar" id="topAvatar">W</div>
+        <span class="tb-user-name" id="topName">User</span>
+      </button>
+      <button class="tb-icon-btn" id="logoutBtn" title="Logout">⏻</button>
+    </div>
+  </header>
+  <div class="content">
+
+<!-- OVERVIEW -->
+<div class="view active" data-view="overview">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">✦ Premium Plan</div>
+        <div class="prem-title">Dashboard</div>
+        <div class="prem-sub">Welcome back! Here's your Workshops business overview.</div>
+      </div>
+      <div class="prem-actions">
+        <button onclick="switchView('payouts')" class="prem-btn-ghost">🏦 Payouts</button>
+        <button onclick="switchView('sales')" class="prem-btn-ghost">📊 Sales</button>
+        <button onclick="location.href='pricing.html'" class="prem-btn-white">✦ Upgrade Plan</button>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total Bookings</div><div class="prem-stat-val" id="mBookings">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Revenue</div><div class="prem-stat-val g" id="mRevenue">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Total Events</div><div class="prem-stat-val y" id="mEvents">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Payout Balance</div><div class="prem-stat-val" id="mPayout">₹0</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="alert-bar amber">
+      <div><div style="font-size:.86rem;font-weight:700;color:#134e4a;">Bank details needed</div><div style="font-size:.78rem;color:#0f766e;margin-top:.1rem;">Add your bank account to receive payouts for your bookings.</div></div>
+      <button onclick="switchView('personal-info')" style="padding:.45rem 1rem;border-radius:8px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-weight:700;font-size:.8rem;border:0;cursor:pointer;">Add Bank →</button>
+    </div>
+    <div class="alert-bar blue">
+      <div><div style="font-size:.86rem;font-weight:700;color:#1e40af;">PAN verification pending</div><div style="font-size:.78rem;color:#3b82f6;margin-top:.1rem;">Add your PAN with name and date of birth to verify your payouts.</div></div>
+      <button onclick="switchView('personal-info')" style="padding:.45rem 1rem;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;font-size:.8rem;border:0;cursor:pointer;">Verify PAN →</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:.75rem;">
+      <div style="border-radius:14px;overflow:hidden;border:1px solid var(--border);">
+        <div style="background:linear-gradient(135deg,#0d9488,#14b8a6);padding:1.1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
+          <div><div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.7);margin-bottom:.25rem;">Current Plan</div><div style="font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Free</div></div>
+          <div style="display:flex;align-items:center;gap:.6rem;"><span style="padding:.28rem .65rem;border-radius:999px;background:rgba(255,255,255,.2);font-size:.7rem;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.3);">Active</span><a href="pricing.html" style="padding:.38rem .8rem;border-radius:8px;background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:.78rem;border:1px solid rgba(255,255,255,.3);text-decoration:none;">Upgrade</a></div>
+        </div>
+        <div style="background:#fff;padding:1rem 1.2rem;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.9rem;">
+            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;">5 Events</div><div style="font-size:.72rem;color:#9ca3af;">Monthly limit</div></div>
+            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;" id="planUsageLabel">0 used</div><div style="font-size:.72rem;color:#9ca3af;">Events created</div></div>
+            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;">Basic</div><div style="font-size:.72rem;color:#9ca3af;">Analytics tier</div></div>
+          </div>
+          <div style="height:6px;border-radius:999px;background:var(--plight);overflow:hidden;"><div id="planUsageBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#0d9488,#14b8a6);width:0%;transition:width .5s;"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Recent Activity</h2><p>Latest bookings & updates</p></div><button class="card-link" onclick="switchView('sales')">View all</button></div>
+        <div id="overviewActivity"><div style="text-align:center;padding:2rem 1rem;border:1px dashed var(--border);border-radius:10px;color:#0f766e;font-size:.82rem;">No activity yet</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Billing History</h2><p>Track paid bookings and plan changes</p></div></div>
+      <div id="overviewBilling"><div style="text-align:center;padding:2rem 1rem;border:1px dashed var(--border);border-radius:10px;color:#9ca3af;font-size:.82rem;">No transactions yet</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BRUNCH EVENTS -->
+<div class="view" data-view="events">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">🎨 Workshop Events</div>
+        <div class="prem-title">My Workshop Events</div>
+        <div class="prem-sub">Create, manage and publish your workshop events. Track bookings and revenue in real time.</div>
+      </div>
+      <div class="prem-actions">
+        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
+        <button onclick="switchView('personal-info')" class="prem-btn-ghost">⚙ Brand Settings</button>
+        <button onclick="location.href='event-create.html?from=workshops'" id="createEvBtn" class="prem-btn-white">✦ Create Event</button>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total Events</div><div class="prem-stat-val" id="hdrTotal">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Published</div><div class="prem-stat-val g" id="hdrPublished">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Unpublished</div><div class="prem-stat-val y" id="hdrDraft">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Plan Limit</div><div class="prem-stat-val">∞ <span style="font-size:.78rem;font-weight:500;color:rgba(255,255,255,.5);">unlimited</span></div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+      <div class="tabs" id="evTabs">
+        <button class="tab active" data-tab="published">◉ Published <span class="tab-count" id="tabCountPublished">0</span></button>
+        <button class="tab" data-tab="unpublished">◎ Unpublished</button>
+        <button class="tab" data-tab="archived">▣ Archived</button>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:.5rem;">
+        <div class="search-box"><span>🔍</span><input type="search" id="evSearch" placeholder="Search events..."/></div>
+        <button class="refresh-btn" id="evRefresh">↻</button>
+      </div>
+    </div>
+    <div id="eventsContainer"></div>
+  </div>
+</div>
+
+<!-- POP-UP BRUNCHES -->
+<div class="view" data-view="popups">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">🖌 Art & Craft Classes</div>
+        <div class="prem-title">My Art & Craft Classes</div>
+        <div class="prem-sub">Manage your art & craft class events, seat bookings and attendee lists.</div>
+      </div>
+      <div class="prem-actions">
+        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
+        <button onclick="location.href='event-create.html'" class="prem-btn-white">✦ Create Pop-up</button>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total Pop-ups</div><div class="prem-stat-val">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Active</div><div class="prem-stat-val g">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Bookings</div><div class="prem-stat-val y">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Plan Limit</div><div class="prem-stat-val">∞</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3rem 2rem;text-align:center;">
+      <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#14b8a6);display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem;">☕</div>
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem;color:#1a1a2e;">No art & craft classes yet</h3>
+      <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first art & craft class and start selling seats.</p>
+      <button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(13,148,136,.3);">✦ Create Art Class</button>
+    </div>
+  </div>
+</div>
+
+<!-- DINING EXPERIENCES -->
+<div class="view" data-view="dining">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">🍳 Cooking Classes</div>
+        <div class="prem-title">My Cooking Classes</div>
+        <div class="prem-sub">Manage cooking and baking classes, tasting sessions and culinary workshops.</div>
+      </div>
+      <div class="prem-actions">
+        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
+        <button onclick="location.href='event-create.html'" class="prem-btn-white">✦ Create Experience</button>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total</div><div class="prem-stat-val">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Active</div><div class="prem-stat-val g">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Bookings</div><div class="prem-stat-val y">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Plan Limit</div><div class="prem-stat-val">∞</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3rem 2rem;text-align:center;">
+      <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#0d9488);display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem;">🍳</div>
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem;color:#1a1a2e;">No cooking classes yet</h3>
+      <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first cooking class and manage bookings.</p>
+      <button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(15,118,110,.3);">✦ Create Cooking Class</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="view" data-view="analytics">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">📈 Analytics</div>
+        <div class="prem-title">Analytics Overview</div>
+        <div class="prem-sub">Track your workshop performance and revenue trends.</div>
+      </div>
+      <div class="prem-actions">
+        <div class="period-tabs" id="periodTabs">
+          <button class="period-tab active" data-period="7">7 days</button>
+          <button class="period-tab" data-period="30">30 days</button>
+          <button class="period-tab" data-period="90">90 days</button>
+          <button class="period-tab" data-period="365">1 year</button>
+        </div>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total Revenue</div><div class="prem-stat-val g" id="anRevenue">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Registrations</div><div class="prem-stat-val" id="anRegs">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Events Live</div><div class="prem-stat-val y" id="anLive">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Avg. per Event</div><div class="prem-stat-val" id="anAvg">₹0</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="an-metrics">
+      <div class="an-metric amber"><div class="an-metric-label">Total Revenue</div><div class="an-metric-val" id="anRevenue2">₹0</div><div class="an-metric-sub"><span class="up">↑ 0%</span> vs prev period</div></div>
+      <div class="an-metric green"><div class="an-metric-label">Registrations</div><div class="an-metric-val" id="anRegs2">0</div><div class="an-metric-sub"><span class="up">↑ 0%</span> vs prev period</div></div>
+      <div class="an-metric orange"><div class="an-metric-label">Events Live</div><div class="an-metric-val" id="anLive2">0</div><div class="an-metric-sub">Published listings</div></div>
+      <div class="an-metric yellow"><div class="an-metric-label">Avg. per Event</div><div class="an-metric-val" id="anAvg2">₹0</div><div class="an-metric-sub">Revenue per event</div></div>
+    </div>
+    <div class="an-grid">
+      <div class="card">
+        <div class="card-head"><div><h2>Revenue Over Time</h2><p>Daily paid bookings</p></div></div>
+        <div class="bar-chart" id="revenueChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Quick Stats</h2><p>Key performance numbers</p></div></div>
+        <div class="stat-row"><div class="stat-row-label">🎨 Total Events Created</div><div class="stat-row-val" id="qsTotal">0</div></div>
+        <div class="stat-row"><div class="stat-row-label">🟢 Published Events</div><div class="stat-row-val" id="qsPublished">0</div></div>
+        <div class="stat-row"><div class="stat-row-label">📝 Draft Events</div><div class="stat-row-val" id="qsDraft">0</div></div>
+        <div class="stat-row"><div class="stat-row-label">💳 Free Events</div><div class="stat-row-val" id="qsFree">0</div></div>
+        <div class="stat-row"><div class="stat-row-label">💰 Paid Events</div><div class="stat-row-val" id="qsPaid">0</div></div>
+        <div class="stat-row"><div class="stat-row-label">⭐ Avg Ticket Price</div><div class="stat-row-val" id="qsAvgPrice">₹0</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SALES -->
+<div class="view" data-view="sales">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">💰 Sales Summary</div>
+        <div class="prem-title">Sales Summary</div>
+        <div class="prem-sub">Track all ticket sales, revenue and settlement status in real time.</div>
+      </div>
+      <div class="prem-actions">
+        <button onclick="switchView('payouts')" class="prem-btn-ghost">🏦 View Payouts</button>
+        <button onclick="switchView('events')" class="prem-btn-white">✦ Create Event</button>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total Revenue</div><div class="prem-stat-val" id="salesTotalRev">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Settled</div><div class="prem-stat-val g" id="salesSettled">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Pending</div><div class="prem-stat-val y" id="salesPending">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Transactions</div><div class="prem-stat-val" id="salesCount">0</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+      <div class="tabs" id="salesTabs">
+        <button class="tab active" data-stab="all">All Transactions</button>
+        <button class="tab" data-stab="paid">✅ Paid</button>
+        <button class="tab" data-stab="pending">⏳ Pending</button>
+        <button class="tab" data-stab="cancelled">❌ Cancelled</button>
+      </div>
+      <div style="margin-left:auto;"><div class="search-box"><span>🔍</span><input type="search" id="salesSearch" placeholder="Search transactions..."/></div></div>
+    </div>
+    <div class="fin-table">
+      <div class="fin-table-head" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:.65rem 1.1rem;">
+        <span>Event</span><span>Date</span><span>Tickets</span><span>Amount</span><span>Status</span>
+      </div>
+      <div id="salesTableBody">
+        <div style="display:flex;flex-direction:column;align-items:center;padding:4rem 2rem;text-align:center;">
+          <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#14b8a6);display:grid;place-items:center;font-size:1.8rem;margin-bottom:1rem;">💰</div>
+          <div style="font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:.4rem;">No sales yet</div>
+          <div style="font-size:.84rem;color:#9ca3af;max-width:280px;line-height:1.6;margin-bottom:1.25rem;">Sales will appear here once attendees register for your events.</div>
+          <button onclick="switchView('events')" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.4rem;border-radius:8px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;">✦ Create Your First Event</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYOUTS -->
+<div class="view" data-view="payouts">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">🏦 Payouts</div>
+        <div class="prem-title">Payouts</div>
+        <div class="prem-sub">Track your earnings, settlement status and bank transfers. Payouts processed every 7 days.</div>
+      </div>
+      <div class="prem-actions">
+        <button onclick="switchView('personal-info')" class="prem-btn-ghost">⚙ Bank Settings</button>
+        <button onclick="switchView('sales')" class="prem-btn-white">💰 View Sales</button>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total Paid Out</div><div class="prem-stat-val g" id="payoutTotal">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">In Transit</div><div class="prem-stat-val" id="payoutTransit">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">On Hold</div><div class="prem-stat-val y" id="payoutHold">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Next Payout</div><div class="prem-stat-val" id="payoutNext">—</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="alert-bar blue">
+      <div style="display:flex;align-items:center;gap:.75rem;"><span style="font-size:1.2rem;">ℹ️</span><div><div style="font-size:.86rem;font-weight:700;color:#1e40af;">Payout Schedule</div><div style="font-size:.78rem;color:#3b82f6;margin-top:.1rem;">Payouts processed every 7 days after event completion. Minimum ₹500.</div></div></div>
+      <button onclick="switchView('personal-info')" style="padding:.42rem .9rem;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;font-size:.8rem;border:0;cursor:pointer;white-space:nowrap;">Add Bank →</button>
+    </div>
+    <div class="card">
+      <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);">Bank Account</div>
+      <div style="background:var(--psoft);border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <div style="width:42px;height:42px;border-radius:10px;background:var(--plight);display:grid;place-items:center;font-size:1.1rem;">🏦</div>
+          <div><strong style="display:block;font-size:.88rem;font-weight:700;color:#1a1a2e;">No bank account linked</strong><span style="font-size:.76rem;color:#9ca3af;">Add your bank details to receive payouts</span></div>
+        </div>
+        <button onclick="switchView('personal-info')" style="padding:.42rem .9rem;border-radius:8px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-weight:700;font-size:.8rem;border:0;cursor:pointer;">+ Add Bank Details</button>
+      </div>
+    </div>
+    <div class="fin-table">
+      <div class="fin-table-head" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:.65rem 1.1rem;">
+        <span>Payout ID</span><span>Date</span><span>Events</span><span>Amount</span><span>Status</span>
+      </div>
+      <div id="payoutsTableBody">
+        <div style="display:flex;flex-direction:column;align-items:center;padding:4rem 2rem;text-align:center;">
+          <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#14b8a6);display:grid;place-items:center;font-size:1.8rem;margin-bottom:1rem;">🏦</div>
+          <div style="font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:.4rem;">No payouts yet</div>
+          <div style="font-size:.84rem;color:#9ca3af;max-width:300px;line-height:1.6;margin-bottom:1.25rem;">Payouts will appear once your events generate revenue.</div>
+          <button onclick="switchView('personal-info')" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.4rem;border-radius:8px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;">🏦 Add Bank Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INSTAGRAM -->
+<div class="view" data-view="instagram">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">📸 Instagram</div>
+        <div class="prem-title">Instagram</div>
+        <div class="prem-sub">Connect Instagram, auto-reply to comments with event links and grow on autopilot.</div>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Followers</div><div class="prem-stat-val">—</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Auto-Replies Sent</div><div class="prem-stat-val y">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Active Rules</div><div class="prem-stat-val g">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Status</div><div class="prem-stat-val y">Not Connected</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+      <div class="card">
+        <div class="card-head"><div><h2>Connect Account</h2><p>Link your Instagram Business account</p></div></div>
+        <div style="text-align:center;padding:1.25rem .5rem;">
+          <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);display:grid;place-items:center;font-size:1.6rem;margin:0 auto .85rem;">📸</div>
+          <div style="font-size:.92rem;font-weight:700;margin-bottom:.35rem;color:#1a1a2e;">Connect Instagram</div>
+          <div style="font-size:.78rem;color:#9ca3af;line-height:1.6;margin-bottom:1.1rem;max-width:260px;margin-left:auto;margin-right:auto;">Log in with Instagram to allow CultureWave to read comments and send auto-replies.</div>
+          <a href="/api/instagram/connect" style="display:inline-flex;align-items:center;gap:.55rem;padding:.65rem 1.5rem;border-radius:999px;background:linear-gradient(135deg,#833ab4,#fd1d1d);color:#fff;font-size:.88rem;font-weight:700;text-decoration:none;">Login with Instagram</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Comment Auto-Reply</h2><p>Auto-send DMs when someone comments</p></div></div>
+        <div style="background:var(--psoft);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:.75rem;">
+          <div style="font-size:.84rem;font-weight:700;color:#134e4a;margin-bottom:.25rem;">⚡ How it works</div>
+          <div style="font-size:.76rem;color:#0f766e;line-height:1.7;">1. Someone comments your keyword (e.g. <strong>"BOOK"</strong>) on your post<br/>2. They instantly get a DM with your event details & booking link<br/>3. More bookings — on autopilot, 24/7</div>
+        </div>
+        <div class="pf-field" style="margin-bottom:.6rem;"><label>Trigger Keyword(s)</label><input type="text" placeholder='e.g. BOOK, INFO, CLASS'/></div>
+        <div class="pf-field" style="margin-bottom:.6rem;"><label>Auto-Reply DM Message</label><textarea style="min-height:80px;" placeholder="Hey! 👋 Thanks for your interest in our workshop!&#10;&#10;🎟 Book here: {booking_link}&#10;&#10;Limited seats — grab yours now! 🎨"></textarea></div>
+        <button onclick="showToast('Auto-reply rule saved!')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:8px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-size:.84rem;font-weight:700;border:0;cursor:pointer;margin-left:auto;">✦ Save Rule</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHATSAPP -->
+<div class="view" data-view="whatsapp">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">💬 WhatsApp</div>
+        <div class="prem-title">WhatsApp</div>
+        <div class="prem-sub">Send booking confirmations, reminders and updates to your attendees via WhatsApp.</div>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Credits Balance</div><div class="prem-stat-val">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Cost Per Message</div><div class="prem-stat-val g">1 Credit</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Delivery Window</div><div class="prem-stat-val y">Within 2 hrs</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Messages Sent</div><div class="prem-stat-val">0</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:.85rem 1rem;display:flex;align-items:center;gap:.85rem;">
+      <span style="font-size:1.2rem;">💳</span>
+      <div style="flex:1;"><div style="font-size:.86rem;font-weight:700;color:#166534;">1 Credit = 1 WhatsApp Message · Powered by OGSHOOTS LUXE</div><div style="font-size:.78rem;color:#15803d;margin-top:.1rem;">Every message is sent by the OGSHOOTS LUXE team on your behalf within 2 hours.</div></div>
+      <a href="credits.html" style="padding:.42rem .9rem;border-radius:8px;background:#16a34a;color:#fff;font-weight:700;font-size:.8rem;text-decoration:none;white-space:nowrap;">Buy Credits</a>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>WhatsApp Settings</h2><p>Configure your number and notifications</p></div></div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;">
+        <div class="pf-field"><label>WhatsApp Number</label><input type="tel" placeholder="+91 XXXXX XXXXX"/></div>
+        <div class="pf-field"><label>Booking Confirmation Message</label><textarea placeholder="Hi {name}, your workshop booking for {event} on {date} is confirmed! 🎨" style="min-height:90px;"></textarea></div>
+        <div class="pf-field"><label>Reminder Message</label><textarea placeholder="Hey {name}, reminder: {event} is tomorrow at {time}. See you there! 🎨" style="min-height:90px;"></textarea></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-top:1px solid var(--border);">
+          <div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Send booking confirmation</div><div style="font-size:.76rem;color:#9ca3af;">Auto-send on every new booking · <span style="color:#16a34a;font-weight:600;">1 credit</span></div></div>
+          <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#25d366;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label>
+        </div>
+        <button onclick="showToast('WhatsApp settings saved!')" style="height:42px;background:#25d366;color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;">✓ Save WhatsApp Settings</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SURVEYS -->
+<div class="view" data-view="surveys">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">📋 Survey Forms</div>
+        <div class="prem-title">Survey Forms</div>
+        <div class="prem-sub">Collect feedback, registrations and data from your attendees with custom forms.</div>
+      </div>
+      <div class="prem-actions">
+        <button onclick="showToast('Form builder coming soon!')" class="prem-btn-white">+ Create Form</button>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total Forms</div><div class="prem-stat-val">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Responses</div><div class="prem-stat-val g">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Active</div><div class="prem-stat-val y">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Completion Rate</div><div class="prem-stat-val">0%</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3rem 2rem;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#14b8a6);display:grid;place-items:center;font-size:1.6rem;margin:0 auto 1rem;">📋</div>
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem;color:#1a1a2e;">No forms yet</h3>
+      <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first survey form to collect feedback from attendees.</p>
+      <button onclick="showToast('Form builder coming soon!')" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:8px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;">+ Create Your First Form</button>
+    </div>
+  </div>
+</div>
+
+<!-- INQUIRIES -->
+<div class="view" data-view="inquiries">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">✉ Inquiries</div>
+        <div class="prem-title">Inquiries</div>
+        <div class="prem-sub">Manage all incoming messages and inquiries from your brand page visitors.</div>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Total</div><div class="prem-stat-val" id="inqTotal">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Unread</div><div class="prem-stat-val y" id="inqUnread">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Replied</div><div class="prem-stat-val g" id="inqReplied">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">This Week</div><div class="prem-stat-val">0</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:.65rem 1.1rem;border-bottom:1px solid var(--border);background:var(--psoft);">
+        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0f766e;">From</span>
+        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0f766e;">Subject</span>
+        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0f766e;">Date</span>
+        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0f766e;">Status</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;padding:3rem 2rem;text-align:center;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--psoft);display:grid;place-items:center;font-size:1.4rem;margin-bottom:.75rem;">✉</div>
+        <div style="font-size:.88rem;font-weight:600;color:#1a1a2e;">No inquiries yet</div>
+        <div style="font-size:.78rem;color:#9ca3af;margin-top:.25rem;">Inquiries from your brand page will appear here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BRAND & PROFILE -->
+<div class="view" data-view="personal-info">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">🏷 Brand Page</div>
+        <div class="prem-title">Brand & Profile</div>
+        <div class="prem-sub">Manage your brand profile, social links, KYC and payout details.</div>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Profile</div><div class="prem-stat-val y">Incomplete</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">KYC</div><div class="prem-stat-val y">Pending</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Bank</div><div class="prem-stat-val y">Not Linked</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">PAN</div><div class="prem-stat-val y">Not Submitted</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="pf-link-bar">
+      <div><div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--p);margin-bottom:.25rem;">🌐 Your Public Brand Page</div><div class="pf-link-url" id="pfPublicUrl">Loading...</div></div>
+      <div style="display:flex;gap:.5rem;"><button class="pf-copy" id="pfCopyBtn">📋 Copy Link</button><a class="pf-copy" id="pfViewBtn" href="#" target="_blank">👁 View Page</a></div>
+    </div>
+    <div class="brand-layout">
+      <nav class="brand-sidenav">
+        <div style="padding:.75rem .65rem .4rem;">
+          <div class="brand-sidenav-section">Brand Page</div>
+          <button class="brand-sidenav-item active" data-panel="bp-basic" onclick="switchPanel(this,'bp-basic')">🖼 Basic Information</button>
+          <button class="brand-sidenav-item" data-panel="bp-website" onclick="switchPanel(this,'bp-website')">🌐 Website</button>
+          <button class="brand-sidenav-item" data-panel="bp-about" onclick="switchPanel(this,'bp-about')">📝 About</button>
+          <button class="brand-sidenav-item" data-panel="bp-socials" onclick="switchPanel(this,'bp-socials')">📲 Socials</button>
+          <button class="brand-sidenav-item" data-panel="bp-tracking" onclick="switchPanel(this,'bp-tracking')">📊 Tracking</button>
+          <div class="brand-sidenav-divider"></div>
+          <div class="brand-sidenav-section">KYC</div>
+          <button class="brand-sidenav-item" data-panel="bp-personal" onclick="switchPanel(this,'bp-personal')">🪪 Personal Details</button>
+          <button class="brand-sidenav-item" data-panel="bp-pan" onclick="switchPanel(this,'bp-pan')">📄 PAN Card</button>
+          <button class="brand-sidenav-item" data-panel="bp-gst" onclick="switchPanel(this,'bp-gst')">🧾 GST Details</button>
+          <div class="brand-sidenav-divider"></div>
+          <div class="brand-sidenav-section">Finance</div>
+          <button class="brand-sidenav-item" data-panel="bp-bank" onclick="switchPanel(this,'bp-bank')">🏦 Bank Details</button>
+        </div>
+      </nav>
+      <div style="min-width:0;">
+        <div class="brand-panel" id="bp-basic" style="display:flex;">
+          <div class="card">
+            <div class="card-head"><div><h2>Basic Information</h2><p>Your brand name, URL and profile image</p></div></div>
+            <div style="margin-bottom:1.25rem;">
+              <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin-bottom:.5rem;">Cover Photo</div>
+              <div class="cover-upload" id="coverUploadArea" onclick="document.getElementById('coverFileInput').click()">
+                <img id="coverPreview" src="" style="display:none;"/>
+                <div id="coverPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:.35rem;"><span style="font-size:1.6rem;">🖼</span><span style="font-size:.82rem;font-weight:600;color:#0f766e;">Click to upload cover photo</span><span style="font-size:.72rem;color:#9ca3af;">Recommended: 1200 × 400 pixels</span></div>
+              </div>
+              <input type="file" id="coverFileInput" accept="image/*" style="display:none;"/>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:1.25rem;margin-bottom:1.25rem;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
+                <div class="avatar-upload" id="avatarUploadArea" onclick="document.getElementById('avatarFileInput').click()">
+                  <span id="avatarInitial" style="font-size:2rem;font-weight:800;color:#fff;">W</span>
+                  <img id="avatarPreview" src="" style="display:none;"/>
+                  <div class="avatar-upload-overlay">📷</div>
+                </div>
+                <input type="file" id="avatarFileInput" accept="image/*" style="display:none;"/>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:.75rem;">
+                <div class="pf-field"><label>Brand Name *</label><input id="pfName" type="text" placeholder="Your brand name"/></div>
+                <div class="pf-field"><label>Your CultureWave URL</label><div style="display:flex;align-items:center;"><span class="url-prefix">culturewave.in/</span><input class="url-input" id="pfHandle" type="text" placeholder="yourbrand"/></div></div>
+              </div>
+            </div>
+            <button class="brand-save-btn" onclick="saveProfile()">✓ Save Basic Info</button>
+          </div>
+        </div>
+        <div class="brand-panel" id="bp-website" style="display:none;">
+          <div class="card"><div class="card-head"><div><h2>Website</h2><p>Link your external website</p></div></div><div class="pf-field"><label>Website URL</label><input id="pfWebsite" type="url" placeholder="https://yourwebsite.com"/></div><button class="brand-save-btn" style="margin-top:.75rem;" onclick="saveProfile()">✓ Save</button></div>
+        </div>
+        <div class="brand-panel" id="bp-about" style="display:none;">
+          <div class="card"><div class="card-head"><div><h2>About</h2><p>Tell visitors about your brand</p></div></div><div class="pf-field"><label>Bio / Description</label><textarea id="pfBio" placeholder="Tell attendees about your workshop brand..." style="min-height:120px;"></textarea></div><button class="brand-save-btn" style="margin-top:.75rem;" onclick="saveProfile()">✓ Save</button></div>
+        </div>
+        <div class="brand-panel" id="bp-socials" style="display:none;">
+          <div class="card"><div class="card-head"><div><h2>Socials</h2><p>Link your social media profiles</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>Instagram</label><input id="pfInstagram" type="text" placeholder="@username"/></div><div class="pf-field"><label>Twitter / X</label><input id="pfTwitter" type="text" placeholder="@username"/></div><div class="pf-field"><label>Facebook</label><input id="pfFacebook" type="text" placeholder="facebook.com/yourpage"/></div><div class="pf-field"><label>YouTube</label><input id="pfYoutube" type="text" placeholder="youtube.com/@channel"/></div><div class="pf-field"><label>LinkedIn</label><input id="pfLinkedin" type="text" placeholder="linkedin.com/in/you"/></div><div class="pf-field"><label>WhatsApp</label><input id="pfWhatsapp" type="text" placeholder="+91 XXXXX XXXXX"/></div></div><button class="brand-save-btn" style="margin-top:.75rem;" onclick="saveProfile()">✓ Save Socials</button></div>
+        </div>
+        <div class="brand-panel" id="bp-tracking" style="display:none;">
+          <div class="card"><div class="card-head"><div><h2>Tracking</h2><p>Add analytics and pixel tracking</p></div></div><div style="display:flex;flex-direction:column;gap:.75rem;"><div class="pf-field"><label>Google Analytics ID</label><input id="pfGaId" type="text" placeholder="G-XXXXXXXXXX"/></div><div class="pf-field"><label>Meta Pixel ID</label><input id="pfMetaPixel" type="text" placeholder="XXXXXXXXXXXXXXXXXX"/></div><div class="pf-field"><label>Google Tag Manager ID</label><input id="pfGtmId" type="text" placeholder="GTM-XXXXXXX"/></div></div><button class="brand-save-btn" style="margin-top:.75rem;" onclick="saveProfile()">✓ Save Tracking</button></div>
+        </div>
+        <div class="brand-panel" id="bp-personal" style="display:none;">
+          <div class="card"><div class="card-head"><div><h2>Personal Details</h2><p>Your basic identity information</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>Full Legal Name</label><input id="piFullName" type="text" placeholder="As per government ID"/></div><div class="pf-field"><label>Date of Birth</label><input id="piDob" type="date"/></div><div class="pf-field"><label>Phone Number</label><input id="piPhone" type="tel" placeholder="+91 XXXXX XXXXX"/></div><div class="pf-field"><label>Email Address</label><input id="piEmail" type="email" placeholder="your@email.com"/></div><div class="pf-field" style="grid-column:1/-1;"><label>Address</label><input id="piAddress" type="text" placeholder="Street address"/></div><div class="pf-field"><label>City</label><input id="piCity" type="text" placeholder="City"/></div><div class="pf-field"><label>State</label><input id="piState" type="text" placeholder="State"/></div><div class="pf-field"><label>PIN Code</label><input id="piPin" type="text" placeholder="6-digit PIN"/></div></div><button onclick="savePersonalInfo()" style="margin-top:1rem;height:42px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;padding:0 1.5rem;">Save Personal Details</button></div>
+        </div>
+        <div class="brand-panel" id="bp-pan" style="display:none;">
+          <div class="card"><div class="card-head"><div><h2>PAN Card Details</h2><p>Required for payouts above ₹50,000</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>PAN Number</label><input id="piPan" type="text" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase;"/></div><div class="pf-field"><label>Name on PAN</label><input id="piPanName" type="text" placeholder="Full name as on PAN card"/></div><div class="pf-field"><label>Date of Birth (as on PAN)</label><input id="piPanDob" type="date"/></div><div class="pf-field"><label>PAN Card Image URL</label><input id="piPanImg" type="url" placeholder="https://..."/></div></div><button onclick="savePanDetails()" style="margin-top:1rem;height:42px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;padding:0 1.5rem;">Save PAN Details</button></div>
+        </div>
+        <div class="brand-panel" id="bp-gst" style="display:none;">
+          <div class="card"><div class="card-head"><div><h2>GST Details</h2><p>Optional — for GST invoicing</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>GST Number</label><input id="piGst" type="text" placeholder="22AAAAA0000A1Z5" maxlength="15" style="text-transform:uppercase;"/></div><div class="pf-field"><label>Business Name (as per GST)</label><input id="piGstBiz" type="text" placeholder="Registered business name"/></div></div><button onclick="saveGstDetails()" style="margin-top:1rem;height:42px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;padding:0 1.5rem;">Save GST Details</button></div>
+        </div>
+        <div class="brand-panel" id="bp-bank" style="display:none;">
+          <div class="card"><div class="card-head"><div><h2>Bank Details</h2><p>For receiving event payouts</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>Account Holder Name</label><input id="bpBankName" type="text" placeholder="Full name"/></div><div class="pf-field"><label>Account Number</label><input id="bpBankAccNo" type="text" placeholder="Account number"/></div><div class="pf-field"><label>Confirm Account Number</label><input id="bpBankAccNo2" type="text" placeholder="Re-enter account number"/></div><div class="pf-field"><label>IFSC Code</label><input id="bpBankIfsc" type="text" placeholder="e.g. SBIN0001234" style="text-transform:uppercase;"/></div><div class="pf-field"><label>Bank Name</label><input id="bpBankBankName" type="text" placeholder="e.g. State Bank of India"/></div><div class="pf-field"><label>Account Type</label><select id="bpBankType"><option value="savings">Savings</option><option value="current">Current</option></select></div></div><button class="brand-save-btn" style="margin-top:1rem;" onclick="saveBrandBankDetails()">Save Bank Details</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="view" data-view="settings">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">⚙ Account</div>
+        <div class="prem-title">Settings</div>
+        <div class="prem-sub">Manage your account preferences and security.</div>
+      </div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Account</div><div class="prem-stat-val g">Active</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Plan</div><div class="prem-stat-val">Free</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Sessions</div><div class="prem-stat-val">1</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">2FA</div><div class="prem-stat-val y">Off</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="card">
+      <div class="card-head"><div><h2>Notifications</h2><p>Choose what you get notified about</p></div></div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--plight);"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Booking alerts</div><div style="font-size:.76rem;color:#9ca3af;">Get notified when someone books your event</div></div><label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:var(--p);border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--plight);"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Payout updates</div><div style="font-size:.76rem;color:#9ca3af;">Get notified when a payout is processed</div></div><label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:var(--p);border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Marketing emails</div><div style="font-size:.76rem;color:#9ca3af;">Tips, product updates and announcements</div></div><label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Security</h2><p>Manage your password and sessions</p></div></div>
+      <div style="display:flex;flex-direction:column;gap:.6rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--plight);"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Password</div><div style="font-size:.76rem;color:#9ca3af;">Last changed — never</div></div><button style="padding:.38rem .85rem;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:.8rem;font-weight:600;cursor:pointer;color:#6b7280;">Change</button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Active sessions</div><div style="font-size:.76rem;color:#9ca3af;">1 device currently signed in</div></div><button style="padding:.38rem .85rem;border-radius:8px;border:1px solid #fecaca;background:#fff5f5;color:#dc2626;font-size:.8rem;font-weight:600;cursor:pointer;">Sign out all</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Danger Zone</h2><p>Irreversible account actions</p></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;"><div><div style="font-size:.86rem;font-weight:600;color:#dc2626;">Delete account</div><div style="font-size:.76rem;color:#9ca3af;">Permanently delete your account and all data</div></div><button style="padding:.42rem 1rem;border-radius:8px;background:#dc2626;color:#fff;font-size:.82rem;font-weight:700;border:0;cursor:pointer;">Delete</button></div>
+    </div>
+  </div>
+</div>
+
+  </div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+var _titles={overview:'🎨 Dashboard',events:'🎨 Workshop Events',popups:'🖌 Art & Craft Classes',dining:'🍳 Cooking Classes',analytics:'📈 Analytics',sales:'💰 Sales Summary',payouts:'🏦 Payouts',instagram:'📸 Instagram',whatsapp:'💬 WhatsApp',surveys:'📋 Survey Forms',inquiries:'✉ Inquiries','personal-info':'🪪 Brand & Profile',settings:'⚙ Settings'};
+function switchView(name){
+  document.querySelectorAll('.view').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
+  document.querySelectorAll('.sb-item[data-view]').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
+  var pt=document.getElementById('pageTitle');if(pt)pt.textContent=_titles[name]||name;
+  if(name==='events'){renderEvents();}
+  if(name==='personal-info'){var pv=document.querySelector('.view[data-view="personal-info"]');if(pv){pv.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});pv.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});var def=document.getElementById('bp-basic');var defBtn=document.querySelector('.brand-sidenav-item[data-panel="bp-basic"]');if(def)def.style.display='flex';if(defBtn)defBtn.classList.add('active');}}
+  try{localStorage.setItem('workshopsDashView',name);}catch(e){}
+}
+function switchPanel(btn,panelId){var view=document.querySelector('.view[data-view="personal-info"]');if(!view)return;view.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});view.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});btn.classList.add('active');var panel=document.getElementById(panelId);if(panel)panel.style.display='flex';}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sbOverlay').classList.add('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('open');}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+document.querySelectorAll('.sb-item[data-view]').forEach(function(btn){btn.addEventListener('click',function(){switchView(btn.dataset.view);closeSidebar();});});
+document.querySelectorAll('#evTabs .tab').forEach(function(btn){btn.addEventListener('click',function(){activeTab=btn.dataset.tab;document.querySelectorAll('#evTabs .tab').forEach(function(t){t.classList.toggle('active',t===btn);});renderEvents();});});
+document.querySelectorAll('#salesTabs .tab').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('#salesTabs .tab').forEach(function(t){t.classList.toggle('active',t===btn);});renderSalesTable(btn.dataset.stab);});});
+var coverInput=document.getElementById('coverFileInput');
+if(coverInput)coverInput.addEventListener('change',function(){var file=this.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var img=document.getElementById('coverPreview');if(img){img.src=e.target.result;img.style.display='block';}var ph=document.getElementById('coverPlaceholder');if(ph)ph.style.display='none';};reader.readAsDataURL(file);});
+var avatarInput=document.getElementById('avatarFileInput');
+if(avatarInput)avatarInput.addEventListener('change',function(){var file=this.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var img=document.getElementById('avatarPreview');if(img){img.src=e.target.result;img.style.display='block';}var ini=document.getElementById('avatarInitial');if(ini)ini.style.display='none';};reader.readAsDataURL(file);});
+var pfHandleEl=document.getElementById('pfHandle');
+if(pfHandleEl)pfHandleEl.addEventListener('input',function(){this.value=this.value.toLowerCase().replace(/[^a-z0-9_-]/g,'');});
+</script>
+<script type="module">
+import{app,auth,db,getCurrentUser,logout,collection,doc,query,where,orderBy,limit,onSnapshot,getDoc,setDoc,updateDoc,serverTimestamp}from"./firebase.js";
+window.db=db;window.doc=doc;window.setDoc=setDoc;window.updateDoc=updateDoc;
+const esc=v=>String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const money=v=>`₹${Number(v||0).toLocaleString('en-IN')}`;
+let allEvents=[],activeTab='published',myUid=null,allBookings=[];
+const user=await getCurrentUser();
+if(!user){location.href='login.html';}
+else{
+  myUid=user.uid;window.myUid=myUid;
+  document.getElementById('sidebarName').textContent=user.name||'Client';
+  document.getElementById('topName').textContent=user.name||'User';
+  const init=(user.name||'W').trim()[0].toUpperCase();
+  ['sideAvatar','topAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});
+  loadProfile(myUid);loadEvents(myUid);loadBookings(myUid);
+}
+document.getElementById('logoutBtn').onclick=()=>logout();
+try{const saved=localStorage.getItem('workshopsDashView');if(saved)switchView(saved);}catch(e){}
+function normStatus(s){const v=(s||'draft').toLowerCase();return(v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished';}
+function loadEvents(uid){const q=query(collection(db,'events'),where('organiserId','==',uid),orderBy('createdAt','desc'));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()}));renderEvents();renderOverview();});}
+function renderEvents(){
+  const q=document.getElementById('evSearch').value.trim().toLowerCase();
+  const filtered=allEvents.filter(e=>{const mt=activeTab==='published'?normStatus(e.status)==='published':activeTab==='archived'?normStatus(e.status)==='archived':normStatus(e.status)==='unpublished';const mq=!q||(e.name||'').toLowerCase().includes(q)||(e.city||'').toLowerCase().includes(q);return mt&&mq;});
+  const pub=allEvents.filter(e=>normStatus(e.status)==='published').length;
+  const el=id=>document.getElementById(id);
+  if(el('tabCountPublished'))el('tabCountPublished').textContent=pub;
+  if(el('hdrTotal'))el('hdrTotal').textContent=allEvents.length;
+  if(el('hdrPublished'))el('hdrPublished').textContent=pub;
+  if(el('hdrDraft'))el('hdrDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;
+  const container=document.getElementById('eventsContainer');
+  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border-radius:14px;padding:5rem 2rem 4rem;text-align:center;"><div style="width:88px;height:88px;border-radius:50%;background:#c47a2b;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🥂</div><h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No workshop events yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first workshop event and start selling seats.</p><button onclick="location.href='event-create.html?from=workshops'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.2rem;border-radius:999px;background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(15,118,110,.35);">✦ Create Workshop Event</button></div>`;return;}
+  container.innerHTML=`<div class="events-table"><div class="ev-table-head"><span>Event</span><span>Status</span><span>Date</span><span>Price</span><span>Actions</span></div>${filtered.map(ev=>{const st=normStatus(ev.status);const stLabel=st==='published'?'Live':st==='archived'?'Archived':'Draft';const date=ev.startDate?.toDate?ev.startDate.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';const price=ev.price||ev.tickets?.[0]?.price||0;return`<div class="ev-row"><div><div class="ev-name">${esc(ev.name||'Untitled')}</div><div class="ev-sub">${esc(ev.city||'')}</div></div><div><span class="status-pill ${st==='published'?'live':st==='archived'?'archived':'draft'}">● ${stLabel}</span></div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.84rem;font-weight:600;color:#1a1a2e;">${price?money(price):'Free'}</div><div class="ev-actions"><button class="ev-act-btn ${st==='published'?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${st==='published'?'Unpublish':'Publish'}</button><a class="ev-act-btn" href="event-detail.html?eventId=${ev.id}" target="_blank">View</a><a class="ev-act-btn" href="event-manage.html?eventId=${ev.id}">Edit</a><button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button></div></div>`;}).join('')}</div>`;
+}
+window.copyEvLink=function(id){navigator.clipboard.writeText(`${location.origin}/event-detail.html?eventId=${id}`).then(()=>showToast('Link copied!'));};
+window.togglePublishEvent=async function(id,st){if(!myUid)return;const ns=st==='published'?'unpublished':'published';await updateDoc(doc(db,'events',id),{status:ns,updatedAt:serverTimestamp()});showToast(ns==='published'?'✅ Event published!':'🟡 Event unpublished');};
+const createEvBtn=document.getElementById("createEvBtn");if(createEvBtn)createEvBtn.onclick=()=>location.href="event-create.html?from=workshops";
+document.getElementById('evSearch').addEventListener('input',renderEvents);
+document.getElementById('evRefresh').onclick=()=>renderEvents();
+renderEvents();
+function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);});}
+function renderOverview(){const el=id=>document.getElementById(id);if(el('mEvents'))el('mEvents').textContent=allEvents.length;if(el('planUsageLabel'))el('planUsageLabel').textContent=allEvents.length+' events created';}
+function renderOverviewBookings(bookings){
+  const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
+  const el=id=>document.getElementById(id);
+  if(el('mBookings'))el('mBookings').textContent=bookings.length;if(el('mRevenue'))el('mRevenue').textContent=money(rev);if(el('mPayout'))el('mPayout').textContent=money(rev);
+  const actEl=document.getElementById('overviewActivity');
+  actEl.innerHTML=bookings.slice(0,6).length?bookings.slice(0,6).map(b=>{const st=(b.status||'pending').toLowerCase();const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'';return`<div style="display:flex;align-items:center;gap:.75rem;padding:.7rem .8rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);margin-bottom:.5rem;"><span style="width:8px;height:8px;border-radius:50%;background:${st==='paid'?'#16a34a':st==='cancelled'?'#dc2626':'#d97706'};flex:none;"></span><div style="flex:1;"><strong style="display:block;font-size:.84rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'Booking')}</strong><span style="font-size:.74rem;color:#9ca3af;">${st} · ${date}</span></div><span style="font-size:.78rem;font-weight:700;color:${st==='paid'?'#16a34a':'#d97706'};">${b.amount?money(b.amount):'Free'}</span></div>`;}).join(''):'<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">No activity yet.</div>';
+  const billEl=document.getElementById('overviewBilling');
+  const paidB=bookings.filter(b=>(b.status||'')==='paid');
+  billEl.innerHTML=paidB.slice(0,5).length?paidB.slice(0,5).map(b=>{const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'';return`<div style="display:flex;align-items:center;gap:.75rem;padding:.7rem .8rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);margin-bottom:.5rem;"><span style="width:32px;height:32px;border-radius:8px;background:var(--plight);display:grid;place-items:center;font-size:.85rem;flex:none;">💳</span><div style="flex:1;"><strong style="display:block;font-size:.84rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'Payment')}</strong><span style="font-size:.74rem;color:#9ca3af;">${date}</span></div><span style="font-size:.84rem;font-weight:700;color:#16a34a;">${money(b.amount)}</span></div>`;}).join(''):'<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">No transactions yet.</div>';
+}
+function renderSalesMetrics(bookings){const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);const el=id=>document.getElementById(id);if(el('salesTotalRev'))el('salesTotalRev').textContent=money(rev);if(el('salesSettled'))el('salesSettled').textContent=money(rev);if(el('salesPending'))el('salesPending').textContent=money(0);if(el('salesCount'))el('salesCount').textContent=bookings.length;}
+function renderSalesTable(filter){const q=(document.getElementById('salesSearch')||{}).value?.trim().toLowerCase()||'';let rows=allBookings;if(filter==='paid')rows=rows.filter(b=>(b.status||'')==='paid');else if(filter==='pending')rows=rows.filter(b=>(b.status||'')!=='paid'&&(b.status||'')!=='cancelled');else if(filter==='cancelled')rows=rows.filter(b=>(b.status||'')==='cancelled');if(q)rows=rows.filter(b=>(b.eventName||'').toLowerCase().includes(q));const body=document.getElementById('salesTableBody');if(!body)return;if(!rows.length){body.innerHTML='<div style="text-align:center;padding:3rem;color:#9ca3af;font-size:.84rem;">No transactions found.</div>';return;}body.innerHTML=rows.map(b=>{const st=(b.status||'pending').toLowerCase();const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';return`<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:.8rem 1.1rem;border-bottom:1px solid var(--plight);align-items:center;"><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'—')}</div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.82rem;color:#6b7280;">${b.tickets||1}</div><div style="font-size:.84rem;font-weight:700;color:#1a1a2e;">${b.amount?money(b.amount):'Free'}</div><div><span style="display:inline-flex;padding:.22rem .6rem;border-radius:999px;font-size:.7rem;font-weight:700;background:${st==='paid'?'#dcfce7':st==='cancelled'?'#fee2e2':'var(--plight)'};color:${st==='paid'?'#16a34a':st==='cancelled'?'#dc2626':'#0f766e'};">${st}</span></div></div>`;}).join('');}
+function renderPayouts(bookings){const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);const el=id=>document.getElementById(id);if(el('payoutTotal'))el('payoutTotal').textContent=money(rev);if(el('payoutTransit'))el('payoutTransit').textContent=money(0);if(el('payoutHold'))el('payoutHold').textContent=money(0);}
+function renderAnalytics(bookings){
+  const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
+  const el=id=>document.getElementById(id);
+  ['anRevenue','anRevenue2'].forEach(id=>{if(el(id))el(id).textContent=money(rev);});
+  ['anRegs','anRegs2'].forEach(id=>{if(el(id))el(id).textContent=bookings.length;});
+  const live=allEvents.filter(e=>normStatus(e.status)==='published').length;
+  ['anLive','anLive2'].forEach(id=>{if(el(id))el(id).textContent=live;});
+  const avg=allEvents.length?money(Math.round(rev/allEvents.length)):'₹0';
+  ['anAvg','anAvg2'].forEach(id=>{if(el(id))el(id).textContent=avg;});
+  if(el('qsTotal'))el('qsTotal').textContent=allEvents.length;if(el('qsPublished'))el('qsPublished').textContent=live;if(el('qsDraft'))el('qsDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;if(el('qsFree'))el('qsFree').textContent=allEvents.filter(e=>!e.price||e.price===0).length;if(el('qsPaid'))el('qsPaid').textContent=allEvents.filter(e=>e.price>0).length;
+  const prices=allEvents.filter(e=>e.price>0).map(e=>Number(e.price||0));if(el('qsAvgPrice'))el('qsAvgPrice').textContent=prices.length?money(Math.round(prices.reduce((a,b)=>a+b,0)/prices.length)):'₹0';
+  const chart=document.getElementById('revenueChart');if(chart){const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const vals=days.map(()=>Math.floor(Math.random()*80)+10);const max=Math.max(...vals);chart.innerHTML=vals.map((v,i)=>`<div class="bar-wrap"><div class="bar" style="height:${Math.round((v/max)*110)}px;"></div><div class="bar-label">${days[i]}</div></div>`).join('');}
+}
+async function loadProfile(uid){
+  const url=`${location.origin}/client-profile.html?uid=${uid}`;
+  const pfUrl=document.getElementById('pfPublicUrl');const pfView=document.getElementById('pfViewBtn');const pfCopy=document.getElementById('pfCopyBtn');
+  if(pfUrl)pfUrl.textContent=url;if(pfView)pfView.href=url;if(pfCopy)pfCopy.onclick=()=>navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!'));
+  const snap=await getDoc(doc(db,'organisers',uid));
+  if(snap.exists()){const d=snap.data();const g=id=>document.getElementById(id);if(g('pfName'))g('pfName').value=d.name||'';if(g('pfHandle'))g('pfHandle').value=d.handle||'';if(g('pfBio'))g('pfBio').value=d.bio||'';if(g('pfWebsite'))g('pfWebsite').value=d.website||'';if(g('pfInstagram'))g('pfInstagram').value=d.instagram||'';if(g('pfTwitter'))g('pfTwitter').value=d.twitter||'';if(g('pfFacebook'))g('pfFacebook').value=d.facebook||'';if(g('pfYoutube'))g('pfYoutube').value=d.youtube||'';if(g('pfLinkedin'))g('pfLinkedin').value=d.linkedin||'';if(g('pfWhatsapp'))g('pfWhatsapp').value=d.whatsapp||'';if(g('pfGaId'))g('pfGaId').value=d.gaId||'';if(g('pfMetaPixel'))g('pfMetaPixel').value=d.metaPixel||'';if(g('pfGtmId'))g('pfGtmId').value=d.gtmId||'';if(d.avatarUrl){const img=g('avatarPreview');if(img){img.src=d.avatarUrl;img.style.display='block';const ini=g('avatarInitial');if(ini)ini.style.display='none';}}if(d.coverUrl){const img=g('coverPreview');if(img){img.src=d.coverUrl;img.style.display='block';const ph=g('coverPlaceholder');if(ph)ph.style.display='none';}}const init=(d.name||'W').trim()[0].toUpperCase();['sideAvatar','topAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});document.getElementById('sidebarName').textContent=d.name||'Client';document.getElementById('topName').textContent=d.name||'User';}
+  const kycSnap=await getDoc(doc(db,'kyc',uid));
+  if(kycSnap.exists()){const k=kycSnap.data();const g=id=>document.getElementById(id);if(g('piFullName'))g('piFullName').value=k.fullName||'';if(g('piDob'))g('piDob').value=k.dob||'';if(g('piPhone'))g('piPhone').value=k.phone||'';if(g('piEmail'))g('piEmail').value=k.email||'';if(g('piAddress'))g('piAddress').value=k.address||'';if(g('piCity'))g('piCity').value=k.city||'';if(g('piState'))g('piState').value=k.state||'';if(g('piPin'))g('piPin').value=k.pin||'';if(g('piPan'))g('piPan').value=k.pan||'';if(g('piPanName'))g('piPanName').value=k.panName||'';if(g('piPanDob'))g('piPanDob').value=k.panDob||'';if(g('piPanImg'))g('piPanImg').value=k.panImg||'';if(g('piGst'))g('piGst').value=k.gst||'';if(g('piGstBiz'))g('piGstBiz').value=k.gstBiz||'';if(g('bpBankName'))g('bpBankName').value=k.bankName||'';if(g('bpBankAccNo'))g('bpBankAccNo').value=k.bankAccNo||'';if(g('bpBankAccNo2'))g('bpBankAccNo2').value=k.bankAccNo||'';if(g('bpBankIfsc'))g('bpBankIfsc').value=k.bankIfsc||'';if(g('bpBankBankName'))g('bpBankBankName').value=k.bankBankName||'';if(g('bpBankType'))g('bpBankType').value=k.bankType||'savings';}
+}
+window.saveProfile=async function(){if(!myUid)return;await setDoc(doc(db,'organisers',myUid),{name:document.getElementById('pfName').value.trim(),handle:document.getElementById('pfHandle').value.trim(),bio:(document.getElementById('pfBio')||{}).value?.trim()||'',website:(document.getElementById('pfWebsite')||{}).value?.trim()||'',instagram:(document.getElementById('pfInstagram')||{}).value?.trim().replace(/^@/,'')||'',twitter:(document.getElementById('pfTwitter')||{}).value?.trim().replace(/^@/,'')||'',facebook:(document.getElementById('pfFacebook')||{}).value?.trim()||'',youtube:(document.getElementById('pfYoutube')||{}).value?.trim()||'',linkedin:(document.getElementById('pfLinkedin')||{}).value?.trim()||'',whatsapp:(document.getElementById('pfWhatsapp')||{}).value?.trim()||'',gaId:(document.getElementById('pfGaId')||{}).value?.trim()||'',metaPixel:(document.getElementById('pfMetaPixel')||{}).value?.trim()||'',gtmId:(document.getElementById('pfGtmId')||{}).value?.trim()||'',updatedAt:serverTimestamp()},{merge:true});showToast('✓ Profile saved!');};
+window.savePersonalInfo=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{fullName:document.getElementById('piFullName').value.trim(),dob:document.getElementById('piDob').value,phone:document.getElementById('piPhone').value.trim(),email:document.getElementById('piEmail').value.trim(),address:document.getElementById('piAddress').value.trim(),city:document.getElementById('piCity').value.trim(),state:document.getElementById('piState').value.trim(),pin:document.getElementById('piPin').value.trim(),updatedAt:new Date().toISOString()},{merge:true});showToast('Personal details saved!');};
+window.savePanDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{pan:document.getElementById('piPan').value.trim().toUpperCase(),panName:document.getElementById('piPanName').value.trim(),panDob:document.getElementById('piPanDob').value,panImg:(document.getElementById('piPanImg')||{}).value?.trim()||'',updatedAt:new Date().toISOString()},{merge:true});showToast('PAN details saved!');};
+window.saveGstDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{gst:document.getElementById('piGst').value.trim().toUpperCase(),gstBiz:document.getElementById('piGstBiz').value.trim(),updatedAt:new Date().toISOString()},{merge:true});showToast('GST details saved!');};
+window.saveBrandBankDetails=async function(){if(!myUid)return;const acc=document.getElementById('bpBankAccNo').value.trim();const acc2=document.getElementById('bpBankAccNo2').value.trim();if(acc!==acc2){showToast('Account numbers do not match');return;}await setDoc(doc(db,'kyc',myUid),{bankName:document.getElementById('bpBankName').value.trim(),bankAccNo:acc,bankIfsc:document.getElementById('bpBankIfsc').value.trim().toUpperCase(),bankBankName:(document.getElementById('bpBankBankName')||{}).value?.trim()||'',bankType:document.getElementById('bpBankType').value,updatedAt:new Date().toISOString()},{merge:true});showToast('Bank details saved!');};
+if(document.getElementById('salesSearch')){document.getElementById('salesSearch').addEventListener('input',()=>{const active=document.querySelector('#salesTabs .tab.active');renderSalesTable(active?active.dataset.stab:'all');});}
+</script>
+</body>
+</html>
