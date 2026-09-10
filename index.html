@@ -667,6 +667,9 @@
     .hs-date{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:.3rem;}
     .hs-title{font-size:1rem;font-weight:800;color:#fff;line-height:1.25;margin:0 0 .25rem;letter-spacing:-.02em;}
     .hs-venue{font-size:.8rem;color:rgba(255,255,255,.45);font-weight:500;}
+    /* Keep the slide controls directly on the banner, without a tint or blur layer. */
+    #heroSlider,#hsTrack,#hsDots{background:transparent!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+    #hsDots::before,#hsDots::after{display:none!important;content:none!important;}
     .hs-dots{display:flex;align-items:center;justify-content:center;gap:.45rem;padding:.9rem 0 0;position:relative;z-index:2;background:transparent!important;}
     .hs-dot{width:8px;height:8px;border-radius:999px;background:#333;border:none;cursor:pointer;padding:0;transition:all .3s;}
     .hs-dot.active{width:24px;background:#fff;}
@@ -722,6 +725,8 @@
       transform:translateY(-4px);
       box-shadow:0 16px 40px rgba(0,0,0,.7)!important;
     }
+    /* Do not darken event artwork when a card is hovered. */
+    .event-card:hover,.event-poster-card:hover{box-shadow:none!important;}
     .event-banner{
       position:relative;
       width:100%;
@@ -736,6 +741,7 @@
       background:linear-gradient(to top,rgba(0,0,0,.45) 0%,transparent 50%);
       pointer-events:none;
     }
+    .event-banner::after{display:none!important;}
     .event-promoted-badge{
       position:absolute;top:.55rem;left:.55rem;z-index:2;
       background:#f97316;color:#fff;
