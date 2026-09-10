@@ -87,7 +87,6 @@
       position:relative;
       padding:1rem 0 1.2rem;
     }
-    /* stage: left margin = prev card sliver space, right margin = folder sliver space */
     .ogp-deck-stage{
       position:relative;
       margin:0 28px 0 36px;
@@ -107,7 +106,6 @@
       text-decoration:none;
       box-shadow:0 8px 32px rgba(0,0,0,.7);
     }
-    /* prev card — only a thin left-edge sliver visible */
     .ogp-peek-left{
       position:absolute;
       top:4px;
@@ -122,7 +120,6 @@
       transform:translateX(-10px);
       clip-path:inset(0 calc(100% - 12px) 0 0 round 20px 0 0 20px);
     }
-    /* folder card 1 — directly behind active, only left ~14px sliver peeks right */
     .ogp-behind1{
       position:absolute;
       top:0; left:0;
@@ -133,11 +130,9 @@
       opacity:.8;
       pointer-events:none;
       z-index:8;
-      /* show only a thin right sliver beyond the active card */
       transform:translateX(10px);
       clip-path:inset(0 0 0 calc(100% - 12px) round 0 20px 20px 0);
     }
-    /* folder card 2 — further behind, thinner sliver */
     .ogp-behind2{
       position:absolute;
       top:0; left:0;
@@ -150,6 +145,33 @@
       z-index:7;
       transform:translateX(20px);
       clip-path:inset(0 0 0 calc(100% - 10px) round 0 20px 20px 0);
+    }
+    /* ── DESKTOP OG PICKS ── */
+    @media(min-width:700px){
+      .ogp-scroll-wrap{padding:1.2rem 0 1.4rem;}
+      .ogp-deck-stage{
+        display:flex;
+        gap:1rem;
+        margin:0 auto;
+        max-width:1240px;
+        padding:0 1.4rem;
+        overflow:hidden;
+        position:relative;
+      }
+      /* hide mobile peek/folder ghosts on desktop */
+      .ogp-peek-left,.ogp-behind1,.ogp-behind2{display:none;}
+      .ogp-card-active-wrap{
+        display:flex;
+        gap:1rem;
+        width:100%;
+        transition:transform .55s cubic-bezier(.4,0,.2,1);
+        will-change:transform;
+      }
+      .ogp-card{
+        flex:0 0 calc(25% - .75rem);
+        width:calc(25% - .75rem);
+        border-radius:16px;
+      }
     }
     .ogp-poster{
       width:100%;aspect-ratio:3/4;
@@ -1652,11 +1674,11 @@
     }catch(e){console.warn('TRN:',e.message);}
   })();
 
-  // OG Picks — left edge peek + center active + right folder stack
+  // OG Picks — mobile: deck stack | desktop: 4-up sliding carousel
   (async function loadOGPicks(){
     try{
       const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,10);
+      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,12);
       const activeWrap = document.getElementById('ogpActiveWrap');
       const peekLeft   = document.getElementById('ogpPeekLeft');
       const behind1    = document.getElementById('ogpBehind1');
@@ -1691,50 +1713,84 @@
           </div></a>`;
       }
 
+      const isDesktop = () => window.innerWidth >= 700;
+
+      /* ── DESKTOP: 4-up sliding ── */
+      function desktopGoTo(idx){
+        cur = (idx + total) % total;
+        const cards = Array.from(activeWrap.querySelectorAll('.ogp-card'));
+        const perPage = 4;
+        const cardW = cards[0] ? cards[0].offsetWidth + 16 : 0; // card + gap
+        activeWrap.style.transform = `translateX(-${cur * cardW}px)`;
+        // counter
+        if(counter){
+          const pages = Math.ceil(total / perPage);
+          const page = Math.floor(cur / perPage);
+          const dots = Array.from({length:Math.min(pages,5)},(_,i)=>
+            `<span class="ogp-dot${i===page?' active':''}"></span>`).join('');
+          counter.innerHTML = `<span class="ogp-counter-pill">${page+1}/${pages}</span>${dots}`;
+        }
+      }
+
+      /* ── MOBILE: deck stack ── */
       function goTo(idx){
         cur = (idx + total) % total;
         const prev = (cur - 1 + total) % total;
         const next1 = (cur + 1) % total;
         const next2 = (cur + 2) % total;
-
-        // active card
         activeWrap.innerHTML = cardHTML(docs[cur], cur);
-
-        // left peek: previous card (only right edge visible via CSS clip)
         peekLeft.innerHTML = cardHTML(docs[prev], prev);
-
-        // folder behind: next cards
         behind1.innerHTML = cardHTML(docs[next1], next1);
         behind2.innerHTML = cardHTML(docs[next2], next2);
-
-        // sync stage height to active card
         requestAnimationFrame(()=>{
           const h = activeWrap.offsetHeight;
           if(h) stage.style.height = h + 'px';
         });
-
-        // counter
         if(counter){
-          const dots = Array.from({length:Math.min(total,3)},(_,i)=>
-            `<span class="ogp-dot${i===0?' active':''}"></span>`).join('');
+          const dots = Array.from({length:Math.min(total,5)},(_,i)=>
+            `<span class="ogp-dot${i===cur%5?' active':''}"></span>`).join('');
           counter.innerHTML = `<span class="ogp-counter-pill">${cur+1}/${total}</span>${dots}`;
         }
       }
 
-      goTo(0);
+      function init(){
+        if(isDesktop()){
+          // render all cards into activeWrap as a flex row
+          stage.style.height = '';
+          activeWrap.style.transform = 'translateX(0)';
+          activeWrap.innerHTML = docs.map((doc,i)=>cardHTML(doc,i)).join('');
+          cur = 0;
+          desktopGoTo(0);
+        } else {
+          activeWrap.style.transform = '';
+          goTo(cur);
+        }
+      }
 
-      // swipe
+      init();
+      window.addEventListener('resize', ()=>{ init(); });
+
+      // swipe (mobile)
       let tx0=0;
       stage.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;},{passive:true});
       stage.addEventListener('touchend',e=>{
         const dx=e.changedTouches[0].clientX-tx0;
-        if(Math.abs(dx)>40){ clearInterval(ogpTimer); goTo(dx<0?cur+1:cur-1); ogpTimer=setInterval(()=>goTo(cur+1),4000); }
+        if(Math.abs(dx)>40){
+          clearInterval(ogpTimer);
+          if(isDesktop()) desktopGoTo(dx<0?cur+4:cur-4);
+          else goTo(dx<0?cur+1:cur-1);
+          ogpTimer=setInterval(tick,4000);
+        }
       },{passive:true});
 
-      let ogpTimer=setInterval(()=>goTo(cur+1),4000);
+      function tick(){
+        if(isDesktop()) desktopGoTo(cur+4);
+        else goTo(cur+1);
+      }
+
+      let ogpTimer=setInterval(tick,4000);
       stage.addEventListener('mouseenter',()=>clearInterval(ogpTimer));
-      stage.addEventListener('mouseleave',()=>{ ogpTimer=setInterval(()=>goTo(cur+1),4000); });
-      window.addEventListener('resize',()=>goTo(cur));
+      stage.addEventListener('mouseleave',()=>{ ogpTimer=setInterval(tick,4000); });
     }catch(e){console.warn('OGP:',e.message);}
   })();
 
