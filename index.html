@@ -107,11 +107,11 @@
       text-decoration:none;
       box-shadow:0 8px 32px rgba(0,0,0,.7);
     }
-    /* prev card — same size as active, pushed left, only right ~32px sliver visible */
+    /* prev card — only a thin left-edge sliver visible */
     .ogp-peek-left{
       position:absolute;
       top:4px;
-      right:calc(100% + 4px);
+      left:0;
       width:100%;
       border-radius:20px;overflow:hidden;
       background:#1a1a1a;
@@ -119,6 +119,8 @@
       opacity:.6;
       pointer-events:none;
       z-index:5;
+      transform:translateX(-10px);
+      clip-path:inset(0 calc(100% - 12px) 0 0 round 20px 0 0 20px);
     }
     /* folder card 1 — directly behind active, only left ~14px sliver peeks right */
     .ogp-behind1{
