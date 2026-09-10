@@ -673,6 +673,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <div class="pf-field"><label>Cover Image URL</label><input id="detCoverUrl" type="url" placeholder="https://..."/></div>
         <div class="pf-field"><label>Card Image URL</label><input id="detCardUrl" type="url" placeholder="https://..."/></div>
       </div>
+      <div class="pf-field"><label>Desktop &amp; Tablet Background URL <small>(not shown on mobile)</small></label><input id="detDesktopBackgroundUrl" type="url" placeholder="https://..."/></div>
       <div id="detCoverPreviewWrap" style="display:none;">
         <img id="detCoverPreview" src="" style="max-width:100%;max-height:200px;border-radius:10px;object-fit:cover;" alt="cover"/>
       </div>
@@ -1509,7 +1510,7 @@ function prefillDetails(){
   set('detTags',Array.isArray(d.tags)?d.tags.join(', '):(d.tags||''));
   set('detVenue',d.venueName||'');set('detCity',d.city||'');set('detState',d.state||'');
   set('detAddress',d.address||'');set('detMapLink',d.mapLink||'');
-  set('detCoverUrl',d.coverUrl||'');set('detCardUrl',d.cardImgUrl||'');
+  set('detCoverUrl',d.coverUrl||'');set('detCardUrl',d.cardImgUrl||'');set('detDesktopBackgroundUrl',d.desktopBackgroundUrl||'');
   set('detNotes',d.notes||'');set('detTerms',d.termsText||'');
   set('detRefundPolicy',d.refundPolicy||'');set('detRefundDays',d.refundDeadlineDays||'');
   if(d.coverUrl){const pw=g('detCoverPreviewWrap');if(pw)pw.style.display='block';const pi=g('detCoverPreview');if(pi)pi.src=d.coverUrl;}
@@ -1526,7 +1527,7 @@ window.saveEventDetails=async function(){
     venueName:g('detVenue').value.trim(),city:g('detCity').value.trim(),
     state:g('detState').value.trim(),address:g('detAddress').value.trim(),
     mapLink:g('detMapLink').value.trim(),coverUrl:g('detCoverUrl').value.trim(),
-    cardImgUrl:g('detCardUrl').value.trim(),notes:g('detNotes').value.trim(),
+    cardImgUrl:g('detCardUrl').value.trim(),desktopBackgroundUrl:g('detDesktopBackgroundUrl').value.trim(),notes:g('detNotes').value.trim(),
     termsText:g('detTerms').value.trim(),refundPolicy:g('detRefundPolicy').value.trim(),
     refundDeadlineDays:Number(g('detRefundDays').value||0),updatedAt:serverTimestamp()
   });

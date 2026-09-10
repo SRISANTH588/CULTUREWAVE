@@ -1337,6 +1337,17 @@
         </div>
       </div>
 
+      <div class="card">
+        <div class="card-head">
+          <h2>Desktop &amp; Tablet Background <span style="font-size:.68rem;color:var(--muted);font-weight:700;">Optional</span></h2>
+          <p>Wide background image for the event details page. It is shown on desktop and tablet only; mobile continues to use the event poster.</p>
+        </div>
+        <div class="field">
+          <label for="desktopBackgroundUrl">Background Image URL</label>
+          <input id="desktopBackgroundUrl" type="url" placeholder="https://example.com/event-background.jpg" />
+        </div>
+      </div>
+
       <!-- Gallery -->
       <div class="card">
         <div class="card-head"><h2>📸 Photo Gallery</h2><p>Add up to 10 photos shown on your event page</p></div>
@@ -2081,6 +2092,7 @@ loadUser();
       const prev = g('coverPreview'); if (prev) { prev.src = d.coverUrl; prev.style.display = 'block'; }
       const ph = g('coverPlaceholder'); if (ph) ph.style.display = 'none';
     }
+    if (d.desktopBackgroundUrl) set('desktopBackgroundUrl', d.desktopBackgroundUrl);
     if (d.seatingPlanUrl) {
       set('seatingPlanUrl', d.seatingPlanUrl);
       showSeatingPlan(d.seatingPlanUrl);
@@ -2761,6 +2773,7 @@ async function saveEvent(status) {
     feeMode: document.getElementById('feeMode').value,
     cardImgUrl: document.getElementById('cardImgUrl').value.trim(),
     coverUrl: document.getElementById('coverUrl').value.trim(),
+    desktopBackgroundUrl: document.getElementById('desktopBackgroundUrl').value.trim(),
     seatingPlanUrl: document.getElementById('seatingPlanUrl').value.trim(),
     seatingPlanMode,
     seatingPlan: seatingPlanMode === 'builder' && seatingPlanLayout.rows.length ? seatingPlanLayout : null,

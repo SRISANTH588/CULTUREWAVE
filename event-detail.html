@@ -175,6 +175,14 @@
     .mob-share-btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:12px;font-size:.82rem;font-weight:800;cursor:pointer;border:1px solid;}
     .mob-share-wa{background:#f0fdf4;border-color:#bbf7d0;color:#166534;}
     .mob-share-copy{background:#f8faff;border-color:var(--border);color:var(--text);}
+
+    /* The event poster is a compact card on desktop instead of spanning the page. */
+    @media (min-width:769px){
+      .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;padding-bottom:3rem;}
+      .desktop-hero-stage.has-desktop-background .hero-banner{height:420px!important;background:transparent!important;}
+      .desktop-hero-stage.has-desktop-background .hero-banner-overlay{display:block;background:linear-gradient(to bottom,rgba(10,15,30,.12),rgba(10,15,30,.62));}
+      .desktop-hero-stage.has-desktop-background .mob-poster{width:340px;max-width:calc(100% - 2rem);margin:-104px auto 0;position:relative;z-index:3;}
+    }
   </style>
 </head>
 <body>
@@ -227,6 +235,7 @@
   </div>
 </nav>
 
+<div class="desktop-hero-stage" id="desktopHeroStage">
 <div class="hero-banner" id="heroBanner">
   <div class="hero-banner-overlay"></div>
   <div class="hero-badges">
@@ -248,6 +257,7 @@
 
 <!-- MOBILE POSTER -->
 <img class="mob-poster" id="mobPoster" src="" alt="Event poster"/>
+</div>
 
 <!-- MOBILE EVENT HEADER -->
 <div class="mob-event-header" id="mobEventHeader">
@@ -560,10 +570,16 @@ async function renderEvent(data){
   ownerUid = data.ownerId;
   document.title = `${data.name||'Event'} | CultureWave`;
 
-  // hero banner — use poster (cardImgUrl) not cover
+  // Optional wide background is displayed on tablet and desktop only.
   const hero = document.getElementById('heroBanner');
   const posterSrc = data.cardImgUrl || data.coverUrl;
-  if(posterSrc) hero.style.backgroundImage = `url('${esc(posterSrc)}')`;
+  const desktopBackgroundSrc = data.desktopBackgroundUrl;
+  if(desktopBackgroundSrc) {
+    hero.classList.add('has-desktop-background');
+    const desktopStage = document.getElementById('desktopHeroStage');
+    desktopStage.classList.add('has-desktop-background');
+    desktopStage.style.setProperty('--desktop-event-background', `url('${esc(desktopBackgroundSrc)}')`);
+  }
   hero.style.backgroundSize = 'cover';
   hero.style.backgroundPosition = 'center';
 
