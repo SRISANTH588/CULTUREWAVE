@@ -45,7 +45,7 @@
     .btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
 
     /* STATS */
-    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);border-radius:18px;background:#fff;overflow:hidden;margin:1.2rem 0;box-shadow:0 2px 12px rgba(18,66,197,.05);}
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:18px;background:#fff;overflow:hidden;margin:1.2rem 0;box-shadow:0 2px 12px rgba(18,66,197,.05);}
     .stat{text-align:center;padding:1rem .5rem;border-right:1px solid var(--border);}
     .stat:last-child{border-right:0;}
     .stat strong{display:block;font-size:1.5rem;font-weight:900;letter-spacing:-.05em;color:var(--blue);}
@@ -92,9 +92,8 @@
       .banner{height:180px;}
       .avatar{width:80px;height:80px;border-radius:18px;font-size:1.6rem;margin-top:-52px;}
       .profile-name{font-size:1.25rem;}
-      .stats-row{grid-template-columns:repeat(2,1fr);}
-      .stat:nth-child(2){border-right:0;}
-      .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--border);}
+      .stats-row{grid-template-columns:repeat(3,1fr);}
+      .stat:nth-child(3){border-right:0;}
       .events-grid{grid-template-columns:repeat(2,1fr);}
       .profile-card{padding:1rem;}
     }
@@ -168,7 +167,6 @@
   <div class="stats-row">
     <div class="stat"><strong id="statEvents">—</strong><span>Events</span></div>
     <div class="stat"><strong id="statLive">—</strong><span>Live Now</span></div>
-    <div class="stat"><strong id="statTotal">—</strong><span>Total Bookings</span></div>
     <div class="stat"><strong id="statFollowers">—</strong><span>Followers</span></div>
   </div>
 
@@ -243,6 +241,8 @@ const targetUid = params.get('uid');
 let isOwner = false;
 let profileData = {};
 let isFollowing = false;
+let myUid = null;
+let targetProfileUid = null;
 
 function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
@@ -257,16 +257,45 @@ function shareProfile(){
   navigator.clipboard.writeText(location.href).then(()=>showToast('Profile link copied!')).catch(()=>showToast(location.href));
 }
 
-function toggleFollow(){
+async function toggleFollow(){
   const btn = document.getElementById('followBtn');
-  if(!btn) return;
+  if(!btn || !myUid || !targetProfileUid) {
+    if(!myUid) { showToast('Please login to follow'); location.href='login.html'; }
+    return;
+  }
+  btn.disabled = true;
   isFollowing = !isFollowing;
-  btn.textContent = isFollowing ? '✔️ Following' : '❤️ Follow';
-  btn.className = isFollowing ? 'btn btn-ghost' : 'btn btn-primary';
   const el = document.getElementById('statFollowers');
   const cur = parseInt((el.textContent||'0').replace(/,/g,''))||0;
-  el.textContent = (isFollowing ? cur+1 : Math.max(0,cur-1)).toLocaleString('en-IN');
-  showToast(isFollowing ? 'You are now following!' : 'Unfollowed');
+  const newCount = isFollowing ? cur+1 : Math.max(0,cur-1);
+  // update UI immediately
+  btn.textContent = isFollowing ? '✔️ Following' : '❤️ Follow';
+  btn.className = isFollowing ? 'btn btn-ghost' : 'btn btn-primary';
+  el.textContent = newCount.toLocaleString('en-IN');
+  try {
+    const batch = db.batch();
+    // store follow record in user's following subcollection
+    const followRef = db.collection('users').doc(myUid).collection('following').doc(targetProfileUid);
+    // update organiser's followers count
+    const profRef = db.collection('organisers').doc(targetProfileUid);
+    if(isFollowing){
+      batch.set(followRef, { followedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batch.update(profRef, { followers: firebase.firestore.FieldValue.increment(1) });
+    } else {
+      batch.delete(followRef);
+      batch.update(profRef, { followers: firebase.firestore.FieldValue.increment(-1) });
+    }
+    await batch.commit();
+    showToast(isFollowing ? 'You are now following!' : 'Unfollowed');
+  } catch(e) {
+    // revert UI on error
+    isFollowing = !isFollowing;
+    btn.textContent = isFollowing ? '✔️ Following' : '❤️ Follow';
+    btn.className = isFollowing ? 'btn btn-ghost' : 'btn btn-primary';
+    el.textContent = cur.toLocaleString('en-IN');
+    showToast('Something went wrong. Try again.');
+  }
+  btn.disabled = false;
 }
 
 function renderEvents(events){
@@ -276,7 +305,7 @@ function renderEvents(events){
   const live = events.filter(e=>(e.status||'').toLowerCase()==='published').length;
   document.getElementById('statEvents').textContent = total;
   document.getElementById('statLive').textContent = live;
-  document.getElementById('statTotal').textContent = events.reduce((s,e)=>s+Number(e.totalBookings||0),0).toLocaleString('en-IN');
+
   document.getElementById('eventsSubtitle').textContent = total + ' listing' + (total!==1?'s':'');
 
   if(!total){
@@ -368,17 +397,19 @@ function renderProfile(data){
       <a href="premium-client-dashboard.html"><button class="btn btn-primary">✏️ Edit Profile</button></a>
       <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share</button>`;
   } else {
+    const followLabel = isFollowing ? '✔️ Following' : '❤️ Follow';
+    const followClass = isFollowing ? 'btn btn-ghost' : 'btn btn-primary';
     document.getElementById('profileActions').innerHTML = `
-      <button class="btn btn-primary" id="followBtn" onclick="toggleFollow()">❤️ Follow</button>
+      <button class="${followClass}" id="followBtn" onclick="toggleFollow()">${followLabel}</button>
       <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share</button>`;
   }
 }
 
 async function init(){
-  let myUid = null;
   try{ const user = await getCurrentUser(); if(user) myUid = user.uid; }catch(e){}
 
   const uid = targetUid || myUid;
+  targetProfileUid = uid;
   if(!uid){
     document.getElementById('profileName').textContent = 'Sign in to view your profile';
     document.getElementById('profileHandle').textContent = '';
@@ -386,6 +417,14 @@ async function init(){
     return;
   }
   isOwner = !!(myUid && myUid === uid);
+
+  // check if current user already follows this profile
+  if(myUid && !isOwner){
+    try{
+      const followSnap = await db.collection('users').doc(myUid).collection('following').doc(uid).get();
+      isFollowing = followSnap.exists;
+    }catch(e){}
+  }
 
   const profSnap = await db.collection('organisers').doc(uid).get();
   if(profSnap.exists) renderProfile({uid, ...profSnap.data()});
