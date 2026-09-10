@@ -240,7 +240,7 @@
             <div class="bk-bill-row"><span>Quantity</span><span id="b_qty">1</span></div>
             <div class="bk-bill-row"><span>Subtotal</span><span id="b_subtotal">₹0</span></div>
             <div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div>
-            <div class="bk-bill-row"><span>Platform fee (4.6%)</span><span id="b_fee">₹0</span></div>
+            <div class="bk-bill-row"><span>Platform fee (10%)</span><span id="b_fee">₹0</span></div>
             <div class="bk-bill-row total"><span>Total</span><strong id="b_total">₹0</strong></div>
           </div>
         </div>
@@ -267,7 +267,7 @@
             <div class="bk-bill-row"><span>Ticket</span><strong id="c_ticket">—</strong></div>
             <div class="bk-bill-row"><span>Seats</span><strong id="c_qty">—</strong></div>
             <div class="bk-bill-row discount" id="c_discountRow" style="display:none;"><span>Discount</span><strong id="c_discount">—</strong></div>
-            <div class="bk-bill-row"><span>Platform fee (4.6%)</span><strong id="c_fee">—</strong></div>
+            <div class="bk-bill-row"><span>Platform fee (10%)</span><strong id="c_fee">—</strong></div>
             <div class="bk-bill-row total"><span>Total</span><strong id="c_total">—</strong></div>
           </div>
         </div>
@@ -471,7 +471,7 @@ function updateBill(){
   const price = t.price||0;
   const subtotal = price * qty;
   const afterDiscount = Math.max(0, subtotal - discountAmt);
-  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.046) : 0;
+  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
   const total = afterDiscount + fee;
   document.getElementById("b_price").textContent = price ? fmt(price) : "Free";
   document.getElementById("b_qty").textContent = qty;
@@ -516,7 +516,7 @@ function goStep4(){
   const price = t.price||0;
   const subtotal = price * qty;
   const afterDiscount = Math.max(0, subtotal - discountAmt);
-  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.046) : 0;
+  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
   const total = afterDiscount + fee;
   document.getElementById("c_event").textContent = evData.name||passedName||"—";
   document.getElementById("c_name").textContent = document.getElementById("bookName").value;
@@ -575,7 +575,7 @@ async function submitBooking(){
   const price = t.price||0;
   const subtotal = price * qty;
   const afterDiscount = Math.max(0, subtotal - discountAmt);
-  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.046) : 0;
+  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
   const total = afterDiscount + fee;
   const name = document.getElementById("bookName").value.trim();
   const email = document.getElementById("bookEmail").value.trim();
