@@ -4985,3 +4985,18 @@ body { background: var(--bw-black) !important; color: var(--bw-white) !important
 .mobile-nav > a::before { background: var(--bw-mid) !important; color: var(--bw-white) !important; }
 .mobile-nav > a::after { color: var(--bw-white) !important; }
 .mobile-nav-ctas { border-color: var(--bw-border) !important; }
+
+/* On mobile, reveal the navigation drawer by moving the page aside. */
+@media (max-width: 960px) {
+  body { overflow-x: hidden; }
+  body > header,
+  body > main,
+  body > footer {
+    transition: transform .28s ease;
+  }
+  body:has(.mobile-nav.open) > header,
+  body:has(.mobile-nav.open) > main,
+  body:has(.mobile-nav.open) > footer {
+    transform: translateX(calc(-1 * min(80vw, 360px)));
+  }
+}
