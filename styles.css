@@ -4991,12 +4991,14 @@ body { background: var(--bw-black) !important; color: var(--bw-white) !important
   body { overflow-x: hidden; }
   body > header,
   body > main,
-  body > footer {
+  body > footer,
+  body > .mobile-bottom-nav {
     transition: transform .28s ease;
   }
   body:has(.mobile-nav.open) > header,
   body:has(.mobile-nav.open) > main,
-  body:has(.mobile-nav.open) > footer {
+  body:has(.mobile-nav.open) > footer,
+  body:has(.mobile-nav.open) > .mobile-bottom-nav {
     transform: translateX(calc(-1 * min(80vw, 360px)));
   }
 }
