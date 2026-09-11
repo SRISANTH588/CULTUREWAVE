@@ -639,7 +639,53 @@
       }
       .hpe-arrow{display:flex;}
     }
-    /* ── DESKTOP BREAKPOINTS ── */
+    /* ── TOP VENUES ── */
+    .tv-section{background:#000;padding:1.8rem 0 1.4rem;border-top:1px solid rgba(255,255,255,.07);}
+    .tv-head{display:flex;align-items:baseline;justify-content:space-between;padding:0 1.2rem .9rem;}
+    .tv-label{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(.9rem,2.5vw,1.1rem);font-weight:900;
+      letter-spacing:.12em;text-transform:uppercase;color:#fff;
+    }
+    .tv-see-all{font-size:.78rem;font-weight:700;color:rgba(255,255,255,.5);text-decoration:none;white-space:nowrap;}
+    .tv-see-all:hover{color:#fff;}
+    .tv-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .tv-scroll-wrap::-webkit-scrollbar{display:none;}
+    .tv-scroll{display:flex;gap:.85rem;padding:0 1.2rem .4rem;width:max-content;}
+    .tv-card{
+      flex:0 0 150px;border-radius:16px;overflow:hidden;
+      background:#111;border:1px solid rgba(255,255,255,.1);
+      text-decoration:none;display:block;
+      transition:transform .2s,border-color .2s;
+    }
+    .tv-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.3);}
+    .tv-poster{
+      width:100%;aspect-ratio:1/1;
+      background-size:cover;background-position:center;
+      background-color:#1a1a1a;
+      position:relative;
+    }
+    .tv-poster-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 55%);
+    }
+    .tv-count{
+      position:absolute;bottom:.5rem;left:.55rem;
+      font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+      color:#fff;background:rgba(0,0,0,.55);border-radius:999px;
+      padding:.18rem .55rem;
+    }
+    .tv-info{padding:.55rem .7rem .7rem;}
+    .tv-name{font-size:.78rem;font-weight:800;color:#fff;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .tv-city{font-size:.65rem;color:rgba(255,255,255,.4);margin-top:.15rem;font-weight:600;}
+    @media(min-width:700px){
+      .tv-card{flex:0 0 180px;}
+    }
+    @media(min-width:900px){
+      .tv-scroll-wrap{max-width:1240px;margin:0 auto;}
+      .tv-scroll{padding:0 1.4rem .4rem;}
+      .tv-card{flex:0 0 200px;}
+    }
     @media(min-width:900px){
       /* Section inner wrappers */
       .trn-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
@@ -1315,6 +1361,17 @@
     </div>
     <div class="hpe-view-all-wrap">
       <a href="categories.html" class="hpe-view-all">View All &#8594;</a>
+    </div>
+  </section>
+
+  <!-- TOP VENUES -->
+  <section class="tv-section" id="tvSection">
+    <div class="tv-head">
+      <div class="tv-label">Top Venues</div>
+      <a href="events.html" class="tv-see-all">See All &rarr;</a>
+    </div>
+    <div class="tv-scroll-wrap">
+      <div class="tv-scroll" id="tvScroll"></div>
     </div>
   </section>
 
@@ -2040,6 +2097,45 @@
         });
       });
     }catch(e){ console.warn('HPE:', e.message); }
+  })();
+
+  // TOP VENUES
+  (async function loadTopVenues(){
+    try{
+      const scroll = document.getElementById('tvScroll');
+      if(!scroll) return;
+      const snap = await _idb.collection('events').limit(200).get();
+      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data()));
+      if(!docs.length){ document.getElementById('tvSection').style.display='none'; return; }
+      // aggregate venues
+      const map = {};
+      docs.forEach(doc => {
+        const d = doc.data();
+        const name = d.venueName || d.venue || '';
+        if(!name) return;
+        const key = name.toLowerCase().trim();
+        if(!map[key]) map[key] = {name, city: d.city||'', img: d.cardImgUrl||d.coverUrl||'', count:0};
+        map[key].count++;
+        if(!map[key].img && (d.cardImgUrl||d.coverUrl)) map[key].img = d.cardImgUrl||d.coverUrl;
+      });
+      const venues = Object.values(map).sort((a,b)=>b.count-a.count).slice(0,12);
+      if(!venues.length){ document.getElementById('tvSection').style.display='none'; return; }
+      venues.forEach(v => {
+        const a = document.createElement('a');
+        a.className = 'tv-card';
+        a.href = `events.html?venue=${encodeURIComponent(v.name)}`;
+        a.innerHTML = `
+          <div class="tv-poster" style="${v.img?`background-image:url('${v.img}')`:'background:linear-gradient(135deg,#1a1a1a,#2a2a2a)'}">
+            <div class="tv-poster-overlay"></div>
+            <span class="tv-count">${v.count} event${v.count!==1?'s':''}</span>
+          </div>
+          <div class="tv-info">
+            <div class="tv-name">${v.name}</div>
+            ${v.city?`<div class="tv-city">${v.city}</div>`:''}
+          </div>`;
+        scroll.appendChild(a);
+      });
+    }catch(e){ console.warn('TopVenues:', e.message); }
   })();
 </script>
 <script>
