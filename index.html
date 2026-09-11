@@ -753,15 +753,15 @@
     }
     @media(min-width:701px){
       .hero-slider-wrap{
-        background:url('herosection.jpeg') center/cover no-repeat;
+        background:none;
         padding:2.5rem 1.2rem 2rem;
       }
     }
     .hero-slider-wrap::before{display:none;}
     .hero-slider{position:relative;z-index:2;width:100%;margin:0 auto;background:transparent!important;padding:0;box-sizing:border-box;overflow:hidden;}
     @media(min-width:701px){
-      .hero-slider{width:min(380px,calc(100% - 2rem));overflow:hidden;}
-      .hero-slider-wrap{padding:3rem 1.2rem 2.5rem;}
+      .hero-slider{width:min(760px,calc(100% - 2rem));overflow:hidden;}
+      .hero-slider-wrap{padding:2rem 1.2rem 1.5rem;}
     }
     .hs-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);will-change:transform;}
     .hs-slide{flex:0 0 100%;box-sizing:border-box;padding:0 1rem;}
@@ -770,55 +770,26 @@
     }
     .hs-card{border:0!important;border-radius:20px;overflow:hidden;background:#171717!important;box-shadow:0 10px 28px rgba(0,0,0,.35)!important;transition:box-shadow .25s ease;}
     .hs-card:hover{box-shadow:0 16px 36px rgba(0,0,0,.45)!important;}
-    .hs-poster{width:100%;aspect-ratio:1/1;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}
-    @media(min-width:701px){
-      .hs-poster{aspect-ratio:16/9;}
-    }
+    .hs-poster{width:100%;aspect-ratio:16/9;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}
     .hs-poster-inner{width:100%;height:100%;display:block;background:none!important;}
     /* mobile: info below card, outside the card box */
     .hs-info{padding:.85rem 1.1rem 1rem;background:#171717!important;}
     @media(max-width:700px){
-      .hs-info{background:transparent!important;padding:.9rem 1rem .2rem;text-align:center;}
-      .hs-card{border-radius:18px!important;box-shadow:none!important;}
-    }
+    /* mobile: info below card, outside the card box */
+    .hs-info{padding:.85rem 1.1rem 1rem;background:#171717!important;}
     .hs-date{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:.3rem;}
-    @media(max-width:700px){ .hs-date{display:none;} }
     .hs-title{font-size:1rem;font-weight:800;color:#fff;line-height:1.25;margin:0 0 .25rem;letter-spacing:-.02em;}
-    @media(max-width:700px){
-      .hs-title{font-size:1.25rem;font-weight:900;letter-spacing:.02em;text-transform:uppercase;}
-    }
     .hs-venue{font-size:.8rem;color:rgba(255,255,255,.45);font-weight:500;}
-    @media(max-width:700px){
-      .hs-venue{font-size:.85rem;color:rgba(255,255,255,.5);}
-    }
     /* Keep the slide controls directly on the banner, without a tint or blur layer. */
     #heroSlider,#hsTrack,#hsDots{background:transparent!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
     #hsDots::before,#hsDots::after{display:none!important;content:none!important;}
     .hs-dots{display:flex;align-items:center;justify-content:center;gap:.45rem;padding:.9rem 0 1.2rem;position:relative;z-index:2;background:transparent!important;}
-    @media(max-width:700px){
-      .hs-dots{padding:.7rem 0 1.4rem;}
-    }
     .hs-dot{width:8px;height:8px;border-radius:999px;background:#333;border:none;cursor:pointer;padding:0;transition:all .3s;}
     .hs-dot.active{width:24px;background:#fff;}
-    /* mobile counter pill */
-    .hs-counter{
-      display:none;
-    }
-    @media(max-width:700px){
-      .hs-dots{display:none;}
-      .hs-counter{
-        display:flex;align-items:center;justify-content:center;
-        gap:.3rem;padding:.7rem 0 1.4rem;
-      }
-      .hs-counter-dot{width:8px;height:8px;border-radius:50%;background:#444;transition:background .3s;}
-      .hs-counter-dot.active{background:#fff;}
-      .hs-counter-pill{
-        background:rgba(255,255,255,.15);border-radius:999px;
-        padding:.22rem .75rem;
-        font-size:.82rem;font-weight:800;color:#fff;
-        letter-spacing:.04em;
-      }
-    }
+    .hs-counter{display:flex;align-items:center;justify-content:center;gap:.3rem;padding:.7rem 0 1.4rem;}
+    .hs-counter-dot{width:8px;height:8px;border-radius:50%;background:#444;transition:background .3s;}
+    .hs-counter-dot.active{background:#fff;}
+    .hs-counter-pill{background:rgba(255,255,255,.15);border-radius:999px;padding:.22rem .75rem;font-size:.82rem;font-weight:800;color:#fff;letter-spacing:.04em;}
 
     /* ── CATEGORY SECTION ── */
     .idx-cat-section{width:100%;max-width:none;padding:1.5rem 0 2rem;background:#000;}
