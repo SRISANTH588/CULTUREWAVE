@@ -55,9 +55,16 @@ async function logout() {
   window.location.href = "login.html";
 }
 
+// Public base URL — works on localhost and GitHub Pages
+function getPublicBase() {
+  const h = location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1') return location.origin;
+  return 'https://srisanth588.github.io/CULTUREWAVE';
+}
+
 export {
   app, auth, db,
-  toEmail, getCurrentUser, requireAuth, logout,
+  toEmail, getCurrentUser, requireAuth, logout, getPublicBase,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail,
   GoogleAuthProvider, signInWithPopup, updateProfile,
   doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,

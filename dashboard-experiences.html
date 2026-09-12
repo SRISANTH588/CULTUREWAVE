@@ -946,7 +946,7 @@ function renderAnalytics(bookings){
   const chart=document.getElementById('revenueChart');if(chart){const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const vals=days.map(()=>Math.floor(Math.random()*80)+10);const max=Math.max(...vals);chart.innerHTML=vals.map((v,i)=>`<div class="bar-wrap"><div class="bar" style="height:${Math.round((v/max)*110)}px;"></div><div class="bar-label">${days[i]}</div></div>`).join('');}
 }
 async function loadProfile(uid){
-  const url=`${location.origin}/client-profile.html?uid=${uid}`;
+  const url=`${location.hostname==="localhost"||location.hostname==="127.0.0.1"?location.origin:"https://srisanth588.github.io/CULTUREWAVE"}/client-profile.html?uid=${uid}`;
   const pfUrl=document.getElementById('pfPublicUrl');const pfView=document.getElementById('pfViewBtn');const pfCopy=document.getElementById('pfCopyBtn');
   if(pfUrl)pfUrl.textContent=url;if(pfView)pfView.href=url;if(pfCopy)pfCopy.onclick=()=>navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!'));
   const snap=await getDoc(doc(db,'organisers',uid));
