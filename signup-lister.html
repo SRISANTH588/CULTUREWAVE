@@ -294,6 +294,19 @@ window.createBrandPage=async function(){
       city,
       createdAt:serverTimestamp()
     });
+    await setDoc(doc(db,'organisers',cred.user.uid),{
+      name:brand,
+      bio,
+      city,
+      category:CAT,
+      dashboard:DASH,
+      whatsapp:'+91'+phone,
+      ownerName:name,
+      ownerEmail:email,
+      followers:0,
+      verified:false,
+      createdAt:serverTimestamp()
+    });
     try{sessionStorage.removeItem('cw_lister_cat');sessionStorage.removeItem('cw_lister_dash');sessionStorage.removeItem('cw_lister_role');}catch(e){}
     setStatus('Account created! Taking you to your dashboard…','success','st3');
     setTimeout(function(){window.location.href=DASH;},1000);
