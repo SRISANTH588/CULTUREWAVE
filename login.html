@@ -586,10 +586,6 @@
 
           <!-- LOGIN FORM -->
           <form class="auth-form" data-auth-form="login">
-            <div class="login-method-switch">
-              <button type="button" id="loginMethodPwd" class="active" onclick="setLoginMethod('pwd')">🔒 Password</button>
-              <button type="button" id="loginMethodOtp" onclick="setLoginMethod('otp')">📧 Email OTP</button>
-            </div>
             <div id="loginPwdSection">
               <div class="form-field">
                 <span class="form-label">Email / Username</span>
@@ -640,7 +636,7 @@
                 <div style="text-align:center;margin-top:.6rem;">
                   <button type="button" onclick="sendLoginOtp()" style="font-size:.8rem;font-weight:700;color:var(--blue);border:none;background:none;cursor:pointer;">Resend OTP</button>
                   <span style="color:#d1d5db;margin:0 .4rem;">·</span>
-                  <button type="button" onclick="document.getElementById('loginOtpStep1').style.display='';document.getElementById('loginOtpStep2').style.display='none';" style="font-size:.8rem;font-weight:700;color:#6b7280;border:none;background:none;cursor:pointer;">Change email</button>
+                  <button type="button" onclick="showPasswordLogin()" style="font-size:.8rem;font-weight:700;color:#6b7280;border:none;background:none;cursor:pointer;">Back to login</button>
                 </div>
               </div>
             </div>
@@ -654,6 +650,7 @@
               </svg>
               Continue with Google
             </button>
+            <button class="google-btn" id="otpLoginBtn" type="button">✉️&nbsp; Continue with OTP</button>
           </form>
 
           <!-- SIGNUP FORM -->
@@ -665,6 +662,14 @@
                 <div class="form-input-wrap">
                   <span class="form-icon">✏️</span>
                   <input id="signupName" type="text" placeholder="Your full name" autocomplete="name" />
+                </div>
+              </div>
+
+              <div class="form-field">
+                <span class="form-label">Email Address</span>
+                <div class="form-input-wrap">
+                  <span class="form-icon">✉️</span>
+                  <input id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email" />
                 </div>
               </div>
 
@@ -813,14 +818,18 @@
         window.location.href = 'premium-client-dashboard.html';
       }
 
-      // ── LOGIN METHOD TOGGLE ──
       let loginOtpGenerated = '';
-      function setLoginMethod(method) {
-        const isPwd = method === 'pwd';
-        document.getElementById('loginPwdSection').style.display = isPwd ? '' : 'none';
-        document.getElementById('loginOtpSection').style.display = isPwd ? 'none' : '';
-        document.getElementById('loginMethodPwd').classList.toggle('active', isPwd);
-        document.getElementById('loginMethodOtp').classList.toggle('active', !isPwd);
+      function showOtpLogin() {
+        document.getElementById('loginPwdSection').style.display = 'none';
+        document.getElementById('loginOtpSection').style.display = '';
+        authStatus.textContent = ''; delete authStatus.dataset.kind;
+      }
+
+      function showPasswordLogin() {
+        document.getElementById('loginPwdSection').style.display = '';
+        document.getElementById('loginOtpSection').style.display = 'none';
+        document.getElementById('loginOtpStep1').style.display = '';
+        document.getElementById('loginOtpStep2').style.display = 'none';
         authStatus.textContent = ''; delete authStatus.dataset.kind;
       }
 
@@ -867,25 +876,19 @@
         if (entered !== loginOtpGenerated) { setStatus('Incorrect OTP. Try again.', 'warning'); return; }
         setStatus('Verified! Signing in...', 'info');
         try {
-          // Try to sign in with a known temp password pattern, or create account
+          // OTP is an alternate login method for an account that already exists.
           const tempPass = 'CW_OTP_' + email.split('@')[0].slice(0,6) + '_2024';
-          let userCred;
-          try {
-            userCred = await signInWithEmailAndPassword(auth, email, tempPass);
-          } catch(e) {
-            if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
-              // create account
-              userCred = await createUserWithEmailAndPassword(auth, email, tempPass);
-              await setDoc(doc(db, 'users', userCred.user.uid), {
-                name: email.split('@')[0], email, role: 'customer',
-                createdAt: Date.now()
-              });
-            } else throw e;
-          }
+          const userCred = await signInWithEmailAndPassword(auth, email, tempPass);
           const role = await getRoleByUid(userCred.user.uid);
           setStatus('Welcome! Redirecting...', 'success');
           redirect(role);
-        } catch(e) { setStatus(e.message, 'warning'); }
+        } catch(e) {
+          if (['auth/user-not-found', 'auth/invalid-credential', 'auth/wrong-password'].includes(e.code)) {
+            document.getElementById('signupEmail').value = email;
+            setMode('signup');
+            setStatus('No OTP account found. Please sign up, or use your username and password.', 'warning');
+          } else setStatus(e.message, 'warning');
+        }
       }
 
       function setMode(mode) {
@@ -913,6 +916,11 @@
         const current = document.querySelector("[data-auth-tab].active")?.dataset.authTab;
         setMode(current === "login" ? "signup" : "login");
       });
+
+      document.getElementById('otpLoginBtn').addEventListener('click', showOtpLogin);
+      window.sendLoginOtp = sendLoginOtp;
+      window.verifyLoginOtp = verifyLoginOtp;
+      window.showPasswordLogin = showPasswordLogin;
 
       document.querySelector("[data-auth-form='login']").addEventListener("submit", async e => {
         e.preventDefault();
