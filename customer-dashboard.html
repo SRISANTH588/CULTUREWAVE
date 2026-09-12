@@ -492,14 +492,35 @@ document.querySelectorAll('.sb-item[data-view]').forEach(btn => {
 // ── BOOKINGS ──
 async function loadBookings() {
   try {
-    const snap = await db.collection('bookings').where('userId','==',currentUser.uid).orderBy('createdAt','desc').get();
+    // Query by userId first
+    let snap = await db.collection('bookings').where('userId','==',currentUser.uid).orderBy('createdAt','desc').get();
     allBookings = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+    // Also query by customerEmail to catch bookings made before account creation
+    if (currentUser.email) {
+      try {
+        const emailSnap = await db.collection('bookings').where('customerEmail','==',currentUser.email).orderBy('createdAt','desc').get();
+        const emailBookings = emailSnap.docs.map(d => ({id:d.id,...d.data()}));
+        // Merge, avoiding duplicates by bookingId/doc id
+        const existingIds = new Set(allBookings.map(b => b.id));
+        emailBookings.forEach(b => { if(!existingIds.has(b.id)) allBookings.push(b); });
+        // Sort by createdAt desc
+        allBookings.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+      } catch(e) {
+        // fallback without orderBy
+        const emailSnap = await db.collection('bookings').where('customerEmail','==',currentUser.email).get();
+        const emailBookings = emailSnap.docs.map(d => ({id:d.id,...d.data()}));
+        const existingIds = new Set(allBookings.map(b => b.id));
+        emailBookings.forEach(b => { if(!existingIds.has(b.id)) allBookings.push(b); });
+      }
+    }
+
     renderBookings(allBookings);
     updateBookingCounts();
   } catch(e) {
-    // fallback without orderBy
+    // fallback: query only by email
     try {
-      const snap = await db.collection('bookings').where('userId','==',currentUser.uid).get();
+      const snap = await db.collection('bookings').where('customerEmail','==',currentUser.email).get();
       allBookings = snap.docs.map(d => ({id:d.id,...d.data()}));
       renderBookings(allBookings);
       updateBookingCounts();

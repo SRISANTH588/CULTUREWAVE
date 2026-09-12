@@ -584,13 +584,15 @@ async function createBookingAccount(name, email, phone){
 async function saveBooking(data){
   try{
     const ts = firebase.firestore.FieldValue.serverTimestamp();
+    let userId = null;
+    try { const u = firebase.auth().currentUser; if(u) userId = u.uid; } catch(e){}
     const doc = {
       bookingId: data.bookingId, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
       amount: data.amount, seats: data.seats, seatIds: data.seatIds||[],
       status: data.status, paymentId: data.paymentId||null,
       customerName: data.name, customerEmail: data.email,
-      customerPhone: data.phone, createdAt: ts
+      customerPhone: data.phone, userId: userId, createdAt: ts
     };
     await db.collection("bookings").doc(data.bookingId).set(doc);
     await db.collection("payments").doc(data.bookingId).set(doc);
