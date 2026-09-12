@@ -2382,10 +2382,10 @@ function renderEvents() {
 }
 
 window.copyEvLink = function(id){
-  navigator.clipboard.writeText(`${location.origin}/event-detail.html?eventId=${id}`)
+  navigator.clipboard.writeText(`${isLocal ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE'}/event-detail.html?eventId=${id}`)
     .then(()=>showToast('Link copied!'))
     .catch(()=>{
-      const url = `${location.origin}/event-detail.html?eventId=${id}`;
+      const url = `${isLocal ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE'}/event-detail.html?eventId=${id}`;
       prompt('Copy this link:', url);
     });
 };
@@ -2531,7 +2531,9 @@ let profileUid = null;
 
 async function loadProfile(uid) {
   profileUid = uid;
-  const url = `${location.origin}/client-profile.html?uid=${uid}`;
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const publicBase = isLocal ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE';
+  const url = `${publicBase}/client-profile.html?uid=${uid}`;
   const pfUrl = document.getElementById('pfPublicUrl');
   const pfView = document.getElementById('pfViewBtn');
   const pfCopy = document.getElementById('pfCopyBtn');
@@ -2946,7 +2948,7 @@ window.addIgAutoReplyRule = async function() {
   if(!kw){ showToast('Enter at least one keyword'); return; }
   if(!msg){ showToast('Enter a reply message'); return; }
   const eventName = document.getElementById('igReplyEvent').selectedOptions[0]?.text || '';
-  const bookingLink = eventId ? `${location.origin}/event-detail.html?eventId=${eventId}` : '';
+  const bookingLink = eventId ? `${location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE'}/event-detail.html?eventId=${eventId}` : '';
   const rule = { keywords:kw, message:msg, eventId, eventName: eventName==='\u2014 Select an event \u2014'?'':eventName, bookingLink, publicReply, enabled:true, createdAt: new Date().toISOString() };
   igRules.push(rule);
   await setDoc(doc(db,'organisers',myUid),{ igAutoReplyRules: igRules, updatedAt: new Date().toISOString() },{merge:true});
@@ -3347,7 +3349,7 @@ function dmGoLive() {
   var eventId = eventSel ? eventSel.value : '';
   var eventName = (eventSel && eventSel.selectedOptions[0]) ? eventSel.selectedOptions[0].text : '';
   if(eventName.includes('Select an event')) eventName='';
-  var bookingLink = eventId ? (location.origin+'/event-detail.html?eventId='+eventId) : '';
+  var bookingLink = eventId ? ((location.hostname==='localhost'||location.hostname==='127.0.0.1'?location.origin:'https://srisanth588.github.io/CULTUREWAVE')+'/event-detail.html?eventId='+eventId) : '';
   var publicReply = document.getElementById('dmExtraPublicReply')?.checked||false;
   var collectEmail = document.getElementById('dmExtraEmail')?.checked||false;
   var collectPhone = document.getElementById('dmExtraPhone')?.checked||false;
