@@ -790,7 +790,7 @@
     #hsDots::before,#hsDots::after{display:none!important;content:none!important;}
     .hs-dots{display:flex;align-items:center;justify-content:center;gap:.45rem;padding:.9rem 0 1.2rem;position:relative;z-index:2;background:transparent!important;}
     @media(max-width:700px){
-      .hs-dots{padding:.7rem 0 1.4rem;}
+      .hs-dots{display:none;}
     }
     .hs-dot{width:8px;height:8px;border-radius:999px;background:#333;border:none;cursor:pointer;padding:0;transition:all .3s;}
     .hs-dot.active{width:24px;background:#fff;}
@@ -802,9 +802,9 @@
       .hs-dots{display:none;}
       .hs-counter{
         display:flex;align-items:center;justify-content:center;
-        gap:.3rem;padding:.7rem 0 1.4rem;
+        gap:.4rem;padding:.7rem 0 1.2rem;
       }
-      .hs-counter-dot{width:8px;height:8px;border-radius:50%;background:#444;transition:background .3s;}
+      .hs-counter-dot{width:7px;height:7px;border-radius:50%;background:#444;transition:background .3s;}
       .hs-counter-dot.active{background:#fff;}
       .hs-counter-pill{
         background:rgba(255,255,255,.15);border-radius:999px;
@@ -2272,19 +2272,14 @@
         // build mobile counter
         if(counterWrap){
           var total = docs.length;
-          for(var k=0;k<total;k++){
-            var cd = document.createElement('span');
-            cd.className = 'hs-counter-dot' + (k===0?' active':'');
-            counterWrap.appendChild(cd);
-          }
           var pill = document.createElement('span');
           pill.className = 'hs-counter-pill';
           pill.textContent = '1/' + total;
           counterWrap.appendChild(pill);
-          for(var k2=0;k2<total;k2++){
-            var cd2 = document.createElement('span');
-            cd2.className = 'hs-counter-dot';
-            counterWrap.appendChild(cd2);
+          for(var k=0;k<total;k++){
+            var cd = document.createElement('span');
+            cd.className = 'hs-counter-dot' + (k===0?' active':'');
+            counterWrap.appendChild(cd);
           }
         }
         resetTimer();
