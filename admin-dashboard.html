@@ -218,6 +218,60 @@
       .view{padding:1rem;}
     }
     @media(max-width:460px){.stats-grid{grid-template-columns:1fr}.topbar-right .tb-search{display:none}.topbar-right .tb-btn:not(.primary){display:none}}
+
+    /* ── MOBILE POLISH ── */
+    @media(max-width:768px){
+      /* Hero stats strip: 2-col grid on mobile */
+      .view[data-view="overview"] > div:first-child > div:last-child {
+        display:grid !important;
+        grid-template-columns:1fr 1fr;
+      }
+      .view[data-view="overview"] > div:first-child > div:last-child > div {
+        border-right:0 !important;
+        border-bottom:1px solid rgba(255,255,255,.12);
+      }
+      /* Filter bars stack vertically */
+      .filter-bar { flex-direction:column; align-items:stretch; }
+      .filter-bar input, .filter-bar select { width:100% !important; min-width:0 !important; }
+      /* Card filter bars */
+      .card > div[style*="display:flex"] { flex-wrap:wrap; }
+      /* Tables: allow horizontal scroll with min widths */
+      .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .data-table { min-width:520px; }
+      /* Topbar: hide browse link on mobile */
+      .topbar-right .tb-btn:not(.primary) { display:none; }
+      /* Modals: full width on small screens */
+      .modal { padding:1rem; }
+      .modal > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
+      /* Hero banners: reduce padding */
+      .view > div[style*="border-radius:20px"] { padding:1.1rem 1.2rem !important; }
+      /* Stat strips inside views: 2-col */
+      .view > div[style*="grid-template-columns:repeat(4,1fr)"] { grid-template-columns:1fr 1fr !important; }
+      /* Quick actions grid */
+      .card > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
+      /* WA cards */
+      .wa-detail-grid { grid-template-columns:1fr !important; }
+      .wa-actions { flex-direction:column; }
+      .wa-btn { min-width:0; width:100%; }
+      /* Bottom user row buttons */
+      .sb-bottom > div:last-child { flex-direction:column; }
+    }
+    @media(max-width:460px){
+      .topbar { height:56px; }
+      .page-title { font-size:.9rem; }
+      /* Hero greeting text */
+      #heroGreeting { font-size:1.3rem !important; }
+      /* Stats strip: single column */
+      .view[data-view="overview"] > div:first-child > div:last-child {
+        grid-template-columns:1fr 1fr;
+      }
+      .view > div[style*="grid-template-columns:repeat(4,1fr)"] { grid-template-columns:1fr 1fr !important; }
+      /* Btn rows in tables: stack */
+      .btn-row { flex-direction:column; }
+      .btn-row .btn { width:100%; justify-content:center; }
+      /* Analytics grid-3 */
+      .grid-3 { grid-template-columns:1fr !important; }
+    }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -247,8 +301,8 @@
     .btn{border-color:var(--premium-line);border-radius:10px;transition:transform .18s,box-shadow .18s,background .18s;}.btn:hover{background:#f3f6ff;border-color:#b8c8f7;color:var(--premium-blue);transform:translateY(-1px);}.btn.primary{background:var(--premium-blue);box-shadow:0 7px 16px rgba(36,84,214,.18);}
     .section-header{background:#fff;border:1px solid var(--premium-line);border-radius:16px;padding:1rem 1.15rem;margin-bottom:0;box-shadow:0 8px 24px rgba(36,84,214,.045);}.filter-bar input,.filter-bar select,.field input,.field select,.field textarea{border-color:var(--premium-line);border-radius:10px;}.modal-overlay{background:rgba(20,45,114,.25);}.modal{border:1px solid #d9e3f8;box-shadow:0 28px 80px rgba(36,84,214,.18);}
     #liveTag{background:#e8f7ef !important;border-color:#b8e5c9 !important;color:#087443 !important;}
-    @media(max-width:768px){.sidebar{left:-260px;padding:0;}.sidebar.open{left:0;}.sb-section-label,.sb-nav,.sb-divider,.sb-bottom{display:flex!important;}.topbar{padding:0 1rem;height:64px}.view{padding:1rem}.stats-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
-    @media(max-width:460px){.stats-grid{grid-template-columns:1fr}.topbar-right .tb-search{width:145px}.topbar-right .tb-btn{display:none}}
+    @media(max-width:768px){.sidebar{left:-260px;padding:0;}.sidebar.open{left:0;}.sb-section-label,.sb-nav,.sb-divider,.sb-bottom{display:flex!important;}.topbar{padding:0 1rem;height:64px}.view{padding:1rem}.stats-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.tb-search{width:140px !important;}}
+    @media(max-width:460px){.stats-grid{grid-template-columns:1fr 1fr}.topbar-right .tb-search{display:none !important}.topbar-right .tb-btn{display:none}}
   </style>
   <style id="premium-members-content">
     .view[data-view="users"]{background:linear-gradient(180deg,#f5f8ff 0%,#f9fbff 42%,#f5f8ff 100%);}
@@ -2181,5 +2235,40 @@ document.querySelectorAll('.sb-item').forEach(item => item.addEventListener('cli
 
 </script>
 <div class="sb-overlay" id="sbOverlay"></div>
+
+<!-- MOBILE BOTTOM NAV -->
+<style>
+.admin-mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:1px solid #e2e8f0;
+  z-index:30;padding:.35rem 0 calc(.35rem + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 16px rgba(29,78,216,.08);
+}
+.amn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:.12rem;
+  padding:.28rem .2rem;border:0;background:none;cursor:pointer;
+  font-size:.56rem;font-weight:600;color:#9ca3af;transition:color .12s;
+}
+.amn-item.active{color:#1d4ed8;}
+.amn-icon{font-size:1.15rem;line-height:1;}
+@media(max-width:768px){
+  .admin-mobile-nav{display:flex;}
+  .view{padding-bottom:4.5rem !important;}
+}
+</style>
+<nav class="admin-mobile-nav" id="adminMobileNav">
+  <button class="amn-item active" onclick="showView('overview');setAmnActive(this)"><span class="amn-icon">🏠</span>Home</button>
+  <button class="amn-item" onclick="showView('events');setAmnActive(this)"><span class="amn-icon">🎪</span>Events</button>
+  <button class="amn-item" onclick="showView('users');setAmnActive(this)"><span class="amn-icon">👥</span>Users</button>
+  <button class="amn-item" onclick="showView('payments');setAmnActive(this)"><span class="amn-icon">💳</span>Pay</button>
+  <button class="amn-item" onclick="showView('settings');setAmnActive(this)"><span class="amn-icon">⚙️</span>Settings</button>
+</nav>
+<script>
+function setAmnActive(el){
+  document.querySelectorAll('.admin-mobile-nav .amn-item').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
 </body>
 </html>

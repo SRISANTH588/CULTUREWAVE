@@ -765,6 +765,9 @@
     }
     .hs-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);will-change:transform;}
     .hs-slide{flex:0 0 100%;box-sizing:border-box;padding:0 1rem;}
+    @media(max-width:700px){
+      .hs-slide{padding:0 .75rem;}
+    }
     @media(min-width:701px){
       .hs-slide{padding:0;}
     }
@@ -772,22 +775,15 @@
     .hs-card:hover{box-shadow:0 16px 36px rgba(0,0,0,.45)!important;}
     .hs-poster{width:100%;aspect-ratio:16/9;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}
     .hs-poster-inner{width:100%;height:100%;display:block;background:none!important;}
-    /* mobile: info below card, outside the card box */
+    /* mobile: info inside card */
     .hs-info{padding:.85rem 1.1rem 1rem;background:#171717!important;}
     @media(max-width:700px){
-      .hs-info{background:transparent!important;padding:.9rem 1rem .2rem;text-align:center;}
-      .hs-card{border-radius:18px!important;box-shadow:none!important;}
+      .hs-info{background:#171717!important;padding:.85rem 1rem 1rem;text-align:left;}
+      .hs-card{border-radius:18px!important;box-shadow:0 8px 24px rgba(0,0,0,.5)!important;}
     }
     .hs-date{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:.3rem;}
-    @media(max-width:700px){ .hs-date{display:none;} }
     .hs-title{font-size:1rem;font-weight:800;color:#fff;line-height:1.25;margin:0 0 .25rem;letter-spacing:-.02em;}
-    @media(max-width:700px){
-      .hs-title{font-size:1.25rem;font-weight:900;letter-spacing:.02em;text-transform:uppercase;}
-    }
     .hs-venue{font-size:.8rem;color:rgba(255,255,255,.45);font-weight:500;}
-    @media(max-width:700px){
-      .hs-venue{font-size:.85rem;color:rgba(255,255,255,.5);}
-    }
     /* Keep the slide controls directly on the banner, without a tint or blur layer. */
     #heroSlider,#hsTrack,#hsDots{background:transparent!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
     #hsDots::before,#hsDots::after{display:none!important;content:none!important;}

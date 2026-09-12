@@ -455,8 +455,62 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   .hamburger{display:flex;}
   .metrics{grid-template-columns:1fr 1fr;}
   .topbar{padding:.75rem 1rem;}
+  /* Grids collapse */
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr !important;}
+  /* Hero banners */
+  .view > div[style*="border-radius:20px"]{padding:1.1rem 1.2rem !important;}
+  /* Tables scroll */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .data-table{min-width:480px;}
+  /* Filter bars */
+  .filter-bar{flex-direction:column;align-items:stretch;}
+  .filter-bar input,.filter-bar select{width:100% !important;min-width:0 !important;}
+  /* Topbar right: hide non-essential */
+  .topbar-right > a{display:none;}
+  /* Stat strips: 2-col */
+  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr !important;}
+  div[style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr 1fr !important;}
 }
-</style>
+@media(max-width:560px){
+  .metrics{grid-template-columns:1fr !important;}
+  .view{padding:.75rem !important;}
+  /* Hero stats strip: single col */
+  div[style*="display:flex;gap:0;flex-wrap:wrap;margin-top"]{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+  }
+  /* Topbar compact */
+  .topbar{padding:.6rem .75rem;}
+  .topbar-title{font-size:.88rem;}
+  /* Modals */
+  .modal{padding:1rem;border-radius:16px;}
+  .modal-actions{flex-direction:column;}
+  /* Btn rows */
+  .btn-row{flex-direction:column;}
+  .btn-row .btn{width:100%;justify-content:center;}
+  /* Stat cards: 2-col */
+  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr !important;}
+  /* Page body padding */
+  .page-body{padding:.75rem !important;}
+  /* Bottom nav */
+  .mobile-bottom-nav{display:flex !important;}
+  .content{padding-bottom:4.5rem;}
+}
+/* Mobile bottom nav */
+.mobile-bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:1px solid var(--border);
+  z-index:30;padding:.35rem 0 calc(.35rem + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 16px rgba(29,78,216,.08);
+}
+.mbn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:.12rem;
+  padding:.28rem .2rem;border:0;background:none;cursor:pointer;
+  font-size:.56rem;font-weight:600;color:#9ca3af;transition:color .12s;
+}
+.mbn-item.active{color:var(--blue);}
+.mbn-icon{font-size:1.15rem;line-height:1;}
 </head>
 <body>
 <div class="layout">
@@ -3118,6 +3172,31 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 })();
 </script>
 <div class="sb-overlay" id="sbOverlay"></div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <button class="mbn-item active" data-view="overview" onclick="switchView('overview');setMbnActive(this)"><span class="mbn-icon">🏠</span>Home</button>
+  <button class="mbn-item" data-view="events" onclick="switchView('events');setMbnActive(this)"><span class="mbn-icon">🎪</span>Events</button>
+  <button class="mbn-item" data-view="sales" onclick="switchView('sales');setMbnActive(this)"><span class="mbn-icon">💳</span>Sales</button>
+  <button class="mbn-item" data-view="whatsapp" onclick="switchView('whatsapp');setMbnActive(this)"><span class="mbn-icon">💬</span>WhatsApp</button>
+  <button class="mbn-item" data-view="personal-info" onclick="switchView('personal-info');setMbnActive(this)"><span class="mbn-icon">👤</span>Profile</button>
+</nav>
+<script>
+function setMbnActive(el){
+  document.querySelectorAll('.mobile-bottom-nav .mbn-item').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+// Sync bottom nav with sidebar nav
+const _origSwitchView = window.switchView;
+if(typeof switchView === 'function'){
+  window.switchView = function(name){
+    _origSwitchView(name);
+    document.querySelectorAll('.mobile-bottom-nav .mbn-item').forEach(b=>{
+      b.classList.toggle('active', b.dataset.view===name);
+    });
+  };
+}
+</script>
 </body>
 
 <script>

@@ -156,16 +156,66 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.15);}
   .hamburger{display:flex;}
   .bk-card-body{grid-template-columns:1fr 1fr;}
-  .hero-stats{overflow-x:auto;}
-  .hero-stat{min-width:100px;}
+  .hero-stats{display:grid !important;grid-template-columns:1fr 1fr;overflow:visible;}
+  .hero-stat{min-width:0;border-right:0 !important;border-bottom:1px solid rgba(255,255,255,.1);}
+  .hero-stat:nth-child(odd){border-right:1px solid rgba(255,255,255,.1) !important;}
   .topbar{padding:.75rem 1rem;}
   .hero-hdr{margin:.75rem .75rem 0;padding:1.25rem 1.2rem;}
   .hero-title{font-size:1.3rem;}
+  /* Topbar: hide browse link */
+  .topbar-right a{display:none;}
 }
 @media(max-width:560px){
   .bk-card-body{grid-template-columns:1fr;}
-  .page-body{padding:1rem;}
+  .page-body{padding:.75rem;gap:.75rem;padding-bottom:5rem;}
+  /* Booking card actions: stack */
+  .bk-card-actions{flex-direction:column;}
+  .bk-card-actions .bk-act-btn{width:100%;justify-content:center;text-align:center;padding:.5rem;}
+  /* Hero stats: single column */
+  .hero-stats{grid-template-columns:1fr !important;}
+  .hero-stat{border-right:0 !important;}
+  .hero-hdr{padding:1rem !important;margin:.5rem .5rem 0 !important;}
+  .hero-title{font-size:1.15rem;}
+  .hero-sub{font-size:.78rem;}
+  /* Topbar: compact */
+  .topbar{padding:.6rem .75rem;}
+  .topbar-title{font-size:.88rem;}
+  .tb-user-name{display:none;}
+  /* Modal: full width */
+  .modal{padding:1rem;border-radius:16px;}
+  .modal-actions{flex-direction:column;}
+  .modal-btn{width:100%;}
+  /* Tabs: scrollable */
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;}
+  .tab{white-space:nowrap;flex-shrink:0;}
+  /* Event cards */
+  .ev-card{flex-direction:column;}
+  .ev-card-img{width:100%;min-height:70px;}
+  .ev-card-btn{padding:.75rem 1rem;}
+  /* Bottom nav visible */
+  .mobile-bottom-nav{display:flex !important;}
 }
+/* Mobile bottom navigation bar */
+.mobile-bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:1px solid var(--border);
+  z-index:30;padding:.4rem 0 calc(.4rem + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 16px rgba(18,66,197,.08);
+}
+.mbn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:.15rem;
+  padding:.3rem .25rem;border:0;background:none;cursor:pointer;
+  font-size:.58rem;font-weight:600;color:#9ca3af;transition:color .12s;
+}
+.mbn-item.active{color:var(--p);}
+.mbn-icon{font-size:1.2rem;line-height:1;}
+.mbn-badge{
+  position:absolute;top:-2px;right:calc(50% - 18px);
+  background:#ef4444;color:#fff;font-size:.5rem;font-weight:800;
+  padding:.1rem .3rem;border-radius:999px;min-width:14px;text-align:center;
+}
+.mbn-item-wrap{position:relative;display:flex;flex-direction:column;align-items:center;}
 </style>
 </head>
 <body>
