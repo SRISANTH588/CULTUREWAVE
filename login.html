@@ -799,23 +799,21 @@
         return input.includes("@") ? input : `${input.toLowerCase()}@cityvibe.local`;
       }
 
-      async function getRoleByUid(uid) {
+      async function getUserData(uid) {
         try {
           const snap = await getDoc(doc(db, "users", uid));
-          if (snap.exists()) return snap.data().role || "client";
+          if (snap.exists()) return snap.data();
         } catch {}
-        return "client";
+        return {};
       }
 
-      function redirect(role) {
-        // Check if coming from event-type-select with a specific dashboard
-        const params = new URLSearchParams(location.search);
-        const dash = params.get('dash') || sessionStorage.getItem('cw_lister_dash');
-        const listerRole = params.get('role') || sessionStorage.getItem('cw_lister_role');
-        try { sessionStorage.removeItem('cw_lister_cat'); sessionStorage.removeItem('cw_lister_dash'); sessionStorage.removeItem('cw_lister_role'); } catch(e) {}
+      async function redirect(uid) {
+        const data = await getUserData(uid);
+        const role = data.role || 'customer';
         if (role === 'admin') { window.location.href = 'admin-dashboard.html'; return; }
-        if (dash && listerRole !== 'customer') { window.location.href = dash; return; }
-        window.location.href = 'premium-client-dashboard.html';
+        if (role === 'lister') { window.location.href = data.dashboard || 'premium-client-dashboard.html'; return; }
+        if (role === 'client') { window.location.href = 'premium-client-dashboard.html'; return; }
+        window.location.href = 'customer-dashboard.html';
       }
 
       let loginOtpGenerated = '';
@@ -883,9 +881,8 @@
           // OTP is an alternate login method for an account that already exists.
           const tempPass = 'CW_OTP_' + email.split('@')[0].slice(0,6) + '_2024';
           const userCred = await signInWithEmailAndPassword(auth, email, tempPass);
-          const role = await getRoleByUid(userCred.user.uid);
           setStatus('Welcome! Redirecting...', 'success');
-          redirect(role);
+          redirect(userCred.user.uid);
         } catch(e) {
           if (['auth/user-not-found', 'auth/invalid-credential', 'auth/wrong-password'].includes(e.code)) {
             const bookingSnap = await getDocs(query(collection(db, 'bookings'), where('customerEmail', '==', email)));
@@ -901,7 +898,7 @@
                   role: 'customer', createdAt: Date.now()
                 }, { merge: true });
                 setStatus('Welcome back! Opening your customer dashboard…', 'success');
-                redirect('customer');
+                window.location.href = 'customer-dashboard.html';
                 return;
               } catch(accountError) {
                 if (accountError.code === 'auth/email-already-in-use') {
@@ -960,9 +957,8 @@
         setStatus("Signing in...", "info");
         try {
           const { user } = await signInWithEmailAndPassword(auth, email, password);
-          const role = await getRoleByUid(user.uid);
           setStatus("Welcome back! Redirecting...", "success");
-          redirect(role);
+          redirect(user.uid);
         } catch (err) {
           const msg = ["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found"].includes(err.code)
             ? "Invalid username or password."
@@ -1025,11 +1021,11 @@
           await setDoc(doc(db, 'users', user.uid), {
             name, email,
             whatsapp: '+91' + whatsapp,
-            role: 'client',
+            role: 'customer',
             createdAt: Date.now()
           });
           setStatus('Account created! Redirecting…', 'success');
-          redirect('client');
+          window.location.href = 'customer-dashboard.html';
         } catch(err) {
           const msg = err.code === 'auth/email-already-in-use' ? 'Account already exists. Try logging in.' : err.message;
           setStatus(msg, 'warning');
@@ -1046,9 +1042,8 @@
             setStatus("No account found. Please sign up with email first.", "warning");
             return;
           }
-          const role = await getRoleByUid(user.uid);
           setStatus("Signed in! Redirecting...", "success");
-          redirect(role);
+          redirect(user.uid);
         } catch (err) {
           if (err.code !== "auth/popup-closed-by-user") setStatus(err.message, "warning");
           else setStatus("", "info");

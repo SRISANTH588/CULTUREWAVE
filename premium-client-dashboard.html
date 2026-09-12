@@ -2172,7 +2172,7 @@ var _titles = {
   integrations:'Integrations', campaigns:'My Campaigns', 'custom-website':'Custom Website',
   sales:'Sales Summary', payouts:'Payouts', settings:'Settings', 'personal-info':'Brand & Profile'
 };
-function switchView(name) {
+window.switchView = function switchView(name) {
   document.querySelectorAll('.view').forEach(function(el){ el.classList.toggle('active', el.dataset.view === name); });
   document.querySelectorAll('.sb-item[data-view]').forEach(function(el){ el.classList.toggle('active', el.dataset.view === name); });
   var pt = document.getElementById('pageTitle');
@@ -3130,9 +3130,12 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 
   const init = (user.name||'C').trim()[0].toUpperCase();
   ['sideAvatar','topAvatar'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=init; });
-  document.getElementById('sidebarName').textContent = (user.name||'Client').split(' ')[0] + (user.name?.split(' ')[1] ? ' '+user.name.split(' ')[1][0]+'...' : '');
-  document.getElementById('sidebarRole').textContent = 'Owner';
-  document.getElementById('topName').textContent = 'User';
+  const sidebarName = document.getElementById('sidebarName');
+  const sidebarRole = document.getElementById('sidebarRole');
+  const topName = document.getElementById('topName');
+  if(sidebarName) sidebarName.textContent = (user.name||'Client').split(' ')[0] + (user.name?.split(' ')[1] ? ' '+user.name.split(' ')[1][0]+'...' : '');
+  if(sidebarRole) sidebarRole.textContent = 'Owner';
+  if(topName) topName.textContent = 'User';
 
   // load events — fetch all and filter client-side to handle any ownerId mismatch
   onSnapshot(
