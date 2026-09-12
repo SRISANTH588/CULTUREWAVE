@@ -116,6 +116,24 @@
         .support-card p { min-height: 0; }
         .support-form { margin-top: .4rem; padding: 1.25rem; border-radius: 22px; }
       }
+      .faq-section,.guides-section{max-width:760px;margin:1.6rem auto 0}
+      .section-title{font-size:1.45rem;font-weight:800;letter-spacing:-.04em;color:#0a1733;margin-bottom:.25rem}
+      .section-sub{color:#63708a;font-size:.88rem;margin-bottom:1.1rem}
+      .faq-item{border:1px solid #dbe6fb;border-radius:16px;background:rgba(255,255,255,.92);margin-bottom:.6rem;overflow:hidden;transition:box-shadow .2s}
+      .faq-item:hover{box-shadow:0 8px 24px rgba(18,66,197,.09)}
+      .faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.2rem;background:none;border:0;cursor:pointer;font:700 .95rem/1.4 'Manrope',sans-serif;color:#0a1733;text-align:left}
+      .faq-arrow{flex:none;width:22px;height:22px;border-radius:50%;background:#eaf1ff;display:grid;place-items:center;font-size:.7rem;transition:transform .25s,background .2s}
+      .faq-item.open .faq-arrow{transform:rotate(180deg);background:#1242c5;color:#fff}
+      .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+      .faq-item.open .faq-a{max-height:400px}
+      .faq-a-inner{padding:.75rem 1.2rem 1rem;color:#4a5568;font-size:.88rem;line-height:1.75;border-top:1px solid #eef3fd}
+      .guides-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem}
+      .guide-card{border:1px solid #dbe6fb;border-radius:18px;background:rgba(255,255,255,.9);padding:1.2rem 1.3rem;display:flex;gap:.9rem;align-items:flex-start;transition:transform .2s,box-shadow .2s,border-color .2s}
+      .guide-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(18,66,197,.11);border-color:#9bb8f5}
+      .guide-icon{flex:none;width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#eaf1ff,#d8e6ff);display:grid;place-items:center;font-size:1.2rem}
+      .guide-body h3{font-size:.95rem;font-weight:800;color:#0a1733;margin-bottom:.3rem}
+      .guide-body p{font-size:.82rem;color:#63708a;line-height:1.6}
+      @media(max-width:640px){.guides-grid{grid-template-columns:1fr}}
     </style>
   </head>
   <body>
@@ -140,6 +158,32 @@
           <article class="support-card"><div class="support-icon">✉️</div><h2>Email support</h2><p>Send the details of your request and our team will follow up.</p><a href="mailto:support.culturewave@gmail.com">support.culturewave@gmail.com →</a></article>
           <article class="support-card"><div class="support-icon">🎟️</div><h2>Booking help</h2><p>Keep your booking ID ready so we can resolve your issue faster.</p><a href="booking.html">View booking flow →</a></article>
         </section>
+        <section class="faq-section">
+          <div class="section-title">Frequently Asked Questions</div>
+          <div class="section-sub">Quick answers to the most common questions.</div>
+          <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I book an event?<span class="faq-arrow">▼</span></button><div class="faq-a"><div class="faq-a-inner">Browse events on the <a href="events.html" style="color:#1242c5;font-weight:700;">Events</a> page, click the event you want, choose your ticket type and quantity, then complete payment. You will receive a booking confirmation with a QR ticket instantly in My Bookings.</div></div></div>
+          <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Where can I find my booking confirmation?<span class="faq-arrow">▼</span></button><div class="faq-a"><div class="faq-a-inner">Log in and go to <a href="customer-dashboard.html" style="color:#1242c5;font-weight:700;">My Bookings</a>. All confirmed bookings are listed there with a QR ticket you can show at the venue.</div></div></div>
+          <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I cancel or get a refund?<span class="faq-arrow">▼</span></button><div class="faq-a"><div class="faq-a-inner">Yes. Cancellations requested at least 24 hours before the event are eligible for a refund. Go to <strong>My Bookings → Cancel</strong> or use the Refund section in your dashboard. Refunds are processed in 5–7 business days after admin approval.</div></div></div>
+          <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What payment methods are accepted?<span class="faq-arrow">▼</span></button><div class="faq-a"><div class="faq-a-inner">We accept all major UPI apps (GPay, PhonePe, Paytm), debit/credit cards, and net banking via our secure Razorpay payment gateway.</div></div></div>
+          <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">I paid but didn't receive a confirmation. What should I do?<span class="faq-arrow">▼</span></button><div class="faq-a"><div class="faq-a-inner">First check your <strong>My Bookings</strong> page — it may already be there. If not, contact us on <a href="https://wa.me/916305183601" target="_blank" style="color:#1242c5;font-weight:700;">WhatsApp</a> or email <a href="mailto:support.culturewave@gmail.com" style="color:#1242c5;font-weight:700;">support.culturewave@gmail.com</a> with your payment screenshot and we will resolve it within 2 hours.</div></div></div>
+          <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I list my event on CultureWave?<span class="faq-arrow">▼</span></button><div class="faq-a"><div class="faq-a-inner">Sign up as an organiser, then use the <a href="event-type-select.html" style="color:#1242c5;font-weight:700;">Create Event</a> flow to add your event details, venue, date, and ticket tiers. Once submitted, our team reviews and publishes it within 24 hours.</div></div></div>
+          <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I check in attendees at my event?<span class="faq-arrow">▼</span></button><div class="faq-a"><div class="faq-a-inner">Use the <a href="checkin.html" style="color:#1242c5;font-weight:700;">Check-in</a> tool from your organiser dashboard. Scan the attendee's QR code or search by booking ID to mark them as checked in.</div></div></div>
+          <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is my payment information secure?<span class="faq-arrow">▼</span></button><div class="faq-a"><div class="faq-a-inner">Yes. All payments are processed by Razorpay, a PCI-DSS compliant gateway. CultureWave never stores your card or UPI details.</div></div></div>
+        </section>
+
+        <section class="guides-section">
+          <div class="section-title">Guides</div>
+          <div class="section-sub">Step-by-step help for common tasks.</div>
+          <div class="guides-grid">
+            <div class="guide-card"><div class="guide-icon">🎟️</div><div class="guide-body"><h3>How to book a ticket</h3><p>Find an event → select ticket type → enter your details → pay securely → get your QR ticket instantly in My Bookings.</p></div></div>
+            <div class="guide-card"><div class="guide-icon">💸</div><div class="guide-body"><h3>Requesting a refund</h3><p>Open My Bookings → tap Cancel → confirm via WhatsApp. Refunds take 5–7 business days after admin approval.</p></div></div>
+            <div class="guide-card"><div class="guide-icon">📋</div><div class="guide-body"><h3>Creating an event</h3><p>Go to Create Event → fill in details, venue, date, and ticket tiers → submit for review. Your event goes live within 24 hours.</p></div></div>
+            <div class="guide-card"><div class="guide-icon">📲</div><div class="guide-body"><h3>Checking in attendees</h3><p>Open the Check-in tool → scan the attendee's QR code or search by booking ID → mark as checked in with one tap.</p></div></div>
+            <div class="guide-card"><div class="guide-icon">👤</div><div class="guide-body"><h3>Managing your account</h3><p>Log in → go to My Profile to view bookings, update contact details, or log out securely from any device.</p></div></div>
+            <div class="guide-card"><div class="guide-icon">🔔</div><div class="guide-body"><h3>Staying updated</h3><p>Check the Notifications tab in your dashboard for booking confirmations, event reminders, and updates from organisers.</p></div></div>
+          </div>
+        </section>
+
         <form class="support-form" id="supportForm"><h2>Send us a message</h2><p>Tell us what you need and we will get back to you.</p><div class="support-fields"><div class="support-field"><label for="supportName">Your name</label><input id="supportName" required /></div><div class="support-field"><label for="supportEmail">Email address</label><input id="supportEmail" type="email" required /></div><div class="support-field full"><label for="supportMessage">How can we help?</label><textarea id="supportMessage" required></textarea></div></div><button class="support-submit" type="submit">Send Support Request</button></form>
       </div>
     </main>
@@ -211,6 +255,7 @@
       const ham=document.getElementById('hamburger'),mNav=document.getElementById('mobileNav');
       ham.addEventListener('click',()=>{ham.classList.toggle('open');mNav.classList.toggle('open');document.body.style.overflow=mNav.classList.contains('open')?'hidden':'';});
       mNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ham.classList.remove('open');mNav.classList.remove('open');document.body.style.overflow='';}));
+      function toggleFaq(btn){const item=btn.closest('.faq-item');item.classList.toggle('open');}
       document.getElementById('supportForm').addEventListener('submit',e=>{e.preventDefault();const subject=encodeURIComponent('CultureWave customer support request');const body=encodeURIComponent(`Name: ${supportName.value}\nEmail: ${supportEmail.value}\n\n${supportMessage.value}`);window.location.href=`mailto:support.culturewave@gmail.com?subject=${subject}&body=${body}`;});
     </script>
   </body>
