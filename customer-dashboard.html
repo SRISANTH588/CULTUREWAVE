@@ -6,7 +6,7 @@
 <title>CultureWave | My Bookings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --p:#1242c5;--p2:#2f6bff;--plight:#e8f0ff;--psoft:#f0f5ff;
@@ -379,10 +379,12 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div class="modal-ticket-body">
         <div class="modal-qr-box" id="modalQrBox"></div>
         <div style="width:100%;">
-          <div class="modal-detail-row"><span>Booking ID</span><span id="modalBookingId">-</span></div>
+          <div class="modal-detail-row"><span>Booking ID</span><span id="modalBookingId" style="font-family:monospace;">-</span></div>
+          <div class="modal-detail-row"><span>Name</span><span id="modalCustomerName">-</span></div>
           <div class="modal-detail-row"><span>Date</span><span id="modalDate">-</span></div>
           <div class="modal-detail-row"><span>Tickets</span><span id="modalTickets">-</span></div>
           <div class="modal-detail-row"><span>Amount</span><span id="modalAmount">-</span></div>
+          <div class="modal-detail-row"><span>Phone</span><span id="modalPhone">-</span></div>
           <div class="modal-detail-row"><span>Status</span><span id="modalStatus">-</span></div>
         </div>
       </div>
@@ -556,24 +558,30 @@ function renderBookings(list) {
     const status = String(b.status||'pending').toLowerCase();
     const statusLabel = status === 'paid' ? 'confirmed' : status;
     const price = b.totalAmount || b.amount || b.price || 0;
-    const tickets = b.quantity || b.tickets || 1;
+    const tickets = b.seats || b.quantity || b.tickets || 1;
+    const seatIds = Array.isArray(b.seatIds) && b.seatIds.length ? b.seatIds.join(', ') : null;
     let dateStr = '-';
     try { const dt = b.eventDate?.toDate ? b.eventDate.toDate() : (b.eventDate ? new Date(b.eventDate) : null); if(dt) dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
+    const bookingRef = (b.bookingId || b.id || '').slice(-8).toUpperCase();
     return `<div class="bk-card" style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:.75rem;">
       <div class="bk-card-top">
         <div class="bk-card-emoji">${b.eventEmoji||'🎉'}</div>
         <div class="bk-card-info">
           <div class="bk-card-name">${b.eventName||'Event'}</div>
-          <div class="bk-card-venue">${b.venueName||b.venue||''}</div>
+          <div class="bk-card-venue">${b.venueName||b.venue||b.city||''}</div>
         </div>
         <div class="bk-card-status"><span class="status-pill ${statusLabel}">${statusLabel}</span></div>
       </div>
       <div class="bk-card-body">
+        <div><div class="bk-detail-label">Booking ID</div><div class="bk-detail-val" style="font-family:monospace;font-size:.8rem;">#${bookingRef}</div></div>
+        <div><div class="bk-detail-label">Name</div><div class="bk-detail-val">${b.customerName||'-'}</div></div>
         <div><div class="bk-detail-label">Date</div><div class="bk-detail-val">${dateStr}</div></div>
-        <div><div class="bk-detail-label">Tickets</div><div class="bk-detail-val">${tickets}</div></div>
+        <div><div class="bk-detail-label">Ticket</div><div class="bk-detail-val">${b.ticketName||'General'}</div></div>
+        <div><div class="bk-detail-label">Seats</div><div class="bk-detail-val">${seatIds || tickets}</div></div>
         <div><div class="bk-detail-label">Amount</div><div class="bk-detail-val blue">${price?'₹'+Number(price).toLocaleString('en-IN'):'Free'}</div></div>
+        <div><div class="bk-detail-label">Phone</div><div class="bk-detail-val">${b.customerPhone||'-'}</div></div>
         <div class="bk-card-actions">
-          <button class="bk-act-btn primary" onclick="showQR('${b.id}')">🎫 Ticket</button>
+          <button class="bk-act-btn primary" onclick="showQR('${b.id}')">🎫 View Ticket</button>
         </div>
       </div>
     </div>`;
@@ -681,21 +689,26 @@ async function loadUpcoming() {
 function showQR(bookingId) {
   const b = allBookings.find(x => x.id === bookingId);
   if (!b) return;
+  const bookingRef = (b.bookingId || b.id || '').slice(-8).toUpperCase();
   document.getElementById('modalEventName').textContent = b.eventName || 'Event';
-  document.getElementById('modalEventVenue').textContent = b.venueName || b.venue || '';
-  document.getElementById('modalBookingId').textContent = bookingId.slice(0,8).toUpperCase();
-  document.getElementById('modalTickets').textContent = b.quantity || b.tickets || 1;
-  document.getElementById('modalAmount').textContent = b.totalAmount ? '₹'+Number(b.totalAmount).toLocaleString('en-IN') : 'Free';
+  document.getElementById('modalEventVenue').textContent = b.venueName || b.venue || b.city || '';
+  document.getElementById('modalBookingId').textContent = '#' + bookingRef;
+  document.getElementById('modalCustomerName').textContent = b.customerName || '-';
+  document.getElementById('modalPhone').textContent = b.customerPhone || '-';
+  document.getElementById('modalTickets').textContent = (b.seats || b.quantity || b.tickets || 1) + (b.ticketName ? ' × ' + b.ticketName : '');
+  document.getElementById('modalAmount').textContent = (b.totalAmount || b.amount || b.price) ? '₹' + Number(b.totalAmount || b.amount || b.price).toLocaleString('en-IN') : 'Free';
   document.getElementById('modalStatus').textContent = b.status || 'confirmed';
   let dateStr = '-';
   try { const dt = b.eventDate?.toDate ? b.eventDate.toDate() : new Date(b.eventDate); dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
   document.getElementById('modalDate').textContent = dateStr;
+
   const qrBox = document.getElementById('modalQrBox');
   qrBox.innerHTML = '';
+  const qrData = JSON.stringify({ bookingId: b.bookingId || b.id, event: b.eventName, customer: b.customerName, seats: b.seats || b.quantity || 1 });
   if (typeof QRCode !== 'undefined') {
-    new QRCode(qrBox, {text: bookingId, width:140, height:140, colorDark:'#0a0f1e', colorLight:'#fff'});
+    new QRCode(qrBox, { text: qrData, width: 160, height: 160, colorDark: '#0a0f1e', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
   } else {
-    qrBox.textContent = bookingId.slice(0,8).toUpperCase();
+    qrBox.innerHTML = `<div style="font-family:monospace;font-size:1.1rem;font-weight:800;color:#0a0f1e;padding:1rem;border:2px dashed #dce4f5;border-radius:12px;">#${bookingRef}</div>`;
   }
   document.getElementById('qrModal').classList.add('open');
 }
