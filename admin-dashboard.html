@@ -2141,6 +2141,7 @@ function renderWAGrid(bookings) {
           <button class="wa-btn wa-btn-sent" onclick="markWASent('${p.id}','both')">
             ✔️ Sent
           </button>
+          ${p.status !== 'cancelled' ? `<button class="wa-btn" style="background:#fff5f5;color:#c92a2a;border:1.5px solid #ffc9c9;" onclick="adminCancelBooking('${p.id}','${name}','${email}','${phone}','${event}')">❌ Cancel Booking</button>` : `<span style="display:inline-flex;align-items:center;padding:.4rem .8rem;border-radius:8px;background:#fff5f5;color:#c92a2a;font-size:.78rem;font-weight:700;">Cancelled</span>`}
         </div>
         <div class="wa-sent-log ${orgSent || custSent ? 'show' : ''}" id="walog-${p.id}">
           ${orgSent  ? '💬 Organizer: ' + orgSent + '<br>' : ''}
@@ -2156,6 +2157,20 @@ window.clearResendFlag = async function(id) {
     await updateDoc(doc(db,'payments',id), { resendRequested: false }).catch(()=>{});
     await updateDoc(doc(db,'bookings',id), { resendRequested: false }).catch(()=>{});
     showToast('\u2705 Marked as done', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
+
+window.adminCancelBooking = async function(id, customerName, customerEmail, customerPhone, eventName) {
+  if (!confirm(`Cancel booking for ${customerName} (${eventName})? This cannot be undone.`)) return;
+  try {
+    await updateDoc(doc(db,'bookings',id), { status: 'cancelled', cancelledAt: new Date().toISOString(), cancelledBy: 'admin' });
+    await updateDoc(doc(db,'payments',id), { status: 'cancelled', cancelledAt: new Date().toISOString(), cancelledBy: 'admin' }).catch(()=>{});
+    showToast('\u2705 Booking cancelled', 'success');
+    // Notify customer on WhatsApp if phone available
+    if (customerPhone) {
+      const msg = encodeURIComponent(`Hi ${customerName}, your booking for *${eventName}* (ID: #${id.slice(-8).toUpperCase()}) has been *cancelled* by CultureWave admin.\n\nIf you have any questions, reply to this message or contact support@culturewave.in`);
+      window.open('https://wa.me/91' + customerPhone.replace(/[^0-9]/g,'') + '?text=' + msg, '_blank');
+    }
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 };
 
