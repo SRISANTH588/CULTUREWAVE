@@ -459,15 +459,17 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-firebase.initializeApp({
+const _fbCfg = {
   apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
   authDomain:"ogshootsluxe-36740.firebaseapp.com",
   projectId:"ogshootsluxe-36740",
   storageBucket:"ogshootsluxe-36740.firebasestorage.app",
   messagingSenderId:"5471814825",
   appId:"1:5471814825:web:07e84f2f88486da817d5b8"
-});
+};
+if (!firebase.apps.length) firebase.initializeApp(_fbCfg);
 const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 const db   = firebase.firestore();
 
 let currentUser = null;
@@ -475,7 +477,17 @@ let allBookings  = [];
 let allNotifs    = [];
 
 // ── AUTH ──
+let authTimeout = setTimeout(() => {
+  // If auth hasn't resolved in 8s, show error
+  if (!currentUser) {
+    document.getElementById('sidebarName').textContent = 'Not signed in';
+    document.getElementById('sidebarEmail').textContent = '';
+    document.getElementById('bookingsList').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><div style="font-size:2rem;margin-bottom:.5rem;">⚠️</div><div style="font-weight:700;margin-bottom:.5rem;">Session expired</div><div style="font-size:.82rem;margin-bottom:1rem;">Please log in again to view your bookings.</div><a href="login.html" style="display:inline-block;padding:.6rem 1.4rem;border-radius:999px;background:var(--p);color:#fff;font-size:.84rem;font-weight:700;">Go to Login</a></div>';
+  }
+}, 8000);
+
 auth.onAuthStateChanged(async user => {
+  clearTimeout(authTimeout);
   if (!user) { window.location.href = 'login.html'; return; }
   currentUser = user;
   const name = user.displayName || user.email.split('@')[0];
