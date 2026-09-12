@@ -592,7 +592,12 @@ async function saveBooking(data){
       amount: data.amount, seats: data.seats, seatIds: data.seatIds||[],
       status: data.status, paymentId: data.paymentId||null,
       customerName: data.name, customerEmail: data.email,
-      customerPhone: data.phone, userId: userId, createdAt: ts
+      customerPhone: data.phone, userId: userId,
+      eventDate: evData.startDate || evData.date || null,
+      venueName: evData.venueName || evData.venue || null,
+      city: evData.city || null,
+      eventEmoji: evData.emoji || null,
+      createdAt: ts
     };
     await db.collection("bookings").doc(data.bookingId).set(doc);
     await db.collection("payments").doc(data.bookingId).set(doc);

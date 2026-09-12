@@ -571,6 +571,7 @@ async function loadBookings() {
     updateBookingCounts();
     populateRefundDropdown();
     document.getElementById('profileBookingCount').textContent = allBookings.length;
+    enrichBookingDates();
   } catch(e) {
     // fallback: query only by email
     try {
@@ -615,7 +616,13 @@ function renderBookings(list) {
     const tickets = b.seats || b.quantity || b.tickets || 1;
     const seatIds = Array.isArray(b.seatIds) && b.seatIds.length ? b.seatIds.join(', ') : null;
     let dateStr = '-';
-    try { const dt = b.eventDate?.toDate ? b.eventDate.toDate() : (b.eventDate ? new Date(b.eventDate) : null); if(dt) dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
+    try {
+      const dt = b.eventDate?.toDate ? b.eventDate.toDate()
+        : b.eventDate ? new Date(b.eventDate)
+        : b.startDate?.toDate ? b.startDate.toDate()
+        : b.startDate ? new Date(b.startDate) : null;
+      if (dt && !isNaN(dt)) dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    } catch(e){}
     const bookingRef = (b.bookingId || b.id || '').slice(-8).toUpperCase();
     return `<div class="bk-card" style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:.75rem;">
       <div class="bk-card-top">
@@ -754,7 +761,13 @@ function showQR(bookingId) {
   document.getElementById('modalAmount').textContent = (b.totalAmount || b.amount || b.price) ? '₹' + Number(b.totalAmount || b.amount || b.price).toLocaleString('en-IN') : 'Free';
   document.getElementById('modalStatus').textContent = b.status || 'confirmed';
   let dateStr = '-';
-  try { const dt = b.eventDate?.toDate ? b.eventDate.toDate() : new Date(b.eventDate); dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
+  try {
+    const dt = b.eventDate?.toDate ? b.eventDate.toDate()
+      : b.eventDate ? new Date(b.eventDate)
+      : b.startDate?.toDate ? b.startDate.toDate()
+      : b.startDate ? new Date(b.startDate) : null;
+    if (dt && !isNaN(dt)) dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  } catch(e){}
   document.getElementById('modalDate').textContent = dateStr;
 
   const qrBox = document.getElementById('modalQrBox');
@@ -780,6 +793,24 @@ function requestCancel(bookingId, eventName, bookingRef) {
 
 Please process my cancellation request. Thank you.`;
   window.open('https://wa.me/916305183601?text=' + encodeURIComponent(msg), '_blank');
+}
+
+async function enrichBookingDates() {
+  // For bookings missing eventDate, fetch from events collection
+  const missing = allBookings.filter(b => !b.eventDate && !b.startDate && b.eventId);
+  if (!missing.length) return;
+  await Promise.all(missing.map(async b => {
+    try {
+      const snap = await db.collection('events').doc(b.eventId).get();
+      if (snap.exists()) {
+        const d = snap.data();
+        b.eventDate = d.startDate || d.date || null;
+        b.venueName = b.venueName || d.venueName || d.venue || null;
+        b.city = b.city || d.city || null;
+      }
+    } catch(e) {}
+  }));
+  renderBookings(allBookings);
 }
 
 function populateRefundDropdown() {
