@@ -173,9 +173,29 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
     </div>
 
-  </div>
-</div>
-</div>
+    <!-- STEP 3: BRAND PAGE -->
+    <div id="step3" style="display:none;">
+      <div class="card-head">
+        <h2>Create your <span>brand page</span></h2>
+        <p>This is where your customers will find you online.</p>
+      </div>
+      <div class="status" id="st3"></div>
+      <div class="form">
+        <div class="field">
+          <span class="field-label">Brand Name</span>
+          <div class="input-wrap"><span class="input-icon">🏷️</span><input id="fbrand" type="text" placeholder="e.g., Mountain Adventures" autocomplete="organization"/></div>
+        </div>
+        <div class="field">
+          <span class="field-label">Bio</span>
+          <div class="input-wrap" style="align-items:flex-start;padding:.75rem .9rem;"><textarea id="fbio" rows="3" placeholder="Tell customers what you do..." style="flex:1;border:0;outline:0;background:transparent;color:#0a0f1e;font-size:.9rem;font-family:inherit;resize:none;"></textarea></div>
+        </div>
+        <div class="field">
+          <span class="field-label">City</span>
+          <div class="input-wrap"><span class="input-icon">📍</span><input id="fcity" type="text" placeholder="e.g., Mumbai" autocomplete="address-level2"/></div>
+        </div>
+        <button class="submit-btn" type="button" onclick="createBrandPage()">Create brand page →</button>
+      </div>
+    </div>
 
 <script>
 var params=new URLSearchParams(location.search);
@@ -238,17 +258,28 @@ window.verifyAndCreate=async function(){
   var phone=document.getElementById('fphone').value.trim();
   if(!entered){setStatus('Enter the OTP.','warning','st2');return;}
   setStatus('Verifying OTP…','info','st2');
-  // verify from Firestore
   var snap=await getDoc(doc(db,'whatsappOtps','+91'+phone));
   if(!snap.exists()){setStatus('OTP expired. Please resend.','warning','st2');return;}
   var d=snap.data();
   if(Date.now()>d.expiresAt){setStatus('OTP expired. Please resend.','warning','st2');return;}
   if(entered!==d.otp){setStatus('Incorrect OTP. Try again.','warning','st2');return;}
+  // OTP verified — go to brand page step
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='';
+};
 
+window.createBrandPage=async function(){
+  var brand=document.getElementById('fbrand').value.trim();
+  var bio=document.getElementById('fbio').value.trim();
+  var city=document.getElementById('fcity').value.trim();
+  if(!brand){setStatus('Enter your brand name.','warning','st3');return;}
+  if(!bio){setStatus('Enter a bio for your brand.','warning','st3');return;}
+  if(!city){setStatus('Enter your city.','warning','st3');return;}
   var name=document.getElementById('fname').value.trim();
   var email=document.getElementById('femail').value.trim();
+  var phone=document.getElementById('fphone').value.trim();
   var pass=document.getElementById('fpass').value;
-  setStatus('Creating your account…','info','st2');
+  setStatus('Creating your account…','info','st3');
   try{
     var cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
@@ -258,15 +289,18 @@ window.verifyAndCreate=async function(){
       role:'client',
       category:CAT,
       dashboard:DASH,
+      brandName:brand,
+      bio,
+      city,
       createdAt:serverTimestamp()
     });
     try{sessionStorage.removeItem('cw_lister_cat');sessionStorage.removeItem('cw_lister_dash');sessionStorage.removeItem('cw_lister_role');}catch(e){}
-    setStatus('Account created! Taking you to your dashboard…','success','st2');
+    setStatus('Account created! Taking you to your dashboard…','success','st3');
     setTimeout(function(){window.location.href=DASH;},1000);
   }catch(e){
     var msg=e.code==='auth/email-already-in-use'?'Account already exists. <a href="login.html" style="color:#1242c5;font-weight:800;">Login here →</a>':e.message;
-    document.getElementById('st2').innerHTML=msg;
-    document.getElementById('st2').dataset.k='warning';
+    document.getElementById('st3').innerHTML=msg;
+    document.getElementById('st3').dataset.k='warning';
   }
 };
 </script>
