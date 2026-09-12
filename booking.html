@@ -563,6 +563,24 @@ function goStep4(){
 }
 
 // ── SAVE BOOKING ──
+// Creates an account that can subsequently be accessed through Email OTP login.
+// The password matches the existing OTP sign-in fallback in login.html.
+async function createBookingAccount(name, email, phone){
+  try{
+    const auth = firebase.auth();
+    const tempPass = "CW_OTP_" + email.split("@")[0].slice(0,6) + "_2024";
+    const credential = await auth.createUserWithEmailAndPassword(email, tempPass);
+    await credential.user.updateProfile({ displayName:name });
+    await db.collection("users").doc(credential.user.uid).set({
+      name, email, phone, whatsapp:phone, role:"customer",
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge:true });
+  }catch(e){
+    // An existing account is valid; never allow account provisioning to block a booking.
+    if(e.code !== "auth/email-already-in-use") console.warn("createBookingAccount:", e);
+  }
+}
+
 async function saveBooking(data){
   try{
     const ts = firebase.firestore.FieldValue.serverTimestamp();
@@ -616,6 +634,7 @@ async function submitBooking(){
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
     await saveBooking({ bookingId:bid, eventName, ticketName:t.name, amount:0, seats:qty, seatIds:selectedSeats, status:"confirmed", name, email, phone });
+    await createBookingAccount(name, email, phone);
     await sendEmail({ name, email, eventName, amount:"Free", seats:qty, bookingId:bid, method:"Free" });
     location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId);
     return;
@@ -633,6 +652,7 @@ async function submitBooking(){
       const pid = r.razorpay_payment_id || bid;
       document.getElementById("rStatus").textContent = "✅ Confirmed";
       await saveBooking({ bookingId:pid, eventName, ticketName:t.name, amount:total, seats:qty, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
+      await createBookingAccount(name, email, phone);
       await sendEmail({ name, email, eventName, amount:fmt(total), seats:qty, bookingId:pid, method:"Razorpay" });
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId);
     },
