@@ -24,8 +24,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .sb-brand-sub{font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:.15rem;}
 .sb-user{margin:.75rem .65rem .5rem;padding:.65rem .75rem;border-radius:12px;background:var(--psoft);border:1px solid var(--border);display:flex;align-items:center;gap:.6rem;}
 .sb-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1242c5,#2f6bff);display:grid;place-items:center;font-weight:700;font-size:.9rem;color:#fff;flex:none;}
-.sb-user-info strong{display:block;font-size:.84rem;font-weight:700;color:#0a0f1e;}
-.sb-user-info small{font-size:.72rem;color:var(--muted);}
+.sb-user-info{min-width:0;overflow:hidden;}
+.sb-user-info strong{display:block;font-size:.84rem;font-weight:700;color:#0a0f1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-user-info small{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
 .sb-nav{flex:1;padding:.5rem .65rem;display:flex;flex-direction:column;gap:.05rem;}
 .sb-section-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#93c5fd;padding:.8rem .4rem .3rem;}
 .sb-item{display:flex;align-items:center;gap:.6rem;padding:.58rem .75rem;border-radius:10px;font-size:.84rem;font-weight:500;color:#6b7280;cursor:pointer;transition:background .12s,color .12s;width:100%;text-align:left;}
@@ -829,7 +830,7 @@ async function enrichBookingDates() {
   await Promise.all(missing.map(async b => {
     try {
       const snap = await db.collection('events').doc(b.eventId).get();
-      if (snap.exists()) {
+      if (snap.exists) {
         const d = snap.data();
         b.eventDate = d.startDate || d.date || null;
         b.venueName = b.venueName || d.venueName || d.venue || null;
