@@ -15,11 +15,12 @@
   <style>
     :root{--blue:#1242c5;--blue-2:#2f6bff;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#f0f4ff;font-family:'Manrope',sans-serif;font-size:14px;overflow-x:hidden;}
+    html,body{max-width:100%;overflow-x:hidden;}
+    body{background:#f0f4ff;font-family:'Manrope',sans-serif;font-size:14px;}
     main{padding:0 !important;margin:0 !important;max-width:100% !important;overflow-x:hidden !important;}
     a{text-decoration:none;color:inherit;}
     button{font:inherit;cursor:pointer;}
-    .bk-stepper-wrap{background:linear-gradient(135deg,#0a0f1e,#1242c5);padding:2rem 1.25rem 0;}
+    .bk-stepper-wrap{background:linear-gradient(135deg,#0a0f1e,#1242c5);padding:1.5rem 1rem 0;width:100%;}
     .bk-stepper{max-width:640px;margin:0 auto;display:flex;align-items:center;padding:0 .5rem;}
     .bk-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;padding-bottom:1rem;border-bottom:3px solid transparent;transition:border-color .3s;}
     .bk-step.active{border-bottom-color:#2f6bff;}
@@ -31,7 +32,7 @@
     .bk-step.active .bk-step-lbl{color:#fff;}
     .bk-step.done .bk-step-lbl{color:rgba(126,179,255,.7);}
     .bk-conn{flex:none;width:2rem;height:2px;background:rgba(255,255,255,.12);margin-bottom:1rem;}
-    .bk-wrap{max-width:640px;margin:0 auto;padding:1.2rem 1.25rem 4rem;overflow-x:hidden;box-sizing:border-box;width:100%;}
+    .bk-wrap{max-width:640px;margin:0 auto;padding:1.2rem 1rem 4rem;overflow-x:hidden;box-sizing:border-box;width:100%;}
     .bk-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;align-items:start;width:100%;box-sizing:border-box;}
     .bk-panel{display:none;flex-direction:column;gap:1rem;}
     .bk-panel.active{display:flex;}
@@ -45,11 +46,11 @@
     .bk-input input,.bk-input select{flex:1;min-width:0;border:none;outline:none;background:transparent;font:inherit;font-size:.82rem;color:var(--text);}
     .bk-input input::placeholder{color:#b0bcd4;}
     .bk-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
-    @media(max-width:400px){.bk-row{grid-template-columns:1fr;}}
-    .bk-verify-row{display:flex;gap:.5rem;align-items:stretch;flex-wrap:nowrap;min-width:0;}
+    @media(max-width:480px){.bk-row{grid-template-columns:1fr;}}
+    .bk-verify-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;min-width:0;}
     .bk-verify-row .bk-input{flex:1;min-width:0;}
-    .bk-verify-btn{height:48px;padding:0 .75rem;background:var(--blue);color:#fff;border:0;border-radius:12px;font-size:.75rem;font-weight:800;white-space:nowrap;flex:none;}
-    .bk-verify-tag{display:inline-flex;align-items:center;padding:.2rem .5rem;border-radius:999px;font-size:.68rem;font-weight:800;white-space:nowrap;align-self:center;flex:none;}
+    .bk-verify-btn{height:44px;padding:0 .7rem;background:var(--blue);color:#fff;border:0;border-radius:12px;font-size:.72rem;font-weight:800;white-space:nowrap;flex:none;}
+    .bk-verify-tag{display:inline-flex;align-items:center;padding:.2rem .45rem;border-radius:999px;font-size:.65rem;font-weight:800;white-space:nowrap;flex:none;}
     .bk-verify-tag.ok{background:#dcfce7;color:#166534;}
     .bk-verify-tag.pending{background:#fef9c3;color:#854d0e;}
     .bk-otp-wrap{display:none;margin-top:.5rem;gap:.5rem;}
@@ -76,7 +77,9 @@
     .bk-coupon-msg.ok{color:#166534;}
     .bk-coupon-msg.err{color:#991b1b;}
     .bk-bill{background:#f7faff;border:1px solid var(--border);border-radius:16px;padding:1rem 1.2rem;}
-    .bk-bill-row{display:flex;justify-content:space-between;font-size:.86rem;color:#374151;font-weight:600;padding:.38rem 0;border-bottom:1px solid rgba(18,66,197,.06);}
+    .bk-bill-row{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.84rem;color:#374151;font-weight:600;padding:.38rem 0;border-bottom:1px solid rgba(18,66,197,.06);}
+    .bk-bill-row span:first-child{flex:1;min-width:0;}
+    .bk-bill-row span:last-child,.bk-bill-row strong{flex:none;text-align:right;word-break:break-all;}
     .bk-bill-row:last-child{border-bottom:none;}
     .bk-bill-row span,.bk-bill-row strong{color:#0a0f1e !important;}
     .bk-bill-row.total{font-size:.98rem;font-weight:900;color:var(--text);padding-top:.6rem;}
@@ -110,7 +113,19 @@
     .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
     @media(max-width:860px){.bk-grid{grid-template-columns:1fr;}.bk-receipt{position:static;}}
-    @media(max-width:560px){.bk-step-lbl{display:none;}.bk-conn{width:1rem;}.bk-card{padding:.85rem;border-radius:14px;}.bk-wrap{padding:.75rem 1rem 4rem;}.bk-btn-next,.bk-btn-back{font-size:.85rem;}}
+    @media(max-width:560px){
+      .bk-step-lbl{display:none;}
+      .bk-conn{width:.75rem;}
+      .bk-stepper{padding:0;}
+      .bk-card{padding:.85rem;border-radius:14px;}
+      .bk-wrap{padding:.75rem .85rem 4rem;}
+      .bk-btn-next,.bk-btn-back{font-size:.85rem;}
+      .bk-bill{padding:.85rem;}
+      .bk-bill-row{font-size:.8rem;}
+      .bk-ticket-inner{padding:.75rem;}
+      .bk-ticket-name{font-size:.84rem;}
+      .bk-ticket-price{font-size:.9rem;}
+    }
   </style>
 </head>
 <body>
@@ -138,7 +153,7 @@
   </div>
 </nav>
 
-<div style="width:100%;box-sizing:border-box;overflow-x:hidden;">
+<div style="width:100%;max-width:100%;overflow-x:hidden;">
 <div class="bk-stepper-wrap">
   <div class="bk-stepper">
     <div class="bk-step active" id="tab1"><div class="bk-step-num">1</div><span class="bk-step-lbl">Your Details</span></div>
