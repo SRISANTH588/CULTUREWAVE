@@ -542,6 +542,9 @@ document.querySelectorAll('.sb-item[data-view]').forEach(btn => {
   btn.addEventListener('click', () => switchView(btn.dataset.view));
 });
 
+// show default view on load
+switchView('bookings');
+
 // ── BOOKINGS ──
 async function loadBookings() {
   try {
