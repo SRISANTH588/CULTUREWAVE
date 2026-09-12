@@ -31,7 +31,7 @@
     .bk-step.active .bk-step-lbl{color:#fff;}
     .bk-step.done .bk-step-lbl{color:rgba(126,179,255,.7);}
     .bk-conn{flex:none;width:2rem;height:2px;background:rgba(255,255,255,.12);margin-bottom:1rem;}
-    .bk-wrap{max-width:640px;margin:0 auto;padding:1.2rem 1.5rem 4rem;overflow-x:hidden;box-sizing:border-box;width:100%;}
+    .bk-wrap{max-width:640px;margin:0 auto;padding:1.2rem 1.25rem 4rem;overflow-x:hidden;box-sizing:border-box;width:100%;}
     .bk-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;align-items:start;width:100%;box-sizing:border-box;}
     .bk-panel{display:none;flex-direction:column;gap:1rem;}
     .bk-panel.active{display:flex;}
@@ -110,7 +110,7 @@
     .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
     @media(max-width:860px){.bk-grid{grid-template-columns:1fr;}.bk-receipt{position:static;}}
-    @media(max-width:560px){.bk-step-lbl{display:none;}.bk-conn{width:1rem;}.bk-card{padding:.9rem;border-radius:16px;}.bk-wrap{padding:.9rem 1.5rem 4rem;}.bk-btn-next,.bk-btn-back{font-size:.85rem;}}
+    @media(max-width:560px){.bk-step-lbl{display:none;}.bk-conn{width:1rem;}.bk-card{padding:.85rem;border-radius:14px;}.bk-wrap{padding:.75rem 1rem 4rem;}.bk-btn-next,.bk-btn-back{font-size:.85rem;}}
   </style>
 </head>
 <body>
@@ -363,9 +363,11 @@ function goStep(n){
     if(i===n) tab.classList.add("active");
   }
   document.querySelector(".bk-trust").style.display = n === 1 ? "none" : "grid";
-  document.getElementById("bkReceipt").style.display = n === 1 ? "none" : "block";
-  document.querySelector(".bk-grid").style.gridTemplateColumns = n === 1 ? "1fr" : "1fr 320px";
-  document.querySelector(".bk-wrap").style.maxWidth = n === 1 ? "640px" : "960px";
+  const isMobile = window.innerWidth <= 860;
+  const showReceipt = n !== 1 && !isMobile;
+  document.getElementById("bkReceipt").style.display = showReceipt ? "block" : "none";
+  document.querySelector(".bk-grid").style.gridTemplateColumns = showReceipt ? "1fr 320px" : "1fr";
+  document.querySelector(".bk-wrap").style.maxWidth = showReceipt ? "960px" : "640px";
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
