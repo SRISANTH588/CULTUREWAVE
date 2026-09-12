@@ -3123,43 +3123,56 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 });
 
 (async () => {
-  const user = await getCurrentUser();
-  if (!user) return location.href = 'login.html';
-  myUid = user.uid;
-  window.myUid = user.uid;
+  try {
+    const user = await getCurrentUser();
+    if (!user) return location.href = 'login.html';
+    myUid = user.uid;
+    window.myUid = user.uid;
 
-  const init = (user.name||'C').trim()[0].toUpperCase();
-  ['sideAvatar','topAvatar'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=init; });
-  const sidebarName = document.getElementById('sidebarName');
-  const sidebarRole = document.getElementById('sidebarRole');
-  const topName = document.getElementById('topName');
-  if(sidebarName) sidebarName.textContent = (user.name||'Client').split(' ')[0] + (user.name?.split(' ')[1] ? ' '+user.name.split(' ')[1][0]+'...' : '');
-  if(sidebarRole) sidebarRole.textContent = 'Owner';
-  if(topName) topName.textContent = 'User';
+    const init = (user.name||'C').trim()[0].toUpperCase();
+    ['sideAvatar','topAvatar'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=init; });
+    const sidebarName = document.getElementById('sidebarName');
+    const sidebarRole = document.getElementById('sidebarRole');
+    const topName = document.getElementById('topName');
+    if(sidebarName) sidebarName.textContent = (user.name||'Client').split(' ')[0] + (user.name?.split(' ')[1] ? ' '+user.name.split(' ')[1][0]+'...' : '');
+    if(sidebarRole) sidebarRole.textContent = 'Owner';
+    if(topName) topName.textContent = 'User';
 
-  // load events — fetch all and filter client-side to handle any ownerId mismatch
-  onSnapshot(
-    query(collection(db,'events'), limit(200)),
-    snap => {
-      const all = snap.docs.map(d=>({id:d.id,...d.data()}));
-      const mine = all.filter(e=> e.ownerId===myUid || e.uid===myUid || e.createdBy===myUid);
-      allEvents = (mine.length ? mine : all)
-        .sort((a,b)=>{ const ta=a.createdAt?.seconds||0; const tb=b.createdAt?.seconds||0; return tb-ta; });
-      window.allEvents = allEvents;
-      renderEvents();
-      renderOverview();
-      populateIgEventDropdown();
-    }
-  );
+    const saved = (()=>{ try{ return localStorage.getItem('cwDashView')||'overview'; }catch{ return 'overview'; }})();
+    if(typeof window.switchView === 'function') window.switchView(saved);
 
-  loadProfile(myUid);
-  loadFinance(myUid);
-  loadAnalytics(myUid);
-  loadWhatsAppStats(myUid);
-  loadInquiries(myUid);
+    onSnapshot(
+      query(collection(db,'events'), limit(200)),
+      snap => {
+        try {
+          const all = snap.docs.map(d=>({id:d.id,...d.data()}));
+          const mine = all.filter(e=> e.ownerId===myUid || e.uid===myUid || e.createdBy===myUid);
+          allEvents = (mine.length ? mine : all)
+            .sort((a,b)=>{ const ta=a.createdAt?.seconds||0; const tb=b.createdAt?.seconds||0; return tb-ta; });
+          window.allEvents = allEvents;
+          renderEvents();
+          renderOverview();
+          populateIgEventDropdown();
+        } catch(e) { console.error('events snapshot error:', e); }
+      }
+    );
 
-  const saved = (()=>{ try{ return localStorage.getItem('cwDashView')||'overview'; }catch{ return 'overview'; }})();
-  switchView(saved);
+    loadProfile(myUid);
+    loadFinance(myUid);
+    loadAnalytics(myUid);
+    loadWhatsAppStats(myUid);
+    loadInquiries(myUid);
+  } catch(err) {
+    console.error('Dashboard boot error:', err);
+    document.body.innerHTML = `<div style="display:grid;place-items:center;min-height:100vh;font-family:Inter,sans-serif;background:#f8f9fa;">
+      <div style="background:#fff;border:1px solid #e9ecef;border-radius:16px;padding:2rem;max-width:480px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:1rem;">⚠️</div>
+        <h2 style="font-size:1.1rem;font-weight:700;color:#1a1a2e;margin-bottom:.5rem;">Dashboard failed to load</h2>
+        <p style="font-size:.84rem;color:#868e96;margin-bottom:1.5rem;">${err.message}</p>
+        <a href="login.html" style="display:inline-block;padding:.6rem 1.5rem;background:#3b5bdb;color:#fff;border-radius:8px;font-weight:700;font-size:.88rem;">Back to Login</a>
+      </div>
+    </div>`;
+  }
 })();
 
 // Mobile sidebar
