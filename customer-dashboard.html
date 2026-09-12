@@ -268,3 +268,422 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     </div>
   </header>
   <div class="content">
+
+    <!-- BOOKINGS VIEW -->
+    <div id="view-bookings" class="view-panel">
+      <div class="page-body">
+        <div class="hero-hdr" id="heroHdr">
+          <div>
+            <div class="hero-title" id="heroTitle">Welcome back 👋</div>
+            <div class="hero-sub" id="heroSub">Here are your bookings</div>
+          </div>
+        </div>
+        <div class="tabs">
+          <button class="tab active" onclick="filterBookings('all',this)">All <span class="tab-count" id="tabAll">0</span></button>
+          <button class="tab" onclick="filterBookings('confirmed',this)">Confirmed <span class="tab-count" id="tabConfirmed">0</span></button>
+          <button class="tab" onclick="filterBookings('pending',this)">Pending <span class="tab-count" id="tabPending">0</span></button>
+          <button class="tab" onclick="filterBookings('cancelled',this)">Cancelled <span class="tab-count" id="tabCancelled">0</span></button>
+        </div>
+        <div id="bookingsList"></div>
+      </div>
+    </div>
+
+    <!-- UPCOMING VIEW -->
+    <div id="view-upcoming" class="view-panel" style="display:none;">
+      <div class="page-body">
+        <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;margin-bottom:1rem;">📅 Upcoming Events</div>
+        <div id="upcomingList"></div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS VIEW -->
+    <div id="view-notifications" class="view-panel" style="display:none;">
+      <div class="page-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;">🔔 Notifications</div>
+          <button onclick="markAllRead()" style="font-size:.78rem;font-weight:700;color:var(--p);border:0;background:none;cursor:pointer;">Mark all read</button>
+        </div>
+        <div id="notifList"><div style="text-align:center;padding:3rem 1rem;color:#9ca3af;">No notifications yet</div></div>
+      </div>
+    </div>
+
+    <!-- SUPPORT VIEW -->
+    <div id="view-support" class="view-panel" style="display:none;">
+      <div class="page-body">
+        <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;margin-bottom:1rem;">💬 Customer Support</div>
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+          <a href="https://wa.me/916305183601" target="_blank" class="support-card">
+            <div class="support-icon" style="background:#dcfce7;">💬</div>
+            <div><div style="font-size:.9rem;font-weight:700;color:#0a0f1e;">WhatsApp Support</div><div style="font-size:.76rem;color:#6b7280;margin-top:.15rem;">Chat with us on WhatsApp</div></div>
+          </a>
+          <a href="mailto:support.culturewave@gmail.com" class="support-card">
+            <div class="support-icon" style="background:#eff6ff;">📧</div>
+            <div><div style="font-size:.9rem;font-weight:700;color:#0a0f1e;">Email Support</div><div style="font-size:.76rem;color:#6b7280;margin-top:.15rem;">support.culturewave@gmail.com</div></div>
+          </a>
+          <a href="customer-service.html" class="support-card">
+            <div class="support-icon" style="background:#fef9c3;">📋</div>
+            <div><div style="font-size:.9rem;font-weight:700;color:#0a0f1e;">Help Center</div><div style="font-size:.76rem;color:#6b7280;margin-top:.15rem;">FAQs and guides</div></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFUNDS VIEW -->
+    <div id="view-refunds" class="view-panel" style="display:none;">
+      <div class="page-body">
+        <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;margin-bottom:1rem;">💸 Refund Policy</div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.2rem;">
+          <div class="refund-step"><div class="refund-step-num">1</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Request within 24 hours</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Cancellations must be made at least 24 hours before the event.</div></div></div>
+          <div class="refund-step"><div class="refund-step-num">2</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Contact support</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Reach out via WhatsApp or email with your booking code.</div></div></div>
+          <div class="refund-step"><div class="refund-step-num">3</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Refund processed in 5–7 days</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Refunds are credited to the original payment method.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE VIEW -->
+    <div id="view-profile" class="view-panel" style="display:none;">
+      <div class="page-body">
+        <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;margin-bottom:1rem;">👤 My Profile</div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.4rem;display:flex;flex-direction:column;gap:.85rem;">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1242c5,#2f6bff);display:grid;place-items:center;font-size:1.4rem;font-weight:800;color:#fff;" id="profileAvatar">U</div>
+            <div><div style="font-size:1rem;font-weight:800;color:#0a0f1e;" id="profileName">-</div><div style="font-size:.8rem;color:#6b7280;" id="profileEmail">-</div></div>
+          </div>
+          <div style="height:1px;background:var(--border);"></div>
+          <div style="display:grid;gap:.5rem;">
+            <div style="display:flex;justify-content:space-between;font-size:.84rem;"><span style="color:#6b7280;">Phone</span><span style="font-weight:700;color:#0a0f1e;" id="profilePhone">-</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:.84rem;"><span style="color:#6b7280;">Member since</span><span style="font-weight:700;color:#0a0f1e;" id="profileJoined">-</span></div>
+          </div>
+          <button onclick="doLogout()" style="width:100%;padding:.75rem;border-radius:10px;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;font-size:.88rem;font-weight:700;cursor:pointer;">⏻ Logout</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+</div><!-- end .main -->
+</div><!-- end .layout -->
+
+<!-- QR MODAL -->
+<div class="modal-overlay" id="qrModal">
+  <div class="modal">
+    <div class="modal-ticket">
+      <div class="modal-ticket-top">
+        <h3 id="modalEventName">Event</h3>
+        <p id="modalEventVenue">Venue</p>
+      </div>
+      <div class="modal-tear"></div>
+      <div class="modal-ticket-body">
+        <div class="modal-qr-box" id="modalQrBox"></div>
+        <div style="width:100%;">
+          <div class="modal-detail-row"><span>Booking ID</span><span id="modalBookingId">-</span></div>
+          <div class="modal-detail-row"><span>Date</span><span id="modalDate">-</span></div>
+          <div class="modal-detail-row"><span>Tickets</span><span id="modalTickets">-</span></div>
+          <div class="modal-detail-row"><span>Amount</span><span id="modalAmount">-</span></div>
+          <div class="modal-detail-row"><span>Status</span><span id="modalStatus">-</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn ghost" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <button class="mbn-item active" onclick="switchView('bookings',this)">
+    <div class="mbn-item-wrap"><span class="mbn-icon">🎟️</span><span class="mbn-badge" id="mbnBadgeBookings" style="display:none;"></span></div>
+    <span>Bookings</span>
+  </button>
+  <button class="mbn-item" onclick="switchView('upcoming',this)">
+    <span class="mbn-icon">📅</span><span>Upcoming</span>
+  </button>
+  <button class="mbn-item" onclick="switchView('notifications',this)">
+    <div class="mbn-item-wrap"><span class="mbn-icon">🔔</span><span class="mbn-badge" id="mbnBadgeNotif" style="display:none;"></span></div>
+    <span>Alerts</span>
+  </button>
+  <button class="mbn-item" onclick="switchView('profile',this)">
+    <span class="mbn-icon">👤</span><span>Profile</span>
+  </button>
+</nav>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain:"ogshootsluxe-36740.firebaseapp.com",
+  projectId:"ogshootsluxe-36740",
+  storageBucket:"ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId:"5471814825",
+  appId:"1:5471814825:web:07e84f2f88486da817d5b8"
+});
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+let currentUser = null;
+let allBookings  = [];
+let allNotifs    = [];
+
+// ── AUTH ──
+auth.onAuthStateChanged(async user => {
+  if (!user) { window.location.href = 'login.html'; return; }
+  currentUser = user;
+  const name = user.displayName || user.email.split('@')[0];
+  const initial = name.charAt(0).toUpperCase();
+  ['sideAvatar','topAvatar','profileAvatar'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=initial; });
+  document.getElementById('sidebarName').textContent = name;
+  document.getElementById('sidebarEmail').textContent = user.email;
+  document.getElementById('topName').textContent = name;
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileEmail').textContent = user.email;
+  document.getElementById('heroTitle').textContent = 'Welcome back, ' + name.split(' ')[0] + ' 👋';
+
+  // load extra profile info
+  try {
+    const snap = await db.collection('users').doc(user.uid).get();
+    if (snap.exists()) {
+      const d = snap.data();
+      document.getElementById('profilePhone').textContent = d.whatsapp || d.phone || '-';
+      if (d.createdAt) {
+        const dt = d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt);
+        document.getElementById('profileJoined').textContent = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      }
+    }
+  } catch(e) {}
+
+  loadBookings();
+  loadNotifications();
+  loadUpcoming();
+});
+
+// ── VIEWS ──
+function switchView(name) {
+  document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById('view-' + name);
+  if (panel) panel.style.display = '';
+
+  document.querySelectorAll('.sb-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  document.querySelectorAll('.mbn-item').forEach(b => b.classList.remove('active'));
+
+  const titles = {bookings:'🎟️ My Bookings',upcoming:'📅 Upcoming Events',notifications:'🔔 Notifications',support:'💬 Support',refunds:'💸 Refund Policy',profile:'👤 My Profile'};
+  document.getElementById('pageTitle').textContent = titles[name] || '';
+
+  if (name === 'notifications') markAllRead();
+  closeSidebar();
+}
+
+// sidebar nav clicks
+document.querySelectorAll('.sb-item[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => switchView(btn.dataset.view));
+});
+
+// ── BOOKINGS ──
+async function loadBookings() {
+  try {
+    const snap = await db.collection('bookings').where('userId','==',currentUser.uid).orderBy('createdAt','desc').get();
+    allBookings = snap.docs.map(d => ({id:d.id,...d.data()}));
+    renderBookings(allBookings);
+    updateBookingCounts();
+  } catch(e) {
+    // fallback without orderBy
+    try {
+      const snap = await db.collection('bookings').where('userId','==',currentUser.uid).get();
+      allBookings = snap.docs.map(d => ({id:d.id,...d.data()}));
+      renderBookings(allBookings);
+      updateBookingCounts();
+    } catch(e2) { console.warn('Bookings:', e2.message); }
+  }
+}
+
+function updateBookingCounts() {
+  const all = allBookings.length;
+  const confirmed = allBookings.filter(b => ['confirmed','paid'].includes(String(b.status).toLowerCase())).length;
+  const pending   = allBookings.filter(b => String(b.status).toLowerCase() === 'pending').length;
+  const cancelled = allBookings.filter(b => String(b.status).toLowerCase() === 'cancelled').length;
+  document.getElementById('tabAll').textContent = all;
+  document.getElementById('tabConfirmed').textContent = confirmed;
+  document.getElementById('tabPending').textContent = pending;
+  document.getElementById('tabCancelled').textContent = cancelled;
+  document.getElementById('heroSub').textContent = all + ' booking' + (all!==1?'s':'') + ' total';
+  if (all > 0) { document.getElementById('bookingsBadge').textContent=all; document.getElementById('bookingsBadge').style.display=''; }
+  if (all > 0) { document.getElementById('mbnBadgeBookings').textContent=all; document.getElementById('mbnBadgeBookings').style.display=''; }
+}
+
+function filterBookings(filter, btn) {
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const filtered = filter === 'all' ? allBookings : allBookings.filter(b => String(b.status).toLowerCase() === filter || (filter==='confirmed' && String(b.status).toLowerCase()==='paid'));
+  renderBookings(filtered);
+}
+
+function renderBookings(list) {
+  const el = document.getElementById('bookingsList');
+  if (!list.length) { el.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><div style="font-size:2.5rem;margin-bottom:.5rem;">🎟️</div><div style="font-weight:700;">No bookings yet</div><div style="font-size:.82rem;margin-top:.3rem;">Browse events and book your first experience!</div><a href="events.html" style="display:inline-block;margin-top:1rem;padding:.6rem 1.4rem;border-radius:999px;background:var(--p);color:#fff;font-size:.84rem;font-weight:700;">Browse Events</a></div>'; return; }
+  el.innerHTML = list.map(b => {
+    const status = String(b.status||'pending').toLowerCase();
+    const statusLabel = status === 'paid' ? 'confirmed' : status;
+    const price = b.totalAmount || b.amount || b.price || 0;
+    const tickets = b.quantity || b.tickets || 1;
+    let dateStr = '-';
+    try { const dt = b.eventDate?.toDate ? b.eventDate.toDate() : (b.eventDate ? new Date(b.eventDate) : null); if(dt) dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
+    return `<div class="bk-card" style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:.75rem;">
+      <div class="bk-card-top">
+        <div class="bk-card-emoji">${b.eventEmoji||'🎉'}</div>
+        <div class="bk-card-info">
+          <div class="bk-card-name">${b.eventName||'Event'}</div>
+          <div class="bk-card-venue">${b.venueName||b.venue||''}</div>
+        </div>
+        <div class="bk-card-status"><span class="status-pill ${statusLabel}">${statusLabel}</span></div>
+      </div>
+      <div class="bk-card-body">
+        <div><div class="bk-detail-label">Date</div><div class="bk-detail-val">${dateStr}</div></div>
+        <div><div class="bk-detail-label">Tickets</div><div class="bk-detail-val">${tickets}</div></div>
+        <div><div class="bk-detail-label">Amount</div><div class="bk-detail-val blue">${price?'₹'+Number(price).toLocaleString('en-IN'):'Free'}</div></div>
+        <div class="bk-card-actions">
+          <button class="bk-act-btn primary" onclick="showQR('${b.id}')">🎫 Ticket</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── NOTIFICATIONS ──
+async function loadNotifications() {
+  try {
+    const snap = await db.collection('notifications')
+      .where('userId','==',currentUser.uid)
+      .orderBy('createdAt','desc')
+      .limit(30)
+      .get();
+    allNotifs = snap.docs.map(d => ({id:d.id,...d.data()}));
+    renderNotifications();
+    updateNotifBadge();
+  } catch(e) {
+    // fallback without orderBy
+    try {
+      const snap = await db.collection('notifications').where('userId','==',currentUser.uid).get();
+      allNotifs = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b) => {
+        const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt||0);
+        const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt||0);
+        return tb - ta;
+      });
+      renderNotifications();
+      updateNotifBadge();
+    } catch(e2) { console.warn('Notifications:', e2.message); }
+  }
+}
+
+function renderNotifications() {
+  const el = document.getElementById('notifList');
+  if (!allNotifs.length) { el.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:#9ca3af;">No notifications yet</div>'; return; }
+  el.innerHTML = allNotifs.map(n => {
+    let timeStr = '';
+    try { const dt = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(n.createdAt); timeStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'}); } catch(e){}
+    return `<div class="notif-item">
+      <div class="notif-dot ${n.read?'read':''}"></div>
+      <div class="notif-content">
+        <strong>${n.title||'Notification'}</strong>
+        <span>${n.message||n.body||''}</span>
+      </div>
+      <div class="notif-time">${timeStr}</div>
+    </div>`;
+  }).join('');
+}
+
+function updateNotifBadge() {
+  const unread = allNotifs.filter(n => !n.read).length;
+  const badge = document.getElementById('notifBadge');
+  const dot   = document.getElementById('notifDot');
+  const mbn   = document.getElementById('mbnBadgeNotif');
+  if (unread > 0) {
+    badge.textContent = unread; badge.style.display = '';
+    dot.style.display = '';
+    mbn.textContent = unread; mbn.style.display = '';
+  } else {
+    badge.style.display = 'none';
+    dot.style.display = 'none';
+    mbn.style.display = 'none';
+  }
+}
+
+async function markAllRead() {
+  const unread = allNotifs.filter(n => !n.read);
+  if (!unread.length) return;
+  const batch = db.batch();
+  unread.forEach(n => batch.update(db.collection('notifications').doc(n.id), {read:true}));
+  try { await batch.commit(); allNotifs.forEach(n => n.read=true); updateNotifBadge(); renderNotifications(); } catch(e) {}
+}
+
+// ── UPCOMING ──
+async function loadUpcoming() {
+  try {
+    const now = new Date();
+    const snap = await db.collection('events').where('status','==','published').limit(100).get();
+    const docs = snap.docs.filter(d => {
+      const dt = d.data().startDate;
+      if (!dt) return false;
+      try { const date = dt.toDate ? dt.toDate() : new Date(String(dt).slice(0,10)+'T00:00:00'); return date >= now; } catch(e) { return false; }
+    }).slice(0,10);
+    const el = document.getElementById('upcomingList');
+    if (!docs.length) { el.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:#9ca3af;">No upcoming events found</div>'; return; }
+    const grads = ['linear-gradient(135deg,#1242c5,#2f6bff)','linear-gradient(135deg,#7c3aed,#a855f7)','linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#065f46,#34d399)'];
+    el.innerHTML = docs.map((doc,i) => {
+      const d = doc.data();
+      const price = d.tickets?.[0]?.price || d.price || 0;
+      let dateStr = '';
+      try { const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00'); dateStr = dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}); } catch(e){}
+      return `<a href="event-detail.html?eventId=${doc.id}" class="ev-card" style="margin-bottom:.75rem;text-decoration:none;">
+        <div class="ev-card-img" style="${d.cardImgUrl||d.coverUrl?`background:url('${d.cardImgUrl||d.coverUrl}') center/cover no-repeat`:grads[i%grads.length]};">${!(d.cardImgUrl||d.coverUrl)?'🎉':''}</div>
+        <div class="ev-card-body">
+          <div class="ev-card-name">${d.name||'Event'}</div>
+          <div class="ev-card-meta"><span>📅 ${dateStr}</span><span>📍 ${d.venueName||d.venue||d.city||'India'}</span></div>
+        </div>
+        <div class="ev-card-btn"><span class="ev-card-price">${price?'₹'+Number(price).toLocaleString('en-IN'):'Free'}</span></div>
+      </a>`;
+    }).join('');
+  } catch(e) { console.warn('Upcoming:', e.message); }
+}
+
+// ── QR MODAL ──
+function showQR(bookingId) {
+  const b = allBookings.find(x => x.id === bookingId);
+  if (!b) return;
+  document.getElementById('modalEventName').textContent = b.eventName || 'Event';
+  document.getElementById('modalEventVenue').textContent = b.venueName || b.venue || '';
+  document.getElementById('modalBookingId').textContent = bookingId.slice(0,8).toUpperCase();
+  document.getElementById('modalTickets').textContent = b.quantity || b.tickets || 1;
+  document.getElementById('modalAmount').textContent = b.totalAmount ? '₹'+Number(b.totalAmount).toLocaleString('en-IN') : 'Free';
+  document.getElementById('modalStatus').textContent = b.status || 'confirmed';
+  let dateStr = '-';
+  try { const dt = b.eventDate?.toDate ? b.eventDate.toDate() : new Date(b.eventDate); dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
+  document.getElementById('modalDate').textContent = dateStr;
+  const qrBox = document.getElementById('modalQrBox');
+  qrBox.innerHTML = '';
+  if (typeof QRCode !== 'undefined') {
+    new QRCode(qrBox, {text: bookingId, width:140, height:140, colorDark:'#0a0f1e', colorLight:'#fff'});
+  } else {
+    qrBox.textContent = bookingId.slice(0,8).toUpperCase();
+  }
+  document.getElementById('qrModal').classList.add('open');
+}
+function closeModal() { document.getElementById('qrModal').classList.remove('open'); }
+document.getElementById('qrModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+// ── SIDEBAR ──
+function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('sbOverlay').classList.add('open'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('open'); }
+
+// ── LOGOUT ──
+function doLogout() { auth.signOut().then(() => window.location.href='login.html'); }
+document.getElementById('logoutBtn').addEventListener('click', doLogout);
+
+// ── TOAST ──
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+</script>
+</body>
+</html>
