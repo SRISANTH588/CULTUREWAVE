@@ -888,6 +888,31 @@
           redirect(role);
         } catch(e) {
           if (['auth/user-not-found', 'auth/invalid-credential', 'auth/wrong-password'].includes(e.code)) {
+            const bookingSnap = await getDocs(query(collection(db, 'bookings'), where('customerEmail', '==', email)));
+            if (!bookingSnap.empty) {
+              const booking = bookingSnap.docs[0].data();
+              try {
+                const tempPass = 'CW_OTP_' + email.split('@')[0].slice(0,6) + '_2024';
+                const { user } = await createUserWithEmailAndPassword(auth, email, tempPass);
+                await updateProfile(user, { displayName: booking.customerName || email.split('@')[0] });
+                await setDoc(doc(db, 'users', user.uid), {
+                  name: booking.customerName || email.split('@')[0], email,
+                  phone: booking.customerPhone || '', whatsapp: booking.customerPhone || '',
+                  role: 'customer', createdAt: Date.now()
+                }, { merge: true });
+                setStatus('Welcome back! Opening your customer dashboard…', 'success');
+                redirect('customer');
+                return;
+              } catch(accountError) {
+                if (accountError.code === 'auth/email-already-in-use') {
+                  showPasswordLogin();
+                  setStatus('An account already exists for this booking. Sign in with your username and password.', 'warning');
+                  return;
+                }
+                setStatus(accountError.message, 'warning');
+                return;
+              }
+            }
             document.getElementById('signupEmail').value = email;
             setMode('signup');
             setStatus('No OTP account found. Please sign up, or use your username and password.', 'warning');
