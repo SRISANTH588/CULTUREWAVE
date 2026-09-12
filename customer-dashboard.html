@@ -869,8 +869,8 @@ function submitRefundRequest() {
 📱 *Phone:* ${b.customerPhone || ''}
 💰 *Amount Paid:* ${b.amount ? '₹' + Number(b.amount).toLocaleString('en-IN') : 'Free'}
 
-❌ *Reason:* ${reason}${note ? '
-📝 *Note:* ' + note : ''}
+❌ *Reason:* ${reason}${note ? `
+📝 *Note:* ${note}` : ''}
 
 Please process my refund request. Thank you.`;
   window.open('https://wa.me/916305183601?text=' + encodeURIComponent(msg), '_blank');
