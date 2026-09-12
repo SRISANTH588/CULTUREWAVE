@@ -44,6 +44,7 @@
     .bk-input input,.bk-input select{flex:1;border:none;outline:none;background:transparent;font:inherit;font-size:.9rem;color:var(--text);}
     .bk-input input::placeholder{color:#b0bcd4;}
     .bk-row{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+    @media(max-width:560px){.bk-row{grid-template-columns:1fr 1fr !important;}}
     .bk-verify-row{display:flex;gap:.5rem;align-items:stretch;}
     .bk-verify-row .bk-input{flex:1;}
     .bk-verify-btn{height:48px;padding:0 1rem;background:var(--blue);color:#fff;border:0;border-radius:12px;font-size:.78rem;font-weight:800;white-space:nowrap;flex:none;}
@@ -76,9 +77,11 @@
     .bk-bill{background:#f7faff;border:1px solid var(--border);border-radius:16px;padding:1rem 1.2rem;}
     .bk-bill-row{display:flex;justify-content:space-between;font-size:.86rem;color:#374151;font-weight:600;padding:.38rem 0;border-bottom:1px solid rgba(18,66,197,.06);}
     .bk-bill-row:last-child{border-bottom:none;}
+    .bk-bill-row span,.bk-bill-row strong{color:#0a0f1e !important;}
     .bk-bill-row.total{font-size:.98rem;font-weight:900;color:var(--text);padding-top:.6rem;}
-    .bk-bill-row.total strong{color:var(--blue);font-size:1.1rem;}
+    .bk-bill-row.total strong{color:var(--blue) !important;font-size:1.1rem;}
     .bk-bill-row.discount{color:#166534;}
+    .bk-bill-row.discount span,.bk-bill-row.discount strong{color:#166534 !important;}
     .bk-tc{display:flex;align-items:flex-start;gap:.6rem;padding:.85rem;background:#f7faff;border:1px solid var(--border);border-radius:12px;font-size:.8rem;color:#475569;line-height:1.6;}
     .bk-tc input[type=checkbox]{margin-top:.15rem;flex:none;width:16px;height:16px;accent-color:var(--blue);}
     .bk-btn-next{width:100%;height:52px;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:14px;font-size:.95rem;font-weight:900;box-shadow:0 6px 20px rgba(18,66,197,.28);transition:transform .15s;}
@@ -94,9 +97,9 @@
     .bk-receipt-body{padding:1.2rem;}
     .bk-receipt-name{font-size:.98rem;font-weight:900;color:var(--text);margin-bottom:.15rem;}
     .bk-receipt-venue{font-size:.74rem;color:var(--muted);margin-bottom:.9rem;}
-    .bk-rrow{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);font-weight:600;padding:.32rem 0;border-bottom:1px solid #f0f4ff;}
+    .bk-rrow{display:flex;justify-content:space-between;font-size:.8rem;color:#374151;font-weight:600;padding:.32rem 0;border-bottom:1px solid #f0f4ff;}
     .bk-rrow:last-child{border-bottom:none;}
-    .bk-rrow strong{color:var(--text);}
+    .bk-rrow strong{color:#0a0f1e;}
     .bk-rtotal{display:flex;justify-content:space-between;font-weight:900;font-size:.95rem;color:var(--text);margin-top:.7rem;padding-top:.7rem;border-top:1.5px dashed var(--border);}
     .bk-rtotal span:last-child{color:var(--blue);font-size:1.05rem;}
     .bk-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin-top:.9rem;}
@@ -106,7 +109,7 @@
     .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
     @media(max-width:860px){.bk-grid{grid-template-columns:1fr;}.bk-receipt{position:static;}}
-    @media(max-width:560px){.bk-row{grid-template-columns:1fr;}.bk-step-lbl{display:none;}.bk-conn{width:1rem;}}
+    @media(max-width:560px){.bk-step-lbl{display:none;}.bk-conn{width:1rem;}}
   </style>
 </head>
 <body>
@@ -220,12 +223,12 @@
           <h2>Booking Summary</h2>
           <p class="sub">Review your details and apply any coupon.</p>
           <div style="display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.2rem;padding:.9rem;background:#f7faff;border:1px solid var(--border);border-radius:14px;">
-            <div style="font-size:.84rem;"><span style="color:var(--muted);">Event: </span><strong id="s3Event">—</strong></div>
-            <div style="font-size:.84rem;"><span style="color:var(--muted);">Name: </span><strong id="s3Name">—</strong></div>
-            <div style="font-size:.84rem;"><span style="color:var(--muted);">WhatsApp: </span><strong id="s3Phone">—</strong></div>
-            <div style="font-size:.84rem;"><span style="color:var(--muted);">Email: </span><strong id="s3Email">—</strong></div>
-            <div style="font-size:.84rem;"><span style="color:var(--muted);">Ticket: </span><strong id="s3Ticket">—</strong></div>
-            <div style="font-size:.84rem;"><span style="color:var(--muted);">Quantity: </span><strong id="s3Qty">—</strong></div>
+            <div style="font-size:.84rem;"><span style="color:#374151;">Event: </span><strong style="color:#0a0f1e;" id="s3Event">—</strong></div>
+            <div style="font-size:.84rem;"><span style="color:#374151;">Name: </span><strong style="color:#0a0f1e;" id="s3Name">—</strong></div>
+            <div style="font-size:.84rem;"><span style="color:#374151;">WhatsApp: </span><strong style="color:#0a0f1e;" id="s3Phone">—</strong></div>
+            <div style="font-size:.84rem;"><span style="color:#374151;">Email: </span><strong style="color:#0a0f1e;" id="s3Email">—</strong></div>
+            <div style="font-size:.84rem;"><span style="color:#374151;">Ticket: </span><strong style="color:#0a0f1e;" id="s3Ticket">—</strong></div>
+            <div style="font-size:.84rem;"><span style="color:#374151;">Quantity: </span><strong style="color:#0a0f1e;" id="s3Qty">—</strong></div>
           </div>
           <div class="bk-field">
             <span class="bk-label">Coupon Code</span>
