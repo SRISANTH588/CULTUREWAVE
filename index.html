@@ -231,6 +231,98 @@
     }
     .ogp-dot.active{background:#fff;}
 
+    /* ── SCENE STEALERS ── */
+    .ss-section{background:#000;padding:0 0 .5rem;border-top:1px solid rgba(255,255,255,.07);}
+    .ss-banner{
+      position:relative;overflow:hidden;
+      background:linear-gradient(135deg,#0a0a0a 0%,#1a1200 40%,#0a0a0a 100%);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:1.6rem 1.4rem 1.8rem;
+      min-height:130px;
+    }
+    .ss-banner::before{
+      content:'';
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse at 30% 50%,rgba(212,160,23,.18),transparent 60%),
+                 radial-gradient(ellipse at 80% 50%,rgba(212,160,23,.08),transparent 50%);
+      pointer-events:none;
+    }
+    .ss-stars{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:space-around;
+      font-size:1rem;color:rgba(255,255,255,.25);pointer-events:none;padding:0 .5rem;
+      letter-spacing:2rem;
+    }
+    .ss-stars span{font-size:.6rem;color:rgba(255,255,255,.15);}
+    .ss-left{position:relative;z-index:1;}
+    .ss-title{
+      font-family:'Georgia','Times New Roman',serif;
+      font-size:clamp(2.2rem,8vw,3rem);font-weight:900;font-style:italic;
+      line-height:.95;letter-spacing:-.02em;
+      background:linear-gradient(135deg,#f5c518 0%,#fff8dc 40%,#d4a017 70%,#f5c518 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 2px 8px rgba(212,160,23,.4));
+    }
+    .ss-right{position:relative;z-index:1;text-align:right;}
+    .ss-offer{
+      font-size:clamp(1.4rem,5vw,2rem);font-weight:900;letter-spacing:-.02em;
+      color:#fff;line-height:1;
+    }
+    .ss-pill{
+      display:inline-block;margin-top:.5rem;
+      padding:.3rem .9rem;border:1.5px solid rgba(255,255,255,.5);
+      border-radius:999px;font-size:.65rem;font-weight:800;
+      letter-spacing:.1em;text-transform:uppercase;color:#fff;
+    }
+    .ss-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .ss-scroll-wrap::-webkit-scrollbar{display:none;}
+    .ss-scroll{display:flex;gap:.85rem;padding:.9rem 1.2rem .4rem;width:max-content;}
+    .ss-card{
+      flex:0 0 160px;border-radius:14px;overflow:hidden;
+      background:#111;border:1px solid rgba(255,255,255,.08);
+      text-decoration:none;display:flex;flex-direction:column;
+      transition:transform .2s,box-shadow .2s;
+    }
+    .ss-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.6);}
+    .ss-poster{
+      width:100%;aspect-ratio:3/4;object-fit:cover;
+      background:#1a1a1a;display:block;
+    }
+    .ss-poster-placeholder{
+      width:100%;aspect-ratio:3/4;
+      background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+      display:grid;place-items:center;font-size:2.5rem;
+    }
+    .ss-card-body{padding:.55rem .65rem .7rem;}
+    .ss-price{
+      display:inline-block;margin-bottom:.35rem;
+      background:#f5c518;color:#000;
+      font-size:.62rem;font-weight:900;padding:.18rem .5rem;
+      border-radius:4px;letter-spacing:.02em;
+    }
+    .ss-name{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .ss-date-row{display:flex;align-items:center;gap:.4rem;margin-top:.3rem;}
+    .ss-date-box{background:#1a1a1a;border-radius:5px;padding:.2rem .35rem;text-align:center;flex:none;}
+    .ss-date-day{font-size:.72rem;font-weight:900;color:#fff;line-height:1;}
+    .ss-date-mon{font-size:.52rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;line-height:1;}
+    .ss-venue{font-size:.65rem;color:rgba(255,255,255,.4);font-weight:600;line-height:1.3;}
+    .ss-view-all-wrap{padding:.6rem 1.2rem 1.4rem;display:flex;justify-content:center;}
+    .ss-view-all{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.5rem 1.5rem;border:1px solid rgba(245,197,24,.3);
+      border-radius:999px;color:#f5c518;font-size:.82rem;font-weight:800;
+      text-decoration:none;transition:background .2s,border-color .2s;
+    }
+    .ss-view-all:hover{background:rgba(245,197,24,.1);border-color:#f5c518;}
+    @media(min-width:700px){
+      .ss-card{flex:0 0 180px;}
+      .ss-banner{padding:2rem 2rem 2.2rem;}
+    }
+    @media(min-width:900px){
+      .ss-scroll-wrap{max-width:1240px;margin:0 auto;}
+      .ss-scroll{padding:.9rem 1.4rem .4rem;}
+      .ss-banner{max-width:1240px;margin:0 auto;border-radius:0;}
+    }
+
     /* ── FINEST TABLES SECTION ── */
     .ft-section{background:#000;}
     .ft-banner{
@@ -1361,6 +1453,26 @@
     </div>
   </section>
 
+  <!-- SCENE STEALERS -->
+  <section class="ss-section">
+    <div class="ss-banner">
+      <div class="ss-stars">✦ <span>✦</span> ✦ <span>✦</span> ✦</div>
+      <div class="ss-left">
+        <div class="ss-title">Scene<br>Stealers</div>
+      </div>
+      <div class="ss-right">
+        <div class="ss-offer">UPTO 50% OFF</div>
+        <div class="ss-pill">LIMITED TIME OFFER</div>
+      </div>
+    </div>
+    <div class="ss-scroll-wrap">
+      <div class="ss-scroll" id="ssScroll"></div>
+    </div>
+    <div class="ss-view-all-wrap">
+      <a href="events.html" class="ss-view-all">View all &#8594;</a>
+    </div>
+  </section>
+
   <!-- FINEST TABLES SECTION -->
   <section class="ft-section">
     <div class="ft-banner">
@@ -2119,6 +2231,62 @@
         scroll.appendChild(a);
       });
     }catch(e){ console.warn('TopVenues:', e.message); }
+  })();
+
+  // SCENE STEALERS
+  (async function loadSceneStealer(){
+    try{
+      const scroll = document.getElementById('ssScroll');
+      if(!scroll) return;
+      const now = new Date();
+      const snap = await _idb.collection('events').limit(200).get();
+      const docs = snap.docs
+        .filter(doc => {
+          const d = doc.data();
+          if(!isPublishedEvent(d)) return false;
+          try{
+            const dt = d.startDate?.toDate ? d.startDate.toDate() : d.startDate ? new Date(String(d.startDate).slice(0,10)+'T00:00:00') : null;
+            return dt && dt >= now;
+          }catch(e){ return false; }
+        })
+        .sort((a,b) => {
+          const pa = a.data().startDate?.seconds||0;
+          const pb = b.data().startDate?.seconds||0;
+          return pa - pb;
+        })
+        .slice(0, 12);
+      if(!docs.length){ document.querySelector('.ss-section').style.display='none'; return; }
+      docs.forEach(doc => {
+        const d = doc.data();
+        const price = d.tickets?.[0]?.price || d.price || 0;
+        const priceStr = price ? '\u20b9' + Number(price).toLocaleString('en-IN') : 'Free';
+        let dayStr = '', monStr = '';
+        try{
+          const dt = d.startDate?.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
+          dayStr = dt.getDate();
+          monStr = dt.toLocaleDateString('en-IN',{month:'short'}).toUpperCase();
+        }catch(e){}
+        const venue = d.venueName || d.venue || d.city || '';
+        const img = d.cardImgUrl || d.coverUrl || '';
+        const a = document.createElement('a');
+        a.className = 'ss-card';
+        a.href = `event-detail.html?eventId=${doc.id}`;
+        a.innerHTML = `
+          ${img
+            ? `<img class="ss-poster" src="${img}" alt="${d.name||''}" loading="lazy">`
+            : `<div class="ss-poster-placeholder">${d.eventEmoji||'🎉'}</div>`
+          }
+          <div class="ss-card-body">
+            <div class="ss-price">Starts at ${priceStr}</div>
+            <div class="ss-name">${d.name||'Event'}</div>
+            <div class="ss-date-row">
+              ${dayStr ? `<div class="ss-date-box"><div class="ss-date-day">${dayStr}</div><div class="ss-date-mon">${monStr}</div></div>` : ''}
+              <div class="ss-venue">${venue}</div>
+            </div>
+          </div>`;
+        scroll.appendChild(a);
+      });
+    }catch(e){ console.warn('SceneStealer:', e.message); }
   })();
 </script>
 <script>
