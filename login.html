@@ -556,26 +556,64 @@
 
           <!-- LOGIN FORM -->
           <form class="auth-form" data-auth-form="login">
-            <div class="form-field">
-              <span class="form-label">Email / Username</span>
-              <div class="form-input-wrap">
-                <span class="form-icon">👤</span>
-                <input id="loginPhone" type="text" placeholder="Email or username" autocomplete="username" />
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem;background:#f0f4ff;border-radius:12px;padding:.25rem;margin-bottom:1rem;border:1px solid rgba(18,66,197,.1);">
+              <button type="button" id="loginMethodPwd" onclick="setLoginMethod('pwd')" style="border:none;border-radius:9px;padding:.55rem;font-size:.82rem;font-weight:800;cursor:pointer;background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(18,66,197,.12);">🔒 Password</button>
+              <button type="button" id="loginMethodOtp" onclick="setLoginMethod('otp')" style="border:none;border-radius:9px;padding:.55rem;font-size:.82rem;font-weight:800;cursor:pointer;background:transparent;color:#6b7280;">📧 Email OTP</button>
+            </div>
+            <div id="loginPwdSection">
+              <div class="form-field">
+                <span class="form-label">Email / Username</span>
+                <div class="form-input-wrap">
+                  <span class="form-icon">👤</span>
+                  <input id="loginPhone" type="text" placeholder="Email or username" autocomplete="username" />
+                </div>
+              </div>
+              <div class="form-field">
+                <span class="form-label">Password</span>
+                <div class="form-input-wrap">
+                  <span class="form-icon">🔒</span>
+                  <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" />
+                  <button class="eye-btn" type="button" aria-label="Show password">◔</button>
+                </div>
+              </div>
+              <div class="form-row-split">
+                <label class="remember-label"><input type="checkbox" /> Remember me</label>
+                <a href="#" class="forgot-link">Forgot password?</a>
+              </div>
+              <button class="submit-btn" type="submit">Sign In →</button>
+            </div>
+            <div id="loginOtpSection" style="display:none;">
+              <div id="loginOtpStep1">
+                <div class="form-field">
+                  <span class="form-label">Email Address</span>
+                  <div class="form-input-wrap">
+                    <span class="form-icon">✉️</span>
+                    <input id="loginOtpEmail" type="email" placeholder="you@gmail.com" />
+                  </div>
+                </div>
+                <button class="submit-btn" type="button" onclick="sendLoginOtp()">Send OTP →</button>
+              </div>
+              <div id="loginOtpStep2" style="display:none;">
+                <div style="text-align:center;margin-bottom:1rem;">
+                  <div style="font-size:2rem;margin-bottom:.4rem;">📧</div>
+                  <div style="font-size:.9rem;font-weight:800;color:#0a0f1e;">Check your email</div>
+                  <div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">OTP sent to <strong id="loginOtpEmailDisplay"></strong></div>
+                </div>
+                <div class="form-field">
+                  <span class="form-label">6-Digit OTP</span>
+                  <div class="form-input-wrap">
+                    <span class="form-icon">🔑</span>
+                    <input id="loginOtpCode" type="text" placeholder="· · · · · ·" maxlength="6" inputmode="numeric" style="letter-spacing:.3em;font-size:1.1rem;font-weight:800;text-align:center;" />
+                  </div>
+                </div>
+                <button class="submit-btn" type="button" onclick="verifyLoginOtp()">Verify &amp; Login →</button>
+                <div style="text-align:center;margin-top:.6rem;">
+                  <button type="button" onclick="sendLoginOtp()" style="font-size:.8rem;font-weight:700;color:var(--blue);border:none;background:none;cursor:pointer;">Resend OTP</button>
+                  <span style="color:#d1d5db;margin:0 .4rem;">·</span>
+                  <button type="button" onclick="document.getElementById('loginOtpStep1').style.display='';document.getElementById('loginOtpStep2').style.display='none';" style="font-size:.8rem;font-weight:700;color:#6b7280;border:none;background:none;cursor:pointer;">Change email</button>
+                </div>
               </div>
             </div>
-            <div class="form-field">
-              <span class="form-label">Password</span>
-              <div class="form-input-wrap">
-                <span class="form-icon">🔒</span>
-                <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" />
-                <button class="eye-btn" type="button" aria-label="Show password">◔</button>
-              </div>
-            </div>
-            <div class="form-row-split">
-              <label class="remember-label"><input type="checkbox" /> Remember me</label>
-              <a href="#" class="forgot-link">Forgot password?</a>
-            </div>
-            <button class="submit-btn" type="submit">Sign In →</button>
             <div class="or-row"><span>or</span></div>
             <button class="google-btn" id="googleLoginBtn" type="button">
               <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true">
