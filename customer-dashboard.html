@@ -47,6 +47,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .content{flex:1;}
 .view{display:none;flex-direction:column;}
 .view.active{display:flex;}
+.view-panel{display:none;flex-direction:column;}
 .page-body{padding:1.5rem;display:flex;flex-direction:column;gap:1rem;}
 .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
 .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
@@ -524,12 +525,12 @@ auth.onAuthStateChanged(async user => {
 function switchView(name) {
   document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
   const panel = document.getElementById('view-' + name);
-  if (panel) panel.style.display = '';
+  if (panel) panel.style.display = 'flex';
 
   document.querySelectorAll('.sb-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === name));
   document.querySelectorAll('.mbn-item').forEach(b => b.classList.remove('active'));
 
-  const titles = {bookings:'🎟️ My Bookings',upcoming:'📅 Upcoming Events',notifications:'🔔 Notifications',support:'💬 Support',refunds:'💸 Refund Policy',profile:'👤 My Profile'};
+  const titles = {bookings:'🎟️ My Bookings',upcoming:'📅 Upcoming Events',notifications:'🔔 Notifications',support:'💬 Support',refunds:'💸 Refund & Cancellation',profile:'👤 My Profile'};
   document.getElementById('pageTitle').textContent = titles[name] || '';
 
   if (name === 'notifications') markAllRead();
