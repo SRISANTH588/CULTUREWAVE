@@ -236,6 +236,33 @@
       /* form */
       .auth-form { display: grid; gap: 1rem; }
       .auth-form[hidden] { display: none; }
+      .login-method-switch {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.3rem;
+        padding: 0.25rem;
+        border: 1px solid rgba(18,66,197,0.1);
+        border-radius: 12px;
+        background: #f0f4ff;
+      }
+      .login-method-switch button {
+        min-height: 42px;
+        padding: 0.5rem 0.35rem;
+        border: none;
+        border-radius: 9px;
+        background: transparent;
+        color: #6b7280;
+        font-size: 0.82rem;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .login-method-switch button.active {
+        background: #fff;
+        color: var(--blue);
+        box-shadow: 0 2px 8px rgba(18,66,197,0.12);
+      }
+      #loginPwdSection, #loginOtpSection { display: grid; gap: 1rem; }
+      #loginOtpSection[style*="display: none"] { display: none; }
       .form-field { display: grid; gap: 0.4rem; }
       .form-label {
         font-size: 0.72rem;
@@ -300,6 +327,7 @@
         font-size: 0.82rem;
         font-weight: 800;
         color: var(--blue);
+        white-space: nowrap;
       }
 
       .submit-btn {
@@ -493,6 +521,8 @@
       @media (max-width: 400px) {
         .auth-card { padding: 1.8rem 1.4rem; border-radius: 22px; }
         .auth-card-head h2 { font-size: 1.5rem; }
+        .form-row-split { align-items: flex-start; flex-direction: column; gap: 0.65rem; }
+        .forgot-link { align-self: flex-end; }
       }
     </style>
   </head>
@@ -556,9 +586,9 @@
 
           <!-- LOGIN FORM -->
           <form class="auth-form" data-auth-form="login">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem;background:#f0f4ff;border-radius:12px;padding:.25rem;margin-bottom:1rem;border:1px solid rgba(18,66,197,.1);">
-              <button type="button" id="loginMethodPwd" onclick="setLoginMethod('pwd')" style="border:none;border-radius:9px;padding:.55rem;font-size:.82rem;font-weight:800;cursor:pointer;background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(18,66,197,.12);">🔒 Password</button>
-              <button type="button" id="loginMethodOtp" onclick="setLoginMethod('otp')" style="border:none;border-radius:9px;padding:.55rem;font-size:.82rem;font-weight:800;cursor:pointer;background:transparent;color:#6b7280;">📧 Email OTP</button>
+            <div class="login-method-switch">
+              <button type="button" id="loginMethodPwd" class="active" onclick="setLoginMethod('pwd')">🔒 Password</button>
+              <button type="button" id="loginMethodOtp" onclick="setLoginMethod('otp')">📧 Email OTP</button>
             </div>
             <div id="loginPwdSection">
               <div class="form-field">
@@ -578,7 +608,7 @@
               </div>
               <div class="form-row-split">
                 <label class="remember-label"><input type="checkbox" /> Remember me</label>
-                <a href="#" class="forgot-link">Forgot password?</a>
+                <a href="#" id="forgotPasswordLink" class="forgot-link">Forgot password?</a>
               </div>
               <button class="submit-btn" type="submit">Sign In →</button>
             </div>
@@ -698,7 +728,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="module">
-      import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+      import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail,
         GoogleAuthProvider, signInWithPopup, updateProfile,
         doc, setDoc, getDoc, collection, query, where, getDocs, onSnapshot } from "./firebase.js";
 
@@ -789,14 +819,27 @@
         const isPwd = method === 'pwd';
         document.getElementById('loginPwdSection').style.display = isPwd ? '' : 'none';
         document.getElementById('loginOtpSection').style.display = isPwd ? 'none' : '';
-        document.getElementById('loginMethodPwd').style.background = isPwd ? '#fff' : 'transparent';
-        document.getElementById('loginMethodPwd').style.color = isPwd ? 'var(--blue)' : '#6b7280';
-        document.getElementById('loginMethodPwd').style.boxShadow = isPwd ? '0 2px 8px rgba(18,66,197,.12)' : 'none';
-        document.getElementById('loginMethodOtp').style.background = isPwd ? 'transparent' : '#fff';
-        document.getElementById('loginMethodOtp').style.color = isPwd ? '#6b7280' : 'var(--blue)';
-        document.getElementById('loginMethodOtp').style.boxShadow = isPwd ? 'none' : '0 2px 8px rgba(18,66,197,.12)';
+        document.getElementById('loginMethodPwd').classList.toggle('active', isPwd);
+        document.getElementById('loginMethodOtp').classList.toggle('active', !isPwd);
         authStatus.textContent = ''; delete authStatus.dataset.kind;
       }
+
+      document.getElementById('forgotPasswordLink').addEventListener('click', async event => {
+        event.preventDefault();
+        const email = loginPhone.value.trim();
+        if (!email || !email.includes('@')) {
+          setStatus('Enter your account email first, then select Forgot password.', 'warning');
+          loginPhone.focus();
+          return;
+        }
+        setStatus('Sending password-reset email…', 'info');
+        try {
+          await sendPasswordResetEmail(auth, email);
+          setStatus('Password-reset email sent. Check your inbox and spam folder.', 'success');
+        } catch (err) {
+          setStatus(err.code === 'auth/user-not-found' ? 'No account was found for that email.' : err.message, 'warning');
+        }
+      });
 
       async function sendLoginOtp() {
         const email = document.getElementById('loginOtpEmail').value.trim();

@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -58,7 +58,7 @@ async function logout() {
 export {
   app, auth, db,
   toEmail, getCurrentUser, requireAuth, logout,
-  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail,
   GoogleAuthProvider, signInWithPopup, updateProfile,
   doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
   collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp
