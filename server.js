@@ -432,7 +432,7 @@ const server = http.createServer(async (req, res) => {
     try {
       const filePath = join(publicDir, url.pathname.slice(1));
       let file = await readFile(filePath, "utf8");
-      if (!file.includes('firebase-config.js') && file.includes('</head>')) {
+      if (!file.includes('firebase-config.js') && !file.includes('from "./firebase.js"') && !file.includes("from './firebase.js'") && file.includes('</head>')) {
         file = file.replace(
           '</head>',
           '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="firebase-config.js"></script></head>'
