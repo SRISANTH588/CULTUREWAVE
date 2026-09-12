@@ -477,16 +477,20 @@ let allBookings  = [];
 let allNotifs    = [];
 
 // ── AUTH ──
+// Show loading state immediately
+document.getElementById('bookingsList').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><div style="font-size:1.5rem;margin-bottom:.5rem;">⏳</div><div style="font-weight:600;">Loading your bookings...</div></div>';
+
+let authResolved = false;
 let authTimeout = setTimeout(() => {
-  // If auth hasn't resolved in 8s, show error
-  if (!currentUser) {
+  if (!authResolved) {
+    document.getElementById('bookingsList').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><div style="font-size:2rem;margin-bottom:.5rem;">⚠️</div><div style="font-weight:700;margin-bottom:.5rem;">Session expired</div><div style="font-size:.82rem;margin-bottom:1rem;">Please log in again to view your bookings.</div><a href="login.html" style="display:inline-block;padding:.6rem 1.4rem;border-radius:999px;background:var(--p);color:#fff;font-size:.84rem;font-weight:700;">Go to Login</a></div>';
     document.getElementById('sidebarName').textContent = 'Not signed in';
     document.getElementById('sidebarEmail').textContent = '';
-    document.getElementById('bookingsList').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><div style="font-size:2rem;margin-bottom:.5rem;">⚠️</div><div style="font-weight:700;margin-bottom:.5rem;">Session expired</div><div style="font-size:.82rem;margin-bottom:1rem;">Please log in again to view your bookings.</div><a href="login.html" style="display:inline-block;padding:.6rem 1.4rem;border-radius:999px;background:var(--p);color:#fff;font-size:.84rem;font-weight:700;">Go to Login</a></div>';
   }
 }, 8000);
 
 auth.onAuthStateChanged(async user => {
+  authResolved = true;
   clearTimeout(authTimeout);
   if (!user) { window.location.href = 'login.html'; return; }
   currentUser = user;
