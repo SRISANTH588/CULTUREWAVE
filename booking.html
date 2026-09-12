@@ -223,8 +223,12 @@
               <button class="bk-qty-btn" onclick="changeQty(-1)">−</button>
               <span class="bk-qty-val" id="qtyVal">1</span>
               <button class="bk-qty-btn" onclick="changeQty(1)">+</button>
-              <span style="font-size:.82rem;color:var(--muted);margin-left:.5rem;" id="qtyPrice"></span>
             </div>
+            <div style="margin-top:.5rem;padding:.6rem .85rem;background:#f0f5ff;border:1px solid var(--border);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:.78rem;color:var(--muted);font-weight:600;">Selected seats</span>
+              <span style="font-size:1rem;font-weight:900;color:var(--blue);" id="qtyDisplay">1</span>
+            </div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:.3rem;" id="qtyPrice"></div>
           </div>
         </div>
         <div class="bk-nav">
@@ -457,6 +461,7 @@ function selectTicket(i){
 function changeQty(d){
   qty = Math.max(1, Math.min(20, qty+d));
   document.getElementById("qtyVal").textContent = qty;
+  document.getElementById("qtyDisplay").textContent = qty;
   document.getElementById("rSeats").textContent = qty;
   updateQtyPrice();
 }
@@ -557,6 +562,33 @@ function goStep4(){
   goStep(4);
 }
 
+// ── AUTO CREATE ACCOUNT ──
+async function autoCreateAccount(name, email, phone){
+  try {
+    const auth = firebase.auth();
+    // try sign in first (account may already exist)
+    let uid;
+    try {
+      const tempPass = "CW_" + phone.slice(-4) + "_" + email.split('@')[0].slice(0,4);
+      let cred;
+      try {
+        cred = await auth.createUserWithEmailAndPassword(email, tempPass);
+      } catch(e) {
+        if(e.code === 'auth/email-already-in-use') {
+          // account exists, sign in
+          cred = await auth.signInWithEmailAndPassword(email, tempPass);
+        } else throw e;
+      }
+      uid = cred.user.uid;
+      await cred.user.updateProfile({ displayName: name });
+      await db.collection('users').doc(uid).set({
+        name, email, phone, whatsapp: phone,
+        role: 'customer', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    } catch(e) { console.warn('autoCreateAccount:', e.message); }
+  } catch(e) { console.warn('autoCreateAccount outer:', e.message); }
+}
+
 // ── SAVE BOOKING ──
 async function saveBooking(data){
   try{
@@ -610,6 +642,7 @@ async function submitBooking(){
 
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
+    await autoCreateAccount(name, email, phone);
     await saveBooking({ bookingId:bid, eventName, ticketName:t.name, amount:0, seats:qty, seatIds:selectedSeats, status:"confirmed", name, email, phone });
     await sendEmail({ name, email, eventName, amount:"Free", seats:qty, bookingId:bid, method:"Free" });
     location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId);
@@ -627,6 +660,7 @@ async function submitBooking(){
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
       document.getElementById("rStatus").textContent = "✅ Confirmed";
+      await autoCreateAccount(name, email, phone);
       await saveBooking({ bookingId:pid, eventName, ticketName:t.name, amount:total, seats:qty, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
       await sendEmail({ name, email, eventName, amount:fmt(total), seats:qty, bookingId:pid, method:"Razorpay" });
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId);
@@ -678,6 +712,7 @@ function toggleSeat(seatId, sofa){
   }
   qty = selectedSeats.length || 1;
   document.getElementById("qtyVal").textContent = qty;
+  document.getElementById("qtyDisplay").textContent = qty;
   document.getElementById("rSeats").textContent = qty;
   updateQtyPrice();
 }
