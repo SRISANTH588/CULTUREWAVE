@@ -507,7 +507,7 @@ auth.onAuthStateChanged(async user => {
   // load extra profile info from users doc, fallback to booking data
   try {
     const snap = await db.collection('users').doc(user.uid).get();
-    const d = snap.exists() ? snap.data() : {};
+    const d = snap.exists ? snap.data() : {};
     let phone = d.whatsapp || d.phone || '';
     let joined = '';
     if (d.createdAt) {
@@ -663,7 +663,7 @@ function renderBookings(list) {
         <div><div class="bk-detail-label">Phone</div><div class="bk-detail-val">${b.customerPhone||'-'}</div></div>
         <div class="bk-card-actions">
           <button class="bk-act-btn primary" onclick="showQR('${b.id}')">🎫 View Ticket</button>
-          ${statusLabel !== 'cancelled' ? `<button class="bk-act-btn" style="background:#fff5f5;color:#c92a2a;border:1px solid #ffc9c9;" onclick="requestCancel('${b.id}','${(b.eventName||'Event').replace(/'/g,'')}','${bookingRef}')">✕ Cancel</button>` : '<span style="font-size:.78rem;color:#c92a2a;font-weight:700;">Cancelled</span>'}
+          ${statusLabel !== 'cancelled' ? '<button class="bk-act-btn" style="background:#fff5f5;color:#c92a2a;border:1px solid #ffc9c9;" onclick="requestCancel(\'' + b.id + '\',\'' + (b.eventName||'Event').replace(/'/g,'') + '\',\'' + bookingRef + '\')">✕ Cancel</button>' : '<span style="font-size:.78rem;color:#c92a2a;font-weight:700;">Cancelled</span>'}
         </div>
       </div>
     </div>`;
