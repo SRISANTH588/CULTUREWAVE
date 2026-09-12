@@ -236,7 +236,6 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <button class="sb-item active" data-view="bookings"><span class="sb-icon">🎟️</span> My Bookings <span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></button>
     <button class="sb-item" data-view="upcoming"><span class="sb-icon">📅</span> Upcoming Events</button>
     <button class="sb-item" data-view="notifications"><span class="sb-icon">🔔</span> Notifications <span class="sb-badge" id="notifBadge" style="display:none;">0</span></button>
-    <a href="index.html" class="sb-item"><span class="sb-icon">🏠</span> Home</a>
     <div class="sb-section-label">Help</div>
     <button class="sb-item" data-view="support"><span class="sb-icon">💬</span> Customer Support</button>
     <button class="sb-item" data-view="refunds"><span class="sb-icon">💸</span> Refund Policy</button>
@@ -263,7 +262,6 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     </div>
     <div class="topbar-right">
       <a href="events.html" style="font-size:.82rem;font-weight:500;color:#6b7280;">⬡ Browse Events</a>
-      <a href="index.html" style="font-size:.82rem;font-weight:500;color:#6b7280;">🏠 Home</a>
       <button class="tb-icon-btn" id="notifBtn" onclick="switchView('notifications')">🔔<span class="tb-dot" id="notifDot" style="display:none;"></span></button>
       <button class="tb-user-btn" onclick="switchView('profile')">
         <div class="tb-user-avatar" id="topAvatar">U</div>
@@ -335,11 +333,50 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <!-- REFUNDS VIEW -->
     <div id="view-refunds" class="view-panel" style="display:none;">
       <div class="page-body">
-        <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;margin-bottom:1rem;">💸 Refund Policy</div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.2rem;">
-          <div class="refund-step"><div class="refund-step-num">1</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Request within 24 hours</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Cancellations must be made at least 24 hours before the event.</div></div></div>
-          <div class="refund-step"><div class="refund-step-num">2</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Contact support</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Reach out via WhatsApp or email with your booking code.</div></div></div>
-          <div class="refund-step"><div class="refund-step-num">3</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Refund processed in 5–7 days</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Refunds are credited to the original payment method.</div></div></div>
+        <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;margin-bottom:1rem;">💸 Refund & Cancellation</div>
+
+        <!-- Policy steps -->
+        <div class="card">
+          <div class="card-head"><h2>Refund Policy</h2></div>
+          <div class="refund-step"><div class="refund-step-num">1</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Cancel at least 24 hrs before the event</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Requests made after this window may not be eligible for a refund.</div></div></div>
+          <div class="refund-step"><div class="refund-step-num">2</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Admin reviews your request</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Only CultureWave admin can approve and process cancellations.</div></div></div>
+          <div class="refund-step"><div class="refund-step-num">3</div><div><strong style="font-size:.88rem;color:#0a0f1e;">Refund in 5–7 business days</strong><div style="font-size:.76rem;color:#6b7280;margin-top:.2rem;">Credited to your original payment method after admin approval.</div></div></div>
+        </div>
+
+        <!-- Request refund form -->
+        <div class="card">
+          <div class="card-head"><h2>Request a Refund</h2><p>Select a booking to raise a refund request</p></div>
+          <div style="display:flex;flex-direction:column;gap:.75rem;">
+            <div style="display:flex;flex-direction:column;gap:.3rem;">
+              <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;">Select Booking</label>
+              <select id="refundBookingSelect" style="padding:.6rem .85rem;border-radius:10px;border:1.5px solid var(--border);font-size:.86rem;font-family:inherit;color:#0a0f1e;background:#f7faff;outline:none;">
+                <option value="">-- Choose a booking --</option>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.3rem;">
+              <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;">Reason for Refund</label>
+              <select id="refundReason" style="padding:.6rem .85rem;border-radius:10px;border:1.5px solid var(--border);font-size:.86rem;font-family:inherit;color:#0a0f1e;background:#f7faff;outline:none;">
+                <option value="">-- Select reason --</option>
+                <option>Can't attend the event</option>
+                <option>Event cancelled by organiser</option>
+                <option>Duplicate booking</option>
+                <option>Medical emergency</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.3rem;">
+              <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;">Additional Details (optional)</label>
+              <textarea id="refundNote" rows="3" placeholder="Any extra info for the admin..." style="padding:.6rem .85rem;border-radius:10px;border:1.5px solid var(--border);font-size:.86rem;font-family:inherit;color:#0a0f1e;background:#f7faff;outline:none;resize:none;"></textarea>
+            </div>
+            <button onclick="submitRefundRequest()" style="width:100%;padding:.75rem;border-radius:10px;background:linear-gradient(135deg,#1242c5,#2f6bff);color:#fff;font-size:.88rem;font-weight:700;border:0;cursor:pointer;">📩 Send Refund Request via WhatsApp</button>
+          </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="card" style="background:linear-gradient(135deg,#0a0f1e,#1242c5);border:0;">
+          <div style="font-size:.84rem;font-weight:700;color:#fff;margin-bottom:.3rem;">Need help faster?</div>
+          <div style="font-size:.76rem;color:rgba(255,255,255,.6);margin-bottom:.85rem;">Chat directly with our support team on WhatsApp.</div>
+          <a href="https://wa.me/916305183601?text=Hi%20CultureWave%2C%20I%20need%20help%20with%20a%20refund." target="_blank" style="display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1.1rem;border-radius:8px;background:rgba(255,255,255,.15);color:#fff;font-size:.82rem;font-weight:700;text-decoration:none;">💬 WhatsApp Support</a>
         </div>
       </div>
     </div>
@@ -356,6 +393,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
           <div style="height:1px;background:var(--border);"></div>
           <div style="display:grid;gap:.5rem;">
             <div style="display:flex;justify-content:space-between;font-size:.84rem;"><span style="color:#6b7280;">Phone</span><span style="font-weight:700;color:#0a0f1e;" id="profilePhone">-</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:.84rem;"><span style="color:#6b7280;">Total Bookings</span><span style="font-weight:700;color:#0a0f1e;" id="profileBookingCount">-</span></div>
             <div style="display:flex;justify-content:space-between;font-size:.84rem;"><span style="color:#6b7280;">Member since</span><span style="font-weight:700;color:#0a0f1e;" id="profileJoined">-</span></div>
           </div>
           <button onclick="doLogout()" style="width:100%;padding:.75rem;border-radius:10px;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;font-size:.88rem;font-weight:700;cursor:pointer;">⏻ Logout</button>
@@ -414,9 +452,6 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   <button class="mbn-item" onclick="switchView('profile',this)">
     <span class="mbn-icon">👤</span><span>Profile</span>
   </button>
-  <a href="index.html" class="mbn-item">
-    <span class="mbn-icon">🏠</span><span>Home</span>
-  </a>
 </nav>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -452,17 +487,32 @@ auth.onAuthStateChanged(async user => {
   document.getElementById('profileEmail').textContent = user.email;
   document.getElementById('heroTitle').textContent = 'Welcome back, ' + name.split(' ')[0] + ' 👋';
 
-  // load extra profile info
+  // load extra profile info from users doc, fallback to booking data
   try {
     const snap = await db.collection('users').doc(user.uid).get();
-    if (snap.exists()) {
-      const d = snap.data();
-      document.getElementById('profilePhone').textContent = d.whatsapp || d.phone || '-';
-      if (d.createdAt) {
-        const dt = d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt);
-        document.getElementById('profileJoined').textContent = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-      }
+    const d = snap.exists() ? snap.data() : {};
+    let phone = d.whatsapp || d.phone || '';
+    let joined = '';
+    if (d.createdAt) {
+      const dt = d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt);
+      joined = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
     }
+    // fallback: get phone + member since from earliest booking
+    if (!phone || !joined) {
+      try {
+        const bSnap = await db.collection('bookings').where('customerEmail','==',user.email).orderBy('createdAt','asc').limit(1).get();
+        if (!bSnap.empty) {
+          const bd = bSnap.docs[0].data();
+          if (!phone) phone = bd.customerPhone || '';
+          if (!joined && bd.createdAt) {
+            const dt = bd.createdAt.toDate ? bd.createdAt.toDate() : new Date(bd.createdAt);
+            joined = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+          }
+        }
+      } catch(e) {}
+    }
+    document.getElementById('profilePhone').textContent = phone || '-';
+    document.getElementById('profileJoined').textContent = joined || '-';
   } catch(e) {}
 
   loadBookings();
@@ -519,6 +569,8 @@ async function loadBookings() {
 
     renderBookings(allBookings);
     updateBookingCounts();
+    populateRefundDropdown();
+    document.getElementById('profileBookingCount').textContent = allBookings.length;
   } catch(e) {
     // fallback: query only by email
     try {
@@ -526,6 +578,8 @@ async function loadBookings() {
       allBookings = snap.docs.map(d => ({id:d.id,...d.data()}));
       renderBookings(allBookings);
       updateBookingCounts();
+      populateRefundDropdown();
+      document.getElementById('profileBookingCount').textContent = allBookings.length;
     } catch(e2) { console.warn('Bookings:', e2.message); }
   }
 }
@@ -725,6 +779,42 @@ function requestCancel(bookingId, eventName, bookingRef) {
 *Email:* ${currentUser?.email || ''}
 
 Please process my cancellation request. Thank you.`;
+  window.open('https://wa.me/916305183601?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function populateRefundDropdown() {
+  const sel = document.getElementById('refundBookingSelect');
+  if (!sel) return;
+  const eligible = allBookings.filter(b => String(b.status).toLowerCase() !== 'cancelled');
+  sel.innerHTML = '<option value="">-- Choose a booking --</option>' +
+    eligible.map(b => {
+      const ref = (b.bookingId || b.id || '').slice(-8).toUpperCase();
+      return `<option value="${b.id}">#${ref} — ${b.eventName || 'Event'} (${b.status || 'pending'})</option>`;
+    }).join('');
+}
+
+function submitRefundRequest() {
+  const sel = document.getElementById('refundBookingSelect');
+  const reason = document.getElementById('refundReason').value;
+  const note = document.getElementById('refundNote').value.trim();
+  if (!sel.value) { alert('Please select a booking.'); return; }
+  if (!reason) { alert('Please select a reason.'); return; }
+  const b = allBookings.find(x => x.id === sel.value);
+  if (!b) return;
+  const ref = (b.bookingId || b.id || '').slice(-8).toUpperCase();
+  const msg = `Hi CultureWave, I would like to request a *refund/cancellation*.
+
+🔖 *Booking ID:* #${ref}
+🎫 *Event:* ${b.eventName || 'Event'}
+👤 *Name:* ${b.customerName || currentUser?.displayName || ''}
+📧 *Email:* ${currentUser?.email || ''}
+📱 *Phone:* ${b.customerPhone || ''}
+💰 *Amount Paid:* ${b.amount ? '₹' + Number(b.amount).toLocaleString('en-IN') : 'Free'}
+
+❌ *Reason:* ${reason}${note ? '
+📝 *Note:* ' + note : ''}
+
+Please process my refund request. Thank you.`;
   window.open('https://wa.me/916305183601?text=' + encodeURIComponent(msg), '_blank');
 }
 
