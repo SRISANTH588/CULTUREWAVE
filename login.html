@@ -650,7 +650,7 @@
               </svg>
               Continue with Google
             </button>
-            <button class="google-btn" id="otpLoginBtn" type="button">✉️&nbsp; Continue with OTP</button>
+            <button class="google-btn" id="otpLoginBtn" type="button" onclick="showOtpLogin()">✉️&nbsp; Continue with OTP</button>
           </form>
 
           <!-- SIGNUP FORM -->
@@ -823,6 +823,7 @@
         document.getElementById('loginPwdSection').style.display = 'none';
         document.getElementById('loginOtpSection').style.display = '';
         authStatus.textContent = ''; delete authStatus.dataset.kind;
+        document.getElementById('loginOtpEmail').focus();
       }
 
       function showPasswordLogin() {
@@ -866,7 +867,10 @@
           document.getElementById('loginOtpStep2').style.display = '';
           document.getElementById('loginOtpEmailDisplay').textContent = email;
           setStatus('OTP sent! Check your inbox.', 'success');
-        } catch(e) { setStatus('Failed to send OTP. Try again.', 'warning'); }
+        } catch(e) {
+          console.error('Email OTP delivery failed:', e);
+          setStatus('Could not send the OTP: ' + (e.text || e.message || 'please try again.'), 'warning');
+        }
       }
 
       async function verifyLoginOtp() {
@@ -921,6 +925,7 @@
       window.sendLoginOtp = sendLoginOtp;
       window.verifyLoginOtp = verifyLoginOtp;
       window.showPasswordLogin = showPasswordLogin;
+      window.showOtpLogin = showOtpLogin;
 
       document.querySelector("[data-auth-form='login']").addEventListener("submit", async e => {
         e.preventDefault();
