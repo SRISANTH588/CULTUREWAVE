@@ -234,44 +234,70 @@
     /* ── SCENE STEALERS ── */
     .ss-section{background:#000;padding:0 0 .5rem;border-top:1px solid rgba(255,255,255,.07);}
     .ss-banner{
-      position:relative;overflow:hidden;
-      background:linear-gradient(135deg,#0a0a0a 0%,#1a1200 40%,#0a0a0a 100%);
-      display:flex;align-items:center;justify-content:space-between;
-      padding:1.6rem 1.4rem 1.8rem;
-      min-height:130px;
+      position:relative;
+      width:100%;
+      min-height:220px;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+      padding:2.5rem 1.4rem 2rem;
+      background:linear-gradient(135deg,#0b1a0b 0%,#1a3a0a 50%,#0b1a0b 100%);
+      border-top:1px solid rgba(180,255,180,.24);
     }
     .ss-banner::before{
-      content:'';
+      content:"";
       position:absolute;inset:0;
-      background:radial-gradient(ellipse at 30% 50%,rgba(212,160,23,.18),transparent 60%),
-                 radial-gradient(ellipse at 80% 50%,rgba(212,160,23,.08),transparent 50%);
+      background:
+        radial-gradient(ellipse 60% 80% at 0% 50%,rgba(120,220,80,.18),transparent 60%),
+        radial-gradient(ellipse 40% 60% at 100% 0%,rgba(245,197,24,.13),transparent 55%);
       pointer-events:none;
     }
-    .ss-stars{
-      position:absolute;inset:0;display:flex;align-items:center;justify-content:space-around;
-      font-size:1rem;color:rgba(255,255,255,.25);pointer-events:none;padding:0 .5rem;
-      letter-spacing:2rem;
+    .ss-banner::after{
+      content:"SCENE";
+      position:absolute;
+      right:-1rem;bottom:-1.5rem;
+      font-size:clamp(5rem,18vw,10rem);
+      font-weight:900;
+      letter-spacing:-.06em;
+      color:rgba(180,255,180,.08);
+      line-height:1;
+      pointer-events:none;
+      user-select:none;
     }
-    .ss-stars span{font-size:.6rem;color:rgba(255,255,255,.15);}
-    .ss-left{position:relative;z-index:1;}
+    .ss-banner-text{position:relative;z-index:2;}
+    .ss-eyebrow{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.68rem;font-weight:800;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:rgba(200,255,200,.78);
+      margin-bottom:.8rem;
+    }
+    .ss-eyebrow::before{
+      content:"";
+      display:inline-block;width:24px;height:1px;
+      background:rgba(200,255,200,.7);
+    }
     .ss-title{
-      font-family:'Georgia','Times New Roman',serif;
-      font-size:clamp(2.2rem,8vw,3rem);font-weight:900;font-style:italic;
-      line-height:.95;letter-spacing:-.02em;
-      background:linear-gradient(135deg,#f5c518 0%,#fff8dc 40%,#d4a017 70%,#f5c518 100%);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-      filter:drop-shadow(0 2px 8px rgba(212,160,23,.4));
+      font-size:clamp(2.8rem,8vw,5rem);
+      font-weight:900;
+      line-height:.92;
+      letter-spacing:-.06em;
+      color:#fff;
+      margin:0;
     }
-    .ss-right{position:relative;z-index:1;text-align:right;}
-    .ss-offer{
-      font-size:clamp(1.4rem,5vw,2rem);font-weight:900;letter-spacing:-.02em;
-      color:#fff;line-height:1;
+    .ss-title em{
+      font-style:italic;
+      display:block;
+      -webkit-text-stroke:1.5px rgba(200,255,200,.86);
+      color:transparent;
     }
-    .ss-pill{
-      display:inline-block;margin-top:.5rem;
-      padding:.3rem .9rem;border:1.5px solid rgba(255,255,255,.5);
-      border-radius:999px;font-size:.65rem;font-weight:800;
-      letter-spacing:.1em;text-transform:uppercase;color:#fff;
+    .ss-sub{
+      margin-top:.9rem;
+      font-size:.78rem;
+      font-weight:700;
+      color:rgba(200,255,200,.72);
+      letter-spacing:.14em;
+      text-transform:uppercase;
     }
     .ss-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
     .ss-scroll-wrap::-webkit-scrollbar{display:none;}
@@ -315,12 +341,12 @@
     .ss-view-all:hover{background:rgba(245,197,24,.1);border-color:#f5c518;}
     @media(min-width:700px){
       .ss-card{flex:0 0 180px;}
-      .ss-banner{padding:2rem 2rem 2.2rem;}
+      .ss-banner{min-height:260px;padding:3rem 1.4rem 2.5rem;}
+      .ss-title{font-size:clamp(3.5rem,6vw,5.5rem);}
     }
     @media(min-width:900px){
       .ss-scroll-wrap{max-width:1240px;margin:0 auto;}
       .ss-scroll{padding:.9rem 1.4rem .4rem;}
-      .ss-banner{max-width:1240px;margin:0 auto;border-radius:0;}
     }
 
     /* ── FINEST TABLES SECTION ── */
@@ -1456,13 +1482,10 @@
   <!-- SCENE STEALERS -->
   <section class="ss-section">
     <div class="ss-banner">
-      <div class="ss-stars">✦ <span>✦</span> ✦ <span>✦</span> ✦</div>
-      <div class="ss-left">
-        <div class="ss-title">Scene<br>Stealers</div>
-      </div>
-      <div class="ss-right">
-        <div class="ss-offer">UPTO 50% OFF</div>
-        <div class="ss-pill">LIMITED TIME OFFER</div>
+      <div class="ss-banner-text">
+        <div class="ss-eyebrow">Scene Stealers</div>
+        <div class="ss-title">Spotlight<br><em>on you</em></div>
+        <div class="ss-sub">✦ Only the best. Every time.</div>
       </div>
     </div>
     <div class="ss-scroll-wrap">
