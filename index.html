@@ -2271,8 +2271,6 @@
         .filter(doc => {
           const d = doc.data();
           if(!isPublishedEvent(d)) return false;
-          // only events with at least one coupon
-          if(!Array.isArray(d.coupons) || !d.coupons.length) return false;
           try{
             const dt = d.startDate?.toDate ? d.startDate.toDate() : d.startDate ? new Date(String(d.startDate).slice(0,10)+'T00:00:00') : null;
             return dt && dt >= now;
