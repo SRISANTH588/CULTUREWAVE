@@ -1546,7 +1546,7 @@
   <!-- COMING UP IN A FEW DAYS -->
   <section class="cup-section">
     <div class="trn-inner">
-    <div class="cup-head">EXPERIENCES YOU'LL LOVE</div>
+    <div class="cup-head">COMING UP IN A FEW DAYS</div>
     <div class="cup-scroll" id="cupScroll"></div>
     <div class="sec-dots" id="cupDots"></div>
     </div>
@@ -1556,8 +1556,7 @@
   <section class="trn-section">
     <div class="trn-inner">
     <div class="trn-head">THE LATEST BUZZ 🔥</div>
-    <div class="trn-grid" id="trnGrid"></div>
-    <div class="sec-dots" id="trnDots"></div>
+    <div class="ev-grid" id="trnGrid"></div>
     </div>
   </section>
 
@@ -1918,21 +1917,21 @@
         let day='',mon='';
         if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
         const a=document.createElement('a');
-        a.className='trn-card';
+        a.className='ev-card';
         a.href=`event-detail.html?eventId=${id}`;
         a.innerHTML=`
-          <div class="trn-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
-            <div class="trn-num">${i+1}</div>
-            ${day?`<div class="trn-date-badge"><div><div class="trn-badge-day">${day}</div><div class="trn-badge-mon">${mon}</div></div></div>`:''}
-            <span class="trn-price-pill ${price?'trn-price-paid':'trn-price-free'}">Starts at ${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+          <div class="ev-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
+            <span class="ev-price-pill ${price?'ev-price-paid':'ev-price-free'}">Starts at ${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
           </div>
-          <div class="trn-info">
-            <div class="trn-title">${d.name||'Untitled'}</div>
-            <div class="trn-venue">${d.venue||d.venueName||d.city||'India'}</div>
+          <div class="ev-body">
+            ${day?`<div class="ev-date" style="display:flex;flex-direction:column;align-items:center;background:#1e1e1e;border-radius:8px;padding:.3rem .45rem;min-width:36px;"><div style="font-size:.95rem;font-weight:900;color:#fff;line-height:1;">${day}</div><div style="font-size:.5rem;font-weight:800;color:#888;text-transform:uppercase;">${mon}</div></div>`:''}
+            <div class="ev-info">
+              <div class="ev-title">${d.name||'Untitled'}</div>
+              <div class="ev-venue">${d.venue||d.venueName||d.city||'India'}</div>
+            </div>
           </div>`;
         grid.appendChild(a);
       });
-      requestAnimationFrame(()=>initScrollDots(grid, document.getElementById('trnDots'), '.trn-card'));
     }catch(e){console.warn('TRN:',e.message);}
   })();
 
