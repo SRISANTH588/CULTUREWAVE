@@ -76,6 +76,11 @@
     .bk-coupon-msg{font-size:.76rem;font-weight:700;margin-top:.35rem;}
     .bk-coupon-msg.ok{color:#166534;}
     .bk-coupon-msg.err{color:#991b1b;}
+    .avail-coupon-chip{display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;background:#fffbeb;border:1.5px dashed #f5c518;border-radius:10px;cursor:pointer;margin-bottom:.35rem;transition:background .15s;}
+    .avail-coupon-chip:hover{background:#fef3c7;}
+    .avail-coupon-code{font-size:.75rem;font-weight:900;color:#92400e;letter-spacing:.06em;flex:1;}
+    .avail-coupon-val{font-size:.7rem;font-weight:800;color:#166534;background:#dcfce7;padding:.15rem .45rem;border-radius:6px;}
+    .avail-coupon-tap{font-size:.62rem;font-weight:700;color:#b45309;white-space:nowrap;}
     .bk-bill{background:#f7faff;border:1px solid var(--border);border-radius:16px;padding:1rem 1.2rem;}
     .bk-bill-row{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.84rem;color:#374151;font-weight:600;padding:.38rem 0;border-bottom:1px solid rgba(18,66,197,.06);}
     .bk-bill-row span:first-child{flex:1;min-width:0;}
@@ -252,6 +257,7 @@
           </div>
           <div class="bk-field">
             <span class="bk-label">Coupon Code</span>
+            <div id="availableCouponsWrap" style="display:none;margin-bottom:.6rem;"></div>
             <div class="bk-coupon-row">
               <input type="text" id="couponInput" placeholder="Enter coupon code"/>
               <button class="bk-coupon-btn" onclick="applyCoupon()">Apply</button>
@@ -513,7 +519,28 @@ function updateBill(){
 }
 
 // ── COUPON ──
-const COUPONS = { "WAVE10": 10, "CULTURE20": 20, "FIRST50": 50 };
+function renderAvailableCoupons(){
+  const coupons = evData.coupons;
+  const wrap = document.getElementById("availableCouponsWrap");
+  if(!wrap) return;
+  if(!Array.isArray(coupons)||!coupons.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  wrap.innerHTML = '<div style="font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#5f6f95;margin-bottom:.45rem;">Available Coupons</div>'
+    + coupons.map(c=>{
+        const val = c.type==='percent'?`${c.value}% OFF`:`₹${c.value} OFF`;
+        return `<div class="avail-coupon-chip" onclick="tapCoupon('${c.code}')">
+          <span class="avail-coupon-code">🏷 ${c.code}</span>
+          <span class="avail-coupon-val">${val}</span>
+          <span class="avail-coupon-tap">Tap to apply</span>
+        </div>`;
+      }).join('');
+}
+
+function tapCoupon(code){
+  document.getElementById('couponInput').value = code;
+  applyCoupon();
+}
+
 function applyCoupon(){
   const code = document.getElementById("couponInput").value.trim().toUpperCase();
   const msg = document.getElementById("couponMsg");
@@ -521,11 +548,14 @@ function applyCoupon(){
   if(couponApplied === code){ msg.textContent="Already applied"; msg.className="bk-coupon-msg err"; return; }
   const t = tickets[selectedTicketIdx]||{price:0};
   const subtotal = t.price * qty;
-  if(COUPONS[code]){
-    const pct = COUPONS[code];
-    discountAmt = Math.round(subtotal * pct / 100);
+  // match against event coupons from Firestore
+  const eventCoupons = Array.isArray(evData.coupons) ? evData.coupons : [];
+  const match = eventCoupons.find(c => c.code.toUpperCase() === code);
+  if(match){
+    discountAmt = match.type==='percent' ? Math.round(subtotal * match.value / 100) : Math.min(match.value, subtotal);
     couponApplied = code;
-    msg.textContent = `✓ ${pct}% discount applied! You save ${fmt(discountAmt)}`;
+    const label = match.type==='percent' ? `${match.value}% discount` : `₹${match.value} off`;
+    msg.textContent = `✓ ${label} applied! You save ${fmt(discountAmt)}`;
     msg.className = "bk-coupon-msg ok";
     updateBill();
   } else {
@@ -748,6 +778,7 @@ async function init(){
           document.getElementById("receiptBanner").innerHTML = "";
           document.getElementById("receiptBanner").appendChild(img);
         }
+        renderAvailableCoupons();
       }
     }catch(e){ console.error(e); }
   } else {
