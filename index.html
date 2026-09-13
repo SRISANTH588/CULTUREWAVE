@@ -331,6 +331,10 @@
     .ss-date-day{font-size:.72rem;font-weight:900;color:#fff;line-height:1;}
     .ss-date-mon{font-size:.52rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;line-height:1;}
     .ss-venue{font-size:.65rem;color:rgba(255,255,255,.4);font-weight:600;line-height:1.3;}
+    .ss-coupons{display:flex;flex-direction:column;gap:.3rem;margin-top:.45rem;}
+    .ss-coupon-chip{display:flex;align-items:center;justify-content:space-between;background:rgba(245,197,24,.1);border:1px dashed rgba(245,197,24,.5);border-radius:6px;padding:.22rem .45rem;}
+    .ss-coupon-tag{font-size:.6rem;font-weight:900;color:#f5c518;letter-spacing:.04em;text-transform:uppercase;}
+    .ss-coupon-val{font-size:.58rem;font-weight:800;color:rgba(245,197,24,.8);}
     .ss-view-all-wrap{padding:.6rem 1.2rem 1.4rem;display:flex;justify-content:center;}
     .ss-view-all{
       display:inline-flex;align-items:center;gap:.4rem;
@@ -2267,6 +2271,8 @@
         .filter(doc => {
           const d = doc.data();
           if(!isPublishedEvent(d)) return false;
+          // only events with at least one coupon
+          if(!Array.isArray(d.coupons) || !d.coupons.length) return false;
           try{
             const dt = d.startDate?.toDate ? d.startDate.toDate() : d.startDate ? new Date(String(d.startDate).slice(0,10)+'T00:00:00') : null;
             return dt && dt >= now;
@@ -2291,6 +2297,11 @@
         }catch(e){}
         const venue = d.venueName || d.venue || d.city || '';
         const img = d.cardImgUrl || d.coverUrl || '';
+        // build coupon chips (show up to 2)
+        const couponsHtml = (d.coupons||[]).slice(0,2).map(c => {
+          const val = c.type==='percent' ? `${c.value}% OFF` : `\u20b9${c.value} OFF`;
+          return `<div class="ss-coupon-chip"><span class="ss-coupon-tag">🏷 ${c.code}</span><span class="ss-coupon-val">${val}</span></div>`;
+        }).join('');
         const a = document.createElement('a');
         a.className = 'ss-card';
         a.href = `event-detail.html?eventId=${doc.id}`;
@@ -2306,6 +2317,7 @@
               ${dayStr ? `<div class="ss-date-box"><div class="ss-date-day">${dayStr}</div><div class="ss-date-mon">${monStr}</div></div>` : ''}
               <div class="ss-venue">${venue}</div>
             </div>
+            ${couponsHtml ? `<div class="ss-coupons">${couponsHtml}</div>` : ''}
           </div>`;
         scroll.appendChild(a);
       });
