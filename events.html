@@ -165,24 +165,28 @@
 
       /* ── CARD ── */
       .ev-card {
-        overflow: hidden;
-        border: 1px solid #e1e4ec;
-        border-radius: 22px;
-        background: #fff;
-        box-shadow: 0 14px 32px rgba(25,55,110,.1);
-        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 18px;
+        background: transparent;
+        transition: transform 0.2s;
         display: flex;
         flex-direction: column;
+        position: relative;
+        cursor: pointer;
       }
-      .ev-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 48px rgba(25,55,110,.16);
+      .ev-card:hover { transform: translateY(-4px); }
+      /* poster wrapper — rank number hangs out of it */
+      .ev-poster-wrap {
+        position: relative;
+        border-radius: 18px;
+        overflow: visible;
       }
       .ev-banner {
-        height: auto;
-        aspect-ratio: 4/5;
+        width: 100%;
+        aspect-ratio: 3/4;
         background-size: cover;
         background-position: center;
+        border-radius: 18px;
+        display: block;
         position: relative;
         overflow: hidden;
       }
@@ -195,7 +199,7 @@
         position: absolute;
         top: 0.85rem;
         left: 0.85rem;
-        z-index: 1;
+        z-index: 2;
         background: rgba(255,255,255,0.18);
         backdrop-filter: blur(8px);
         border: 1px solid rgba(255,255,255,0.3);
@@ -207,60 +211,86 @@
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
-      .ev-body {
-        padding: 1rem 1.1rem 1.1rem;
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-      }
-      .ev-poster-info {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.6rem;
-        margin-bottom: 0.8rem;
-        color: #68738a;
-        font-size: 0.72rem;
+      /* pink price bar at bottom of poster */
+      .ev-price-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0; right: 0;
+        background: #e91e8c;
+        color: #fff;
+        font-size: 0.8rem;
         font-weight: 800;
-        white-space: nowrap;
+        padding: 0.45rem 0.9rem;
+        border-radius: 0 0 18px 18px;
+        z-index: 2;
       }
-      .ev-poster-date { color: #8b2cff; overflow: hidden; text-overflow: ellipsis; }
-      .ev-poster-location { overflow: hidden; text-overflow: ellipsis; }
-      .ev-body h3 {
-        display: -webkit-box;
-        overflow: hidden;
-        margin: 0 0 0.35rem;
-        color: #0b1220;
-        font-size: 1.05rem;
-        line-height: 1.2;
-        letter-spacing: -0.035em;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
+      /* big rank number — overlaps poster bottom-left AND info row */
+      .ev-rank {
+        position: absolute;
+        bottom: -0.55rem;
+        left: -0.3rem;
+        z-index: 10;
+        font-size: 5.5rem;
+        font-weight: 900;
+        line-height: 1;
+        color: #e91e8c;
+        letter-spacing: -0.05em;
+        pointer-events: none;
+        text-shadow: 0 2px 12px rgba(233,30,140,0.18);
       }
-      .ev-body p {
-        display: -webkit-box;
-        overflow: hidden;
-        margin: 0 0 0.75rem;
-        color: #68738a;
-        font-size: 0.8rem;
-        line-height: 1.35;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-      }
-      .ev-poster-price {
+      /* info row below poster */
+      .ev-body {
         display: flex;
-        align-items: baseline;
-        gap: 0.35rem;
-        color: #888;
-        font-size: 0.8rem;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.7rem 0.2rem 0 2.8rem;
+      }
+      .ev-date-box {
+        flex-shrink: 0;
+        background: #1a1a2e;
+        color: #fff;
+        border-radius: 10px;
+        padding: 0.35rem 0.6rem;
+        text-align: center;
+        min-width: 2.6rem;
+        line-height: 1.15;
+      }
+      .ev-date-box .ev-day {
+        font-size: 1.1rem;
+        font-weight: 900;
+        display: block;
+      }
+      .ev-date-box .ev-mon {
+        font-size: 0.62rem;
         font-weight: 700;
-        margin-top: auto;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        opacity: 0.75;
+        display: block;
       }
-      .ev-poster-price strong { color: #8b2cff; font-size: 1rem; font-weight: 900; }
-      .ev-book {
-        display: none;
+      .ev-info {
+        flex: 1;
+        min-width: 0;
       }
+      .ev-info h3 {
+        margin: 0 0 0.18rem;
+        font-size: 0.92rem;
+        font-weight: 800;
+        color: #0b1220;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        letter-spacing: -0.02em;
+      }
+      .ev-venue {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ev-poster-price, .ev-book { display: none; }
 
       /* ── EMPTY STATE ── */
       .ev-empty {
@@ -508,30 +538,29 @@
             if(d.startDate) {
               try { date = d.startDate.toDate ? d.startDate.toDate().toISOString().slice(0,10) : String(d.startDate).slice(0,10); } catch(e){}
             }
-            const dateLabel = date ? new Date(date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : 'TBA';
             const price = d.tickets?.[0]?.price||d.price||0;
-            const priceStr = price ? `<strong>\u20b9${Number(price).toLocaleString('en-IN')}</strong> onwards` : '<strong>Free</strong> entry';
             const bannerClass = banners[i%banners.length];
             const article = document.createElement('article');
             article.className = 'ev-card';
             article.dataset.name = d.name||'';
             article.dataset.category = (d.category||'other').toLowerCase();
             article.dataset.date = date;
+            const [dayStr, monStr] = date ? [new Date(date+'T00:00:00').getDate(), new Date(date+'T00:00:00').toLocaleDateString('en-IN',{month:'short'})] : ['?','TBA'];
+            const priceLabel = price ? `Starts at ₹${Number(price).toLocaleString('en-IN')}` : 'Free Entry';
             article.innerHTML = `
-              <a href="event-detail.html?eventId=${id}" style="display:contents;text-decoration:none;">
-              <div class="ev-banner ${bannerClass}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} >
-                <span class="ev-tag">${d.category||'Event'}</span>
+              <a href="event-detail.html?eventId=${id}" style="display:contents;text-decoration:none;color:inherit;">
+              <div class="ev-poster-wrap">
+                <div class="ev-banner ${bannerClass}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} >
+                  <span class="ev-tag">${d.category||'Event'}</span>
+                  <div class="ev-price-bar">${priceLabel}</div>
+                </div>
+                <span class="ev-rank">${i+1}</span>
               </div>
               <div class="ev-body">
-                <div class="ev-poster-info">
-                  <span class="ev-poster-date">▣ ${dateLabel}</span>
-                  <span class="ev-poster-location">⌖ ${d.city||'India'}</span>
-                </div>
-                <h3>${d.name||'Untitled Event'}</h3>
-                <p>${d.summary||d.description||''}</p>
-                <div class="ev-poster-price">
-                  <strong>${price ? `₹${Number(price).toLocaleString('en-IN')}` : 'Free'}</strong>
-                  <span>${price ? '/ onward' : 'entry'}</span>
+                <div class="ev-date-box"><span class="ev-day">${dayStr}</span><span class="ev-mon">${monStr}</span></div>
+                <div class="ev-info">
+                  <h3>${d.name||'Untitled Event'}</h3>
+                  <div class="ev-venue">${d.venue||d.location||d.city||'Hyderabad'}</div>
                 </div>
               </div>
               </a>`;

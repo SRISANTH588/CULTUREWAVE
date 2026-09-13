@@ -1239,6 +1239,101 @@
       .cup-card{flex:0 0 180px;max-width:200px;}
     }
 
+    /* ── WHEN IS THE PLAN ── */
+    .witp-section{
+      background:#000;
+      padding:2.2rem 0 2.8rem;
+      border-top:1px solid rgba(255,255,255,.07);
+      position:relative;
+      overflow:hidden;
+    }
+    .witp-section::before{
+      content:"PLAN";
+      position:absolute;right:-1rem;top:50%;transform:translateY(-50%);
+      font-family:'Barlow Condensed','Impact',sans-serif;
+      font-size:clamp(6rem,22vw,14rem);font-weight:900;
+      color:rgba(255,255,255,.03);letter-spacing:-.06em;
+      pointer-events:none;user-select:none;line-height:1;
+    }
+    .witp-head{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(1.8rem,6vw,2.8rem);font-weight:900;
+      letter-spacing:.12em;text-transform:uppercase;
+      color:#fff;padding:0 1.4rem 1.6rem;line-height:1;
+    }
+    .witp-grid{
+      display:flex;gap:.6rem;
+      padding:0 1rem 1.2rem;
+      overflow-x:auto;scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+      align-items:stretch;
+    }
+    .witp-grid::-webkit-scrollbar{display:none;}
+    .witp-item{
+      flex:1 1 0;
+      min-width:0;
+      display:flex;flex-direction:column;
+      align-items:center;
+      cursor:pointer;
+    }
+    .witp-blob-wrap{
+      position:relative;
+      width:100%;padding-bottom:100%;
+      transition:transform .3s cubic-bezier(.34,1.56,.64,1),filter .3s;
+      filter:drop-shadow(0 4px 14px rgba(0,0,0,.5));
+    }
+    /* tall blobs for THIS WEEK'S and NEXT WEEKEND */
+    .witp-item.tall .witp-blob-wrap{padding-bottom:118%;}
+    .witp-item:hover .witp-blob-wrap{
+      transform:scale(1.06) translateY(-3px);
+    }
+    .witp-item.active .witp-blob-wrap{
+      transform:scale(1.08) translateY(-4px);
+    }
+    /* per-blob active glow — set via inline style on active item */
+    .witp-item[data-glow].active .witp-blob-wrap{
+      filter:drop-shadow(0 0 14px var(--glow)) drop-shadow(0 0 28px var(--glow));
+    }
+    .witp-blob-wrap svg{
+      width:100%;height:100%;
+      position:absolute;inset:0;
+    }
+    .witp-blob-wrap::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 55%);
+      pointer-events:none;
+    }
+    .witp-text{
+      position:absolute;inset:0;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      gap:.1rem;padding:.4rem;
+      z-index:2;
+    }
+    .witp-main{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(1.1rem,3.8vw,1.6rem);font-weight:900;
+      color:#fff;text-align:center;
+      line-height:1;letter-spacing:.04em;
+      text-transform:uppercase;
+      text-shadow:0 0 12px rgba(255,255,255,.7),0 2px 6px rgba(0,0,0,.8);
+    }
+    .witp-sub{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(.6rem,2vw,.78rem);font-weight:800;
+      color:rgba(255,255,255,.85);
+      letter-spacing:.2em;text-transform:uppercase;
+      text-shadow:0 0 8px rgba(255,255,255,.5),0 1px 4px rgba(0,0,0,.7);
+      margin-top:.1rem;
+    }
+    @media(min-width:700px){
+      .witp-grid{gap:.9rem;padding:0 1.4rem 1.4rem;}
+    }
+    @media(min-width:1000px){
+      .witp-grid{justify-content:flex-start;max-width:1240px;margin:0 auto;}
+      .witp-head{max-width:1240px;margin:0 auto;}
+    }
     /* ── TRENDING RIGHT NOW ── */
     .trn-section{background:#000;padding:1.8rem 0 2rem;border-top:1px solid rgba(255,255,255,.07);}
     .trn-inner{max-width:1240px;margin:0 auto;}
@@ -1538,6 +1633,96 @@
     <div class="trn-inner">
     <div class="trn-head">THE LATEST BUZZ 🔥</div>
     <div class="ev-grid" id="trnGrid"></div>
+    </div>
+  </section>
+
+  <!-- WHEN IS THE PLAN -->
+  <section class="witp-section">
+    <div class="trn-inner">
+      <div class="witp-head">WHEN IS THE PLAN?</div>
+      <div class="witp-grid">
+
+        <!-- TODAY'S VIBE — round blob, hot pink/magenta -->
+        <div class="witp-item active" data-glow style="--glow:#f472b6" onclick="filterPlanEvents('today',this)">
+          <div class="witp-blob-wrap">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="g1" cx="38%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#f472b6"/>
+                  <stop offset="55%" stop-color="#db2777"/>
+                  <stop offset="100%" stop-color="#6b0a3a"/>
+                </radialGradient>
+              </defs>
+              <path fill="url(#g1)" d="M47.5,-62.8C60.3,-53.2,68.8,-37.6,72.4,-21.1C76,-4.6,74.7,12.8,67.8,27.5C60.9,42.2,48.4,54.2,33.8,61.8C19.2,69.4,2.5,72.6,-14.8,70.4C-32.1,68.2,-50,60.6,-61.2,47.2C-72.4,33.8,-76.9,14.6,-74.2,-3.2C-71.5,-21,-61.6,-37.4,-48.4,-47.2C-35.2,-57,-18.6,-60.2,-0.8,-59.2C17,-58.2,34.7,-72.4,47.5,-62.8Z" transform="translate(100 100)"/>
+            </svg>
+            <div class="witp-text">
+              <span class="witp-main">TODAY'S</span>
+              <span class="witp-sub">VIBE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- WEEKEND MOOD — wavy blob, deep teal/blue -->
+        <div class="witp-item" data-glow style="--glow:#38bdf8" onclick="filterPlanEvents('weekend',this)">
+          <div class="witp-blob-wrap">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="g2" cx="40%" cy="32%" r="65%">
+                  <stop offset="0%" stop-color="#38bdf8"/>
+                  <stop offset="50%" stop-color="#0369a1"/>
+                  <stop offset="100%" stop-color="#0c2340"/>
+                </radialGradient>
+              </defs>
+              <path fill="url(#g2)" d="M38.5,-52.1C49.3,-43.8,57,-31.2,62.4,-16.8C67.8,-2.4,70.9,13.8,65.8,27.2C60.7,40.6,47.4,51.2,33,57.8C18.6,64.4,3.1,67,-13.2,65.2C-29.5,63.4,-46.6,57.2,-57.4,45.2C-68.2,33.2,-72.7,15.4,-70.8,-1.1C-68.9,-17.6,-60.6,-32.8,-49,-43.4C-37.4,-54,-22.5,-60,-7.2,-62.2C8.1,-64.4,27.7,-60.4,38.5,-52.1Z" transform="translate(100 100)"/>
+            </svg>
+            <div class="witp-text">
+              <span class="witp-main">WEEKEND</span>
+              <span class="witp-sub">MOOD</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- THIS WEEK'S DROPS — squarish blob, deep purple -->
+        <div class="witp-item tall" data-glow style="--glow:#a78bfa" onclick="filterPlanEvents('thisweek',this)">
+          <div class="witp-blob-wrap">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="g3" cx="42%" cy="36%" r="62%">
+                  <stop offset="0%" stop-color="#a78bfa"/>
+                  <stop offset="50%" stop-color="#7c3aed"/>
+                  <stop offset="100%" stop-color="#2e1065"/>
+                </radialGradient>
+              </defs>
+              <path fill="url(#g3)" d="M44.3,-58.2C55.9,-49.4,62.5,-34.2,66.8,-18.2C71.1,-2.2,73.1,14.6,67.4,28.6C61.7,42.6,48.3,53.8,33.4,60.4C18.5,67,-1.9,69,-20.2,65.2C-38.5,61.4,-54.7,51.8,-64.2,37.6C-73.7,23.4,-76.5,4.6,-72.4,-12C-68.3,-28.6,-57.3,-43,-44,-52.4C-30.7,-61.8,-15.4,-66.2,0.8,-67.2C17,-68.2,32.7,-67,44.3,-58.2Z" transform="translate(100 100)"/>
+            </svg>
+            <div class="witp-text">
+              <span class="witp-main">THIS<br>WEEK'S</span>
+              <span class="witp-sub">DROPS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEXT WEEKEND TEA — organic blob, burnt amber/brown -->
+        <div class="witp-item tall" data-glow style="--glow:#fbbf24" onclick="filterPlanEvents('nextweekend',this)">
+          <div class="witp-blob-wrap">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="g4" cx="38%" cy="34%" r="65%">
+                  <stop offset="0%" stop-color="#fbbf24"/>
+                  <stop offset="45%" stop-color="#b45309"/>
+                  <stop offset="100%" stop-color="#431407"/>
+                </radialGradient>
+              </defs>
+              <path fill="url(#g4)" d="M41.2,-55.3C52.4,-46.2,59.5,-31.8,64.2,-16.2C68.9,-0.6,71.2,16.2,65.4,29.8C59.6,43.4,45.7,53.8,30.8,60.2C15.9,66.6,-0,69,-16.4,66.4C-32.8,63.8,-49.7,56.2,-60.4,43.2C-71.1,30.2,-75.6,11.8,-72.8,-5C-70,-21.8,-59.9,-37,-47.2,-46.4C-34.5,-55.8,-19.2,-59.4,-3.2,-55.8C12.8,-52.2,30,-64.4,41.2,-55.3Z" transform="translate(100 100)"/>
+            </svg>
+            <div class="witp-text">
+              <span class="witp-main">NEXT<br>WEEKEND</span>
+              <span class="witp-sub">TEA</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
@@ -1853,12 +2038,12 @@
         try{
           const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');
           const diff=(dt-now)/(1000*60*60*24);
-          return diff>=0 && diff<=2;
+          return diff>=0 && diff<=30;
         }catch(e){return false;}
       }).slice(0,10);
       const scroll=document.getElementById('cupScroll');
       if(!scroll) return;
-      if(!docs.length){scroll.closest('.cup-section').style.display='none';return;}
+      if(!docs.length){ scroll.innerHTML='<div style="padding:1.5rem 1.2rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;">No upcoming events. Check back soon!</div>'; return; }
       const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)','linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
       docs.forEach((doc,i)=>{
         const d=doc.data(),id=doc.id;
@@ -2238,6 +2423,31 @@
       });
     }catch(e){ console.warn('TopVenues:', e.message); }
   })();
+
+  // WHEN IS THE PLAN filter
+  function filterPlanEvents(type, el){
+    document.querySelectorAll('.witp-item').forEach(b=>b.classList.remove('active'));
+    if(el) el.classList.add('active');
+    const now = new Date();
+    const day = now.getDay();
+    let start, end;
+    if(type==='today'){
+      start=new Date(now); start.setHours(0,0,0,0);
+      end=new Date(now); end.setHours(23,59,59,999);
+    } else if(type==='weekend'){
+      const diff = day===0?0:6-day;
+      start=new Date(now); start.setDate(now.getDate()+(day===6?0:diff===0?0:diff)); start.setHours(0,0,0,0);
+      end=new Date(start); end.setDate(start.getDate()+(day===0?0:1)); end.setHours(23,59,59,999);
+    } else if(type==='thisweek'){
+      start=new Date(now); start.setHours(0,0,0,0);
+      end=new Date(now); end.setDate(now.getDate()+(6-day)); end.setHours(23,59,59,999);
+    } else {
+      const daysToNextSat = (6-day+7)%7||7;
+      start=new Date(now); start.setDate(now.getDate()+daysToNextSat); start.setHours(0,0,0,0);
+      end=new Date(start); end.setDate(start.getDate()+1); end.setHours(23,59,59,999);
+    }
+    window.location.href=`events.html?from=${start.toISOString().slice(0,10)}&to=${end.toISOString().slice(0,10)}`;
+  }
 
   // SCENE STEALERS
   (async function loadSceneStealer(){
