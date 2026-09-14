@@ -6,7 +6,9 @@
 <title>CultureWave | Premium Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<!-- Do not let an unavailable font CDN delay the dashboard's first render. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/></noscript>
 <style>
 :root{
   --blue:#3b5bdb;--blue-2:#4c6ef5;--blue-light:#e7f5ff;--blue-soft:#f0f4ff;
