@@ -1629,7 +1629,7 @@
   </section>
 
   <!-- TRENDING RIGHT NOW -->
-  <section class="trn-section">
+  <section class="trn-section" id="latestBuzzSection" hidden>
     <div class="trn-inner">
     <div class="trn-head">THE LATEST BUZZ 🔥</div>
     <div class="ev-grid" id="trnGrid"></div>
@@ -1751,6 +1751,7 @@
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="script.js"></script>
 <script>
@@ -1765,6 +1766,26 @@
     });
   }
   const _idb = firebase.firestore();
+  const _paidListerPlans = new Set(['pro','premium','business','growth']);
+
+  // The Latest Buzz is a paid-lister benefit. Keep it hidden unless the
+  // authenticated user's Firestore profile confirms the correct role and plan.
+  firebase.auth().onAuthStateChanged(async (user) => {
+    const section = document.getElementById('latestBuzzSection');
+    if (!section || !user) return;
+    try {
+      const profile = await _idb.collection('users').doc(user.uid).get();
+      const data = profile.exists ? profile.data() : {};
+      const plan = String(data.plan || data.subscriptionPlan || '').trim().toLowerCase();
+      const status = String(data.subscriptionStatus || data.planStatus || 'active').trim().toLowerCase();
+      const hasActivePaidPlan = _paidListerPlans.has(plan) && !['cancelled','expired','inactive'].includes(status);
+      if (String(data.role || '').toLowerCase() === 'lister' && hasActivePaidPlan) {
+        section.hidden = false;
+      }
+    } catch (error) {
+      console.warn('Latest Buzz eligibility check failed:', error.message);
+    }
+  });
   const _banners = ['banner-a','banner-b','banner-c'];
   const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
