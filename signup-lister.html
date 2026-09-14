@@ -212,6 +212,24 @@ document.getElementById('cardPill').textContent=label;
 function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=msg;el.dataset.k=k||'';}
 function toggleEye(btn){var i=btn.previousElementSibling;i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'◔':'◉';}
 
+async function requestWhatsappOtp(phone,name){
+  var res=await fetch('/api/whatsapp/send-otp',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({phone:'+91'+phone,name:name})
+  });
+  var contentType=res.headers.get('content-type')||'';
+  if(!contentType.includes('application/json')){
+    if(location.hostname.endsWith('github.io')){
+      throw new Error('WhatsApp verification needs the API server. GitHub Pages only hosts the website, so this endpoint must be deployed to a backend first.');
+    }
+    throw new Error('OTP service returned an invalid response. Please try again.');
+  }
+  var data=await res.json();
+  if(!res.ok||!data.success)throw new Error(data.error||'Failed to send OTP');
+  return data;
+}
+
 async function sendOtp(){
   var name=document.getElementById('fname').value.trim();
   var email=document.getElementById('femail').value.trim();
@@ -223,9 +241,7 @@ async function sendOtp(){
   if(!pass||pass.length<6){setStatus('Password must be at least 6 characters.','warning','st1');return;}
   setStatus('Sending OTP to your WhatsApp…','info','st1');
   try{
-    var res=await fetch('/api/whatsapp/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:'+91'+phone,name:name})});
-    var data=await res.json();
-    if(!data.success)throw new Error(data.error||'Failed to send OTP');
+    await requestWhatsappOtp(phone,name);
     document.getElementById('otpPhoneShow').textContent='+91 '+phone;
     document.getElementById('step1').style.display='none';
     document.getElementById('step2').style.display='';
@@ -238,11 +254,9 @@ async function resendOtp(){
   var name=document.getElementById('fname').value.trim();
   setStatus('Resending OTP…','info','st2');
   try{
-    var res=await fetch('/api/whatsapp/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:'+91'+phone,name:name})});
-    var data=await res.json();
-    if(!data.success)throw new Error(data.error||'Failed');
+    await requestWhatsappOtp(phone,name);
     setStatus('OTP resent to your WhatsApp!','success','st2');
-  }catch(e){setStatus('Failed to resend.','warning','st2');}
+  }catch(e){setStatus(e.message||'Failed to resend.','warning','st2');}
 }
 
 function backToStep1(){
