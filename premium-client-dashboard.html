@@ -2379,10 +2379,13 @@ function renderEvents() {
 }
 
 window.copyEvLink = function(id){
-  navigator.clipboard.writeText(`${isLocal ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE'}/event-detail.html?eventId=${id}`)
+  const publicBase = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? location.origin
+    : 'https://srisanth588.github.io/CULTUREWAVE';
+  navigator.clipboard.writeText(`${publicBase}/event-detail.html?eventId=${id}`)
     .then(()=>showToast('Link copied!'))
     .catch(()=>{
-      const url = `${isLocal ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE'}/event-detail.html?eventId=${id}`;
+      const url = `${publicBase}/event-detail.html?eventId=${id}`;
       prompt('Copy this link:', url);
     });
 };
