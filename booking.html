@@ -248,19 +248,6 @@
           <div id="seatingWrap" style="display:none;">
             <div class="bk-seating" id="seatingContainer"></div>
           </div>
-          <div class="bk-field" style="margin-top:.75rem;" id="qtyField">
-            <span class="bk-label">Number of Seats</span>
-            <div class="bk-qty">
-              <button class="bk-qty-btn" onclick="changeQty(-1)">−</button>
-              <span class="bk-qty-val" id="qtyVal">1</span>
-              <button class="bk-qty-btn" onclick="changeQty(1)">+</button>
-            </div>
-            <div style="margin-top:.5rem;padding:.6rem .85rem;background:#f0f5ff;border:1px solid var(--border);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:.78rem;color:var(--muted);font-weight:600;">Selected seats</span>
-              <span style="font-size:1rem;font-weight:900;color:var(--blue);" id="qtyDisplay">1</span>
-            </div>
-            <div style="font-size:.8rem;color:var(--muted);margin-top:.3rem;" id="qtyPrice"></div>
-          </div>
         </div>
         <div class="bk-nav">
           <button class="bk-btn-back" onclick="goStep(1)">← Back</button>
@@ -409,6 +396,13 @@ function showToast(msg){ const t=document.getElementById("toast"); t.textContent
 
 function eventDateValue(value){ return value && value.toDate ? value.toDate() : new Date(value); }
 function ticketMax(ticket){ const inventory=Number(ticket.available ?? ticket.inventory ?? ticket.remaining ?? ticket.qty ?? 0); const configured=Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 20); return inventory > 0 ? Math.min(inventory, configured || inventory) : (ticket.soldOut ? 0 : (configured || 20)); }
+function selectedTicketItems(){
+  const items=tickets.map((ticket,index)=>({ticket,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
+  return items.length ? items : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},quantity:qty}];
+}
+function selectedTicketCount(){ return selectedTicketItems().reduce((sum,item)=>sum+item.quantity,0); }
+function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+Number(item.ticket.price||0)*item.quantity,0); }
+function selectedTicketLabel(){ return selectedTicketItems().map(item=>`${item.ticket.name||'Ticket'} × ${item.quantity}`).join(', '); }
 function renderTicketPicker(){
   const list=document.getElementById('pickerTicketList');
   const title=document.getElementById('pickerEventTitle'); const location=document.getElementById('pickerEventLocation');
@@ -425,8 +419,8 @@ function renderTicketPicker(){
 function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
 function changePickerQty(index,change){
   const max=ticketMax(tickets[index]); const next=Math.max(0,Math.min(max,(pickerQuantities[index]||0)+change));
-  pickerQuantities.fill(0); pickerQuantities[index]=next; selectedTicketIdx=index; qty=next||1;
-  if(selectedSeats.length > next) selectedSeats = selectedSeats.slice(0,next);
+  pickerQuantities[index]=next; selectedTicketIdx=index; qty=selectedTicketCount()||1;
+  if(selectedSeats.length > qty) selectedSeats = selectedSeats.slice(0,qty);
   if(evData.seatingPlan&&Array.isArray(evData.seatingPlan.rows)) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
   renderTicketPicker(); updateQtyPrice();
 }
@@ -548,19 +542,8 @@ function selectTicket(i){
   updateQtyPrice();
 }
 
-function changeQty(d){
-  qty = Math.max(1, Math.min(20, qty+d));
-  document.getElementById("qtyVal").textContent = qty;
-  document.getElementById("qtyDisplay").textContent = qty;
-  document.getElementById("rSeats").textContent = qty;
-  updateQtyPrice();
-}
-
 function updateQtyPrice(){
-  const t = tickets[selectedTicketIdx]||{price:0};
-  const subtotal = t.price * qty;
-  document.getElementById("qtyPrice").textContent = subtotal ? fmt(subtotal)+" total" : "Free";
-  document.getElementById("rTicket").textContent = t.name||"General Admission";
+  document.getElementById("rTicket").textContent = selectedTicketLabel();
   updateBill();
 }
 
@@ -571,13 +554,12 @@ function goStep3(){
   if(hasSeating && !isImagePlan && selectedSeats.length === 0){
     showToast("Please select at least one seat"); return;
   }
-  const t = tickets[selectedTicketIdx]||{name:"General Admission",price:0};
   document.getElementById("s3Event").textContent = evData.name||passedName||"—";
   document.getElementById("s3Name").textContent = document.getElementById("bookName").value;
   document.getElementById("s3Phone").textContent = document.getElementById("bookPhone").value;
   document.getElementById("s3Email").textContent = document.getElementById("bookEmail").value;
-  document.getElementById("s3Ticket").textContent = t.name;
-  document.getElementById("s3Qty").textContent = qty;
+  document.getElementById("s3Ticket").textContent = selectedTicketLabel();
+  document.getElementById("s3Qty").textContent = selectedTicketCount();
   const eventDate = eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date);
   const dateLabel = !Number.isNaN(eventDate.getTime()) ? eventDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
   const locationLabel = [evData.venueName||evData.venue, evData.city].filter(Boolean).join(' · ');
@@ -588,14 +570,12 @@ function goStep3(){
 
 // ── BILL ──
 function updateBill(){
-  const t = tickets[selectedTicketIdx]||{price:0};
-  const price = t.price||0;
-  const subtotal = price * qty;
+  const subtotal = selectedTicketSubtotal();
   const afterDiscount = Math.max(0, subtotal - discountAmt);
   const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
   const total = afterDiscount + fee;
-  document.getElementById("b_price").textContent = price ? fmt(price) : "Free";
-  document.getElementById("b_qty").textContent = qty;
+  document.getElementById("b_price").textContent = selectedTicketLabel();
+  document.getElementById("b_qty").textContent = selectedTicketCount();
   document.getElementById("b_subtotal").textContent = fmt(subtotal);
   if(discountAmt > 0){
     document.getElementById("b_discountRow").style.display = "";
@@ -634,8 +614,7 @@ function applyCoupon(){
   const msg = document.getElementById("couponMsg");
   if(!code){ msg.textContent="Enter a coupon code"; msg.className="bk-coupon-msg err"; return; }
   if(couponApplied === code){ msg.textContent="Already applied"; msg.className="bk-coupon-msg err"; return; }
-  const t = tickets[selectedTicketIdx]||{price:0};
-  const subtotal = t.price * qty;
+  const subtotal = selectedTicketSubtotal();
   // match against event coupons from Firestore
   const eventCoupons = Array.isArray(evData.coupons) ? evData.coupons : [];
   const match = eventCoupons.find(c => c.code.toUpperCase() === code);
@@ -657,9 +636,7 @@ function goStep4(){
   if(!document.getElementById("tcCheck").checked){
     showToast("Please agree to Terms & Conditions"); return;
   }
-  const t = tickets[selectedTicketIdx]||{name:"General Admission",price:0};
-  const price = t.price||0;
-  const subtotal = price * qty;
+  const subtotal = selectedTicketSubtotal();
   const afterDiscount = Math.max(0, subtotal - discountAmt);
   const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
   const total = afterDiscount + fee;
@@ -667,8 +644,8 @@ function goStep4(){
   document.getElementById("c_name").textContent = document.getElementById("bookName").value;
   document.getElementById("c_phone").textContent = document.getElementById("bookPhone").value;
   document.getElementById("c_email").textContent = document.getElementById("bookEmail").value;
-  document.getElementById("c_ticket").textContent = t.name;
-  document.getElementById("c_qty").textContent = qty;
+  document.getElementById("c_ticket").textContent = selectedTicketLabel();
+  document.getElementById("c_qty").textContent = selectedTicketCount();
   document.getElementById("c_fee").textContent = fee ? fmt(fee) : "₹0";
   document.getElementById("c_total").textContent = total ? fmt(total) : "Free";
   if(discountAmt > 0){
@@ -723,9 +700,9 @@ async function sendEmail(data){
 // ── SUBMIT ──
 async function submitBooking(){
   if(!document.getElementById('tcCheck').checked){ showToast('Please agree to Terms & Conditions'); return; }
-  const t = tickets[selectedTicketIdx]||{name:"General Admission",price:0};
-  const price = t.price||0;
-  const subtotal = price * qty;
+  const ticketName = selectedTicketLabel();
+  const ticketCount = selectedTicketCount();
+  const subtotal = selectedTicketSubtotal();
   const afterDiscount = Math.max(0, subtotal - discountAmt);
   const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
   const total = afterDiscount + fee;
@@ -741,8 +718,8 @@ async function submitBooking(){
 
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
-    await saveBooking({ bookingId:bid, eventName, ticketName:t.name, amount:0, seats:qty, seatIds:selectedSeats, status:"confirmed", name, email, phone });
-    await sendEmail({ name, email, eventName, amount:"Free", seats:qty, bookingId:bid, method:"Free" });
+    await saveBooking({ bookingId:bid, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone });
+    await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
     location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId);
     return;
   }
@@ -758,8 +735,8 @@ async function submitBooking(){
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
       document.getElementById("rStatus").textContent = "✅ Confirmed";
-      await saveBooking({ bookingId:pid, eventName, ticketName:t.name, amount:total, seats:qty, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
-      await sendEmail({ name, email, eventName, amount:fmt(total), seats:qty, bookingId:pid, method:"Razorpay" });
+      await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
+      await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:"Razorpay" });
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId);
     },
     modal:{ ondismiss:()=>{ submitBtn.disabled=false; submitBtn.textContent="🔒 Pay Now"; } }
@@ -810,9 +787,7 @@ function toggleSeat(seatId, sofa){
     el.style.color = sofa==="true" ? "#be185d" : "#1242c5";
     el.style.boxShadow = "";
   }
-  qty = pickerQuantities.reduce((sum,value)=>sum+value,0) || selectedSeats.length || 1;
-  document.getElementById("qtyVal").textContent = qty;
-  document.getElementById("qtyDisplay").textContent = qty;
+  qty = selectedTicketCount() || selectedSeats.length || 1;
   document.getElementById("rSeats").textContent = qty;
   updateQtyPrice();
   updatePickerBar();
@@ -839,24 +814,20 @@ async function init(){
           img.style = "width:100%;border-radius:10px;";
           document.getElementById("seatingContainer").appendChild(img);
           document.getElementById("seatingWrap").style.display = "";
-          document.getElementById("qtyField").style.display = "none";
         } else if(evData.seatingPlan&&Array.isArray(evData.seatingPlan.rows)){
           await fetchBookedSeats();
           renderSeating(evData.seatingPlan, document.getElementById("seatingContainer"));
           document.getElementById("seatingWrap").style.display = "";
-          document.getElementById("qtyField").style.display = "none";
         }
         // On phones, keep ticket selection and the seating plan together in
         // the first screen; desktop keeps the existing wider layout.
         if(window.innerWidth <= 768){
           const seatWrap = document.getElementById('seatingWrap');
-          const qtyField = document.getElementById('qtyField');
-          if(seatWrap.style.display !== 'none' || qtyField){
+          if(seatWrap.style.display !== 'none'){
             const section = document.createElement('section');
             section.className = 'picker-seat-section';
             section.innerHTML = '<div class="bk-picker-label">SELECT SEATS</div><p class="picker-seat-status" id="pickerSeatStatus">Select your tickets first</p>';
             section.appendChild(seatWrap);
-            section.appendChild(qtyField);
             document.getElementById('pickerSeatMount').appendChild(section);
           }
         }
