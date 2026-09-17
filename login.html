@@ -809,6 +809,13 @@
 
       async function redirect(uid) {
         const data = await getUserData(uid);
+        // A booking link must take precedence over the normal dashboard redirect.
+        // Only accept a same-site relative path to avoid an open-redirect URL.
+        const next = new URLSearchParams(location.search).get('next');
+        if (next && /^booking\.html(?:[?#]|$)/.test(next)) {
+          window.location.href = next;
+          return;
+        }
         const role = data.role || 'customer';
         if (role === 'admin') { window.location.href = 'admin-dashboard.html'; return; }
         if (role === 'lister') { window.location.href = data.dashboard || 'premium-client-dashboard.html'; return; }
@@ -898,7 +905,7 @@
                   role: 'customer', createdAt: Date.now()
                 }, { merge: true });
                 setStatus('Welcome back! Opening your customer dashboard…', 'success');
-                window.location.href = 'customer-dashboard.html';
+                redirect(user.uid);
                 return;
               } catch(accountError) {
                 if (accountError.code === 'auth/email-already-in-use') {
@@ -1025,7 +1032,7 @@
             createdAt: Date.now()
           });
           setStatus('Account created! Redirecting…', 'success');
-          window.location.href = 'customer-dashboard.html';
+          redirect(user.uid);
         } catch(err) {
           const msg = err.code === 'auth/email-already-in-use' ? 'Account already exists. Try logging in.' : err.message;
           setStatus(msg, 'warning');
