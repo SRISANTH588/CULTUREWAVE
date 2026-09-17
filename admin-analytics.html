@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Platform Analytics</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="culturewave-features.js"></script>
+  <style>
+    :root{--blue:#1242c5;--bg:#f5f7fb;--text:#0f172a;--muted:#64748b;--border:#e5e9f0;--green:#16a34a;--orange:#ea580c;--red:#dc2626;--purple:#7c3aed;}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+    body{background:var(--bg);color:var(--text);padding:1.5rem;max-width:1200px;margin:0 auto;}
+    .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem;}
+    h1{font-size:1.35rem;}
+    .sub{color:var(--muted);font-size:.85rem;margin-top:.2rem;}
+    .back{font-size:.82rem;color:var(--blue);text-decoration:none;font-weight:700;}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem;margin-bottom:1.5rem;}
+    .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;}
+    .card .k{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+    .card .v{font-size:1.45rem;font-weight:800;margin-top:.35rem;}
+    .card .h{font-size:.7rem;color:var(--muted);margin-top:.2rem;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+    @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+    .panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.1rem;}
+    .panel h2{font-size:.95rem;margin-bottom:.85rem;}
+    .bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.55rem;font-size:.8rem;}
+    .bar-row .lbl{width:120px;flex-shrink:0;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .bar-track{flex:1;height:16px;background:#f1f5f9;border-radius:8px;overflow:hidden;}
+    .bar-fill{height:100%;background:linear-gradient(90deg,#2f6bff,#1242c5);border-radius:8px;}
+    .bar-val{width:90px;text-align:right;flex-shrink:0;font-weight:700;font-variant-numeric:tabular-nums;}
+    .spark{display:flex;align-items:flex-end;gap:3px;height:120px;padding-top:.5rem;}
+    .spark .b{flex:1;background:linear-gradient(180deg,#2f6bff,#1242c5);border-radius:4px 4px 0 0;min-height:2px;position:relative;}
+    .spark .b:hover::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;font-size:.62rem;padding:.2rem .4rem;border-radius:5px;white-space:nowrap;margin-bottom:3px;}
+    .spark-labels{display:flex;gap:3px;margin-top:.3rem;}
+    .spark-labels span{flex:1;text-align:center;font-size:.56rem;color:var(--muted);overflow:hidden;}
+    .empty{text-align:center;color:var(--muted);padding:1.5rem;font-size:.82rem;}
+    table{width:100%;border-collapse:collapse;}
+    th,td{text-align:left;padding:.5rem .5rem;font-size:.8rem;border-bottom:1px solid var(--border);}
+    th{color:var(--muted);text-transform:uppercase;font-size:.64rem;letter-spacing:.05em;}
+    .num{text-align:right;font-variant-numeric:tabular-nums;}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <h1>📊 Platform Analytics</h1>
+      <div class="sub">Sales, revenue &amp; performance across CultureWave</div>
+    </div>
+    <a class="back" href="admin-dashboard.html">← Back to Admin</a>
+  </div>
+
+  <div class="cards" id="kpis">
+    <div class="card"><div class="k">Tickets Sold</div><div class="v" id="kTickets">—</div></div>
+    <div class="card"><div class="k">Gross Sales</div><div class="v" id="kGross">—</div></div>
+    <div class="card"><div class="k">Platform Revenue</div><div class="v" id="kPlatform">—</div><div class="h">10% commission</div></div>
+    <div class="card"><div class="k">Organizer Revenue</div><div class="v" id="kOrg">—</div></div>
+    <div class="card"><div class="k">Check-in Rate</div><div class="v" id="kCheckin">—</div></div>
+    <div class="card"><div class="k">Conversion Rate</div><div class="v" id="kConv">—</div><div class="h">bookings ÷ published events</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>💰 Daily Sales (last 14 days)</h2>
+      <div class="spark" id="dailySpark"><div class="empty">Loading…</div></div>
+      <div class="spark-labels" id="dailyLabels"></div>
+    </div>
+    <div class="panel">
+      <h2>🏙️ Sales by City</h2>
+      <div id="byCity"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>🎫 Top Events by Revenue</h2>
+      <div id="byEvent"><div class="empty">Loading…</div></div>
+    </div>
+    <div class="panel">
+      <h2>🏷️ Ticket Category Performance</h2>
+      <div id="byCategory"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+<script>
+  firebase.initializeApp({
+    apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+    authDomain:"ogshootsluxe-36740.firebaseapp.com",
+    projectId:"ogshootsluxe-36740",
+    storageBucket:"ogshootsluxe-36740.firebasestorage.app",
+    messagingSenderId:"5471814825",
+    appId:"1:5471814825:web:07e84f2f88486da817d5b8"
+  });
+  const db = firebase.firestore();
+  const inr = n => "₹" + Number(n||0).toLocaleString("en-IN");
+  const RATE = (window.CWFeatures && CWFeatures.config.PLATFORM_COMMISSION_RATE) || 0.10;
+
+  function toDate(v){
+    try{
+      if(!v) return null;
+      if(v.toDate) return v.toDate();
+      const d = new Date(v); return isNaN(d) ? null : d;
+    }catch(_){ return null; }
+  }
+
+  function barChart(el, rows, valFmt){
+    if(!rows.length){ el.innerHTML = '<div class="empty">No data yet</div>'; return; }
+    const max = Math.max.apply(null, rows.map(r=>r.value)) || 1;
+    el.innerHTML = rows.map(r=>`
+      <div class="bar-row">
+        <span class="lbl" title="${r.label}">${r.label}</span>
+        <span class="bar-track"><span class="bar-fill" style="width:${Math.max(2,Math.round(r.value/max*100))}%"></span></span>
+        <span class="bar-val">${valFmt(r.value)}</span>
+      </div>`).join("");
+  }
+
+  async function load(){
+    let bookings = [], events = [];
+    try{ const bs = await db.collection("bookings").get(); bookings = bs.docs.map(d=>({id:d.id,...d.data()})); }catch(e){}
+    try{ const es = await db.collection("events").get(); events = es.docs.map(d=>({id:d.id,...d.data()})); }catch(e){}
+
+    // Consider only non-refunded, non-cancelled bookings for sales.
+    const valid = bookings.filter(b=>{ const s=String(b.status||"").toLowerCase(); return s!=="refunded" && s!=="cancelled"; });
+
+    // KPIs
+    let tickets=0, gross=0, checkedIn=0;
+    valid.forEach(b=>{
+      tickets += Number(b.seats||b.quantity||1)||1;
+      gross += Number(b.grossAmount!=null?b.grossAmount:b.amount)||0;
+      if(b.checkedIn) checkedIn++;
+    });
+    const platform = Math.round(gross*RATE);
+    const org = gross - platform;
+    const publishedEvents = events.filter(e=>String(e.status||"").toLowerCase()!=="draft").length || events.length;
+    const conv = publishedEvents ? (valid.length/publishedEvents) : 0;
+    const checkinRate = valid.length ? Math.round(checkedIn/valid.length*100) : 0;
+
+    document.getElementById("kTickets").textContent = tickets.toLocaleString("en-IN");
+    document.getElementById("kGross").textContent = inr(gross);
+    document.getElementById("kPlatform").textContent = inr(platform);
+    document.getElementById("kOrg").textContent = inr(org);
+    document.getElementById("kCheckin").textContent = checkinRate + "%";
+    document.getElementById("kConv").textContent = conv.toFixed(1) + "×";
+
+    // Daily sales (last 14 days)
+    const days = [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    for(let i=13;i>=0;i--){ const d=new Date(today); d.setDate(d.getDate()-i); days.push({ date:d, total:0 }); }
+    valid.forEach(b=>{
+      const dt = toDate(b.createdAt); if(!dt) return;
+      const d0 = new Date(dt); d0.setHours(0,0,0,0);
+      const bucket = days.find(x=>x.date.getTime()===d0.getTime());
+      if(bucket) bucket.total += Number(b.grossAmount!=null?b.grossAmount:b.amount)||0;
+    });
+    const maxDay = Math.max.apply(null, days.map(d=>d.total)) || 1;
+    document.getElementById("dailySpark").innerHTML = days.map(d=>{
+      const h = Math.max(2, Math.round(d.total/maxDay*110));
+      const lbl = d.date.toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+      return `<div class="b" style="height:${h}px" data-tip="${lbl}: ${inr(d.total)}"></div>`;
+    }).join("");
+    document.getElementById("dailyLabels").innerHTML = days.map((d,i)=> (i%2===0)?`<span>${d.date.getDate()}</span>`:`<span></span>`).join("");
+
+    // Sales by city
+    const cityMap = {};
+    valid.forEach(b=>{ const c=b.city||"Unknown"; cityMap[c]=(cityMap[c]||0)+(Number(b.grossAmount!=null?b.grossAmount:b.amount)||0); });
+    const cityRows = Object.entries(cityMap).map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value).slice(0,8);
+    barChart(document.getElementById("byCity"), cityRows, inr);
+
+    // Top events by revenue
+    const evMap = {};
+    valid.forEach(b=>{ const e=b.eventName||"Unknown"; evMap[e]=(evMap[e]||0)+(Number(b.grossAmount!=null?b.grossAmount:b.amount)||0); });
+    const evRows = Object.entries(evMap).map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value).slice(0,8);
+    barChart(document.getElementById("byEvent"), evRows, inr);
+
+    // Ticket category performance (by ticketName): tickets sold + revenue
+    const catMap = {};
+    valid.forEach(b=>{
+      const t = b.ticketName||"General";
+      if(!catMap[t]) catMap[t] = { tickets:0, revenue:0 };
+      catMap[t].tickets += Number(b.seats||b.quantity||1)||1;
+      catMap[t].revenue += Number(b.grossAmount!=null?b.grossAmount:b.amount)||0;
+    });
+    const catRows = Object.entries(catMap).sort((a,b)=>b[1].revenue-a[1].revenue).slice(0,10);
+    const catEl = document.getElementById("byCategory");
+    if(!catRows.length){ catEl.innerHTML = '<div class="empty">No data yet</div>'; }
+    else {
+      catEl.innerHTML = `<table><thead><tr><th>Ticket Type</th><th class="num">Sold</th><th class="num">Revenue</th></tr></thead><tbody>`
+        + catRows.map(([name,v])=>`<tr><td>${name}</td><td class="num">${v.tickets}</td><td class="num">${inr(v.revenue)}</td></tr>`).join("")
+        + `</tbody></table>`;
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>

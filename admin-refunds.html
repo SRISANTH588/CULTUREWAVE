@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Refund Management</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="culturewave-features.js"></script>
+  <style>
+    :root{--blue:#1242c5;--bg:#f5f7fb;--text:#0f172a;--muted:#64748b;--border:#e5e9f0;--green:#16a34a;--orange:#ea580c;--red:#dc2626;}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+    body{background:var(--bg);color:var(--text);padding:1.5rem;max-width:1100px;margin:0 auto;}
+    .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem;}
+    h1{font-size:1.35rem;}
+    .sub{color:var(--muted);font-size:.85rem;margin-top:.2rem;}
+    .back{font-size:.82rem;color:var(--blue);text-decoration:none;font-weight:700;}
+    .tabs{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;}
+    .tab{padding:.4rem .9rem;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--muted);}
+    .tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    th,td{text-align:left;padding:.7rem .9rem;font-size:.82rem;border-bottom:1px solid var(--border);vertical-align:top;}
+    th{background:#f8fafc;font-weight:700;color:var(--muted);text-transform:uppercase;font-size:.68rem;letter-spacing:.05em;}
+    tr:last-child td{border-bottom:0;}
+    .pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.66rem;font-weight:800;text-transform:capitalize;}
+    .pill.requested{background:#eff6ff;color:var(--blue);}
+    .pill.approved{background:#fff7ed;color:var(--orange);}
+    .pill.processed{background:#f0fdf4;color:var(--green);}
+    .pill.rejected{background:#fef2f2;color:var(--red);}
+    .btn{padding:.4rem .7rem;border:0;border-radius:8px;font-weight:700;font-size:.74rem;cursor:pointer;margin-right:.35rem;}
+    .btn.approve{background:#16a34a;color:#fff;}
+    .btn.reject{background:#dc2626;color:#fff;}
+    .btn.process{background:var(--blue);color:#fff;}
+    .btn:disabled{opacity:.5;cursor:not-allowed;}
+    .empty{text-align:center;color:var(--muted);padding:2rem;font-size:.85rem;}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.72rem;color:var(--muted);}
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    .reason{color:var(--muted);font-size:.76rem;margin-top:.2rem;max-width:260px;}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <h1>↩️ Refund Management</h1>
+      <div class="sub">Review, approve and process customer refund requests</div>
+    </div>
+    <a class="back" href="admin-dashboard.html">← Back to Admin</a>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-f="all" onclick="setFilter('all',this)">All</button>
+    <button class="tab" data-f="requested" onclick="setFilter('requested',this)">Requested</button>
+    <button class="tab" data-f="approved" onclick="setFilter('approved',this)">Approved</button>
+    <button class="tab" data-f="processed" onclick="setFilter('processed',this)">Processed</button>
+    <button class="tab" data-f="rejected" onclick="setFilter('rejected',this)">Rejected</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Customer</th><th>Event</th><th>Amount</th><th>Reason</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody id="rows"><tr><td colspan="6" class="empty">Loading refund requests…</td></tr></tbody>
+  </table>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  firebase.initializeApp({
+    apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+    authDomain:"ogshootsluxe-36740.firebaseapp.com",
+    projectId:"ogshootsluxe-36740",
+    storageBucket:"ogshootsluxe-36740.firebasestorage.app",
+    messagingSenderId:"5471814825",
+    appId:"1:5471814825:web:07e84f2f88486da817d5b8"
+  });
+  const db = firebase.firestore();
+  const inr = n => "₹" + Number(n||0).toLocaleString("en-IN");
+  let filter = "all";
+  let allRequests = [];
+  function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2800); }
+
+  window.setFilter = function(f, el){
+    filter = f;
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    el.classList.add("active");
+    render();
+  };
+
+  function actionsFor(r){
+    if(r.status === "requested"){
+      return `<button class="btn approve" onclick="setStatus('${r.id}','approved')">Approve</button>
+              <button class="btn reject" onclick="setStatus('${r.id}','rejected')">Reject</button>`;
+    }
+    if(r.status === "approved"){
+      return `<button class="btn process" onclick="processRefund('${r.id}', this)">Process Refund</button>`;
+    }
+    return "—";
+  }
+
+  function render(){
+    const list = filter==="all" ? allRequests : allRequests.filter(r=>r.status===filter);
+    if(!list.length){ document.getElementById("rows").innerHTML = `<tr><td colspan="6" class="empty">No ${filter==="all"?"":filter+" "}refund requests.</td></tr>`; return; }
+    document.getElementById("rows").innerHTML = list.map(r=>`
+      <tr>
+        <td>${r.customerName||"Guest"}<div class="mono">${r.customerEmail||""}</div></td>
+        <td>${r.eventName||"—"}<div class="mono">${(r.bookingId||"").slice(-10).toUpperCase()}</div></td>
+        <td><b>${inr(r.amount)}</b></td>
+        <td><div class="reason">${r.reason||"—"}</div></td>
+        <td><span class="pill ${r.status}">${r.status}</span>${r.refundId?`<div class="mono">${r.refundId}</div>`:""}</td>
+        <td>${actionsFor(r)}</td>
+      </tr>`).join("");
+  }
+
+  window.setStatus = async function(id, status){
+    try{
+      await db.collection("refundRequests").doc(id).set({ status, decidedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+      const req = allRequests.find(r=>r.id===id);
+      if(req){ await db.collection("bookings").doc(req.bookingId).set({ refundStatus: status }, { merge:true }); }
+      toast("Marked "+status);
+      await load();
+    }catch(e){ toast("Error: "+e.message); }
+  };
+
+  window.processRefund = async function(id, btn){
+    const req = allRequests.find(r=>r.id===id);
+    if(!req) return;
+    btn.disabled = true; btn.textContent = "Processing…";
+    try{
+      // Attempt gateway refund via server; falls back to manual mark if server unavailable.
+      let refundId = "manual_"+Date.now();
+      let via = "manual";
+      try{
+        const resp = await fetch("/api/refunds", {
+          method:"POST", headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ bookingId:req.bookingId, paymentId:req.paymentId||null, amount:req.amount })
+        });
+        if(resp.ok){ const d = await resp.json(); if(d.success){ refundId = d.refundId || refundId; via = d.provider || "gateway"; } }
+      }catch(_){ /* server not running — mark manually */ }
+
+      await db.collection("refundRequests").doc(id).set({
+        status:"processed", refundId, refundVia: via,
+        processedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge:true });
+      await db.collection("bookings").doc(req.bookingId).set({
+        status:"refunded", refundStatus:"processed", refundId,
+        settlementStatus:"reversed"
+      }, { merge:true });
+      try{ await db.collection("payments").doc(req.bookingId).set({ status:"refunded", refundId }, { merge:true }); }catch(_){}
+      toast("Refund processed ("+via+")");
+      await load();
+    }catch(e){ toast("Error: "+e.message); btn.disabled=false; btn.textContent="Process Refund"; }
+  };
+
+  async function load(){
+    try{
+      const snap = await db.collection("refundRequests").orderBy("createdAt","desc").get();
+      allRequests = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    }catch(e){
+      // orderBy may fail without index — fall back to unordered.
+      try{ const s2 = await db.collection("refundRequests").get(); allRequests = s2.docs.map(d=>({id:d.id,...d.data()})); }
+      catch(err){ document.getElementById("rows").innerHTML = `<tr><td colspan="6" class="empty">Error: ${err.message}</td></tr>`; return; }
+    }
+    render();
+  }
+
+  load();
+</script>
+</body>
+</html>

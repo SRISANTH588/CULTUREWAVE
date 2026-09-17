@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Organizer Settlements</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="culturewave-features.js"></script>
+  <style>
+    :root{--blue:#1242c5;--bg:#f5f7fb;--text:#0f172a;--muted:#64748b;--border:#e5e9f0;--green:#16a34a;--orange:#ea580c;--red:#dc2626;}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+    body{background:var(--bg);color:var(--text);padding:1.5rem;max-width:1100px;margin:0 auto;}
+    .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem;}
+    h1{font-size:1.35rem;}
+    .sub{color:var(--muted);font-size:.85rem;margin-top:.2rem;}
+    .back{font-size:.82rem;color:var(--blue);text-decoration:none;font-weight:700;}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.9rem;margin-bottom:1.25rem;}
+    .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;}
+    .card .k{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+    .card .v{font-size:1.5rem;font-weight:800;margin-top:.35rem;}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    th,td{text-align:left;padding:.7rem .9rem;font-size:.82rem;border-bottom:1px solid var(--border);}
+    th{background:#f8fafc;font-weight:700;color:var(--muted);text-transform:uppercase;font-size:.68rem;letter-spacing:.05em;}
+    tr:last-child td{border-bottom:0;}
+    .pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.68rem;font-weight:800;}
+    .pill.pending{background:#fff7ed;color:var(--orange);}
+    .pill.paid{background:#f0fdf4;color:var(--green);}
+    .btn{padding:.45rem .85rem;border:0;border-radius:8px;background:var(--blue);color:#fff;font-weight:700;font-size:.78rem;cursor:pointer;}
+    .btn:disabled{opacity:.5;cursor:not-allowed;}
+    .empty{text-align:center;color:var(--muted);padding:2rem;font-size:.85rem;}
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.76rem;}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <h1>💸 Organizer Settlements</h1>
+      <div class="sub">Platform commission (10%) &amp; payouts owed to organizers</div>
+    </div>
+    <a class="back" href="admin-dashboard.html">← Back to Admin</a>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="k">Gross Sales</div><div class="v" id="cGross">—</div></div>
+    <div class="card"><div class="k">Platform Revenue</div><div class="v" id="cCommission">—</div></div>
+    <div class="card"><div class="k">Pending Payouts</div><div class="v" id="cPending">—</div></div>
+    <div class="card"><div class="k">Paid Out</div><div class="v" id="cPaid">—</div></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Organizer</th><th>Bookings</th><th>Gross</th><th>Commission</th><th>Net Owed</th><th>Pending</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody id="rows"><tr><td colspan="8" class="empty">Loading settlements…</td></tr></tbody>
+  </table>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  firebase.initializeApp({
+    apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+    authDomain:"ogshootsluxe-36740.firebaseapp.com",
+    projectId:"ogshootsluxe-36740",
+    storageBucket:"ogshootsluxe-36740.firebasestorage.app",
+    messagingSenderId:"5471814825",
+    appId:"1:5471814825:web:07e84f2f88486da817d5b8"
+  });
+  const db = firebase.firestore();
+  const inr = n => "₹" + Number(n||0).toLocaleString("en-IN");
+  function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600); }
+
+  async function nameFor(uid){
+    if(!uid || uid==="unknown") return "Unknown organizer";
+    try{ const s=await db.collection("users").doc(uid).get(); if(s.exists) return s.data().name || s.data().email || uid; }catch(_){}
+    return uid;
+  }
+
+  async function load(){
+    let rows;
+    try{ rows = await CWFeatures.computeSettlements(); }
+    catch(e){ document.getElementById("rows").innerHTML = `<tr><td colspan="8" class="empty">Error: ${e.message}</td></tr>`; return; }
+
+    let gross=0, commission=0, pending=0, paid=0;
+    rows.forEach(r=>{ gross+=r.gross; commission+=r.commission; pending+=r.pendingNet; paid+=r.paidNet; });
+    document.getElementById("cGross").textContent = inr(gross);
+    document.getElementById("cCommission").textContent = inr(commission);
+    document.getElementById("cPending").textContent = inr(pending);
+    document.getElementById("cPaid").textContent = inr(paid);
+
+    if(!rows.length){ document.getElementById("rows").innerHTML = `<tr><td colspan="8" class="empty">No paid bookings yet.</td></tr>`; return; }
+
+    const html = await Promise.all(rows.map(async r=>{
+      const nm = await nameFor(r.organiserId);
+      const status = r.pendingNet>0 ? '<span class="pill pending">Pending</span>' : '<span class="pill paid">Settled</span>';
+      const btn = r.pendingNet>0
+        ? `<button class="btn" onclick="settle('${r.organiserId}', this)">Mark Paid</button>`
+        : `<button class="btn" disabled>—</button>`;
+      return `<tr>
+        <td>${nm}<div class="mono">${r.organiserId}</div></td>
+        <td>${r.bookingCount}</td>
+        <td>${inr(r.gross)}</td>
+        <td>${inr(r.commission)}</td>
+        <td><b>${inr(r.net)}</b></td>
+        <td>${inr(r.pendingNet)}</td>
+        <td>${status}</td>
+        <td>${btn}</td>
+      </tr>`;
+    }));
+    document.getElementById("rows").innerHTML = html.join("");
+  }
+
+  window.settle = async function(orgId, btn){
+    if(!confirm("Mark all pending bookings for this organizer as paid out?")) return;
+    btn.disabled = true; btn.textContent = "Processing…";
+    try{
+      const res = await CWFeatures.settleOrganiser(orgId, "Manual settlement from admin panel");
+      toast(`Settled ${inr(res.amount)} across ${res.bookingCount} booking(s)`);
+      await load();
+    }catch(e){ toast("Error: "+e.message); btn.disabled=false; btn.textContent="Mark Paid"; }
+  };
+
+  load();
+</script>
+</body>
+</html>

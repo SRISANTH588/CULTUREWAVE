@@ -239,6 +239,102 @@ function verifyRazorpaySignature(orderId, paymentId, signature, secret) {
   return expected === signature;
 }
 
+function getSmtpConfig() {
+  return {
+    host: process.env.SMTP_HOST || "",
+    port: Number(process.env.SMTP_PORT || 465),
+    user: process.env.SMTP_USER || "",
+    pass: process.env.SMTP_PASS || "",
+    from: process.env.SMTP_FROM || process.env.SMTP_USER || "CultureWave <no-reply@culturewave.local>",
+    secure: String(process.env.SMTP_SECURE || "true").toLowerCase() !== "false",
+  };
+}
+
+// Minimal dependency-free SMTP client (implicit TLS, AUTH LOGIN).
+// Returns { sent: boolean, skipped?: boolean, error?: string }.
+async function sendEmailSmtp({ to, subject, html, text }) {
+  const cfg = getSmtpConfig();
+  if (!cfg.host || !cfg.user || !cfg.pass) {
+    console.log(`[email] SMTP not configured — skipping email to ${to} (subject: ${subject})`);
+    return { sent: false, skipped: true };
+  }
+  const tls = await import("node:tls");
+  return await new Promise((resolve) => {
+    let settled = false;
+    const done = (result) => { if (!settled) { settled = true; try { socket.end(); } catch {} resolve(result); } };
+    const socket = tls.connect({ host: cfg.host, port: cfg.port, servername: cfg.host }, () => {});
+    socket.setEncoding("utf8");
+    socket.setTimeout(15000, () => done({ sent: false, error: "SMTP timeout" }));
+
+    const steps = [];
+    const fromAddr = (cfg.from.match(/<([^>]+)>/) || [null, cfg.from])[1];
+    const b64 = (s) => Buffer.from(s, "utf8").toString("base64");
+    const body =
+      `From: ${cfg.from}\r\n` +
+      `To: ${to}\r\n` +
+      `Subject: ${subject}\r\n` +
+      `MIME-Version: 1.0\r\n` +
+      `Content-Type: text/html; charset=UTF-8\r\n\r\n` +
+      (html || text || "");
+
+    // Ordered SMTP dialogue. Each entry: [expectedCodePrefix, commandToSend].
+    steps.push(["220", `EHLO culturewave.local\r\n`]);
+    steps.push(["250", `AUTH LOGIN\r\n`]);
+    steps.push(["334", `${b64(cfg.user)}\r\n`]);
+    steps.push(["334", `${b64(cfg.pass)}\r\n`]);
+    steps.push(["235", `MAIL FROM:<${fromAddr}>\r\n`]);
+    steps.push(["250", `RCPT TO:<${to}>\r\n`]);
+    steps.push(["250", `DATA\r\n`]);
+    steps.push(["354", `${body}\r\n.\r\n`]);
+    steps.push(["250", `QUIT\r\n`]);
+
+    let i = 0;
+    let buffer = "";
+    socket.on("data", (chunk) => {
+      buffer += chunk;
+      if (!/\r?\n$/.test(buffer)) return; // wait for full line(s)
+      const line = buffer.trim().split(/\r?\n/).pop();
+      buffer = "";
+      const code = line.slice(0, 3);
+      const [expected, command] = steps[i] || [];
+      if (!expected) return;
+      if (!code.startsWith(expected[0]) && code !== expected) {
+        // Accept any 2xx/3xx where appropriate; otherwise fail.
+        if (!(code[0] === "2" && expected[0] === "2") && !(code[0] === "3" && expected[0] === "3")) {
+          return done({ sent: false, error: `SMTP error: ${line}` });
+        }
+      }
+      i++;
+      if (command) socket.write(command);
+      if (i >= steps.length) done({ sent: true });
+    });
+    socket.on("error", (err) => done({ sent: false, error: err.message }));
+  });
+}
+
+// Branded HTML for a booking/payment confirmation email.
+function bookingEmailHtml({ name, eventName, bookingId, amount, seats, ticketUrl }) {
+  const shortId = String(bookingId || "").slice(-10).toUpperCase();
+  const amt = amount ? `₹${Number(amount).toLocaleString("en-IN")}` : "Free";
+  return `<div style="font-family:system-ui,Segoe UI,sans-serif;max-width:520px;margin:auto;border:1px solid #e5e9f0;border-radius:16px;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#0a0f1e,#1242c5);padding:24px;text-align:center;color:#fff">
+      <div style="font-size:22px;font-weight:800">🎟️ Booking Confirmed</div>
+      <div style="opacity:.8;font-size:13px;margin-top:4px">CultureWave</div>
+    </div>
+    <div style="padding:24px;color:#0f172a">
+      <p style="font-size:15px">Hi ${name || "there"}, your booking is confirmed!</p>
+      <table style="width:100%;font-size:14px;border-collapse:collapse;margin:16px 0">
+        <tr><td style="padding:6px 0;color:#64748b">Event</td><td style="padding:6px 0;text-align:right;font-weight:700">${eventName || "Event"}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b">Booking ID</td><td style="padding:6px 0;text-align:right;font-family:monospace">#${shortId}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b">Tickets</td><td style="padding:6px 0;text-align:right">${seats || 1}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b">Amount</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1242c5">${amt}</td></tr>
+      </table>
+      ${ticketUrl ? `<a href="${ticketUrl}" style="display:block;text-align:center;background:#1242c5;color:#fff;text-decoration:none;padding:12px;border-radius:10px;font-weight:700">View / Download E-Ticket</a>` : ""}
+      <p style="font-size:12px;color:#94a3b8;margin-top:20px">Show the QR code on your e-ticket at the venue for entry. This is an automated confirmation from CultureWave.</p>
+    </div>
+  </div>`;
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
 
@@ -668,6 +764,17 @@ const server = http.createServer(async (req, res) => {
       } catch (writeError) {
         console.warn("Free booking Firestore write skipped:", writeError.message);
       }
+      // Fire-and-forget confirmation email (no-op when SMTP unconfigured).
+      if (email) {
+        sendEmailSmtp({
+          to: email,
+          subject: `Your CultureWave booking is confirmed — ${booking.event?.name || "Event"}`,
+          html: bookingEmailHtml({
+            name, eventName: booking.event?.name, bookingId, amount: 0, seats: booking.seats,
+            ticketUrl: `https://srisanth588.github.io/CULTUREWAVE/success.html?bookingId=${encodeURIComponent(bookingId)}`,
+          }),
+        }).catch((e) => console.warn("free booking email:", e.message));
+      }
       return send(res, 200, { success: true, bookingId });
     } catch (error) {
       return send(res, 400, { success: false, error: error.message || "Could not create free booking" });
@@ -709,6 +816,19 @@ const server = http.createServer(async (req, res) => {
       }
       if (booking && admin.apps.length) {
         await admin.firestore().collection("bookings").doc(booking.bookingId).set(booking, { merge: true });
+      }
+      // Fire-and-forget payment/booking confirmation email.
+      const custEmail = booking?.customer?.email;
+      if (booking && custEmail) {
+        sendEmailSmtp({
+          to: custEmail,
+          subject: `Payment received — your CultureWave booking is confirmed`,
+          html: bookingEmailHtml({
+            name: booking.customer?.name, eventName: booking.event?.name, bookingId: booking.bookingId,
+            amount: booking.amount, seats: booking.seats,
+            ticketUrl: `https://srisanth588.github.io/CULTUREWAVE/success.html?bookingId=${encodeURIComponent(booking.bookingId)}`,
+          }),
+        }).catch((e) => console.warn("verify booking email:", e.message));
       }
       return send(res, 200, { success: true, verified: true, bookingId: booking?.bookingId || null });
     } catch (error) {
@@ -977,8 +1097,132 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
   }
 
+  // ── EMAIL NOTIFICATIONS ──────────────────────────────────────
+  // Generic email sender. Body: { to, subject, html } OR a booking payload
+  // { to, type:"booking", name, eventName, bookingId, amount, seats, ticketUrl }.
+  if (req.method === "POST" && url.pathname === "/api/notify/email") {
+    try {
+      const body = await readBody(req);
+      const to = String(body.to || "").trim();
+      if (!to) return send(res, 400, { success: false, error: "Missing recipient" });
+      let subject = body.subject;
+      let html = body.html;
+      if (body.type === "booking" || (!html && body.bookingId)) {
+        subject = subject || `Your CultureWave booking is confirmed — ${body.eventName || "Event"}`;
+        html = bookingEmailHtml(body);
+      }
+      const result = await sendEmailSmtp({ to, subject: subject || "CultureWave", html, text: body.text });
+      return send(res, 200, { success: true, ...result });
+    } catch (error) {
+      return send(res, 400, { success: false, error: error.message || "Email failed" });
+    }
+  }
+
+  // ── REFUNDS ──────────────────────────────────────────────────
+  // Process a refund through the original payment gateway. Falls back to a
+  // manual record if no gateway credentials or payment id are available so
+  // the admin flow always resolves.
+  if (req.method === "POST" && url.pathname === "/api/refunds") {
+    try {
+      const body = await readBody(req);
+      const bookingId = String(body.bookingId || "").trim();
+      let paymentId = body.paymentId ? String(body.paymentId).trim() : "";
+      let amount = Number(body.amount) || 0; // rupees
+
+      // Look up the booking to resolve the gateway payment id / amount if missing.
+      if (admin.apps.length && bookingId) {
+        try {
+          const snap = await admin.firestore().collection("bookings").doc(bookingId).get();
+          if (snap.exists) {
+            const b = snap.data();
+            paymentId = paymentId || b.paymentId || b.razorpayPaymentId || "";
+            if (!amount) amount = Number(b.amount) || 0;
+          }
+        } catch (lookupErr) {
+          console.warn("refund lookup skipped:", lookupErr.message);
+        }
+      }
+
+      const amountPaise = Math.round(amount * 100);
+
+      // Razorpay: refund against a captured payment id (pay_...).
+      const { keyId, keySecret } = getRazorpayConfig();
+      if (keyId && keySecret && /^pay_/.test(paymentId)) {
+        const rp = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}/refund`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}`,
+          },
+          body: JSON.stringify(amountPaise > 0 ? { amount: amountPaise, speed: "normal" } : { speed: "normal" }),
+        });
+        if (rp.ok) {
+          const data = await rp.json();
+          await markBookingRefunded(bookingId, data.id, "razorpay");
+          return send(res, 200, { success: true, provider: "razorpay", refundId: data.id, status: data.status });
+        }
+        const errText = await rp.text();
+        console.warn("razorpay refund failed:", errText);
+      }
+
+      // Cashfree: refund against the order id.
+      const cf = getCashfreeConfig();
+      if (cf.appId && cf.secretKey && bookingId) {
+        const apiUrl = cf.environment === "production"
+          ? `https://api.cashfree.com/pg/orders/${bookingId}/refunds`
+          : `https://sandbox.cashfree.com/pg/orders/${bookingId}/refunds`;
+        const cfResp = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-version": "2025-01-01",
+            "x-client-id": cf.appId,
+            "x-client-secret": cf.secretKey,
+          },
+          body: JSON.stringify({
+            refund_amount: Number(amount.toFixed(2)),
+            refund_id: `rf_${randomUUID().slice(0, 8)}`,
+            refund_note: "CultureWave admin refund",
+          }),
+        });
+        if (cfResp.ok) {
+          const data = await cfResp.json();
+          await markBookingRefunded(bookingId, data.refund_id || data.cf_refund_id, "cashfree");
+          return send(res, 200, { success: true, provider: "cashfree", refundId: data.refund_id || data.cf_refund_id, status: data.refund_status });
+        }
+        const errText = await cfResp.text();
+        console.warn("cashfree refund failed:", errText);
+      }
+
+      // Fallback: no gateway available — record a manual refund so the flow completes.
+      const manualId = `manual_${randomUUID().slice(0, 8)}`;
+      await markBookingRefunded(bookingId, manualId, "manual");
+      return send(res, 200, { success: true, provider: "manual", refundId: manualId, status: "processed" });
+    } catch (error) {
+      return send(res, 400, { success: false, error: error.message || "Refund failed" });
+    }
+  }
+
   return send(res, 404, "Not found");
 });
+
+async function markBookingRefunded(bookingId, refundId, provider) {
+  if (!admin.apps.length || !bookingId) return;
+  const patch = {
+    status: "refunded",
+    refundStatus: "processed",
+    refundId: refundId || null,
+    refundVia: provider || "manual",
+    settlementStatus: "reversed",
+    refundedAt: new Date().toISOString(),
+  };
+  try {
+    await admin.firestore().collection("bookings").doc(bookingId).set(patch, { merge: true });
+    await admin.firestore().collection("payments").doc(bookingId).set(patch, { merge: true });
+  } catch (err) {
+    console.warn("markBookingRefunded skipped:", err.message);
+  }
+}
 
 server.listen(3000, "127.0.0.1", () => {
   console.log("cityvibe running on http://127.0.0.1:3000");
