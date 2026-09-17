@@ -175,9 +175,58 @@
     .mob-share-btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:12px;font-size:.82rem;font-weight:800;cursor:pointer;border:1px solid;}
     .mob-share-wa{background:#f0fdf4;border-color:#bbf7d0;color:#166534;}
     .mob-share-copy{background:#f8faff;border-color:var(--border);color:var(--text);}
+    .mob-about-host{display:none;}
+    .mob-seating-title{display:none;}
+    .mob-detail-tabs{display:none;}
+    .seating-plan-intro{font-size:.84rem;color:#64748b;margin-bottom:.85rem;}
+
+    /* Phone-only event-detail refinements. Desktop keeps its existing layout. */
+    @media (max-width:768px){
+      body{background:#05070c;color:#f8fafc;padding-bottom:104px;}
+      .topbar,.mobile-nav,.desktop-hero-stage .hero-banner{display:none!important;}
+      .mob-topbar{height:70px;display:grid!important;grid-template-columns:42px 1fr 42px;padding:.7rem 1rem;background:rgba(5,7,12,.94);border:0;position:sticky;top:0;backdrop-filter:blur(18px);}
+      .mob-topbar-org,.mob-topbar-actions{display:none!important;}
+      .mob-detail-back,.mob-detail-share{width:42px;height:42px;border:1px solid #343945;border-radius:50%;display:grid;place-items:center;color:#fff;background:#11151f;font-size:1.9rem;line-height:1;text-decoration:none;}
+      .mob-detail-share{font-size:1.6rem;padding-bottom:.22rem;justify-self:end;}
+      .mob-detail-nav-title{align-self:center;padding:0 .5rem;font-size:.82rem;font-weight:900;letter-spacing:.03em;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;}
+      .mob-poster{width:calc(100% - 2.25rem);margin:.35rem auto 0;border:1px solid #3d414a;outline:0;border-radius:23px;box-shadow:0 16px 32px rgba(0,0,0,.45);}
+      .mob-event-header{padding:1.55rem 1.4rem .45rem;background:#05070c;color:#fff;}
+      .mob-hosted-line,.mob-event-summary{color:#aeb4c0;}
+      .mob-hosted-line a{color:#fff;}
+      .mob-event-title{font-size:1.55rem;color:#fff;text-transform:uppercase;letter-spacing:-.03em;}
+      .mob-info-list{border-top:1px solid #252a34;padding-top:1rem;gap:.85rem;}
+      .mob-info-row{padding:.05rem 0;}.mob-info-icon-box{width:45px;min-width:45px;height:45px;border-radius:12px;background:#171b23!important;}
+      .mob-info-text-title{color:#fff;font-size:.9rem;}.mob-info-text-sub{color:#aeb4c0;}
+      .mob-detail-tabs{position:sticky;top:70px;z-index:25;display:grid;grid-template-columns:repeat(4,1fr);gap:.18rem;margin:1rem 1.2rem 1.4rem;padding:.25rem;background:#292d36;border:1px solid #4a4e58;border-radius:999px;}
+      .mob-detail-tabs button{height:39px;border:0;border-radius:999px;background:transparent;color:#e5e7eb;font-size:.84rem;font-weight:800;}.mob-detail-tabs button.active{background:#fff;color:#10131a;}
+      .shell{padding:0 1.4rem;background:#05070c;}.section,.mob-section-card{background:#0f1219!important;border-color:#292e38!important;color:#fff;box-shadow:none!important;}
+      .section-title,.mob-section-label{color:#fff!important;}.section-title::before{background:#ff5a19;}.description{color:#d2d6de!important;}
+      #descSection{padding:1.25rem 1.1rem;margin-top:1.15rem;}
+      #descSection .section-title{margin-bottom:.7rem;}
+      #descSection .description{font-size:.94rem;line-height:1.72;}
+      .mob-about-host{width:100%;display:flex;align-items:center;gap:.75rem;margin-top:1.15rem;padding:.8rem .85rem;text-align:left;background:#181c25;border:1px solid #303641;border-radius:14px;color:#fff;}
+      .mob-about-host-avatar{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#ff6a2a,#b53010);color:#fff;font-weight:900;font-size:.8rem;flex:none;}
+      .mob-about-host-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
+      .mob-about-host-copy{display:flex;flex-direction:column;gap:.12rem;min-width:0;}
+      .mob-about-host-copy small{font-size:.69rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+      .mob-about-host-copy strong{font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .mob-about-host-arrow{margin-left:auto;font-size:1.5rem;color:var(--blue);line-height:1;}
+      #mobOrgCard{display:none!important;}
+      #seatingPlanSection{padding:1.25rem 1.1rem;background:#0f1219;}
+      #seatingPlanSection .section-title{font-size:.76rem;margin-bottom:.45rem;}
+      .mob-seating-title{display:inline;}
+      .desktop-seating-title{display:none;}
+      .seating-plan-intro{font-size:.82rem;line-height:1.55;margin-bottom:.85rem;}
+      #seatingPlanSection > div:last-child{padding:.55rem;border-radius:15px;background:#171b23;box-shadow:none;}
+      #seatingPlanImage{border-radius:10px!important;}
+      .mob-gallery-section{margin:1.4rem 0;}.mob-detail-heading{font-size:1.35rem;font-weight:900;letter-spacing:-.04em;margin:0 0 .85rem;}.mob-gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;}.mob-gallery-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px;background:#171b23;}.mob-gallery-grid img:first-child{grid-row:span 2;grid-column:span 2;aspect-ratio:auto;height:100%;}
+      .faq-item{background:#151922;border-color:#303641;}.faq-item summary,.faq-item .faq-ans{background:#151922;color:#fff;}.faq-item .faq-ans{color:#c5cad3;}.seating-plan-intro{color:#aeb4c0;}
+      .mob-register-bar{left:1rem;right:1rem;bottom:.8rem;border:1px solid #464b55;border-radius:18px;padding:.7rem 1rem;background:#252a33;box-shadow:0 12px 30px rgba(0,0,0,.5);}.mob-reg-label{color:#b8bec8;}.mob-reg-price{color:#fff;}.mob-reg-btn{background:#ff5a19;box-shadow:none;border-radius:13px;}
+    }
 
     /* The event poster is a compact card on desktop instead of spanning the page. */
     @media (min-width:769px){
+      .mob-detail-tabs,.mob-gallery-section{display:none!important;}
       .desktop-hero-stage .mob-poster{display:block;width:300px;max-width:calc(100% - 2rem);margin:2rem auto;position:relative;z-index:3;}
       .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;padding-bottom:3rem;}
       .desktop-hero-stage.has-desktop-background .hero-banner{height:420px!important;background:transparent!important;}
@@ -190,6 +239,9 @@
 
 <!-- MOBILE TOP BAR -->
 <div class="mob-topbar" id="mobTopbar">
+  <a class="mob-detail-back" href="events.html" aria-label="Back to events">←</a>
+  <div class="mob-detail-nav-title" id="mobDetailNavTitle">Event details</div>
+  <button class="mob-detail-share" type="button" onclick="openShare()" aria-label="Share event">⇧</button>
   <div class="mob-topbar-org" onclick="goToProfile()">
     <div class="mob-topbar-avatar" id="mobTopAvatar">🎪</div>
     <span class="mob-topbar-name" id="mobTopOrgName">Organiser</span>
@@ -310,6 +362,14 @@
   </div>
 </div>
 
+<!-- Phone-only quick navigation, inspired by the event discovery flow. -->
+<nav class="mob-detail-tabs" aria-label="Event details sections">
+  <button class="active" type="button" data-mob-tab="about" onclick="showMobileDetailTab('about')">About</button>
+  <button type="button" data-mob-tab="photos" onclick="showMobileDetailTab('photos')">Photos</button>
+  <button type="button" data-mob-tab="venue" onclick="showMobileDetailTab('venue')">Venue</button>
+  <button type="button" data-mob-tab="help" onclick="showMobileDetailTab('help')">Help</button>
+</nav>
+
 
 <div class="shell">
   <!-- LEFT -->
@@ -334,6 +394,17 @@
     <div class="section" id="descSection" style="display:none;">
       <div class="section-title">About this event</div>
       <div class="description" id="evDesc"></div>
+      <!-- Mobile-only: keeps the host close to the event story. -->
+      <button class="mob-about-host" id="mobAboutHost" type="button" onclick="goToProfile()">
+        <span class="mob-about-host-avatar" id="mobAboutHostAvatar">CW</span>
+        <span class="mob-about-host-copy"><small>Hosted by</small><strong id="mobAboutHostName">Organiser</strong></span>
+        <span class="mob-about-host-arrow">›</span>
+      </button>
+    </div>
+
+    <div class="mob-gallery-section" id="mobGallerySection" style="display:none;">
+      <div class="mob-detail-heading">Photos &amp; videos</div>
+      <div class="mob-gallery-grid" id="mobGalleryGrid"></div>
     </div>
 
     <!-- TICKETS -->
@@ -343,8 +414,8 @@
 
     <!-- SEATING PLAN -->
     <div class="section" id="seatingPlanSection" style="display:none;">
-      <div class="section-title">Seating Plan</div>
-      <p style="font-size:.84rem;color:#64748b;margin-bottom:.85rem;">See the venue layout before choosing your seat.</p>
+      <div class="section-title"><span class="mob-seating-title">Venue &amp; seating plan</span><span class="desktop-seating-title">Seating Plan</span></div>
+      <p class="seating-plan-intro">See the venue layout before choosing your seat.</p>
       <div style="border:1px solid var(--border);border-radius:14px;padding:.75rem;overflow:auto;background:#f8faff;">
         <img id="seatingPlanImage" src="" alt="Seating plan" style="display:block;width:100%;max-height:520px;object-fit:contain;border-radius:10px;"/>
         <div id="seatingPlanBuilder" style="display:none;"></div>
@@ -517,6 +588,18 @@ function goToProfile(){
   if(ownerUid) location.href = `client-profile.html?uid=${ownerUid}`;
 }
 
+function showMobileDetailTab(tab){
+  const targets = {
+    about: 'descSection',
+    photos: 'mobGallerySection',
+    venue: 'seatingPlanSection',
+    help: 'faqsSection'
+  };
+  document.querySelectorAll('[data-mob-tab]').forEach(button => button.classList.toggle('active', button.dataset.mobTab === tab));
+  const target = document.getElementById(targets[tab]) || document.getElementById('descSection');
+  if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
 function renderSeatingLayout(layout, target){
   if(!target) return;
   const rows = Array.isArray(layout.rows) ? layout.rows : [];
@@ -591,6 +674,18 @@ async function renderEvent(data){
   // mobile event header
   document.getElementById('mobEvTitle').textContent = data.name||'Untitled Event';
   document.getElementById('mobEvSummary').textContent = data.summary||data.tagline||'';
+  document.getElementById('mobDetailNavTitle').textContent = data.name||'Event details';
+
+  // A poster is useful as the first gallery tile when no extra photos were added.
+  const gallerySource = data.galleryImages || data.gallery || data.photos || [];
+  const gallery = Array.isArray(gallerySource) ? gallerySource.filter(Boolean) : [];
+  const galleryImages = [...new Set([posterSrc, ...gallery].filter(Boolean))].slice(0, 8);
+  if(galleryImages.length){
+    document.getElementById('mobGalleryGrid').innerHTML = galleryImages.map((src,index) =>
+      `<img src="${esc(src)}" alt="${esc(data.name||'Event')} photo ${index+1}" loading="lazy"/>`
+    ).join('');
+    document.getElementById('mobGallerySection').style.display = 'block';
+  }
 
   // highlights strip
   const price0 = (data.tickets||[])[0]?.price || data.price || 0;
@@ -745,13 +840,13 @@ async function renderEvent(data){
       console.log('org doc exists:', snap.exists, 'avatarUrl:', org.avatarUrl, 'ownerId:', data.ownerId);
       const name = org.name || data.organiserName || 'Organiser';
       const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar'].forEach(id=>{
+      ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar','mobAboutHostAvatar'].forEach(id=>{
         const el = document.getElementById(id);
         if(!el) return;
         if(org.avatarUrl) el.innerHTML = `<img src="${org.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
         else el.textContent = initials;
       });
-      ['orgName','sideOrgName','mobTopOrgName','mobHostedName','mobOrgName'].forEach(id=>{
+      ['orgName','sideOrgName','mobTopOrgName','mobHostedName','mobOrgName','mobAboutHostName'].forEach(id=>{
         const el = document.getElementById(id);
         if(el) el.textContent = name;
       });
@@ -762,13 +857,13 @@ async function renderEvent(data){
           const u = usnap.data();
           const uname = u.name || u.displayName || 'Organiser';
           const uinitials = uname.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-          ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar'].forEach(id=>{
+          ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar','mobAboutHostAvatar'].forEach(id=>{
             const el = document.getElementById(id);
             if(!el) return;
             if(u.avatarUrl||u.photoURL) el.innerHTML = `<img src="${u.avatarUrl||u.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
             else el.textContent = uinitials;
           });
-          ['orgName','sideOrgName','mobTopOrgName','mobHostedName','mobOrgName'].forEach(id=>{
+          ['orgName','sideOrgName','mobTopOrgName','mobHostedName','mobOrgName','mobAboutHostName'].forEach(id=>{
             const el = document.getElementById(id);
             if(el) el.textContent = uname;
           });
