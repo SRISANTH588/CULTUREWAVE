@@ -231,7 +231,7 @@
 
     /* The event poster is a compact card on desktop instead of spanning the page. */
     @media (min-width:769px){
-      .mob-detail-tabs,.mob-gallery-section,.nightlife-mobile{display:none!important;}
+      .mob-detail-tabs,.mob-gallery-section,.nightlife-mobile,.mob-poster-actions{display:none!important;}
       .desktop-hero-stage .mob-poster{display:block;width:300px;max-width:calc(100% - 2rem);margin:2rem auto;position:relative;z-index:3;}
       .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;padding-bottom:3rem;}
       .desktop-hero-stage.has-desktop-background .hero-banner{height:420px!important;background:transparent!important;}
@@ -244,7 +244,7 @@
     .mob-poster-copy{display:none}
     @media (max-width:768px){
       .desktop-hero-stage{position:relative;padding:0 0 .1rem}
-      .mob-topbar{display:none!important}.mob-poster-actions{position:absolute;z-index:4;left:2rem;right:2rem;top:1.25rem;display:flex;justify-content:space-between;align-items:center}.mob-poster-action{display:grid;place-items:center;width:46px;height:46px;padding:0;border:1px solid rgba(232,235,241,.42);border-radius:50%;background:rgba(6,8,12,.62);box-shadow:0 5px 14px rgba(0,0,0,.32);backdrop-filter:blur(12px);color:#fff;transition:transform .18s ease,background .18s ease}.mob-poster-action:hover,.mob-poster-action:focus-visible{background:rgba(29,32,38,.82);transform:scale(1.05);outline:none}.mob-poster-action svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+      .mob-topbar{display:none!important}.mob-poster-actions{display:flex;justify-content:space-between;align-items:center;margin:.75rem 1.125rem .5rem;padding:.5rem .72rem;border:1px solid #2c323c;border-radius:20px;background:#10141b;box-shadow:0 9px 20px rgba(0,0,0,.24)}.mob-poster-action{display:grid;place-items:center;width:46px;height:46px;padding:0;border:1px solid rgba(232,235,241,.42);border-radius:50%;background:rgba(6,8,12,.62);box-shadow:0 5px 14px rgba(0,0,0,.32);backdrop-filter:blur(12px);color:#fff;transition:transform .18s ease,background .18s ease}.mob-poster-action:hover,.mob-poster-action:focus-visible{background:rgba(29,32,38,.82);transform:scale(1.05);outline:none}.mob-poster-action svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
       .mob-poster{display:block!important;aspect-ratio:3/4;object-fit:cover;filter:saturate(.92) contrast(1.07) brightness(.72)}
       .desktop-hero-stage::after{content:'';position:absolute;pointer-events:none;left:1.125rem;right:1.125rem;top:.35rem;bottom:.1rem;border-radius:23px;background:linear-gradient(180deg,rgba(0,0,0,.06) 24%,rgba(3,5,9,.04) 45%,rgba(3,5,9,.86) 100%)}
       .mob-poster-copy{position:absolute;z-index:3;left:2rem;right:2rem;top:2rem;bottom:1.1rem;display:flex;flex-direction:column;color:#fff;pointer-events:none;text-shadow:0 2px 13px rgba(0,0,0,.6)}
@@ -318,6 +318,11 @@
   </div>
 </nav>
 
+<nav class="mob-poster-actions" aria-label="Event navigation">
+  <a href="events.html" class="mob-poster-action" aria-label="Back to events"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+  <button type="button" class="mob-poster-action" onclick="openShare()" aria-label="Share event"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0l-4 4m4-4l4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
+</nav>
+
 <div class="desktop-hero-stage" id="desktopHeroStage">
 <div class="hero-banner" id="heroBanner">
   <div class="hero-banner-overlay"></div>
@@ -341,10 +346,6 @@
 <!-- MOBILE POSTER -->
 <img class="mob-poster" id="mobPoster" src="" alt="Event poster"/>
 <div class="mob-poster-copy" aria-hidden="true"></div>
-<nav class="mob-poster-actions" aria-label="Event navigation">
-  <a href="events.html" class="mob-poster-action" aria-label="Back to events"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
-  <button type="button" class="mob-poster-action" onclick="openShare()" aria-label="Share event"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0l-4 4m4-4l4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
-</nav>
 </div>
 
 <!-- MOBILE EVENT HEADER -->
