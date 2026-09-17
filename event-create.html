@@ -1359,6 +1359,26 @@
         <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;" onchange="loadGalleryFiles(this)" />
       </div>
 
+      <div class="card">
+        <div class="card-head"><h2>Featured Artists <span style="font-size:.68rem;color:var(--muted);font-weight:700;">Optional</span></h2><p>Add the artists assigned to this event. They will appear on the event details page.</p></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.6rem;align-items:end;">
+          <div class="field"><label for="artistName">Artist name</label><input id="artistName" type="text" placeholder="e.g. Korolova" /></div>
+          <div class="field"><label for="artistImage">Artist image URL</label><input id="artistImage" type="url" placeholder="https://example.com/artist.jpg" /></div>
+          <button class="btn-primary" type="button" style="height:42px;white-space:nowrap;" onclick="addArtist()">+ Add artist</button>
+        </div>
+        <div id="artistList" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.85rem;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Event Details <span style="font-size:.68rem;color:var(--muted);font-weight:700;">Optional</span></h2><p>Only details you choose here will be shown to attendees.</p></div>
+        <div class="grid-2">
+          <div class="field"><label for="eventLanguage">Language</label><input id="eventLanguage" type="text" placeholder="e.g. English, Hindi" /></div>
+          <div class="field"><label for="layoutType">Layout type</label><select id="layoutType"><option value="">Do not display</option><option value="Indoor">Indoor</option><option value="Outdoor">Outdoor</option></select></div>
+          <div class="field"><label for="kidsFriendly">Kid friendly?</label><select id="kidsFriendly"><option value="">Do not display</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+          <div class="field"><label for="petsFriendly">Pet friendly?</label><select id="petsFriendly"><option value="">Do not display</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+        </div>
+      </div>
+
       <!-- Promo Video -->
       <div class="card">
         <div class="card-head"><h2>🎬 Promo Video</h2><p>A short teaser can increase ticket sales by up to 30%</p></div>
@@ -1877,6 +1897,7 @@ let eventType = 'in-person';
 let tickets = [];
 let coupons = [];
 let faqs = [];
+let artists = [];
 let uid = null;
 let coverFile = null;
 let cardImgFile = null;
@@ -1908,7 +1929,7 @@ function saveLocalDraft() {
     const toggles = {};
     document.querySelectorAll('.toggle[id]').forEach(el => { toggles[el.id] = el.classList.contains('on'); });
     localStorage.setItem(localDraftKey, JSON.stringify({
-      fields, toggles, eventType, eventDates, tickets, coupons, faqs, galleryImages,
+      fields, toggles, eventType, eventDates, tickets, coupons, faqs, artists, galleryImages,
       ticketMode, perDateTickets, ticketDeliveryMode, ticketDesign, rsvpCQs,
       seatingPlanMode, seatingPlanLayout,
       savedAt: Date.now(),
@@ -1937,6 +1958,7 @@ function restoreLocalDraft() {
     if (Array.isArray(draft.tickets)) { tickets = draft.tickets; renderTickets(); }
     if (Array.isArray(draft.coupons)) { coupons = draft.coupons; renderCoupons(); }
     if (Array.isArray(draft.faqs)) { faqs = draft.faqs; renderFaqs(); }
+    if (Array.isArray(draft.artists)) { artists = draft.artists; renderArtists(); }
     if (Array.isArray(draft.galleryImages)) { galleryImages = draft.galleryImages; renderGallery(); }
     if (draft.ticketMode) setTicketMode(draft.ticketMode);
     if (draft.perDateTickets) perDateTickets = draft.perDateTickets;
@@ -2086,6 +2108,7 @@ loadUser();
     if (d.ticketMode) { ticketMode = d.ticketMode; setTicketMode(d.ticketMode); }
     if (d.ticketDeliveryMode) { ticketDeliveryMode = d.ticketDeliveryMode; setTicketDelivery(d.ticketDeliveryMode); }
     if (d.perDateTickets) perDateTickets = d.perDateTickets;
+    if (Array.isArray(d.artists)) { artists = d.artists; renderArtists(); }
     // images
     if (d.coverUrl) {
       set('coverUrl', d.coverUrl);
@@ -2137,6 +2160,10 @@ loadUser();
     if (g('inviteCode')) set('inviteCode', d.inviteCode || '');
     if (g('soldOutMsg')) set('soldOutMsg', d.soldOutMsg || '');
     if (g('videoUrl')) set('videoUrl', d.videoUrl || '');
+    if (g('eventLanguage')) set('eventLanguage', d.language || '');
+    if (g('layoutType')) set('layoutType', d.layoutType || '');
+    if (g('kidsFriendly')) set('kidsFriendly', d.kidsFriendly || '');
+    if (g('petsFriendly')) set('petsFriendly', d.petsFriendly || '');
     if (g('currency') && d.currency) g('currency').value = d.currency;
     if (g('feeMode') && d.feeMode) g('feeMode').value = d.feeMode;
     // update page title to indicate edit mode
@@ -2649,6 +2676,30 @@ function renderCoupons() {
 }
 window.removeCoupon = i => { coupons.splice(i, 1); renderCoupons(); };
 
+// ── FEATURED ARTISTS ──
+window.addArtist = () => {
+  const name = document.getElementById('artistName').value.trim();
+  const image = document.getElementById('artistImage').value.trim();
+  if (!name || !image) { alert('Artist name and image URL are required.'); return; }
+  artists.push({ name, image, active: true });
+  document.getElementById('artistName').value = '';
+  document.getElementById('artistImage').value = '';
+  renderArtists();
+  scheduleDraftSave();
+};
+function renderArtists() {
+  const list = document.getElementById('artistList');
+  if (!list) return;
+  if (!artists.length) { list.innerHTML = ''; return; }
+  list.innerHTML = artists.map((artist, i) => `
+    <div style="display:flex;align-items:center;gap:.7rem;padding:.55rem .7rem;border:1px solid var(--border);border-radius:12px;background:var(--blue-soft);">
+      <img src="${String(artist.image || '').replace(/&/g, '&amp;').replace(/\"/g, '&quot;')}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:9px;background:#e2e8f0;" />
+      <strong style="flex:1;font-size:.84rem;">${String(artist.name || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+      <label style="display:flex;align-items:center;gap:.3rem;font-size:.74rem;font-weight:700;cursor:pointer;"><input type="checkbox" ${artist.active !== false ? 'checked' : ''} onchange="artists[${i}].active=this.checked;scheduleDraftSave()" style="accent-color:var(--blue);" /> Active</label>
+      <button class="tr-del" type="button" onclick="artists.splice(${i},1);renderArtists();scheduleDraftSave()">✕</button>
+    </div>`).join('');
+}
+
 // ── FAQ MODAL ──
 window.openFaqModal = () => document.getElementById('faqModal').classList.add('open');
 window.closeFaqModal = () => {
@@ -2767,6 +2818,10 @@ async function saveEvent(status) {
     startDate: eventDates.length ? eventDates[0].date : '',
     capacity: Number(document.getElementById('capacity').value || 0),
     duration: Number(document.getElementById('eventDuration').value || 0),
+    language: document.getElementById('eventLanguage').value.trim(),
+    layoutType: document.getElementById('layoutType').value,
+    kidsFriendly: document.getElementById('kidsFriendly').value,
+    petsFriendly: document.getElementById('petsFriendly').value,
     regDeadline: document.getElementById('regDeadline').value,
     timezone: document.getElementById('timezone').value,
     currency: document.getElementById('currency').value,
@@ -2780,7 +2835,7 @@ async function saveEvent(status) {
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
     customQuestion: (document.getElementById('customQ') ? document.getElementById('customQ').value.trim() : ''),
-    tickets, coupons, faqs, eventDates,
+    tickets, coupons, faqs, artists, eventDates,
     ticketMode,
     perDateTickets,
     ticketDeliveryMode,
