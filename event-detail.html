@@ -407,7 +407,7 @@
 </nav>
 
 <main class="nightlife-mobile" id="nightlifeMobile">
-  <section class="night-offers" id="nightOffers"><h2>Offers on booking</h2><article class="night-offer-card"><span class="offer-brand">s<br>c</span><span><strong>15% off upto ₹1500</strong><small>use SCENES15 | Above ₹1000</small></span><b>1/2</b></article></section>
+  <section class="night-offers" id="nightOffers" hidden></section>
   <section class="night-about" id="nightAbout"><h2>About</h2><p id="nightAboutCopy">Turn your night into a full blown vibe as DJ Ram Dasarp takes over with an electrifying Afro House set designed to keep you moving. This is more than a party - it's an immersive escape where rhythm, mood and atmosphere fuse to create something unforgettable. Step into a darker, edgier space where deep beats and hypnotic grooves drive the floor into a trance.</p><button type="button" id="nightMore" onclick="toggleNightAbout()">...more</button><div class="night-details"><div><i>文</i><span>Language<strong>English</strong></span></div><div><i>⌛</i><span>Duration<strong>3 hours</strong></span></div><div><i>⌂</i><span>Layout<strong>Indoor</strong></span></div><div><i>☺</i><span>Kid Friendly?<strong>No</strong></span></div></div></section>
   <section class="night-share-card" aria-label="Share this event"><h3>Share this event</h3><div class="night-share-actions"><button type="button" onclick="shareWA()">WhatsApp</button><button type="button" onclick="copyLink()">Copy link</button></div></section>
   <div class="night-divider"><span></span><b>CHECK OUT THE VIBE</b><span></span></div>
@@ -644,6 +644,69 @@ function openDirections(){ const venue=evData.venueName||'Raasta Madhapur Hydera
 function openNightLightbox(src){ document.getElementById('galleryLightboxImage').src=src; document.getElementById('galleryLightbox').classList.add('open'); }
 function closeNightLightbox(){ document.getElementById('galleryLightbox').classList.remove('open'); }
 
+function couponDate(value){
+  if(!value) return null;
+  if(value.toDate) return value.toDate();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isActiveOffer(coupon){
+  if(!coupon || !String(coupon.code || '').trim() || !Number(coupon.value)) return false;
+  if(coupon.active === false || coupon.enabled === false || coupon.disabled === true || coupon.unavailable === true) return false;
+  if(['inactive', 'disabled', 'expired', 'unavailable'].includes(String(coupon.status || '').toLowerCase())) return false;
+
+  const now = new Date();
+  const startsAt = couponDate(coupon.startsAt || coupon.startDate || coupon.validFrom);
+  const endsAt = couponDate(coupon.expiresAt || coupon.expiryDate || coupon.endDate || coupon.validUntil);
+  if((startsAt && startsAt > now) || (endsAt && endsAt < now)) return false;
+
+  const limit = Number(coupon.limit || coupon.usageLimit || 0);
+  const used = Number(coupon.used || coupon.usedCount || coupon.redemptions || 0);
+  return !(limit > 0 && used >= limit);
+}
+
+function renderNightOffers(coupons){
+  const section = document.getElementById('nightOffers');
+  const activeOffers = (Array.isArray(coupons) ? coupons : []).filter(isActiveOffer);
+  section.replaceChildren();
+  section.hidden = activeOffers.length === 0;
+  if(!activeOffers.length) return;
+
+  let index = 0;
+  const heading = document.createElement('h2');
+  heading.textContent = 'Offers on booking';
+  const card = document.createElement('article');
+  card.className = 'night-offer-card';
+  const brand = document.createElement('span');
+  brand.className = 'offer-brand';
+  brand.innerHTML = 's<br>c';
+  const copy = document.createElement('span');
+  const title = document.createElement('strong');
+  const subtitle = document.createElement('small');
+  const counter = document.createElement('b');
+  copy.append(title, subtitle);
+  card.append(brand, copy, counter);
+  section.append(heading, card);
+
+  const showOffer = () => {
+    const offer = activeOffers[index];
+    const amount = offer.type === 'percent' ? `${offer.value}% off` : `₹${offer.value} off`;
+    title.textContent = amount;
+    subtitle.textContent = `use ${String(offer.code).toUpperCase()}${offer.minOrder || offer.minimumOrder ? ` | Above ₹${offer.minOrder || offer.minimumOrder}` : ''}`;
+    counter.textContent = `${index + 1}/${activeOffers.length}`;
+  };
+  showOffer();
+  if(activeOffers.length > 1) {
+    card.style.cursor = 'pointer';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    const nextOffer = () => { index = (index + 1) % activeOffers.length; showOffer(); };
+    card.addEventListener('click', nextOffer);
+    card.addEventListener('keydown', event => { if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); nextOffer(); } });
+  }
+}
+
 function syncMobileTabs(){
   const sections = [['about','nightAbout'],['photos','nightPhotos'],['venue','nightVenue'],['help','nightHelp']];
   const marker = window.scrollY + 155;
@@ -706,6 +769,7 @@ async function renderEvent(data){
   evData = data;
   ownerUid = data.ownerId;
   document.title = `${data.name||'Event'} | CultureWave`;
+  renderNightOffers([...(Array.isArray(data.coupons) ? data.coupons : []), ...(Array.isArray(data.offers) ? data.offers : [])]);
 
   // Optional wide background is displayed on tablet and desktop only.
   const hero = document.getElementById('heroBanner');
