@@ -63,6 +63,54 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
     }
 
+    // Refund requests — customers create, anyone reads their own; admin manages in app.
+    match /refundRequests/{id} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if request.auth != null;
+    }
+
+    // Organizer settlement payout log — app-side admin gate.
+    match /settlements/{id} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Waitlist — anyone can join (guest-friendly), authed can manage.
+    match /waitlist/{id} {
+      allow read: if request.auth != null;
+      allow create: if true;
+      allow update, delete: if request.auth != null;
+    }
+
+    // Loyalty points — users read/write their own balance + history subcollection.
+    match /loyalty/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      match /history/{hid} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // Referrals — a user owns their code doc; codes are publicly readable so
+    // they can be validated when someone applies one.
+    match /referrals/{uid} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Referral claims — keyed by the new (referred) user's uid.
+    match /referralClaims/{uid} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+    }
+
+    // Notifications — users read their own; app/admin can create.
+    match /notifications/{id} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
     // Admin-only collections — only authenticated users (admin check done in app)
     match /adminLogs/{id} {
       allow read, write: if request.auth != null;

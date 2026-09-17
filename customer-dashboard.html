@@ -238,6 +238,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <button class="sb-item active" data-view="bookings"><span class="sb-icon">🎟️</span> My Bookings <span class="sb-badge" id="bookingsBadge" style="display:none;">0</span></button>
     <button class="sb-item" data-view="upcoming"><span class="sb-icon">📅</span> Upcoming Events</button>
     <button class="sb-item" data-view="notifications"><span class="sb-icon">🔔</span> Notifications <span class="sb-badge" id="notifBadge" style="display:none;">0</span></button>
+    <button class="sb-item" data-view="rewards"><span class="sb-icon">🎁</span> Rewards &amp; Referrals</button>
     <div class="sb-section-label">Help</div>
     <button class="sb-item" data-view="support"><span class="sb-icon">💬</span> Customer Support</button>
     <button class="sb-item" data-view="refunds"><span class="sb-icon">💸</span> Refund Policy</button>
@@ -297,6 +298,38 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div class="page-body">
         <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;margin-bottom:1rem;">📅 Upcoming Events</div>
         <div id="upcomingList"></div>
+      </div>
+    </div>
+
+    <!-- REWARDS VIEW -->
+    <div id="view-rewards" class="view-panel" style="display:none;">
+      <div class="page-body">
+        <div style="font-size:1.1rem;font-weight:800;color:#0a0f1e;margin-bottom:.25rem;">🎁 Rewards &amp; Referrals</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" id="rewardsGrid">
+          <div class="card" style="background:linear-gradient(135deg,#0a0f1e,#1242c5);color:#fff;">
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.7;">Loyalty Points</div>
+            <div style="font-size:2.2rem;font-weight:900;margin:.35rem 0;" id="loyaltyBalance">—</div>
+            <div style="font-size:.74rem;opacity:.8;">Earn 1 point per ₹100 spent · 1 point = ₹1 off</div>
+          </div>
+          <div class="card">
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;">Your Referral Code</div>
+            <div style="font-size:1.6rem;font-weight:900;margin:.4rem 0;letter-spacing:.08em;color:#1242c5;" id="referralCode">…</div>
+            <div style="font-size:.74rem;color:#64748b;margin-bottom:.6rem;">Share it — you earn 100 points when a friend makes their first booking.</div>
+            <button onclick="copyReferral()" style="padding:.45rem .9rem;border:0;border-radius:8px;background:#1242c5;color:#fff;font-weight:700;font-size:.78rem;cursor:pointer;">📋 Copy Code</button>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <div style="font-size:.9rem;font-weight:800;margin-bottom:.5rem;">Got a referral code?</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <input id="applyReferralInput" placeholder="Enter friend's code" style="flex:1;min-width:180px;height:42px;border:1.5px solid #e5e9f0;border-radius:10px;padding:0 1rem;font:inherit;"/>
+            <button onclick="submitReferral(this)" style="height:42px;padding:0 1.1rem;border:0;border-radius:10px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer;">Apply</button>
+          </div>
+          <div id="referralMsg" style="font-size:.78rem;font-weight:700;margin-top:.5rem;"></div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <div style="font-size:.9rem;font-weight:800;margin-bottom:.5rem;">Points Activity</div>
+          <div id="loyaltyHistory" style="font-size:.82rem;color:#64748b;">Loading…</div>
+        </div>
       </div>
     </div>
 
@@ -459,6 +492,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="culturewave-features.js"></script>
 <script>
 const _fbCfg = {
   apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
@@ -547,10 +581,11 @@ function switchView(name) {
   document.querySelectorAll('.sb-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === name));
   document.querySelectorAll('.mbn-item').forEach(b => b.classList.remove('active'));
 
-  const titles = {bookings:'🎟️ My Bookings',upcoming:'📅 Upcoming Events',notifications:'🔔 Notifications',support:'💬 Support',refunds:'💸 Refund & Cancellation',profile:'👤 My Profile'};
+  const titles = {bookings:'🎟️ My Bookings',upcoming:'📅 Upcoming Events',rewards:'🎁 Rewards & Referrals',notifications:'🔔 Notifications',support:'💬 Support',refunds:'💸 Refund & Cancellation',profile:'👤 My Profile'};
   document.getElementById('pageTitle').textContent = titles[name] || '';
 
   if (name === 'notifications') markAllRead();
+  if (name === 'rewards') loadRewards();
   closeSidebar();
 }
 
@@ -665,6 +700,9 @@ function renderBookings(list) {
         <div class="bk-card-actions">
           <button class="bk-act-btn primary" onclick="showQR('${b.id}')">🎫 View Ticket</button>
           ${statusLabel !== 'cancelled' ? `<button class="bk-act-btn" style="background:#fff5f5;color:#c92a2a;border:1px solid #ffc9c9;" data-cancel-id="${b.id}" onclick="handleCancel(this)">✕ Cancel</button>` : '<span style="font-size:.78rem;color:#c92a2a;font-weight:700;">Cancelled</span>'}
+          ${(price && !b.checkedIn && b.refundStatus !== 'requested' && b.refundStatus !== 'processed' && status !== 'refunded') ? `<button class="bk-act-btn" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;" onclick="handleRefund('${b.bookingId||b.id}', this)">↩️ Request Refund</button>` : ''}
+          ${b.refundStatus === 'requested' ? '<span style="font-size:.74rem;color:#c2410c;font-weight:700;">Refund requested</span>' : ''}
+          ${(b.refundStatus === 'processed' || status === 'refunded') ? '<span style="font-size:.74rem;color:#16a34a;font-weight:700;">Refunded ✓</span>' : ''}
         </div>
       </div>
     </div>`;
@@ -821,6 +859,76 @@ function requestCancel(bookingId, eventName, bookingRef) {
 
 Please process my cancellation request. Thank you.`;
   window.open('https://wa.me/916305183601?text=' + encodeURIComponent(msg), '_blank');
+}
+
+async function handleRefund(bookingId, btn) {
+  const reason = prompt('Please tell us why you would like a refund (optional):', '');
+  if (reason === null) return; // user cancelled the prompt
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  try {
+    await CWFeatures.requestRefund(bookingId, reason || '');
+    btn.textContent = 'Refund requested';
+    btn.style.background = '#f0fdf4'; btn.style.color = '#16a34a'; btn.style.borderColor = '#bbf7d0';
+    // Refresh so the badge reflects the new refundStatus.
+    if (typeof loadBookings === 'function') { try { await loadBookings(); } catch(_){} }
+    alert('Your refund request has been submitted. Our team will review it shortly.');
+  } catch (e) {
+    btn.disabled = false; btn.textContent = original;
+    alert('Could not submit refund: ' + e.message);
+  }
+}
+
+// ── REWARDS (loyalty + referrals) ──
+let _referralCode = '';
+async function loadRewards() {
+  if (!currentUser) return;
+  try {
+    const bal = await CWFeatures.getLoyaltyBalance(currentUser.uid);
+    document.getElementById('loyaltyBalance').textContent = Number(bal).toLocaleString('en-IN');
+  } catch(e) { document.getElementById('loyaltyBalance').textContent = '0'; }
+  try {
+    _referralCode = await CWFeatures.ensureReferralCode(currentUser.uid, currentUser.displayName || currentUser.email);
+    document.getElementById('referralCode').textContent = _referralCode;
+  } catch(e) { document.getElementById('referralCode').textContent = '—'; }
+  // Points history
+  try {
+    const snap = await db.collection('loyalty').doc(currentUser.uid).collection('history').orderBy('createdAt','desc').limit(20).get();
+    const rows = snap.docs.map(d => d.data());
+    const el = document.getElementById('loyaltyHistory');
+    if (!rows.length) { el.textContent = 'No points activity yet — book an event to start earning!'; }
+    else {
+      el.innerHTML = rows.map(r => {
+        const pos = Number(r.points) >= 0;
+        const label = r.type === 'referral' ? 'Referral reward' : (r.type === 'redeem' ? 'Redeemed' : 'Earned from booking');
+        return `<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #f1f5f9;">
+          <span>${label}</span><span style="font-weight:800;color:${pos?'#16a34a':'#dc2626'};">${pos?'+':''}${r.points}</span></div>`;
+      }).join('');
+    }
+  } catch(e) { document.getElementById('loyaltyHistory').textContent = 'Could not load history.'; }
+}
+
+function copyReferral() {
+  if (!_referralCode) return;
+  navigator.clipboard?.writeText(_referralCode).then(
+    () => alert('Referral code copied: ' + _referralCode),
+    () => prompt('Copy your referral code:', _referralCode)
+  );
+}
+
+async function submitReferral(btn) {
+  const code = (document.getElementById('applyReferralInput').value || '').trim().toUpperCase();
+  const msg = document.getElementById('referralMsg');
+  if (!code) { msg.textContent = 'Enter a code first.'; msg.style.color = '#dc2626'; return; }
+  btn.disabled = true;
+  try {
+    await CWFeatures.applyReferralCode(currentUser.uid, code);
+    msg.textContent = '✓ Referral applied! Your friend earns points on your first booking.';
+    msg.style.color = '#16a34a';
+  } catch(e) {
+    msg.textContent = e.message;
+    msg.style.color = '#dc2626';
+  } finally { btn.disabled = false; }
 }
 
 async function enrichBookingDates() {

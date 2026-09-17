@@ -454,6 +454,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="culturewave-features.js"></script>
 <script>
 firebase.initializeApp({
   apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
@@ -549,6 +550,10 @@ function selectTicket(i){
 
 function register(){
   if(!eventId) return;
+  // If the event is sold out, offer the waitlist instead of the booking flow.
+  if(evData.soldOut === true || String(evData.status||'').toLowerCase() === 'soldout'){
+    return joinEventWaitlist();
+  }
   const tickets = Array.isArray(evData.tickets) && evData.tickets.length ? evData.tickets : [];
   const t = tickets[selectedTicketIndex] || tickets[0] || {};
   const price = Number(t.price || evData.price || 0);
@@ -564,6 +569,29 @@ function register(){
     seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
   });
   location.href = `booking.html?${qs.toString()}`;
+}
+
+async function joinEventWaitlist(){
+  const name = prompt('This event is sold out. Join the waitlist?\n\nYour name:', (firebase.auth().currentUser && firebase.auth().currentUser.displayName) || '');
+  if(name === null) return;
+  const email = prompt('Your email (we\'ll notify you if a spot opens up):', (firebase.auth().currentUser && firebase.auth().currentUser.email) || '');
+  if(email === null) return;
+  try{
+    await CWFeatures.joinWaitlist(eventId, { eventName: evData.name || '', name, email });
+    alert('🎉 You\'re on the waitlist! We\'ll email you if a spot opens up.');
+  }catch(e){
+    alert('Could not join waitlist: ' + e.message);
+  }
+}
+
+// Reflect a sold-out state on the primary CTA when data loads.
+function applySoldOutState(){
+  try{
+    if(evData.soldOut === true || String(evData.status||'').toLowerCase() === 'soldout'){
+      document.querySelectorAll('[onclick*="register("]').forEach(btn=>{ btn.textContent = '⏳ Join Waitlist'; });
+      const rp = document.getElementById('regPrice'); if(rp) rp.innerHTML = 'Sold Out';
+    }
+  }catch(_){}
 }
 
 async function renderEvent(data){
@@ -776,6 +804,7 @@ async function renderEvent(data){
       }
     }catch(e){ console.error('org load error',e); }
   }
+  applySoldOutState();
 }
 
 async function init(){

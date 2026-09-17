@@ -12,6 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="culturewave-features.js"></script>
   <style>
     :root{--blue:#1242c5;--blue-2:#2f6bff;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
     *{box-sizing:border-box;margin:0;padding:0;}
@@ -689,6 +690,19 @@ async function submitBooking(){
       const pid = r.razorpay_payment_id || bid;
       document.getElementById("rStatus").textContent = "✅ Confirmed";
       await saveBooking({ bookingId:pid, eventName, ticketName:t.name, amount:total, seats:qty, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
+      // Platform commission + organiser settlement tracking
+      try{
+        const organiserId = evData.organiserId || evData.ownerId || null;
+        await CWFeatures.recordCommission(pid, total, organiserId);
+      }catch(err){ console.warn("commission:", err); }
+      // Loyalty points + referral reward for signed-in customers
+      try{
+        const u = firebase.auth().currentUser;
+        if(u){
+          await CWFeatures.accrueLoyalty(u.uid, total, pid);
+          await CWFeatures.rewardReferralIfPending(u.uid);
+        }
+      }catch(err){ console.warn("loyalty:", err); }
       await createBookingAccount(name, email, phone);
       await sendEmail({ name, email, eventName, amount:fmt(total), seats:qty, bookingId:pid, method:"Razorpay" });
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId);
