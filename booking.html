@@ -270,7 +270,7 @@
         <div class="bk-tc"><input type="checkbox" id="tcCheck"/><label for="tcCheck">I agree to the <a href="terms-and-conditions.html" target="_blank">Terms &amp; Conditions</a> and <a href="refund-policy.html" target="_blank">Refund Policy</a>.</label></div>
         <div class="bk-nav">
           <button class="bk-btn-back" onclick="returnToTicketPicker()">← Back</button>
-          <div class="checkout-pay-method"><small>SECURE PAYMENT VIA</small><strong>Razorpay</strong></div><button class="bk-btn-next" id="submitBtn" onclick="submitBooking()">Pay ₹0</button>
+          <button class="bk-btn-next" id="submitBtn" onclick="submitBooking()">Pay ₹0</button>
         </div>
       </div>
 
@@ -689,9 +689,9 @@ async function sendEmail(data){
       event_name: data.eventName, booking_id: data.bookingId.slice(-10).toUpperCase(),
       amount: data.amount, seats: selectedSeats.length ? selectedSeats.join(", ") : String(data.seats),
       seats_label: selectedSeats.length ? "Seat Numbers" : "Seats", booking_type: "Event Booking",
-      date_time: new Date().toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}),
+      date_time: [eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}), eventStartTime()].filter(Boolean).join(" • "),
       payment_method: data.method||"Online",
-      ticket_url: "https://srisanth588.github.io/CULTUREWAVE/success.html?bookingId="+encodeURIComponent(data.bookingId)+"&event="+encodeURIComponent(data.eventName)+"&amount="+encodeURIComponent(data.amount)+"&status=Confirmed",
+      ticket_url: "https://srisanth588.github.io/CULTUREWAVE/success.html?bookingId="+encodeURIComponent(data.bookingId)+"&event="+encodeURIComponent(data.eventName)+"&amount="+encodeURIComponent(data.amount)+"&status=Confirmed&eventId="+encodeURIComponent(eventId),
       reply_to: "support.culturewave@gmail.com"
     });
   }catch(e){ console.error("email failed:",e); }
@@ -710,6 +710,8 @@ async function submitBooking(){
   const email = document.getElementById("bookEmail").value.trim();
   const phone = document.getElementById("bookPhone").value.trim();
   const eventName = evData.name||passedName||"Event";
+  const eventDate = evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || '';
+  const eventTime = eventStartTime();
   const bid = "CV"+Date.now();
 
   const submitBtn = document.getElementById("submitBtn");
@@ -720,7 +722,7 @@ async function submitBooking(){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
     await saveBooking({ bookingId:bid, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone });
     await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
-    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId);
+    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     return;
   }
 
@@ -737,7 +739,7 @@ async function submitBooking(){
       document.getElementById("rStatus").textContent = "✅ Confirmed";
       await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
       await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:"Razorpay" });
-      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId);
+      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     },
     modal:{ ondismiss:()=>{ submitBtn.disabled=false; submitBtn.textContent="🔒 Pay Now"; } }
   };
