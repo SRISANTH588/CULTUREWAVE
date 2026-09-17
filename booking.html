@@ -131,6 +131,10 @@
       .bk-ticket-name{font-size:.84rem;}
       .bk-ticket-price{font-size:.9rem;}
     }
+    .bk-ticket-picker{display:none;}.bk-picker-bar{display:none;}
+    @media(max-width:768px){
+      body{background:#05070c;color:#fff;padding-bottom:104px;}.topbar,.mobile-nav,.bk-stepper-wrap{display:none!important}.bk-wrap{padding:0;max-width:none!important}.bk-grid{display:block}.bk-panel.active{display:block}.bk-panel.ticket-picker> :not(.bk-ticket-picker){display:none}.bk-ticket-picker{display:block;min-height:100vh;padding:calc(env(safe-area-inset-top) + 1rem) 1.2rem 7.5rem;background:#05070c}.bk-picker-head{display:flex;gap:.85rem;align-items:flex-start;margin-bottom:1.5rem}.bk-picker-back{width:40px;height:40px;border:1px solid #303641;border-radius:50%;background:#151922;color:#fff;font-size:1.5rem;flex:none}.bk-picker-title{font-size:1.05rem;font-weight:900;line-height:1.25}.bk-picker-location{margin-top:.28rem;color:#aeb4c0;font-size:.78rem}.bk-picker-info{display:flex;gap:.7rem;margin:1.25rem 0 1.7rem}.bk-picker-date,.bk-picker-time{min-width:82px;padding:.7rem .85rem;border:1.5px solid #ff661d;border-radius:15px;background:#14181f;color:#fff}.bk-picker-date b{display:block;font-size:.69rem;color:#ff9a70;text-transform:uppercase;letter-spacing:.08em}.bk-picker-date strong,.bk-picker-time strong{display:block;margin-top:.16rem;font-size:1rem}.bk-picker-time{display:flex;align-items:center;min-width:130px}.bk-picker-sheet{margin:0 -1.2rem;padding:1.15rem 1.2rem 1.8rem;border-radius:27px 27px 0 0;background:#151922;min-height:55vh}.bk-picker-handle{width:40px;height:4px;border-radius:999px;background:#59606c;margin:0 auto 1.25rem}.bk-picker-label{font-size:.72rem;font-weight:900;letter-spacing:.12em;color:#b7bdc8;margin-bottom:1rem}.bk-picker-ticket{padding:1rem 0;border-bottom:1px dashed #434954}.bk-picker-ticket:last-child{border-bottom:0}.bk-picker-ticket-top{display:flex;align-items:center;gap:.65rem}.bk-picker-ticket-name{font-size:1rem;font-weight:900;flex:1}.bk-picker-ticket-price{font-size:1rem;font-weight:900;color:#fff}.bk-picker-details{border:1px solid #3c424d;border-radius:999px;background:transparent;color:#d9dde4;padding:.38rem .65rem;font-size:.68rem;font-weight:800}.bk-picker-desc{display:none;margin:.65rem 0 0;color:#aeb4c0;font-size:.78rem;line-height:1.55}.bk-picker-desc.open{display:block}.bk-picker-ticket-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:.8rem}.bk-picker-availability{font-size:.72rem;color:#aeb4c0}.bk-picker-add,.bk-picker-qty{height:36px;border-radius:10px;font-size:.76rem;font-weight:900}.bk-picker-add{min-width:70px;border:1px solid #ff661d;background:#ff661d;color:#16110e}.bk-picker-add:disabled{border-color:#5b616b;background:#2a2f37;color:#959ba5}.bk-picker-qty{display:flex;align-items:center;gap:.8rem;padding:0 .55rem;border:1px solid #ff661d;color:#fff}.bk-picker-qty button{border:0;background:transparent;color:#ff8a58;font-size:1.25rem;line-height:1}.bk-picker-bar{position:fixed;z-index:30;display:none;align-items:center;gap:.75rem;left:.85rem;right:.85rem;bottom:calc(env(safe-area-inset-bottom) + .7rem);padding:.72rem .75rem .72rem 1rem;border:1px solid #434a55;border-radius:18px;background:#252a33;box-shadow:0 12px 30px rgba(0,0,0,.5)}.bk-picker-bar.show{display:flex}.bk-picker-total{flex:1}.bk-picker-total small{display:block;color:#bdc3cc;font-size:.68rem;font-weight:800}.bk-picker-total strong{font-size:1rem}.bk-picker-proceed{height:46px;padding:0 1.15rem;border:0;border-radius:13px;background:#ff5a19;color:#fff;font-weight:900}.bk-picker-state{padding:1.2rem 0;color:#aeb4c0;text-align:center;font-size:.85rem}
+    }
   </style>
 </head>
 <body>
@@ -177,6 +181,12 @@
 
       <!-- STEP 1: YOUR DETAILS -->
       <div class="bk-panel active" id="panel1">
+        <section class="bk-ticket-picker" id="ticketPicker">
+          <div class="bk-picker-head"><button class="bk-picker-back" type="button" onclick="history.back()" aria-label="Back">‹</button><div><div class="bk-picker-title" id="pickerEventTitle">Loading event…</div><div class="bk-picker-location" id="pickerEventLocation"></div></div></div>
+          <div class="bk-picker-info"><div class="bk-picker-date"><b id="pickerDay">—</b><strong id="pickerDate">—</strong></div><div class="bk-picker-time"><strong id="pickerTime">—</strong></div></div>
+          <div class="bk-picker-sheet"><div class="bk-picker-handle"></div><div class="bk-picker-label">CHOOSE TICKETS</div><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div></div>
+        </section>
+        <div class="bk-picker-bar" id="pickerBar"><div class="bk-picker-total"><small id="pickerCount">0 tickets</small><strong id="pickerTotal">₹0</strong></div><button class="bk-picker-proceed" type="button" onclick="showBookingDetails()">Proceed</button></div>
         <div class="bk-card">
           <h2>Your Details</h2>
           <p class="sub">We'll send your booking confirmation to these details.</p>
@@ -374,9 +384,30 @@ let emailVerified = false;
 let generatedOtp = "";
 let selectedSeats = [];
 let bookedSeats = [];
+let pickerQuantities = [];
 
 function fmt(n){ return n===0?"Free":"₹"+Number(n).toLocaleString("en-IN"); }
 function showToast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2500); }
+
+function eventDateValue(value){ return value && value.toDate ? value.toDate() : new Date(value); }
+function ticketMax(ticket){ const inventory=Number(ticket.available ?? ticket.inventory ?? ticket.remaining ?? ticket.qty ?? 0); const configured=Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 20); return inventory > 0 ? Math.min(inventory, configured || inventory) : (ticket.soldOut ? 0 : (configured || 20)); }
+function renderTicketPicker(){
+  const list=document.getElementById('pickerTicketList');
+  const title=document.getElementById('pickerEventTitle'); const location=document.getElementById('pickerEventLocation');
+  title.textContent=evData.name||'Event'; location.textContent=[evData.venueName||evData.venue,evData.city].filter(Boolean).join(', ');
+  const date=eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date);
+  if(!Number.isNaN(date.getTime())){ document.getElementById('pickerDay').textContent=date.toLocaleDateString('en-IN',{weekday:'short'}); document.getElementById('pickerDate').textContent=date.toLocaleDateString('en-IN',{day:'numeric',month:'short'}); }
+  const startTime=evData.startTime || evData.time || '';
+  const endTime=evData.endTime || evData.finishTime || '';
+  document.getElementById('pickerTime').textContent=startTime ? `${startTime}${endTime ? ` – ${endTime}` : ''}` : 'Time TBA';
+  if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
+  list.innerHTML=tickets.map((ticket,index)=>{ const max=ticketMax(ticket), quantity=pickerQuantities[index]||0, sold=max===0; const description=ticket.description||ticket.details||''; return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticket.price||0)}</span><button class="bk-picker-details" type="button" onclick="togglePickerDetails(${index})">Details⌄</button></div>${description?`<p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom"><span class="bk-picker-availability">${sold?'Sold out':max+' available'}</span>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
+  updatePickerBar();
+}
+function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
+function changePickerQty(index,change){ const max=ticketMax(tickets[index]); const next=Math.max(0,Math.min(max,(pickerQuantities[index]||0)+change)); pickerQuantities.fill(0); pickerQuantities[index]=next; selectedTicketIdx=index; qty=next||1; renderTicketPicker(); updateQtyPrice(); }
+function updatePickerBar(){ const count=pickerQuantities.reduce((sum,value)=>sum+value,0); const total=pickerQuantities.reduce((sum,value,index)=>sum+value*Number(tickets[index]?.price||0),0); document.getElementById('pickerCount').textContent=`${count} ticket${count===1?'':'s'}`; document.getElementById('pickerTotal').textContent=fmt(total); document.getElementById('pickerBar').classList.toggle('show',count>0); }
+function showBookingDetails(){ if(!pickerQuantities.some(Boolean)){ showToast('Add at least one ticket'); return; } document.getElementById('panel1').classList.remove('ticket-picker'); document.getElementById('pickerBar').classList.remove('show'); window.scrollTo({top:0,behavior:'smooth'}); }
 
 // ── STEPPER ──
 function goStep(n){
@@ -441,8 +472,8 @@ function goStep2(){
 function buildTickets(){
   const list = document.getElementById("ticketList");
   if(!tickets.length){
-    list.innerHTML = `<div style="padding:.75rem;background:#f7faff;border-radius:12px;font-size:.86rem;color:var(--muted);">General Admission</div>`;
-    tickets = [{ name: passedTicketName||"General Admission", price: passedTicketPrice||0 }];
+    list.innerHTML = `<div style="padding:.75rem;background:#f7faff;border-radius:12px;font-size:.86rem;color:var(--muted);">No tickets are available for this event.</div>`;
+    return;
   }
   list.innerHTML = tickets.map((t,i)=>`
     <div class="bk-ticket-card ${i===0?"selected":""}" onclick="selectTicket(${i})">
@@ -747,12 +778,14 @@ function toggleSeat(seatId, sofa){
 
 // ── INIT ──
 async function init(){
+  document.getElementById('panel1').classList.add('ticket-picker');
   if(eventId){
     try{
       const snap = await db.collection("events").doc(eventId).get();
       if(snap.exists){
         evData = {id:snap.id,...snap.data()};
-        tickets = Array.isArray(evData.tickets)&&evData.tickets.length ? evData.tickets : [{name:passedTicketName||"General Admission",price:passedTicketPrice||0}];
+        tickets = Array.isArray(evData.tickets) ? evData.tickets : [];
+        pickerQuantities = tickets.map(()=>0);
         document.getElementById("evNameDisplay").textContent = evData.name||passedName;
         document.getElementById("evVenueDisplay").textContent = (evData.venueName||"")+(evData.city?", "+evData.city:"");
         document.getElementById("rEventName").textContent = evData.name||passedName;
@@ -779,15 +812,14 @@ async function init(){
           document.getElementById("receiptBanner").appendChild(img);
         }
         renderAvailableCoupons();
+        renderTicketPicker();
+      } else {
+        document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">This event could not be found.</div>';
       }
-    }catch(e){ console.error(e); }
+    }catch(e){ console.error(e); document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">Unable to load this event. Please try again.</div>'; }
   } else {
-    evData = { name: passedName, venueName: passedVenue };
-    tickets = [{ name: passedTicketName||"General Admission", price: passedTicketPrice||0 }];
-    document.getElementById("evNameDisplay").textContent = passedName||"Event";
-    document.getElementById("evVenueDisplay").textContent = passedVenue||"";
-    document.getElementById("rEventName").textContent = passedName||"Event";
-    document.getElementById("rVenue").textContent = passedVenue||"";
+    document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">Missing event link. Please open booking from an event page.</div>';
+    return;
   }
   buildTickets();
 }
