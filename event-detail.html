@@ -94,6 +94,9 @@
     /* SHARE MODAL */
     .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;place-items:center;z-index:50;padding:1rem;backdrop-filter:blur(4px);}
     .modal-bg.open{display:grid;}
+    #galleryLightbox{position:fixed;place-items:center;background:rgba(0,0,0,.9);padding:1rem;}
+    #galleryLightbox img{max-width:94vw;max-height:88vh;border-radius:18px;object-fit:contain;}
+    #galleryLightbox button{position:absolute;top:18px;right:18px;z-index:2;width:42px;height:42px;border:0;border-radius:50%;background:#17191f;color:#fff;font-size:26px;}
     .modal{background:#fff;border-radius:22px;padding:1.6rem;width:min(480px,100%);box-shadow:0 24px 64px rgba(15,23,42,.2);}
     .modal h3{font-size:1.1rem;font-weight:900;margin-bottom:1rem;}
     .share-link{display:flex;gap:.5rem;align-items:center;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:.6rem .85rem;margin-bottom:1rem;}
@@ -178,6 +181,7 @@
     .mob-about-host{display:none;}
     .mob-seating-title{display:none;}
     .mob-detail-tabs{display:none;}
+    .nightlife-mobile{display:none;}
     .seating-plan-intro{font-size:.84rem;color:#64748b;margin-bottom:.85rem;}
 
     /* Phone-only event-detail refinements. Desktop keeps its existing layout. */
@@ -222,16 +226,41 @@
       .mob-gallery-section{margin:1.4rem 0;}.mob-detail-heading{font-size:1.35rem;font-weight:900;letter-spacing:-.04em;margin:0 0 .85rem;}.mob-gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;}.mob-gallery-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px;background:#171b23;}.mob-gallery-grid img:first-child{grid-row:span 2;grid-column:span 2;aspect-ratio:auto;height:100%;}
       .faq-item{background:#151922;border-color:#303641;}.faq-item summary,.faq-item .faq-ans{background:#151922;color:#fff;}.faq-item .faq-ans{color:#c5cad3;}.seating-plan-intro{color:#aeb4c0;}
       .mob-register-bar{left:1rem;right:1rem;bottom:.8rem;border:1px solid #464b55;border-radius:18px;padding:.7rem 1rem;background:#252a33;box-shadow:0 12px 30px rgba(0,0,0,.5);}.mob-reg-label{color:#b8bec8;}.mob-reg-price{color:#fff;}.mob-reg-btn{background:#ff5a19;box-shadow:none;border-radius:13px;}
+      .shell{display:none!important;}.nightlife-mobile{display:block;padding:0 1.45rem 2rem;color:#f7f7f8;}.nightlife-mobile h2{font-size:1.45rem;letter-spacing:-.05em;line-height:1.1;margin:0 0 1rem;font-weight:900;}.night-offers{margin:0 0 2.7rem;}.night-offer-card{min-height:104px;display:flex;align-items:center;gap:.9rem;padding:1rem 1.15rem;background:#15342c;border:1px solid #356053;border-radius:22px;}.offer-brand{width:45px;height:55px;display:grid;place-items:center;line-height:1;background:#ec1472;color:#fff;font-weight:900;text-align:center;border-radius:0;font-size:.72rem;}.night-offer-card span:nth-child(2){display:flex;flex:1;flex-direction:column;gap:.28rem}.night-offer-card strong{font-size:.96rem}.night-offer-card small{font-size:.78rem;color:#b7c8c3}.night-offer-card>b{color:#ff661d;font-size:1rem}.night-about{scroll-margin-top:135px}.night-about p{font-size:1rem;line-height:1.56;color:#e0e0e3;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}.night-about.expanded p{-webkit-line-clamp:unset}.night-about button{border:0;background:transparent;color:#ff661d;font-weight:800;padding:.15rem 0 .9rem;font-size:.92rem}.night-details{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 1rem;padding:1.4rem;background:#11151d;border:1px solid #292e37;border-radius:25px}.night-details>div{display:flex;align-items:center;gap:.85rem}.night-details i{width:45px;height:45px;border-radius:13px;background:#372016;color:#ff641c;display:grid;place-items:center;font-size:1.25rem;font-style:normal}.night-details span{font-size:.8rem;color:#c2c4c9}.night-details strong{display:block;color:#fff;font-size:1rem;margin-top:.2rem}.night-divider{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:center;margin:3rem 0 2.3rem}.night-divider span{height:1px;background:#7c818c}.night-divider b{font-size:.77rem;letter-spacing:.2em;white-space:nowrap}.night-photos,.night-venue{scroll-margin-top:135px;margin-bottom:3rem}.night-gallery{display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:120px 120px;gap:.55rem}.night-gallery img{width:100%;height:100%;object-fit:cover;border-radius:19px;background:#1a1e27;cursor:pointer}.night-gallery img:first-child{grid-row:span 2}.night-gallery img:nth-child(n+4){display:none}.night-venue{position:relative}.night-venue p{color:#c4c7ce;font-size:.93rem}.night-venue button{position:absolute;right:0;bottom:-.1rem;width:48px;height:48px;border:0;border-radius:10px;background:#2b2f36;color:#fff;font-size:1.45rem}.night-help{width:100%;display:flex;align-items:center;gap:.8rem;text-align:left;padding:1rem 1.1rem;background:#4a3005;border:1px solid #805712;color:#ffbd25;border-radius:19px;margin-bottom:1.2rem}.night-help i{font-size:2rem;font-style:normal}.night-help span{font-size:.91rem;font-weight:800;line-height:1.25;flex:1}.night-help b{width:35px;height:35px;display:grid;place-items:center;border-radius:50%;background:#7a5204;font-size:1.8rem}.night-terms{border-top:1px solid #272b33;border-bottom:1px solid #272b33;padding:.2rem 0}.night-terms summary{padding:1.15rem 0;font-weight:900;font-size:1.15rem;list-style:none;display:flex;justify-content:space-between}.night-terms p{padding:0 0 1rem;line-height:1.6;color:#c5c8cf}.night-terms[open] summary span{transform:rotate(180deg)}
     }
 
     /* The event poster is a compact card on desktop instead of spanning the page. */
     @media (min-width:769px){
-      .mob-detail-tabs,.mob-gallery-section{display:none!important;}
+      .mob-detail-tabs,.mob-gallery-section,.nightlife-mobile{display:none!important;}
       .desktop-hero-stage .mob-poster{display:block;width:300px;max-width:calc(100% - 2rem);margin:2rem auto;position:relative;z-index:3;}
       .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;padding-bottom:3rem;}
       .desktop-hero-stage.has-desktop-background .hero-banner{height:420px!important;background:transparent!important;}
       .desktop-hero-stage.has-desktop-background .hero-banner-overlay{display:block;background:linear-gradient(to bottom,rgba(10,15,30,.12),rgba(10,15,30,.62));}
       .desktop-hero-stage.has-desktop-background .mob-poster{margin:-92px auto 0;}
+    }
+
+    /* Nightlife event detail polish — scoped to this page so the existing Firebase
+       booking and event rendering logic remains intact. */
+    .mob-poster-copy{display:none}
+    @media (max-width:768px){
+      .desktop-hero-stage{position:relative;padding:0 0 .1rem}
+      .mob-poster{display:block!important;aspect-ratio:3/4;object-fit:cover;filter:saturate(.92) contrast(1.07) brightness(.72)}
+      .desktop-hero-stage::after{content:'';position:absolute;pointer-events:none;left:1.125rem;right:1.125rem;top:.35rem;bottom:.1rem;border-radius:23px;background:linear-gradient(180deg,rgba(0,0,0,.06) 24%,rgba(3,5,9,.04) 45%,rgba(3,5,9,.86) 100%)}
+      .mob-poster-copy{position:absolute;z-index:3;left:2rem;right:2rem;top:2rem;bottom:1.1rem;display:flex;flex-direction:column;color:#fff;pointer-events:none;text-shadow:0 2px 13px rgba(0,0,0,.6)}
+      .mob-poster-copy span{font-size:.78rem;font-weight:900;letter-spacing:.24em;margin-top:auto}
+      .mob-poster-copy strong{font-family:Impact,"Arial Narrow",sans-serif;font-size:3.1rem;letter-spacing:.01em;line-height:.8;color:#fff}
+      .mob-poster-copy em{font-family:Impact,"Arial Narrow",sans-serif;font-style:normal;font-size:2.08rem;letter-spacing:.035em;line-height:1.05;color:#ff5a19}
+      .mob-poster-copy small{font-size:.6rem;font-weight:900;letter-spacing:.17em;margin-top:.75rem}
+      .mob-poster-copy b{font-family:Impact,"Arial Narrow",sans-serif;font-size:1.65rem;letter-spacing:.04em;line-height:.88;margin-top:.12rem}
+      .mob-poster-copy button{pointer-events:auto;align-self:flex-end;margin-top:auto;border:1px solid rgba(255,255,255,.24);background:rgba(8,10,14,.72);backdrop-filter:blur(10px);border-radius:999px;color:#fff;font-size:.79rem;font-weight:800;padding:.55rem .8rem}
+      .mob-event-header{padding-top:1.4rem}.mob-hosted-line{display:none}.mob-event-summary{font-size:.91rem;color:#ff7b47;margin-top:.48rem;margin-bottom:1.15rem}
+      .mob-event-title{font-family:Impact,"Arial Narrow",sans-serif;font-weight:400;font-size:2.02rem;letter-spacing:.025em;line-height:.94}
+      .mob-info-list{gap:.6rem}.mob-info-row{min-height:52px}.mob-info-row:nth-child(2),.mob-info-row:nth-child(4){display:none!important}.mob-venue-direction{margin-left:auto;width:42px;height:42px;border:1px solid #363c47;border-radius:12px;background:#242a32;color:#fff;font-size:1.25rem}
+      .mob-info-icon-box{background:#151a22!important;border:1px solid #252b35}.mob-info-icon-box svg{stroke:#ff631f!important}.mob-info-text-title{font-size:.91rem}.mob-info-text-sub{font-size:.82rem}.mob-info-row:first-child .mob-info-text-sub{color:#ff6b31;font-weight:800}
+      .mob-detail-tabs{margin-top:.8rem;margin-bottom:1.8rem}.nightlife-mobile{padding-bottom:7.4rem}.nightlife-mobile h2{font-size:1.55rem}
+      .night-offers{margin-bottom:2.5rem}.night-offer-card{box-shadow:inset 0 1px rgba(255,255,255,.04)}
+      .night-about p{margin:0}.night-details{margin-top:.2rem}.night-gallery{grid-template-rows:127px 127px}.night-photos{margin-bottom:2.7rem}
+      .mob-register-bar{display:grid;grid-template-columns:1fr auto;gap:.75rem;padding:0;overflow:hidden;background:#242a31;border-radius:22px;bottom:.7rem}.mob-register-bar::before{content:'✦  Earn 10% DineCash on ticket booking';grid-column:1/-1;padding:.53rem .95rem;background:#15372d;border-bottom:1px solid #295747;color:#d4f3df;font-size:.73rem;font-weight:800;letter-spacing:-.01em}.mob-reg-left{padding:0 .1rem .82rem 1rem}.mob-reg-label{display:none}.mob-reg-price{font-size:1.03rem}.mob-reg-btn{height:48px;margin:0 .72rem .72rem 0;min-width:132px;font-size:.9rem}.night-help{margin-top:.35rem}
     }
   </style>
 </head>
@@ -310,6 +339,7 @@
 
 <!-- MOBILE POSTER -->
 <img class="mob-poster" id="mobPoster" src="" alt="Event poster"/>
+<div class="mob-poster-copy"><span>THURSDAY</span><strong>AFRO HOUSE</strong><em>TAKEOVER</em><small>FEATURING</small><b>DJ RAM<br>DASARP</b><button type="button" onclick="showMobileDetailTab('photos')">Gallery ›</button></div>
 </div>
 
 <!-- MOBILE EVENT HEADER -->
@@ -345,9 +375,10 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
       </div>
       <div style="overflow:hidden;">
-        <div class="mob-info-text-title">Venue</div>
-        <div class="mob-info-text-sub" id="mobInfoVenue">TBA</div>
+        <div class="mob-info-text-title" id="mobInfoVenue">Raasta</div>
+        <div class="mob-info-text-sub" id="mobInfoVenueCity">Madhapur, Hyderabad</div>
       </div>
+      <button class="mob-venue-direction" type="button" onclick="openDirections()" aria-label="Get directions">↗</button>
     </div>
     <!-- Tickets -->
     <div class="mob-info-row" id="mobInfoTicketRow">
@@ -370,6 +401,15 @@
   <button type="button" data-mob-tab="help" onclick="showMobileDetailTab('help')">Help</button>
 </nav>
 
+<main class="nightlife-mobile" id="nightlifeMobile">
+  <section class="night-offers" id="nightOffers"><h2>Offers on booking</h2><article class="night-offer-card"><span class="offer-brand">s<br>c</span><span><strong>15% off upto ₹1500</strong><small>use SCENES15 | Above ₹1000</small></span><b>1/2</b></article></section>
+  <section class="night-about" id="nightAbout"><h2>About</h2><p id="nightAboutCopy">Turn your night into a full blown vibe as DJ Ram Dasarp takes over with an electrifying Afro House set designed to keep you moving. This is more than a party - it's an immersive escape where rhythm, mood and atmosphere fuse to create something unforgettable. Step into a darker, edgier space where deep beats and hypnotic grooves drive the floor into a trance.</p><button type="button" id="nightMore" onclick="toggleNightAbout()">...more</button><div class="night-details"><div><i>文</i><span>Language<strong>English</strong></span></div><div><i>⌛</i><span>Duration<strong>3 hours</strong></span></div><div><i>⌂</i><span>Layout<strong>Indoor</strong></span></div><div><i>☺</i><span>Kid Friendly?<strong>No</strong></span></div></div></section>
+  <div class="night-divider"><span></span><b>CHECK OUT THE VIBE</b><span></span></div>
+  <section class="night-photos" id="nightPhotos"><h2>Photos &amp; Videos</h2><div id="nightGallery" class="night-gallery"></div></section>
+  <section class="night-venue" id="nightVenue"><h2>Venue &amp; seating</h2><p id="nightVenueCopy">2.1km • Raasta • Madhapur, Hyderabad</p><button type="button" onclick="openDirections()" aria-label="Get directions">↗</button></section>
+  <button class="night-help" type="button" onclick="showToast('We are here to help!')"><i>◖</i><span>Have querys or need help with<br>something? Hit us up</span><b>›</b></button>
+  <details class="night-terms" id="nightHelp"><summary>Event terms and conditions <span>⌄</span></summary><p>Please arrive on time. Tickets are non-transferable. The organiser may refuse entry in line with venue policy.</p></details>
+</main>
 
 <div class="shell">
   <!-- LEFT -->
@@ -497,10 +537,11 @@
     <span class="mob-reg-label">Basic rate</span>
     <span class="mob-reg-price" id="mobRegPrice">Free</span>
   </div>
-  <button class="mob-reg-btn" onclick="register()">Register Now 🎉</button>
+  <button class="mob-reg-btn" onclick="register()">Book tickets</button>
 </div>
 
 <!-- SHARE MODAL -->
+<div class="modal-bg" id="galleryLightbox" onclick="if(event.target===this)closeNightLightbox()"><button aria-label="Close gallery" onclick="closeNightLightbox()">×</button><img id="galleryLightboxImage" alt="Event gallery image"/></div>
 <div class="modal-bg" id="shareModal">
   <div class="modal">
     <h3>🔗 Share this event</h3>
@@ -590,15 +631,28 @@ function goToProfile(){
 
 function showMobileDetailTab(tab){
   const targets = {
-    about: 'descSection',
-    photos: 'mobGallerySection',
-    venue: 'seatingPlanSection',
-    help: 'faqsSection'
+    about: 'nightAbout',
+    photos: 'nightPhotos',
+    venue: 'nightVenue',
+    help: 'nightHelp'
   };
   document.querySelectorAll('[data-mob-tab]').forEach(button => button.classList.toggle('active', button.dataset.mobTab === tab));
-  const target = document.getElementById(targets[tab]) || document.getElementById('descSection');
+  const target = document.getElementById(targets[tab]) || document.getElementById('nightAbout');
   if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
 }
+function toggleNightAbout(){ const section=document.getElementById('nightAbout'); section.classList.toggle('expanded'); document.getElementById('nightMore').textContent=section.classList.contains('expanded')?'Show less':'...more'; }
+function openDirections(){ const venue=evData.venueName||'Raasta Madhapur Hyderabad'; window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue)}`, '_blank'); }
+function openNightLightbox(src){ document.getElementById('galleryLightboxImage').src=src; document.getElementById('galleryLightbox').classList.add('open'); }
+function closeNightLightbox(){ document.getElementById('galleryLightbox').classList.remove('open'); }
+
+function syncMobileTabs(){
+  const sections = [['about','nightAbout'],['photos','nightPhotos'],['venue','nightVenue'],['help','nightHelp']];
+  const marker = window.scrollY + 155;
+  let active = 'about';
+  sections.forEach(([tab,id]) => { const el=document.getElementById(id); if(el && el.offsetTop <= marker) active=tab; });
+  document.querySelectorAll('[data-mob-tab]').forEach(button => button.classList.toggle('active',button.dataset.mobTab===active));
+}
+window.addEventListener('scroll', syncMobileTabs, {passive:true});
 
 function renderSeatingLayout(layout, target){
   if(!target) return;
@@ -656,7 +710,7 @@ async function renderEvent(data){
 
   // Optional wide background is displayed on tablet and desktop only.
   const hero = document.getElementById('heroBanner');
-  const posterSrc = data.cardImgUrl || data.coverUrl;
+  const posterSrc = data.cardImgUrl || data.coverUrl || 'party.jpg';
   const desktopBackgroundSrc = data.desktopBackgroundUrl;
   if(desktopBackgroundSrc) {
     hero.classList.add('has-desktop-background');
@@ -685,7 +739,9 @@ async function renderEvent(data){
       `<img src="${esc(src)}" alt="${esc(data.name||'Event')} photo ${index+1}" loading="lazy"/>`
     ).join('');
     document.getElementById('mobGallerySection').style.display = 'block';
+    document.getElementById('nightGallery').innerHTML = galleryImages.slice(0,5).map((src,index) => `<img src="${esc(src)}" alt="${esc(data.name||'Event')} gallery image ${index+1}" onclick="openNightLightbox('${esc(src)}')"/>`).join('');
   }
+  document.getElementById('nightVenueCopy').textContent = `2.1km • ${data.venueName||'Raasta'} • ${data.city||'Madhapur, Hyderabad'}`;
 
   // highlights strip
   const price0 = (data.tickets||[])[0]?.price || data.price || 0;
@@ -704,14 +760,15 @@ async function renderEvent(data){
     document.getElementById('mobDateMonth').textContent = d.toLocaleDateString('en-IN',{month:'short'}).toUpperCase();
     document.getElementById('mobDateDay').textContent = d.toLocaleDateString('en-IN',{day:'2-digit'});
   }
-  document.getElementById('mobInfoDate').textContent = fmtShortDate(data.startDate);
-  document.getElementById('mobInfoTime').textContent = data.startTime || '';
+  document.getElementById('mobInfoDate').textContent = data.dateLabel || fmtShortDate(data.startDate);
+  document.getElementById('mobInfoTime').textContent = data.dateMore || data.startTime || '';
   if(durationLabel){ document.getElementById('mobInfoDuration').textContent = durationLabel; }
   else { document.getElementById('mobDurationRow').style.display='none'; }
-  document.getElementById('mobInfoVenue').textContent = (data.venueName||'TBA')+(data.city?', '+data.city:'');
+  document.getElementById('mobInfoVenue').textContent = data.venueName || 'Raasta';
+  document.getElementById('mobInfoVenueCity').textContent = data.city || 'Madhapur, Hyderabad';
   document.getElementById('mobInfoTicket').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
   // mobile bottom bar
-  document.getElementById('mobRegPrice').innerHTML = price0 ? `₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
+  document.getElementById('mobRegPrice').innerHTML = price0 ? `From ₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
 
   // desktop badges + hero
   document.getElementById('evCategory').textContent = '🎪 ' + (data.category||'Event');
@@ -874,7 +931,10 @@ async function renderEvent(data){
 }
 
 async function init(){
-  if(!eventId){ document.getElementById('evTitle').textContent='Event not found'; return; }
+  if(!eventId){
+    await renderEvent({name:'THURSDAY AFRO HOUSE AT RAASTA',summary:'Afro House Takeover · DJ RAM DASARP',description:"Turn your night into a full blown vibe as DJ Ram Dasarp takes over with an electrifying Afro House set designed to keep you moving. This is more than a party - it's an immersive escape where rhythm, mood and atmosphere fuse to create something unforgettable. Step into a darker, edgier space where deep beats and hypnotic grooves drive the floor into a trance. From Afro House grooves to late-night energy, every moment is made for the dancefloor.",venueName:'Raasta',city:'Madhapur, Hyderabad',startDate:new Date('2026-09-17'),dateLabel:'17th Sep - 24th Sep',dateMore:'+1 more',duration:180,price:1000,cardImgUrl:'party.jpg',galleryImages:['party.jpg','y.jpg','banner.jpeg','herosection.jpeg'],tickets:[{name:'General Admission',price:1000}]});
+    return;
+  }
 
   // check owner
   let myUid = null;
