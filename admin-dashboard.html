@@ -382,6 +382,7 @@
   <nav class="sb-nav">
     <button class="sb-item" data-view="credits"><span class="si-icon">🪙</span> Credits & Wallets</button>
     <button class="sb-item" data-view="activity"><span class="si-icon">📋</span> Activity Log</button>
+    <button class="sb-item" data-view="site-visibility"><span class="si-icon">👁️</span> Content Visibility</button>
     <button class="sb-item" data-view="settings"><span class="si-icon">⚙️</span> Settings</button>
     <a class="sb-item" href="checkin.html" target="_blank"><span class="si-icon">📷</span> Check-In Scanner</a>
   </nav>
@@ -1011,6 +1012,33 @@
     </div>
   </div>
 
+  <!-- SITE VISIBILITY -->
+  <div class="view" data-view="site-visibility">
+    <div style="background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#3b82f6 100%);border-radius:20px;padding:1.4rem 1.75rem;">
+      <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.25rem .75rem;font-size:.65rem;font-weight:800;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;">👁️ Website control</div>
+      <div style="font-size:1.9rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;">Content Visibility</div>
+      <div style="font-size:.9rem;color:rgba(255,255,255,.7);margin-top:.3rem;">Hide or show navigation links and individual homepage sections.</div>
+    </div>
+    <div class="card" style="max-width:720px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
+        <div><div style="font-size:1rem;font-weight:800;">Desktop maintenance mode</div><div id="siteVisibilityStatus" style="font-size:.78rem;color:var(--muted);margin-top:.25rem;">Checking current status…</div></div>
+        <button class="toggle" id="siteVisibilityToggle" aria-label="Toggle desktop maintenance mode"></button>
+      </div>
+      <div class="field" style="margin-top:1rem;"><label>Maintenance message</label><textarea id="siteVisibilityMessage" placeholder="The site is temporarily unavailable while we make a few improvements."></textarea></div>
+      <div class="btn-row" style="margin-top:1rem;"><button class="btn primary" id="saveSiteVisibility">Save visibility</button></div>
+      <p style="margin-top:.9rem;font-size:.74rem;line-height:1.5;color:var(--muted);">When enabled, laptop and desktop visitors see a maintenance screen with only Login available. Mobile visitors can continue using the site normally.</p>
+    </div>
+    <div class="card" style="max-width:720px;">
+      <div class="card-head"><h2>Navigation links</h2><p>These controls apply to desktop and mobile navigation throughout the public site.</p></div>
+      <div class="grid-2" id="navVisibilityControls"></div>
+    </div>
+    <div class="card" style="max-width:720px;">
+      <div class="card-head"><h2>Homepage sections</h2><p>Turn off any section without deleting its content.</p></div>
+      <div class="grid-2" id="sectionVisibilityControls"></div>
+      <div class="btn-row" style="margin-top:1rem;"><button class="btn primary" id="saveContentVisibility">Save content visibility</button></div>
+    </div>
+  </div>
+
   <!-- WHATSAPP VIEW -->
   <div class="view wa-view" data-view="whatsapp">
     <div class="wa-hero">
@@ -1332,7 +1360,7 @@ const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', users:'Member Management', events:'Live Events',
   campaigns:'Campaigns', payments:'Transactions', refunds:'Refunds',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
-  restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', settings:'Platform Settings'
+  restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', 'site-visibility':'Content Visibility', settings:'Platform Settings'
 };
 window.showView = function(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===name));
@@ -1344,6 +1372,89 @@ window.showView = function(name) {
   if(name==='whatsapp') { syncWABookings(); filterWA(); }
 };
 document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
+
+// ── PUBLIC SITE VISIBILITY ──
+const siteVisibilityRef = doc(db, 'platformSettings', 'siteVisibility');
+let publicSiteEnabled = true;
+let hiddenContentItems = {};
+const siteToggle = document.getElementById('siteVisibilityToggle');
+const siteStatus = document.getElementById('siteVisibilityStatus');
+const siteMessage = document.getElementById('siteVisibilityMessage');
+const contentControls = [
+  ['nav-home', 'Home link', 'nav'], ['nav-events', 'Events link', 'nav'],
+  ['nav-restaurants', 'Restaurants link', 'nav'], ['nav-how-it-works', 'How it works link', 'nav'],
+  ['home-hero', 'Hero banner', 'section'], ['home-categories', 'Categories', 'section'],
+  ['home-popular', 'Popular experiences', 'section'], ['home-trending', 'Trending venues', 'section'],
+  ['home-weekend', 'Weekend section', 'section'], ['home-featured', 'Featured section', 'section'],
+  ['home-partners', 'Partners section', 'section'], ['home-events', 'Events listing', 'section'],
+  ['site-footer', 'Footer', 'section']
+];
+
+function renderContentControls() {
+  ['nav', 'section'].forEach(group => {
+    const target = document.getElementById(group === 'nav' ? 'navVisibilityControls' : 'sectionVisibilityControls');
+    target.innerHTML = contentControls.filter(([, , type]) => type === group).map(([key, label]) => `
+      <label style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.75rem .8rem;border:1px solid var(--border);border-radius:10px;cursor:pointer;">
+        <span style="font-size:.82rem;font-weight:700;">${label}</span>
+        <span style="font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;">Visible <input class="content-visibility-control" data-key="${key}" type="checkbox" ${hiddenContentItems[key] ? '' : 'checked'}></span>
+      </label>`).join('');
+  });
+}
+
+siteToggle.addEventListener('click', () => {
+  publicSiteEnabled = !publicSiteEnabled;
+  siteToggle.classList.toggle('on', publicSiteEnabled);
+  siteStatus.textContent = publicSiteEnabled ? 'Desktop site is live.' : 'Desktop maintenance mode is on; mobile remains available.';
+  siteStatus.style.color = publicSiteEnabled ? 'var(--green)' : 'var(--orange)';
+});
+
+onSnapshot(siteVisibilityRef, snapshot => {
+  const settings = snapshot.exists() ? snapshot.data() : {};
+  publicSiteEnabled = settings.publicSiteEnabled !== false;
+  hiddenContentItems = settings.hiddenItems || {};
+  siteToggle.classList.toggle('on', publicSiteEnabled);
+  siteMessage.value = settings.message || 'The site is temporarily unavailable while we make a few improvements.';
+  siteStatus.textContent = publicSiteEnabled ? 'Desktop site is live.' : 'Desktop maintenance mode is on; mobile remains available.';
+  siteStatus.style.color = publicSiteEnabled ? 'var(--green)' : 'var(--orange)';
+  renderContentControls();
+});
+
+document.getElementById('saveSiteVisibility').addEventListener('click', async () => {
+  const button = document.getElementById('saveSiteVisibility');
+  button.disabled = true;
+  button.textContent = 'Saving…';
+  try {
+    await setDoc(siteVisibilityRef, {
+      publicSiteEnabled,
+      message: siteMessage.value.trim() || 'The site is temporarily unavailable while we make a few improvements.',
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    showToast(publicSiteEnabled ? 'Desktop site is now live' : 'Desktop maintenance mode is on', 'success');
+  } catch (error) {
+    showToast('Could not save visibility: ' + error.message, 'error');
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Save visibility';
+  }
+});
+
+document.getElementById('saveContentVisibility').addEventListener('click', async () => {
+  const button = document.getElementById('saveContentVisibility');
+  document.querySelectorAll('.content-visibility-control').forEach(input => {
+    hiddenContentItems[input.dataset.key] = !input.checked;
+  });
+  button.disabled = true;
+  button.textContent = 'Saving…';
+  try {
+    await setDoc(siteVisibilityRef, { hiddenItems: hiddenContentItems, updatedAt: serverTimestamp() }, { merge: true });
+    showToast('Content visibility saved', 'success');
+  } catch (error) {
+    showToast('Could not save content visibility: ' + error.message, 'error');
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Save content visibility';
+  }
+});
 
 // ── AUTH BOOTSTRAP ──
 (async function bootstrap() {
