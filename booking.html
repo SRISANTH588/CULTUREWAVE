@@ -683,9 +683,14 @@ async function saveBooking(data){
 // ── SEND EMAIL ──
 async function sendEmail(data){
   try{
+    // The account email is authoritative. It cannot be replaced by a value
+    // typed into checkout, so a confirmation always goes to the account that
+    // made the booking.
+    const accountEmail = firebase.auth().currentUser?.email || data.email;
+    if(!accountEmail) throw new Error('No account email is available for this booking.');
     await emailjs.send(EJ_SVC, EJ_TPL, {
-      to_name: data.name, to_email: data.email,
-      recipient_email: data.email, user_email: data.email,
+      to_name: data.name, to_email: accountEmail,
+      recipient_email: accountEmail, user_email: accountEmail,
       event_name: data.eventName, booking_id: data.bookingId.slice(-10).toUpperCase(),
       amount: data.amount, seats: selectedSeats.length ? selectedSeats.join(", ") : String(data.seats),
       seats_label: selectedSeats.length ? "Seat Numbers" : "Seats", booking_type: "Event Booking",
@@ -694,7 +699,20 @@ async function sendEmail(data){
       ticket_url: "https://srisanth588.github.io/CULTUREWAVE/success.html?bookingId="+encodeURIComponent(data.bookingId)+"&event="+encodeURIComponent(data.eventName)+"&amount="+encodeURIComponent(data.amount)+"&status=Confirmed&eventId="+encodeURIComponent(eventId),
       reply_to: "support.culturewave@gmail.com"
     });
+    // Delivery has succeeded even if the optional audit write is blocked by a
+    // restrictive Firestore rule, so never report a false email failure here.
+    try {
+      await db.collection("bookings").doc(data.bookingId).set({
+        confirmationEmail: accountEmail,
+        confirmationEmailStatus: "sent",
+        confirmationEmailSentAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    } catch (auditError) {
+      console.warn("Could not record confirmation email status:", auditError);
+    }
+    return true;
   }catch(e){ console.error("email failed:",e); }
+  return false;
 }
 
 // ── SUBMIT ──
@@ -707,7 +725,9 @@ async function submitBooking(){
   const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
   const total = afterDiscount + fee;
   const name = document.getElementById("bookName").value.trim();
-  const email = document.getElementById("bookEmail").value.trim();
+  // Always bind a booking to the signed-in account, rather than allowing a
+  // stale form value to become the confirmation recipient.
+  const email = bookingAuth.currentUser?.email || document.getElementById("bookEmail").value.trim();
   const phone = document.getElementById("bookPhone").value.trim();
   const eventName = evData.name||passedName||"Event";
   const eventDate = evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || '';
@@ -721,7 +741,8 @@ async function submitBooking(){
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
     await saveBooking({ bookingId:bid, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone });
-    await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
+    const emailSent = await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
+    if(!emailSent) showToast("Booking confirmed, but we could not send the confirmation email.");
     location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     return;
   }
@@ -738,7 +759,8 @@ async function submitBooking(){
       const pid = r.razorpay_payment_id || bid;
       document.getElementById("rStatus").textContent = "✅ Confirmed";
       await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
-      await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:"Razorpay" });
+      const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:"Razorpay" });
+      if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     },
     modal:{ ondismiss:()=>{ submitBtn.disabled=false; submitBtn.textContent="🔒 Pay Now"; } }
@@ -890,5 +912,6 @@ const ham=document.getElementById("hamburger"),mNav=document.getElementById("mob
 ham.addEventListener("click",()=>{ ham.classList.toggle("open"); mNav.classList.toggle("open"); document.body.style.overflow=mNav.classList.contains("open")?"hidden":""; });
 mNav.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{ ham.classList.remove("open"); mNav.classList.remove("open"); document.body.style.overflow=""; }));
 </script>
+<script src="auth-nav.js"></script>
 </body>
 </html>
