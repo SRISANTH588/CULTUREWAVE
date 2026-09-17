@@ -772,6 +772,11 @@ window.addEventListener('scroll', syncMobileTabs, {passive:true});
 
 function renderSeatingLayout(layout, target){
   if(!target) return;
+  const sections = Array.isArray(layout.sections) ? layout.sections : [];
+  if(sections.length) {
+    target.innerHTML = `<div style="position:relative;min-width:420px;height:420px;overflow:hidden;border-radius:14px;background:#10151f;">${sections.map(section => `<div style="position:absolute;left:${Number(section.x)||0}%;top:${Number(section.y)||0}%;width:${Number(section.width)||20}%;height:${Number(section.height)||14}%;display:grid;place-items:center;box-sizing:border-box;padding:.35rem;border:2px solid rgba(255,255,255,.3);border-radius:${section.shape==='rounded'?'18px':'5px'};background:${esc(section.color||'#2563eb')};color:#fff;font-size:.72rem;font-weight:900;text-align:center;">${esc(section.name||'SECTION')}</div>`).join('')}</div>`;
+    return;
+  }
   const rows = Array.isArray(layout.rows) ? layout.rows : [];
   target.innerHTML = `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${esc(layout.stage || 'STAGE')}</div>` + rows.map(row => {
     const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
@@ -992,7 +997,7 @@ async function renderEvent(data){
   if(data.seatingPlanUrl){
     document.getElementById('seatingPlanImage').src = data.seatingPlanUrl;
     document.getElementById('seatingPlanSection').style.display = 'block';
-  } else if (data.seatingPlan && Array.isArray(data.seatingPlan.rows)) {
+  } else if (data.seatingPlan && (Array.isArray(data.seatingPlan.rows) || Array.isArray(data.seatingPlan.sections))) {
     renderSeatingLayout(data.seatingPlan, document.getElementById('seatingPlanBuilder'));
     document.getElementById('seatingPlanImage').style.display = 'none';
     document.getElementById('seatingPlanBuilder').style.display = 'block';

@@ -929,7 +929,7 @@
     <!-- STEP 5: SEATING PLAN -->
     <div class="step-panel" data-panel="4">
       <div class="card">
-        <div class="card-head"><h2>Seating Plan</h2><p>Create a simple seat map here or upload an existing venue plan for customers.</p></div>
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;"><div><h2>Seating Plan</h2><p>Create a simple seat map, generate one, or upload an existing venue plan.</p></div><button class="btn-primary" type="button" onclick="openAiSeatingModal()">✨ Generate with AI</button></div>
         <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-bottom:1rem;">
           <button id="seatingBuilderTab" type="button" onclick="setSeatingPlanMode('builder')" style="text-align:left;padding:.9rem;border:2px solid var(--blue);border-radius:14px;background:var(--blue-light);cursor:pointer;color:inherit;"><strong style="display:block;font-size:.84rem;">Create on website</strong><span style="display:block;font-size:.72rem;color:var(--muted);margin-top:.25rem;">Build rows and numbered seats</span></button>
           <button id="seatingUploadTab" type="button" onclick="setSeatingPlanMode('image')" style="text-align:left;padding:.9rem;border:2px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;color:inherit;"><strong style="display:block;font-size:.84rem;">Upload an image</strong><span style="display:block;font-size:.72rem;color:var(--muted);margin-top:.25rem;">Use a venue map from ImageKit</span></button>
@@ -1727,6 +1727,8 @@
   </div><!-- /content -->
 </div><!-- /layout -->
 
+<div class="modal-overlay" id="aiSeatingModal"><div class="modal" style="max-width:680px;"><h3>✨ Generate Seating Plan with AI</h3><p style="color:var(--muted);font-size:.84rem;">Describe the venue, then refine the generated structured layout in the editor.</p><div class="field"><label for="aiSeatingPrompt">Describe your seating arrangement</label><textarea id="aiSeatingPrompt" style="min-height:95px;" placeholder="Example: Stage at the top, VIP in front, Premium behind VIP, General admission at the back, two backstage areas on both sides."></textarea></div><div class="grid-2"><div class="field"><label for="aiVenueType">Venue type</label><select id="aiVenueType"><option>Concert</option><option>Club</option><option>Theatre</option><option>Auditorium</option><option>Outdoor</option></select></div><div class="field"><label for="aiSeatingType">Seating type</label><select id="aiSeatingType"><option>Mixed</option><option>Standing</option><option>Seated</option></select></div><div class="field"><label for="aiSectionCount">Number of sections</label><input id="aiSectionCount" type="number" min="1" max="12" value="3" /></div><div class="field"><label for="aiSectionNames">Section names</label><input id="aiSectionNames" placeholder="VIP, Premium, General" /></div></div><div class="modal-actions"><button class="btn-ghost" type="button" onclick="closeAiSeatingModal()">Cancel</button><button class="btn-primary" type="button" onclick="generateAiSeatingPlan()">✨ Generate layout</button></div></div></div>
+
 <!-- ADD DATE MODAL -->
 <div class="modal-overlay" id="addDateModal">
   <div class="modal">
@@ -1909,6 +1911,7 @@ let seatingPlanLayout = {
   title: 'Venue Seating Plan',
   stage: 'STAGE',
   rows: [],
+  sections: [],
 };
 let draftSaveTimer = null;
 const localDraftKey = 'culturewave:event-create:draft';
@@ -1985,7 +1988,15 @@ function renderSeatingBuilder() {
   const preview = document.getElementById('seatingBuilderPreview');
   if (!list || !preview) return;
   const rows = seatingPlanLayout.rows || [];
-  list.innerHTML = rows.map((row, index) => `
+  const sections = seatingPlanLayout.sections || [];
+  list.innerHTML = sections.length ? sections.map((section, index) => `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 90px auto;gap:.55rem;align-items:end;padding:.65rem;border:1px solid var(--border);border-radius:11px;background:#fff;">
+      <div class="field"><label>Section name</label><input value="${section.name || ''}" oninput="updateAiSection(${index}, 'name', this.value)" /></div>
+      <div class="field"><label>Capacity</label><input type="number" min="0" value="${Number(section.capacity || 0)}" oninput="updateAiSection(${index}, 'capacity', this.value)" /></div>
+      <div class="field"><label>Ticket category</label><input value="${section.ticketCategory || ''}" oninput="updateAiSection(${index}, 'ticketCategory', this.value)" /></div>
+      <div class="field"><label>Color</label><input type="color" value="${section.color || '#2563eb'}" oninput="updateAiSection(${index}, 'color', this.value)" /></div>
+      <button type="button" onclick="removeAiSection(${index})" style="background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.48rem .6rem;font-weight:800;cursor:pointer;">Remove</button>
+    </div>`).join('') + '<button type="button" onclick="addAiSection()" style="margin-top:.7rem;background:var(--blue-light);color:var(--blue);border:1px solid rgba(20,84,255,.18);border-radius:9px;padding:.45rem .75rem;font-size:.76rem;font-weight:800;cursor:pointer;">+ Add section</button>' : rows.map((row, index) => `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:.55rem;align-items:end;padding:.65rem;border:1px solid var(--border);border-radius:11px;background:#fff;">
       <div class="field"><label>Row name</label><input value="${row.label || ''}" oninput="updateSeatingRow(${index}, 'label', this.value)" /></div>
       <div class="field"><label>Seats / sofas</label><input type="number" min="1" max="100" value="${Number(row.seats || 1)}" oninput="updateSeatingRow(${index}, 'seats', this.value)" /></div>
@@ -1998,7 +2009,7 @@ function renderSeatingBuilder() {
   const stage = document.getElementById('seatingStageLabel');
   if (title && title.value !== seatingPlanLayout.title) title.value = seatingPlanLayout.title || 'Venue Seating Plan';
   if (stage && stage.value !== seatingPlanLayout.stage) stage.value = seatingPlanLayout.stage || 'STAGE';
-  preview.innerHTML = `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${seatingPlanLayout.stage || 'STAGE'}</div>` +
+  preview.innerHTML = sections.length ? `<div style="position:relative;height:420px;overflow:hidden;border-radius:16px;background:#10151f;">${sections.map(section => `<div style="position:absolute;left:${section.x}%;top:${section.y}%;width:${section.width}%;height:${section.height}%;display:grid;place-items:center;padding:.35rem;box-sizing:border-box;border:2px solid rgba(255,255,255,.3);border-radius:${section.shape === 'rounded' ? '18px' : '5px'};background:${section.color};color:#fff;font-size:.72rem;font-weight:900;text-align:center;cursor:move;">${section.name}</div>`).join('')}</div>` : `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${seatingPlanLayout.stage || 'STAGE'}</div>` +
     (rows.length ? rows.map(row => {
       const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
       const justify = row.align === 'left' ? 'flex-start' : row.align === 'right' ? 'flex-end' : 'center';
@@ -2042,6 +2053,32 @@ window.updateSeatingMeta = function(key, value) {
   seatingPlanLayout[key] = value.trim().slice(0, 80);
   renderSeatingBuilder();
   updateProgress();
+};
+window.updateAiSection = function(index, key, value) { const section = seatingPlanLayout.sections[index]; if (!section) return; section[key] = key === 'capacity' ? Number(value || 0) : value; renderSeatingBuilder(); scheduleDraftSave(); };
+window.removeAiSection = function(index) { seatingPlanLayout.sections.splice(index, 1); renderSeatingBuilder(); scheduleDraftSave(); };
+window.addAiSection = function() { seatingPlanLayout.sections.push({ id:`section-${Date.now()}`, name:'NEW SECTION', type:'section', x:20, y:70, width:30, height:16, shape:'rounded', color:'#2563eb', capacity:0, ticketCategory:'', price:0 }); renderSeatingBuilder(); };
+
+window.openAiSeatingModal = () => document.getElementById('aiSeatingModal').classList.add('open');
+window.closeAiSeatingModal = () => document.getElementById('aiSeatingModal').classList.remove('open');
+window.generateAiSeatingPlan = () => {
+  const prompt = document.getElementById('aiSeatingPrompt').value.toLowerCase();
+  const listed = document.getElementById('aiSectionNames').value.split(',').map(name => name.trim()).filter(Boolean);
+  const defaults = prompt.includes('fanpit') ? ['FANPIT', 'PREMIUM', 'GENERAL'] : ['VIP', 'PREMIUM', 'GENERAL'];
+  const names = (listed.length ? listed : defaults).slice(0, Math.max(1, Number(document.getElementById('aiSectionCount').value) || 3));
+  const colors = ['#eab308', '#a855f7', '#2563eb', '#16a34a', '#ec4899', '#f97316'];
+  seatingPlanLayout = {
+    title: `${document.getElementById('aiVenueType').value} Seating Plan`, stage: 'STAGE',
+    rows: [],
+    sections: [
+      { id: 'stage', name: 'STAGE', type: 'stage', x: 25, y: 5, width: 50, height: 12, shape: 'rounded', color: '#111827', capacity: 0, ticketCategory: '', price: 0 },
+      ...names.map((name, index) => ({ id: `section-${Date.now()}-${index}`, name: name.toUpperCase(), type: 'section', x: 12 + (index % 2) * 39, y: 23 + Math.floor(index / 2) * 27, width: names.length === 1 ? 76 : 37, height: 20, shape: index === 0 ? 'rounded' : 'rectangle', color: colors[index % colors.length], capacity: 100, ticketCategory: name, price: 0 }))
+    ]
+  };
+  seatingPlanMode = 'builder';
+  closeAiSeatingModal();
+  renderSeatingBuilder();
+  updateProgress();
+  alert('AI generated your seating plan. You can edit its sections below.');
 };
 
 async function uploadSelectedImage(file, folder, urlId, clearPending, render) {
@@ -2831,7 +2868,7 @@ async function saveEvent(status) {
     desktopBackgroundUrl: document.getElementById('desktopBackgroundUrl').value.trim(),
     seatingPlanUrl: document.getElementById('seatingPlanUrl').value.trim(),
     seatingPlanMode,
-    seatingPlan: seatingPlanMode === 'builder' && seatingPlanLayout.rows.length ? seatingPlanLayout : null,
+    seatingPlan: seatingPlanMode === 'builder' && ((seatingPlanLayout.rows || []).length || (seatingPlanLayout.sections || []).length) ? seatingPlanLayout : null,
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
     customQuestion: (document.getElementById('customQ') ? document.getElementById('customQ').value.trim() : ''),
