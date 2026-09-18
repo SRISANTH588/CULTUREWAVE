@@ -1809,7 +1809,7 @@
       const grid = document.getElementById('indexEventsGrid');
       const empty = document.getElementById('indexEventsEmpty');
       if(!grid) return;
-      const snap = await _idb.collection('events').limit(200).get();
+      const snap = await _idb.collection('events').orderBy('createdAt', 'desc').limit(200).get();
       const docs = snap.docs.filter(doc => isPublishedEvent(doc.data()));
       if(snap.empty || !docs.length){ empty.style.display=''; return; }
       empty.style.display = 'none';
