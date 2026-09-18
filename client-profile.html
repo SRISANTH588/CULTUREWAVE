@@ -19,7 +19,6 @@
     .banner{height:260px;background:linear-gradient(135deg,#0a0f1e 0%,#1242c5 55%,#2f6bff 100%);position:relative;overflow:hidden;}
     .banner-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
     .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,15,30,.1) 0%,rgba(10,15,30,.55) 100%);}
-    .banner-edit{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;padding:.4rem .9rem;font-size:.76rem;font-weight:800;backdrop-filter:blur(8px);display:none;cursor:pointer;z-index:2;}
 
     /* PROFILE CARD */
     .profile-wrap{max-width:860px;margin:0 auto;padding:0 1.2rem 3rem;}
@@ -138,7 +137,6 @@
 <!-- BANNER -->
 <div class="banner" id="bannerEl">
   <div class="banner-overlay"></div>
-  <button class="banner-edit" id="bannerEditBtn" onclick="location.href='premium-client-dashboard.html'">✏️ Edit Profile</button>
 </div>
 
 <div class="profile-wrap">
@@ -392,9 +390,7 @@ function renderProfile(data){
   document.getElementById('profileSocials').innerHTML = socials.join('');
 
   if(isOwner){
-    document.getElementById('bannerEditBtn').style.display='block';
     document.getElementById('profileActions').innerHTML = `
-      <a href="premium-client-dashboard.html"><button class="btn btn-primary">✏️ Edit Profile</button></a>
       <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share</button>`;
   } else {
     const followLabel = isFollowing ? '✔️ Following' : '❤️ Follow';
