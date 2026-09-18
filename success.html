@@ -257,16 +257,16 @@
     .sc-help {
       width: 100%; max-width: 680px;
       margin-top: 1.4rem;
-      border: 1.5px solid #dce4f5;
-      border-radius: 18px;
-      background: #fff;
+      border: 1px solid #dbe7ff;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #f8fbff, #fff);
       overflow: hidden;
-      box-shadow: 0 4px 16px rgba(18,66,197,.06);
+      box-shadow: 0 10px 28px rgba(18,66,197,.08);
     }
     .sc-help summary {
       cursor: pointer;
-      padding: 1rem 1.2rem;
-      color: #1242c5;
+      padding: 1.05rem 1.2rem;
+      color: #10275e;
       font-size: .88rem;
       font-weight: 800;
       list-style: none;
@@ -275,16 +275,21 @@
       justify-content: space-between;
     }
     .sc-help summary::-webkit-details-marker { display: none; }
-    .sc-help summary::after { content: '+'; font-size: 1.25rem; line-height: 1; }
+    .sc-help summary::after { content: '+'; width: 1.8rem; height: 1.8rem; border-radius: 50%; display: grid; place-items: center; background: #e7efff; color: #1242c5; font-size: 1.25rem; line-height: 1; }
     .sc-help[open] summary { border-bottom: 1px solid #e8eefb; }
     .sc-help[open] summary::after { content: '−'; }
-    .sc-faq-list { padding: .2rem 1.2rem 1rem; }
-    .sc-faq-list details { border-bottom: 1px solid #eef2fb; padding: .85rem 0; }
+    .sc-help-title { display: flex; align-items: center; gap: .8rem; }
+    .sc-help-icon { width: 2.35rem; height: 2.35rem; border-radius: 12px; display: grid; place-items: center; flex: none; background: linear-gradient(135deg, #2f6bff, #1242c5); color: #fff; font-size: 1.1rem; box-shadow: 0 6px 14px rgba(18,66,197,.2); }
+    .sc-help-title strong, .sc-help-title small { display: block; }
+    .sc-help-title small { margin-top: .15rem; color: #7180a3; font-size: .71rem; font-weight: 600; }
+    .sc-faq-list { padding: .15rem 1.2rem .85rem; }
+    .sc-faq-list details { border-bottom: 1px solid #e7edf9; padding: .85rem 0; }
     .sc-faq-list details:last-child { border-bottom: 0; }
     .sc-faq-list summary { display: block; padding: 0; color: #17203a; font-size: .8rem; }
     .sc-faq-list summary::after { display: none; }
     .sc-faq-list p { margin: .45rem 0 0; color: #64748b; font-size: .78rem; line-height: 1.55; }
     .sc-faq-list a { color: #1242c5; font-weight: 800; }
+    .sc-help-contact { display: block; margin-top: .9rem; padding: .75rem .85rem; border-radius: 10px; background: #edf4ff; color: #1242c5; font-size: .76rem; font-weight: 800; text-align: center; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
@@ -302,6 +307,13 @@
     /* Mobile ticket confirmation experience */
     @media (max-width:600px){
       body{background:#171719;color:#f5f5f6}.topbar,.mobile-nav,.site-footer{display:none!important}.sc-page{min-height:100vh;align-items:stretch;padding:3.1rem 1.75rem 8.5rem;background:radial-gradient(ellipse 75% 23% at 50% 10%,rgba(20,144,96,.24),transparent 62%),#171719}.sc-status-banner{max-width:none;margin:0;padding:0 0 2.2rem;border-radius:0;background:transparent!important;box-shadow:none!important;overflow:visible}.sc-status-banner::before{display:none}.sc-icon-ring{width:4.8rem;height:4.8rem;margin:0 auto 1.25rem;background:radial-gradient(circle at 32% 26%,#7df0bb,#28c982 32%,#067349 100%)!important;border:3px solid rgba(211,255,234,.64)!important;box-shadow:0 0 0 7px rgba(53,218,143,.13),0 14px 30px rgba(0,0,0,.32),inset 0 1px 2px rgba(255,255,255,.55),inset 0 -7px 12px rgba(0,59,35,.24)!important;font-size:2rem}.sc-status-banner h1{color:#26bf84;font-family:cursive;font-size:2.1rem;letter-spacing:-.07em}.sc-status-banner p{display:none}.sc-hero-qr{display:flex;flex-direction:column;align-items:center;gap:.9rem;margin:1.2rem 0 1.25rem}.sc-hero-qr .sc-qr-box{width:145px;height:145px;padding:.7rem;border:0;border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.3)}.sc-hero-qr .sc-qr-scan-note{max-width:310px;color:#f1d26d;font-size:.84rem;line-height:1.45}.sc-booking-id{margin:0;background:none;border:0;border-radius:0;padding:0;color:#a7a7ab;font-size:.76rem;letter-spacing:0}.sc-ticket{max-width:none;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}.sc-ticket-top{padding:0 0 1.05rem;background:transparent!important;display:block}.sc-ticket-top::after,.sc-ticket-cover,.sc-ticket-emoji{display:none!important}.sc-ticket-event-info h2{font-size:1.15rem;line-height:1.32;color:#f5f5f6}.sc-ticket-event-info span{color:#aaaab0;font-size:.78rem}.sc-ticket-event-info span::before{display:none}.sc-tear{display:none}.sc-ticket-body{display:block;padding:0}.sc-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:1.05rem 1.05rem;background:#05070d;border:1px solid rgba(255,255,255,.04);border-radius:20px}.sc-detail{padding:.65rem 0;border-bottom:1px dashed #35363c}.sc-detail:nth-child(odd){padding-right:.7rem}.sc-detail:nth-child(even){text-align:right}.sc-detail:nth-last-child(-n+2){border-bottom:0}.sc-detail-label{color:#a7a8ae;font-size:.61rem}.sc-detail-value{color:#f1f1f3;font-size:.8rem}.sc-detail-value.blue{color:#2dca8d}.sc-actions{position:fixed;z-index:9;left:0;right:0;bottom:0;max-width:none;display:grid;grid-template-columns:1fr 1fr;padding:.9rem 1.75rem calc(env(safe-area-inset-bottom) + .9rem);margin:0;background:linear-gradient(transparent,#121214 23%)}.sc-btn{min-height:55px;border-radius:16px}.sc-btn-download{background:#ff5a12;box-shadow:none;order:1}.sc-btn-share{display:flex;order:2;background:#27282c;color:#f5f5f6;border-color:#414248;box-shadow:none}.sc-btn-home{display:none}.sc-failed-actions{padding:1rem}.sc-help{margin-top:1.4rem;background:#202126;border-color:#34353b;box-shadow:none}.sc-help summary{color:#f1d26d}.sc-help[open] summary{border-bottom-color:#34353b}.sc-faq-list details{border-bottom-color:#34353b}.sc-faq-list summary{color:#f5f5f6}.sc-faq-list p{color:#b8b8bd}.sc-faq-list a{color:#f1d26d}.sc-ticket #ticketCustomMessage{background:#0b0d13!important;color:#bdbec4!important}.sc-qr-label{display:none}
+    }
+    @media (max-width:600px){
+      .sc-help{background:#202126;border-color:#34353b;}
+      .sc-help summary::after{background:#34353b;color:#f1d26d;}
+      .sc-help-icon{background:linear-gradient(135deg,#ff7a18,#ff5a12);box-shadow:none;}
+      .sc-help-title small{color:#aaabb1;}
+      .sc-help-contact{background:#2b2c31;color:#f1d26d;}
     }
   </style>
 </head>
@@ -411,12 +423,12 @@
       </div>
 
       <details class="sc-help" id="scHelp">
-        <summary>Need help? View FAQs</summary>
+        <summary><span class="sc-help-title"><span class="sc-help-icon">?</span><span><strong>Need help with your booking?</strong><small>Quick answers and support are here.</small></span></span></summary>
         <div class="sc-faq-list">
           <details><summary>Where can I find my ticket?</summary><p>Your booking ID and QR code are on this page. You can also use your booking confirmation email at the venue.</p></details>
           <details><summary>What should I show at entry?</summary><p>Show the QR code or your booking ID to the event team or restaurant staff.</p></details>
           <details><summary>Can I cancel or request a refund?</summary><p>Refund eligibility depends on the organiser’s policy. Contact <a href="customer-service.html">Customer Service</a> with your booking ID.</p></details>
-          <details><summary>I need more help</summary><p>Email <a href="mailto:support.culturewave@gmail.com">support.culturewave@gmail.com</a> and include your booking ID.</p></details>
+          <a class="sc-help-contact" href="mailto:support.culturewave@gmail.com">Email support.culturewave@gmail.com</a>
         </div>
       </details>
 
