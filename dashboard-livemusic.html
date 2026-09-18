@@ -897,7 +897,7 @@ else{
 document.getElementById('logoutBtn').onclick=()=>logout();
 try{const saved=localStorage.getItem('livemusicDashView');if(saved)switchView(saved);}catch(e){}
 function normStatus(s){const v=(s||'draft').toLowerCase();return(v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished';}
-function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid),orderBy('createdAt','desc'));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()}));renderEvents();renderOverview();});}
+function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();},err=>console.error('Unable to load events:',err));}
 function renderEvents(){
   const q=document.getElementById('evSearch').value.trim().toLowerCase();
   const filtered=allEvents.filter(e=>{const mt=activeTab==='published'?normStatus(e.status)==='published':activeTab==='archived'?normStatus(e.status)==='archived':normStatus(e.status)==='unpublished';const mq=!q||(e.name||'').toLowerCase().includes(q)||(e.city||'').toLowerCase().includes(q);return mt&&mq;});

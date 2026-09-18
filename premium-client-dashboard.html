@@ -3144,20 +3144,22 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     const saved = (()=>{ try{ return localStorage.getItem('cwDashView')||'overview'; }catch{ return 'overview'; }})();
     if(typeof window.switchView === 'function') window.switchView(saved);
 
+    // Query this lister's events at the database. Loading a limited global
+    // collection first meant recently created events could be omitted once the
+    // collection grew beyond that limit.
     onSnapshot(
-      query(collection(db,'events'), limit(200)),
+      query(collection(db,'events'), where('ownerId','==',myUid)),
       snap => {
         try {
-          const all = snap.docs.map(d=>({id:d.id,...d.data()}));
-          const mine = all.filter(e=> e.ownerId===myUid || e.uid===myUid || e.createdBy===myUid);
-          allEvents = (mine.length ? mine : all)
+          allEvents = snap.docs.map(d=>({id:d.id,...d.data()}))
             .sort((a,b)=>{ const ta=a.createdAt?.seconds||0; const tb=b.createdAt?.seconds||0; return tb-ta; });
           window.allEvents = allEvents;
           renderEvents();
           renderOverview();
           populateIgEventDropdown();
         } catch(e) { console.error('events snapshot error:', e); }
-      }
+      },
+      err => console.error('Unable to load lister events:', err)
     );
 
     loadProfile(myUid);
