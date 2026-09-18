@@ -395,7 +395,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       </div>
       <div class="prem-actions">
         <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
-        <button onclick="location.href='event-create.html'" class="prem-btn-white">✦ Create Party Event</button>
+        <button onclick="location.href='event-create.html?from=nightlife'" class="prem-btn-white">✦ Create Party Event</button>
       </div>
     </div>
     <div class="prem-stats">
@@ -410,7 +410,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a855f7);display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem;">🎉</div>
       <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem;color:#1a1a2e;">No party events yet</h3>
       <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first party event and start selling tickets.</p>
-      <button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,.3);">✦ Create Party</button>
+      <button onclick="location.href='event-create.html?from=nightlife'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,.3);">✦ Create Party</button>
     </div>
   </div>
 </div>
@@ -426,7 +426,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       </div>
       <div class="prem-actions">
         <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
-        <button onclick="location.href='event-create.html'" class="prem-btn-white">✦ Create Club Night</button>
+        <button onclick="location.href='event-create.html?from=nightlife'" class="prem-btn-white">✦ Create Club Night</button>
       </div>
     </div>
     <div class="prem-stats">
@@ -441,7 +441,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#6d28d9,#7c3aed);display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem;">🎧</div>
       <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem;color:#1a1a2e;">No club nights yet</h3>
       <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first club night and manage bookings.</p>
-      <button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,.3);">✦ Create Club Night</button>
+      <button onclick="location.href='event-create.html?from=nightlife'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,.3);">✦ Create Club Night</button>
     </div>
   </div>
 </div>
@@ -1039,12 +1039,12 @@ function renderEvents(){
   if(el('hdrPublished'))el('hdrPublished').textContent=pub;
   if(el('hdrDraft'))el('hdrDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;
   const container=document.getElementById('eventsContainer');
-  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3.5rem 2rem;text-align:center;"><div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);display:grid;place-items:center;font-size:2rem;margin:0 auto 1.25rem;">🌙</div><h3 style="font-size:1.1rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No events yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:320px;margin:0 auto 1.75rem;line-height:1.7;">Create your first nightlife event and start selling tickets.</p><button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2rem;border-radius:999px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:0;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;">✦ Create Your First Event</button></div>`;return;}
+  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3.5rem 2rem;text-align:center;"><div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);display:grid;place-items:center;font-size:2rem;margin:0 auto 1.25rem;">🌙</div><h3 style="font-size:1.1rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No events yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:320px;margin:0 auto 1.75rem;line-height:1.7;">Create your first nightlife event and start selling tickets.</p><button onclick="location.href='event-create.html?from=nightlife'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2rem;border-radius:999px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:0;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;">✦ Create Your First Event</button></div>`;return;}
   container.innerHTML=`<div class="events-table"><div class="ev-table-head"><span>Event</span><span>Status</span><span>Date</span><span>Price</span><span>Actions</span></div>${filtered.map(ev=>{const st=normStatus(ev.status);const stLabel=st==='published'?'Live':st==='archived'?'Archived':'Draft';const date=ev.startDate?.toDate?ev.startDate.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';const price=ev.price||ev.tickets?.[0]?.price||0;return`<div class="ev-row"><div><div class="ev-name">${esc(ev.name||'Untitled')}</div><div class="ev-sub">${esc(ev.city||'')}</div></div><div><span class="status-pill ${st==='published'?'live':st==='archived'?'archived':'draft'}">● ${stLabel}</span></div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.84rem;font-weight:600;color:#1a1a2e;">${price?money(price):'Free'}</div><div class="ev-actions"><button class="ev-act-btn ${st==='published'?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${st==='published'?'Unpublish':'Publish'}</button><a class="ev-act-btn" href="event-detail.html?eventId=${ev.id}" target="_blank">View</a><a class="ev-act-btn" href="event-manage.html?eventId=${ev.id}">Edit</a><button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button></div></div>`;}).join('')}</div>`;
 }
 window.copyEvLink=function(id){navigator.clipboard.writeText(`${location.origin}/event-detail.html?eventId=${id}`).then(()=>showToast('Link copied!'));};
 window.togglePublishEvent=async function(id,st){if(!myUid)return;const ns=st==='published'?'unpublished':'published';await updateDoc(doc(db,'events',id),{status:ns,updatedAt:serverTimestamp()});showToast(ns==='published'?'✅ Event published!':'🟡 Event unpublished');};
-document.getElementById('createEvBtn').onclick=()=>location.href='event-create.html';
+document.getElementById('createEvBtn').onclick=()=>location.href='event-create.html?from=nightlife';
 document.getElementById('evSearch').addEventListener('input',renderEvents);
 document.getElementById('evRefresh').onclick=()=>renderEvents();
 function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);});}
@@ -1153,12 +1153,12 @@ function renderEvents(){
   if(el('hdrPublished'))el('hdrPublished').textContent=pub;
   if(el('hdrDraft'))el('hdrDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;
   const container=document.getElementById('eventsContainer');
-  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3.5rem 2rem;text-align:center;"><div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);display:grid;place-items:center;font-size:2rem;margin:0 auto 1.25rem;">🌙</div><h3 style="font-size:1.1rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No events yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:320px;margin:0 auto 1.75rem;line-height:1.7;">Create your first nightlife event and start selling tickets.</p><button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2rem;border-radius:999px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:0;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;">✦ Create Your First Event</button></div>`;return;}
+  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3.5rem 2rem;text-align:center;"><div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);display:grid;place-items:center;font-size:2rem;margin:0 auto 1.25rem;">🌙</div><h3 style="font-size:1.1rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No events yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:320px;margin:0 auto 1.75rem;line-height:1.7;">Create your first nightlife event and start selling tickets.</p><button onclick="location.href='event-create.html?from=nightlife'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2rem;border-radius:999px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:0;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;">✦ Create Your First Event</button></div>`;return;}
   container.innerHTML=`<div class="events-table"><div class="ev-table-head"><span>Event</span><span>Status</span><span>Date</span><span>Price</span><span>Actions</span></div>${filtered.map(ev=>{const st=normStatus(ev.status);const stLabel=st==='published'?'Live':st==='archived'?'Archived':'Draft';const date=ev.startDate?.toDate?ev.startDate.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';const price=ev.price||ev.tickets?.[0]?.price||0;return`<div class="ev-row"><div><div class="ev-name">${esc(ev.name||'Untitled')}</div><div class="ev-sub">${esc(ev.city||'')}</div></div><div><span class="status-pill ${st==='published'?'live':st==='archived'?'archived':'draft'}">● ${stLabel}</span></div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.84rem;font-weight:600;color:#1a1a2e;">${price?money(price):'Free'}</div><div class="ev-actions"><button class="ev-act-btn ${st==='published'?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${st==='published'?'Unpublish':'Publish'}</button><a class="ev-act-btn" href="event-detail.html?eventId=${ev.id}" target="_blank">View</a><a class="ev-act-btn" href="event-manage.html?eventId=${ev.id}">Edit</a><button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button></div></div>`;}).join('')}</div>`;
 }
 window.copyEvLink=function(id){navigator.clipboard.writeText(`${location.origin}/event-detail.html?eventId=${id}`).then(()=>showToast('Link copied!'));};
 window.togglePublishEvent=async function(id,st){if(!myUid)return;const ns=st==='published'?'unpublished':'published';await updateDoc(doc(db,'events',id),{status:ns,updatedAt:serverTimestamp()});showToast(ns==='published'?'✅ Event published!':'🟡 Event unpublished');};
-document.getElementById('createEvBtn').onclick=()=>location.href='event-create.html';
+document.getElementById('createEvBtn').onclick=()=>location.href='event-create.html?from=nightlife';
 document.getElementById('evSearch').addEventListener('input',renderEvents);
 document.getElementById('evRefresh').onclick=()=>renderEvents();
 function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);});}

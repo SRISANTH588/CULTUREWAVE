@@ -2923,7 +2923,13 @@ async function saveEvent(status) {
       await addDoc(collection(db, 'events'), payload);
       localStorage.removeItem(localDraftKey);
       const fromParam = new URLSearchParams(location.search).get('from');
-      window.location.href = fromParam === 'nightlife' ? 'dashboard-nightlife.html' : 'dashboard-brunch.html';
+      const dashboardBySource = {
+        nightlife: 'dashboard-nightlife.html',
+        livemusic: 'dashboard-livemusic.html',
+        workshops: 'dashboard-workshops.html',
+        experiences: 'dashboard-experiences.html'
+      };
+      window.location.href = dashboardBySource[fromParam] || 'dashboard-brunch.html';
     }
   } catch (err) {
     alert('Error saving event: ' + err.message);
