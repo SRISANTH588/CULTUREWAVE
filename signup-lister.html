@@ -125,6 +125,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           <div class="input-wrap"><span class="input-icon">📧</span><input id="femail" type="email" placeholder="you@example.com" autocomplete="email"/></div>
         </div>
         <div class="field">
+          <span class="field-label">Phone Number <span style="font-size:.6rem;color:#64748b;font-weight:800;letter-spacing:.06em;">· NO OTP REQUIRED</span></span>
+          <div class="input-wrap"><span class="input-icon">📱</span><span class="wa-pre">+91</span><input id="fphone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" autocomplete="tel"/></div>
+        </div>
+        <div class="field">
           <span class="field-label">Password</span>
           <div class="input-wrap"><span class="input-icon">🔒</span><input id="fpass" type="password" placeholder="Min 6 characters" autocomplete="new-password"/><button class="eye" type="button" onclick="toggleEye(this)">◔</button></div>
         </div>
@@ -177,9 +181,11 @@ function toggleEye(btn){var i=btn.previousElementSibling;i.type=i.type==='passwo
 function continueToBrand(){
   var name=document.getElementById('fname').value.trim();
   var email=document.getElementById('femail').value.trim();
+  var phone=document.getElementById('fphone').value.trim();
   var pass=document.getElementById('fpass').value;
   if(!name){setStatus('Enter your full name.','warning','st1');return;}
   if(!email||!email.includes('@')){setStatus('Enter a valid email.','warning','st1');return;}
+  if(!/^\d{10}$/.test(phone)){setStatus('Enter a valid 10-digit phone number.','warning','st1');return;}
   if(!pass||pass.length<6){setStatus('Password must be at least 6 characters.','warning','st1');return;}
   document.getElementById('step1').style.display='none';
   document.getElementById('step3').style.display='';
@@ -197,14 +203,17 @@ window.createBrandPage=async function(){
   if(!city){setStatus('Enter your city.','warning','st3');return;}
   var name=document.getElementById('fname').value.trim();
   var email=document.getElementById('femail').value.trim();
+  var phone=document.getElementById('fphone').value.trim();
   var pass=document.getElementById('fpass').value;
+  if(!/^\d{10}$/.test(phone)){setStatus('Go back and enter a valid 10-digit phone number.','warning','st3');return;}
   setStatus('Creating your account…','info','st3');
   try{
     var cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
-    await sendEmailVerification(cred.user);
     await setDoc(doc(db,'users',cred.user.uid),{
       name,email,
+      phone:'+91'+phone,
+      whatsapp:'+91'+phone,
       role:'lister',
       emailVerificationRequired:true,
       category:CAT,
@@ -220,18 +229,31 @@ window.createBrandPage=async function(){
       city,
       category:CAT,
       dashboard:DASH,
+      phone:'+91'+phone,
+      whatsapp:'+91'+phone,
       ownerName:name,
       ownerEmail:email,
       followers:0,
       verified:false,
       createdAt:serverTimestamp()
     });
+    var verificationSent=true;
+    try { await sendEmailVerification(cred.user); }
+    catch (verificationError) { verificationSent=false; console.warn('Verification email could not be sent:', verificationError); }
     try{sessionStorage.removeItem('cw_lister_cat');sessionStorage.removeItem('cw_lister_dash');sessionStorage.removeItem('cw_lister_role');}catch(e){}
-    setStatus('Account created. Check your email to verify it.','success','st3');
+    setStatus(verificationSent ? 'Account created. Check your email to verify it.' : 'Account created, but the verification email could not be sent yet.','success','st3');
     document.querySelector('#step3 .form').style.display='none';
     var notice=document.getElementById('verifyNotice');
-    notice.innerHTML='We sent a verification link to <strong>'+email+'</strong>. Verify your email, then <a href="login.html">log in</a>.';
+    notice.innerHTML=verificationSent
+      ? 'We sent a verification link to <strong>'+email+'</strong>. Verify your email, then <a href="login.html">log in</a>.'
+      : 'Use the button below to try sending the verification email again.';
     notice.style.display='block';
+    if(!verificationSent){
+      var resend=document.createElement('button');
+      resend.type='button'; resend.className='submit-btn'; resend.style.marginTop='1rem'; resend.textContent='Resend verification email';
+      resend.onclick=async function(){ try{await sendEmailVerification(cred.user);setStatus('Verification email sent. Check your inbox.','success','st3');resend.remove();notice.innerHTML='We sent a verification link to <strong>'+email+'</strong>. Verify your email, then <a href="login.html">log in</a>.';}catch(e){setStatus('Could not send the email yet: '+e.message,'warning','st3');} };
+      notice.after(resend);
+    }
   }catch(e){
     var msg=e.code==='auth/email-already-in-use'?'Account already exists. <a href="login.html" style="color:#1242c5;font-weight:800;">Login here →</a>':e.message;
     document.getElementById('st3').innerHTML=msg;
