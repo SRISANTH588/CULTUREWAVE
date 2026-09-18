@@ -1370,12 +1370,12 @@
       </div>
 
       <div class="card">
-        <div class="card-head"><h2>Event Details <span style="font-size:.68rem;color:var(--muted);font-weight:700;">Optional</span></h2><p>Only details you choose here will be shown to attendees.</p></div>
+        <div class="card-head"><div style="display:flex;align-items:center;gap:.5rem;"><h2>Event Details</h2><span style="background:#ef4444;color:#fff;font-size:.62rem;font-weight:800;padding:.18rem .5rem;border-radius:999px;">*</span></div><p>Complete these details so attendees have the information they need before booking.</p></div>
         <div class="grid-2">
-          <div class="field"><label for="eventLanguage">Language</label><input id="eventLanguage" type="text" placeholder="e.g. English, Hindi" /></div>
-          <div class="field"><label for="layoutType">Layout type</label><select id="layoutType"><option value="">Do not display</option><option value="Indoor">Indoor</option><option value="Outdoor">Outdoor</option></select></div>
-          <div class="field"><label for="kidsFriendly">Kid friendly?</label><select id="kidsFriendly"><option value="">Do not display</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
-          <div class="field"><label for="petsFriendly">Pet friendly?</label><select id="petsFriendly"><option value="">Do not display</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+          <div class="field"><label for="eventLanguage">Language</label><input id="eventLanguage" type="text" placeholder="e.g. English, Hindi" required /></div>
+          <div class="field"><label for="layoutType">Layout type</label><select id="layoutType" required><option value="" disabled selected>Select layout</option><option value="Indoor">Indoor</option><option value="Outdoor">Outdoor</option></select></div>
+          <div class="field"><label for="kidsFriendly">Kid friendly?</label><select id="kidsFriendly" required><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+          <div class="field"><label for="petsFriendly">Pet friendly?</label><select id="petsFriendly" required><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
         </div>
       </div>
 
@@ -1914,7 +1914,10 @@ let seatingPlanLayout = {
   sections: [],
 };
 let draftSaveTimer = null;
-const localDraftKey = 'culturewave:event-create:draft';
+const legacyLocalDraftKey = 'culturewave:event-create:draft';
+function getLocalDraftKey() {
+  return uid ? `culturewave:event-create:draft:${uid}` : null;
+}
 
 function scheduleDraftSave() {
   if (new URLSearchParams(location.search).get('eventId')) return;
@@ -1924,6 +1927,8 @@ function scheduleDraftSave() {
 
 function saveLocalDraft() {
   if (new URLSearchParams(location.search).get('eventId')) return;
+  const localDraftKey = getLocalDraftKey();
+  if (!localDraftKey) return;
   try {
     const fields = {};
     document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
@@ -1932,6 +1937,7 @@ function saveLocalDraft() {
     const toggles = {};
     document.querySelectorAll('.toggle[id]').forEach(el => { toggles[el.id] = el.classList.contains('on'); });
     localStorage.setItem(localDraftKey, JSON.stringify({
+      ownerId: uid,
       fields, toggles, eventType, eventDates, tickets, coupons, faqs, artists, galleryImages,
       ticketMode, perDateTickets, ticketDeliveryMode, ticketDesign, rsvpCQs,
       seatingPlanMode, seatingPlanLayout,
@@ -1944,10 +1950,16 @@ function saveLocalDraft() {
 
 function restoreLocalDraft() {
   if (new URLSearchParams(location.search).get('eventId')) return;
+  const localDraftKey = getLocalDraftKey();
+  if (!localDraftKey) return;
   try {
     const raw = localStorage.getItem(localDraftKey);
     if (!raw) return;
     const draft = JSON.parse(raw);
+    if (draft.ownerId && draft.ownerId !== uid) {
+      localStorage.removeItem(localDraftKey);
+      return;
+    }
     Object.entries(draft.fields || {}).forEach(([id, value]) => {
       const el = document.getElementById(id);
       if (el && el.type !== 'file') el[el.type === 'checkbox' ? 'checked' : 'value'] = value;
@@ -2099,6 +2111,12 @@ async function loadUser() {
   const user = await getCurrentUser();
   if (!user) { window.location.href = 'login.html'; return; }
   uid = user.uid;
+  // Previous versions used one browser-wide draft key. Remove it so a new
+  // account never inherits another user's unfinished listing.
+  localStorage.removeItem(legacyLocalDraftKey);
+  restoreLocalDraft();
+  updateProgress();
+  renderRsvpPreview();
   const init = (user.name || 'U').trim().charAt(0).toUpperCase();
   const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
 }
@@ -2113,6 +2131,11 @@ loadUser();
     const snap = await db.collection('events').doc(eventId).get();
     if (!snap.exists) return;
     const d = snap.data();
+    const user = await getCurrentUser();
+    if (!user || (d.ownerId && d.ownerId !== user.uid)) {
+      history.replaceState(null, '', 'event-create.html');
+      return;
+    }
     const g = id => document.getElementById(id);
     const set = (id, val) => { const el = g(id); if (el && val !== undefined && val !== null) el.value = val; };
     // basic info
@@ -2231,7 +2254,16 @@ loadUser();
 })();
 
 // ── STEP NAVIGATION ──
+function hasRequiredEventDetails() {
+  return ['eventLanguage', 'layoutType', 'kidsFriendly', 'petsFriendly']
+    .every(id => document.getElementById(id)?.value.trim());
+}
+
 window.goStep = function(n) {
+  if (currentStep === 6 && n > 6 && !hasRequiredEventDetails()) {
+    alert('Please complete all required Event Details before continuing.');
+    return;
+  }
   const panels = document.querySelectorAll('.step-panel');
   const btns = document.querySelectorAll('.step-btn');
   panels.forEach(p => p.classList.toggle('active', +p.dataset.panel === n));
@@ -2794,6 +2826,11 @@ async function saveEvent(status) {
     alert('Please complete Summary and Description.');
     return;
   }
+  if (status === 'published' && !hasRequiredEventDetails()) {
+    goStep(6);
+    alert('Please complete all required Event Details before publishing.');
+    return;
+  }
   if (!uid) { await loadUser(); }
   if (!uid) { alert("Please sign in to save."); return; }
 
@@ -2917,11 +2954,11 @@ async function saveEvent(status) {
     if (editId) {
       const {createdAt, ...updatePayload} = payload;
       await db.collection('events').doc(editId).update({...updatePayload, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-      localStorage.removeItem(localDraftKey);
+      localStorage.removeItem(getLocalDraftKey());
       window.location.href = 'event-manage.html?eventId=' + editId;
     } else {
       await addDoc(collection(db, 'events'), payload);
-      localStorage.removeItem(localDraftKey);
+      localStorage.removeItem(getLocalDraftKey());
       const fromParam = new URLSearchParams(location.search).get('from');
       const dashboardBySource = {
         nightlife: 'dashboard-nightlife.html',
@@ -3451,7 +3488,6 @@ document.addEventListener('change', scheduleDraftSave);
 document.addEventListener('click', e => {
   if (e.target.closest('.toggle')) scheduleDraftSave();
 });
-restoreLocalDraft();
 updateProgress();
 renderRsvpPreview();
 
