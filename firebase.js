@@ -39,10 +39,12 @@ async function getCurrentUser() {
       email: user.email,
       name: data.name || user.displayName || user.email,
       role: data.role || "client",
+      plan: data.plan || data.subscriptionPlan || "free",
+      subscriptionStatus: data.subscriptionStatus || data.planStatus || "active",
       photoURL: user.photoURL || null,
     };
   } catch {
-    return { uid: user.uid, email: user.email, name: user.displayName || user.email, role: "client" };
+    return { uid: user.uid, email: user.email, name: user.displayName || user.email, role: "client", plan: "free", subscriptionStatus: "active" };
   }
 }
 

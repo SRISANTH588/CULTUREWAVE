@@ -234,7 +234,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   <div class="sb-footer">
     <div class="sb-upgrade">
       <div class="sb-upgrade-label">Current Plan</div>
-      <div class="sb-upgrade-plan">🎵 Live Music Plan</div>
+      <div class="sb-upgrade-plan" id="sidebarPlan">🎵 Live Music Plan</div>
       <button class="sb-upgrade-btn" onclick="location.href='pricing.html'">Upgrade for more features</button>
     </div>
   </div>
@@ -265,7 +265,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   <div class="prem-hdr">
     <div class="prem-hdr-top">
       <div class="prem-hdr-left">
-        <div class="prem-badge">✦ Premium Plan</div>
+        <div class="prem-badge" id="headerPlanBadge">✦ Plan</div>
         <div class="prem-title">Dashboard</div>
         <div class="prem-sub">Welcome back! Here's your Live Music business overview.</div>
       </div>
@@ -294,14 +294,14 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:.75rem;">
       <div style="border-radius:14px;overflow:hidden;border:1px solid var(--border);">
         <div style="background:linear-gradient(135deg,#e11d48,#f43f5e);padding:1.1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
-          <div><div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.7);margin-bottom:.25rem;">Current Plan</div><div style="font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Free</div></div>
+          <div><div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.7);margin-bottom:.25rem;">Current Plan</div><div id="currentPlanName" style="font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Free</div></div>
           <div style="display:flex;align-items:center;gap:.6rem;"><span style="padding:.28rem .65rem;border-radius:999px;background:rgba(255,255,255,.2);font-size:.7rem;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.3);">Active</span><a href="pricing.html" style="padding:.38rem .8rem;border-radius:8px;background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:.78rem;border:1px solid rgba(255,255,255,.3);text-decoration:none;">Upgrade</a></div>
         </div>
         <div style="background:#fff;padding:1rem 1.2rem;">
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.9rem;">
-            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;">5 Events</div><div style="font-size:.72rem;color:#9ca3af;">Monthly limit</div></div>
+            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div id="planLimit" style="font-size:.9rem;font-weight:800;color:#1a1a2e;">5 Events</div><div style="font-size:.72rem;color:#9ca3af;">Monthly limit</div></div>
             <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;" id="planUsageLabel">0 used</div><div style="font-size:.72rem;color:#9ca3af;">Events created</div></div>
-            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;">Basic</div><div style="font-size:.72rem;color:#9ca3af;">Analytics tier</div></div>
+            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div id="analyticsTier" style="font-size:.9rem;font-weight:800;color:#1a1a2e;">Basic</div><div style="font-size:.72rem;color:#9ca3af;">Analytics tier</div></div>
           </div>
           <div style="height:6px;border-radius:999px;background:var(--plight);overflow:hidden;"><div id="planUsageBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#e11d48,#f43f5e);width:0%;transition:width .5s;"></div></div>
         </div>
@@ -823,7 +823,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     </div>
     <div class="prem-stats">
       <div class="prem-stat"><div class="prem-stat-lbl">Account</div><div class="prem-stat-val g">Active</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Plan</div><div class="prem-stat-val">Free</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Plan</div><div class="prem-stat-val" id="settingsPlan">Free</div></div>
       <div class="prem-stat"><div class="prem-stat-lbl">Sessions</div><div class="prem-stat-val">1</div></div>
       <div class="prem-stat"><div class="prem-stat-lbl">2FA</div><div class="prem-stat-val y">Off</div></div>
     </div>
@@ -888,11 +888,22 @@ const user=await getCurrentUser();
 if(!user){location.href='login.html';}
 else{
   myUid=user.uid;window.myUid=myUid;
+  renderPlan(user);
   document.getElementById('sidebarName').textContent=user.name||'Client';
   document.getElementById('topName').textContent=user.name||'User';
   const init=(user.name||'M').trim()[0].toUpperCase();
   ['sideAvatar','topAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});
   loadProfile(myUid);loadEvents(myUid);loadBookings(myUid);
+}
+function renderPlan(user){
+  const plan=String(user.plan||user.subscriptionPlan||'free').trim().toLowerCase();
+  const labels={free:'Free',pro:'Pro',premium:'Premium',business:'Business',growth:'Growth'};
+  const label=labels[plan]||'Free';
+  const paid=['pro','premium','business','growth'].includes(plan);
+  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  set('sidebarPlan','🎵 '+label+' Plan');set('headerPlanBadge','✦ '+label+' Plan');
+  set('currentPlanName',label);set('settingsPlan',label);
+  set('planLimit',paid?'Unlimited':'5 Events');set('analyticsTier',paid?'Advanced':'Basic');
 }
 document.getElementById('logoutBtn').onclick=()=>logout();
 try{const saved=localStorage.getItem('livemusicDashView');if(saved)switchView(saved);}catch(e){}
