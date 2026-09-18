@@ -669,6 +669,7 @@ async function saveBooking(data){
       status: data.status, paymentId: data.paymentId||null,
       customerName: data.name, customerEmail: data.email,
       customerPhone: data.phone, userId: userId,
+      organiserId: evData.ownerId || null,
       eventDate: evData.startDate || evData.date || null,
       venueName: evData.venueName || evData.venue || null,
       city: evData.city || null,

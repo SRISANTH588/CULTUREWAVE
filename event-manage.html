@@ -955,6 +955,10 @@ async function loadEvent(){
   const snap=await db.collection('events').doc(eventId).get();
   if(!snap.exists){showToast('Event not found');return;}
   eventData={id:snap.id,...snap.data()};
+  if(eventData.ownerId !== auth.currentUser?.uid){
+    document.body.innerHTML='<div style="padding:3rem;text-align:center;font-family:Inter,sans-serif;">You do not have access to manage this event. <a href="premium-client-dashboard.html">Go back</a></div>';
+    return;
+  }
   renderEventMeta();prefillDetails();prefillSettings();prefillTickets();loadBookings();
 }
 
@@ -993,13 +997,12 @@ window.shareEvent=function(){
 };
 
 function loadBookings(){
-  // Merge booking and payment records because older payment flows may only
-  // have one readable record. Booking IDs keep the merged list unique.
-  db.collection('bookings').limit(500).onSnapshot(snap=>{
+  // Restrict reads to this event before merging booking and payment records.
+  db.collection('bookings').where('eventId','==',eventId).limit(500).onSnapshot(snap=>{
     allBookingDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
     syncManagedBookings();
   });
-  db.collection('payments').limit(500).onSnapshot(snap=>{
+  db.collection('payments').where('eventId','==',eventId).limit(500).onSnapshot(snap=>{
     allPaymentBookingDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
     syncManagedBookings();
   },()=>{});
