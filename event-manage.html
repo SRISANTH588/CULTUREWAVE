@@ -744,9 +744,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div class="card-head"><div><h2>Custom Landing Page</h2><p>Design a dedicated page for your event</p></div></div>
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
       <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#e7f5ff,#f0f4ff);display:grid;place-items:center;font-size:1.8rem;">&#127775;</div>
-      <div style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Landing Pages</div>
-      <div style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">Create beautiful custom landing pages with your logo, brand colours and event details.</div>
-      <button onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
+      <div class="premium-lock-message" style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Landing Pages</div>
+      <div class="premium-lock-description" style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">Create beautiful custom landing pages with your logo, brand colours and event details.</div>
+      <button class="premium-upgrade" onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
     </div>
   </div>
 </div>
@@ -763,9 +763,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div class="card-head"><div><h2>Email Campaign</h2><p>Reach your attendees directly in their inbox</p></div></div>
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
       <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#d1fae5,#a7f3d0);display:grid;place-items:center;font-size:1.8rem;">&#128140;</div>
-      <div style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Email Campaigns</div>
-      <div style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">Send bulk emails, reminders and updates to all your registered attendees in one click.</div>
-      <button onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
+      <div class="premium-lock-message" style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Email Campaigns</div>
+      <div class="premium-lock-description" style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">Send bulk emails, reminders and updates to all your registered attendees in one click.</div>
+      <button class="premium-upgrade" onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
     </div>
   </div>
 </div>
@@ -782,9 +782,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div class="card-head"><div><h2>Waitlist Management</h2><p>Handle overflow registrations automatically</p></div></div>
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
       <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#f3e8ff,#ede9fe);display:grid;place-items:center;font-size:1.8rem;">&#128203;</div>
-      <div style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Waitlist</div>
-      <div style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">When your event sells out, automatically add interested attendees to a waitlist and notify them when spots open up.</div>
-      <button onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
+      <div class="premium-lock-message" style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Waitlist</div>
+      <div class="premium-lock-description" style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">When your event sells out, automatically add interested attendees to a waitlist and notify them when spots open up.</div>
+      <button class="premium-upgrade" onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
     </div>
   </div>
 </div>
@@ -919,7 +919,7 @@ const params = new URLSearchParams(location.search);
 const eventId = params.get('eventId');
 if(!eventId){document.body.innerHTML='<div style="padding:3rem;text-align:center;">No event ID. <a href="premium-client-dashboard.html">Go back</a></div>';}
 
-let eventData=null, allBookings=[], allBookingDocs=[], allPaymentBookingDocs=[], anPeriod=30;
+let eventData=null, allBookings=[], allBookingDocs=[], allPaymentBookingDocs=[], anPeriod=30, hasPremiumPages=false;
 
 function switchPanel(btn,panelId){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
@@ -959,7 +959,25 @@ async function loadEvent(){
     document.body.innerHTML='<div style="padding:3rem;text-align:center;font-family:Inter,sans-serif;">You do not have access to manage this event. <a href="premium-client-dashboard.html">Go back</a></div>';
     return;
   }
+  const account=await db.collection('users').doc(auth.currentUser.uid).get();
+  const accountData=account.exists ? account.data() : {};
+  const plan=String(accountData.plan||accountData.subscriptionPlan||'').toLowerCase();
+  const planStatus=String(accountData.subscriptionStatus||accountData.planStatus||'active').toLowerCase();
+  hasPremiumPages=['pro','premium','business','growth'].includes(plan) && !['cancelled','expired','inactive'].includes(planStatus);
+  applyPremiumPagesAccess();
   renderEventMeta();prefillDetails();prefillSettings();prefillTickets();loadBookings();
+}
+
+function applyPremiumPagesAccess(){
+  if(!hasPremiumPages)return;
+  document.querySelectorAll('.premium-upgrade').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.premium-lock-message').forEach(el=>{
+    el.textContent='Business access enabled';
+    el.style.color='var(--green)';
+  });
+  document.querySelectorAll('.premium-lock-description').forEach(el=>{
+    el.textContent='This Premium Pages feature is included with your active Business plan.';
+  });
 }
 
 function renderEventMeta(){
