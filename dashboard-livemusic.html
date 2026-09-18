@@ -272,7 +272,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div class="prem-actions">
         <button onclick="switchView('payouts')" class="prem-btn-ghost">🏦 Payouts</button>
         <button onclick="switchView('sales')" class="prem-btn-ghost">📊 Sales</button>
-        <button onclick="location.href='pricing.html'" class="prem-btn-white">✦ Upgrade Plan</button>
+        <button id="headerUpgradeBtn" onclick="location.href='pricing.html'" class="prem-btn-white">✦ Upgrade Plan</button>
       </div>
     </div>
     <div class="prem-stats">
@@ -295,7 +295,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div style="border-radius:14px;overflow:hidden;border:1px solid var(--border);">
         <div style="background:linear-gradient(135deg,#e11d48,#f43f5e);padding:1.1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
           <div><div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.7);margin-bottom:.25rem;">Current Plan</div><div id="currentPlanName" style="font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Free</div></div>
-          <div style="display:flex;align-items:center;gap:.6rem;"><span style="padding:.28rem .65rem;border-radius:999px;background:rgba(255,255,255,.2);font-size:.7rem;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.3);">Active</span><a href="pricing.html" style="padding:.38rem .8rem;border-radius:8px;background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:.78rem;border:1px solid rgba(255,255,255,.3);text-decoration:none;">Upgrade</a></div>
+          <div style="display:flex;align-items:center;gap:.6rem;"><span style="padding:.28rem .65rem;border-radius:999px;background:rgba(255,255,255,.2);font-size:.7rem;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.3);">Active</span><a id="planUpgradeLink" href="pricing.html" style="padding:.38rem .8rem;border-radius:8px;background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:.78rem;border:1px solid rgba(255,255,255,.3);text-decoration:none;">Upgrade</a></div>
         </div>
         <div style="background:#fff;padding:1rem 1.2rem;">
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.9rem;">
@@ -889,6 +889,9 @@ if(!user){location.href='login.html';}
 else{
   myUid=user.uid;window.myUid=myUid;
   renderPlan(user);
+  onSnapshot(doc(db,'users',myUid), snap=>{
+    if(snap.exists()) renderPlan({...user,...snap.data()});
+  }, err=>console.error('Unable to load subscription:',err));
   document.getElementById('sidebarName').textContent=user.name||'Client';
   document.getElementById('topName').textContent=user.name||'User';
   const init=(user.name||'M').trim()[0].toUpperCase();
@@ -904,6 +907,10 @@ function renderPlan(user){
   set('sidebarPlan','🎵 '+label+' Plan');set('headerPlanBadge','✦ '+label+' Plan');
   set('currentPlanName',label);set('settingsPlan',label);
   set('planLimit',paid?'Unlimited':'5 Events');set('analyticsTier',paid?'Advanced':'Basic');
+  const upgradeButton=document.getElementById('headerUpgradeBtn');
+  const upgradeLink=document.getElementById('planUpgradeLink');
+  if(upgradeButton) upgradeButton.style.display=paid?'none':'';
+  if(upgradeLink) upgradeLink.style.display=paid?'none':'';
 }
 document.getElementById('logoutBtn').onclick=()=>logout();
 try{const saved=localStorage.getItem('livemusicDashView');if(saved)switchView(saved);}catch(e){}
