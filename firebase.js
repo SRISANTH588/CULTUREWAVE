@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -29,6 +29,11 @@ async function getCurrentUser() {
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
     const data = snap.exists() ? snap.data() : {};
+    if (data.emailVerificationRequired && !user.emailVerified) {
+      await signOut(auth);
+      window.location.href = "login.html?verification=pending";
+      return null;
+    }
     return {
       uid: user.uid,
       email: user.email,
@@ -65,7 +70,7 @@ function getPublicBase() {
 export {
   app, auth, db,
   toEmail, getCurrentUser, requireAuth, logout, getPublicBase,
-  signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification,
   GoogleAuthProvider, signInWithPopup, updateProfile,
   doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
   collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp

@@ -74,17 +74,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .submit-btn:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(18,66,197,.4);}
 .submit-btn:active{transform:translateY(0);}
 
-.otp-header{text-align:center;margin-bottom:1rem;}
-.otp-icon{width:3rem;height:3rem;border-radius:50%;background:linear-gradient(135deg,rgba(18,66,197,.12),rgba(47,107,255,.06));border:1px solid rgba(18,66,197,.2);display:grid;place-items:center;font-size:1.3rem;margin:0 auto .6rem;}
-.otp-title{font-size:.92rem;font-weight:800;color:#0a0f1e;}
-.otp-sub{font-size:.75rem;color:#6b7280;margin-top:.2rem;}
-.otp-sub strong{color:#1242c5;}
-#otpInput{letter-spacing:.4em;font-size:1.2rem;font-weight:800;text-align:center;}
-.otp-actions{display:flex;justify-content:center;align-items:center;gap:.5rem;margin-top:.6rem;}
-.otp-btn{font-size:.78rem;font-weight:700;padding:.2rem .5rem;border-radius:6px;transition:background .15s;}
-.otp-btn.blue{color:#1242c5;}.otp-btn.blue:hover{background:#f0f5ff;}
-.otp-btn.grey{color:#6b7280;}.otp-btn.grey:hover{background:#f3f4f6;}
-.otp-dot{color:#d1d5db;font-size:.65rem;}
 .card-footer{margin-top:1.2rem;text-align:center;font-size:.82rem;color:#6b7280;}
 .card-footer a{color:#1242c5;font-weight:800;}
 </style>
@@ -104,7 +93,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="left-features">
       <div class="left-feat"><span class="left-feat-icon">🎟</span><span class="left-feat-text">Sell tickets with UPI &amp; QR</span></div>
       <div class="left-feat"><span class="left-feat-icon">📊</span><span class="left-feat-text">Real-time analytics &amp; revenue</span></div>
-      <div class="left-feat"><span class="left-feat-icon">💬</span><span class="left-feat-text">WhatsApp booking confirmations</span></div>
       <div class="left-feat"><span class="left-feat-icon">🏦</span><span class="left-feat-text">Weekly bank payouts</span></div>
     </div>
   </div>
@@ -124,7 +112,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="card-cat-pill" id="cardPill">✦ New Lister</div>
       <div class="card-head">
         <h2>Create your <span>account</span></h2>
-        <p>Fill in your details — we'll verify your email with an OTP.</p>
+        <p>Fill in your details — we'll send a verification link to your email.</p>
       </div>
       <div class="status" id="st1"></div>
       <div class="form">
@@ -133,47 +121,20 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           <div class="input-wrap"><span class="input-icon">✏️</span><input id="fname" type="text" placeholder="Your full name" autocomplete="name"/></div>
         </div>
         <div class="field">
-          <span class="field-label">Email <span style="font-size:.6rem;color:#1242c5;font-weight:800;letter-spacing:.06em;">· OTP VERIFIED</span></span>
+          <span class="field-label">Email <span style="font-size:.6rem;color:#1242c5;font-weight:800;letter-spacing:.06em;">· VERIFICATION REQUIRED</span></span>
           <div class="input-wrap"><span class="input-icon">📧</span><input id="femail" type="email" placeholder="you@example.com" autocomplete="email"/></div>
-        </div>
-        <div class="field">
-          <span class="field-label">WhatsApp Number</span>
-          <div class="input-wrap"><span class="input-icon">📱</span><span class="wa-pre">+91</span><input id="fphone" type="tel" placeholder="9876543210" maxlength="10" autocomplete="tel"/></div>
         </div>
         <div class="field">
           <span class="field-label">Password</span>
           <div class="input-wrap"><span class="input-icon">🔒</span><input id="fpass" type="password" placeholder="Min 6 characters" autocomplete="new-password"/><button class="eye" type="button" onclick="toggleEye(this)">◔</button></div>
         </div>
         <div class="divider"></div>
-        <button class="submit-btn" type="button" onclick="sendOtp()">Send Verification OTP →</button>
+        <button class="submit-btn" type="button" onclick="continueToBrand()">Continue →</button>
       </div>
       <div class="card-footer">Already have an account? <a href="login.html">Login here</a></div>
     </div>
 
-    <!-- STEP 2: OTP -->
-    <div id="step2" style="display:none;">
-      <div class="status" id="st2"></div>
-      <div class="otp-header">
-        <div class="otp-icon">📱</div>
-        <div class="otp-title">Verify your WhatsApp</div>
-        <div class="otp-sub">6-digit OTP sent to <strong id="otpPhoneShow"></strong></div>
-      </div>
-      <div class="divider"></div>
-      <div class="form">
-        <div class="field">
-          <span class="field-label">One-Time Password</span>
-          <div class="input-wrap"><span class="input-icon">🔑</span><input id="otpInput" type="text" placeholder="· · · · · ·" maxlength="6" inputmode="numeric"/></div>
-        </div>
-        <button class="submit-btn" type="button" onclick="verifyAndCreate()">Verify &amp; Create Account →</button>
-        <div class="otp-actions">
-          <button class="otp-btn blue" type="button" onclick="resendOtp()">Resend OTP</button>
-          <span class="otp-dot">●</span>
-          <button class="otp-btn grey" type="button" onclick="backToStep1()">Change email</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 3: BRAND PAGE -->
+    <!-- STEP 2: BRAND PAGE -->
     <div id="step3" style="display:none;">
       <div class="card-head">
         <h2>Create your <span>brand page</span></h2>
@@ -195,6 +156,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         </div>
         <button class="submit-btn" type="button" onclick="createBrandPage()">Create brand page →</button>
       </div>
+      <div id="verifyNotice" class="card-footer" style="display:none;"></div>
     </div>
 
 <script>
@@ -212,75 +174,19 @@ document.getElementById('cardPill').textContent=label;
 function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=msg;el.dataset.k=k||'';}
 function toggleEye(btn){var i=btn.previousElementSibling;i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'◔':'◉';}
 
-async function requestWhatsappOtp(phone,name){
-  var res=await fetch('/api/whatsapp/send-otp',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({phone:'+91'+phone,name:name})
-  });
-  var contentType=res.headers.get('content-type')||'';
-  if(!contentType.includes('application/json')){
-    if(location.hostname.endsWith('github.io')){
-      throw new Error('WhatsApp verification needs the API server. GitHub Pages only hosts the website, so this endpoint must be deployed to a backend first.');
-    }
-    throw new Error('OTP service returned an invalid response. Please try again.');
-  }
-  var data=await res.json();
-  if(!res.ok||!data.success)throw new Error(data.error||'Failed to send OTP');
-  return data;
-}
-
-async function sendOtp(){
+function continueToBrand(){
   var name=document.getElementById('fname').value.trim();
   var email=document.getElementById('femail').value.trim();
-  var phone=document.getElementById('fphone').value.trim();
   var pass=document.getElementById('fpass').value;
   if(!name){setStatus('Enter your full name.','warning','st1');return;}
   if(!email||!email.includes('@')){setStatus('Enter a valid email.','warning','st1');return;}
-  if(!phone||phone.length!==10){setStatus('Enter a valid 10-digit WhatsApp number.','warning','st1');return;}
   if(!pass||pass.length<6){setStatus('Password must be at least 6 characters.','warning','st1');return;}
-  setStatus('Sending OTP to your WhatsApp…','info','st1');
-  try{
-    await requestWhatsappOtp(phone,name);
-    document.getElementById('otpPhoneShow').textContent='+91 '+phone;
-    document.getElementById('step1').style.display='none';
-    document.getElementById('step2').style.display='';
-    setStatus('OTP sent to your WhatsApp! Check your messages.','success','st2');
-  }catch(e){setStatus(e.message||'Failed to send OTP.','warning','st1');}
-}
-
-async function resendOtp(){
-  var phone=document.getElementById('fphone').value.trim();
-  var name=document.getElementById('fname').value.trim();
-  setStatus('Resending OTP…','info','st2');
-  try{
-    await requestWhatsappOtp(phone,name);
-    setStatus('OTP resent to your WhatsApp!','success','st2');
-  }catch(e){setStatus(e.message||'Failed to resend.','warning','st2');}
-}
-
-function backToStep1(){
-  document.getElementById('step2').style.display='none';
-  document.getElementById('step1').style.display='';
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step3').style.display='';
 }
 </script>
 <script type="module">
-import{auth,db,createUserWithEmailAndPassword,updateProfile,doc,setDoc,getDoc,serverTimestamp}from'./firebase.js';
-
-window.verifyAndCreate=async function(){
-  var entered=document.getElementById('otpInput').value.trim();
-  var phone=document.getElementById('fphone').value.trim();
-  if(!entered){setStatus('Enter the OTP.','warning','st2');return;}
-  setStatus('Verifying OTP…','info','st2');
-  var snap=await getDoc(doc(db,'whatsappOtps','+91'+phone));
-  if(!snap.exists()){setStatus('OTP expired. Please resend.','warning','st2');return;}
-  var d=snap.data();
-  if(Date.now()>d.expiresAt){setStatus('OTP expired. Please resend.','warning','st2');return;}
-  if(entered!==d.otp){setStatus('Incorrect OTP. Try again.','warning','st2');return;}
-  // OTP verified — go to brand page step
-  document.getElementById('step2').style.display='none';
-  document.getElementById('step3').style.display='';
-};
+import{auth,db,createUserWithEmailAndPassword,updateProfile,sendEmailVerification,doc,setDoc,serverTimestamp}from'./firebase.js';
 
 window.createBrandPage=async function(){
   var brand=document.getElementById('fbrand').value.trim();
@@ -291,16 +197,16 @@ window.createBrandPage=async function(){
   if(!city){setStatus('Enter your city.','warning','st3');return;}
   var name=document.getElementById('fname').value.trim();
   var email=document.getElementById('femail').value.trim();
-  var phone=document.getElementById('fphone').value.trim();
   var pass=document.getElementById('fpass').value;
   setStatus('Creating your account…','info','st3');
   try{
     var cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
+    await sendEmailVerification(cred.user);
     await setDoc(doc(db,'users',cred.user.uid),{
       name,email,
-      whatsapp:'+91'+phone,
       role:'lister',
+      emailVerificationRequired:true,
       category:CAT,
       dashboard:DASH,
       brandName:brand,
@@ -314,7 +220,6 @@ window.createBrandPage=async function(){
       city,
       category:CAT,
       dashboard:DASH,
-      whatsapp:'+91'+phone,
       ownerName:name,
       ownerEmail:email,
       followers:0,
@@ -322,8 +227,11 @@ window.createBrandPage=async function(){
       createdAt:serverTimestamp()
     });
     try{sessionStorage.removeItem('cw_lister_cat');sessionStorage.removeItem('cw_lister_dash');sessionStorage.removeItem('cw_lister_role');}catch(e){}
-    setStatus('Account created! Taking you to your dashboard…','success','st3');
-    setTimeout(function(){window.location.href=DASH;},1000);
+    setStatus('Account created. Check your email to verify it.','success','st3');
+    document.querySelector('#step3 .form').style.display='none';
+    var notice=document.getElementById('verifyNotice');
+    notice.innerHTML='We sent a verification link to <strong>'+email+'</strong>. Verify your email, then <a href="login.html">log in</a>.';
+    notice.style.display='block';
   }catch(e){
     var msg=e.code==='auth/email-already-in-use'?'Account already exists. <a href="login.html" style="color:#1242c5;font-weight:800;">Login here →</a>':e.message;
     document.getElementById('st3').innerHTML=msg;
