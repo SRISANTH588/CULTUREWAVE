@@ -430,6 +430,23 @@ const server = http.createServer(async (req, res) => {
 
   // Public attendee access is deliberately served by the server: the browser
   // never receives the bookings collection or other guests' personal data.
+  if (req.method === "GET" && url.pathname === "/api/guest/playlist") {
+    try {
+      if (!admin.apps.length) return send(res, 503, { success: false, error: "Playlists are unavailable." });
+      const eventId = String(url.searchParams.get("eventId") || "").trim();
+      let playlists = eventId
+        ? await admin.firestore().collection("playlists").where("eventId", "==", eventId).limit(1).get()
+        : { empty: true };
+      if (playlists.empty) playlists = await admin.firestore().collection("playlists").where("isDefault", "==", true).limit(1).get();
+      if (playlists.empty) return send(res, 404, { success: false, error: "No playlist has been published yet." });
+      const playlist = playlists.docs[0].data();
+      return send(res, 200, { success: true, playlist: { title: playlist.title || "Event Playlist", description: playlist.description || "", songs: Array.isArray(playlist.songs) ? playlist.songs : [] } });
+    } catch (error) {
+      console.error("Public playlist request failed:", error);
+      return send(res, 500, { success: false, error: "We could not load this playlist right now." });
+    }
+  }
+
   if (req.method === "POST" && url.pathname === "/api/guest/playlist-access") {
     try {
       if (!admin.apps.length) return send(res, 503, { success: false, error: "Booking verification is unavailable." });
