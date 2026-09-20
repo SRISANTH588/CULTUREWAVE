@@ -961,5 +961,16 @@ window.saveGstDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc
 window.saveBrandBankDetails=async function(){if(!myUid)return;const acc=document.getElementById('bpBankAccNo').value.trim();const acc2=document.getElementById('bpBankAccNo2').value.trim();if(acc!==acc2){showToast('Account numbers do not match');return;}await setDoc(doc(db,'kyc',myUid),{bankName:document.getElementById('bpBankName').value.trim(),bankAccNo:acc,bankIfsc:document.getElementById('bpBankIfsc').value.trim().toUpperCase(),bankBankName:(document.getElementById('bpBankBankName')||{}).value?.trim()||'',bankType:document.getElementById('bpBankType').value,updatedAt:new Date().toISOString()},{merge:true});showToast('Bank details saved!');};
 if(document.getElementById('salesSearch')){document.getElementById('salesSearch').addEventListener('input',()=>{const active=document.querySelector('#salesTabs .tab.active');renderSalesTable(active?active.dataset.stab:'all');});}
 </script>
+<script src="imagekit.js"></script>
+<script>
+window.addEventListener('load', () => {
+  const saveProfileFields = window.saveProfile;
+  window.saveProfile = async function () {
+    const cover = document.getElementById('coverFileInput')?.files[0]; const logo = document.getElementById('avatarFileInput')?.files[0];
+    await saveProfileFields(); if (!cover && !logo) return;
+    try { const images = {}; if (cover) images.coverUrl = await uploadImageToImageKit(cover, '/profile-covers'); if (logo) images.avatarUrl = await uploadImageToImageKit(logo, '/profile-avatars'); await window.setDoc(window.doc(window.db, 'organisers', window.myUid), {...images, updatedAt:new Date().toISOString()}, {merge:true}); showToast('✓ Profile images saved!'); } catch (error) { console.error('Profile image upload failed:', error); showToast('Image upload failed: ' + error.message); }
+  };
+});
+</script>
 </body>
 </html>
