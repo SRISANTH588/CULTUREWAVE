@@ -428,6 +428,45 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
   }
 
+  // Public attendee access is deliberately served by the server: the browser
+  // never receives the bookings collection or other guests' personal data.
+  if (req.method === "POST" && url.pathname === "/api/guest/playlist-access") {
+    try {
+      if (!admin.apps.length) return send(res, 503, { success: false, error: "Booking verification is unavailable." });
+      const body = await readBody(req);
+      const phone = String(body.phone || "").replace(/\D/g, "");
+      if (phone.length < 10) return send(res, 400, { success: false, error: "Enter a valid mobile number." });
+      const matchesPhone = (value) => String(value || "").replace(/\D/g, "").slice(-10) === phone.slice(-10);
+      const snap = await admin.firestore().collection("bookings").limit(5000).get();
+      const bookingDoc = snap.docs.find((entry) => {
+        const b = entry.data();
+        const status = String(b.status || "").toLowerCase();
+        return !["cancelled", "failed", "refunded"].includes(status) && matchesPhone(b.customerPhone || b.customer?.phone || b.buyerPhone || b.buyer?.phone || b.phone);
+      });
+      if (!bookingDoc) return send(res, 404, { success: false, error: "No active booking was found for this number." });
+      const booking = bookingDoc.data();
+      const eventId = booking.eventId || booking.event?.id || booking.event?.eventId || null;
+      let playlist = null;
+      if (eventId) {
+        const playlists = await admin.firestore().collection("playlists").where("eventId", "==", eventId).limit(1).get();
+        if (!playlists.empty) playlist = { id: playlists.docs[0].id, ...playlists.docs[0].data() };
+      }
+      if (!playlist) {
+        const playlists = await admin.firestore().collection("playlists").where("isDefault", "==", true).limit(1).get();
+        if (!playlists.empty) playlist = { id: playlists.docs[0].id, ...playlists.docs[0].data() };
+      }
+      return send(res, 200, {
+        success: true,
+        guestName: booking.customerName || booking.customer?.name || booking.buyerName || "Guest",
+        eventName: booking.eventName || booking.event?.name || booking.event?.title || "your event",
+        playlist: playlist ? { title: playlist.title || "Event Playlist", description: playlist.description || "", songs: Array.isArray(playlist.songs) ? playlist.songs : [] } : null,
+      });
+    } catch (error) {
+      console.error("Guest playlist access failed:", error);
+      return send(res, 500, { success: false, error: "We could not verify this booking right now." });
+    }
+  }
+
   if (req.method === "GET" && extname(url.pathname)) {
     try {
       const filePath = join(publicDir, url.pathname.slice(1));

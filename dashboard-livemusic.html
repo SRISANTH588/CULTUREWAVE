@@ -220,6 +220,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <button class="sb-item" data-view="events"><span class="sb-icon">🎵</span> Music Events</button>
     <button class="sb-item" data-view="popups"><span class="sb-icon">🎸</span> Live Concerts</button>
     <button class="sb-item" data-view="dining"><span class="sb-icon">🎤</span> Open Mic Nights</button>
+    <button class="sb-item" data-view="playlists"><span class="sb-icon">🎶</span> Guest Playlists</button>
     <div class="sb-section-label">Tools</div>
     <button class="sb-item" data-view="instagram"><span class="sb-icon">📸</span> Instagram</button>
     <button class="sb-item" data-view="whatsapp"><span class="sb-icon">💬</span> WhatsApp</button>
@@ -415,6 +416,26 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first open mic night and manage bookings.</p>
       <button onclick="location.href='event-create.html?from=livemusic'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#be123c,#e11d48);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(190,18,60,.3);">✦ Create Open Mic Night</button>
     </div>
+  </div>
+</div>
+
+<!-- GUEST PLAYLISTS -->
+<div class="view" data-view="playlists">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top"><div class="prem-hdr-left"><div class="prem-badge">🎶 Attendee experience</div><div class="prem-title">Guest Playlists</div><div class="prem-sub">Create the music guests unlock after confirming their booking with a mobile number.</div></div><div class="prem-actions"><a class="prem-btn-white" href="guest-playlist.html" target="_blank">Open guest page ↗</a></div></div>
+  </div>
+  <div class="page-body">
+    <div class="card" style="max-width:820px;">
+      <div class="card-head"><div><h2>Create or update playlist</h2><p>Link it to an event, or make it the default playlist.</p></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;">
+        <div class="pf-field"><label>Playlist title</label><input id="playlistTitle" placeholder="e.g. Sunset Festival Vibes"/></div>
+        <div class="pf-field"><label>Event</label><select id="playlistEvent"><option value="">Default for all verified guests</option></select></div>
+        <div class="pf-field" style="grid-column:1/-1;"><label>Description</label><input id="playlistDescription" placeholder="A short welcome message for your guests"/></div>
+        <div class="pf-field" style="grid-column:1/-1;"><label>Songs <small>(one per line: Song title — Artist — optional link)</small></label><textarea id="playlistSongs" placeholder="Midnight City — M83 — https://open.spotify.com/...&#10;Blinding Lights — The Weeknd"></textarea></div>
+      </div>
+      <div style="display:flex;gap:.65rem;align-items:center;margin-top:1rem;flex-wrap:wrap;"><button class="brand-save-btn" onclick="savePlaylist()">Save playlist</button><span style="font-size:.78rem;color:#9ca3af;">The event playlist is shown first; otherwise the default is used.</span></div>
+    </div>
+    <div class="card"><div class="card-head"><div><h2>Saved playlists</h2><p>Manage guest-facing music lists.</p></div></div><div id="playlistList" style="display:flex;flex-direction:column;gap:.55rem;"><div style="color:#9ca3af;font-size:.84rem;">Loading playlists…</div></div></div>
   </div>
 </div>
 
@@ -855,7 +876,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-var _titles={overview:'🎵 Dashboard',events:'🎵 Music Events',popups:'🎸 Live Concerts',dining:'🎤 Open Mic Nights',analytics:'📈 Analytics',sales:'💰 Sales Summary',payouts:'🏦 Payouts',instagram:'📸 Instagram',whatsapp:'💬 WhatsApp',surveys:'📋 Survey Forms',inquiries:'✉ Inquiries','personal-info':'🪪 Brand & Profile',settings:'⚙ Settings'};
+var _titles={overview:'🎵 Dashboard',events:'🎵 Music Events',popups:'🎸 Live Concerts',dining:'🎤 Open Mic Nights',playlists:'🎶 Guest Playlists',analytics:'📈 Analytics',sales:'💰 Sales Summary',payouts:'🏦 Payouts',instagram:'📸 Instagram',whatsapp:'💬 WhatsApp',surveys:'📋 Survey Forms',inquiries:'✉ Inquiries','personal-info':'🪪 Brand & Profile',settings:'⚙ Settings'};
 function switchView(name){
   document.querySelectorAll('.view').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
   document.querySelectorAll('.sb-item[data-view]').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
@@ -879,11 +900,11 @@ var pfHandleEl=document.getElementById('pfHandle');
 if(pfHandleEl)pfHandleEl.addEventListener('input',function(){this.value=this.value.toLowerCase().replace(/[^a-z0-9_-]/g,'');});
 </script>
 <script type="module">
-import{app,auth,db,getCurrentUser,logout,collection,doc,query,where,orderBy,limit,onSnapshot,getDoc,setDoc,updateDoc,serverTimestamp}from"./firebase.js";
+import{app,auth,db,getCurrentUser,logout,collection,doc,query,where,orderBy,limit,onSnapshot,getDoc,setDoc,updateDoc,deleteDoc,serverTimestamp}from"./firebase.js";
 window.db=db;window.doc=doc;window.setDoc=setDoc;window.updateDoc=updateDoc;
 const esc=v=>String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const money=v=>`₹${Number(v||0).toLocaleString('en-IN')}`;
-let allEvents=[],activeTab='published',myUid=null,allBookings=[];
+let allEvents=[],activeTab='published',myUid=null,allBookings=[],allPlaylists=[];
 const user=await getCurrentUser();
 if(!user){location.href='login.html';}
 else{
@@ -896,7 +917,7 @@ else{
   document.getElementById('topName').textContent=user.name||'User';
   const init=(user.name||'M').trim()[0].toUpperCase();
   ['sideAvatar','topAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});
-  loadProfile(myUid);loadEvents(myUid);loadBookings(myUid);
+  loadProfile(myUid);loadEvents(myUid);loadBookings(myUid);loadPlaylists(myUid);
 }
 function renderPlan(user){
   const plan=String(user.plan||user.subscriptionPlan||'free').trim().toLowerCase();
@@ -916,6 +937,13 @@ document.getElementById('logoutBtn').onclick=()=>logout();
 try{const saved=localStorage.getItem('livemusicDashView');if(saved)switchView(saved);}catch(e){}
 function normStatus(s){const v=(s||'draft').toLowerCase();return(v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished';}
 function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();},err=>console.error('Unable to load events:',err));}
+function playlistEventName(id){const ev=allEvents.find(e=>e.id===id);return ev?.name||'Default playlist';}
+function fillPlaylistEvents(){const select=document.getElementById('playlistEvent');if(!select)return;const selected=select.value;select.innerHTML='<option value="">Default for all verified guests</option>'+allEvents.map(e=>`<option value="${e.id}">${esc(e.name||'Untitled event')}</option>`).join('');select.value=selected;}
+function loadPlaylists(uid){onSnapshot(query(collection(db,'playlists'),where('ownerId','==',uid)),snap=>{allPlaylists=snap.docs.map(d=>({id:d.id,...d.data()}));renderPlaylists();},err=>{console.error('Unable to load playlists:',err);const el=document.getElementById('playlistList');if(el)el.textContent='Unable to load playlists.';});}
+function renderPlaylists(){fillPlaylistEvents();const list=document.getElementById('playlistList');if(!list)return;if(!allPlaylists.length){list.innerHTML='<div style="color:#9ca3af;font-size:.84rem;padding:.5rem 0;">No playlist saved yet.</div>';return;}list.innerHTML=allPlaylists.map(p=>`<div style="display:flex;align-items:center;gap:.8rem;padding:.8rem;border:1px solid var(--border);border-radius:10px;"><span style="font-size:1.2rem;">🎵</span><div style="flex:1;"><strong style="font-size:.86rem;">${esc(p.title||'Untitled playlist')}</strong><div style="font-size:.75rem;color:#9ca3af;margin-top:.15rem;">${esc(playlistEventName(p.eventId))} · ${(p.songs||[]).length} songs</div></div><button class="ev-act-btn" onclick="editPlaylist('${p.id}')">Edit</button><button class="ev-act-btn" onclick="deletePlaylist('${p.id}')">Delete</button></div>`).join('');}
+window.editPlaylist=function(id){const p=allPlaylists.find(x=>x.id===id);if(!p)return;document.getElementById('playlistTitle').value=p.title||'';document.getElementById('playlistEvent').value=p.eventId||'';document.getElementById('playlistDescription').value=p.description||'';document.getElementById('playlistSongs').value=(p.songs||[]).map(s=>[s.title,s.artist,s.url].filter(Boolean).join(' — ')).join('\n');document.getElementById('playlistTitle').dataset.editId=id;switchView('playlists');};
+window.savePlaylist=async function(){if(!myUid)return;const title=document.getElementById('playlistTitle').value.trim();if(!title){showToast('Add a playlist title');return;}const songs=document.getElementById('playlistSongs').value.split('\n').map(line=>line.trim()).filter(Boolean).map(line=>{const [title,artist,url]=line.split('—').map(s=>s.trim());return {title,artist:artist||'',url:url||''};});const titleEl=document.getElementById('playlistTitle');const id=titleEl.dataset.editId||doc(collection(db,'playlists')).id;await setDoc(doc(db,'playlists',id),{ownerId:myUid,title,description:document.getElementById('playlistDescription').value.trim(),eventId:document.getElementById('playlistEvent').value||null,isDefault:!document.getElementById('playlistEvent').value,songs,updatedAt:serverTimestamp()},{merge:true});titleEl.dataset.editId='';document.getElementById('playlistTitle').value='';document.getElementById('playlistDescription').value='';document.getElementById('playlistSongs').value='';document.getElementById('playlistEvent').value='';showToast('Playlist saved!');};
+window.deletePlaylist=async function(id){if(!confirm('Delete this playlist?'))return;await deleteDoc(doc(db,'playlists',id));showToast('Playlist deleted');};
 function renderEvents(){
   const q=document.getElementById('evSearch').value.trim().toLowerCase();
   const filtered=allEvents.filter(e=>{const mt=activeTab==='published'?normStatus(e.status)==='published':activeTab==='archived'?normStatus(e.status)==='archived':normStatus(e.status)==='unpublished';const mq=!q||(e.name||'').toLowerCase().includes(q)||(e.city||'').toLowerCase().includes(q);return mt&&mq;});
