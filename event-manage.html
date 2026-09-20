@@ -214,35 +214,6 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <span class="sb-icon">&#128722;</span>
     <span><span style="display:block;">Abandoned Carts</span><span class="sb-sub">Started checkout but did not pay</span></span>
   </button>
-  <div class="sb-section">Event</div>
-  <button class="sb-item" data-panel="details" onclick="switchPanel(this,'details')">
-    <span class="sb-icon">&#128221;</span>
-    <span><span style="display:block;">Event Details</span><span class="sb-sub">Edit event information</span></span>
-  </button>
-  <button class="sb-item" data-panel="tickets" onclick="switchPanel(this,'tickets')">
-    <span class="sb-icon">&#127903;</span>
-    <span><span style="display:block;">Tickets and Pricing</span><span class="sb-sub">Manage ticket types</span></span>
-  </button>
-  <button class="sb-item" data-panel="settings" onclick="switchPanel(this,'settings')">
-    <span class="sb-icon">&#9881;</span>
-    <span><span style="display:block;">Event Settings</span><span class="sb-sub">Visibility and access</span></span>
-  </button>
-  <div class="sb-section" style="display:flex;align-items:center;justify-content:space-between;">
-    <span>Premium Pages</span>
-    <span style="background:linear-gradient(135deg,#f59f00,#f76707);color:#fff;font-size:.55rem;font-weight:800;padding:.15rem .45rem;border-radius:999px;letter-spacing:.06em;">PRO</span>
-  </div>
-  <button class="sb-item" data-panel="premium-landing" onclick="switchPanel(this,'premium-landing')">
-    <span class="sb-icon">&#127775;</span>
-    <span><span style="display:block;">Landing Page</span><span class="sb-sub">Custom event landing page</span></span>
-  </button>
-  <button class="sb-item" data-panel="premium-email" onclick="switchPanel(this,'premium-email')">
-    <span class="sb-icon">&#128140;</span>
-    <span><span style="display:block;">Email Campaign</span><span class="sb-sub">Send to registered attendees</span></span>
-  </button>
-  <button class="sb-item" data-panel="premium-waitlist" onclick="switchPanel(this,'premium-waitlist')">
-    <span class="sb-icon">&#128203;</span>
-    <span><span style="display:block;">Waitlist</span><span class="sb-sub">Manage overflow registrations</span></span>
-  </button>
 </aside>
 <div class="main">
   <header class="topbar">
@@ -256,6 +227,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div class="topbar-right">
       <button class="tb-btn" onclick="viewPublicPage()">&#128065; View Page</button>
       <button class="tb-btn" onclick="shareEvent()">&#128279; Share</button>
+      <a class="tb-btn" id="editEventLink" href="event-create.html">&#9998; Edit Details</a>
       <button class="tb-btn primary" id="publishBtn" onclick="togglePublish()">Publish</button>
     </div>
   </header>
@@ -997,6 +969,8 @@ function renderEventMeta(){
   pubBtn.className='tb-btn '+(st==='published'?'':'primary');
   const el=document.getElementById('editTicketsLink');
   if(el) el.href='event-create.html?eventId='+eventId;
+  const editEventLink=document.getElementById('editEventLink');
+  if(editEventLink) editEventLink.href='event-create.html?eventId='+eventId;
 }
 
 window.togglePublish=async function(){
