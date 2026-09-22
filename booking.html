@@ -413,7 +413,12 @@ function eventStartTime(){
   const firstDate=(evData.eventDates||[])[0]||{};
   return evData.startTime || evData.time || firstDate.startTime || firstDate.time || (firstDate.slots||[])[0]?.start || '';
 }
-function ticketMax(ticket){ const inventory=Number(ticket.available ?? ticket.inventory ?? ticket.remaining ?? ticket.qty ?? 0); const configured=Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 20); return inventory > 0 ? Math.min(inventory, configured || inventory) : (ticket.soldOut ? 0 : (configured || 20)); }
+function ticketMax(ticket){
+  const inventory = Number(ticket.available ?? ticket.inventory ?? ticket.remaining ?? ticket.qty ?? 0);
+  const configured = Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 4);
+  return inventory > 0 ? Math.min(inventory, configured || inventory) : (ticket.soldOut ? 0 : (configured || 4));
+}
+const MAX_TOTAL_TICKETS = 10; // max tickets per booking across all categories
 function selectedTicketItems(){
   const items=tickets.map((ticket,index)=>({ticket,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
   return items.length ? items : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},quantity:qty}];
@@ -435,16 +440,27 @@ function renderTicketPicker(){
   const endTime=evData.endTime || evData.finishTime || '';
   document.getElementById('pickerTime').textContent=startTime ? `${startTime}${endTime ? ` – ${endTime}` : ''}` : 'Time TBA';
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const max=ticketMax(ticket), quantity=pickerQuantities[index]||0, sold=max===0; const description=ticket.description||ticket.details||''; return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticket.price||0)}</span><button class="bk-picker-details" type="button" onclick="togglePickerDetails(${index})">Details⌄</button></div>${description?`<p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom"><span class="bk-picker-availability">${sold?'Sold out':max+' available'}</span>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const max=ticketMax(ticket), quantity=pickerQuantities[index]||0, sold=max===0; const description=ticket.description||ticket.details||''; return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticket.price||0)}</span><button class="bk-picker-details" type="button" onclick="togglePickerDetails(${index})">Details⌄</button></div>${description?`<p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom"><span class="bk-picker-availability">${sold?'Sold out':max+' available · max '+max+' per person'}</span>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
   updatePickerBar();
 }
 function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
-function changePickerQty(index,change){
-  const max=ticketMax(tickets[index]); const next=Math.max(0,Math.min(max,(pickerQuantities[index]||0)+change));
-  pickerQuantities[index]=next; selectedTicketIdx=index; qty=selectedTicketCount()||1;
-  if(selectedSeats.length > qty) selectedSeats = selectedSeats.slice(0,qty);
+function changePickerQty(index, change){
+  const max = ticketMax(tickets[index]);
+  const currentTotal = pickerQuantities.reduce((s,v)=>s+v, 0);
+  const currentForThis = pickerQuantities[index] || 0;
+  // Enforce per-type cap and total cap
+  if(change > 0 && currentTotal >= MAX_TOTAL_TICKETS){
+    showToast(`Max ${MAX_TOTAL_TICKETS} tickets allowed per booking`);
+    return;
+  }
+  const next = Math.max(0, Math.min(max, currentForThis + change));
+  pickerQuantities[index] = next;
+  selectedTicketIdx = index;
+  qty = selectedTicketCount() || 1;
+  if(selectedSeats.length > qty) selectedSeats = selectedSeats.slice(0, qty);
   if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
-  renderTicketPicker(); updateQtyPrice();
+  renderTicketPicker();
+  updateQtyPrice();
 }
 function updatePickerBar(){
   const count=pickerQuantities.reduce((sum,value)=>sum+value,0);
