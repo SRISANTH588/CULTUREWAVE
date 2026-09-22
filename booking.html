@@ -385,8 +385,8 @@ function selectedTicketCount(){ return selectedTicketItems().reduce((sum,item)=>
 function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+Number(item.ticket.price||0)*item.quantity,0); }
 function selectedTicketLabel(){ return selectedTicketItems().map(item=>`${item.ticket.name||'Ticket'} × ${item.quantity}`).join(', '); }
 function eventCoupons(){
-  const source=evData.coupons || evData.discountCoupons || evData.offers || [];
-  return Array.isArray(source) ? source.filter(c=>c && String(c.code||c.couponCode||'').trim() && Number(c.value??c.discount??0)>0) : [];
+  const source=evData.coupons || evData.discountCoupons || evData.offers || evData.couponCodes || evData.promos || [];
+  return Array.isArray(source) ? source.filter(c=>c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0) : [];
 }
 function renderTicketPicker(){
   const list=document.getElementById('pickerTicketList');
@@ -582,11 +582,16 @@ function renderAvailableCoupons(){
   const coupons = eventCoupons();
   const wrap = document.getElementById("availableCouponsWrap");
   if(!wrap) return;
-  if(!coupons.length){ wrap.style.display=''; wrap.innerHTML='<div class="checkout-no-coupons">No coupons are available for this event.</div>'; return; }
-  wrap.style.display='';
-  wrap.innerHTML = '<div class="checkout-coupon-title">Available coupons</div>'
+  // Always show the manual input field
+  const manualInput = `<div class="bk-coupon-row" style="margin-bottom:.6rem;">
+    <input type="text" id="manualCouponInput" placeholder="Enter coupon code" style="text-transform:uppercase;"/>
+    <button class="bk-coupon-btn" type="button" onclick="applyManualCoupon()">Apply</button>
+  </div>`;
+  if(!coupons.length){ wrap.innerHTML = manualInput; return; }
+  wrap.innerHTML = manualInput + '<div class="checkout-coupon-title">Available coupons</div>'
     + coupons.map(c=>{
-        const code=String(c.code||c.couponCode).trim().toUpperCase(); const value=Number(c.value??c.discount);
+        const code=String(c.code||c.couponCode||c.promoCode).trim().toUpperCase();
+        const value=Number(c.value??c.discount??c.amount??c.off);
         const val = (c.type==='percent'||c.type==='percentage')?`${value}% OFF`:`₹${value} OFF`;
         return `<button class="avail-coupon-chip" type="button" onclick='tapCoupon(${JSON.stringify(code)})'>
           <span class="avail-coupon-code">${code}</span>
@@ -597,7 +602,14 @@ function renderAvailableCoupons(){
 }
 
 function tapCoupon(code){
+  const input = document.getElementById('manualCouponInput');
+  if(input) input.value = code;
   applyCoupon(code);
+}
+
+function applyManualCoupon(){
+  const input = document.getElementById('manualCouponInput');
+  if(input) applyCoupon(input.value.trim());
 }
 
 function toggleCouponOffers(){
@@ -608,17 +620,35 @@ function toggleCouponOffers(){
   chevron.textContent=isOpen ? '›' : '⌃';
 }
 
-function applyCoupon(selectedCode){
+async function applyCoupon(selectedCode){
   const code = String(selectedCode||'').trim().toUpperCase();
   const msg = document.getElementById("couponMsg");
-  if(!code){ msg.textContent="Select an available coupon"; msg.className="bk-coupon-msg err"; return; }
+  if(!code){ msg.textContent="Enter a coupon code"; msg.className="bk-coupon-msg err"; return; }
   if(couponApplied === code){ msg.textContent="Already applied"; msg.className="bk-coupon-msg err"; return; }
   const subtotal = selectedTicketSubtotal();
-  // match against event coupons from Firestore
-  const configuredCoupons = eventCoupons();
-  const match = configuredCoupons.find(c => String(c.code||c.couponCode||'').trim().toUpperCase() === code);
+
+  // 1. Try coupons already loaded in evData
+  let match = eventCoupons().find(c => String(c.code||c.couponCode||c.promoCode||'').trim().toUpperCase() === code);
+
+  // 2. Fallback: fetch directly from Firestore coupons subcollection or top-level collection
+  if(!match && eventId){
+    try{
+      // Try subcollection first
+      const subSnap = await db.collection('events').doc(eventId).collection('coupons').where('code','==',code).limit(1).get();
+      if(!subSnap.empty) match = subSnap.docs[0].data();
+    }catch(_){}
+    if(!match){
+      try{
+        // Try top-level coupons collection
+        const topSnap = await db.collection('coupons').where('eventId','==',eventId).where('code','==',code).limit(1).get();
+        if(!topSnap.empty) match = topSnap.docs[0].data();
+      }catch(_){}
+    }
+  }
+
   if(match){
-    const value=Number(match.value??match.discount??0);
+    const value=Number(match.value??match.discount??match.amount??match.off??0);
+    if(!value){ msg.textContent="Invalid coupon"; msg.className="bk-coupon-msg err"; return; }
     discountAmt = (match.type==='percent'||match.type==='percentage') ? Math.round(subtotal * value / 100) : Math.min(value, subtotal);
     couponApplied = code;
     const label = (match.type==='percent'||match.type==='percentage') ? `${value}% discount` : `₹${value} off`;
@@ -626,7 +656,7 @@ function applyCoupon(selectedCode){
     msg.className = "bk-coupon-msg ok";
     updateBill();
   } else {
-    msg.textContent = "Invalid coupon code";
+    msg.textContent = "Invalid or expired coupon code";
     msg.className = "bk-coupon-msg err";
   }
 }
