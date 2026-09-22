@@ -869,10 +869,16 @@ async function submitBooking(){
 async function fetchBookedSeats(){
   if(!eventId) return;
   try{
-    const snap = await db.collection("bookings").where("eventId","==",eventId).where("status","in",["confirmed","paid"]).get();
+    const snap = await db.collection("bookings").where("eventId","==",eventId).get();
     bookedSeats = [];
-    snap.forEach(doc=>{ const d=doc.data(); if(Array.isArray(d.seatIds)) bookedSeats.push(...d.seatIds); });
-  }catch(e){ console.error(e); }
+    snap.forEach(doc=>{
+      const d = doc.data();
+      const s = String(d.status||'').toLowerCase();
+      if((s==='confirmed'||s==='paid') && Array.isArray(d.seatIds) && d.seatIds.length){
+        bookedSeats.push(...d.seatIds);
+      }
+    });
+  }catch(e){ console.error('fetchBookedSeats:',e); }
 }
 
 function renderSeating(layout, container){
