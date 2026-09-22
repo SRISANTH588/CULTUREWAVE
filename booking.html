@@ -772,6 +772,8 @@ async function submitBooking(){
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
     await saveBooking({ bookingId:bid, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone });
+    await fetchBookedSeats();
+    if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
     const emailSent = await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
     if(!emailSent) showToast("Booking confirmed, but we could not send the confirmation email.");
     location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
@@ -790,6 +792,8 @@ async function submitBooking(){
       const pid = r.razorpay_payment_id || bid;
       document.getElementById("rStatus").textContent = "✅ Confirmed";
       await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
+      await fetchBookedSeats();
+      if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
       const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:"Razorpay" });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
@@ -905,6 +909,7 @@ async function init(){
         document.getElementById("rVenue").textContent = evData.venueName||evData.city||"";
         // seating plan
         if(evData.seatingPlanUrl){
+          await fetchBookedSeats();
           const img = document.createElement("img");
           img.src = evData.seatingPlanUrl;
           img.style = "width:100%;border-radius:10px;";
