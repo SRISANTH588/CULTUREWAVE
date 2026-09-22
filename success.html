@@ -507,6 +507,7 @@
     const eventName  = params.get("event")     || "Your Booking";
     const amount     = params.get("amount")    || "—";
     const status     = (params.get("status")   || "").toLowerCase();
+    const failReason = params.get("reason")    || "";
     const bkType     = params.get("type")      || "event";
     const eventId    = params.get("eventId")  || "";
     const bkDate     = params.get("date")      || "";
@@ -688,12 +689,16 @@
       // FAILED state
       document.getElementById("scBanner").classList.add("failed");
       document.getElementById("scIcon").textContent = "❌";
-      document.getElementById("scTitle").textContent = "Payment Failed";
-      document.getElementById("scSubtitle").textContent = "Your payment could not be processed. Please try again.";
+      document.getElementById("scTitle").textContent = "Payment Not Done";
+      document.getElementById("scSubtitle").textContent = failReason || "Your payment was not completed. No amount has been deducted. Please try again.";
       document.getElementById("scBookingId").style.display = "none";
+      document.querySelector('.sc-qr-wrap').style.display = "none";
       document.getElementById("scTicket").style.display = "none";
       document.getElementById("scActions").style.display = "none";
       document.getElementById("scFailedActions").style.display = "grid";
+      // Update retry link to go back to the same event
+      const retryLink = document.querySelector('#scFailedActions a:first-child');
+      if(retryLink && eventId) retryLink.href = `booking.html?eventId=${eventId}`;
     }
 
     /* ── DOWNLOAD TICKET ── */

@@ -388,6 +388,26 @@ let pickerQuantities = [];
 function fmt(n){ return n===0?"Free":"₹"+Number(n).toLocaleString("en-IN"); }
 function showToast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2500); }
 
+function showPaymentError(reason){
+  let el = document.getElementById('paymentErrorBanner');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'paymentErrorBanner';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:200;background:#1a0a0a;border-bottom:2px solid #ef4444;padding:1rem 1.2rem;display:flex;align-items:flex-start;gap:.85rem;';
+    el.innerHTML = `
+      <div style="width:40px;height:40px;border-radius:50%;background:rgba(239,68,68,.15);border:1.5px solid #ef4444;display:grid;place-items:center;font-size:1.2rem;flex:none;">✗</div>
+      <div style="flex:1;">
+        <div style="font-size:.92rem;font-weight:900;color:#ef4444;margin-bottom:.2rem;">Payment Not Done</div>
+        <div style="font-size:.78rem;color:#fca5a5;line-height:1.5;" id="paymentErrorMsg"></div>
+      </div>
+      <button onclick="document.getElementById('paymentErrorBanner').remove()" style="border:0;background:transparent;color:#9ca3af;font-size:1.4rem;line-height:1;flex:none;padding:0;">×</button>
+    `;
+    document.body.appendChild(el);
+  }
+  document.getElementById('paymentErrorMsg').textContent = reason;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
 function eventDateValue(value){ return value && value.toDate ? value.toDate() : new Date(value); }
 function eventStartTime(){
   const firstDate=(evData.eventDates||[])[0]||{};
@@ -852,15 +872,47 @@ async function submitBooking(){
     theme: { color: "#1242c5" },
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
+      submitBtn.textContent = "Verifying payment...";
+      // Verify payment via Razorpay fetch API
+      let verified = false;
+      let paymentStatus = '';
+      let paymentMethod = 'Razorpay';
+      try{
+        const res = await fetch(`https://api.razorpay.com/v1/payments/${pid}`, {
+          headers: { 'Authorization': 'Basic ' + btoa('rzp_live_SYhM7tRhZXmKn1:') }
+        });
+        if(res.ok){
+          const pData = await res.json();
+          paymentStatus = pData.status;
+          paymentMethod = pData.method || 'Razorpay';
+          verified = pData.status === 'captured' || pData.status === 'authorized';
+        }
+      }catch(verifyErr){
+        console.warn('Verification fetch failed, trusting handler:', verifyErr);
+        // Razorpay handler only fires on success, so trust it as fallback
+        verified = true;
+      }
+      if(!verified){
+        submitBtn.disabled = false;
+        submitBtn.textContent = `Pay ${fmt(total)}`;
+        showPaymentError(`Payment not completed. Status: ${paymentStatus||'unknown'}. Please try again or contact support.`);
+        return;
+      }
       document.getElementById("rStatus").textContent = "✅ Confirmed";
       await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
       await fetchBookedSeats();
       if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
-      const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:"Razorpay" });
+      const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     },
-    modal:{ ondismiss:()=>{ submitBtn.disabled=false; submitBtn.textContent="🔒 Pay Now"; } }
+    modal:{
+      ondismiss: ()=>{
+        submitBtn.disabled = false;
+        submitBtn.textContent = `Pay ${fmt(total)}`;
+        showPaymentError('Payment was cancelled. Your booking has not been confirmed.');
+      }
+    }
   };
   new Razorpay(options).open();
 }
