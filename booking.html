@@ -610,12 +610,22 @@ function applySheetCoupon(){
   const input = document.getElementById('couponSheetInput');
   applyCoupon(input ? input.value.trim() : '');
 }
+function removeCoupon(){
+  discountAmt = 0;
+  couponApplied = '';
+  const input = document.getElementById('couponSheetInput');
+  if(input) input.value = '';
+  const msg = document.getElementById('couponMsg');
+  if(msg){ msg.textContent=''; msg.className='bk-coupon-msg'; }
+  updateBill();
+  renderCouponSheet();
+}
 function renderCouponSheet(){
   const coupons = eventCoupons();
   const subtotal = selectedTicketSubtotal();
   const list = document.getElementById('couponSheetList');
   if(!list) return;
-  if(!coupons.length){ list.innerHTML='<div style="color:#8892a4;font-size:.84rem;padding:.75rem 0;">No coupons available for this event.</div>'; return; }
+  if(!coupons.length){ list.innerHTML='<div style="color:#8892a4;font-size:.9rem;padding:1rem 0;">No coupons available for this event.</div>'; return; }
   list.innerHTML = coupons.map(c=>{
     const code = String(c.code||c.couponCode||c.promoCode||'').trim().toUpperCase();
     const value = Number(c.value??c.discount??c.amount??c.off??0);
@@ -623,23 +633,28 @@ function renderCouponSheet(){
     const saving = isPct ? Math.round(subtotal*value/100) : Math.min(value,subtotal);
     const minOrder = Number(c.minOrder||c.minimumOrder||0);
     const eligible = subtotal >= minOrder;
-    const tabColor = eligible ? (isPct&&value>=20?'#ff5a19':isPct&&value>=15?'#e67e22':'#1dae79') : '#4b5563';
+    const isApplied = couponApplied === code;
+    const tabColor = isApplied ? '#1dae79' : eligible ? (isPct&&value>=20?'#ff5a19':isPct&&value>=15?'#e67e22':'#1dae79') : '#4b5563';
     const desc = c.description||c.desc||`Get ${isPct?value+'%':'₹'+value} OFF${c.maxDiscount?` upto ₹${c.maxDiscount}`:''}${minOrder?` on orders above ₹${minOrder}`:''}${c.maxUses?` · Limited offer`:''}`;
-    return `<div style="display:flex;border-radius:16px;overflow:hidden;background:#111520;border:1px solid #1e2535;margin-bottom:.85rem;">
-      <div style="width:52px;min-width:52px;background:${tabColor};display:flex;align-items:center;justify-content:center;position:relative;">
-        <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:#0a0c12;"></div>
-        <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:#0a0c12;"></div>
-        <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:.65rem;font-weight:900;color:#fff;letter-spacing:.1em;">${isPct?value+'% OFF':'₹'+value+' OFF'}</span>
+    return `<div style="display:flex;border-radius:18px;overflow:hidden;background:#111520;border:1.5px solid ${isApplied?'#1dae79':'#1e2535'};margin-bottom:1rem;min-height:110px;">
+      <div style="width:62px;min-width:62px;background:${tabColor};display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:#0a0c12;"></div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:#0a0c12;"></div>
+        <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:.72rem;font-weight:900;color:#fff;letter-spacing:.12em;">${isPct?value+'% OFF':'₹'+value+' OFF'}</span>
       </div>
-      <div style="flex:1;padding:.85rem 1rem;border-left:1.5px dashed #2a3040;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem;">
-          <span style="font-size:.92rem;font-weight:900;color:#fff;letter-spacing:.04em;">${code}</span>
-          <button onclick="tapCoupon('${code}')" style="border:0;background:transparent;color:${eligible?tabColor:'#4b5563'};font-size:.78rem;font-weight:900;letter-spacing:.05em;padding:0;">${eligible?'APPLY':'APPLY'}</button>
+      <div style="flex:1;padding:1rem 1.1rem;border-left:2px dashed #2a3040;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem;">
+          <span style="font-size:1rem;font-weight:900;color:#fff;letter-spacing:.05em;">${code}</span>
+          ${isApplied
+            ? `<button onclick="removeCoupon()" style="border:0;background:transparent;color:#ef4444;font-size:.82rem;font-weight:900;letter-spacing:.05em;padding:0;">REMOVE</button>`
+            : `<button onclick="tapCoupon('${code}')" style="border:0;background:transparent;color:${eligible?tabColor:'#4b5563'};font-size:.82rem;font-weight:900;letter-spacing:.05em;padding:0;">APPLY</button>`
+          }
         </div>
-        ${eligible&&saving?`<div style="font-size:.78rem;color:#1dae79;font-weight:700;margin-bottom:.3rem;">Save ₹${saving} on this order!</div>`:''}
-        ${!eligible&&minOrder?`<div style="font-size:.75rem;color:#f59e0b;margin-bottom:.3rem;">Add ₹${minOrder-subtotal} more to avail this offer</div>`:''}
-        <div style="border-top:1px dashed #2a3040;margin:.45rem 0;"></div>
-        <div style="font-size:.74rem;color:#8892a4;line-height:1.5;">${desc}</div>
+        ${isApplied?`<div style="font-size:.82rem;color:#1dae79;font-weight:700;margin-bottom:.4rem;">✓ Applied! You save ₹${saving}</div>`:
+          eligible&&saving?`<div style="font-size:.82rem;color:#1dae79;font-weight:700;margin-bottom:.4rem;">Save ₹${saving} on this order!</div>`:''}
+        ${!eligible&&minOrder?`<div style="font-size:.78rem;color:#f59e0b;margin-bottom:.4rem;">Add ₹${minOrder-subtotal} more to avail this offer</div>`:''}
+        <div style="border-top:1px dashed #2a3040;margin:.5rem 0;"></div>
+        <div style="font-size:.78rem;color:#8892a4;line-height:1.6;">${desc}</div>
       </div>
     </div>`;
   }).join('');
@@ -692,7 +707,7 @@ async function applyCoupon(selectedCode){
     msg.textContent = `✓ ${label} applied! You save ${fmt(discountAmt)}`;
     msg.className = "bk-coupon-msg ok";
     updateBill();
-    setTimeout(()=>closeCouponSheet(), 800);
+    renderCouponSheet();
   } else {
     msg.textContent = "Invalid or expired coupon code";
     msg.className = "bk-coupon-msg err";
