@@ -264,7 +264,24 @@
       <div class="bk-panel" id="panel3">
         <header class="bk-review-head"><button class="bk-picker-back" type="button" onclick="returnToTicketPicker()" aria-label="Back">‹</button><div><h1>Checkout</h1><p id="reviewEventMeta">Review your booking</p></div></header>
         <div class="checkout-event"><h2 id="s3Event">—</h2><p id="checkoutLocation">Review your booking</p><div class="checkout-ticket"><div class="checkout-ticket-top"><strong id="checkoutDate">—</strong><span id="s3Qty">1 ticket</span></div><div class="checkout-ticket-bottom"><span id="s3Ticket">—</span><div class="checkout-quantity"><button type="button" onclick="changePickerQty(selectedTicketIdx,-1)">−</button><b id="checkoutQty">1</b><button type="button" onclick="changePickerQty(selectedTicketIdx,1)">+</button></div><strong id="b_subtotal">₹0</strong></div></div></div>
-        <section class="checkout-section"><h3>Additional Offers</h3><button class="checkout-offer" type="button" onclick="toggleCouponOffers()"><div><strong>Apply coupon &amp; Bank Offers</strong><span id="offerSaving">Tap to view available offers</span></div><span class="checkout-chevron" id="offerChevron">⌃</span></button><div class="checkout-coupon" id="checkoutCouponList"><div id="availableCouponsWrap"></div><div class="bk-coupon-msg" id="couponMsg"></div></div></section>
+        <section class="checkout-section"><h3>Additional Offers</h3><button class="checkout-offer" type="button" onclick="openCouponSheet()"><div><strong>Apply coupon &amp; Bank Offers</strong><span id="offerSaving">Tap to view available offers</span></div><span class="checkout-chevron" style="font-size:1.4rem;color:#aeb0b7;">›</span></button></section>
+
+      <!-- COUPON FULL-SCREEN SHEET -->
+      <div id="couponSheet" style="display:none;position:fixed;inset:0;z-index:100;background:#0a0c12;overflow-y:auto;padding:0 0 3rem;">
+        <div style="display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.2rem;background:#0a0c12;border-bottom:1px solid #1e2230;position:sticky;top:0;z-index:2;">
+          <button onclick="closeCouponSheet()" style="width:38px;height:38px;border:1px solid #2a2f3a;border-radius:50%;background:#151922;color:#fff;font-size:1.5rem;flex:none;">‹</button>
+          <div><div style="font-size:1rem;font-weight:900;color:#fff;letter-spacing:.02em;">APPLY COUPON</div><div style="font-size:.75rem;color:#8892a4;margin-top:.1rem;">Your cart: <span id="couponSheetCart">₹0</span></div></div>
+        </div>
+        <div style="padding:1rem 1.2rem .5rem;">
+          <div style="display:flex;align-items:center;background:#151922;border:1px solid #2a2f3a;border-radius:14px;overflow:hidden;">
+            <input id="couponSheetInput" type="text" placeholder="Enter Coupon Code" style="flex:1;background:transparent;border:0;outline:none;padding:.85rem 1rem;font:inherit;font-size:.92rem;color:#fff;text-transform:uppercase;letter-spacing:.05em;"/>
+            <button onclick="applySheetCoupon()" style="padding:0 1.1rem;height:100%;background:transparent;border:0;color:#1dae79;font-size:.82rem;font-weight:900;letter-spacing:.05em;">APPLY</button>
+          </div>
+          <div class="bk-coupon-msg" id="couponMsg" style="margin-top:.5rem;"></div>
+        </div>
+        <div style="padding:.5rem 1.2rem .3rem;font-size:.78rem;font-weight:900;color:#e5e7eb;">More offers</div>
+        <div id="couponSheetList" style="padding:0 1.2rem;"></div>
+      </div>
         <section class="checkout-section"><h3>Bill Details</h3><div class="bk-bill checkout-bill"><div class="bk-bill-row"><span id="b_price">Ticket</span><span id="checkoutTicketTotal">₹0</span></div><div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div><div class="bk-bill-row"><span>Booking fee</span><span id="b_fee">₹0</span></div><div class="bk-bill-row total"><span>To Pay</span><strong id="b_total">₹0</strong></div></div></section>
         <details class="checkout-remember"><summary>Things to remember</summary><p>Your ticket will be confirmed after successful payment. Please carry a valid ID to the venue.</p></details>
         <div class="bk-tc"><input type="checkbox" id="tcCheck"/><label for="tcCheck">I agree to the <a href="terms-and-conditions.html" target="_blank">Terms &amp; Conditions</a> and <a href="refund-policy.html" target="_blank">Refund Policy</a>.</label></div>
@@ -578,47 +595,67 @@ function updateBill(){
 }
 
 // ── COUPON ──
-function renderAvailableCoupons(){
+function openCouponSheet(){
+  const subtotal = selectedTicketSubtotal();
+  document.getElementById('couponSheetCart').textContent = fmt(subtotal);
+  renderCouponSheet();
+  document.getElementById('couponSheet').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeCouponSheet(){
+  document.getElementById('couponSheet').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function applySheetCoupon(){
+  const input = document.getElementById('couponSheetInput');
+  applyCoupon(input ? input.value.trim() : '');
+}
+function renderCouponSheet(){
   const coupons = eventCoupons();
-  const wrap = document.getElementById("availableCouponsWrap");
-  if(!wrap) return;
-  // Always show the manual input field
-  const manualInput = `<div class="bk-coupon-row" style="margin-bottom:.6rem;">
-    <input type="text" id="manualCouponInput" placeholder="Enter coupon code" style="text-transform:uppercase;"/>
-    <button class="bk-coupon-btn" type="button" onclick="applyManualCoupon()">Apply</button>
-  </div>`;
-  if(!coupons.length){ wrap.innerHTML = manualInput; return; }
-  wrap.innerHTML = manualInput + '<div class="checkout-coupon-title">Available coupons</div>'
-    + coupons.map(c=>{
-        const code=String(c.code||c.couponCode||c.promoCode).trim().toUpperCase();
-        const value=Number(c.value??c.discount??c.amount??c.off);
-        const val = (c.type==='percent'||c.type==='percentage')?`${value}% OFF`:`₹${value} OFF`;
-        return `<button class="avail-coupon-chip" type="button" onclick='tapCoupon(${JSON.stringify(code)})'>
-          <span class="avail-coupon-code">${code}</span>
-          <span class="avail-coupon-val">${val}</span>
-          <span class="avail-coupon-tap">Apply</span>
-        </button>`;
-      }).join('');
+  const subtotal = selectedTicketSubtotal();
+  const list = document.getElementById('couponSheetList');
+  if(!list) return;
+  if(!coupons.length){ list.innerHTML='<div style="color:#8892a4;font-size:.84rem;padding:.75rem 0;">No coupons available for this event.</div>'; return; }
+  list.innerHTML = coupons.map(c=>{
+    const code = String(c.code||c.couponCode||c.promoCode||'').trim().toUpperCase();
+    const value = Number(c.value??c.discount??c.amount??c.off??0);
+    const isPct = c.type==='percent'||c.type==='percentage';
+    const saving = isPct ? Math.round(subtotal*value/100) : Math.min(value,subtotal);
+    const minOrder = Number(c.minOrder||c.minimumOrder||0);
+    const eligible = subtotal >= minOrder;
+    const tabColor = eligible ? (isPct&&value>=20?'#ff5a19':isPct&&value>=15?'#e67e22':'#1dae79') : '#4b5563';
+    const desc = c.description||c.desc||`Get ${isPct?value+'%':'₹'+value} OFF${c.maxDiscount?` upto ₹${c.maxDiscount}`:''}${minOrder?` on orders above ₹${minOrder}`:''}${c.maxUses?` · Limited offer`:''}`;
+    return `<div style="display:flex;border-radius:16px;overflow:hidden;background:#111520;border:1px solid #1e2535;margin-bottom:.85rem;">
+      <div style="width:52px;min-width:52px;background:${tabColor};display:flex;align-items:center;justify-content:center;position:relative;">
+        <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:#0a0c12;"></div>
+        <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:#0a0c12;"></div>
+        <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:.65rem;font-weight:900;color:#fff;letter-spacing:.1em;">${isPct?value+'% OFF':'₹'+value+' OFF'}</span>
+      </div>
+      <div style="flex:1;padding:.85rem 1rem;border-left:1.5px dashed #2a3040;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem;">
+          <span style="font-size:.92rem;font-weight:900;color:#fff;letter-spacing:.04em;">${code}</span>
+          <button onclick="tapCoupon('${code}')" style="border:0;background:transparent;color:${eligible?tabColor:'#4b5563'};font-size:.78rem;font-weight:900;letter-spacing:.05em;padding:0;">${eligible?'APPLY':'APPLY'}</button>
+        </div>
+        ${eligible&&saving?`<div style="font-size:.78rem;color:#1dae79;font-weight:700;margin-bottom:.3rem;">Save ₹${saving} on this order!</div>`:''}
+        ${!eligible&&minOrder?`<div style="font-size:.75rem;color:#f59e0b;margin-bottom:.3rem;">Add ₹${minOrder-subtotal} more to avail this offer</div>`:''}
+        <div style="border-top:1px dashed #2a3040;margin:.45rem 0;"></div>
+        <div style="font-size:.74rem;color:#8892a4;line-height:1.5;">${desc}</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function tapCoupon(code){
-  const input = document.getElementById('manualCouponInput');
+  const input = document.getElementById('couponSheetInput');
   if(input) input.value = code;
   applyCoupon(code);
 }
-
 function applyManualCoupon(){
-  const input = document.getElementById('manualCouponInput');
+  const input = document.getElementById('couponSheetInput');
   if(input) applyCoupon(input.value.trim());
 }
 
-function toggleCouponOffers(){
-  const list=document.getElementById('checkoutCouponList');
-  const chevron=document.getElementById('offerChevron');
-  const isOpen=!list.hidden;
-  list.hidden=isOpen;
-  chevron.textContent=isOpen ? '›' : '⌃';
-}
+function toggleCouponOffers(){}
 
 async function applyCoupon(selectedCode){
   const code = String(selectedCode||'').trim().toUpperCase();
@@ -655,6 +692,7 @@ async function applyCoupon(selectedCode){
     msg.textContent = `✓ ${label} applied! You save ${fmt(discountAmt)}`;
     msg.className = "bk-coupon-msg ok";
     updateBill();
+    setTimeout(()=>closeCouponSheet(), 800);
   } else {
     msg.textContent = "Invalid or expired coupon code";
     msg.className = "bk-coupon-msg err";
@@ -939,7 +977,6 @@ async function init(){
           document.getElementById("receiptBanner").innerHTML = "";
           document.getElementById("receiptBanner").appendChild(img);
         }
-        renderAvailableCoupons();
         renderTicketPicker();
       } else {
         document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">This event could not be found.</div>';
