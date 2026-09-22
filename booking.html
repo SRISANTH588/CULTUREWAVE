@@ -745,6 +745,14 @@ async function saveBooking(data){
     const ts = firebase.firestore.FieldValue.serverTimestamp();
     let userId = null;
     try { const u = firebase.auth().currentUser; if(u) userId = u.uid; } catch(e){}
+    // Resolve organiserId — try evData fields first, then fetch event doc directly
+    let organiserId = evData.ownerId || evData.organiserId || null;
+    if(!organiserId && eventId){
+      try{
+        const evSnap = await db.collection('events').doc(eventId).get();
+        if(evSnap.exists) organiserId = evSnap.data().ownerId || evSnap.data().organiserId || null;
+      }catch(_){}
+    }
     const doc = {
       bookingId: data.bookingId, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
@@ -752,7 +760,8 @@ async function saveBooking(data){
       status: data.status, paymentId: data.paymentId||null,
       customerName: data.name, customerEmail: data.email,
       customerPhone: data.phone, userId: userId,
-      organiserId: evData.ownerId || null,
+      organiserId: organiserId,
+      ownerId: organiserId,
       eventDate: evData.startDate || evData.date || null,
       venueName: evData.venueName || evData.venue || null,
       city: evData.city || null,
