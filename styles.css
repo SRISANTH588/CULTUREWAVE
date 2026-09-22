@@ -5002,3 +5002,9 @@ body { background: var(--bw-black) !important; color: var(--bw-white) !important
     transform: translateX(calc(-1 * min(80vw, 360px)));
   }
 }
+
+/* Short public pages end with their footer instead of leaving unused canvas
+   below the content. Scoped to pages that use the shared footer. */
+body:has(> .site-footer) { min-height: 100vh; display: flex; flex-direction: column; }
+body:has(> .site-footer) > main { flex: 1 0 auto; }
+body:has(> .site-footer) > .site-footer { margin-top: auto !important; flex-shrink: 0; }
