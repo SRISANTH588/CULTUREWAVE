@@ -843,6 +843,17 @@ async function submitBooking(){
   if(!document.getElementById('tcCheck').checked){ showToast('Please agree to Terms & Conditions'); return; }
   const ticketName = selectedTicketLabel();
   const ticketCount = selectedTicketCount();
+  // Recheck immediately before payment in case another guest took a seat while
+  // this page was open.
+  if(evData.seatingPlan && (Array.isArray(evData.seatingPlan.rows) || Array.isArray(evData.seatingPlan.sections))){
+    await fetchBookedSeats();
+    if(selectedSeats.length !== ticketCount){
+      renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+      updatePickerBar();
+      showToast('One or more selected seats were just booked. Please choose another seat.');
+      return;
+    }
+  }
   const subtotal = selectedTicketSubtotal();
   const afterDiscount = Math.max(0, subtotal - discountAmt);
   const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
@@ -928,32 +939,45 @@ async function submitBooking(){
 }
 
 // ── SEATING PLAN ──
+function bookingSeatIds(booking){
+  const raw = booking.seatIds ?? booking.seatId ?? [];
+  const values = Array.isArray(raw) ? raw : String(raw).split(',');
+  return values.map(value => String(value).trim()).filter(Boolean);
+}
+
+function isConfirmedBooking(booking){
+  return ['confirmed','paid','success','completed'].includes(String(booking.status || '').toLowerCase());
+}
+
+function applyBookedSeats(seats){
+  bookedSeats = [...new Set(seats)];
+  // A seat taken by another customer must also be removed from this screen's
+  // temporary selection before the guest can continue to checkout.
+  selectedSeats = selectedSeats.filter(seatId => !bookedSeats.includes(seatId));
+}
+
 async function fetchBookedSeats(){
   if(!eventId) return;
   try{
     const snap = await db.collection("bookings").where("eventId","==",eventId).get();
-    bookedSeats = [];
+    const seats = [];
     snap.forEach(doc=>{
       const d = doc.data();
-      const s = String(d.status||'').toLowerCase();
-      if((s==='confirmed'||s==='paid') && Array.isArray(d.seatIds) && d.seatIds.length){
-        bookedSeats.push(...d.seatIds);
-      }
+      if(isConfirmedBooking(d)) seats.push(...bookingSeatIds(d));
     });
+    applyBookedSeats(seats);
   }catch(e){ console.error('fetchBookedSeats:',e); }
 }
 
 function watchBookedSeats(){
   if(!eventId) return;
   db.collection("bookings").where("eventId","==",eventId).onSnapshot(snap=>{
-    bookedSeats = [];
+    const seats = [];
     snap.forEach(doc=>{
       const d = doc.data();
-      const s = String(d.status||'').toLowerCase();
-      if((s==='confirmed'||s==='paid') && Array.isArray(d.seatIds) && d.seatIds.length){
-        bookedSeats.push(...d.seatIds);
-      }
+      if(isConfirmedBooking(d)) seats.push(...bookingSeatIds(d));
     });
+    applyBookedSeats(seats);
     if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
       renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
     }
@@ -990,7 +1014,7 @@ function renderSeating(layout, container){
         const seatId=(row.label||"")+String(i+1);
         const isBooked=bookedSeats.includes(seatId);
         const w=sofa?"50px":"26px"; const br=sofa?"13px":"6px";
-        if(isBooked) return `<span style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:#fee2e2;color:#ef4444;font-size:.5rem;font-weight:800;cursor:not-allowed;border:1.5px solid #ef4444;" title="Booked — ${seatId}">🚫</span>`;
+        if(isBooked) return `<span role="img" aria-label="Booked seat ${seatId}" style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:#dc2626;color:#fff;font-size:.72rem;font-weight:900;cursor:not-allowed;border:1.5px solid #991b1b;box-shadow:inset 0 1px rgba(255,255,255,.22);" title="Booked — ${seatId}">🚫</span>`;
         const isSelected=selectedSeats.includes(seatId);
         return `<span id="seat_${seatId}" onclick="toggleSeat('${seatId}','${sofa}')" style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:${isSelected?'#1242c5':(sofa?'#fce7f3':'#e8efff')};color:${isSelected?'#fff':(sofa?'#be185d':'#1242c5')};box-shadow:${isSelected?'0 0 0 2px #2f6bff':'none'};font-size:.55rem;font-weight:800;cursor:pointer;transition:all .15s;">${sofa?"Sofa ":""} ${seatId}</span>`;
       }).join("")}</div></div></div>`;
@@ -1022,6 +1046,11 @@ function toggleSectionSeat(sectionId){
 function toggleSeat(seatId, sofa){
   const el = document.getElementById("seat_"+seatId);
   if(!el) return;
+  if(bookedSeats.includes(seatId)){
+    showToast('This seat has already been booked');
+    renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+    return;
+  }
   const idx = selectedSeats.indexOf(seatId);
   if(idx === -1){
     const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
