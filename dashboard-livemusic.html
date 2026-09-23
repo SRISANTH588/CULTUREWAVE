@@ -1005,7 +1005,7 @@ window.saveProfile=async function(){
   const button=document.querySelector('#bp-basic .brand-save-btn');
   if(button){button.disabled=true;button.textContent='Saving...';}
   try{
-    await setDoc(doc(db,'organisers',myUid),{
+    const payload={
       name:document.getElementById('pfName').value.trim(),
       handle:document.getElementById('pfHandle').value.trim().replace(/^@/,''),
       bio:(document.getElementById('pfBio')||{}).value?.trim()||'',
@@ -1020,7 +1020,16 @@ window.saveProfile=async function(){
       metaPixel:(document.getElementById('pfMetaPixel')||{}).value?.trim()||'',
       gtmId:(document.getElementById('pfGtmId')||{}).value?.trim()||'',
       updatedAt:serverTimestamp()
-    },{merge:true});
+    };
+    const cover=document.getElementById('coverFileInput')?.files[0];
+    const logo=document.getElementById('avatarFileInput')?.files[0];
+    if(cover)payload.coverUrl=await uploadImageToImageKit(cover,'/profile-covers');
+    if(logo)payload.avatarUrl=await uploadImageToImageKit(logo,'/profile-avatars');
+    await setDoc(doc(db,'organisers',myUid),payload,{merge:true});
+    if(payload.coverUrl){const img=document.getElementById('coverPreview');if(img){img.src=payload.coverUrl;img.style.display='block';}const ph=document.getElementById('coverPlaceholder');if(ph)ph.style.display='none';}
+    if(payload.avatarUrl){const img=document.getElementById('avatarPreview');if(img){img.src=payload.avatarUrl;img.style.display='block';}const ini=document.getElementById('avatarInitial');if(ini)ini.style.display='none';}
+    const coverInput=document.getElementById('coverFileInput');if(coverInput)coverInput.value='';
+    const avatarInput=document.getElementById('avatarFileInput');if(avatarInput)avatarInput.value='';
     showToast('✓ Profile saved!');
   }catch(error){
     console.error('Could not save organiser profile:',error);
@@ -1036,15 +1045,6 @@ window.saveBrandBankDetails=async function(){if(!myUid)return;const acc=document
 if(document.getElementById('salesSearch')){document.getElementById('salesSearch').addEventListener('input',()=>{const active=document.querySelector('#salesTabs .tab.active');renderSalesTable(active?active.dataset.stab:'all');});}
 </script>
 <script src="imagekit.js"></script>
-<script>
-window.addEventListener('load', () => {
-  const saveProfileFields = window.saveProfile;
-  window.saveProfile = async function () {
-    const cover = document.getElementById('coverFileInput')?.files[0]; const logo = document.getElementById('avatarFileInput')?.files[0];
-    await saveProfileFields(); if (!cover && !logo) return;
-    try { const images = {}; if (cover) images.coverUrl = await uploadImageToImageKit(cover, '/profile-covers'); if (logo) images.avatarUrl = await uploadImageToImageKit(logo, '/profile-avatars'); await window.setDoc(window.doc(window.db, 'organisers', window.myUid), {...images, updatedAt:new Date().toISOString()}, {merge:true}); showToast('✓ Profile images saved!'); } catch (error) { console.error('Profile image upload failed:', error); showToast('Image upload failed: ' + error.message); }
-  };
-});
-</script>
+
 </body>
 </html>
