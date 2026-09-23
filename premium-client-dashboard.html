@@ -2698,6 +2698,55 @@ window.saveBrandBankDetails = async function() {
 
 // ── SALES + PAYOUTS ──
 let allSalesRows = [];
+const bookingSnapshots = new Map();
+const bookingListeners = new Map();
+
+function refreshDashboardBookings() {
+  const unique = new Map();
+  bookingSnapshots.forEach(rows => rows.forEach(row => unique.set(row.id, row)));
+  const rows = [...unique.values()].sort((a,b) => {
+    const time = value => value?.toDate ? value.toDate().getTime() : new Date(value||0).getTime();
+    return time(b.createdAt) - time(a.createdAt);
+  });
+  allSalesRows = rows;
+  analyticsBookings = rows;
+  const paid = rows.filter(r=>(r.status||'').toLowerCase()==='paid');
+  const totalRev = paid.reduce((s,r)=>s+Number(r.amount||0),0);
+  const settled = paid.filter(r=>r.settled).reduce((s,r)=>s+Number(r.amount||0),0);
+  document.getElementById('salesTotalRev').textContent = money(totalRev);
+  document.getElementById('salesSettled').textContent = money(settled);
+  document.getElementById('salesPending').textContent = money(totalRev-settled);
+  document.getElementById('salesCount').textContent = rows.length;
+  document.getElementById('mBookings').textContent = rows.length;
+  document.getElementById('mRevenue').textContent = money(totalRev);
+  renderOverviewBookings(rows);
+  renderSalesTable(document.querySelector('#salesTabs .tab.active')?.dataset.stab || 'all');
+  renderAnalytics();
+}
+
+function watchBookingSource(key, constraints, uid) {
+  if(bookingListeners.has(key)) return;
+  const stop = onSnapshot(
+    query(collection(db,'bookings'), ...constraints, limit(500)),
+    snap => {
+      bookingSnapshots.set(key, snap.docs.map(d=>({id:d.id,...d.data()})));
+      refreshDashboardBookings();
+    },
+    err => console.error(`Unable to load dashboard bookings (${key}, ${uid}):`, err)
+  );
+  bookingListeners.set(key, stop);
+}
+
+function watchEventBookings(events, uid) {
+  const wanted = new Set(events.map(ev=>`event:${ev.id}`));
+  for(const [key,stop] of bookingListeners) {
+    if(key.startsWith('event:') && !wanted.has(key)) {
+      stop(); bookingListeners.delete(key); bookingSnapshots.delete(key);
+    }
+  }
+  events.forEach(ev=>watchBookingSource(`event:${ev.id}`, [where('eventId','==',ev.id)], uid));
+  refreshDashboardBookings();
+}
 
 function renderSalesTable(filter) {
   filter = filter || 'all';
@@ -2841,36 +2890,9 @@ document.querySelectorAll('.period-tab').forEach(btn => {
   });
 });
 
-function loadAnalytics(uid) {
-  onSnapshot(
-    query(collection(db,'bookings'), where('organiserId','==',uid), limit(500)),
-    snap => {
-      analyticsBookings = snap.docs.map(d=>({id:d.id,...d.data()}));
-      renderAnalytics();
-    }
-  );
-}
-
 function loadFinance(uid) {
-  onSnapshot(
-    query(collection(db,'bookings'), where('organiserId','==',uid), limit(500)),
-    snap => {
-      const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
-      allSalesRows = rows;
-      const paid = rows.filter(r=>(r.status||'').toLowerCase()==='paid');
-      const totalRev = paid.reduce((s,r)=>s+Number(r.amount||0),0);
-      const settled = paid.filter(r=>r.settled).reduce((s,r)=>s+Number(r.amount||0),0);
-      document.getElementById('salesTotalRev').textContent = money(totalRev);
-      document.getElementById('salesSettled').textContent = money(settled);
-      document.getElementById('salesPending').textContent = money(totalRev-settled);
-      document.getElementById('salesCount').textContent = rows.length;
-      document.getElementById('mBookings').textContent = rows.length;
-      document.getElementById('mRevenue').textContent = money(totalRev);
-      renderOverviewBookings(rows);
-      const activeTab2 = document.querySelector('#salesTabs .tab.active');
-      renderSalesTable(activeTab2 ? activeTab2.dataset.stab : 'all');
-    }
-  );
+  watchBookingSource('organiser', [where('organiserId','==',uid)], uid);
+  watchBookingSource('owner', [where('ownerId','==',uid)], uid);
   onSnapshot(
     query(collection(db,'payouts'), where('ownerId','==',uid), limit(50)),
     snap => {
@@ -3188,6 +3210,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
           renderEvents();
           renderOverview();
           populateIgEventDropdown();
+          watchEventBookings(allEvents, myUid);
         } catch(e) { console.error('events snapshot error:', e); }
       },
       err => console.error('Unable to load lister events:', err)
@@ -3196,7 +3219,6 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     loadProfile(myUid);
     loadSurveys(myUid);
     loadFinance(myUid);
-    loadAnalytics(myUid);
     loadWhatsAppStats(myUid);
     loadInquiries(myUid);
   } catch(err) {
