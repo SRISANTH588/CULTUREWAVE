@@ -347,6 +347,7 @@
       <div class="hero-meta-item"><span>📅</span><span id="evDate">—</span></div>
       <div class="hero-meta-item"><span>📍</span><span id="evVenue">—</span><span id="evCity" style="opacity:.7;"></span></div>
       <div class="hero-meta-item" id="evCapacityRow" style="display:none;"><span>👥</span><span id="evCapacity">—</span></div>
+      <div class="hero-meta-item" id="evAttendeeCountRow" style="display:none;"><span>🎟️</span><span><strong id="evAttendeeCount">0</strong> registered</span></div>
     </div>
   </div>
 </div>
@@ -404,6 +405,10 @@
         <div class="mob-info-text-sub" id="mobInfoTicket">Free</div>
       </div>
     </div>
+    <div class="mob-info-row" id="mobAttendeeCountRow" style="display:none;">
+      <div class="mob-info-icon-box">🎟️</div>
+      <div><div class="mob-info-text-title"><span id="mobAttendeeCount">0</span> registered</div><div class="mob-info-text-sub">Attendee count</div></div>
+    </div>
   </div>
 </div>
 
@@ -418,7 +423,7 @@
 <main class="nightlife-mobile" id="nightlifeMobile">
   <section class="night-offers" id="nightOffers" hidden></section>
   <section class="night-about" id="nightAbout"><h2>About</h2><p id="nightAboutCopy">Event details will be available soon.</p><button type="button" id="nightMore" onclick="toggleNightAbout()" hidden>...more</button><div class="night-details" id="nightDetails" hidden></div></section>
-  <section class="night-share-card" aria-label="Share this event"><h3>Share this event</h3><div class="night-share-actions"><button type="button" onclick="shareWA()">WhatsApp</button><button type="button" onclick="copyLink()">Copy link</button></div></section>
+  <section class="night-share-card" id="nightShareCard" aria-label="Share this event"><h3>Share this event</h3><div class="night-share-actions"><button type="button" onclick="shareWA()">WhatsApp</button><button type="button" onclick="copyLink()">Copy link</button></div></section>
   <section class="night-org-card" aria-label="Organised by"><div class="night-org-label">Organised by</div><button type="button" class="night-org-row" onclick="goToProfile()"><span class="night-org-avatar" id="nightOrgAvatar">JN</span><span><strong id="nightOrgName">Organiser</strong><small>View profile →</small></span></button></section>
   <div class="night-divider"><span></span><b>CHECK OUT THE VIBE</b><span></span></div>
   <section class="night-photos" id="nightPhotos"><h2>Photos &amp; Videos</h2><div id="nightGallery" class="night-gallery"></div><button class="night-open-gallery" id="nightOpenGallery" type="button" onclick="openNightGallery()" hidden>Open gallery</button></section>
@@ -636,14 +641,15 @@ function showToast(msg){
 function getShareUrl(){ return `${location.origin}/event-detail.html?eventId=${eventId}`; }
 
 function openShare(){
+  if(evData.allowSharing===false) return;
   document.getElementById('shareUrl').textContent = getShareUrl();
   document.getElementById('shareModal').classList.add('open');
 }
 function closeShare(){ document.getElementById('shareModal').classList.remove('open'); }
-function copyLink(){ navigator.clipboard.writeText(getShareUrl()).then(()=>showToast('Link copied!')); closeShare(); }
-function shareWA(){ window.open(`https://wa.me/?text=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
-function shareTwitter(){ window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this event on CultureWave!')}&url=${encodeURIComponent(getShareUrl())}`, '_blank'); }
-function shareEmail(){ window.open(`mailto:?subject=${encodeURIComponent(evData.name||'Event')}&body=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
+function copyLink(){ if(evData.allowSharing===false) return; navigator.clipboard.writeText(getShareUrl()).then(()=>showToast('Link copied!')); closeShare(); }
+function shareWA(){ if(evData.allowSharing===false) return; window.open(`https://wa.me/?text=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
+function shareTwitter(){ if(evData.allowSharing===false) return; window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this event on CultureWave!')}&url=${encodeURIComponent(getShareUrl())}`, '_blank'); }
+function shareEmail(){ if(evData.allowSharing===false) return; window.open(`mailto:?subject=${encodeURIComponent(evData.name||'Event')}&body=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
 
 function goToProfile(){
   if(ownerUid) location.href = `client-profile.html?uid=${ownerUid}`;
@@ -928,6 +934,17 @@ async function renderEvent(data){
   document.getElementById('evDate').textContent = fmtDate(eventStart);
   document.getElementById('evVenue').textContent = data.venueName||'Venue TBA';
   document.getElementById('evCity').textContent = data.city ? ' · '+data.city : '';
+  const attendeeCount = Math.max(Number(data.totalBooked)||0,(data.tickets||[]).reduce((sum,ticket)=>sum + (Number(ticket.booked)||0),0));
+  if(data.showAttendeeCount!==false){
+    document.getElementById('evAttendeeCount').textContent = attendeeCount.toLocaleString('en-IN');
+    document.getElementById('evAttendeeCountRow').style.display='flex';
+    document.getElementById('mobAttendeeCount').textContent = attendeeCount.toLocaleString('en-IN');
+    document.getElementById('mobAttendeeCountRow').style.display='flex';
+  }
+  if(data.allowSharing===false){
+    document.querySelectorAll('[onclick="openShare()"]').forEach(button=>button.style.display='none');
+    document.getElementById('nightShareCard').style.display='none';
+  }
   if(data.capacity){ document.getElementById('evCapacity').textContent = Number(data.capacity).toLocaleString('en-IN')+' seats'; document.getElementById('evCapacityRow').style.display='flex'; }
   document.getElementById('hlDate').textContent = fmtDate(eventStart);
   document.getElementById('hlVenue').textContent = data.venueName||data.city||'TBA';
@@ -1110,6 +1127,26 @@ async function init(){
 
   const data = {id:snap.id,...snap.data()};
   await renderEvent(data);
+
+  db.collection('events').doc(eventId).onSnapshot(liveSnap=>{
+    if(!liveSnap.exists) return;
+    const liveData = liveSnap.data();
+    evData.allowSharing = liveData.allowSharing;
+    evData.showAttendeeCount = liveData.showAttendeeCount;
+    if(liveData.showAttendeeCount!==false){
+      const count = Math.max(Number(liveData.totalBooked)||0,(liveData.tickets||[]).reduce((sum,ticket)=>sum + (Number(ticket.booked)||0),0));
+      document.getElementById('evAttendeeCount').textContent = count.toLocaleString('en-IN');
+      document.getElementById('evAttendeeCountRow').style.display='flex';
+      document.getElementById('mobAttendeeCount').textContent = count.toLocaleString('en-IN');
+      document.getElementById('mobAttendeeCountRow').style.display='flex';
+    }else{
+      document.getElementById('evAttendeeCountRow').style.display='none';
+      document.getElementById('mobAttendeeCountRow').style.display='none';
+    }
+    const sharingAllowed = liveData.allowSharing !== false;
+    document.querySelectorAll('[onclick="openShare()"]').forEach(button=>button.style.display=sharingAllowed?'':'none');
+    document.getElementById('nightShareCard').style.display=sharingAllowed?'':'none';
+  },error=>console.warn('Event display settings:',error.message));
 
   // show edit button if owner
   if(myUid && myUid === data.ownerId){

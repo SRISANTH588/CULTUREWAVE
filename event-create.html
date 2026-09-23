@@ -2223,10 +2223,10 @@ loadUser();
     setToggle('toggleSoldOut', d.soldOut);
     setToggle('toggleWaitlist', d.allowWaitlist);
     setToggle('toggleNotifyWaitlist', d.notifyWaitlist);
-    setToggle('toggleAttendeeCount', d.showAttendeeCount);
-    setToggle('toggleRefunds', d.enableRefunds);
-    setToggle('togglePublicListing', d.publicListing);
-    setToggle('toggleSharing', d.allowSharing);
+    setToggle('toggleAttendeeCount', d.showAttendeeCount !== false);
+    setToggle('toggleRefunds', d.enableRefunds !== false);
+    setToggle('togglePublicListing', d.publicListing !== false);
+    setToggle('toggleSharing', d.allowSharing !== false);
     Object.entries(d.rsvpFields || {}).forEach(([field, enabled]) => {
       const el = document.querySelector(`.toggle[data-field="${field}"]`);
       if (el) el.classList.toggle('on', Boolean(enabled));

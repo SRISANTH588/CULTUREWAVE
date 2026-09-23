@@ -696,6 +696,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setShowCount" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Enable Refunds</div><div style="font-size:.76rem;color:var(--muted);">Allow attendees to request refunds</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setEnableRefunds" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
         <div><div style="font-size:.86rem;font-weight:700;">Invite Only</div><div style="font-size:.76rem;color:var(--muted);">Require invite code to register</div></div>
         <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setInviteOnly" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
       </div>
@@ -1536,7 +1540,8 @@ function prefillSettings(){
   const setChk=(id,v)=>{const el=document.getElementById(id);if(!el)return;el.checked=!!v;const track=el.nextElementSibling;if(track){const thumb=track.querySelector('span');if(v){track.style.background='#3b5bdb';if(thumb)thumb.style.transform='translateX(18px)';}else{track.style.background='#e9ecef';if(thumb)thumb.style.transform='';}}};
   setChk('setPublicListing',d.publicListing);
   setChk('setAllowSharing',d.allowSharing!==false);
-  setChk('setShowCount',d.showAttendeeCount);
+  setChk('setShowCount',d.showAttendeeCount!==false);
+  setChk('setEnableRefunds',d.enableRefunds!==false);
   setChk('setInviteOnly',d.inviteOnly);
 }
 
@@ -1546,6 +1551,7 @@ window.saveSettings=async function(){
     publicListing:document.getElementById('setPublicListing').checked,
     allowSharing:document.getElementById('setAllowSharing').checked,
     showAttendeeCount:document.getElementById('setShowCount').checked,
+    enableRefunds:document.getElementById('setEnableRefunds').checked,
     inviteOnly:document.getElementById('setInviteOnly').checked,
     updatedAt:serverTimestamp()
   });

@@ -805,11 +805,18 @@ async function saveBooking(data){
     };
     await db.collection("bookings").doc(data.bookingId).set(doc);
     await db.collection("payments").doc(data.bookingId).set(doc);
+    if(eventId){
+      try{
+        await db.collection('events').doc(eventId).update({
+          totalBooked: firebase.firestore.FieldValue.increment(Math.max(1, Number(data.seats) || 1))
+        });
+      }catch(e){ console.warn('Could not update public attendee count:', e.message); }
+    }
     // Also update the event's bookedSeats array in Firestore so the seat map
     // reflects the new booking immediately for all users.
     if(eventId){
       try{
-        const updateData = { totalBooked: firebase.firestore.FieldValue.increment(data.seats || 1) };
+        const updateData = {};
         if(seatIds.length) updateData.bookedSeats = firebase.firestore.FieldValue.arrayUnion(...seatIds);
         // Decrement available count on the specific ticket type
         const evSnap = await db.collection('events').doc(eventId).get();
@@ -822,7 +829,7 @@ async function saveBooking(data){
             updateData.tickets = evTickets;
           }
         }
-        await db.collection('events').doc(eventId).update(updateData);
+        if(Object.keys(updateData).length) await db.collection('events').doc(eventId).update(updateData);
       }catch(_){}
     }
   }catch(e){ console.error("saveBooking:",e); }

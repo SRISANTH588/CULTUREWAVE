@@ -7,6 +7,17 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    // Public booking pages may update only the aggregate attendee counter.
+    // Event fields and attendee details remain owner/admin controlled.
+    function attendeeCountIncrement() {
+      let previous = resource.data.get('totalBooked', 0);
+      let next = request.resource.data.get('totalBooked', -1);
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalBooked']) &&
+        (previous is int || previous is float) && next is int &&
+        next > previous && next <= previous + 20 &&
+        resource.data.status in ['published', 'live', 'active'];
+    }
+
     // Anyone can write/read their own OTP (needed for signup before auth exists)
     match /emailOtps/{email} {
       allow read, write: if true;
@@ -23,7 +34,9 @@ service cloud.firestore {
     match /events/{id} {
       allow read: if true;
       allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
-      allow update, delete: if request.auth != null &&
+      allow update: if (request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin())) || attendeeCountIncrement();
+      allow delete: if request.auth != null &&
         (resource.data.ownerId == request.auth.uid || isAdmin());
     }
 
