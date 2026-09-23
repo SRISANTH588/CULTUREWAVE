@@ -1447,25 +1447,30 @@
     }
     .cup-scroll::-webkit-scrollbar{display:none;}
     .cup-card{
-      flex:0 0 44vw;max-width:170px;
-      border-radius:14px;overflow:hidden;
-      background:#111;border:1px solid rgba(255,255,255,.1);
+      flex:0 0 85vw;max-width:260px;
+      border-radius:16px;overflow:hidden;
+      background:#111;border:1px solid rgba(255,255,255,.12);
       text-decoration:none;display:block;
       scroll-snap-align:start;
-      transition:transform .2s;
+      transition:transform .4s ease,box-shadow .4s ease,border-color .4s ease;
     }
-    .cup-card:hover{transform:translateY(-4px);}
+    .cup-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.3);}
     .cup-poster{
       width:100%;aspect-ratio:3/4;
       background-size:cover;background-position:center;
     }
-    .cup-info{padding:.55rem .65rem .7rem;background:#111;}
-    .cup-title{font-size:.82rem;font-weight:800;color:#fff;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-    .cup-date{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.25rem;font-weight:600;}
-    .cup-price{font-size:.72rem;font-weight:800;color:#22c55e;margin-top:.15rem;}
+    .cup-info{padding:.6rem .7rem .75rem;background:#111;border-top:1px solid rgba(255,255,255,.07);}
+    .cup-title{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .cup-date{font-size:.63rem;color:rgba(255,255,255,.4);margin-top:.2rem;font-weight:600;}
+    .cup-price{font-size:.68rem;font-weight:800;color:#22c55e;margin-top:.35rem;}
     .cup-price.paid{color:#fff;}
     @media(min-width:700px){
       .cup-card{flex:0 0 180px;max-width:200px;}
+    }
+    @media(max-width:699px){
+      .cup-section .cup-scroll{gap:.75rem;padding:1rem 1rem 1.2rem;}
+      .cup-card{flex:0 0 calc((100vw - 2.75rem) / 2);max-width:none;border-radius:18px;
+        border:1px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.5);}
     }
 
     /* ── EDGE TO EDGE on mobile: specific sections only, not hero/category/footer ── */
@@ -1875,8 +1880,14 @@
 
   <!-- COMING UP IN A FEW DAYS -->
   <section class="cup-section" data-site-section="home-partners">
+    <div class="hpe-banner cup-banner">
+      <div class="hpe-banner-text">
+        <div class="hpe-eyebrow">Coming up in a few days</div>
+        <div class="hpe-heading">Curated<br><em>for you</em></div>
+        <div class="hpe-sub">✦ Only the best. Every time.</div>
+      </div>
+    </div>
     <div class="trn-inner">
-    <div class="cup-head">COMING UP IN A FEW DAYS</div>
     <div class="cup-scroll" id="cupScroll"></div>
     </div>
   </section>
