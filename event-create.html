@@ -2134,10 +2134,29 @@ async function uploadSelectedImage(file, folder, urlId, clearPending, render) {
     clearPending();
     render(url);
     updateProgress();
-    saveLocalDraft();
+    await persistUploadedImage(urlId, url);
   } catch (error) {
     console.warn('Image upload will retry when the event is saved:', error);
   }
+}
+
+async function persistUploadedImage(urlId, url) {
+  const editId = new URLSearchParams(location.search).get('eventId');
+  if (!editId) {
+    saveLocalDraft();
+    return;
+  }
+  const fieldPath = {
+    coverUrl: 'coverUrl',
+    cardImgUrl: 'cardImgUrl',
+    logoUrl: 'ticketDesign.logoUrl',
+    seatingPlanUrl: 'seatingPlanUrl',
+  }[urlId];
+  if (!fieldPath) return;
+  await db.collection('events').doc(editId).update({
+    [fieldPath]: url,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
 }
 
 // ── AUTH ──
