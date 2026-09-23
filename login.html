@@ -588,10 +588,10 @@
           <form class="auth-form" data-auth-form="login">
             <div id="loginPwdSection">
               <div class="form-field">
-                <span class="form-label">Email Address</span>
+                <span class="form-label">Username or Email</span>
                 <div class="form-input-wrap">
                   <span class="form-icon">👤</span>
-                  <input id="loginPhone" type="email" placeholder="you@example.com" autocomplete="email" />
+                  <input id="loginPhone" type="text" placeholder="Enter username or email" autocomplete="username" />
                 </div>
               </div>
               <div class="form-field">
@@ -770,9 +770,6 @@
       }
 
       function toFirebaseEmail(input) {
-        // Firebase password accounts are identified by their registration
-        // email. Keeping the old username conversion only supports legacy
-        // local accounts; new customers must enter their full email address.
         const value = input.trim().toLowerCase();
         return value.includes("@") ? value : `${value}@cityvibe.local`;
       }
@@ -819,9 +816,9 @@
 
       document.getElementById('forgotPasswordLink').addEventListener('click', async event => {
         event.preventDefault();
-        const email = loginPhone.value.trim();
-        if (!email || !email.includes('@')) {
-          setStatus('Enter your account email first, then select Forgot password.', 'warning');
+        const email = toFirebaseEmail(loginPhone.value.trim());
+        if (!loginPhone.value.trim()) {
+          setStatus('Enter your username or email first, then select Forgot password.', 'warning');
           loginPhone.focus();
           return;
         }
@@ -914,7 +911,7 @@
           redirect(user.uid);
         } catch (err) {
           const msg = ["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found"].includes(err.code)
-            ? "We could not sign you in. Use the email you registered with and your password, or select Forgot password."
+          ? "We could not sign you in. Check your username or email and password, or select Forgot password."
             : err.message;
           setStatus(msg, "warning");
         }
