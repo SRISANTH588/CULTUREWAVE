@@ -183,6 +183,15 @@
     .mob-detail-tabs{display:none;}
     .nightlife-mobile{display:none;}
     .seating-plan-intro{font-size:.84rem;color:#64748b;margin-bottom:.85rem;}
+    .event-info-accordion>summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;list-style:none;}
+    .event-info-accordion>summary::-webkit-details-marker{display:none;}
+    .event-info-accordion>summary span{transition:transform .18s ease;}
+    .event-info-accordion[open]>summary span{transform:rotate(180deg);}
+    .event-info-content{display:grid;gap:1rem;padding-top:.35rem;}
+    .event-info-content section+section{border-top:1px solid rgba(127,135,150,.22);padding-top:.9rem;}
+    .event-info-content h3{margin:0 0 .35rem;font-size:.82rem;font-weight:800;}
+    .event-info-content p{margin:0;font-size:.84rem;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;}
+    .night-faqs{margin-top:2.2rem;}
 
     /* Phone-only event-detail refinements. Desktop keeps its existing layout. */
     @media (max-width:768px){
@@ -430,7 +439,15 @@
   <section class="night-artists" id="nightArtists" hidden><h2>Featured Artists</h2><div class="night-artists-track" id="nightArtistsTrack"></div></section>
   <section class="night-venue" id="nightVenue"><h2>Venue &amp; seating</h2><p id="nightVenueCopy">2.1km • Raasta • Madhapur, Hyderabad</p><div class="night-seating-map" id="nightSeatingPlan" hidden></div><button type="button" onclick="openDirections()" aria-label="Get directions">↗</button></section>
   <button class="night-help" type="button" onclick="showToast('We are here to help!')"><i>◖</i><span>Have querys or need help with<br>something? Hit us up</span><b>›</b></button>
-  <details class="night-terms" id="nightHelp"><summary>Event terms and conditions <span>⌄</span></summary><p>Please arrive on time. Tickets are non-transferable. The organiser may refuse entry in line with venue policy.</p></details>
+  <details class="night-terms event-info-accordion" id="mobileEventInfo" hidden>
+    <summary>Event information <span aria-hidden="true">⌄</span></summary>
+    <div class="event-info-content">
+      <section id="mobileTermsSection" hidden><h3>Terms &amp; Conditions</h3><p id="mobileTermsText"></p></section>
+      <section id="mobileRefundSection" hidden><h3>Refund Policy</h3><p id="mobileRefundText"></p></section>
+      <section id="mobileInstructionsSection" hidden><h3>Special Instructions</h3><p id="mobileInstructionsText"></p></section>
+    </div>
+  </details>
+  <section class="night-faqs" id="mobileFaqsSection" hidden><h2>Frequently Asked Questions</h2><div id="mobileFaqsList"></div></section>
 </main>
 
 <div class="shell">
@@ -496,22 +513,18 @@
       </div>
     </div>
 
-    <!-- FAQS -->
+    <details class="section event-info-accordion desktop-event-info" id="desktopEventInfo" hidden>
+      <summary class="section-title">Event information <span aria-hidden="true">⌄</span></summary>
+      <div class="event-info-content">
+        <section id="desktopTermsSection" hidden><h3>Terms &amp; Conditions</h3><p id="desktopTermsText"></p></section>
+        <section id="desktopRefundSection" hidden><h3>Refund Policy</h3><p id="desktopRefundText"></p></section>
+        <section id="desktopInstructionsSection" hidden><h3>Special Instructions</h3><p id="desktopInstructionsText"></p></section>
+      </div>
+    </details>
+
     <div class="section" id="faqsSection" style="display:none;">
-      <div class="section-title">FAQs</div>
+      <div class="section-title">Frequently Asked Questions</div>
       <div id="faqsList"></div>
-    </div>
-
-    <!-- TERMS & CONDITIONS -->
-    <div class="section" id="termsSection" style="display:none;">
-      <div class="section-title">Terms &amp; Conditions</div>
-      <div class="description" id="termsText" style="font-size:.84rem;"></div>
-    </div>
-
-    <!-- REFUND POLICY -->
-    <div class="section" id="refundSection" style="display:none;">
-      <div class="section-title">Refund Policy</div>
-      <div class="description" id="refundText" style="font-size:.84rem;"></div>
     </div>
 
   </div>
@@ -984,9 +997,27 @@ async function renderEvent(data){
   document.getElementById('hlVenue').textContent = data.venueName||data.city||'TBA';
   document.getElementById('hlPrice').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
   document.getElementById('hlCap').textContent = data.capacity ? Number(data.capacity).toLocaleString('en-IN')+' seats' : 'Open';
-  // terms & conditions
-  if(data.termsText){ document.getElementById('termsText').textContent=data.termsText; document.getElementById('termsSection').style.display='block'; }
-  if(data.refundPolicy){ document.getElementById('refundText').textContent=data.refundPolicy; document.getElementById('refundSection').style.display='block'; }
+  // Keep organiser-provided policies and instructions collapsed until requested.
+  const eventInfoItems = [
+    { value: data.termsText, mobileSection: 'mobileTermsSection', mobileText: 'mobileTermsText', desktopSection: 'desktopTermsSection', desktopText: 'desktopTermsText' },
+    { value: data.refundPolicy, mobileSection: 'mobileRefundSection', mobileText: 'mobileRefundText', desktopSection: 'desktopRefundSection', desktopText: 'desktopRefundText' },
+    { value: data.notes, mobileSection: 'mobileInstructionsSection', mobileText: 'mobileInstructionsText', desktopSection: 'desktopInstructionsSection', desktopText: 'desktopInstructionsText' }
+  ];
+  let hasEventInfo = false;
+  eventInfoItems.forEach(item => {
+    const value = String(item.value || '').trim();
+    if (!value) return;
+    hasEventInfo = true;
+    [
+      [item.mobileSection, item.mobileText],
+      [item.desktopSection, item.desktopText]
+    ].forEach(([sectionId, textId]) => {
+      document.getElementById(textId).textContent = value;
+      document.getElementById(sectionId).hidden = false;
+    });
+  });
+  document.getElementById('mobileEventInfo').hidden = !hasEventInfo;
+  document.getElementById('desktopEventInfo').hidden = !hasEventInfo;
 
   // sidebar
   document.getElementById('sideDate').textContent = fmtDate(eventStart)+(data.startTime?' · '+data.startTime:'');
@@ -1092,14 +1123,20 @@ async function renderEvent(data){
   }
 
   // faqs
-  const faqs = data.faqs||[];
+  const faqs = Array.isArray(data.faqs) ? data.faqs.filter(f => f && (f.question||f.q||f.answer||f.a)) : [];
   if(faqs.length){
-    document.getElementById('faqsList').innerHTML = faqs.map(f=>`
+    const faqMarkup = faqs.map(f=>`
       <details class="faq-item">
         <summary>${esc(f.question||f.q||'')} <span style="color:var(--muted);font-size:1.1rem;">+</span></summary>
         <div class="faq-ans">${esc(f.answer||f.a||'')}</div>
       </details>`).join('');
+    document.getElementById('faqsList').innerHTML = faqMarkup;
+    document.getElementById('mobileFaqsList').innerHTML = faqMarkup;
     document.getElementById('faqsSection').style.display='block';
+    document.getElementById('mobileFaqsSection').hidden = false;
+  } else {
+    document.getElementById('faqsSection').style.display='none';
+    document.getElementById('mobileFaqsSection').hidden = true;
   }
 
   // load organiser
