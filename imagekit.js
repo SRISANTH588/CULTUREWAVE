@@ -54,6 +54,8 @@ async function uploadToCloudinary(file, folder) {
     '/event-logos': 'event-logos',
     '/event-galleries': 'event-galleries',
     '/seating-plans': 'seating-plans',
+    '/profile-covers': 'profile-covers',
+    '/profile-avatars': 'profile-avatars',
   };
   const cloudFolder = folderMap[folder] || 'uploads';
 

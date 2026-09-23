@@ -2208,10 +2208,11 @@ function switchToolTab(btn, toolId) {
   if(panel) panel.style.display='block';
 }
 </script>
+<script src="imagekit.js"></script>
 <script type="module">
 import { app, auth, db, getCurrentUser, logout,
   collection, doc, query, where, orderBy, limit,
-  onSnapshot, getDocs, getDoc, setDoc, updateDoc, serverTimestamp
+  onSnapshot, getDocs, getDoc, setDoc, addDoc, updateDoc, serverTimestamp
 } from "./firebase.js";
 
 window.db = db; window.doc = doc; window.setDoc = setDoc; window.updateDoc = updateDoc;
@@ -2370,7 +2371,7 @@ function renderEvents() {
         <div class="ev-actions" style="flex-wrap:wrap;gap:.3rem;">
           <button class="ev-act-btn ${isPublished?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${isPublished?'Unpublish':'Publish'}</button>
           <a class="ev-act-btn" href="event-detail.html?eventId=${ev.id}" target="_blank">View</a>
-          <a class="ev-act-btn" href="event-manage.html?eventId=${ev.id}">Edit</a>
+          <a class="ev-act-btn" href="event-create.html?eventId=${ev.id}">Edit</a>
           <button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button>
           ${st!=='archived'?`<button class="ev-act-btn" onclick="archiveEvent('${ev.id}')" title="Keep as archived">Keep</button>`:''}
         </div>
@@ -2665,9 +2666,9 @@ window.saveProfile = async function() {
     throw new Error(data.error?.message || 'Upload failed');
   }
   const coverFile = document.getElementById('coverFileInput')?.files[0];
-  if(coverFile){ payload.coverUrl = await uploadToCloudinary(coverFile, 'profile-covers'); console.log('coverUrl:', payload.coverUrl); }
+  if(coverFile){ payload.coverUrl = await uploadImageToImageKit(coverFile, '/profile-covers'); console.log('coverUrl:', payload.coverUrl); }
   const avatarFile = document.getElementById('avatarFileInput')?.files[0];
-  if(avatarFile){ payload.avatarUrl = await uploadToCloudinary(avatarFile, 'profile-avatars'); console.log('avatarUrl:', payload.avatarUrl); }
+  if(avatarFile){ payload.avatarUrl = await uploadImageToImageKit(avatarFile, '/profile-avatars'); console.log('avatarUrl:', payload.avatarUrl); }
   console.log('saving to organisers/', profileUid, payload);
   await setDoc(doc(db,'organisers',profileUid), payload, {merge:true});
   btns.forEach(b=>{ b.textContent='✓ Saved!'; setTimeout(()=>b.textContent=b.textContent.includes('Bank')?'Save Bank Details':'✓ Save',2000); });
@@ -3027,9 +3028,39 @@ window.disconnectInstagram = async function() {
   }
 })();
 
-window.createSurveyForm = function() {
-  showToast('Survey form builder coming soon!');
+window.createSurveyForm = async function() {
+  if(!myUid) return;
+  const title = prompt('Form title', 'Event feedback');
+  if(!title?.trim()) return;
+  const linkToEvent = confirm('Link this form to one of your events?\n\nChoose Cancel for a standalone public form.');
+  let eventId = null, eventName = '';
+  if(linkToEvent) {
+    if(!allEvents.length) { showToast('Create an event first, or make a standalone form.'); return; }
+    const choices = allEvents.map((e,i)=>`${i + 1}. ${e.name || 'Untitled event'}`).join('\n');
+    const selected = Number(prompt(`Choose an event number:\n${choices}`, '1')) - 1;
+    if(!allEvents[selected]) { showToast('Invalid event selection'); return; }
+    eventId = allEvents[selected].id; eventName = allEvents[selected].name || '';
+  }
+  const questions = [{id:'name',label:'Full name',type:'text',required:true},{id:'email',label:'Email address',type:'email',required:true},{id:'feedback',label:'Your feedback',type:'textarea',required:true}];
+  const ref = await addDoc(collection(db,'surveys'), {ownerId:myUid,title:title.trim(),eventId,eventName,questions,active:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+  showToast('Form created — its share link was copied.');
+  await loadSurveys(myUid);
+  navigator.clipboard?.writeText(`${location.origin}/survey.html?formId=${ref.id}`).catch(()=>{});
 };
+
+async function loadSurveys(uid) {
+  const snap = await getDocs(query(collection(db,'surveys'),where('ownerId','==',uid)));
+  const forms = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const responses = await getDocs(query(collection(db,'surveyResponses'),where('ownerId','==',uid)));
+  const byForm = {}; responses.forEach(d=>{const id=d.data().surveyId;byForm[id]=(byForm[id]||0)+1;});
+  const el=id=>document.getElementById(id);
+  if(el('surveyTotal')) el('surveyTotal').textContent=forms.length;
+  if(el('surveyResponses')) el('surveyResponses').textContent=responses.size;
+  if(el('surveyActive')) el('surveyActive').textContent=forms.filter(f=>f.active!==false).length;
+  if(el('surveyRate')) el('surveyRate').textContent=forms.length?'100%':'0%';
+  const list=el('surveyList'); if(!list || !forms.length) return;
+  list.innerHTML=forms.map(f=>{const link=`${location.origin}/survey.html?formId=${f.id}`;return `<div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:.75rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;"><div style="flex:1;min-width:180px;"><strong>${esc(f.title)}</strong><div style="font-size:.76rem;color:var(--muted);margin-top:.25rem;">${f.eventName?`Linked to: ${esc(f.eventName)}`:'Standalone form'} · ${byForm[f.id]||0} responses</div></div><button onclick="navigator.clipboard.writeText('${link}').then(()=>showToast('Share link copied!'))" style="padding:.45rem .7rem;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;font-weight:700;">Copy link</button><a href="${link}" target="_blank" style="padding:.45rem .7rem;border-radius:7px;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;">Open</a></div>`;}).join('');
+}
 
 // expose globals for file:// compatibility
 window.normStatus = normStatus;
@@ -3163,6 +3194,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     );
 
     loadProfile(myUid);
+    loadSurveys(myUid);
     loadFinance(myUid);
     loadAnalytics(myUid);
     loadWhatsAppStats(myUid);

@@ -2138,8 +2138,11 @@ loadUser();
     }
     const g = id => document.getElementById(id);
     const set = (id, val) => { const el = g(id); if (el && val !== undefined && val !== null) el.value = val; };
+    const setToggle = (id, val) => { const el = g(id); if (!el) return; if (val) el.classList.add('on'); else el.classList.remove('on'); };
     // basic info
     set('eventName', d.name || '');
+    set('urlKey', d.urlKey || '');
+    set('summary', d.summary || '');
     set('description', d.description || '');
     if (g('category')) g('category').value = d.category || '';
     set('tags', Array.isArray(d.tags) ? d.tags.join(', ') : (d.tags || ''));
@@ -2165,10 +2168,13 @@ loadUser();
       tickets = d.tickets;
       renderTickets();
     }
+    if (Array.isArray(d.coupons)) { coupons = d.coupons; renderCoupons(); }
+    if (Array.isArray(d.faqs)) { faqs = d.faqs; renderFaqs(); }
     if (d.ticketMode) { ticketMode = d.ticketMode; setTicketMode(d.ticketMode); }
     if (d.ticketDeliveryMode) { ticketDeliveryMode = d.ticketDeliveryMode; setTicketDelivery(d.ticketDeliveryMode); }
     if (d.perDateTickets) perDateTickets = d.perDateTickets;
     if (Array.isArray(d.artists)) { artists = d.artists; renderArtists(); }
+    if (Array.isArray(d.galleryImages)) { galleryImages = d.galleryImages; renderGallery(); }
     // images
     if (d.coverUrl) {
       set('coverUrl', d.coverUrl);
@@ -2193,9 +2199,14 @@ loadUser();
     }
     // ticket design
     if (d.ticketDesign) {
+      ticketDesign = { g1: d.ticketDesign.gradientStart || '#1454ff', g2: d.ticketDesign.gradientEnd || '#4c7dff' };
+      set('tdColor1', ticketDesign.g1); set('tdColor2', ticketDesign.g2);
+      applyThemeToPreview(ticketDesign.g1, ticketDesign.g2);
       if (g('tdOrgName')) set('tdOrgName', d.ticketDesign.organiserName || '');
       if (g('tdTagline')) set('tdTagline', d.ticketDesign.tagline || '');
       if (g('tdFooter')) set('tdFooter', d.ticketDesign.footer || '');
+      const ticketToggleKeys = {tdShowQR:'showQR',tdShowSeat:'showSeat',tdShowVenue:'showVenue',tdShowLogo:'showLogo'};
+      Object.entries(ticketToggleKeys).forEach(([id, key]) => { if (key in d.ticketDesign) setToggle(id, d.ticketDesign[key]); });
       if (g('logoUrl') && d.ticketDesign.logoUrl) {
         set('logoUrl', d.ticketDesign.logoUrl);
         showLogoPreview(d.ticketDesign.logoUrl);
@@ -2208,7 +2219,6 @@ loadUser();
     if (g('refundDeadlineDays')) set('refundDeadlineDays', d.refundDeadlineDays || '');
     if (g('refundPercent')) set('refundPercent', d.refundPercent !== undefined ? d.refundPercent : 100);
     // toggles
-    const setToggle = (id, val) => { const el = g(id); if (!el) return; if (val) el.classList.add('on'); else el.classList.remove('on'); };
     setToggle('toggleInvite', d.inviteOnly);
     setToggle('toggleSoldOut', d.soldOut);
     setToggle('toggleWaitlist', d.allowWaitlist);
@@ -2217,6 +2227,17 @@ loadUser();
     setToggle('toggleRefunds', d.enableRefunds);
     setToggle('togglePublicListing', d.publicListing);
     setToggle('toggleSharing', d.allowSharing);
+    Object.entries(d.rsvpFields || {}).forEach(([field, enabled]) => {
+      const el = document.querySelector(`.toggle[data-field="${field}"]`);
+      if (el) el.classList.toggle('on', Boolean(enabled));
+    });
+    if (Array.isArray(d.customQuestions)) { rsvpCQs = d.customQuestions; renderRsvpCQs(); }
+    setToggle('rsvpToggleTC', d.requireTC);
+    setToggle('rsvpToggleConfEmail', d.sendConfirmEmail);
+    setToggle('rsvpToggleConfWA', d.sendConfirmWA);
+    set('rsvpConfirmMsg', d.confirmMsg || '');
+    set('guestEmails', Array.isArray(d.guestEmails) ? d.guestEmails.join('\n') : '');
+    set('overflowAction', d.overflowAction || '');
     if (g('inviteCode')) set('inviteCode', d.inviteCode || '');
     if (g('soldOutMsg')) set('soldOutMsg', d.soldOutMsg || '');
     if (g('videoUrl')) set('videoUrl', d.videoUrl || '');
@@ -2875,6 +2896,9 @@ async function saveEvent(status) {
   document.querySelectorAll('.toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
   });
+  // Local gallery previews are data URLs and can make a Firestore event document
+  // exceed its 1 MiB limit. Persist only uploaded/pasted image URLs.
+  const savedGalleryImages = galleryImages.filter(src => !String(src || '').startsWith('data:'));
 
   const payload = {
     ownerId: uid, organiserId: uid, name, urlKey, summary, description,
@@ -2908,8 +2932,13 @@ async function saveEvent(status) {
     seatingPlan: seatingPlanMode === 'builder' && ((seatingPlanLayout.rows || []).length || (seatingPlanLayout.sections || []).length) ? seatingPlanLayout : null,
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
+    customQuestions: rsvpCQs,
+    confirmMsg: document.getElementById('rsvpConfirmMsg').value.trim(),
+    requireTC: document.getElementById('rsvpToggleTC').classList.contains('on'),
+    sendConfirmEmail: document.getElementById('rsvpToggleConfEmail').classList.contains('on'),
+    sendConfirmWA: document.getElementById('rsvpToggleConfWA').classList.contains('on'),
     customQuestion: (document.getElementById('customQ') ? document.getElementById('customQ').value.trim() : ''),
-    tickets, coupons, faqs, artists, eventDates,
+    tickets, coupons, faqs, artists, galleryImages: savedGalleryImages, eventDates,
     ticketMode,
     perDateTickets,
     ticketDeliveryMode,
@@ -2969,11 +2998,12 @@ async function saveEvent(status) {
       window.location.href = dashboardBySource[fromParam] || 'dashboard-brunch.html';
     }
   } catch (err) {
-    alert('Error saving event: ' + err.message);
-    document.getElementById('publishBtn').textContent = 'Publish Event';
-    document.getElementById('publishBtn').disabled = false;
-    document.getElementById('saveDraftBtn').textContent = 'Save Draft';
-    document.getElementById('saveDraftBtn').disabled = false;
+    console.error('Event save failed:', err);
+    alert('Could not save the event. ' + (err.message || 'Please check your connection and try again.'));
+    const publishButton = document.getElementById('publishBtn');
+    const draftButton = document.getElementById('saveDraftBtn');
+    if (publishButton) { publishButton.textContent = editId ? 'Save Changes' : 'Publish Event'; publishButton.disabled = false; }
+    if (draftButton) { draftButton.textContent = 'Save Draft'; draftButton.disabled = false; }
   }
 }
 
