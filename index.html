@@ -749,8 +749,8 @@
     @media(max-width:699px){
       .hpe-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
       .hpe-scroll{display:flex;gap:.75rem;padding:.9rem 0 .8rem;width:max-content;transform:none!important;transition:none!important;}
-      .hpe-card{flex:0 0 calc(100vw - 2rem);max-width:none;border-radius:14px;margin-left:1rem;}
-      .hpe-card:last-child{margin-right:1rem;}
+      .hpe-card{flex:0 0 100vw;max-width:none;border-radius:14px;margin-left:0;}
+      .hpe-card:last-child{margin-right:0;}
       .hpe-scroll-wrap::before,.hpe-scroll-wrap::after{display:none;}
     }
     @media(min-width:700px){
@@ -1415,6 +1415,23 @@
     .cup-price.paid{color:#fff;}
     @media(min-width:700px){
       .cup-card{flex:0 0 180px;max-width:200px;}
+    }
+
+    /* ── EDGE TO EDGE: remove all side padding from every section except hero/footer ── */
+    .idx-cat-section,.hpe-section,.tv-section,.ss-section,.ft-section,
+    .cup-section,.trn-section,.ogp-section,.cp-section,.trending-section,
+    #events,#restaurants{
+      padding-left:0!important;padding-right:0!important;
+    }
+    .idx-cat-inner,.trn-inner,.hpe-banner-text,.ss-banner-text,
+    .ft-banner-content,.tv-head,.tv-scroll-wrap,.ss-scroll-wrap,
+    .ft-scroll-wrap,.ft-scroll-wrap .ft-scroll,.hpe-scroll-wrap,
+    .hpe-view-all-wrap,.ss-view-all-wrap,.ft-view-all-wrap,
+    .ogp-head,.ogp-scroll-wrap,.ogp-counter,
+    .cp-banner-inner,.cp-cards-strip,
+    .witp-head,.witp-grid,
+    .trending-head,.trending-ticker-wrap{
+      padding-left:0!important;padding-right:0!important;
     }
 
     /* ── TRENDING RIGHT NOW ── */
