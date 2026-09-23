@@ -704,8 +704,19 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setEnableRefunds" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
-        <div><div style="font-size:.86rem;font-weight:700;">Invite Only</div><div style="font-size:.76rem;color:var(--muted);">Require invite code to register</div></div>
+        <div><div style="font-size:.86rem;font-weight:700;">Invite Only</div><div style="font-size:.76rem;color:var(--muted);">Require approved guest email, invite code, or private link to register</div></div>
         <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setInviteOnly" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div id="inviteLinkPanel" style="display:none;padding:.9rem;border:1px solid var(--border);border-radius:10px;">
+        <div style="font-size:.86rem;font-weight:700;">Private invite link</div><p style="font-size:.76rem;color:var(--muted);margin:.25rem 0 .65rem;">Share this link with invited guests. They can use it without entering the code.</p>
+        <input id="inviteLinkValue" readonly style="width:100%;box-sizing:border-box;padding:.65rem;border:1px solid var(--border);border-radius:8px;margin-bottom:.55rem;" />
+        <button type="button" onclick="copyInviteLink()" class="save-btn">Copy invite link</button>
+      </div>
+      <div id="inviteEmailPanel" style="display:none;padding:.9rem;border:1px solid var(--border);border-radius:10px;">
+        <div style="font-size:.86rem;font-weight:700;">Guest invitations</div>
+        <p id="inviteEmailSummary" style="font-size:.76rem;color:var(--muted);margin:.25rem 0 .65rem;"></p>
+        <button type="button" onclick="sendGuestInvitations()" class="save-btn">Send invite emails</button>
+        <div id="inviteEmailStatus" role="status" style="font-size:.78rem;color:var(--muted);margin-top:.55rem;"></div>
       </div>
       <button onclick="saveSettings()" class="save-btn">Save Settings</button>
     </div>
@@ -863,6 +874,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 </div>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -876,6 +888,10 @@ firebase.initializeApp({
   appId: "1:5471814825:web:07e84f2f88486da817d5b8"
 });
 const db = firebase.firestore();
+const INVITE_EMAIL_TEMPLATE='template_667qxrq';
+const INVITE_EMAIL_SERVICE='service_esppdwf';
+const INVITE_EMAIL_PUBLIC_KEY='PDb2vpOIeLkbZBBFP';
+emailjs.init({publicKey:INVITE_EMAIL_PUBLIC_KEY});
 const auth = firebase.auth();
 function serverTimestamp(){ return firebase.firestore.FieldValue.serverTimestamp(); }
 </script>
@@ -929,6 +945,8 @@ async function loadEvent(){
     document.body.innerHTML='<div style="padding:3rem;text-align:center;font-family:Inter,sans-serif;">You do not have access to manage this event. <a href="premium-client-dashboard.html">Go back</a></div>';
     return;
   }
+  const inviteAccessSnap=await db.collection('eventAccess').doc(eventId).get();
+  if(inviteAccessSnap.exists)Object.assign(eventData,inviteAccessSnap.data());
   const account=await db.collection('users').doc(auth.currentUser.uid).get();
   const accountData=account.exists ? account.data() : {};
   const plan=String(accountData.plan||accountData.subscriptionPlan||'').toLowerCase();
@@ -1567,7 +1585,57 @@ function prefillSettings(){
   setChk('setShowCount',d.showAttendeeCount!==false);
   setChk('setEnableRefunds',d.enableRefunds!==false);
   setChk('setInviteOnly',d.inviteOnly);
+  const inviteLinkPanel=document.getElementById('inviteLinkPanel');
+  const inviteLinkValue=document.getElementById('inviteLinkValue');
+  if(inviteLinkPanel&&inviteLinkValue&&d.inviteOnly&&d.inviteLinkEnabled&&d.inviteToken){
+    inviteLinkValue.value=`${location.origin}${location.pathname.replace(/event-manage\.html.*/, '')}booking.html?eventId=${encodeURIComponent(eventId)}&inviteToken=${encodeURIComponent(d.inviteToken)}`;
+    inviteLinkPanel.style.display='block';
+  }else if(inviteLinkPanel){inviteLinkPanel.style.display='none';}
+  const inviteEmailPanel=document.getElementById('inviteEmailPanel');
+  const inviteEmailSummary=document.getElementById('inviteEmailSummary');
+  const inviteEmailStatus=document.getElementById('inviteEmailStatus');
+  const invitedEmails=Array.isArray(d.guestEmails)?d.guestEmails:[];
+  if(inviteEmailPanel&&d.inviteOnly&&invitedEmails.length){
+    inviteEmailPanel.style.display='block';
+    inviteEmailSummary.textContent=`${invitedEmails.length} invited email${invitedEmails.length===1?'':'s'}. Emails already sent will be skipped.`;
+    const sent=Array.isArray(d.sentInviteEmails)?d.sentInviteEmails:[];
+    inviteEmailStatus.textContent=sent.length?`${sent.length} invitation${sent.length===1?'':'s'} already sent.`:'No invitation emails sent yet.';
+  }else if(inviteEmailPanel){inviteEmailPanel.style.display='none';}
 }
+window.copyInviteLink=async function(){
+  const value=document.getElementById('inviteLinkValue')?.value;
+  if(!value){showToast('Enable invite link in the event editor first.');return;}
+  try{await navigator.clipboard.writeText(value);showToast('Invite link copied!');}
+  catch(_){const field=document.getElementById('inviteLinkValue');field.select();document.execCommand('copy');showToast('Invite link copied!');}
+};
+window.sendGuestInvitations=async function(){
+  const accessRef=db.collection('eventAccess').doc(eventId);
+  const status=document.getElementById('inviteEmailStatus');
+  const button=document.querySelector('#inviteEmailPanel button');
+  const inviteAccess=eventData;
+  const guests=Array.isArray(inviteAccess.guestEmails)?inviteAccess.guestEmails:[];
+  if(!guests.length){status.textContent='Add guest emails in the event editor first.';return;}
+  if(button){button.disabled=true;button.textContent='Sending…';}
+  let sent=0,failed=0;
+  const alreadySent=new Set(Array.isArray(inviteAccess.sentInviteEmails)?inviteAccess.sentInviteEmails:[]);
+  const bookingUrl=inviteAccess.inviteLinkEnabled&&inviteAccess.inviteToken
+    ?`${location.origin}${location.pathname.replace(/event-manage\.html.*/, '')}booking.html?eventId=${encodeURIComponent(eventId)}&inviteToken=${encodeURIComponent(inviteAccess.inviteToken)}`
+    :`${location.origin}${location.pathname.replace(/event-manage\.html.*/, '')}event-detail.html?eventId=${encodeURIComponent(eventId)}`;
+  for(const email of guests){
+    if(alreadySent.has(email))continue;
+    try{
+      await emailjs.send(INVITE_EMAIL_SERVICE,INVITE_EMAIL_TEMPLATE,{
+        to_email:email,to_name:email.split('@')[0],event_name:eventData.name||'CultureWave event',
+        booking_url:bookingUrl,invite_code:inviteAccess.inviteCode||''
+      });
+      await accessRef.update({sentInviteEmails:firebase.firestore.FieldValue.arrayUnion(email)});
+      alreadySent.add(email);sent++;
+    }catch(error){console.error('Invite email failed:',email,error);failed++;}
+  }
+  eventData.sentInviteEmails=[...alreadySent];
+  status.textContent=failed?`${sent} sent; ${failed} failed. You can retry failed addresses.`:`${sent?`${sent} sent`:'All invitations were already sent.'}`;
+  if(button){button.disabled=false;button.textContent='Send invite emails';}
+};
 
 window.saveSettings=async function(){
   if(!eventId) return;

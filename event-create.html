@@ -1622,11 +1622,11 @@
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
           <div class="toggle-row">
             <div><strong>🔒 Enable Invite Only</strong><span>Only guests with an invite link or code can register</span></div>
-            <button class="toggle" id="toggleInvite" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleInvite" onclick="this.classList.toggle('on');if(!this.classList.contains('on'))document.getElementById('toggleInviteLink').classList.remove('on')"></button>
           </div>
           <div class="toggle-row">
             <div><strong>🔗 Generate Invite Link</strong><span>Share a private link with selected guests</span></div>
-            <button class="toggle" id="toggleInviteLink" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleInviteLink" onclick="this.classList.toggle('on');if(this.classList.contains('on'))document.getElementById('toggleInvite').classList.add('on')"></button>
           </div>
         </div>
       </div>
@@ -1635,7 +1635,7 @@
         <div class="field">
           <label for="guestEmails">Guest Emails</label>
           <textarea id="guestEmails" style="min-height:100px;" placeholder="one@email.com&#10;two@email.com&#10;three@email.com"></textarea>
-          <span class="field-hint">One email per line. Guests will receive an invite email.</span>
+          <span class="field-hint">One email per line. Only these addresses can register unless they also have the invite code or private link.</span>
         </div>
       </div>
       <div class="card">
@@ -1878,6 +1878,15 @@ const auth = firebase.auth();
 function serverTimestamp() { return firebase.firestore.FieldValue.serverTimestamp(); }
 function collection(db, name) { return db.collection(name); }
 async function addDoc(ref, data) { return await ref.add(data); }
+async function saveEventInviteAccess(eventId, ownerId, config) {
+  const accessRef=db.collection('eventAccess').doc(eventId);
+  const oldSnap=await accessRef.get();
+  const oldToken=oldSnap.exists?oldSnap.data().inviteToken:'';
+  if(oldToken && oldToken!==config.inviteToken) await db.collection('eventAccessLinks').doc(oldToken).delete().catch(()=>{});
+  if(!config.inviteOnly){if(oldSnap.exists) await accessRef.delete();return;}
+  await accessRef.set({ownerId,inviteOnly:config.inviteOnly,inviteLinkEnabled:config.inviteLinkEnabled,inviteCode:config.inviteCode,guestEmails:config.guestEmails,inviteToken:config.inviteLinkEnabled?config.inviteToken:'',sentInviteEmails:oldSnap.exists?(oldSnap.data().sentInviteEmails||[]):[],updatedAt:serverTimestamp()});
+  if(config.inviteLinkEnabled&&config.inviteToken) await db.collection('eventAccessLinks').doc(config.inviteToken).set({eventId,ownerId,createdAt:serverTimestamp()});
+}
 
 async function getCurrentUser() {
   return new Promise(resolve => {
@@ -2136,6 +2145,8 @@ loadUser();
       history.replaceState(null, '', 'event-create.html');
       return;
     }
+    const accessSnap=await db.collection('eventAccess').doc(eventId).get();
+    if(accessSnap.exists) Object.assign(d,accessSnap.data());
     const g = id => document.getElementById(id);
     const set = (id, val) => { const el = g(id); if (el && val !== undefined && val !== null) el.value = val; };
     const setToggle = (id, val) => { const el = g(id); if (!el) return; if (val) el.classList.add('on'); else el.classList.remove('on'); };
@@ -2220,6 +2231,8 @@ loadUser();
     if (g('refundPercent')) set('refundPercent', d.refundPercent !== undefined ? d.refundPercent : 100);
     // toggles
     setToggle('toggleInvite', d.inviteOnly);
+    setToggle('toggleInviteLink', d.inviteLinkEnabled);
+    window.inviteTokenDraft = d.inviteToken || '';
     setToggle('toggleSoldOut', d.soldOut);
     setToggle('toggleWaitlist', d.allowWaitlist);
     setToggle('toggleNotifyWaitlist', d.notifyWaitlist);
@@ -2831,6 +2844,13 @@ window.removeFaq = i => { faqs.splice(i, 1); renderFaqs(); };
 
 // ── SAVE / PUBLISH ──
 async function saveEvent(status) {
+  const inviteAccessConfig={
+    inviteOnly:document.getElementById('toggleInvite').classList.contains('on'),
+    inviteLinkEnabled:document.getElementById('toggleInviteLink').classList.contains('on'),
+    inviteCode:document.getElementById('inviteCode').value.trim(),
+    guestEmails:[...new Set(document.getElementById('guestEmails').value.split('\n').map(e=>e.trim().toLowerCase()).filter(Boolean))],
+    inviteToken:document.getElementById('toggleInviteLink').classList.contains('on')?(window.inviteTokenDraft||(window.inviteTokenDraft=crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`)):''
+  };
   const name = document.getElementById('eventName').value.trim();
   const urlKey = document.getElementById('urlKey').value.trim() || slugify(name);
   const summary = document.getElementById('summary').value.trim();
@@ -2959,9 +2979,8 @@ async function saveEvent(status) {
     refundPolicy: document.getElementById('refundPolicy').value.trim(),
     refundDeadlineDays: Number(document.getElementById('refundDeadlineDays').value || 0),
     refundPercent: Number(document.getElementById('refundPercent').value || 100),
-    inviteOnly: document.getElementById('toggleInvite').classList.contains('on'),
-    inviteCode: document.getElementById('inviteCode').value.trim(),
-    guestEmails: document.getElementById('guestEmails').value.split('\n').map(e => e.trim()).filter(Boolean),
+    inviteOnly: inviteAccessConfig.inviteOnly,
+    inviteLinkEnabled: inviteAccessConfig.inviteLinkEnabled,
     soldOut: document.getElementById('toggleSoldOut').classList.contains('on'),
     soldOutMsg: document.getElementById('soldOutMsg').value.trim(),
     allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on') || ['waitlist','notify'].includes(document.getElementById('overflowAction').value),
@@ -2976,17 +2995,23 @@ async function saveEvent(status) {
     updatedAt: serverTimestamp(),
   };
 
+  if(inviteAccessConfig.inviteOnly && !inviteAccessConfig.inviteLinkEnabled && !inviteAccessConfig.inviteCode && !inviteAccessConfig.guestEmails.length){
+    alert('Add invited guest emails, an invite code, or enable the private invite link.'); return;
+  }
+
   try {
     const btn = saveButton;
     btn.textContent = 'Saving...';
     btn.disabled = true;
     if (editId) {
       const {createdAt, ...updatePayload} = payload;
-      await db.collection('events').doc(editId).update({...updatePayload, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
+      await db.collection('events').doc(editId).update({...updatePayload, inviteCode:firebase.firestore.FieldValue.delete(), guestEmails:firebase.firestore.FieldValue.delete(), inviteToken:firebase.firestore.FieldValue.delete(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
+      await saveEventInviteAccess(editId,uid,inviteAccessConfig);
       localStorage.removeItem(getLocalDraftKey());
       window.location.href = 'event-manage.html?eventId=' + editId;
     } else {
-      await addDoc(collection(db, 'events'), payload);
+      const created=await addDoc(collection(db, 'events'), payload);
+      await saveEventInviteAccess(created.id,uid,inviteAccessConfig);
       localStorage.removeItem(getLocalDraftKey());
       const fromParam = new URLSearchParams(location.search).get('from');
       const dashboardBySource = {

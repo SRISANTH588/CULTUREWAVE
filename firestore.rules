@@ -29,6 +29,37 @@ service cloud.firestore {
             eventData.get('totalBooked', 0) >= eventData.get('capacity', 0)));
     }
 
+    function inviteAllowsBooking(eventId) {
+      let eventData = get(/databases/$(database)/documents/events/$(eventId)).data;
+      return eventData.get('inviteOnly', false) != true ||
+        (request.auth != null && exists(/databases/$(database)/documents/eventInviteClaims/$(eventId + '_' + request.auth.uid)));
+    }
+
+    function inviteAllowsWaitlist(eventId) {
+      return inviteAllowsBooking(eventId);
+    }
+
+    function validInviteClaim(eventId) {
+      let eventData = get(/databases/$(database)/documents/events/$(eventId)).data;
+      let access = get(/databases/$(database)/documents/eventAccess/$(eventId)).data;
+      let method = request.resource.data.get('method', '');
+      return eventData.get('inviteOnly', false) == true &&
+        request.resource.data.get('eventId', '') == eventId &&
+        request.resource.data.get('userId', '') == request.auth.uid &&
+        ((method == 'email' && request.auth.token.email in access.get('guestEmails', [])) ||
+         (method == 'code' && access.get('inviteCode', '') != '' &&
+          request.resource.data.get('inviteCode', '') == access.get('inviteCode', '')) ||
+         (method == 'link' && access.get('inviteLinkEnabled', false) == true &&
+          access.get('inviteToken', '') != '' &&
+          request.resource.data.get('inviteToken', '') == access.get('inviteToken', '') &&
+          get(/databases/$(database)/documents/eventAccessLinks/$(request.resource.data.get('inviteToken', ''))).data.eventId == eventId));
+    }
+
+    function ownsEvent(eventId) {
+      return request.auth != null &&
+        (get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid || isAdmin());
+    }
+
     // Anyone can write/read their own OTP (needed for signup before auth exists)
     match /emailOtps/{email} {
       allow read, write: if true;
@@ -51,6 +82,25 @@ service cloud.firestore {
         (resource.data.ownerId == request.auth.uid || isAdmin());
     }
 
+    match /eventAccess/{eventId} {
+      allow read, write: if ownsEvent(eventId);
+    }
+
+    match /eventAccessLinks/{token} {
+      allow read: if request.auth != null && resource.data.ownerId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid &&
+        ownsEvent(request.resource.data.eventId);
+      allow update: if request.auth != null && resource.data.ownerId == request.auth.uid &&
+        ownsEvent(resource.data.eventId);
+      allow delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /eventInviteClaims/{claimId} {
+      allow create: if request.auth != null && validInviteClaim(request.resource.data.eventId);
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || ownsEvent(resource.data.eventId));
+      allow update, delete: if request.auth != null && ownsEvent(resource.data.eventId);
+    }
+
     match /bookings/{id} {
       allow read: if request.auth != null && (
         resource.data.userId == request.auth.uid ||
@@ -59,7 +109,8 @@ service cloud.firestore {
         || (resource.data.eventId != null &&
           get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.ownerId == request.auth.uid)
       );
-      allow create: if true;
+      allow create: if request.resource.data.eventId is string &&
+        inviteAllowsBooking(request.resource.data.eventId);
       allow update: if true;
       allow delete: if request.auth != null;
     }
@@ -71,6 +122,7 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid &&
         request.resource.data.eventId is string &&
         waitlistEventAllows(request.resource.data.eventId) &&
+        inviteAllowsWaitlist(request.resource.data.eventId) &&
         request.resource.data.ownerId == get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.ownerId &&
         request.resource.data.status == 'waiting';
       allow read: if request.auth != null && (
@@ -89,7 +141,8 @@ service cloud.firestore {
         || (resource.data.eventId != null &&
           get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.ownerId == request.auth.uid)
       );
-      allow create: if true;  // allow guest bookings (free + paid) to save
+      allow create: if request.resource.data.eventId is string &&
+        inviteAllowsBooking(request.resource.data.eventId);  // guest bookings must pass invite checks when enabled
       allow update, delete: if request.auth != null;
     }
 

@@ -197,6 +197,13 @@
 </div>
 
 <div class="bk-wrap">
+  <section id="inviteAccessGate" style="display:none;max-width:520px;margin:2rem auto;padding:1.25rem;border:1px solid #dbe2ea;border-radius:18px;background:#fff;box-shadow:0 12px 36px rgba(15,23,42,.08);">
+    <h2 style="margin:0 0 .4rem;">Private event</h2><p style="margin:0 0 1rem;color:#64748b;">Enter your invite code, or open the private invite link. Invited email addresses can continue automatically.</p>
+    <label for="inviteCodeEntry" style="display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem;">Invite code</label>
+    <input id="inviteCodeEntry" autocomplete="off" style="width:100%;padding:.8rem;border:1px solid #cbd5e1;border-radius:10px;box-sizing:border-box;" placeholder="Enter invite code" />
+    <button type="button" onclick="redeemInviteCode()" style="width:100%;margin-top:.75rem;padding:.8rem;border:0;border-radius:10px;background:#1242c5;color:#fff;font-weight:800;">Continue</button>
+    <div id="inviteAccessStatus" role="status" style="margin-top:.6rem;color:#b91c1c;font-size:.82rem;"></div>
+  </section>
   <div class="bk-grid">
     <div>
 
@@ -384,6 +391,35 @@ let generatedOtp = "";
 let selectedSeats = [];
 let bookedSeats = [];
 let pickerQuantities = [];
+const inviteTokenParam = urlP.get('inviteToken') || '';
+function inviteSessionKey(){ return `inviteAccess:${eventId}`; }
+async function inviteAccessAllowed(){
+  if(evData.inviteOnly !== true) return true;
+  const uid=bookingAuth.currentUser?.uid;
+  if(!uid)return false;
+  const claimRef=db.collection('eventInviteClaims').doc(`${eventId}_${uid}`);
+  try{if((await claimRef.get()).exists)return true;}catch(_){return false;}
+  const makeClaim=async(method,extra={})=>{try{await claimRef.set({eventId,userId:uid,method,...extra,createdAt:firebase.firestore.FieldValue.serverTimestamp()});return true;}catch(_){return false;}};
+  if(bookingAuth.currentUser.email&&await makeClaim('email'))return true;
+  if(inviteTokenParam&&await makeClaim('link',{inviteToken:inviteTokenParam}))return true;
+  return false;
+}
+function showInviteGate(){
+  document.getElementById('inviteAccessGate').style.display='block';
+  document.querySelector('.bk-grid').style.display='none';
+}
+window.redeemInviteCode=async function(){
+  const entered=document.getElementById('inviteCodeEntry').value.trim();
+  const status=document.getElementById('inviteAccessStatus');
+  if(!entered){status.textContent='Enter your invite code.';return;}
+  const uid=bookingAuth.currentUser?.uid;
+  if(!uid){status.textContent='Sign in before using your invite code.';return;}
+  const claimRef=db.collection('eventInviteClaims').doc(`${eventId}_${uid}`);
+  try{
+    if(!(await claimRef.get()).exists)await claimRef.set({eventId,userId:uid,method:'code',inviteCode:entered,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    location.reload();
+  }catch(_){status.textContent='That invite code is not valid.';}
+};
 
 function fmt(n){ return n===0?"Free":"₹"+Number(n).toLocaleString("en-IN"); }
 function showToast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2500); }
@@ -855,7 +891,7 @@ async function saveBooking(data){
       eventName: data.eventName, ticketName: data.ticketName,
       amount: data.amount, seats: data.seats, seatIds: seatIds,
       status: data.status, paymentId: data.paymentId||null,
-      customerName: data.name, customerEmail: data.email,
+      customerName: data.name, customerEmail: String(data.email||'').trim().toLowerCase(),
       customerPhone: data.phone, userId: userId,
       organiserId: organiserId,
       ownerId: organiserId,
@@ -1223,6 +1259,7 @@ async function init(){
       const snap = await db.collection("events").doc(eventId).get();
       if(snap.exists){
         evData = {id:snap.id,...snap.data()};
+        if(!(await inviteAccessAllowed())) { showInviteGate(); return; }
         tickets = Array.isArray(evData.tickets) ? evData.tickets : [];
         pickerQuantities = tickets.map(()=>0);
         document.getElementById("evNameDisplay").textContent = evData.name||passedName;
