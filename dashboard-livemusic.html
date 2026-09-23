@@ -1000,7 +1000,35 @@ async function loadProfile(uid){
   const kycSnap=await getDoc(doc(db,'kyc',uid));
   if(kycSnap.exists()){const k=kycSnap.data();const g=id=>document.getElementById(id);if(g('piFullName'))g('piFullName').value=k.fullName||'';if(g('piDob'))g('piDob').value=k.dob||'';if(g('piPhone'))g('piPhone').value=k.phone||'';if(g('piEmail'))g('piEmail').value=k.email||'';if(g('piAddress'))g('piAddress').value=k.address||'';if(g('piCity'))g('piCity').value=k.city||'';if(g('piState'))g('piState').value=k.state||'';if(g('piPin'))g('piPin').value=k.pin||'';if(g('piPan'))g('piPan').value=k.pan||'';if(g('piPanName'))g('piPanName').value=k.panName||'';if(g('piPanDob'))g('piPanDob').value=k.panDob||'';if(g('piPanImg'))g('piPanImg').value=k.panImg||'';if(g('piGst'))g('piGst').value=k.gst||'';if(g('piGstBiz'))g('piGstBiz').value=k.gstBiz||'';if(g('bpBankName'))g('bpBankName').value=k.bankName||'';if(g('bpBankAccNo'))g('bpBankAccNo').value=k.bankAccNo||'';if(g('bpBankAccNo2'))g('bpBankAccNo2').value=k.bankAccNo||'';if(g('bpBankIfsc'))g('bpBankIfsc').value=k.bankIfsc||'';if(g('bpBankBankName'))g('bpBankBankName').value=k.bankBankName||'';if(g('bpBankType'))g('bpBankType').value=k.bankType||'savings';}
 }
-window.saveProfile=async function(){if(!myUid)return;await setDoc(doc(db,'organisers',myUid),{name:document.getElementById('pfName').value.trim(),handle:document.getElementById('pfHandle').value.trim(),bio:(document.getElementById('pfBio')||{}).value?.trim()||'',website:(document.getElementById('pfWebsite')||{}).value?.trim()||'',instagram:(document.getElementById('pfInstagram')||{}).value?.trim().replace(/^@/,'')||'',twitter:(document.getElementById('pfTwitter')||{}).value?.trim().replace(/^@/,'')||'',facebook:(document.getElementById('pfFacebook')||{}).value?.trim()||'',youtube:(document.getElementById('pfYoutube')||{}).value?.trim()||'',linkedin:(document.getElementById('pfLinkedin')||{}).value?.trim()||'',whatsapp:(document.getElementById('pfWhatsapp')||{}).value?.trim()||'',gaId:(document.getElementById('pfGaId')||{}).value?.trim()||'',metaPixel:(document.getElementById('pfMetaPixel')||{}).value?.trim()||'',gtmId:(document.getElementById('pfGtmId')||{}).value?.trim()||'',updatedAt:serverTimestamp()},{merge:true});showToast('✓ Profile saved!');};
+window.saveProfile=async function(){
+  if(!myUid)return;
+  const button=document.querySelector('#bp-basic .brand-save-btn');
+  if(button){button.disabled=true;button.textContent='Saving...';}
+  try{
+    await setDoc(doc(db,'organisers',myUid),{
+      name:document.getElementById('pfName').value.trim(),
+      handle:document.getElementById('pfHandle').value.trim().replace(/^@/,''),
+      bio:(document.getElementById('pfBio')||{}).value?.trim()||'',
+      website:(document.getElementById('pfWebsite')||{}).value?.trim()||'',
+      instagram:(document.getElementById('pfInstagram')||{}).value?.trim().replace(/^@/,'')||'',
+      twitter:(document.getElementById('pfTwitter')||{}).value?.trim().replace(/^@/,'')||'',
+      facebook:(document.getElementById('pfFacebook')||{}).value?.trim()||'',
+      youtube:(document.getElementById('pfYoutube')||{}).value?.trim()||'',
+      linkedin:(document.getElementById('pfLinkedin')||{}).value?.trim()||'',
+      whatsapp:(document.getElementById('pfWhatsapp')||{}).value?.trim()||'',
+      gaId:(document.getElementById('pfGaId')||{}).value?.trim()||'',
+      metaPixel:(document.getElementById('pfMetaPixel')||{}).value?.trim()||'',
+      gtmId:(document.getElementById('pfGtmId')||{}).value?.trim()||'',
+      updatedAt:serverTimestamp()
+    },{merge:true});
+    showToast('✓ Profile saved!');
+  }catch(error){
+    console.error('Could not save organiser profile:',error);
+    showToast('Profile save failed: '+(error.message||'Please try again.'));
+  }finally{
+    if(button){button.disabled=false;button.textContent='✓ Save Basic Info';}
+  }
+};
 window.savePersonalInfo=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{fullName:document.getElementById('piFullName').value.trim(),dob:document.getElementById('piDob').value,phone:document.getElementById('piPhone').value.trim(),email:document.getElementById('piEmail').value.trim(),address:document.getElementById('piAddress').value.trim(),city:document.getElementById('piCity').value.trim(),state:document.getElementById('piState').value.trim(),pin:document.getElementById('piPin').value.trim(),updatedAt:new Date().toISOString()},{merge:true});showToast('Personal details saved!');};
 window.savePanDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{pan:document.getElementById('piPan').value.trim().toUpperCase(),panName:document.getElementById('piPanName').value.trim(),panDob:document.getElementById('piPanDob').value,panImg:(document.getElementById('piPanImg')||{}).value?.trim()||'',updatedAt:new Date().toISOString()},{merge:true});showToast('PAN details saved!');};
 window.saveGstDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{gst:document.getElementById('piGst').value.trim().toUpperCase(),gstBiz:document.getElementById('piGstBiz').value.trim(),updatedAt:new Date().toISOString()},{merge:true});showToast('GST details saved!');};

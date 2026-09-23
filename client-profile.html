@@ -364,6 +364,7 @@ function renderProfile(data){
 
   // banner
   const bannerEl = document.getElementById('bannerEl');
+  bannerEl.querySelectorAll('.banner-img').forEach(img => img.remove());
   const bannerSrc = data.bannerUrl || data.coverUrl || '';
   if(bannerSrc){
     const img = document.createElement('img');
@@ -422,12 +423,14 @@ async function init(){
     }catch(e){}
   }
 
-  const profSnap = await db.collection('organisers').doc(uid).get();
-  if(profSnap.exists) renderProfile({uid, ...profSnap.data()});
-  else {
+  db.collection('organisers').doc(uid).onSnapshot(async profSnap => {
+    if(profSnap.exists) {
+      renderProfile({uid, ...profSnap.data()});
+      return;
+    }
     const userSnap = await db.collection('users').doc(uid).get();
     renderProfile({uid, ...(userSnap.exists ? userSnap.data() : { name: 'Organiser' })});
-  }
+  }, error => console.error('Could not watch organiser profile:', error));
 
   const snap = await db.collection('events').where('ownerId','==',uid).limit(50).get();
   const events = snap.docs
