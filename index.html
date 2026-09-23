@@ -299,15 +299,16 @@
       letter-spacing:.14em;
       text-transform:uppercase;
     }
-    .ss-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .ss-scroll-wrap{overflow:hidden;scrollbar-width:none;}
     .ss-scroll-wrap::-webkit-scrollbar{display:none;}
-    .ss-scroll{display:flex;gap:.85rem;padding:.9rem 0 .4rem;width:max-content;padding-left:0;}
+    .ss-scroll{display:flex;gap:.75rem;padding:1rem 1rem 1.2rem;width:max-content;transition:transform .5s cubic-bezier(.4,0,.2,1);}
     .ss-card:first-child{margin-left:0;}
     .ss-card:last-child{margin-right:0;}
     .ss-card{
-      flex:0 0 160px;border-radius:14px;overflow:hidden;
-      background:#111;border:1px solid rgba(255,255,255,.08);
+      flex:0 0 calc((100vw - 2.75rem) / 2);border-radius:18px;overflow:hidden;
+      background:#111;border:1px solid rgba(255,255,255,.15);
       text-decoration:none;display:flex;flex-direction:column;
+      box-shadow:0 8px 24px rgba(0,0,0,.5);
       transition:transform .2s,box-shadow .2s;
     }
     .ss-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.6);}
@@ -320,7 +321,7 @@
       background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
       display:grid;place-items:center;font-size:2.5rem;
     }
-    .ss-card-body{padding:.55rem .65rem .7rem;}
+    .ss-card-body{padding:.6rem .7rem .75rem;border-top:1px solid rgba(255,255,255,.07);}
     .ss-price{
       display:inline-block;margin-bottom:.35rem;
       background:#f5c518;color:#000;
@@ -345,6 +346,16 @@
       text-decoration:none;transition:background .2s,border-color .2s;
     }
     .ss-view-all:hover{background:rgba(245,197,24,.1);border-color:#f5c518;}
+    .ss-dots-mobile{
+      display:flex;align-items:center;justify-content:center;
+      gap:.45rem;padding:.5rem 0 .2rem;background:#000;
+    }
+    .ss-dot-m{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);border:none;padding:0;cursor:pointer;
+      transition:all .3s;
+    }
+    .ss-dot-m.active{width:20px;border-radius:999px;background:#fff;}
     @media(min-width:700px){
       .ss-card{flex:0 0 180px;}
       .ss-banner{min-height:260px;padding:3rem 0 2.5rem;}
@@ -1818,6 +1829,7 @@
     <div class="ss-scroll-wrap">
       <div class="ss-scroll" id="ssScroll"></div>
     </div>
+    <div class="ss-dots-mobile" id="ssDotsM"></div>
     <div class="ss-view-all-wrap">
       <a href="events.html" class="ss-view-all">View all &#8594;</a>
     </div>
@@ -2642,6 +2654,42 @@
           </div>`;
         scroll.appendChild(a);
       });
+      // 2-per-page carousel with dots
+      const ssCards = Array.from(scroll.querySelectorAll('.ss-card'));
+      const ssTotal = ssCards.length;
+      const ssPerPage = 2;
+      const ssPages = () => Math.ceil(ssTotal / ssPerPage);
+      let ssIdx = 0, ssTimer;
+      const dotsM = document.getElementById('ssDotsM');
+      function buildSsDots(){
+        if(!dotsM) return;
+        dotsM.innerHTML = '';
+        for(let i=0;i<ssPages();i++){
+          const d = document.createElement('button');
+          d.className = 'ss-dot-m' + (i===0?' active':'');
+          d.addEventListener('click', () => { ssMobileTo(i); resetSsTimer(); });
+          dotsM.appendChild(d);
+        }
+      }
+      function updateSsDots(p){
+        if(!dotsM) return;
+        Array.from(dotsM.querySelectorAll('.ss-dot-m')).forEach((d,i) => d.classList.toggle('active', i===p));
+      }
+      function ssMobileTo(page){
+        const p = (page + ssPages()) % ssPages();
+        ssIdx = p;
+        const wrapW = scroll.parentElement.offsetWidth;
+        scroll.style.transform = `translateX(-${p * wrapW}px)`;
+        updateSsDots(p);
+      }
+      function resetSsTimer(){ clearInterval(ssTimer); ssTimer = setInterval(() => ssMobileTo(ssIdx + 1), 3500); }
+      if(window.innerWidth < 768){
+        buildSsDots();
+        ssMobileTo(0);
+        resetSsTimer();
+        scroll.addEventListener('touchstart', () => clearInterval(ssTimer), {passive:true});
+        scroll.addEventListener('touchend', resetSsTimer, {passive:true});
+      }
     }catch(e){ console.warn('SceneStealer:', e.message); }
   })();
 </script>
