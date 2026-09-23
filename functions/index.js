@@ -1,4 +1,5 @@
-const {onDocumentUpdated} = require('firebase-functions/v2/firestore');
+const {onDocumentUpdated, onDocumentWritten} = require('firebase-functions/v2/firestore');
+const {onCall, HttpsError} = require('firebase-functions/v2/https');
 const {defineString} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
@@ -8,6 +9,50 @@ const db = getFirestore();
 const emailServiceId = defineString('EMAILJS_SERVICE_ID', {default: 'service_esppdwf'});
 const emailPublicKey = defineString('EMAILJS_PUBLIC_KEY', {default: 'PDb2vpOIeLkbZBBFP'});
 const waitlistTemplateId = defineString('EMAILJS_WAITLIST_TEMPLATE_ID');
+
+function bookingSeatIds(booking) {
+  const raw = booking.seatIds ?? booking.seatId ?? [];
+  const values = Array.isArray(raw) ? raw : String(raw).split(',');
+  return values.map(value => String(value).trim()).filter(Boolean);
+}
+
+function isSeatBookingConfirmed(booking) {
+  return ['confirmed', 'paid', 'success', 'completed'].includes(String(booking.status || '').toLowerCase());
+}
+
+// Attendees may see occupied seat IDs, but never other guests' booking records.
+exports.getEventBookedSeats = onCall({region: 'asia-south1'}, async (request) => {
+  if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to view seat availability.');
+  const eventId = String(request.data?.eventId || '').trim();
+  if (!eventId || eventId.length > 200) throw new HttpsError('invalid-argument', 'A valid event ID is required.');
+
+  const [eventSnap, bookingsSnap] = await Promise.all([
+    db.collection('events').doc(eventId).get(),
+    db.collection('bookings').where('eventId', '==', eventId).limit(5000).get(),
+  ]);
+  if (!eventSnap.exists) throw new HttpsError('not-found', 'Event not found.');
+
+  const eventBookedSeats = eventSnap.data().bookedSeats;
+  const occupied = new Set((Array.isArray(eventBookedSeats) ? eventBookedSeats : []).map(String).filter(Boolean));
+  bookingsSnap.forEach(doc => {
+    const booking = doc.data();
+    if (isSeatBookingConfirmed(booking)) bookingSeatIds(booking).forEach(seatId => occupied.add(seatId));
+  });
+  return {seatIds: [...occupied]};
+});
+
+// Keep the public event seat map current after a confirmed seat booking.
+exports.addBookedSeatsToEvent = onDocumentWritten({
+  document: 'bookings/{bookingId}',
+  region: 'asia-south1',
+}, async (event) => {
+  const booking = event.data?.after?.exists ? event.data.after.data() : null;
+  if (!booking || !isSeatBookingConfirmed(booking)) return;
+  const eventId = String(booking.eventId || '').trim();
+  const seatIds = bookingSeatIds(booking);
+  if (!eventId || !seatIds.length) return;
+  await db.collection('events').doc(eventId).update({bookedSeats: FieldValue.arrayUnion(...seatIds)});
+});
 
 function availableSpots(event) {
   if (!['published', 'live', 'active'].includes(String(event.status || '').toLowerCase())) return 0;

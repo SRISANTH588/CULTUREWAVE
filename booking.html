@@ -11,6 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     :root{--blue:#1242c5;--blue-2:#2f6bff;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
@@ -390,6 +391,7 @@ let emailVerified = false;
 let generatedOtp = "";
 let selectedSeats = [];
 let bookedSeats = [];
+let seatAvailabilityVerified = false;
 let pickerQuantities = [];
 const inviteTokenParam = urlP.get('inviteToken') || '';
 function inviteSessionKey(){ return `inviteAccess:${eventId}`; }
@@ -983,7 +985,11 @@ async function submitBooking(){
   // Recheck immediately before payment in case another guest took a seat while
   // this page was open.
   if(evData.seatingPlan && (Array.isArray(evData.seatingPlan.rows) || Array.isArray(evData.seatingPlan.sections))){
-    await fetchBookedSeats();
+    const availabilityVerified = await fetchBookedSeats();
+    if(!availabilityVerified){
+      showToast('Could not verify seat availability. Please try again in a moment.');
+      return;
+    }
     if(selectedSeats.length !== ticketCount){
       renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
       updatePickerBar();
@@ -1094,39 +1100,16 @@ function applyBookedSeats(seats){
 }
 
 async function fetchBookedSeats(){
-  if(!eventId) return;
+  if(!eventId) return false;
   try{
-    const [bookingsSnap, paymentsSnap, eventSnap] = await Promise.all([
-      db.collection("bookings").where("eventId","==",eventId).get(),
-      db.collection("payments").where("eventId","==",eventId).get(),
-      db.collection('events').doc(eventId).get()
-    ]);
-    const seats = [];
-    const seen = new Set();
-    [...bookingsSnap.docs, ...paymentsSnap.docs].forEach(doc=>{
-      if(seen.has(doc.id)) return;
-      seen.add(doc.id);
-      const d = doc.data();
-      if(isConfirmedBooking(d)) seats.push(...bookingSeatIds(d));
-    });
-    // Also merge seats stored directly on the event document
-    if(eventSnap.exists){
-      const evSeats = eventSnap.data().bookedSeats || [];
-      if(Array.isArray(evSeats)) seats.push(...evSeats.map(String).filter(Boolean));
-    }
+    const getBookedSeats = firebase.app().functions('asia-south1').httpsCallable('getEventBookedSeats');
+    const result = await getBookedSeats({eventId});
+    const seats = Array.isArray(result.data?.seatIds) ? result.data.seatIds.map(String).filter(Boolean) : [];
     applyBookedSeats(seats);
-    // Backfill event.bookedSeats so future loads are fast
-    const unique = [...new Set(seats)];
-    if(unique.length && eventSnap.exists){
-      const existing = eventSnap.data().bookedSeats || [];
-      const missing = unique.filter(s => !existing.includes(s));
-      if(missing.length){
-        db.collection('events').doc(eventId).update({
-          bookedSeats: firebase.firestore.FieldValue.arrayUnion(...missing)
-        }).catch(()=>{});
-      }
-    }
+    seatAvailabilityVerified = true;
+    return true;
   }catch(e){ console.error('fetchBookedSeats:',e); }
+  return false;
 }
 
 function watchBookedSeats(){
@@ -1191,12 +1174,15 @@ function renderSeating(layout, container){
     + layout.rows.map(row=>{
       const count=Math.max(1,Math.min(100,Number(row.seats)||1));
       const justify=row.align==="left"?"flex-start":row.align==="right"?"flex-end":"center";
+      const direction=row.direction==="vertical"?"column":"row";
       const sofa=row.seatStyle==="sofa";
-      return `<div style="margin:.5rem 0;"><div style="font-size:.6rem;font-weight:800;color:#64748b;margin:0 0 .2rem 24px;">${row.ticketType||"General Admission"}</div><div style="display:flex;align-items:center;gap:.35rem;"><span style="width:20px;font-size:.65rem;font-weight:900;color:#64748b;">${row.label||""}</span><div style="display:flex;flex-wrap:wrap;justify-content:${justify};gap:.25rem;flex:1;">${Array.from({length:count},(_,i)=>{
+      const alignItems=row.align==="left"?"flex-start":row.align==="right"?"flex-end":"center";
+      return `<div style="margin:.5rem 0;"><div style="font-size:.6rem;font-weight:800;color:#64748b;margin:0 0 .2rem 24px;">${row.ticketType||"General Admission"}</div><div style="display:flex;align-items:center;gap:.35rem;"><span style="width:20px;font-size:.65rem;font-weight:900;color:#64748b;">${row.label||""}</span><div style="display:flex;flex-direction:${direction};flex-wrap:${direction==="row"?"wrap":"nowrap"};align-items:${direction==="column"?alignItems:"center"};justify-content:${direction==="row"?justify:"flex-start"};gap:.25rem;flex:1;">${Array.from({length:count},(_,i)=>{
         const seatId=(row.label||"")+String(i+1);
         const isBooked=bookedSeats.includes(seatId);
         const w=sofa?"50px":"26px"; const br=sofa?"13px":"6px";
         if(isBooked) return `<span role="img" aria-label="Booked seat ${seatId}" style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:#dc2626;color:#fff;font-size:.72rem;font-weight:900;cursor:not-allowed;border:1.5px solid #991b1b;box-shadow:inset 0 1px rgba(255,255,255,.22);" title="Booked — ${seatId}">🚫</span>`;
+        if(!seatAvailabilityVerified) return `<span role="img" aria-label="Seat availability is being verified" style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:#64748b;color:#fff;font-size:.55rem;font-weight:800;cursor:not-allowed;opacity:.65;" title="Seat availability could not be verified">—</span>`;
         const isSelected=selectedSeats.includes(seatId);
         return `<span id="seat_${seatId}" onclick="toggleSeat('${seatId}','${sofa}')" style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:${isSelected?'#1242c5':(sofa?'#fce7f3':'#e8efff')};color:${isSelected?'#fff':(sofa?'#be185d':'#1242c5')};box-shadow:${isSelected?'0 0 0 2px #2f6bff':'none'};font-size:.55rem;font-weight:800;cursor:pointer;transition:all .15s;">${sofa?"Sofa ":""} ${seatId}</span>`;
       }).join("")}</div></div></div>`;
@@ -1204,6 +1190,7 @@ function renderSeating(layout, container){
 }
 
 function toggleSectionSeat(sectionId){
+  if(!seatAvailabilityVerified){ showToast('Seat availability is still being verified. Please try again.'); return; }
   const section=(evData.seatingPlan?.sections||[]).find((item,index)=>(item.id||`section-${index}`)===sectionId);
   if(!section) return;
   const capacity=Math.max(1,Number(section.capacity)||1);
@@ -1226,6 +1213,7 @@ function toggleSectionSeat(sectionId){
 }
 
 function toggleSeat(seatId, sofa){
+  if(!seatAvailabilityVerified){ showToast('Seat availability is still being verified. Please try again.'); return; }
   const el = document.getElementById("seat_"+seatId);
   if(!el) return;
   if(bookedSeats.includes(seatId)){
