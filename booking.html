@@ -477,7 +477,7 @@ window.joinEventWaitlist=async function(){
     if(button){button.disabled=false;button.textContent='Join waitlist';}
   }
 };
-const MAX_TOTAL_TICKETS = 999;
+const MAX_TOTAL_TICKETS = 20;
 function selectedTicketItems(){
   const items=tickets.map((ticket,index)=>({ticket,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
   return items.length ? items : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},quantity:qty}];
@@ -503,7 +503,7 @@ function renderTicketPicker(){
     return;
   }
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),Math.max(0,remainingEventCapacity()-selectedElsewhere)), sold=max===0; const description=ticket.description||ticket.details||''; return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticket.price||0)}</span><button class="bk-picker-details" type="button" onclick="togglePickerDetails(${index})">Details⌄</button></div>${description?`<p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom"><span class="bk-picker-availability">${sold?'Sold out':max+' available'}</span>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), sold=max<=0; const description=ticket.description||ticket.details||''; return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticket.price||0)}</span><button class="bk-picker-details" type="button" onclick="togglePickerDetails(${index})">Details⌄</button></div>${description?`<p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom"><span class="bk-picker-availability">${sold?'Sold out':max+' available'}</span>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
   updatePickerBar();
 }
 function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
@@ -512,7 +512,7 @@ function changePickerQty(index, change){
   const currentForThis = pickerQuantities[index] || 0;
   const remainingEvent=remainingEventCapacity();
   const otherTickets=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0);
-  const next = Math.max(0, Math.min(max, remainingEvent-otherTickets, currentForThis + change));
+  const next = Math.max(0, Math.min(max, remainingEvent-otherTickets, MAX_TOTAL_TICKETS-otherTickets, currentForThis + change));
   pickerQuantities[index] = next;
   selectedTicketIdx = index;
   qty = selectedTicketCount() || 1;
