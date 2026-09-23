@@ -1417,21 +1417,27 @@
       .cup-card{flex:0 0 180px;max-width:200px;}
     }
 
-    /* ── EDGE TO EDGE: remove all side padding from every section except hero/footer ── */
-    .idx-cat-section,.hpe-section,.tv-section,.ss-section,.ft-section,
-    .cup-section,.trn-section,.ogp-section,.cp-section,.trending-section,
-    #events,#restaurants{
-      padding-left:0!important;padding-right:0!important;
-    }
-    .idx-cat-inner,.trn-inner,.hpe-banner-text,.ss-banner-text,
-    .ft-banner-content,.tv-head,.tv-scroll-wrap,.ss-scroll-wrap,
-    .ft-scroll-wrap,.ft-scroll-wrap .ft-scroll,.hpe-scroll-wrap,
-    .hpe-view-all-wrap,.ss-view-all-wrap,.ft-view-all-wrap,
-    .ogp-head,.ogp-scroll-wrap,.ogp-counter,
-    .cp-banner-inner,.cp-cards-strip,
-    .witp-head,.witp-grid,
-    .trending-head,.trending-ticker-wrap{
-      padding-left:0!important;padding-right:0!important;
+    /* ── EDGE TO EDGE on mobile: all index sections except hero/footer ── */
+    @media(max-width:768px){
+      .idx-cat-section,.hpe-section,.tv-section,.ss-section,.ft-section,
+      .cup-section,.trn-section,.ogp-section,.cp-section,.trending-section,
+      #events,#restaurants{
+        padding-left:0!important;padding-right:0!important;
+        margin-left:0!important;margin-right:0!important;
+        max-width:100%!important;width:100%!important;
+      }
+      .idx-cat-inner,.trn-inner,.idx-feat-inner,
+      .hpe-banner-text,.ss-banner-text,.ft-banner-content,
+      .tv-head,.tv-scroll-wrap,.ss-scroll-wrap,.ft-scroll-wrap,
+      .hpe-scroll-wrap,.hpe-view-all-wrap,.ss-view-all-wrap,.ft-view-all-wrap,
+      .ogp-head,.ogp-scroll-wrap,.ogp-counter,
+      .cp-banner-inner,.cp-cards-strip,
+      .witp-head,.witp-grid,.trending-head,.trending-ticker-wrap,
+      .cup-scroll,.ev-grid,.trn-grid,.trn-head,.cup-head{
+        padding-left:0!important;padding-right:0!important;
+        margin-left:0!important;margin-right:0!important;
+        max-width:100%!important;width:100%!important;
+      }
     }
 
     /* ── TRENDING RIGHT NOW ── */
