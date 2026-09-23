@@ -783,10 +783,12 @@ async function saveBooking(data){
         if(evSnap.exists) organiserId = evSnap.data().ownerId || evSnap.data().organiserId || null;
       }catch(_){}
     }
+    // Ensure seatIds is always a proper array of strings
+    const seatIds = Array.isArray(data.seatIds) ? data.seatIds.map(String).filter(Boolean) : [];
     const doc = {
       bookingId: data.bookingId, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
-      amount: data.amount, seats: data.seats, seatIds: data.seatIds||[],
+      amount: data.amount, seats: data.seats, seatIds: seatIds,
       status: data.status, paymentId: data.paymentId||null,
       customerName: data.name, customerEmail: data.email,
       customerPhone: data.phone, userId: userId,
@@ -800,6 +802,15 @@ async function saveBooking(data){
     };
     await db.collection("bookings").doc(data.bookingId).set(doc);
     await db.collection("payments").doc(data.bookingId).set(doc);
+    // Also update the event's bookedSeats array in Firestore so the seat map
+    // reflects the new booking immediately for all users.
+    if(eventId && seatIds.length){
+      try{
+        await db.collection('events').doc(eventId).update({
+          bookedSeats: firebase.firestore.FieldValue.arrayUnion(...seatIds)
+        });
+      }catch(_){}
+    }
   }catch(e){ console.error("saveBooking:",e); }
 }
 
@@ -959,29 +970,59 @@ function applyBookedSeats(seats){
 async function fetchBookedSeats(){
   if(!eventId) return;
   try{
-    const snap = await db.collection("bookings").where("eventId","==",eventId).get();
+    const [bookingsSnap, eventSnap] = await Promise.all([
+      db.collection("bookings").where("eventId","==",eventId).get(),
+      db.collection("events").doc(eventId).get()
+    ]);
     const seats = [];
-    snap.forEach(doc=>{
+    bookingsSnap.forEach(doc=>{
       const d = doc.data();
       if(isConfirmedBooking(d)) seats.push(...bookingSeatIds(d));
     });
+    // Also merge seats stored directly on the event document
+    if(eventSnap.exists){
+      const evSeats = eventSnap.data().bookedSeats || [];
+      if(Array.isArray(evSeats)) seats.push(...evSeats.map(String).filter(Boolean));
+    }
     applyBookedSeats(seats);
   }catch(e){ console.error('fetchBookedSeats:',e); }
 }
 
 function watchBookedSeats(){
   if(!eventId) return;
+  // Watch bookings collection for real-time seat updates
   db.collection("bookings").where("eventId","==",eventId).onSnapshot(snap=>{
     const seats = [];
     snap.forEach(doc=>{
       const d = doc.data();
       if(isConfirmedBooking(d)) seats.push(...bookingSeatIds(d));
     });
-    applyBookedSeats(seats);
+    // Also merge from event doc bookedSeats
+    db.collection('events').doc(eventId).get().then(evSnap=>{
+      if(evSnap.exists){
+        const evSeats = evSnap.data().bookedSeats || [];
+        if(Array.isArray(evSeats)) seats.push(...evSeats.map(String).filter(Boolean));
+      }
+      applyBookedSeats(seats);
+      if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
+        renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+      }
+    }).catch(()=>{
+      applyBookedSeats(seats);
+      if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
+        renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+      }
+    });
+  }, e=>console.error('watchBookedSeats:',e));
+  // Also watch the event doc's bookedSeats field directly
+  db.collection('events').doc(eventId).onSnapshot(evSnap=>{
+    if(!evSnap.exists) return;
+    const evSeats = (evSnap.data().bookedSeats || []).map(String).filter(Boolean);
+    applyBookedSeats([...bookedSeats, ...evSeats]);
     if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
       renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
     }
-  }, e=>console.error('watchBookedSeats:',e));
+  }, ()=>{});
 }
 
 function renderSeating(layout, container){
