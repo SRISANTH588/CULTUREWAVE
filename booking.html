@@ -416,7 +416,10 @@ function eventStartTime(){
 function ticketMax(ticket){
   const inventory = Number(ticket.available ?? ticket.inventory ?? ticket.remaining ?? ticket.qty ?? 0);
   const configured = Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 0);
-  return inventory > 0 ? Math.min(inventory, configured || inventory) : (ticket.soldOut ? 0 : (configured || 999));
+  // Subtract already-booked count for this ticket type
+  const alreadyBooked = Number(ticket.booked ?? ticket.soldCount ?? ticket.totalBooked ?? 0);
+  const effectiveInventory = inventory > 0 ? Math.max(0, inventory - alreadyBooked) : 0;
+  return effectiveInventory > 0 ? Math.min(effectiveInventory, configured || effectiveInventory) : (ticket.soldOut ? 0 : (configured || 999));
 }
 const MAX_TOTAL_TICKETS = 999;
 function selectedTicketItems(){
@@ -804,11 +807,22 @@ async function saveBooking(data){
     await db.collection("payments").doc(data.bookingId).set(doc);
     // Also update the event's bookedSeats array in Firestore so the seat map
     // reflects the new booking immediately for all users.
-    if(eventId && seatIds.length){
+    if(eventId){
       try{
-        await db.collection('events').doc(eventId).update({
-          bookedSeats: firebase.firestore.FieldValue.arrayUnion(...seatIds)
-        });
+        const updateData = { totalBooked: firebase.firestore.FieldValue.increment(data.seats || 1) };
+        if(seatIds.length) updateData.bookedSeats = firebase.firestore.FieldValue.arrayUnion(...seatIds);
+        // Decrement available count on the specific ticket type
+        const evSnap = await db.collection('events').doc(eventId).get();
+        if(evSnap.exists){
+          const evTickets = evSnap.data().tickets || [];
+          const tIdx = evTickets.findIndex(t => (t.name||'') === (data.ticketName||'').split(' × ')[0] || (t.name||'') === (data.ticketName||''));
+          if(tIdx !== -1 && evTickets[tIdx].available > 0){
+            evTickets[tIdx].available = Math.max(0, Number(evTickets[tIdx].available) - (data.seats || 1));
+            evTickets[tIdx].booked = (Number(evTickets[tIdx].booked) || 0) + (data.seats || 1);
+            updateData.tickets = evTickets;
+          }
+        }
+        await db.collection('events').doc(eventId).update(updateData);
       }catch(_){}
     }
   }catch(e){ console.error("saveBooking:",e); }
