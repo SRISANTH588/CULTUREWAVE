@@ -398,10 +398,6 @@
               <span class="sc-detail-label" id="dEventLabel">Event</span>
               <span class="sc-detail-value" id="dEvent">—</span>
             </div>
-            <div class="sc-detail" id="dSeatsRow" style="display:none;">
-              <span class="sc-detail-label">Seat(s)</span>
-              <span class="sc-detail-value blue" id="dSeats">—</span>
-            </div>
             <div class="sc-detail">
               <span class="sc-detail-label">Issued by</span>
               <span class="sc-detail-value" id="dIssuedBy">CultureWave</span>
@@ -518,8 +514,6 @@
     const bkTime     = params.get("time")      || "";
     const ticketName = params.get("ticket")    || "Entry Pass";
     const seatCount  = params.get("seats")     || "1";
-    const seatIdsRaw = params.get("seatIds")   || "";
-    const seatIdsList = seatIdsRaw ? seatIdsRaw.split(",").map(s=>s.trim()).filter(Boolean) : [];
     const isRestaurant = bkType === "restaurant";
     const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
 
@@ -657,10 +651,6 @@
       document.getElementById("dDate").textContent      = eventDateLabel + (bkTime ? " · " + bkTime : "");
       document.getElementById("dEventLabel").textContent = `${seatCount} ticket${seatCount === "1" ? "" : "s"}`;
       document.getElementById("dEvent").textContent     = ticketName;
-      if(seatIdsList.length){
-        document.getElementById("dSeats").textContent = seatIdsList.join(", ");
-        document.getElementById("dSeatsRow").style.display = "";
-      }
       if (isRestaurant) {
         document.getElementById("dEventLabel").textContent = "Restaurant";
       }
@@ -694,20 +684,6 @@
         document.getElementById("qrScanNote").textContent = "Staff scans at reception";
       }
       applyEventTicketDesign();
-      // Fallback: fetch seatIds from Firestore if not in URL (old bookings)
-      if(!seatIdsList.length && bookingId && window.firebase){
-        try{
-          if(!firebase.apps.length) firebase.initializeApp({apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",authDomain:"ogshootsluxe-36740.firebaseapp.com",projectId:"ogshootsluxe-36740",storageBucket:"ogshootsluxe-36740.firebasestorage.app",messagingSenderId:"5471814825",appId:"1:5471814825:web:07e84f2f88486da817d5b8"});
-          const bkSnap = await firebase.firestore().collection('bookings').doc(bookingId).get();
-          if(bkSnap.exists){
-            const ids = bkSnap.data().seatIds || [];
-            if(ids.length){
-              document.getElementById("dSeats").textContent = ids.join(", ");
-              document.getElementById("dSeatsRow").style.display = "";
-            }
-          }
-        }catch(e){}
-      }
 
     } else {
       // FAILED state

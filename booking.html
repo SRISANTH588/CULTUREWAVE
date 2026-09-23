@@ -890,7 +890,7 @@ async function submitBooking(){
     if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
     const emailSent = await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
     if(!emailSent) showToast("Booking confirmed, but we could not send the confirmation email.");
-    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(","))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
+    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     return;
   }
 
@@ -936,7 +936,7 @@ async function submitBooking(){
       if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
       const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
-      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(","))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
+      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     },
     modal:{
       ondismiss: ()=>{
