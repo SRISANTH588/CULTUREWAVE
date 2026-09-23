@@ -1023,6 +1023,18 @@ function syncManagedBookings(){
       return b.eventId===eventId || b.event?.id===eventId || b.event?.eventId===eventId ||
         (!!currentEventName && bookingEventName===currentEventName);
     });
+    const attendeeCount = allBookings
+      .filter(b=>normBookingStatus(b.status)==='paid')
+      .reduce((sum,b)=>{
+        const raw=b.seats ?? b.quantity ?? (typeof b.tickets==='number' ? b.tickets : 1);
+        const quantity=Number(raw);
+        return sum + (Number.isFinite(quantity) && quantity>0 ? quantity : 1);
+      },0);
+    if(Number(eventData?.totalBooked||0)!==attendeeCount){
+      eventData.totalBooked=attendeeCount;
+      db.collection('events').doc(eventId).update({totalBooked:attendeeCount})
+        .catch(error=>console.warn('Could not refresh public attendee count:',error.message));
+    }
     renderBookings();renderBookingStats();renderAnalytics();renderCiRecent();
 }
 
