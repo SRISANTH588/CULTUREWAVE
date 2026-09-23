@@ -2568,16 +2568,24 @@
       const docs = snap.docs.filter(doc => isPublishedEvent(doc.data()));
       if(!docs.length){ document.getElementById('tvSection').style.display='none'; return; }
       // aggregate venues
+      const VENUE_OVERRIDES = {
+        'bratt cafe': { img: 'bratt.jpeg' },
+      };
+      const VENUE_EXCLUDE = ['taluka tiffins'];
       const map = {};
       docs.forEach(doc => {
         const d = doc.data();
         const name = d.venueName || d.venue || '';
         if(!name) return;
         const key = name.toLowerCase().trim();
+        if(VENUE_EXCLUDE.includes(key)) return;
         if(!map[key]) map[key] = {name, city: d.city||'', img: d.cardImgUrl||d.coverUrl||'', count:0};
         map[key].count++;
         if(!map[key].img && (d.cardImgUrl||d.coverUrl)) map[key].img = d.cardImgUrl||d.coverUrl;
+        if(VENUE_OVERRIDES[key]) map[key].img = VENUE_OVERRIDES[key].img;
       });
+      // apply overrides to already-built map entries
+      Object.keys(VENUE_OVERRIDES).forEach(k => { if(map[k]) map[k].img = VENUE_OVERRIDES[k].img; });
       const venues = Object.values(map).sort((a,b)=>b.count-a.count).slice(0,12);
       if(!venues.length){ document.getElementById('tvSection').style.display='none'; return; }
       venues.forEach(v => {
