@@ -730,6 +730,18 @@
       display:flex;justify-content:center;
       background:#000;
     }
+    .hpe-dots-mobile{
+      display:none;
+      align-items:center;justify-content:center;
+      gap:.45rem;padding:.5rem 0 .2rem;
+      background:#000;
+    }
+    .hpe-dot-m{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);border:none;padding:0;cursor:pointer;
+      transition:all .3s;
+    }
+    .hpe-dot-m.active{width:20px;border-radius:999px;background:#fff;}
     .hpe-view-all{
       display:inline-flex;align-items:center;gap:.4rem;
       padding:.6rem 1.6rem;
@@ -755,14 +767,15 @@
     .hpe-arrow-prev{left:12px;}
     .hpe-arrow-next{right:12px;}
     @media(max-width:699px){
-      .hpe-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 1rem!important;}
-      .hpe-scroll{display:flex;gap:.75rem;padding:1rem 0 1.2rem;width:max-content;transform:none!important;transition:none!important;}
+      .hpe-scroll-wrap{overflow:hidden;padding:0!important;}
+      .hpe-scroll{display:flex;gap:.75rem;padding:1rem 1rem 1.2rem;width:max-content;transform:none;transition:transform .5s cubic-bezier(.4,0,.2,1)!important;}
       .hpe-card{flex:0 0 calc(50vw - 1.4rem);max-width:none;border-radius:18px;margin-left:0;
         border:1px solid rgba(255,255,255,.15);
         box-shadow:0 8px 24px rgba(0,0,0,.5);
       }
       .hpe-card:last-child{margin-right:0;}
       .hpe-scroll-wrap::before,.hpe-scroll-wrap::after{display:none;}
+      .hpe-dots-mobile{display:flex!important;}
     }
     @media(min-width:700px){
       .hpe-card{flex:0 0 260px;max-width:280px;}
@@ -1774,6 +1787,7 @@
       <div class="hpe-scroll" id="hpeScroll"></div>
       <button class="hpe-arrow hpe-arrow-next" id="hpeNext" aria-label="Next">&#8250;</button>
     </div>
+    <div class="hpe-dots-mobile" id="hpeDotsM"></div>
     <div class="hpe-view-all-wrap">
       <a href="categories.html" class="hpe-view-all">View All &#8594;</a>
     </div>
@@ -2431,44 +2445,57 @@
           </div>`;
         return a;
       }
-      // render cards once only
+      // render cards
       docs.forEach(doc => scroll.appendChild(makeCard(doc)));
       const cards = Array.from(scroll.querySelectorAll('.hpe-card'));
       const total = cards.length;
       let hpeIdx = 0;
+      let hpeTimer;
       const prevBtn = document.getElementById('hpePrev');
       const nextBtn = document.getElementById('hpeNext');
+      const dotsM = document.getElementById('hpeDotsM');
+      const isMobile = () => window.innerWidth < 768;
 
-      const isDesktop = () => window.innerWidth >= 768;
+      /* ── MOBILE: 2 cards per page ── */
+      const perPage = 2;
+      const pages = () => Math.ceil(total / perPage);
 
-      function getCardWidth(){
-        return cards[0].offsetWidth + 16;
+      function buildMobileDots(){
+        if(!dotsM) return;
+        dotsM.innerHTML = '';
+        const p = pages();
+        for(let i=0;i<p;i++){
+          const d = document.createElement('button');
+          d.className = 'hpe-dot-m' + (i===0?' active':'');
+          d.addEventListener('click', () => { mobileTo(i); resetTimer(); });
+          dotsM.appendChild(d);
+        }
       }
 
+      function updateMobileDots(page){
+        if(!dotsM) return;
+        Array.from(dotsM.querySelectorAll('.hpe-dot-m')).forEach((d,i) => d.classList.toggle('active', i===page));
+      }
+
+      function mobileTo(page){
+        const p = (page + pages()) % pages();
+        hpeIdx = p;
+        // each page = 2 cards width + gap
+        const cardW = cards[0] ? cards[0].offsetWidth + 12 : 0;
+        const pageW = cardW * perPage;
+        // offset = page * (2 cards + gap between pages)
+        const offset = p * pageW;
+        scroll.style.transform = `translateX(-${offset}px)`;
+        updateMobileDots(p);
+      }
+
+      /* ── DESKTOP: scroll 4 cards ── */
       function getVisibleCount(){
-        if(!cards[0]) return 1;
+        if(!cards[0]) return 4;
         const wrapW = scroll.parentElement.offsetWidth;
-        return Math.round(wrapW / (cards[0].offsetWidth + 19)) || 1;
+        return Math.round(wrapW / (cards[0].offsetWidth + 19)) || 4;
       }
 
-      /* ── MOBILE: centered single-card carousel ── */
-      function setPadding(){
-        const wrap = scroll.parentElement;
-        const wrapW = wrap.offsetWidth;
-        const cardW = cards[0].offsetWidth;
-        const side = Math.floor((wrapW - cardW) / 2);
-        scroll.style.paddingLeft = side + 'px';
-        scroll.style.paddingRight = side + 'px';
-      }
-
-      function centerOn(idx){
-        hpeIdx = (idx + total) % total;
-        const cardW = getCardWidth();
-        scroll.style.transform = `translateX(-${hpeIdx * cardW}px)`;
-        cards.forEach((c, i) => c.classList.toggle('hpe-active', i === hpeIdx));
-      }
-
-      /* ── DESKTOP: scroll one card at a time ── */
       function desktopScrollTo(idx){
         const vis = getVisibleCount();
         const max = Math.max(0, total - vis);
@@ -2480,49 +2507,45 @@
       }
 
       function init(){
-        if(isDesktop()){
-          scroll.style.paddingLeft = '';
-          scroll.style.paddingRight = '';
-          desktopScrollTo(hpeIdx);
+        if(isMobile()){
+          scroll.style.paddingLeft = '1rem';
+          scroll.style.paddingRight = '1rem';
+          buildMobileDots();
+          mobileTo(0);
         } else {
           scroll.style.paddingLeft = '';
           scroll.style.paddingRight = '';
-          scroll.style.transform = '';
+          if(dotsM) dotsM.style.display = 'none';
+          desktopScrollTo(0);
         }
       }
 
+      function tick(){
+        if(isMobile()) mobileTo(hpeIdx + 1);
+        else desktopScrollTo(hpeIdx + 1 > Math.max(0, total - getVisibleCount()) ? 0 : hpeIdx + 1);
+      }
+
+      function resetTimer(){ clearInterval(hpeTimer); hpeTimer = setInterval(tick, 3500); }
+
       init();
-      window.addEventListener('resize', init);
+      resetTimer();
+      window.addEventListener('resize', () => { init(); resetTimer(); });
 
       if(prevBtn) prevBtn.addEventListener('click', () => {
-        if(isDesktop()) desktopScrollTo(hpeIdx - 1);
-        else centerOn(hpeIdx - 1);
+        if(isMobile()) mobileTo(hpeIdx - 1); else desktopScrollTo(hpeIdx - 1);
+        resetTimer();
       });
       if(nextBtn) nextBtn.addEventListener('click', () => {
-        if(isDesktop()) desktopScrollTo(hpeIdx + 1);
-        else centerOn(hpeIdx + 1);
+        if(isMobile()) mobileTo(hpeIdx + 1); else desktopScrollTo(hpeIdx + 1);
+        resetTimer();
       });
 
-      let hpeTimer = setInterval(() => {
-        if(isDesktop()) desktopScrollTo(hpeIdx + 1 > Math.max(0, total - getVisibleCount()) ? 0 : hpeIdx + 1);
-        else centerOn(hpeIdx + 1);
-      }, 3500);
       const pauseTimer = () => clearInterval(hpeTimer);
-      const resumeTimer = () => { hpeTimer = setInterval(() => {
-        if(isDesktop()) desktopScrollTo(hpeIdx + 1 > Math.max(0, total - getVisibleCount()) ? 0 : hpeIdx + 1);
-        else centerOn(hpeIdx + 1);
-      }, 3500); };
-
+      const resumeTimer = () => resetTimer();
       scroll.addEventListener('mouseenter', pauseTimer);
       scroll.addEventListener('mouseleave', resumeTimer);
       scroll.addEventListener('touchstart', pauseTimer, {passive:true});
       scroll.addEventListener('touchend', resumeTimer, {passive:true});
-
-      cards.forEach((card, i) => {
-        card.addEventListener('click', e => {
-          if(!isDesktop() && i !== hpeIdx){ e.preventDefault(); centerOn(i); }
-        });
-      });
     }catch(e){ console.warn('HPE:', e.message); }
   })();
 
