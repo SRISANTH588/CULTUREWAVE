@@ -1110,6 +1110,165 @@
     .promo-heading{color:#fff!important;}
     .promo-cta{color:#888!important;}
 
+    /* ── CREATORS & PREMIUM BANNER ── */
+    .cp-section{
+      background:#000;
+      border-top:1px solid rgba(255,255,255,.07);
+      position:relative;
+    }
+    .cp-banner{
+      position:relative;
+      width:100%;
+      min-height:220px;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+      padding:2.5rem 1.4rem 2rem;
+      background:linear-gradient(135deg,#0a0a1a 0%,#1a0a2e 50%,#0a0a1a 100%);
+      border-top:1px solid rgba(180,140,255,.22);
+    }
+    .cp-banner::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 60% 80% at 0% 50%,rgba(140,80,255,.18),transparent 60%),
+        radial-gradient(ellipse 40% 60% at 100% 0%,rgba(255,180,80,.12),transparent 55%);
+      pointer-events:none;
+    }
+    .cp-banner::after{
+      content:"CREATE";
+      position:absolute;
+      right:-1rem;bottom:-1.5rem;
+      font-size:clamp(5rem,18vw,10rem);
+      font-weight:900;
+      letter-spacing:-.06em;
+      color:rgba(180,140,255,.08);
+      line-height:1;
+      pointer-events:none;
+      user-select:none;
+    }
+    .cp-banner-text{position:relative;z-index:2;}
+    .cp-eyebrow{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.68rem;font-weight:800;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:rgba(200,170,255,.78);
+      margin-bottom:.8rem;
+    }
+    .cp-eyebrow::before{
+      content:"";
+      display:inline-block;width:24px;height:1px;
+      background:rgba(200,170,255,.7);
+    }
+    .cp-title{
+      font-size:clamp(2.8rem,8vw,5rem);
+      font-weight:900;
+      line-height:.92;
+      letter-spacing:-.06em;
+      color:#fff;
+      margin:0;
+    }
+    .cp-title em{
+      font-style:italic;
+      display:block;
+      -webkit-text-stroke:1.5px rgba(200,170,255,.86);
+      color:transparent;
+    }
+    .cp-sub{
+      margin-top:.9rem;
+      font-size:.78rem;
+      font-weight:700;
+      color:rgba(200,170,255,.72);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+    /* cards strip */
+    .cp-cards-wrap{
+      background:#000;
+      border-top:1px solid rgba(255,255,255,.06);
+      padding:1.4rem 1rem 1.8rem;
+    }
+    @media(min-width:700px){
+      .cp-cards-wrap{padding:1.6rem 1.4rem 2rem;}
+    }
+    .cp-cards{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:.85rem;
+      max-width:900px;
+      margin:0 auto;
+    }
+    @media(max-width:560px){
+      .cp-cards{grid-template-columns:1fr;}
+    }
+    .cp-card{
+      border-radius:18px;
+      padding:1.4rem 1.3rem 1.5rem;
+      border:1px solid rgba(255,255,255,.1);
+      background:#111;
+      display:flex;
+      flex-direction:column;
+      gap:.55rem;
+      text-decoration:none;
+      transition:transform .22s,box-shadow .22s,border-color .22s;
+    }
+    .cp-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 18px 40px rgba(0,0,0,.7);
+      border-color:rgba(255,255,255,.22);
+    }
+    .cp-card.cp-featured{
+      background:linear-gradient(145deg,#1a0a2e,#0f0f1a);
+      border-color:rgba(180,140,255,.28);
+    }
+    .cp-card.cp-featured:hover{border-color:rgba(180,140,255,.55);}
+    .cp-card-icon{font-size:1.6rem;line-height:1;}
+    .cp-card-name{
+      font-size:.68rem;font-weight:800;
+      letter-spacing:.14em;text-transform:uppercase;
+      color:rgba(255,255,255,.4);
+    }
+    .cp-card.cp-featured .cp-card-name{color:rgba(200,170,255,.7);}
+    .cp-card-title{
+      font-size:1.1rem;font-weight:900;
+      color:#fff;letter-spacing:-.03em;
+      line-height:1.15;
+    }
+    .cp-perks{
+      display:grid;gap:.35rem;
+      margin:.1rem 0;
+    }
+    .cp-perk{
+      display:flex;align-items:center;gap:.5rem;
+      font-size:.78rem;font-weight:600;
+      color:rgba(255,255,255,.55);
+      line-height:1.3;
+    }
+    .cp-perk::before{
+      content:"✓";
+      color:rgba(200,170,255,.8);
+      font-weight:900;flex-shrink:0;
+    }
+    .cp-card.cp-featured .cp-perk::before{color:rgba(200,170,255,.9);}
+    .cp-card-cta{
+      display:inline-flex;align-items:center;gap:.4rem;
+      margin-top:.4rem;
+      padding:.55rem 1.1rem;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.07);
+      color:#fff;
+      font-size:.78rem;font-weight:800;
+      width:fit-content;
+      transition:background .18s,border-color .18s;
+    }
+    .cp-card:hover .cp-card-cta{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);}
+    .cp-card.cp-featured .cp-card-cta{
+      background:rgba(180,140,255,.18);
+      border-color:rgba(180,140,255,.4);
+    }
+    .cp-card.cp-featured:hover .cp-card-cta{background:rgba(180,140,255,.3);border-color:rgba(180,140,255,.7);}
+
     /* ── BUTTONS ── */
     .btn{border-color:#333;}
     .hero-btn-white{background:#fff!important;color:#000!important;}
@@ -1664,6 +1823,46 @@
 
 
 
+
+  <!-- CREATORS & PREMIUM MEMBERS -->
+  <section class="cp-section" data-site-section="home-creators">
+    <div class="cp-banner">
+      <div class="cp-banner-text">
+        <div class="cp-eyebrow">For Creators &amp; Premium Members</div>
+        <div class="cp-title">Create.<br><em>Elevate.</em></div>
+        <div class="cp-sub">✦ Exclusive access. Every event.</div>
+      </div>
+    </div>
+    <div class="cp-cards-wrap">
+      <div class="cp-cards">
+
+        <a class="cp-card" href="reel-creators.html">
+          <div class="cp-card-icon">🎬</div>
+          <div class="cp-card-name">Reel Creator</div>
+          <div class="cp-card-title">Backstage Access &amp; Content Rights</div>
+          <div class="cp-perks">
+            <div class="cp-perk">Dedicated shooting zones</div>
+            <div class="cp-perk">Priority entry — no queue</div>
+            <div class="cp-perk">Featured on our channels</div>
+          </div>
+          <div class="cp-card-cta">Apply now &#8594;</div>
+        </a>
+
+        <a class="cp-card cp-featured" href="reel-creators.html">
+          <div class="cp-card-icon">✦</div>
+          <div class="cp-card-name">Premium Member</div>
+          <div class="cp-card-title">Unlimited Events &amp; VIP Perks</div>
+          <div class="cp-perks">
+            <div class="cp-perk">VIP lounge &amp; reserved seating</div>
+            <div class="cp-perk">48-hr early booking window</div>
+            <div class="cp-perk">Personal concierge support</div>
+          </div>
+          <div class="cp-card-cta">Join Premium &#8594;</div>
+        </a>
+
+      </div>
+    </div>
+  </section>
 
   <!-- PROMO BANNERS -->
 
