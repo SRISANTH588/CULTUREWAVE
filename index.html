@@ -364,6 +364,12 @@
       transition:all .3s;
     }
     .ss-dot-m.active{width:20px;border-radius:999px;background:#fff;}
+    @media(max-width:699px){
+      .ss-scroll-wrap{overflow:hidden;padding:0!important;}
+      .ss-scroll{display:flex;gap:.75rem;padding:1rem 1rem 1.2rem;width:max-content;transition:transform .5s cubic-bezier(.4,0,.2,1)!important;}
+      .ss-card{flex:0 0 calc((100vw - 2.75rem) / 2)!important;border-radius:18px;}
+      .ss-scroll-wrap::before,.ss-scroll-wrap::after{display:none;}
+    }
     @media(min-width:700px){
       .ss-card{flex:0 0 180px;}
       .ss-banner{min-height:260px;padding:3rem 0 2.5rem;}
