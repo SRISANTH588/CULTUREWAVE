@@ -1111,157 +1111,166 @@
     .promo-cta{color:#888!important;}
 
     /* ── CREATORS & PREMIUM ── */
-    .cp-section{background:#000;position:relative;overflow:hidden;}
-    .cp-wrap{
-      max-width:1240px;margin:0 auto;
-      padding:3.5rem 1.4rem 3.5rem;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:0;
-      align-items:stretch;
-    }
-    /* left dark panel */
-    .cp-left{
+    .cp-section{background:#000;position:relative;overflow:hidden;border-top:1px solid rgba(255,255,255,.07);}
+
+    /* full-width banner */
+    .cp-banner{
       position:relative;
-      padding:3rem 2.8rem 3rem 0;
-      display:flex;flex-direction:column;
-      justify-content:center;
-      border-right:1px solid rgba(255,255,255,.07);
+      width:100%;
+      min-height:260px;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      padding:3rem 1.4rem;
+      background:linear-gradient(135deg,#07070f 0%,#110820 45%,#0a0a0a 100%);
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    .cp-left::before{
+    .cp-banner::before{
       content:"";
       position:absolute;inset:0;
-      background:radial-gradient(ellipse 80% 70% at 0% 50%,rgba(120,60,255,.1),transparent 65%);
+      background:
+        radial-gradient(ellipse 55% 90% at 0% 50%,rgba(130,70,255,.18),transparent 55%),
+        radial-gradient(ellipse 40% 60% at 100% 10%,rgba(255,180,60,.1),transparent 50%),
+        radial-gradient(ellipse 30% 50% at 60% 100%,rgba(100,50,255,.1),transparent 55%);
       pointer-events:none;
     }
-    .cp-eyebrow{
-      display:inline-flex;align-items:center;gap:.55rem;
-      font-size:.65rem;font-weight:900;
-      letter-spacing:.2em;text-transform:uppercase;
-      color:rgba(255,255,255,.35);
-      margin-bottom:1.2rem;
+    .cp-banner-wm{
+      position:absolute;
+      right:-1rem;top:50%;transform:translateY(-50%);
+      font-size:clamp(7rem,20vw,14rem);
+      font-weight:900;letter-spacing:-.06em;
+      color:rgba(255,255,255,.025);
+      line-height:1;pointer-events:none;user-select:none;
+      white-space:nowrap;
     }
-    .cp-eyebrow::before{content:"";display:inline-block;width:20px;height:1px;background:rgba(255,255,255,.3);}
+    .cp-banner-inner{
+      position:relative;z-index:2;
+      max-width:1240px;margin:0 auto;width:100%;
+    }
+    .cp-eyebrow{
+      display:inline-flex;align-items:center;gap:.6rem;
+      font-size:.62rem;font-weight:900;
+      letter-spacing:.22em;text-transform:uppercase;
+      color:rgba(255,255,255,.35);
+      margin-bottom:1rem;
+    }
+    .cp-eyebrow::before{content:"";display:inline-block;width:22px;height:1px;background:rgba(255,255,255,.3);}
     .cp-heading{
-      font-size:clamp(3rem,6vw,5rem);
+      font-size:clamp(3.2rem,7vw,6rem);
       font-weight:900;
-      line-height:.9;
-      letter-spacing:-.06em;
+      line-height:.88;
+      letter-spacing:-.07em;
       color:#fff;
-      margin:0 0 .6rem;
+      margin:0 0 1rem;
     }
     .cp-heading em{
       font-style:italic;
-      -webkit-text-stroke:1.5px rgba(255,255,255,.5);
+      -webkit-text-stroke:2px rgba(255,255,255,.45);
       color:transparent;
       display:block;
     }
     .cp-sub{
-      font-size:.7rem;font-weight:800;
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.68rem;font-weight:800;
       letter-spacing:.2em;text-transform:uppercase;
-      color:rgba(255,255,255,.25);
-      margin-top:1rem;
+      color:rgba(255,255,255,.28);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:999px;
+      padding:.32rem .9rem;
+      background:rgba(255,255,255,.04);
     }
-    .cp-sub span{color:rgba(255,255,255,.5);}
-    /* right cards panel */
-    .cp-right{
-      padding:3rem 0 3rem 2.8rem;
+
+    /* booking cards strip */
+    .cp-cards-strip{
+      max-width:1240px;margin:0 auto;
+      padding:1.8rem 1.4rem 2.2rem;
       display:grid;
-      grid-template-rows:1fr 1fr;
-      gap:1rem;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:.9rem;
     }
     .cp-card{
       position:relative;
       border-radius:20px;
-      padding:1.6rem 1.8rem;
-      display:flex;
-      gap:1.4rem;
-      align-items:flex-start;
+      padding:1.5rem 1.4rem 1.6rem;
+      display:flex;flex-direction:column;
+      gap:.45rem;
       text-decoration:none;
       border:1px solid rgba(255,255,255,.08);
       background:#0d0d0d;
-      transition:transform .22s,box-shadow .22s,border-color .22s,background .22s;
       overflow:hidden;
+      transition:transform .22s,box-shadow .22s,border-color .22s;
     }
-    .cp-card::before{
-      content:"";
-      position:absolute;inset:0;
-      opacity:0;
-      transition:opacity .3s;
-      background:radial-gradient(ellipse 80% 80% at 0% 0%,rgba(255,255,255,.04),transparent);
+    .cp-card:hover{transform:translateY(-5px);box-shadow:0 22px 55px rgba(0,0,0,.7);border-color:rgba(255,255,255,.2);}
+    .cp-card.cp-gold{
+      background:linear-gradient(155deg,#120e00,#0d0d0d);
+      border-color:rgba(245,197,24,.22);
     }
-    .cp-card:hover{transform:translateY(-3px);box-shadow:0 20px 50px rgba(0,0,0,.6);border-color:rgba(255,255,255,.18);}
-    .cp-card:hover::before{opacity:1;}
-    .cp-card.cp-featured{
-      background:linear-gradient(135deg,#0e0820,#0a0a14);
-      border-color:rgba(160,120,255,.25);
+    .cp-card.cp-gold:hover{border-color:rgba(245,197,24,.55);box-shadow:0 22px 55px rgba(245,197,24,.1);}
+    .cp-card.cp-purple{
+      background:linear-gradient(155deg,#0e0820,#0a0a0d);
+      border-color:rgba(150,100,255,.22);
     }
-    .cp-card.cp-featured:hover{border-color:rgba(160,120,255,.55);box-shadow:0 20px 50px rgba(100,60,255,.15);}
+    .cp-card.cp-purple:hover{border-color:rgba(150,100,255,.55);box-shadow:0 22px 55px rgba(100,60,255,.12);}
+    .cp-card-shine{
+      position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+    }
+    .cp-card.cp-gold .cp-card-shine{background:linear-gradient(90deg,transparent,rgba(245,197,24,.3),transparent);}
+    .cp-card.cp-purple .cp-card-shine{background:linear-gradient(90deg,transparent,rgba(150,100,255,.3),transparent);}
     .cp-card-icon{
-      width:3rem;height:3rem;
-      border-radius:14px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.1);
-      display:grid;place-items:center;
-      font-size:1.3rem;
-      flex-shrink:0;
+      font-size:1.8rem;line-height:1;
+      margin-bottom:.3rem;
     }
-    .cp-card.cp-featured .cp-card-icon{
-      background:rgba(160,120,255,.12);
-      border-color:rgba(160,120,255,.25);
-    }
-    .cp-card-body{display:grid;gap:.4rem;flex:1;}
-    .cp-card-name{
-      font-size:.62rem;font-weight:900;
+    .cp-card-tag{
+      font-size:.58rem;font-weight:900;
       letter-spacing:.18em;text-transform:uppercase;
-      color:rgba(255,255,255,.3);
+      color:rgba(255,255,255,.28);
     }
-    .cp-card.cp-featured .cp-card-name{color:rgba(160,120,255,.7);}
+    .cp-card.cp-gold .cp-card-tag{color:rgba(245,197,24,.6);}
+    .cp-card.cp-purple .cp-card-tag{color:rgba(150,100,255,.65);}
     .cp-card-title{
-      font-size:1rem;font-weight:900;
-      color:#fff;letter-spacing:-.03em;line-height:1.2;
+      font-size:.95rem;font-weight:900;
+      color:#fff;letter-spacing:-.03em;line-height:1.25;
     }
-    .cp-perks{display:grid;gap:.28rem;margin:.2rem 0;}
+    .cp-card-loc{
+      display:flex;align-items:center;gap:.35rem;
+      font-size:.7rem;font-weight:700;
+      color:rgba(255,255,255,.3);
+      margin:.1rem 0;
+    }
+    .cp-card-loc::before{content:"📍";font-size:.7rem;}
+    .cp-perks{display:grid;gap:.25rem;margin:.15rem 0;}
     .cp-perk{
-      display:flex;align-items:center;gap:.5rem;
-      font-size:.75rem;font-weight:600;
-      color:rgba(255,255,255,.4);line-height:1.3;
+      display:flex;align-items:center;gap:.45rem;
+      font-size:.72rem;font-weight:600;
+      color:rgba(255,255,255,.38);line-height:1.3;
     }
-    .cp-perk::before{content:"—";color:rgba(255,255,255,.2);font-weight:900;flex-shrink:0;}
-    .cp-card.cp-featured .cp-perk::before{content:"✦";color:rgba(160,120,255,.6);}
+    .cp-perk::before{content:"—";color:rgba(255,255,255,.18);flex-shrink:0;}
+    .cp-card.cp-gold .cp-perk::before{content:"✦";color:rgba(245,197,24,.5);}
+    .cp-card.cp-purple .cp-perk::before{content:"✦";color:rgba(150,100,255,.55);}
     .cp-card-cta{
       display:inline-flex;align-items:center;gap:.4rem;
-      margin-top:.5rem;
-      padding:.42rem .9rem;
+      margin-top:.6rem;
+      padding:.45rem .95rem;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.12);
       background:transparent;
-      color:rgba(255,255,255,.55);
+      color:rgba(255,255,255,.5);
       font-size:.72rem;font-weight:800;
       width:fit-content;
       transition:all .18s;
     }
-    .cp-card:hover .cp-card-cta{color:#fff;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.06);}
-    .cp-card.cp-featured .cp-card-cta{border-color:rgba(160,120,255,.3);color:rgba(160,120,255,.8);}
-    .cp-card.cp-featured:hover .cp-card-cta{background:rgba(160,120,255,.12);border-color:rgba(160,120,255,.6);color:#c4a8ff;}
-    /* watermark text */
-    .cp-watermark{
-      position:absolute;
-      right:-2rem;bottom:-2rem;
-      font-size:clamp(6rem,16vw,11rem);
-      font-weight:900;letter-spacing:-.06em;
-      color:rgba(255,255,255,.025);
-      line-height:1;pointer-events:none;user-select:none;
-    }
-    @media(max-width:860px){
-      .cp-wrap{grid-template-columns:1fr;gap:0;}
-      .cp-left{padding:2.5rem 1.4rem 2rem;border-right:none;border-bottom:1px solid rgba(255,255,255,.07);}
-      .cp-right{padding:2rem 1.4rem 2.5rem;grid-template-rows:auto auto;}
-    }
+    .cp-card:hover .cp-card-cta{color:#fff;border-color:rgba(255,255,255,.38);background:rgba(255,255,255,.06);}
+    .cp-card.cp-gold .cp-card-cta{border-color:rgba(245,197,24,.25);color:rgba(245,197,24,.7);}
+    .cp-card.cp-gold:hover .cp-card-cta{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.55);color:#f5c518;}
+    .cp-card.cp-purple .cp-card-cta{border-color:rgba(150,100,255,.25);color:rgba(150,100,255,.75);}
+    .cp-card.cp-purple:hover .cp-card-cta{background:rgba(150,100,255,.1);border-color:rgba(150,100,255,.55);color:#b08fff;}
+    @media(max-width:900px){.cp-cards-strip{grid-template-columns:repeat(2,1fr);}}
     @media(max-width:560px){
-      .cp-left{padding:2rem 1rem 1.5rem;}
-      .cp-right{padding:1.5rem 1rem 2rem;}
-      .cp-card{padding:1.2rem 1.1rem;gap:1rem;}
+      .cp-cards-strip{grid-template-columns:1fr;padding:1.4rem 1rem 2rem;}
+      .cp-banner{min-height:auto;padding:2.2rem 1rem;}
+      .cp-heading{font-size:clamp(2.8rem,10vw,4rem);}
+      .cp-heading em{-webkit-text-stroke:1.5px rgba(255,255,255,.45);}
     }
 
     /* ── BUTTONS ── */
@@ -1736,51 +1745,52 @@
 
   <!-- CREATORS & PREMIUM MEMBERS -->
   <section class="cp-section" data-site-section="home-creators">
-    <div class="cp-watermark">CREATE</div>
-    <div class="cp-wrap">
 
-      <!-- LEFT: heading -->
-      <div class="cp-left">
+    <!-- BANNER -->
+    <div class="cp-banner">
+      <div class="cp-banner-wm">CREATE</div>
+      <div class="cp-banner-inner">
         <div class="cp-eyebrow">For Creators &amp; Premium Members</div>
-        <div class="cp-heading">
-          Create.<br>
-          <em>Elevate.</em>
+        <div class="cp-heading">Create.<br><em>Elevate.</em></div>
+        <div class="cp-sub">✦ Exclusive Access. Every Event.</div>
+      </div>
+    </div>
+
+    <!-- 2 BOOKING CARDS -->
+    <div class="cp-cards-strip" style="grid-template-columns:1fr 1fr;max-width:860px;">
+
+      <!-- Instant Reels -->
+      <a class="cp-card cp-gold" href="reel-creators.html">
+        <div class="cp-card-shine"></div>
+        <div class="cp-card-icon">🎬</div>
+        <div class="cp-card-tag">OG Shoots</div>
+        <div class="cp-card-title">Instant Reels</div>
+        <div class="cp-card-loc">Vijayawada &amp; Hyderabad</div>
+        <div class="cp-perks">
+          <div class="cp-perk">Shot on iPhone Pro Max</div>
+          <div class="cp-perk">Delivered in 30 mins</div>
+          <div class="cp-perk">OG Signature Branding</div>
+          <div class="cp-perk">From ₹1,799</div>
         </div>
-        <div class="cp-sub"><span>✦</span> Exclusive access. Every event.</div>
-      </div>
+        <div class="cp-card-cta">Book Now &#8594;</div>
+      </a>
 
-      <!-- RIGHT: two cards stacked -->
-      <div class="cp-right">
+      <!-- Photography & Videography -->
+      <a class="cp-card cp-purple" href="reel-creators.html">
+        <div class="cp-card-shine"></div>
+        <div class="cp-card-icon">📸</div>
+        <div class="cp-card-tag">OG Shoots</div>
+        <div class="cp-card-title">Photography &amp; Videography</div>
+        <div class="cp-card-loc">Vijayawada &amp; Hyderabad</div>
+        <div class="cp-perks">
+          <div class="cp-perk">Cinematic stills &amp; videos</div>
+          <div class="cp-perk">Edited &amp; delivered fast</div>
+          <div class="cp-perk">OG Certified Creator</div>
+          <div class="cp-perk">Custom packages</div>
+        </div>
+        <div class="cp-card-cta">Book Now &#8594;</div>
+      </a>
 
-        <a class="cp-card" href="reel-creators.html">
-          <div class="cp-card-icon">🎬</div>
-          <div class="cp-card-body">
-            <div class="cp-card-name">Reel Creator</div>
-            <div class="cp-card-title">Backstage Access &amp; Content Rights</div>
-            <div class="cp-perks">
-              <div class="cp-perk">Dedicated shooting zones</div>
-              <div class="cp-perk">Priority entry — no queue</div>
-              <div class="cp-perk">Featured on our channels</div>
-            </div>
-            <div class="cp-card-cta">Apply now &#8594;</div>
-          </div>
-        </a>
-
-        <a class="cp-card cp-featured" href="reel-creators.html">
-          <div class="cp-card-icon">✦</div>
-          <div class="cp-card-body">
-            <div class="cp-card-name">Premium Member</div>
-            <div class="cp-card-title">Unlimited Events &amp; VIP Perks</div>
-            <div class="cp-perks">
-              <div class="cp-perk">VIP lounge &amp; reserved seating</div>
-              <div class="cp-perk">48-hr early booking window</div>
-              <div class="cp-perk">Personal concierge support</div>
-            </div>
-            <div class="cp-card-cta">Join Premium &#8594;</div>
-          </div>
-        </a>
-
-      </div>
     </div>
   </section>
 
