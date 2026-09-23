@@ -1792,10 +1792,9 @@ function serverTimestamp() { return firebase.firestore.FieldValue.serverTimestam
 function collection(db, name) { return db.collection(name); }
 async function addDoc(ref, data) { return await ref.add(data); }
 async function saveEventInviteAccess(eventId,ownerId,config){
-  const ref=db.collection('eventAccess').doc(eventId),old=await ref.get(),oldToken=old.exists?old.data().inviteToken:'';
-  if(oldToken&&oldToken!==config.inviteToken) await db.collection('eventAccessLinks').doc(oldToken).delete().catch(()=>{});
-  if(!config.inviteOnly){if(old.exists)await ref.delete();return;}
-  await ref.set({ownerId,inviteOnly:config.inviteOnly,inviteLinkEnabled:config.inviteLinkEnabled,inviteCode:config.inviteCode,guestEmails:config.guestEmails,inviteToken:config.inviteLinkEnabled?config.inviteToken:'',sentInviteEmails:old.exists?(old.data().sentInviteEmails||[]):[],updatedAt:serverTimestamp()});
+  const ref=db.collection('eventAccess').doc(eventId);
+  if(!config.inviteOnly){await ref.delete().catch(()=>{});return;}
+  await ref.set({ownerId,inviteOnly:config.inviteOnly,inviteLinkEnabled:config.inviteLinkEnabled,inviteCode:config.inviteCode,guestEmails:config.guestEmails,inviteToken:config.inviteLinkEnabled?config.inviteToken:'',updatedAt:serverTimestamp()},{merge:true});
   if(config.inviteLinkEnabled&&config.inviteToken)await db.collection('eventAccessLinks').doc(config.inviteToken).set({eventId,ownerId,createdAt:serverTimestamp()});
 }
 
@@ -2371,7 +2370,7 @@ async function saveEvent(status) {
     btn.textContent = 'Saving...';
     btn.disabled = true;
     const created=await addDoc(collection(db, 'events'), payload);
-    await saveEventInviteAccess(created.id,uid,inviteAccessConfig);
+    if(inviteAccessConfig.inviteOnly){btn.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
     window.location.href = 'premium-client-dashboard.html';
   } catch (err) {
     alert('Error saving event: ' + err.message);

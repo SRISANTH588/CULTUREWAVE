@@ -1880,11 +1880,8 @@ function collection(db, name) { return db.collection(name); }
 async function addDoc(ref, data) { return await ref.add(data); }
 async function saveEventInviteAccess(eventId, ownerId, config) {
   const accessRef=db.collection('eventAccess').doc(eventId);
-  const oldSnap=await accessRef.get();
-  const oldToken=oldSnap.exists?oldSnap.data().inviteToken:'';
-  if(oldToken && oldToken!==config.inviteToken) await db.collection('eventAccessLinks').doc(oldToken).delete().catch(()=>{});
-  if(!config.inviteOnly){if(oldSnap.exists) await accessRef.delete();return;}
-  await accessRef.set({ownerId,inviteOnly:config.inviteOnly,inviteLinkEnabled:config.inviteLinkEnabled,inviteCode:config.inviteCode,guestEmails:config.guestEmails,inviteToken:config.inviteLinkEnabled?config.inviteToken:'',sentInviteEmails:oldSnap.exists?(oldSnap.data().sentInviteEmails||[]):[],updatedAt:serverTimestamp()});
+  if(!config.inviteOnly){await accessRef.delete().catch(()=>{});return;}
+  await accessRef.set({ownerId,inviteOnly:config.inviteOnly,inviteLinkEnabled:config.inviteLinkEnabled,inviteCode:config.inviteCode,guestEmails:config.guestEmails,inviteToken:config.inviteLinkEnabled?config.inviteToken:'',updatedAt:serverTimestamp()},{merge:true});
   if(config.inviteLinkEnabled&&config.inviteToken) await db.collection('eventAccessLinks').doc(config.inviteToken).set({eventId,ownerId,createdAt:serverTimestamp()});
 }
 
@@ -3006,12 +3003,13 @@ async function saveEvent(status) {
     if (editId) {
       const {createdAt, ...updatePayload} = payload;
       await db.collection('events').doc(editId).update({...updatePayload, inviteCode:firebase.firestore.FieldValue.delete(), guestEmails:firebase.firestore.FieldValue.delete(), inviteToken:firebase.firestore.FieldValue.delete(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
+      if(inviteAccessConfig.inviteOnly)saveButton.textContent='Finishing invite setup…';
       await saveEventInviteAccess(editId,uid,inviteAccessConfig);
       localStorage.removeItem(getLocalDraftKey());
       window.location.href = 'event-manage.html?eventId=' + editId;
     } else {
       const created=await addDoc(collection(db, 'events'), payload);
-      await saveEventInviteAccess(created.id,uid,inviteAccessConfig);
+      if(inviteAccessConfig.inviteOnly){saveButton.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
       localStorage.removeItem(getLocalDraftKey());
       const fromParam = new URLSearchParams(location.search).get('from');
       const dashboardBySource = {
