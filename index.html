@@ -769,7 +769,7 @@
     @media(max-width:699px){
       .hpe-scroll-wrap{overflow:hidden;padding:0!important;}
       .hpe-scroll{display:flex;gap:.75rem;padding:1rem 1rem 1.2rem;width:max-content;transform:none;transition:transform .5s cubic-bezier(.4,0,.2,1)!important;}
-      .hpe-card{flex:0 0 calc(50vw - 1.4rem);max-width:none;border-radius:18px;margin-left:0;
+      .hpe-card{flex:0 0 calc((100vw - 2.75rem) / 2);max-width:none;border-radius:18px;margin-left:0;
         border:1px solid rgba(255,255,255,.15);
         box-shadow:0 8px 24px rgba(0,0,0,.5);
       }
@@ -2480,11 +2480,9 @@
       function mobileTo(page){
         const p = (page + pages()) % pages();
         hpeIdx = p;
-        // each page = 2 cards width + gap
-        const cardW = cards[0] ? cards[0].offsetWidth + 12 : 0;
-        const pageW = cardW * perPage;
-        // offset = page * (2 cards + gap between pages)
-        const offset = p * pageW;
+        const wrapW = scroll.parentElement.offsetWidth;
+        // full page width = wrap width (both cards + gap fit exactly)
+        const offset = p * wrapW;
         scroll.style.transform = `translateX(-${offset}px)`;
         updateMobileDots(p);
       }
