@@ -40,14 +40,6 @@
     .mobile-nav>a::after{color:#888!important;}
     .mobile-nav-ctas{border-top:1px solid #222!important;}
 
-    /* override global 2-col mobile rule for category */
-    @media(max-width:640px){
-      .idx-cat-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.35rem!important;}
-      .idx-cat-card{min-width:0;height:120px!important;padding:0;border-radius:12px!important;border:1.5px solid rgba(255,255,255,.7)!important;}
-      .idx-cat-label{font-size:.65rem!important;}
-      .idx-cat-sub{display:none;}
-    }
-
     /* ── OG PICKS ── */
     .ogp-section{
       background:#000;
@@ -1409,13 +1401,23 @@
     .icc-experiences .idx-cat-bg{background-image:url('community.jpg');}
     .icc-music .idx-cat-bg     {background-image:url('music.jpg');}
     @media(max-width:600px){
-      .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,1fr);gap:.35rem;}
+      .idx-cat-section{padding:1.35rem 0 1.75rem;}
+      .idx-cat-section .idx-cat-inner{padding:0 1rem;}
+      .idx-cat-section .idx-section-label{margin-bottom:.45rem;font-size:.64rem;}
+      .idx-cat-section .idx-section-title{font-size:clamp(1.45rem,6vw,2rem);line-height:1.12;margin-bottom:1rem;}
+      .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;}
       .idx-cat-section .idx-cat-card{
-        height:120px;
+        height:auto;
+        aspect-ratio:.92 / 1;
         border-radius:12px;
-        border:1.5px solid rgba(255,255,255,.7);
+        border:1px solid rgba(255,255,255,.35);
       }
-      .idx-cat-section .idx-cat-label{font-size:.65rem;top:.5rem;left:.55rem;}
+      .idx-cat-section .idx-cat-label{font-size:clamp(.58rem,2.7vw,.78rem);top:.55rem;left:.55rem;right:.4rem;}
+    }
+    @media(max-width:360px){
+      .idx-cat-section .idx-cat-inner{padding:0 .8rem;}
+      .idx-cat-section .idx-cat-grid{gap:.5rem;}
+      .idx-cat-section .idx-cat-label{font-size:.56rem;top:.45rem;left:.45rem;}
     }
     /* ── COMING UP IN A FEW DAYS ── */
     .cup-section{background:#000;padding:1.8rem 0 1.2rem;border-top:1px solid rgba(255,255,255,.07);}
