@@ -160,7 +160,8 @@ service cloud.firestore {
     }
 
     match /playlists/{id} {
-      allow read: if resource.data.isPublic == true || (request.auth != null && (request.auth.uid == resource.data.ownerId || isAdmin()));
+      // Saved playlists are guest-facing content; only owners/admins may mutate them.
+      allow read: if true;
       allow create: if request.auth != null && (request.auth.uid == request.resource.data.ownerId || isAdmin());
       allow update, delete: if request.auth != null && (request.auth.uid == resource.data.ownerId || isAdmin());
     }

@@ -1,4 +1,4 @@
-import { collection, db, getDocs, query, where } from './firebase.js';
+import { collection, db, getDocs, query } from './firebase.js';
 
 const esc = value => String(value || '').replace(/[&<>"']/g, character => ({
   '&': '&amp;',
@@ -11,7 +11,7 @@ const esc = value => String(value || '').replace(/[&<>"']/g, character => ({
 async function loadPlaylist() {
   const status = document.getElementById('status');
   const eventId = new URLSearchParams(location.search).get('eventId');
-  const snapshot = await getDocs(query(collection(db, 'playlists'), where('isPublic', '==', true)));
+  const snapshot = await getDocs(query(collection(db, 'playlists')));
   const playlists = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
   const playlist = (eventId && playlists.find(item => item.eventId === eventId))
     || playlists.find(item => item.isDefault)
