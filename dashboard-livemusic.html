@@ -963,7 +963,7 @@ const createEvBtn=document.getElementById("createEvBtn");if(createEvBtn)createEv
 document.getElementById('evSearch').addEventListener('input',renderEvents);
 document.getElementById('evRefresh').onclick=()=>renderEvents();
 renderEvents();
-function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);});}
+function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);},error=>{console.error('Could not load organizer bookings:',error);const count=document.getElementById('mBookings');if(count)count.textContent='—';const activity=document.getElementById('overviewActivity');if(activity)activity.innerHTML='<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">Bookings could not be loaded. Refresh to try again.</div>';});}
 function renderOverview(){const el=id=>document.getElementById(id);if(el('mEvents'))el('mEvents').textContent=allEvents.length;if(el('planUsageLabel'))el('planUsageLabel').textContent=allEvents.length+' events created';}
 function renderOverviewBookings(bookings){
   const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
