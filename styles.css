@@ -5013,3 +5013,35 @@ body:has(> .site-footer) > .site-footer { margin-top: 0 !important; flex-shrink:
    styles set the document background to black. */
 html:has(body .site-footer),
 body:has(.site-footer) { background: #111 !important; }
+
+/* ── INDEX PAGE: FULL EDGE-TO-EDGE ON MOBILE ── */
+@media (max-width: 768px) {
+  main { padding: 0 !important; margin: 0 !important; }
+  .idx-cat-section, .hpe-section, .tv-section, .ss-section,
+  .ft-section, .cup-section, .trn-section, .ogp-section,
+  .cp-section, .trending-section, #events, #restaurants {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .idx-cat-inner, .trn-inner, .idx-feat-inner, .idx-how-inner,
+  .hpe-banner-text, .ss-banner-text, .ft-banner-content,
+  .tv-head, .tv-scroll-wrap, .ss-scroll-wrap, .ft-scroll-wrap,
+  .hpe-scroll-wrap, .hpe-view-all-wrap, .ss-view-all-wrap,
+  .ft-view-all-wrap, .ogp-head, .ogp-scroll-wrap, .ogp-counter,
+  .cp-banner-inner, .cp-cards-strip, .witp-head, .witp-grid,
+  .trending-head, .trending-ticker-wrap, .cup-scroll,
+  .ev-grid, .trn-grid, .trn-head, .cup-head {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
