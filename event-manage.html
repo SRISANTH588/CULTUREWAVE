@@ -205,6 +205,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <span class="sb-icon">&#128172;</span>
     <span><span style="display:block;">Post Sale Communication</span><span class="sb-sub">Configure post sale messages</span></span>
   </button>
+  <button class="sb-item" data-panel="premium-waitlist" onclick="switchPanel(this,'premium-waitlist')">
+    <span class="sb-icon">&#128203;</span>
+    <span><span style="display:block;">Waitlist</span><span class="sb-sub">Manage overflow registrations</span></span>
+  </button>
   <div class="sb-section">Analytics</div>
   <button class="sb-item" data-panel="analytics" onclick="switchPanel(this,'analytics')">
     <span class="sb-icon">&#128202;</span>
@@ -748,20 +752,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 <!-- PREMIUM WAITLIST PANEL -->
 <div class="panel" id="panel-premium-waitlist">
-  <div style="background:linear-gradient(135deg,#1e0a3c 0%,#4c1d95 40%,#7c3aed 80%,#9333ea 100%);border-radius:20px;padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;"></div>
-    <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem;">&#128203; Premium Feature</div>
-    <div style="font-size:1.8rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Waitlist</div>
-    <div style="font-size:.86rem;color:rgba(255,255,255,.6);margin-top:.35rem;">Automatically manage overflow registrations with a smart waitlist.</div>
-  </div>
   <div class="card">
-    <div class="card-head"><div><h2>Waitlist Management</h2><p>Handle overflow registrations automatically</p></div></div>
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
-      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#f3e8ff,#ede9fe);display:grid;place-items:center;font-size:1.8rem;">&#128203;</div>
-      <div class="premium-lock-message" style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Waitlist</div>
-      <div class="premium-lock-description" style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">When your event sells out, automatically add interested attendees to a waitlist and notify them when spots open up.</div>
-      <button class="premium-upgrade" onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
-    </div>
+    <div class="card-head"><div><h2>Waitlist</h2><p>Guests waiting for a place at this event</p></div><span id="waitlistCount" class="bk-count">0 waiting</span></div>
+    <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;min-width:560px;"><thead><tr style="text-align:left;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;"><th style="padding:.7rem;">Guest</th><th style="padding:.7rem;">Email</th><th style="padding:.7rem;">Phone</th><th style="padding:.7rem;">Joined</th><th style="padding:.7rem;">Status</th></tr></thead><tbody id="waitlistRows"><tr><td colspan="5" style="padding:2rem;text-align:center;color:var(--muted);">Loading waitlist…</td></tr></tbody></table></div>
+    <div id="waitlistNotice" style="font-size:.78rem;color:var(--muted);margin-top:.8rem;"></div>
   </div>
 </div>
 
@@ -941,7 +935,25 @@ async function loadEvent(){
   const planStatus=String(accountData.subscriptionStatus||accountData.planStatus||'active').toLowerCase();
   hasPremiumPages=['pro','premium','business','growth'].includes(plan) && !['cancelled','expired','inactive'].includes(planStatus);
   applyPremiumPagesAccess();
-  renderEventMeta();prefillDetails();prefillSettings();prefillTickets();loadBookings();
+  renderEventMeta();prefillDetails();prefillSettings();prefillTickets();loadBookings();loadWaitlist();
+}
+
+function loadWaitlist(){
+  const rows=document.getElementById('waitlistRows');
+  document.getElementById('waitlistNotice').textContent=eventData.notifyWaitlist&&eventData.allowWaitlist
+    ?'Email notifications are enabled. Waiting guests are emailed automatically when spots reopen.'
+    :'Waitlist signups are collected, but automatic email notifications are currently off.';
+  db.collection('waitlist').where('eventId','==',eventId).where('ownerId','==',auth.currentUser.uid).limit(500).onSnapshot(snap=>{
+    const entries=snap.docs.map(doc=>({id:doc.id,...doc.data()})).sort((a,b)=>{
+      const stamp=v=>v?.toDate?v.toDate().getTime():new Date(v||0).getTime();return stamp(a.createdAt)-stamp(b.createdAt);
+    });
+    document.getElementById('waitlistCount').textContent=`${entries.filter(x=>x.status==='waiting').length} waiting`;
+    rows.innerHTML=entries.length?entries.map(entry=>{
+      const date=entry.createdAt?.toDate?entry.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';
+      const status=entry.status==='notified'?'Notified':entry.status==='removed'?'Removed':'Waiting';
+      return `<tr style="border-top:1px solid var(--border);"><td style="padding:.8rem;font-weight:700;">${esc(entry.name||'Guest')}</td><td style="padding:.8rem;">${esc(entry.email||'—')}</td><td style="padding:.8rem;">${esc(entry.phone||'—')}</td><td style="padding:.8rem;">${date}</td><td style="padding:.8rem;"><span class="status-pill ${entry.status==='notified'?'live':'draft'}">${status}</span></td></tr>`;
+    }).join(''):'<tr><td colspan="5" style="padding:2rem;text-align:center;color:var(--muted);">No one has joined the waitlist yet.</td></tr>';
+  },error=>{console.error('waitlist load failed:',error);rows.innerHTML='<tr><td colspan="5" style="padding:2rem;text-align:center;color:#c92a2a;">Could not load waitlist.</td></tr>';});
 }
 
 function applyPremiumPagesAccess(){

@@ -522,6 +522,7 @@
       <div class="reg-price" id="regPrice">Free</div>
       <div class="reg-meta" id="regMeta">Register to attend</div>
       <button class="reg-btn" id="regBtn" onclick="register()">Register Now 🎉</button>
+      <div id="soldOutMessage" hidden style="margin-top:.65rem;padding:.65rem .75rem;border-radius:10px;background:#fff1f2;color:#9f1239;font-size:.8rem;line-height:1.5;"></div>
       <button class="reg-share" onclick="openShare()">🔗 Share Event</button>
       <hr class="reg-divider"/>
       <div class="reg-detail"><span class="reg-detail-icon">📅</span><span id="sideDate">—</span></div>
@@ -830,8 +831,27 @@ function selectTicket(i){
   document.getElementById('regMeta').textContent = price ? 'Per person · Taxes may apply' : 'Free to attend';
 }
 
+function eventIsSoldOut(data){
+  const tickets=Array.isArray(data.tickets)?data.tickets:[];
+  const ticketCap=tickets.reduce((sum,t)=>sum+Math.max(0,Number(t.qty||t.inventory)||0),0);
+  const cap=Number(data.capacity||0)||ticketCap;
+  const ticketListExhausted=tickets.length>0&&tickets.every(t=>{
+    if(t.soldOut===true) return true;
+    const remaining=t.available??t.remaining;
+    if(remaining!=null) return Number(remaining)<=0;
+    const limit=Number(t.qty||t.inventory||0);
+    return limit>0&&Number(t.booked||t.soldCount||0)>=limit;
+  });
+  return data.soldOut===true||(cap>0&&Number(data.totalBooked||0)>=cap)||ticketListExhausted;
+}
+function eventWaitlistOpen(data){
+  return data.allowWaitlist===true&&(data.soldOut===true||data.overflowAction==='waitlist'||data.overflowAction==='notify');
+}
 function register(){
   if(!eventId) return;
+  const soldOut=eventIsSoldOut(evData);
+  const waitlistOpen=eventWaitlistOpen(evData);
+  if(soldOut&&!waitlistOpen) return;
   const tickets = Array.isArray(evData.tickets) && evData.tickets.length ? evData.tickets : [];
   const t = tickets[selectedTicketIndex] || tickets[0] || {};
   const price = Number(t.price || evData.price || 0);
@@ -849,8 +869,22 @@ function register(){
   location.href = `booking.html?${qs.toString()}`;
 }
 
+function updateRegistrationStatus(data){
+  const soldOut=eventIsSoldOut(data);
+  const waitlistOpen=eventWaitlistOpen(data);
+  const label=soldOut?(waitlistOpen?'Join Waitlist':'Sold Out'):'Register Now 🎉';
+  const mobileLabel=soldOut?(waitlistOpen?'Join Waitlist':'Sold Out'):'Book tickets';
+  const message=document.getElementById('soldOutMessage');
+  if(message){message.hidden=!soldOut;message.textContent=soldOut?(data.soldOutMsg||'This event is sold out.'):'';}
+  const button=document.getElementById('regBtn');
+  const mobile=document.querySelector('.mob-reg-btn');
+  if(button){button.textContent=label;button.disabled=soldOut&&!waitlistOpen;button.style.opacity=button.disabled?'.55':'';button.style.cursor=button.disabled?'not-allowed':'';}
+  if(mobile){mobile.textContent=mobileLabel;mobile.disabled=soldOut&&!waitlistOpen;mobile.style.opacity=mobile.disabled?'.55':'';mobile.style.cursor=mobile.disabled?'not-allowed':'';}
+}
+
 async function renderEvent(data){
   evData = data;
+  updateRegistrationStatus(data);
   ownerUid = data.ownerId;
   document.title = `${data.name||'Event'} | CultureWave`;
   renderNightOffers([...(Array.isArray(data.coupons) ? data.coupons : []), ...(Array.isArray(data.offers) ? data.offers : [])]);
@@ -1131,6 +1165,8 @@ async function init(){
   db.collection('events').doc(eventId).onSnapshot(liveSnap=>{
     if(!liveSnap.exists) return;
     const liveData = liveSnap.data();
+    evData={...evData,...liveData};
+    updateRegistrationStatus(evData);
     evData.allowSharing = liveData.allowSharing;
     evData.showAttendeeCount = liveData.showAttendeeCount;
     if(liveData.showAttendeeCount!==false){

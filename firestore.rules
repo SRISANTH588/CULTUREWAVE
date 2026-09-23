@@ -18,6 +18,17 @@ service cloud.firestore {
         resource.data.status in ['published', 'live', 'active'];
     }
 
+    function waitlistEventAllows(eventId) {
+      let eventData = get(/databases/$(database)/documents/events/$(eventId)).data;
+      return eventData.allowWaitlist == true &&
+        eventData.status in ['published', 'live', 'active'] &&
+        (eventData.get('soldOut', false) == true ||
+          (eventData.overflowAction in ['waitlist', 'notify'] &&
+            eventData.get('capacity', 0) is number &&
+            eventData.get('capacity', 0) > 0 &&
+            eventData.get('totalBooked', 0) >= eventData.get('capacity', 0)));
+    }
+
     // Anyone can write/read their own OTP (needed for signup before auth exists)
     match /emailOtps/{email} {
       allow read, write: if true;
@@ -51,6 +62,23 @@ service cloud.firestore {
       allow create: if true;
       allow update: if true;
       allow delete: if request.auth != null;
+    }
+
+    // Guests can join a waitlist only for an event that has enabled it.
+    // Attendees can read their own entry; event owners can manage their entries.
+    match /waitlist/{entryId} {
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.eventId is string &&
+        waitlistEventAllows(request.resource.data.eventId) &&
+        request.resource.data.ownerId == get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.ownerId &&
+        request.resource.data.status == 'waiting';
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid || isAdmin()
+      );
+      allow update, delete: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
     }
 
     match /payments/{id} {

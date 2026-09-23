@@ -1594,11 +1594,11 @@
           </div>
           <div class="toggle-row">
             <div><strong>📋 Enable Waitlist</strong><span>Collect waitlist registrations when sold out</span></div>
-            <button class="toggle" id="toggleWaitlist" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleWaitlist" onclick="this.classList.toggle('on');if(!this.classList.contains('on')){document.getElementById('toggleNotifyWaitlist').classList.remove('on');document.getElementById('overflowAction').value='close';}"></button>
           </div>
           <div class="toggle-row">
             <div><strong>🔔 Notify Waitlist</strong><span>Auto-notify waitlisted guests if spots open up</span></div>
-            <button class="toggle" id="toggleNotifyWaitlist" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleNotifyWaitlist" onclick="this.classList.toggle('on');if(this.classList.contains('on')){document.getElementById('toggleWaitlist').classList.add('on');document.getElementById('overflowAction').value='notify';}else if(document.getElementById('overflowAction').value==='notify'){document.getElementById('overflowAction').value='waitlist';}"></button>
           </div>
         </div>
       </div>
@@ -1613,7 +1613,7 @@
         <div class="card-head"><h2>Overflow Options</h2><p>What happens when capacity is reached</p></div>
         <div class="field">
           <label for="overflowAction">When capacity is full</label>
-          <select id="overflowAction">
+          <select id="overflowAction" onchange="if(this.value==='waitlist'||this.value==='notify')document.getElementById('toggleWaitlist').classList.add('on');if(this.value==='notify')document.getElementById('toggleNotifyWaitlist').classList.add('on');if(this.value==='waitlist'||this.value==='close')document.getElementById('toggleNotifyWaitlist').classList.remove('on');">
             <option value="close">Close registrations</option>
             <option value="waitlist">Move to waitlist</option>
             <option value="notify">Show sold out & notify me</option>
@@ -2388,7 +2388,7 @@ async function saveEvent(status) {
     onlinePlatform: document.getElementById('onlinePlatform').value,
     eventDates,
     startDate: eventDates.length ? eventDates[0].date : '',
-    capacity: Number(document.getElementById('capacity').value || 0),
+    capacity: Number(document.getElementById('capacity').value || 0) || tickets.reduce((sum,ticket)=>sum+Math.max(0,Number(ticket.qty||0)),0),
     duration: Number(document.getElementById('eventDuration').value || 0),
     regDeadline: document.getElementById('regDeadline').value,
     timezone: document.getElementById('timezone').value,
@@ -2424,8 +2424,8 @@ async function saveEvent(status) {
     guestEmails: document.getElementById('guestEmails').value.split('\n').map(e => e.trim()).filter(Boolean),
     soldOut: document.getElementById('toggleSoldOut').classList.contains('on'),
     soldOutMsg: document.getElementById('soldOutMsg').value.trim(),
-    allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on'),
-    notifyWaitlist: document.getElementById('toggleNotifyWaitlist').classList.contains('on'),
+    allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on') || ['waitlist','notify'].includes(document.getElementById('overflowAction').value),
+    notifyWaitlist: document.getElementById('toggleNotifyWaitlist').classList.contains('on') || document.getElementById('overflowAction').value === 'notify',
     overflowAction: document.getElementById('overflowAction').value,
     showAttendeeCount: document.getElementById('toggleAttendeeCount').classList.contains('on'),
     enableRefunds: document.getElementById('toggleRefunds').classList.contains('on'),

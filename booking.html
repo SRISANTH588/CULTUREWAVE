@@ -414,13 +414,69 @@ function eventStartTime(){
   return evData.startTime || evData.time || firstDate.startTime || firstDate.time || (firstDate.slots||[])[0]?.start || '';
 }
 function ticketMax(ticket){
-  const inventory = Number(ticket.available ?? ticket.inventory ?? ticket.remaining ?? ticket.qty ?? 0);
+  const remainingValue = ticket.available ?? ticket.remaining;
+  const remaining = remainingValue != null
+    ? Math.max(0, Number(remainingValue)||0)
+    : (Number(ticket.qty||ticket.inventory||0) > 0
+      ? Math.max(0, Number(ticket.qty||ticket.inventory) - Number(ticket.booked||ticket.soldCount||0))
+      : 999);
   const configured = Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 0);
-  // Subtract already-booked count for this ticket type
-  const alreadyBooked = Number(ticket.booked ?? ticket.soldCount ?? ticket.totalBooked ?? 0);
-  const effectiveInventory = inventory > 0 ? Math.max(0, inventory - alreadyBooked) : 0;
-  return effectiveInventory > 0 ? Math.min(effectiveInventory, configured || effectiveInventory) : (ticket.soldOut ? 0 : (configured || 999));
+  return ticket.soldOut ? 0 : Math.min(remaining, configured || remaining);
 }
+function eventCapacity(){
+  const explicit=Number(evData.capacity||0);
+  if(explicit>0) return explicit;
+  const finite=tickets.map(t=>Number(t.qty||t.inventory||0)).filter(n=>n>0);
+  return finite.length ? finite.reduce((sum,n)=>sum+n,0) : 0;
+}
+function remainingEventCapacity(){
+  const cap=eventCapacity();
+  return cap>0?Math.max(0,cap-Number(evData.totalBooked||0)):999;
+}
+function eventSoldOut(){
+  const cap=eventCapacity();
+  return evData.soldOut===true || (cap>0 && Number(evData.totalBooked||0)>=cap) || (tickets.length>0 && tickets.every(t=>ticketMax(t)===0));
+}
+function canJoinWaitlist(){
+  if(!evData.allowWaitlist) return false;
+  const manual=evData.soldOut===true;
+  return manual || evData.overflowAction==='waitlist' || evData.overflowAction==='notify';
+}
+function renderSoldOutPanel(){
+  const msg=String(evData.soldOutMsg||'This event is sold out.');
+  const user=bookingAuth.currentUser;
+  const waitlist=canJoinWaitlist();
+  return `<div style="padding:1rem;border:1px solid #fecaca;border-radius:14px;background:#fff7f7;color:#7f1d1d;">
+    <strong style="display:block;font-size:1rem;margin-bottom:.35rem;">⛔ Sold out</strong>
+    <p style="margin:0 0 .85rem;line-height:1.5;">${msg.replace(/[&<>\"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch]))}</p>
+    ${waitlist?`<div style="padding-top:.75rem;border-top:1px solid #fecaca;"><strong>Join the waitlist</strong><p style="font-size:.84rem;margin:.3rem 0 .7rem;">${evData.notifyWaitlist?'We’ll email you if a place opens.':'Your request will be recorded with the event organizer.'}</p><input id="waitlistName" value="${String(user?.displayName||'').replace(/[&<>\"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch]))}" placeholder="Your name" style="width:100%;padding:.7rem;border:1px solid #e5baba;border-radius:9px;margin-bottom:.45rem;"><input id="waitlistPhone" placeholder="Phone number" style="width:100%;padding:.7rem;border:1px solid #e5baba;border-radius:9px;margin-bottom:.6rem;"><button type="button" onclick="joinEventWaitlist()" style="width:100%;padding:.75rem;border:0;border-radius:9px;background:#b91c1c;color:#fff;font-weight:700;cursor:pointer;">Join waitlist</button><div id="waitlistStatus" style="font-size:.82rem;margin-top:.5rem;"></div></div>`:''}
+  </div>`;
+}
+window.joinEventWaitlist=async function(){
+  const user=bookingAuth.currentUser;
+  const status=document.getElementById('waitlistStatus');
+  const button=document.querySelector('#pickerTicketList button[onclick="joinEventWaitlist()"]');
+  if(!user){ if(status) status.textContent='Sign in to join the waitlist.'; return; }
+  if(!canJoinWaitlist()){ if(status) status.textContent='The waitlist is not available for this event.'; return; }
+  if(button){button.disabled=true;button.textContent='Joining…';}
+  try{
+    const entryRef=db.collection('waitlist').doc(`${eventId}_${user.uid}`);
+    const existing=await entryRef.get();
+    if(existing.exists){ if(status) status.textContent='You are already on the waitlist.'; if(button){button.textContent='Joined';} return; }
+    await entryRef.set({
+      eventId, eventName:evData.name||passedName||'Event', ownerId:evData.ownerId||evData.organiserId||'',
+      userId:user.uid, name:document.getElementById('waitlistName')?.value.trim()||user.displayName||'Guest',
+      email:user.email||'', phone:document.getElementById('waitlistPhone')?.value.trim()||'',
+      status:'waiting', createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    if(status) status.textContent=evData.notifyWaitlist?'You’re on the waitlist. We’ll email you when a spot opens.':'You’re on the waitlist. Your request was sent to the event organizer.';
+    if(button){button.textContent='Joined';}
+  }catch(error){
+    console.error('waitlist signup failed:',error);
+    if(status) status.textContent='Could not join the waitlist. Please try again.';
+    if(button){button.disabled=false;button.textContent='Join waitlist';}
+  }
+};
 const MAX_TOTAL_TICKETS = 999;
 function selectedTicketItems(){
   const items=tickets.map((ticket,index)=>({ticket,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
@@ -442,15 +498,21 @@ function renderTicketPicker(){
   const startTime=eventStartTime();
   const endTime=evData.endTime || evData.finishTime || '';
   document.getElementById('pickerTime').textContent=startTime ? `${startTime}${endTime ? ` – ${endTime}` : ''}` : 'Time TBA';
+  if(eventSoldOut()){
+    list.innerHTML=renderSoldOutPanel();
+    return;
+  }
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const max=ticketMax(ticket), quantity=pickerQuantities[index]||0, sold=max===0; const description=ticket.description||ticket.details||''; return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticket.price||0)}</span><button class="bk-picker-details" type="button" onclick="togglePickerDetails(${index})">Details⌄</button></div>${description?`<p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom"><span class="bk-picker-availability">${sold?'Sold out':max+' available'}</span>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),Math.max(0,remainingEventCapacity()-selectedElsewhere)), sold=max===0; const description=ticket.description||ticket.details||''; return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticket.price||0)}</span><button class="bk-picker-details" type="button" onclick="togglePickerDetails(${index})">Details⌄</button></div>${description?`<p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom"><span class="bk-picker-availability">${sold?'Sold out':max+' available'}</span>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
   updatePickerBar();
 }
 function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
 function changePickerQty(index, change){
   const max = ticketMax(tickets[index]);
   const currentForThis = pickerQuantities[index] || 0;
-  const next = Math.max(0, Math.min(max, currentForThis + change));
+  const remainingEvent=remainingEventCapacity();
+  const otherTickets=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0);
+  const next = Math.max(0, Math.min(max, remainingEvent-otherTickets, currentForThis + change));
   pickerQuantities[index] = next;
   selectedTicketIdx = index;
   qty = selectedTicketCount() || 1;
@@ -872,6 +934,13 @@ async function sendEmail(data){
 
 // ── SUBMIT ──
 async function submitBooking(){
+  try{
+    const fresh=await db.collection('events').doc(eventId).get({source:'server'});
+    if(fresh.exists){evData={id:fresh.id,...fresh.data()};tickets=Array.isArray(evData.tickets)?evData.tickets:[];}
+  }catch(error){console.error('Could not recheck event capacity:',error);showToast('Could not verify availability. Please try again.');return;}
+  if(eventSoldOut() || (eventCapacity()>0 && Number(evData.totalBooked||0)+selectedTicketCount()>eventCapacity())){
+    pickerQuantities=tickets.map(()=>0);selectedSeats=[];document.getElementById('panel1').classList.add('ticket-picker');goStep(1);renderTicketPicker();updatePickerBar();showToast(evData.soldOutMsg||'This event is sold out.');return;
+  }
   if(!document.getElementById('tcCheck').checked){ showToast('Please agree to Terms & Conditions'); return; }
   const ticketName = selectedTicketLabel();
   const ticketCount = selectedTicketCount();
@@ -1194,6 +1263,21 @@ async function init(){
           document.getElementById("receiptBanner").appendChild(img);
         }
         renderTicketPicker();
+        db.collection('events').doc(eventId).onSnapshot(liveSnap=>{
+          if(!liveSnap.exists) return;
+          evData={id:liveSnap.id,...liveSnap.data()};
+          tickets=Array.isArray(evData.tickets)?evData.tickets:[];
+          if(pickerQuantities.length!==tickets.length) pickerQuantities=tickets.map(()=>0);
+          if(eventSoldOut()){
+            pickerQuantities=tickets.map(()=>0);
+            selectedSeats=[];
+            if(!document.getElementById('panel1').classList.contains('active')){document.getElementById('panel1').classList.add('ticket-picker');goStep(1);}
+            renderTicketPicker();
+            updatePickerBar();
+          } else if(document.getElementById('panel1').classList.contains('active')) {
+            renderTicketPicker();
+          }
+        },error=>console.error('Live event availability listener failed:',error));
       } else {
         document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">This event could not be found.</div>';
       }
