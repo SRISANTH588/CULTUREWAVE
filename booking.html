@@ -970,12 +970,16 @@ function applyBookedSeats(seats){
 async function fetchBookedSeats(){
   if(!eventId) return;
   try{
-    const [bookingsSnap, eventSnap] = await Promise.all([
+    const [bookingsSnap, paymentsSnap, eventSnap] = await Promise.all([
       db.collection("bookings").where("eventId","==",eventId).get(),
-      db.collection("events").doc(eventId).get()
+      db.collection("payments").where("eventId","==",eventId).get(),
+      db.collection('events').doc(eventId).get()
     ]);
     const seats = [];
-    bookingsSnap.forEach(doc=>{
+    const seen = new Set();
+    [...bookingsSnap.docs, ...paymentsSnap.docs].forEach(doc=>{
+      if(seen.has(doc.id)) return;
+      seen.add(doc.id);
       const d = doc.data();
       if(isConfirmedBooking(d)) seats.push(...bookingSeatIds(d));
     });
@@ -985,6 +989,17 @@ async function fetchBookedSeats(){
       if(Array.isArray(evSeats)) seats.push(...evSeats.map(String).filter(Boolean));
     }
     applyBookedSeats(seats);
+    // Backfill event.bookedSeats so future loads are fast
+    const unique = [...new Set(seats)];
+    if(unique.length && eventSnap.exists){
+      const existing = eventSnap.data().bookedSeats || [];
+      const missing = unique.filter(s => !existing.includes(s));
+      if(missing.length){
+        db.collection('events').doc(eventId).update({
+          bookedSeats: firebase.firestore.FieldValue.arrayUnion(...missing)
+        }).catch(()=>{});
+      }
+    }
   }catch(e){ console.error('fetchBookedSeats:',e); }
 }
 
