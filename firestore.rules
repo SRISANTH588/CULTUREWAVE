@@ -160,7 +160,7 @@ service cloud.firestore {
     }
 
     match /playlists/{id} {
-      allow read: if request.auth != null && (request.auth.uid == resource.data.ownerId || isAdmin());
+      allow read: if resource.data.isPublic == true || (request.auth != null && (request.auth.uid == resource.data.ownerId || isAdmin()));
       allow create: if request.auth != null && (request.auth.uid == request.resource.data.ownerId || isAdmin());
       allow update, delete: if request.auth != null && (request.auth.uid == resource.data.ownerId || isAdmin());
     }
