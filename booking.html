@@ -895,7 +895,7 @@ async function submitBooking(){
   }
 
   const options = {
-    key: "rzp_live_SYhM7tRhZXmKn1",
+    key: "rzp_live_TfQxJ9jyHm051R",
     amount: Math.round(total * 100),
     currency: "INR",
     name: "CultureWave",
@@ -911,7 +911,7 @@ async function submitBooking(){
       let paymentMethod = 'Razorpay';
       try{
         const res = await fetch(`https://api.razorpay.com/v1/payments/${pid}`, {
-          headers: { 'Authorization': 'Basic ' + btoa('rzp_live_SYhM7tRhZXmKn1:') }
+          headers: { 'Authorization': 'Basic ' + btoa('rzp_live_TfQxJ9jyHm051R:') }
         });
         if(res.ok){
           const pData = await res.json();
