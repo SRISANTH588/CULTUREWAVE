@@ -456,7 +456,7 @@ function ticketMax(ticket){
     ? Math.max(0, Number(remainingValue)||0)
     : (Number(ticket.qty||ticket.inventory||0) > 0
       ? Math.max(0, Number(ticket.qty||ticket.inventory) - Number(ticket.booked||ticket.soldCount||0))
-      : 999);
+      : Number.POSITIVE_INFINITY);
   const configured = Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 0);
   const bulkIsConfigured = Number(ticket.bulk?.minPersons||0)>0 && Number(ticket.bulk?.pricePerPerson||0)>0;
   const bulkMax = bulkIsConfigured ? Number(ticket.bulk.maxPersons || 0) : 0;
@@ -471,7 +471,7 @@ function eventCapacity(){
 }
 function remainingEventCapacity(){
   const cap=eventCapacity();
-  return cap>0?Math.max(0,cap-Number(evData.totalBooked||0)):999;
+  return cap>0?Math.max(0,cap-Number(evData.totalBooked||0)):Number.POSITIVE_INFINITY;
 }
 function eventSoldOut(){
   const cap=eventCapacity();
@@ -517,7 +517,7 @@ window.joinEventWaitlist=async function(){
     if(button){button.disabled=false;button.textContent='Join waitlist';}
   }
 };
-const MAX_TOTAL_TICKETS = 20;
+const MAX_TOTAL_TICKETS = Number.POSITIVE_INFINITY;
 function selectedTicketItems(){
   const items=tickets.map((ticket,index)=>({ticket,index,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
   return items.length ? items : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},index:selectedTicketIdx,quantity:qty}];
