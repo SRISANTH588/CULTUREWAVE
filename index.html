@@ -353,19 +353,21 @@
     }
     .ss-coupon-chip{
       display:flex;align-items:center;justify-content:space-between;gap:.4rem;
-      min-width:0;padding:.35rem .45rem .35rem .6rem;border-radius:999px;
-      background:linear-gradient(110deg,rgba(245,197,24,.13),rgba(245,197,24,.045));
-      border:1px solid rgba(245,197,24,.38);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 12px rgba(0,0,0,.2);
+      min-width:0;min-height:38px;padding:.32rem .38rem .32rem .65rem;border-radius:999px;
+      background:linear-gradient(110deg,rgba(7,9,7,.96),rgba(20,19,12,.96));
+      border:1.5px solid #f5c518;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 6px 18px rgba(0,0,0,.65);
+      backdrop-filter:blur(10px);
     }
     .ss-coupon-tag{
       display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-      font-size:.62rem;font-weight:900;color:#f7d66e;letter-spacing:.08em;text-transform:uppercase;
+      font-size:.65rem;font-weight:900;color:#fff3bf;letter-spacing:.08em;text-transform:uppercase;
+      text-shadow:0 1px 5px rgba(0,0,0,.85);
     }
     .ss-coupon-val{
       flex:none;padding:.22rem .45rem;border-radius:999px;
-      background:rgba(245,197,24,.16);font-size:.58rem;font-weight:900;
-      color:#ffe69a;letter-spacing:.03em;white-space:nowrap;
+      background:#f5c518;font-size:.6rem;font-weight:900;
+      color:#171300;letter-spacing:.03em;white-space:nowrap;
     }
     .ss-view-all-wrap{padding:.6rem 0 1.4rem;display:flex;justify-content:center;}
     .ss-view-all{
@@ -701,7 +703,7 @@
       bottom:-1.3rem;
       color:rgba(202,255,233,.09);
     }
-    .cup-banner .hpe-banner-text{margin-left:clamp(1rem,5vw,5rem);}
+    .cup-banner .hpe-banner-text{margin-left:clamp(1rem,5vw,5rem);margin-right:auto;text-align:left;}
     .cup-banner .hpe-eyebrow{color:rgba(207,245,228,.86);}
     .cup-banner .hpe-eyebrow::before{background:rgba(207,245,228,.82);}
     .cup-banner .hpe-heading em{-webkit-text-stroke-color:rgba(207,245,228,.92);}
@@ -2842,11 +2844,19 @@
         }catch(e){}
         const venue = d.venueName || d.venue || d.city || '';
         const img = d.cardImgUrl || d.coverUrl || '';
-        // build coupon chips (show up to 2)
-        const couponsHtml = (d.coupons||[]).slice(0,2).map(c => {
-          const val = c.type==='percent' ? `${c.value}% OFF` : `\u20b9${c.value} OFF`;
-          return `<div class="ss-coupon-chip"><span class="ss-coupon-tag">✦ ${c.code}</span><span class="ss-coupon-val">${val}</span></div>`;
-        }).join('');
+        // Read the same coupon fields used by booking and show one valid offer.
+        const couponSource = [d.coupons,d.discountCoupons,d.offers,d.couponCodes,d.promos]
+          .find(source => Array.isArray(source) && source.length) || [];
+        const couponsHtml = couponSource
+          .filter(c => c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0)
+          .slice(0,1)
+          .map(c => {
+            const code = String(c.code||c.couponCode||c.promoCode).trim().toUpperCase();
+            const safeCode = code.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+            const value = Number(c.value??c.discount??c.amount??c.off);
+            const val = c.type==='percent'||c.type==='percentage' ? `${value}% OFF` : `\u20b9${value} OFF`;
+            return `<div class="ss-coupon-chip"><span class="ss-coupon-tag">✦ ${safeCode}</span><span class="ss-coupon-val">${val}</span></div>`;
+          }).join('');
         const a = document.createElement('a');
         a.className = 'ss-card';
         a.href = `event-detail.html?eventId=${doc.id}`;
