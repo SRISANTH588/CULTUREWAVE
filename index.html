@@ -1500,7 +1500,7 @@
       padding:0 0 1rem;line-height:1;
     }
     .cup-kicker{font-size:.67rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:#c8a8ff;}
-    .cup-heading-main{display:block;max-width:100%;font-size:clamp(2rem,3.4vw,3rem);font-weight:900;letter-spacing:-.025em;color:#fff;line-height:1.08;overflow-wrap:anywhere;}
+    .cup-heading-main{display:block;max-width:100%;font-size:clamp(1.65rem,3.4vw,3rem);font-weight:900;letter-spacing:-.025em;color:#fff;line-height:1.08;white-space:nowrap;}
     .cup-heading-main em{display:block;margin-top:.04em;font-style:italic;color:#c8a8ff;line-height:1.08;}
     .cup-heading-sub{font-family:Manrope,Arial,sans-serif;font-size:.73rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:.2rem;}
     .cup-scroll{
@@ -1554,7 +1554,7 @@
     @media(max-width:699px){
       .cup-section .cup-scroll{gap:.75rem;padding:1rem 1rem 1.2rem;}
       .cup-head{padding:0 1rem .85rem!important;}
-      .cup-heading-main{font-size:clamp(1.9rem,8vw,2.6rem);}
+      .cup-heading-main{font-size:clamp(1.35rem,6.8vw,2.15rem);}
       .cup-heading-sub{font-size:.62rem;letter-spacing:.08em;}
       .cup-card{flex:0 0 calc((100vw - 2.75rem) / 2);max-width:none;border-radius:18px;
         border:1px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.5);
@@ -2032,7 +2032,7 @@
   <!-- COMING UP IN A FEW DAYS -->
   <section class="cup-section" data-site-section="home-partners">
     <div class="trn-inner">
-    <div class="cup-head"><span class="cup-kicker">COMING UP IN A FEW DAYS</span><span class="cup-heading-main">Good things<br><em>are coming.</em></span><span class="cup-heading-sub">✦ Handpicked experiences, arriving soon.</span></div>
+    <div class="cup-head"><span class="cup-kicker">COMING UP IN A FEW DAYS</span><span class="cup-heading-main">Good things are coming</span><span class="cup-heading-sub">✦ Handpicked experiences, arriving soon.</span></div>
     <div class="cup-scroll" id="cupScroll"></div>
     </div>
   </section>
@@ -2373,7 +2373,7 @@
         try{
           const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');
           const diff=(dt-now)/(1000*60*60*24);
-          return diff>=0 && diff<=30;
+          return diff>=0 && diff<=7;
         }catch(e){return false;}
       }).slice(0,10);
       const scroll=document.getElementById('cupScroll');
