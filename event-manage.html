@@ -1655,7 +1655,7 @@ function prefillTickets(){
   const tickets=eventData?.tickets||[];
   const el=document.getElementById('ticketsList');
   if(!tickets.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.84rem;border:1px dashed var(--border);border-radius:10px;">No tickets configured</div>';return;}
-  el.innerHTML=tickets.map(t=>'<div class="ticket-row"><div class="ticket-name">'+esc(t.name||'General')+'</div><div class="ticket-price">'+(t.price?money(t.price):'Free')+'</div><div class="ticket-qty">'+(t.qty?t.qty+' seats':'Unlimited')+'</div></div>').join('');
+  el.innerHTML=tickets.map(t=>'<div class="ticket-row"><div class="ticket-name">'+esc(t.name||'General')+'</div><div class="ticket-price">'+(t.price?money(t.price):'Free')+'</div><div class="ticket-qty">'+(t.bulk?`${t.qty||'Unlimited'} single · ${t.bulk.qty||'Unlimited'} group`:t.qty?`${t.qty} single`:'Unlimited')+'</div></div>').join('');
 }
 
 window.toggleSwitch=function(id){
