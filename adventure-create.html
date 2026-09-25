@@ -1710,9 +1710,9 @@
       <div class="field"><label for="tDesc">Description</label><input id="tDesc" type="text" placeholder="What's included?" /></div>
       <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:0.75rem;">
         <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:0.55rem;">&#127939; Single / Per Person</div>
-        <div class="grid-2">
+        <div class="grid-2" id="singleTicketGrid">
           <div class="field"><label for="tPrice">Price per person (₹)</label><input id="tPrice" type="number" min="0" value="0" placeholder="0 = Free" /></div>
-          <div class="field"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /></div>
+          <div class="field" id="ticketStockField"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /><div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">Attendee spots, including group members</div></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.75rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;">
@@ -1730,6 +1730,7 @@
           <div class="field"><label for="tGroupPrice">Price per person (₹)</label><input id="tGroupPrice" type="number" min="0" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
         </div>
         <div id="bulkPreview" style="margin-top:0.55rem;font-size:0.76rem;color:#065f46;font-weight:700;"></div>
+        <div style="font-size:.7rem;color:#42695b;margin-top:.35rem;">Set Total Quantity above for the whole group ticket. Each attendee in a booked group uses one spot; the ticket sells out when all spots are booked.</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -2128,6 +2129,12 @@ window.toggleBulkSection = function() {
   btn.classList.toggle('on');
   const on = btn.classList.contains('on');
   document.getElementById('bulkSection').style.display = on ? '' : 'none';
+  const stockField = document.getElementById('ticketStockField');
+  const bulkSection = document.getElementById('bulkSection');
+  const singleGrid = document.getElementById('singleTicketGrid');
+  const preview = document.getElementById('bulkPreview');
+  if (on) bulkSection.insertBefore(stockField, preview);
+  else singleGrid.appendChild(stockField);
   if (!on) document.getElementById('bulkPreview').textContent = '';
 };
 window.updateBulkPreview = function() {
@@ -2150,6 +2157,7 @@ window.closeTicketModal = () => {
   });
   const btn = document.getElementById('toggleBulk');
   btn.classList.remove('on');
+  document.getElementById('singleTicketGrid').appendChild(document.getElementById('ticketStockField'));
   document.getElementById('bulkSection').style.display = 'none';
   document.getElementById('bulkPreview').textContent = '';
   activePerDateIdx = null;
