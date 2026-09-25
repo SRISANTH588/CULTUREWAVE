@@ -1061,7 +1061,9 @@ async function renderEvent(data){
   // highlights strip
   const firstTicket = (data.tickets||[])[0] || {};
   const firstGroupPrice = Number(firstTicket.bulk?.pricePerPerson||0);
-  const price0 = Number(firstTicket.price)>0 ? Number(firstTicket.price) : firstGroupPrice>0 ? firstGroupPrice : Number(data.price||0);
+  const firstGroupMin = Number(firstTicket.bulk?.minPersons||0);
+  const isGroupTicket = firstGroupPrice>0 && firstGroupMin>0;
+  const price0 = isGroupTicket ? firstGroupPrice*firstGroupMin : Number(firstTicket.price)>0 ? Number(firstTicket.price) : Number(data.price||0);
   const mins = Number(data.duration||0);
   const durationLabel = mins ? (mins >= 60 ? (mins/60 % 1 === 0 ? (mins/60)+' Hrs' : (mins/60).toFixed(1)+' Hrs') : mins+' Mins') : '';
   function fmtShortDate(ts){
@@ -1084,9 +1086,9 @@ async function renderEvent(data){
   else { document.getElementById('mobDurationRow').style.display='none'; }
   document.getElementById('mobInfoVenue').textContent = data.venueName || 'Raasta';
   document.getElementById('mobInfoVenueCity').textContent = data.city || 'Madhapur, Hyderabad';
-  document.getElementById('mobInfoTicket').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
+  document.getElementById('mobInfoTicket').textContent = price0 ? `₹${Number(price0).toLocaleString('en-IN')}${isGroupTicket?' · group of '+firstGroupMin:''}` : 'Free';
   // mobile bottom bar
-  document.getElementById('mobRegPrice').innerHTML = price0 ? `From ₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
+  document.getElementById('mobRegPrice').innerHTML = price0 ? `${isGroupTicket?'Group from':'From'} ₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
 
   // desktop badges + hero
   document.getElementById('evCategory').textContent = '🎪 ' + (data.category||'Event');
@@ -1148,7 +1150,7 @@ async function renderEvent(data){
 
   // price
   document.getElementById('regPrice').innerHTML = price0 ? `&#8377;${Number(price0).toLocaleString('en-IN')}<small> onwards</small>` : 'Free';
-  document.getElementById('regMeta').textContent = price0 ? 'Per person · Taxes may apply' : 'Free to attend';
+  document.getElementById('regMeta').textContent = price0 ? isGroupTicket ? `Group of ${firstGroupMin} · ₹${firstGroupPrice.toLocaleString('en-IN')}/person · Taxes may apply` : 'Per person · Taxes may apply' : 'Free to attend';
 
   // About always reflects the live Firebase description (with summary as fallback).
   const about = String(data.description || data.about || data.summary || 'Event details will be available soon.').trim();
@@ -1176,8 +1178,8 @@ async function renderEvent(data){
       const groupMin = Number(t.bulk?.minPersons || 0);
       const groupMax = Number(t.bulk?.maxPersons || 0);
       const groupPrice = Number(t.bulk?.pricePerPerson || 0);
-      const priceStr = Number(t.price)>0 ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : groupPrice>0 ? `&#8377;${groupPrice.toLocaleString('en-IN')} / person` : 'Free';
-      const groupLabel = groupMin && groupPrice > 0 ? `Group ${groupMin}${groupMax ? '–'+groupMax : '+'} people · ₹${groupPrice.toLocaleString('en-IN')}/person` : '';
+      const priceStr = groupMin && groupPrice>0 ? `&#8377;${(groupMin*groupPrice).toLocaleString('en-IN')} group` : Number(t.price)>0 ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
+      const groupLabel = groupMin && groupPrice > 0 ? `${groupMin}${groupMax ? '–'+groupMax : '+'} people · ₹${groupPrice.toLocaleString('en-IN')}/person` : '';
       const firstDate = Array.isArray(data.eventDates)&&data.eventDates[0];
       const dateLabel = firstDate ? new Date(firstDate.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : fmtDate(eventStart);
       const venueLabel = data.venueName||data.city||'Venue TBA';

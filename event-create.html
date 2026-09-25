@@ -1798,7 +1798,7 @@
         <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:0.55rem;">&#127939; Single / Per Person</div>
         <div class="grid-2">
           <div class="field"><label for="tPrice">Price per person (₹)</label><input id="tPrice" type="number" min="0" value="0" placeholder="0 = Free" /></div>
-          <div class="field"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /></div>
+          <div class="field"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /><div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">Attendee spots before this ticket sells out</div></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.75rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;">
@@ -1816,6 +1816,7 @@
           <div class="field"><label for="tGroupPrice">Price per person (₹) <span class="req">*</span></label><input id="tGroupPrice" type="number" min="1" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
         </div>
         <div id="bulkPreview" style="margin-top:0.55rem;font-size:0.76rem;color:#065f46;font-weight:700;"></div>
+        <div style="font-size:.7rem;color:#42695b;margin-top:.35rem;">Group members count toward Total Quantity. The ticket sells out when its attendee spots are used.</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -2692,7 +2693,7 @@ function renderPerDateTicketCards() {
         ${dtix.length ? dtix.map((t, ti) => `
           <div class="ticket-row">
             <div><div class="tr-name">${t.name}</div>${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);">${t.desc}</div>` : ''}${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}</div>
-            <span class="tr-price">${t.bulk && Number(t.price) === 0 && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + Number(t.bulk.pricePerPerson).toLocaleString('en-IN') + '/person group' : Number(t.price) === 0 ? 'Free' : '&#8377;' + Number(t.price).toLocaleString('en-IN')}</span>
+            <span class="tr-price">${t.bulk && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + (Number(t.bulk.pricePerPerson)*Number(t.bulk.minPersons)).toLocaleString('en-IN') + ' group' : Number(t.price) === 0 ? 'Free' : '&#8377;' + Number(t.price).toLocaleString('en-IN')}</span>
             <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
             <button class="tr-del" onclick="removePerDateTicket('${d.date}',${ti})">&#10005;</button>
           </div>`).join('') : `<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.82rem;border:1px dashed var(--border);border-radius:10px;">No tickets for this date yet</div>`}
@@ -2787,7 +2788,7 @@ function renderTickets() {
         ${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);margin-top:0.1rem;">${t.desc}</div>` : ''}
         ${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;margin-top:0.2rem;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}
       </div>
-      <span class="tr-price">${t.bulk && Number(t.price) === 0 && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + Number(t.bulk.pricePerPerson).toLocaleString('en-IN') + '/person group' : t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
+      <span class="tr-price">${t.bulk && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + (Number(t.bulk.pricePerPerson)*Number(t.bulk.minPersons)).toLocaleString('en-IN') + ' group' : t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
       <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
       <button class="tr-del" onclick="removeTicket(${i})">&#10005;</button>
     </div>`).join('');

@@ -519,8 +519,8 @@ window.joinEventWaitlist=async function(){
 };
 const MAX_TOTAL_TICKETS = 20;
 function selectedTicketItems(){
-  const items=tickets.map((ticket,index)=>({ticket,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
-  return items.length ? items : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},quantity:qty}];
+  const items=tickets.map((ticket,index)=>({ticket,index,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
+  return items.length ? items : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},index:selectedTicketIdx,quantity:qty}];
 }
 function groupTicketPrice(ticket, quantity){
   const bulk=ticket?.bulk||{};
@@ -532,11 +532,12 @@ function groupTicketHint(ticket){
   const min=Number(bulk.minPersons||0), max=Number(bulk.maxPersons||0), price=Number(bulk.pricePerPerson||0);
   if(!min || !(price>0)) return '';
   const range=max ? `${min}–${max}` : `${min}+`;
-  return `👥 Group of ${range}: ₹${price.toLocaleString('en-IN')} per person`;
+  const minimumTotal=min*price;
+  return `👥 Group ${range}: ₹${minimumTotal.toLocaleString('en-IN')} total · ₹${price.toLocaleString('en-IN')}/person`;
 }
 function selectedTicketCount(){ return selectedTicketItems().reduce((sum,item)=>sum+item.quantity,0); }
 function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+groupTicketPrice(item.ticket,item.quantity)*item.quantity,0); }
-function selectedTicketLabel(){ return selectedTicketItems().map(item=>`${item.ticket.name||'Ticket'} × ${item.quantity}`).join(', '); }
+function selectedTicketLabel(){ return selectedTicketItems().map(item=>{ const isGroup=ticketMinRequired(item.ticket)>1&&item.quantity>=ticketMinRequired(item.ticket); return isGroup?`${item.ticket.name||'Ticket'} (group of ${item.quantity})`:`${item.ticket.name||'Ticket'} × ${item.quantity}`; }).join(', '); }
 function eventCoupons(){
   const source=evData.coupons || evData.discountCoupons || evData.offers || evData.couponCodes || evData.promos || [];
   return Array.isArray(source) ? source.filter(c=>c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0) : [];
@@ -555,7 +556,7 @@ function renderTicketPicker(){
     return;
   }
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const unitPrice=quantity?groupTicketPrice(ticket,quantity):groupHint?groupRate:Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(unitPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">per person · group</small>':''}</span><button class="bk-picker-details" type="button" onclick="togglePickerDetails(${index})">Details⌄</button></div>${groupHint?`<div style="margin-top:.45rem;color:#45d49c;font-size:.74rem;font-weight:700;">${groupHint} · Add ${min} to start</div>`:''}${description?`<p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom"><span class="bk-picker-availability">${sold?'Not enough available for a group':max+' available'}</span>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">${groupHint?`ADD GROUP OF ${min}`:'ADD'}</button>`}</div></article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span></div>${groupHint?`<div style="margin-top:.45rem;color:#45d49c;font-size:.74rem;font-weight:700;">${groupHint} · Add ${min} to start</div>`:''}${description?`<p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom">${sold?'<span class="bk-picker-availability">Sold out</span>':''}${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">${groupHint?`ADD GROUP OF ${min}`:'ADD'}</button>`}</div></article>`; }).join('');
   updatePickerBar();
 }
 function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
@@ -911,6 +912,7 @@ async function saveBooking(data){
     const doc = {
       bookingId: data.bookingId, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
+      ticketItems: selectedTicketItems().map(item=>({ticketIndex:item.index,ticketName:item.ticket.name||'Ticket',quantity:item.quantity})),
       amount: data.amount, seats: data.seats, seatIds: seatIds,
       status: data.status, paymentId: data.paymentId||null,
       customerName: data.name, customerEmail: String(data.email||'').trim().toLowerCase(),
@@ -938,16 +940,22 @@ async function saveBooking(data){
       try{
         const updateData = {};
         if(seatIds.length) updateData.bookedSeats = firebase.firestore.FieldValue.arrayUnion(...seatIds);
-        // Decrement available count on the specific ticket type
+        // Keep inventory on the selected ticket types so their quantities sell out independently.
         const evSnap = await db.collection('events').doc(eventId).get();
         if(evSnap.exists){
           const evTickets = evSnap.data().tickets || [];
-          const tIdx = evTickets.findIndex(t => (t.name||'') === (data.ticketName||'').split(' × ')[0] || (t.name||'') === (data.ticketName||''));
-          if(tIdx !== -1 && evTickets[tIdx].available > 0){
-            evTickets[tIdx].available = Math.max(0, Number(evTickets[tIdx].available) - (data.seats || 1));
-            evTickets[tIdx].booked = (Number(evTickets[tIdx].booked) || 0) + (data.seats || 1);
-            updateData.tickets = evTickets;
-          }
+          const bookedItems = Array.isArray(data.ticketItems) && data.ticketItems.length ? data.ticketItems : [{ticketIndex:-1,ticketName:(data.ticketName||'').split(' × ')[0],quantity:data.seats||1}];
+          bookedItems.forEach(item=>{
+            const tIdx = Number.isInteger(Number(item.ticketIndex)) && Number(item.ticketIndex)>=0 && evTickets[Number(item.ticketIndex)]?.name===item.ticketName
+              ? Number(item.ticketIndex)
+              : evTickets.findIndex(t => (t.name||'') === item.ticketName);
+            if(tIdx<0 || !evTickets[tIdx]) return;
+            const booked = (Number(evTickets[tIdx].booked)||0) + Math.max(1,Number(item.quantity)||1);
+            evTickets[tIdx].booked = booked;
+            const inventory = Number(evTickets[tIdx].qty||evTickets[tIdx].inventory||0);
+            if(inventory>0 || evTickets[tIdx].available!=null) evTickets[tIdx].available = Math.max(0,(inventory||Number(evTickets[tIdx].available)||booked)-booked);
+          });
+          if(bookedItems.length) updateData.tickets = evTickets;
         }
         if(Object.keys(updateData).length) await db.collection('events').doc(eventId).update(updateData);
       }catch(_){}
