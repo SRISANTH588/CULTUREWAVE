@@ -548,10 +548,10 @@
             </div>
             <div class="left-stat">
               <strong id="statBookings">—</strong>
-              <span>Bookings made</span>
+              <span>Tickets booked</span>
             </div>
             <div class="left-stat">
-              <strong id="statSat">—</strong>
+              <strong id="statSat" title="This will appear after attendees submit ratings">—</strong>
               <span>Satisfaction</span>
             </div>
           </div>
@@ -714,38 +714,34 @@
 
       emailjs.init({ publicKey: 'PDb2vpOIeLkbZBBFP' });
 
-      function animateCount(el, target, suffix) {
-        let start = 0;
-        const step = Math.ceil(target / 40);
-        const timer = setInterval(() => {
-          start = Math.min(start + step, target);
-          el.textContent = start >= 1000 ? (start/1000).toFixed(1).replace('.0','') + 'k+' : start + suffix;
-          if (start >= target) clearInterval(timer);
-        }, 35);
+      let loginStats = { events: 0, bookings: 0 };
+      function formatLoginCount(value) {
+        if (value == null) return '—';
+        return value >= 1000 ? (value/1000).toFixed(1).replace('.0','') + 'k+' : value + '+';
       }
-      let loginStats = { events: 0, bookings: 0, confirmed: 0 };
       function renderLoginStats() {
-        const satisfaction = loginStats.bookings > 0
-          ? Math.round((loginStats.confirmed / loginStats.bookings) * 100)
-          : 98;
-        animateCount(document.getElementById('statEvents'), loginStats.events, '+');
-        animateCount(document.getElementById('statBookings'), loginStats.bookings, '+');
-        document.getElementById('statSat').textContent = satisfaction + '%';
-      }
-      function showLoginStatsError() {
-        document.getElementById('statEvents').textContent = '—';
-        document.getElementById('statBookings').textContent = '—';
+        document.getElementById('statEvents').textContent = formatLoginCount(loginStats.events);
+        document.getElementById('statBookings').textContent = formatLoginCount(loginStats.bookings);
+        // No attendee rating/review records currently exist, so don't show a fabricated percentage.
         document.getElementById('statSat').textContent = '—';
       }
-      onSnapshot(query(collection(db, 'events'), where('status', '==', 'published')), snap => {
-        loginStats.events = snap.size || 0;
+      onSnapshot(query(collection(db, 'events'), where('status', 'in', ['published', 'live', 'active'])), snap => {
+        const publicEvents = snap.docs.filter(doc => doc.data().publicListing !== false);
+        loginStats.events = publicEvents.length;
+        // Event totals are public aggregates; attendee/booking documents remain private.
+        loginStats.bookings = publicEvents.reduce((total, doc) => {
+          const event = doc.data();
+          const ticketBookings = Array.isArray(event.tickets)
+            ? event.tickets.reduce((count, ticket) => count + (Number(ticket.booked || ticket.soldCount) || 0), 0)
+            : 0;
+          return total + Math.max(0, Number(event.totalBooked) || 0, ticketBookings);
+        }, 0);
         renderLoginStats();
-      }, showLoginStatsError);
-      onSnapshot(collection(db, 'bookings'), snap => {
-        loginStats.bookings = snap.size || 0;
-        loginStats.confirmed = snap.docs.filter(doc => doc.data().status === 'confirmed' || doc.data().status === 'paid').length;
+      }, () => {
+        loginStats.events = null;
+        loginStats.bookings = null;
         renderLoginStats();
-      }, showLoginStatsError);
+      });
 
       const authTabs = document.querySelectorAll("[data-auth-tab]");
       const authForms = document.querySelectorAll("[data-auth-form]");
