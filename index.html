@@ -664,25 +664,25 @@
       min-height:clamp(220px,26vw,320px);
       align-items:center;
       padding:clamp(2rem,5vw,3.5rem) 0;
-      background:linear-gradient(120deg,#101a3b 0%,#263f7b 52%,#11172f 100%);
-      border-top:1px solid rgba(170,195,255,.3);
+      background:linear-gradient(120deg,#21150e 0%,#493018 52%,#17110c 100%);
+      border-top:1px solid rgba(244,196,112,.3);
     }
     .cup-banner::before{
       background:
-        radial-gradient(ellipse 58% 90% at 8% 50%,rgba(107,151,255,.3),transparent 68%),
-        radial-gradient(ellipse 38% 70% at 92% 12%,rgba(189,170,255,.2),transparent 65%);
+        radial-gradient(ellipse 58% 90% at 8% 50%,rgba(197,133,55,.28),transparent 68%),
+        radial-gradient(ellipse 38% 70% at 92% 12%,rgba(245,202,130,.16),transparent 65%);
     }
     .cup-banner::after{
       content:"SOON";
       right:clamp(1rem,4vw,4rem);
       bottom:-1.3rem;
-      color:rgba(204,218,255,.09);
+      color:rgba(255,220,170,.09);
     }
     .cup-banner .hpe-banner-text{margin-left:clamp(1rem,5vw,5rem);}
-    .cup-banner .hpe-eyebrow{color:rgba(216,228,255,.82);}
-    .cup-banner .hpe-eyebrow::before{background:rgba(216,228,255,.75);}
-    .cup-banner .hpe-heading em{-webkit-text-stroke-color:rgba(199,213,255,.92);}
-    .cup-banner .hpe-sub{color:rgba(216,228,255,.78);}
+    .cup-banner .hpe-eyebrow{color:rgba(255,229,190,.86);}
+    .cup-banner .hpe-eyebrow::before{background:rgba(255,220,170,.82);}
+    .cup-banner .hpe-heading em{-webkit-text-stroke-color:rgba(255,220,170,.92);}
+    .cup-banner .hpe-sub{color:rgba(255,229,190,.78);}
     .hpe-banner-text{position:relative;z-index:2;}
     .hpe-eyebrow{
       display:inline-flex;align-items:center;gap:.5rem;
@@ -1525,6 +1525,25 @@
     .cup-price.paid{color:#fff;}
     @media(min-width:700px){
       .cup-card{flex:0 0 180px;max-width:200px;}
+    }
+    @media(min-width:768px){
+      .cup-scroll{gap:1.2rem;padding:1.4rem 0;}
+      .cup-card{
+        flex:0 0 calc(25% - 1rem);
+        max-width:none;
+        border-radius:16px;
+        border-color:rgba(255,255,255,.12);
+        box-shadow:none;
+      }
+      .cup-card:hover{
+        transform:translateY(-4px);
+        border-color:rgba(255,255,255,.35);
+        box-shadow:0 20px 48px rgba(0,0,0,.65);
+      }
+      .cup-info{padding:.6rem .7rem .75rem;}
+    }
+    @media(min-width:900px){
+      .cup-section .trn-inner{padding:0 clamp(1.5rem,5vw,5rem);}
     }
     @media(max-width:699px){
       .cup-section .cup-scroll{gap:.75rem;padding:1rem 1rem 1.2rem;}
