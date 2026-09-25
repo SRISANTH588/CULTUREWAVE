@@ -2743,7 +2743,7 @@
       if(!docs.length){ document.getElementById('tvSection').style.display='none'; return; }
       // aggregate venues
       const VENUE_OVERRIDES = {
-        'bratt cafe': { img: 'bratt.jpeg' },
+        'bratt brewing kitchen': { name: 'Bratt Brewing & Kitchen', img: 'bratt.jpeg' },
       };
       const VENUE_EXCLUDE = ['taluka tiffins'];
       const map = {};
@@ -2751,9 +2751,13 @@
         const d = doc.data();
         const name = d.venueName || d.venue || '';
         if(!name) return;
-        const key = name.toLowerCase().trim();
+        const rawKey = name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+        const key = ['bratt cafe', 'bratt brewing kitchen', 'bratt brewing and kitchen'].includes(rawKey)
+          ? 'bratt brewing kitchen'
+          : rawKey;
         if(VENUE_EXCLUDE.includes(key)) return;
-        if(!map[key]) map[key] = {name, city: d.city||'', img: d.cardImgUrl||d.coverUrl||'', count:0};
+        // Aggregate spelling/case/punctuation variants into one venue card.
+        if(!map[key]) map[key] = {name: VENUE_OVERRIDES[key]?.name || name, city: d.city||'', img: VENUE_OVERRIDES[key]?.img || d.cardImgUrl||d.coverUrl||'', count:0};
         map[key].count++;
         if(!map[key].img && (d.cardImgUrl||d.coverUrl)) map[key].img = d.cardImgUrl||d.coverUrl;
         if(VENUE_OVERRIDES[key]) map[key].img = VENUE_OVERRIDES[key].img;
