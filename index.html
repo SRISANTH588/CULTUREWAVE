@@ -1546,9 +1546,12 @@
       .cup-section .trn-inner{padding:0 clamp(1.5rem,5vw,5rem);}
     }
     @media(max-width:699px){
+      .cup-banner{min-height:260px;padding:3rem 0 2.5rem;}
+      .cup-banner .hpe-heading{font-size:clamp(3rem,12vw,3.5rem);}
       .cup-section .cup-scroll{gap:.75rem;padding:1rem 1rem 1.2rem;}
       .cup-card{flex:0 0 calc((100vw - 2.75rem) / 2);max-width:none;border-radius:18px;
-        border:1px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.5);}
+        border:1px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.5);
+        transition:transform .4s ease,box-shadow .4s ease,border-color .4s ease;}
     }
 
     /* ── EDGE TO EDGE on mobile: specific sections only, not hero/category/footer ── */
@@ -1573,6 +1576,7 @@
     @media(max-width:699px){
       #events .trn-head{padding-left:1rem!important;padding-right:1rem!important;}
       #events .ev-grid{padding:.75rem 1rem 1.5rem!important;}
+      .cup-section .cup-scroll{padding:1rem 1rem 1.2rem!important;}
     }
 
     /* ── TRENDING RIGHT NOW ── */
