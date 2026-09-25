@@ -953,6 +953,8 @@
       .trn-card{flex:0 0 200px;max-width:200px;}
       /* ev-grid 2 columns on desktop */
       .ev-grid{grid-template-columns:repeat(2,1fr);gap:1rem;padding:.5rem 0 1.4rem;}
+      #events .trn-inner{padding:0 clamp(1.5rem,5vw,5rem);}
+      #events .ev-grid{gap:clamp(1rem,2vw,1.5rem);padding:1.2rem 0 1.5rem;}
       #events.trn-section{padding-left:0;padding-right:0;}
       /* cup section */
       .cup-head{padding:0 0 .9rem;}
@@ -1586,7 +1588,7 @@
         position:relative;left:50%;right:50%;
         margin-left:-50vw!important;margin-right:-50vw!important;
       }
-      .hpe-banner-text,.ss-banner-text,.ft-banner-content,
+      .hpe-banner-text,.ss-banner-text,.events-banner-text,.ft-banner-content,
       .tv-head,.tv-scroll-wrap,.ss-scroll-wrap,.ft-scroll-wrap,
       .hpe-scroll-wrap,.hpe-view-all-wrap,.ss-view-all-wrap,.ft-view-all-wrap,
       .cup-scroll,.ev-grid,.trn-head,.cup-head,.trn-inner{
@@ -1595,6 +1597,7 @@
         max-width:100%!important;width:100%!important;
       }
       .cup-banner .hpe-banner-text{margin-left:0;padding-left:1rem!important;padding-right:1rem!important;}
+      .events-banner-text{padding-left:1rem!important;padding-right:1rem!important;}
     }
     @media(max-width:699px){
       #events .trn-head{padding-left:1rem!important;padding-right:1rem!important;}
@@ -1706,6 +1709,8 @@
     }
     @media(max-width:699px){
       .ev-grid{padding:.75rem 1rem 1.5rem;gap:.85rem;align-items:stretch;}
+      #events .ev-grid{gap:.9rem;padding:.75rem 1rem 1rem;}
+      #events .ev-card{border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.5);}
     }
     .ev-card{
       text-decoration:none;display:block;
@@ -2023,8 +2028,14 @@
 
   <!-- FEATURED EVENTS -->
   <section class="trn-section" id="events" data-site-section="home-events">
+    <div class="ss-banner events-banner">
+      <div class="ss-banner-text events-banner-text">
+        <div class="ss-eyebrow">Book the events you love ✦</div>
+        <div class="ss-title">Book it.<br><em>Love it.</em></div>
+        <div class="ss-sub">✦ Live it. Only the best. Every time.</div>
+      </div>
+    </div>
     <div class="trn-inner">
-    <div class="trn-head"><span style="font-size:.72rem;font-weight:800;letter-spacing:.14em;color:rgba(255,255,255,.45);display:block;margin-bottom:.4rem;">BOOK THE EVENTS YOU LOVE ✦</span>Book It. Love It. Live It.</div>
     <div class="ev-grid" id="indexEventsGrid">
       <div id="indexEventsEmpty" style="text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);display:none;min-width:200px;">
         <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
