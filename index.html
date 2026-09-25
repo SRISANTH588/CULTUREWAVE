@@ -1782,6 +1782,22 @@
       #events .ev-title{font-size:.75rem;line-height:1.3;}
       #events .ev-venue{font-size:.63rem;}
     }
+    /* Keep the homepage event cards aligned to one desktop size system. */
+    @media(min-width:900px){
+      .hpe-card,.ss-card,.cup-card,#events .ev-card{
+        flex:0 0 clamp(220px,20vw,280px);
+        max-width:280px;
+        box-sizing:border-box;
+      }
+      .hpe-poster,.ss-poster,.ss-poster-placeholder,.cup-poster,#events .ev-poster{
+        aspect-ratio:3/4;
+      }
+      .hpe-info,.ss-card-body,.cup-info,#events .ev-body{
+        box-sizing:border-box;
+        min-height:112px;
+      }
+      #events .ev-grid{display:flex;flex-wrap:wrap;align-items:stretch;}
+    }
     .trn-head{
       font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
       font-size:clamp(1.3rem,5vw,1.8rem);font-weight:900;
