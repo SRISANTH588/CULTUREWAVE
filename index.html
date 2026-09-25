@@ -371,8 +371,12 @@
     .ss-dot-m.active{width:20px;border-radius:999px;background:#fff;}
     @media(max-width:699px){
       .ss-scroll-wrap{overflow:hidden;padding:0!important;}
-      .ss-scroll{display:flex;gap:.75rem;padding:1rem 1rem 1.2rem;width:max-content;transition:transform .5s cubic-bezier(.4,0,.2,1)!important;}
+      .ss-scroll{display:flex;gap:.75rem;padding:1rem 1rem .25rem;width:max-content;transition:transform .5s cubic-bezier(.4,0,.2,1)!important;}
       .ss-card{flex:0 0 calc((100vw - 2.75rem) / 2)!important;border-radius:18px;}
+      .ss-price{display:none;}
+      .ss-coupon-chip:nth-child(n+2){display:none;}
+      .ss-dots-mobile{padding:.25rem 0 .1rem;}
+      .ss-view-all-wrap{padding:.25rem 0 .65rem;}
       .ss-scroll-wrap::before,.ss-scroll-wrap::after{display:none;}
     }
     @media(min-width:700px){
@@ -382,7 +386,7 @@
     }
     @media(min-width:900px){
       .ss-scroll-wrap{max-width:none;margin:0;}
-      .ss-scroll{gap:1.15rem;padding:1.2rem clamp(1.5rem,5vw,5rem) 1.2rem;}
+      .ss-scroll{gap:1.15rem;padding:1.2rem clamp(1.5rem,5vw,5rem) .25rem;}
       .ss-card{
         flex:0 0 clamp(220px,20vw,280px);
         border-radius:22px;
@@ -401,7 +405,10 @@
       .ss-date-day{font-size:.82rem;}
       .ss-date-mon{font-size:.58rem;}
       .ss-venue{font-size:.72rem;}
-      .ss-price{bottom:.75rem;left:.75rem;font-size:.72rem;padding:.32rem .75rem;}
+      .ss-price{display:none;}
+      .ss-coupon-chip:nth-child(n+2){display:none;}
+      .ss-dots-mobile{display:none;}
+      .ss-view-all-wrap{padding:.25rem 0 .65rem;}
     }
 
     /* ── FINEST TABLES SECTION ── */
