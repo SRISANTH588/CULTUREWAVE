@@ -556,7 +556,7 @@ function renderTicketPicker(){
     return;
   }
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span></div>${groupHint?`<div style="margin-top:.45rem;color:#45d49c;font-size:.74rem;font-weight:700;">${groupHint} · Add ${min} to start</div>`:''}${description?`<p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom">${sold?'<span class="bk-picker-availability">Sold out</span>':''}${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">${groupHint?`ADD GROUP OF ${min}`:'ADD'}</button>`}</div></article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span></div>${groupHint?`<div style="margin-top:.45rem;color:#45d49c;font-size:.74rem;font-weight:700;">${groupHint} · ADD selects ${min}; + adds ${min} more</div>`:''}${description?`<p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom">${sold?'<span class="bk-picker-availability">Sold out</span>':''}${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
   updatePickerBar();
 }
 function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
@@ -566,12 +566,13 @@ function changePickerQty(index, change){
   const remainingEvent=remainingEventCapacity();
   const otherTickets=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0);
   const minRequired = ticketMinRequired(tickets[index]);
+  const step = minRequired>1 ? minRequired : 1;
   const available = Math.min(max, remainingEvent-otherTickets, MAX_TOTAL_TICKETS-otherTickets);
-  let requested = currentForThis + change;
-  if(change>0 && currentForThis===0 && minRequired>1) requested=minRequired;
-  if(change<0 && currentForThis>0 && currentForThis<=minRequired) requested=0;
-  let next = Math.max(0, Math.min(available, requested));
-  if(next>0 && next<minRequired) next=available>=minRequired?minRequired:0;
+  let requested = change>0
+    ? (currentForThis===0 ? minRequired : currentForThis+step)
+    : (currentForThis<=step ? 0 : currentForThis-step);
+  if(change>0 && requested>available){ showToast(`Not enough attendee spots for another group of ${step}`); return; }
+  const next = Math.max(0, Math.min(available, requested));
   pickerQuantities[index] = next;
   selectedTicketIdx = index;
   qty = selectedTicketCount() || 1;
