@@ -1712,7 +1712,7 @@
         <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:0.55rem;">&#127939; Single / Per Person</div>
         <div class="grid-2" id="singleTicketGrid">
           <div class="field"><label for="tPrice">Price per person (₹)</label><input id="tPrice" type="number" min="0" value="0" placeholder="0 = Free" /></div>
-          <div class="field"><label for="tQty">Single / Per Person Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /><div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">Individual attendee spots for regular priced tickets</div></div>
+          <div class="field" id="ticketStockField"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /><div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">Attendee spots, including group members</div></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.75rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;">
@@ -1729,9 +1729,8 @@
           <div class="field"><label for="tGroupMax">Max. persons</label><input id="tGroupMax" type="number" min="2" placeholder="e.g. 10" oninput="updateBulkPreview()" /></div>
           <div class="field"><label for="tGroupPrice">Price per person (₹)</label><input id="tGroupPrice" type="number" min="0" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
         </div>
-        <div class="field" style="margin-top:.65rem;"><label for="tGroupQty">Group Total Quantity</label><input id="tGroupQty" type="number" min="1" placeholder="e.g. 20" /><div style="font-size:.68rem;color:#42695b;margin-top:.2rem;">Attendee spots reserved for group-priced bookings</div></div>
         <div id="bulkPreview" style="margin-top:0.55rem;font-size:0.76rem;color:#065f46;font-weight:700;"></div>
-        <div style="font-size:.7rem;color:#42695b;margin-top:.35rem;">Group Total Quantity is separate from single ticket quantity. Each attendee in a group uses one group spot.</div>
+        <div style="font-size:.7rem;color:#42695b;margin-top:.35rem;">Set Total Quantity above for the whole group ticket. Each attendee in a booked group uses one spot; the ticket sells out when all spots are booked.</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -2107,7 +2106,7 @@ function renderPerDateTicketCards() {
           <div class="ticket-row">
             <div><div class="tr-name">${t.name}</div>${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);">${t.desc}</div>` : ''}</div>
             <span class="tr-price">${t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
-            <span class="tr-qty">${t.bulk ? `${t.qty||'Unlimited'} single · ${t.bulk.qty||'Unlimited'} group` : t.qty ? `${t.qty} single` : 'Unlimited'}</span>
+            <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
             <button class="tr-del" onclick="removePerDateTicket('${d.date}',${ti})">&#10005;</button>
           </div>`).join('') : `<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.82rem;border:1px dashed var(--border);border-radius:10px;">No tickets for this date yet</div>`}
       </div>
@@ -2130,6 +2129,12 @@ window.toggleBulkSection = function() {
   btn.classList.toggle('on');
   const on = btn.classList.contains('on');
   document.getElementById('bulkSection').style.display = on ? '' : 'none';
+  const stockField = document.getElementById('ticketStockField');
+  const bulkSection = document.getElementById('bulkSection');
+  const singleGrid = document.getElementById('singleTicketGrid');
+  const preview = document.getElementById('bulkPreview');
+  if (on) bulkSection.insertBefore(stockField, preview);
+  else singleGrid.appendChild(stockField);
   if (!on) document.getElementById('bulkPreview').textContent = '';
 };
 window.updateBulkPreview = function() {
@@ -2146,12 +2151,13 @@ window.updateBulkPreview = function() {
 window.openTicketModal = () => { activePerDateIdx = null; document.getElementById('ticketModal').classList.add('open'); };
 window.closeTicketModal = () => {
   document.getElementById('ticketModal').classList.remove('open');
-  ['tName','tPrice','tQty','tDesc','tGroupMin','tGroupMax','tGroupPrice','tGroupQty'].forEach(id => {
+  ['tName','tPrice','tQty','tDesc','tGroupMin','tGroupMax','tGroupPrice'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = id === 'tPrice' ? '0' : '';
   });
   const btn = document.getElementById('toggleBulk');
   btn.classList.remove('on');
+  document.getElementById('singleTicketGrid').appendChild(document.getElementById('ticketStockField'));
   document.getElementById('bulkSection').style.display = 'none';
   document.getElementById('bulkPreview').textContent = '';
   activePerDateIdx = null;
@@ -2169,7 +2175,6 @@ window.addTicket = () => {
       minPersons: Number(document.getElementById('tGroupMin').value || 0),
       maxPersons: Number(document.getElementById('tGroupMax').value || 0),
       pricePerPerson: Number(document.getElementById('tGroupPrice').value || 0),
-      qty: Number(document.getElementById('tGroupQty').value || 0),
     } : null,
   };
   if (bulkOn && !ticket.bulk.minPersons) { alert('Please enter minimum persons for group pricing.'); return; }
@@ -2200,7 +2205,7 @@ function renderTickets() {
         ${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;margin-top:0.2rem;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}
       </div>
       <span class="tr-price">${t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
-      <span class="tr-qty">${t.bulk ? `${t.qty||'Unlimited'} single · ${t.bulk.qty||'Unlimited'} group` : t.qty ? `${t.qty} single` : 'Unlimited'}</span>
+      <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
       <button class="tr-del" onclick="removeTicket(${i})">&#10005;</button>
     </div>`).join('');
 }

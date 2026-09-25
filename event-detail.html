@@ -883,22 +883,14 @@ function selectTicket(i){
 
 function eventIsSoldOut(data){
   const tickets=Array.isArray(data.tickets)?data.tickets:[];
-  const ticketCap=tickets.reduce((sum,t)=>sum+Math.max(0,Number(t.qty||t.inventory)||0)+Math.max(0,Number(t.bulk?.qty||t.bulk?.inventory)||0),0);
+  const ticketCap=tickets.reduce((sum,t)=>sum+Math.max(0,Number(t.qty||t.inventory)||0),0);
   const cap=Number(data.capacity||0)||ticketCap;
   const ticketListExhausted=tickets.length>0&&tickets.every(t=>{
     if(t.soldOut===true) return true;
-    const groupEnabled=Number(t.bulk?.minPersons||0)>0&&Number(t.bulk?.pricePerPerson||0)>0;
-    const hasGroupInventory=groupEnabled&&Object.prototype.hasOwnProperty.call(t.bulk||{},'qty');
-    const groupInventory=Number(t.bulk?.qty||t.bulk?.inventory||0);
-    const singleLimit=Number(t.qty||t.inventory||0);
-    const singleRemaining=t.available??t.remaining;
-    const singleSold=singleRemaining!=null?Number(singleRemaining)<=0:singleLimit>0&&Number(t.booked||t.soldCount||0)>=singleLimit;
-    if(!groupEnabled) return singleSold;
-    const groupLimit=Number(hasGroupInventory?groupInventory:singleLimit);
-    const groupRemaining=hasGroupInventory?(t.bulk?.available??t.bulk?.remaining):singleRemaining;
-    const groupBooked=Number(hasGroupInventory?t.bulk?.booked:t.booked||t.soldCount||0);
-    const groupSold=t.bulk?.soldOut===true||(groupRemaining!=null?Number(groupRemaining)<=0:groupLimit>0&&groupBooked>=groupLimit);
-    return singleSold&&groupSold;
+    const remaining=t.available??t.remaining;
+    if(remaining!=null) return Number(remaining)<=0;
+    const limit=Number(t.qty||t.inventory||0);
+    return limit>0&&Number(t.booked||t.soldCount||0)>=limit;
   });
   return data.soldOut===true||(cap>0&&Number(data.totalBooked||0)>=cap)||ticketListExhausted;
 }
@@ -1110,7 +1102,7 @@ async function renderEvent(data){
   document.getElementById('evDate').textContent = fmtDate(eventStart);
   document.getElementById('evVenue').textContent = data.venueName||'Venue TBA';
   document.getElementById('evCity').textContent = data.city ? ' · '+data.city : '';
-  const attendeeCount = Math.max(Number(data.totalBooked)||0,(data.tickets||[]).reduce((sum,ticket)=>sum + (Number(ticket.booked)||0) + (Number(ticket.bulk?.booked)||0),0));
+  const attendeeCount = Math.max(Number(data.totalBooked)||0,(data.tickets||[]).reduce((sum,ticket)=>sum + (Number(ticket.booked)||0),0));
   if(data.showAttendeeCount!==false){
     document.getElementById('evAttendeeCount').textContent = attendeeCount.toLocaleString('en-IN');
     document.getElementById('evAttendeeCountRow').style.display='flex';
@@ -1186,18 +1178,10 @@ async function renderEvent(data){
       const groupMin = Number(t.bulk?.minPersons || 0);
       const groupMax = Number(t.bulk?.maxPersons || 0);
       const groupPrice = Number(t.bulk?.pricePerPerson || 0);
-      const groupInventory=Number(t.bulk?.qty||t.bulk?.inventory||0);
-      const groupEnabled=groupMin>0&&groupPrice>0;
-      const hasGroupInventory=groupEnabled&&Object.prototype.hasOwnProperty.call(t.bulk||{},'qty');
-      const inventory=Number(hasGroupInventory?groupInventory:t.qty||t.inventory||0);
-      const remaining=hasGroupInventory?(t.bulk?.available??t.bulk?.remaining):(t.available??t.remaining);
-      const booked=Number(hasGroupInventory?t.bulk?.booked:t.booked||t.soldCount||0);
-      const singleInventory=Number(t.qty||t.inventory||0);
-      const singleRemaining=t.available??t.remaining;
-      const singleSold=t.soldOut===true||(singleRemaining!=null&&Number(singleRemaining)<=0)||(singleInventory>0&&Number(t.booked||t.soldCount||0)>=singleInventory);
-      const groupSold=groupEnabled&&(t.bulk?.soldOut===true||(remaining!=null&&Number(remaining)<=0)||(inventory>0&&booked>=inventory));
-      const ticketSoldOut=singleSold&&(!groupEnabled||groupSold);
-      const priceStr = ticketSoldOut ? 'SOLD OUT' : groupEnabled&&!groupSold ? `&#8377;${(groupMin*groupPrice).toLocaleString('en-IN')} group` : Number(t.price)>0 ? `&#8377;${Number(t.price).toLocaleString('en-IN')} single` : 'Free';
+      const inventory = Number(t.qty||t.inventory||0);
+      const remaining = t.available ?? t.remaining;
+      const ticketSoldOut = t.soldOut===true || (remaining!=null && Number(remaining)<=0) || (inventory>0 && Number(t.booked||t.soldCount||0)>=inventory);
+      const priceStr = ticketSoldOut ? 'SOLD OUT' : groupMin && groupPrice>0 ? `&#8377;${(groupMin*groupPrice).toLocaleString('en-IN')} group` : Number(t.price)>0 ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
       const groupLabel = groupMin && groupPrice > 0 ? `${groupMin}${groupMax ? '–'+groupMax : '+'} people · ₹${groupPrice.toLocaleString('en-IN')}/person` : '';
       const firstDate = Array.isArray(data.eventDates)&&data.eventDates[0];
       const dateLabel = firstDate ? new Date(firstDate.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : fmtDate(eventStart);
@@ -1217,7 +1201,7 @@ async function renderEvent(data){
           <div style="text-align:right;">
             <div style="font-size:${ticketSoldOut?'.82rem':'1.1rem'};font-weight:900;color:${ticketSoldOut?'#fecaca':'#fff'};">${priceStr}</div>
             ${groupLabel?`<div style="font-size:.62rem;font-weight:800;color:#d9c6ff;margin-top:.25rem;white-space:nowrap;">${esc(groupLabel)}</div>`:''}
-            ${t.qty||t.bulk?.qty?`<div style="font-size:.65rem;color:rgba(255,255,255,.65);">${t.qty?`${Number(t.qty).toLocaleString('en-IN')} single spots`:''}${t.qty&&t.bulk?.qty?' · ':''}${t.bulk?.qty?`${Number(t.bulk.qty).toLocaleString('en-IN')} group spots`:''}</div>`:''}
+            ${t.qty?`<div style="font-size:.65rem;color:rgba(255,255,255,.65);">${Number(t.qty).toLocaleString('en-IN')} seats</div>`:''}
           </div>
         </div>
         <div style="display:flex;align-items:center;border-top:2px dashed #e2eafc;">
@@ -1355,7 +1339,7 @@ async function init(){
     evData.allowSharing = liveData.allowSharing;
     evData.showAttendeeCount = liveData.showAttendeeCount;
     if(liveData.showAttendeeCount!==false){
-      const count = Math.max(Number(liveData.totalBooked)||0,(liveData.tickets||[]).reduce((sum,ticket)=>sum + (Number(ticket.booked)||0) + (Number(ticket.bulk?.booked)||0),0));
+      const count = Math.max(Number(liveData.totalBooked)||0,(liveData.tickets||[]).reduce((sum,ticket)=>sum + (Number(ticket.booked)||0),0));
       document.getElementById('evAttendeeCount').textContent = count.toLocaleString('en-IN');
       document.getElementById('evAttendeeCountRow').style.display='flex';
       document.getElementById('mobAttendeeCount').textContent = count.toLocaleString('en-IN');

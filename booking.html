@@ -271,7 +271,7 @@
       <!-- STEP 3: SUMMARY + COUPON + BILL -->
       <div class="bk-panel" id="panel3">
         <header class="bk-review-head"><button class="bk-picker-back" type="button" onclick="returnToTicketPicker()" aria-label="Back">‹</button><div><h1>Checkout</h1><p id="reviewEventMeta">Review your booking</p></div></header>
-        <div class="checkout-event"><h2 id="s3Event">—</h2><p id="checkoutLocation">Review your booking</p><div class="checkout-ticket"><div class="checkout-ticket-top"><strong id="checkoutDate">—</strong><span id="s3Qty">1 ticket</span></div><div class="checkout-ticket-bottom"><span id="s3Ticket">—</span><div class="checkout-quantity"><button type="button" onclick="changePickerQty(selectedTicketIdx,-1,selectedTicketMode)">−</button><b id="checkoutQty">1</b><button type="button" onclick="changePickerQty(selectedTicketIdx,1,selectedTicketMode)">+</button></div><strong id="b_subtotal">₹0</strong></div></div></div>
+        <div class="checkout-event"><h2 id="s3Event">—</h2><p id="checkoutLocation">Review your booking</p><div class="checkout-ticket"><div class="checkout-ticket-top"><strong id="checkoutDate">—</strong><span id="s3Qty">1 ticket</span></div><div class="checkout-ticket-bottom"><span id="s3Ticket">—</span><div class="checkout-quantity"><button type="button" onclick="changePickerQty(selectedTicketIdx,-1)">−</button><b id="checkoutQty">1</b><button type="button" onclick="changePickerQty(selectedTicketIdx,1)">+</button></div><strong id="b_subtotal">₹0</strong></div></div></div>
         <section class="checkout-section"><h3>Additional Offers</h3><button class="checkout-offer" type="button" onclick="openCouponSheet()"><div><strong>Apply coupon &amp; Bank Offers</strong><span id="offerSaving">Tap to view available offers</span></div><span class="checkout-chevron" style="font-size:1.4rem;color:#aeb0b7;">›</span></button></section>
 
       <!-- COUPON FULL-SCREEN SHEET -->
@@ -392,8 +392,6 @@ let generatedOtp = "";
 let selectedSeats = [];
 let bookedSeats = [];
 let pickerQuantities = [];
-let pickerGroupQuantities = [];
-let selectedTicketMode = false;
 const inviteTokenParam = urlP.get('inviteToken') || '';
 function inviteSessionKey(){ return `inviteAccess:${eventId}`; }
 async function inviteAccessAllowed(){
@@ -452,29 +450,23 @@ function eventStartTime(){
   const firstDate=(evData.eventDates||[])[0]||{};
   return evData.startTime || evData.time || firstDate.startTime || firstDate.time || (firstDate.slots||[])[0]?.start || '';
 }
-function ticketMax(ticket, forGroup=false){
-  const bulkIsConfigured = ticketHasGroup(ticket);
-  const hasBulkInventory = bulkIsConfigured && Object.prototype.hasOwnProperty.call(ticket.bulk||{},'qty');
-  const bulkInventory = Number(ticket.bulk?.qty||ticket.bulk?.inventory||0);
-  const useGroupInventory = forGroup && bulkIsConfigured;
-  const inventory = useGroupInventory && hasBulkInventory ? bulkInventory : Number(ticket.qty||ticket.inventory||0);
-  const remainingValue = useGroupInventory
-    ? (ticket.bulk?.available ?? ticket.bulk?.remaining ?? (hasBulkInventory ? null : ticket.available ?? ticket.remaining))
-    : (ticket.available ?? ticket.remaining);
-  const bookedCount = useGroupInventory && hasBulkInventory ? Number(ticket.bulk?.booked||0) : Number(ticket.booked||ticket.soldCount||0);
+function ticketMax(ticket){
+  const remainingValue = ticket.available ?? ticket.remaining;
   const remaining = remainingValue != null
     ? Math.max(0, Number(remainingValue)||0)
-    : (inventory > 0 ? Math.max(0, inventory - bookedCount) : Number.POSITIVE_INFINITY);
+    : (Number(ticket.qty||ticket.inventory||0) > 0
+      ? Math.max(0, Number(ticket.qty||ticket.inventory) - Number(ticket.booked||ticket.soldCount||0))
+      : Number.POSITIVE_INFINITY);
   const configured = Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 0);
-  const bulkMax = useGroupInventory ? Number(ticket.bulk.maxPersons || 0) : 0;
-  return (ticket.soldOut || (useGroupInventory && ticket.bulk?.soldOut)) ? 0 : Math.min(remaining, configured || remaining, bulkMax || remaining);
+  const bulkIsConfigured = Number(ticket.bulk?.minPersons||0)>0 && Number(ticket.bulk?.pricePerPerson||0)>0;
+  const bulkMax = bulkIsConfigured ? Number(ticket.bulk.maxPersons || 0) : 0;
+  return ticket.soldOut ? 0 : Math.min(remaining, configured || remaining, bulkMax || remaining);
 }
-function ticketHasGroup(ticket){ return Number(ticket?.bulk?.minPersons||0)>0 && Number(ticket?.bulk?.pricePerPerson||0)>0; }
-function ticketMinRequired(ticket){ return ticketHasGroup(ticket) ? Number(ticket.bulk.minPersons) : 1; }
+function ticketMinRequired(ticket){ return Number(ticket?.bulk?.minPersons||0)>0 && Number(ticket?.bulk?.pricePerPerson||0)>0 ? Number(ticket.bulk.minPersons) : 1; }
 function eventCapacity(){
   const explicit=Number(evData.capacity||0);
   if(explicit>0) return explicit;
-  const finite=tickets.flatMap(t=>[Number(t.qty||t.inventory||0),Number(t.bulk?.qty||t.bulk?.inventory||0)]).filter(n=>n>0);
+  const finite=tickets.map(t=>Number(t.qty||t.inventory||0)).filter(n=>n>0);
   return finite.length ? finite.reduce((sum,n)=>sum+n,0) : 0;
 }
 function remainingEventCapacity(){
@@ -483,7 +475,7 @@ function remainingEventCapacity(){
 }
 function eventSoldOut(){
   const cap=eventCapacity();
-  return evData.soldOut===true || (cap>0 && Number(evData.totalBooked||0)>=cap) || (tickets.length>0 && tickets.every(t=>ticketMax(t,false)===0&&(!ticketHasGroup(t)||ticketMax(t,true)===0)));
+  return evData.soldOut===true || (cap>0 && Number(evData.totalBooked||0)>=cap) || (tickets.length>0 && tickets.every(t=>ticketMax(t)===0));
 }
 function canJoinWaitlist(){
   if(!evData.allowWaitlist) return false;
@@ -527,16 +519,13 @@ window.joinEventWaitlist=async function(){
 };
 const MAX_TOTAL_TICKETS = Number.POSITIVE_INFINITY;
 function selectedTicketItems(){
-  const items=tickets.flatMap((ticket,index)=>[
-    {ticket,index,quantity:pickerQuantities[index]||0,isGroup:false},
-    {ticket,index,quantity:pickerGroupQuantities[index]||0,isGroup:true}
-  ]).filter(item=>item.quantity>0);
-  return items.length ? items : (tickets.length ? [] : [{ticket:{name:'General Admission',price:0},index:selectedTicketIdx,quantity:qty,isGroup:false}]);
+  const items=tickets.map((ticket,index)=>({ticket,index,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
+  return items.length ? items : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},index:selectedTicketIdx,quantity:qty}];
 }
-function groupTicketPrice(ticket, quantity, isGroup=false){
+function groupTicketPrice(ticket, quantity){
   const bulk=ticket?.bulk||{};
-  const groupPrice=Number(bulk.pricePerPerson||0);
-  return isGroup && groupPrice>0 ? groupPrice : Number(ticket?.price||0);
+  const min=Number(bulk.minPersons||0), max=Number(bulk.maxPersons||0), groupPrice=Number(bulk.pricePerPerson||0);
+  return min>0 && groupPrice>0 && quantity>=min && (!max||quantity<=max) ? groupPrice : Number(ticket?.price||0);
 }
 function groupTicketHint(ticket){
   const bulk=ticket?.bulk||{};
@@ -547,8 +536,8 @@ function groupTicketHint(ticket){
   return `👥 Group ${range}: ₹${minimumTotal.toLocaleString('en-IN')} total · ₹${price.toLocaleString('en-IN')}/person`;
 }
 function selectedTicketCount(){ return selectedTicketItems().reduce((sum,item)=>sum+item.quantity,0); }
-function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+groupTicketPrice(item.ticket,item.quantity,item.isGroup)*item.quantity,0); }
-function selectedTicketLabel(){ return selectedTicketItems().map(item=>item.isGroup?`${item.ticket.name||'Ticket'} (group of ${item.quantity})`:`${item.ticket.name||'Ticket'} × ${item.quantity}`).join(', '); }
+function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+groupTicketPrice(item.ticket,item.quantity)*item.quantity,0); }
+function selectedTicketLabel(){ return selectedTicketItems().map(item=>{ const isGroup=ticketMinRequired(item.ticket)>1&&item.quantity>=ticketMinRequired(item.ticket); return isGroup?`${item.ticket.name||'Ticket'} (group of ${item.quantity})`:`${item.ticket.name||'Ticket'} × ${item.quantity}`; }).join(', '); }
 function eventCoupons(){
   const source=evData.coupons || evData.discountCoupons || evData.offers || evData.couponCodes || evData.promos || [];
   return Array.isArray(source) ? source.filter(c=>c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0) : [];
@@ -567,27 +556,25 @@ function renderTicketPicker(){
     return;
   }
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, groupQuantity=pickerGroupQuantities[index]||0, min=ticketMinRequired(ticket), hasGroup=ticketHasGroup(ticket), totalSelected=selectedTicketCount(), otherSelected=totalSelected-quantity-groupQuantity, freeCapacity=Math.min(remainingEventCapacity()-otherSelected,MAX_TOTAL_TICKETS-otherSelected), singleMax=Math.min(ticketMax(ticket,false),freeCapacity-groupQuantity), groupMax=Math.min(ticketMax(ticket,true),freeCapacity-quantity), singleSold=singleMax<1, groupSold=groupMax<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const controls=(qty,mode,sold,minQty,label,price)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-top:.55rem;padding:.6rem;border:1px solid #343840;border-radius:12px;"><span style="font-size:.75rem;color:#d4d5da;"><b>${label}</b><small style="display:block;color:#9699a2;">${price}${sold?' · Sold out':''}</small></span>${qty?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1,${mode})">−</button><b>${qty}</b><button type="button" onclick="changePickerQty(${index},1,${mode})">+</button></div>`:sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1,${mode})">ADD</button>`}</div>`; return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(Number(ticket.price||0))}<small style="display:block;font-size:.65em;opacity:.75;">per person</small></span></div>${hasGroup?`<div style="margin-top:.45rem;color:#45d49c;font-size:.74rem;font-weight:700;">${groupHint} · choose single tickets or a group below</div>`:''}${description?`<p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom">${hasGroup?`${controls(quantity,'false',singleSold,1,'Single / per person',fmt(ticket.price||0))}${controls(groupQuantity,'true',groupSold,min,`Group of ${min}+`,fmt(Number(ticket.bulk.pricePerPerson||0)*min))}`:`${quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1,false)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1,false)">+</button></div>`:singleSold?'<span class="bk-picker-availability">Sold out</span><button class="bk-picker-add" disabled>SOLD OUT</button>':`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1,false)">ADD</button>`}`}</div></article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span></div>${groupHint?`<div style="margin-top:.45rem;color:#45d49c;font-size:.74rem;font-weight:700;">${groupHint} · ADD selects ${min}; + adds ${min} more</div>`:''}${description?`<p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom">${sold?'<span class="bk-picker-availability">Sold out</span>':''}${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
   updatePickerBar();
 }
 function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
-function changePickerQty(index, change, isGroup=false){
-  const targetQuantities=isGroup?pickerGroupQuantities:pickerQuantities;
-  const max = ticketMax(tickets[index],isGroup);
-  const currentForThis = targetQuantities[index] || 0;
+function changePickerQty(index, change){
+  const max = ticketMax(tickets[index]);
+  const currentForThis = pickerQuantities[index] || 0;
   const remainingEvent=remainingEventCapacity();
-  const otherTickets=selectedTicketCount()-currentForThis;
-  const minRequired = isGroup ? ticketMinRequired(tickets[index]) : 1;
-  const step = minRequired;
+  const otherTickets=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0);
+  const minRequired = ticketMinRequired(tickets[index]);
+  const step = minRequired>1 ? minRequired : 1;
   const available = Math.min(max, remainingEvent-otherTickets, MAX_TOTAL_TICKETS-otherTickets);
   let requested = change>0
     ? (currentForThis===0 ? minRequired : currentForThis+step)
     : (currentForThis<=step ? 0 : currentForThis-step);
   if(change>0 && requested>available){ showToast(`Not enough attendee spots for another group of ${step}`); return; }
   const next = Math.max(0, Math.min(available, requested));
-  targetQuantities[index] = next;
+  pickerQuantities[index] = next;
   selectedTicketIdx = index;
-  selectedTicketMode=isGroup;
   qty = selectedTicketCount() || 1;
   if(selectedSeats.length > qty) selectedSeats = selectedSeats.slice(0, qty);
   if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
@@ -595,8 +582,8 @@ function changePickerQty(index, change, isGroup=false){
   updateQtyPrice();
 }
 function updatePickerBar(){
-  const count=selectedTicketCount();
-  const total=selectedTicketSubtotal();
+  const count=pickerQuantities.reduce((sum,value)=>sum+value,0);
+  const total=pickerQuantities.reduce((sum,value,index)=>sum+groupTicketPrice(tickets[index],value)*value,0);
   document.getElementById('pickerCount').textContent=`${count} ticket${count===1?'':'s'}`;
   document.getElementById('pickerTotal').textContent=fmt(total);
   document.getElementById('pickerBar').classList.toggle('show',count>0);
@@ -609,10 +596,10 @@ function updatePickerBar(){
   if(button) button.textContent=hasMap && selectedSeats.length!==count ? 'Select seats' : 'Checkout';
 }
 function showBookingDetails(){
-  if(!selectedTicketCount()){ showToast('Add at least one ticket'); return; }
+  if(!pickerQuantities.some(Boolean)){ showToast('Add at least one ticket'); return; }
   const hasSeating = document.getElementById('seatingWrap').style.display !== 'none';
   const isImagePlan = hasSeating && document.querySelector('#seatingContainer img');
-  const ticketCount=selectedTicketCount();
+  const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
   if(hasSeating && !isImagePlan && selectedSeats.length !== ticketCount){ showToast(`Please select ${ticketCount} seat${ticketCount===1?'':'s'}`); return; }
   const phone = document.getElementById('bookPhone').value.trim();
   if(!phone || phone.length < 10){ showToast('Add a valid WhatsApp number in your profile before booking'); return; }
@@ -923,7 +910,7 @@ async function saveBooking(data){
     }
     // Ensure seatIds is always a proper array of strings
     const seatIds = Array.isArray(data.seatIds) ? data.seatIds.map(String).filter(Boolean) : [];
-    const ticketItems = selectedTicketItems().map(item=>({ticketIndex:item.index,ticketName:item.ticket.name||'Ticket',quantity:item.quantity,isGroup:!!item.isGroup}));
+    const ticketItems = selectedTicketItems().map(item=>({ticketIndex:item.index,ticketName:item.ticket.name||'Ticket',quantity:item.quantity}));
     const doc = {
       bookingId: data.bookingId, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
@@ -965,18 +952,10 @@ async function saveBooking(data){
               ? Number(item.ticketIndex)
               : evTickets.findIndex(t => (t.name||'') === item.ticketName);
             if(tIdx<0 || !evTickets[tIdx]) return;
-            const quantity = Math.max(1,Number(item.quantity)||1);
-            if(item.isGroup && evTickets[tIdx].bulk && Object.prototype.hasOwnProperty.call(evTickets[tIdx].bulk,'qty')){
-              const bulk=evTickets[tIdx].bulk;
-              const groupInventory=Number(bulk.qty||bulk.inventory||0);
-              bulk.booked=(Number(bulk.booked)||0)+quantity;
-              if(groupInventory>0 || bulk.available!=null) bulk.available=Math.max(0,(groupInventory||Number(bulk.available)||bulk.booked)-bulk.booked);
-            }else{
-              const booked=(Number(evTickets[tIdx].booked)||0)+quantity;
-              evTickets[tIdx].booked=booked;
-              const inventory=Number(evTickets[tIdx].qty||evTickets[tIdx].inventory||0);
-              if(inventory>0 || evTickets[tIdx].available!=null) evTickets[tIdx].available=Math.max(0,(inventory||Number(evTickets[tIdx].available)||booked)-booked);
-            }
+            const booked = (Number(evTickets[tIdx].booked)||0) + Math.max(1,Number(item.quantity)||1);
+            evTickets[tIdx].booked = booked;
+            const inventory = Number(evTickets[tIdx].qty||evTickets[tIdx].inventory||0);
+            if(inventory>0 || evTickets[tIdx].available!=null) evTickets[tIdx].available = Math.max(0,(inventory||Number(evTickets[tIdx].available)||booked)-booked);
           });
           if(bookedItems.length) updateData.tickets = evTickets;
         }
@@ -1027,9 +1006,8 @@ async function submitBooking(){
     const fresh=await db.collection('events').doc(eventId).get({source:'server'});
     if(fresh.exists){evData={id:fresh.id,...fresh.data()};tickets=Array.isArray(evData.tickets)?evData.tickets:[];}
   }catch(error){console.error('Could not recheck event capacity:',error);showToast('Could not verify availability. Please try again.');return;}
-  const ticketInventoryExceeded=selectedTicketItems().some(item=>item.quantity>ticketMax(tickets[item.index]||item.ticket,item.isGroup));
-  if(eventSoldOut() || ticketInventoryExceeded || (eventCapacity()>0 && Number(evData.totalBooked||0)+selectedTicketCount()>eventCapacity())){
-    pickerQuantities=tickets.map(()=>0);pickerGroupQuantities=tickets.map(()=>0);selectedSeats=[];document.getElementById('panel1').classList.add('ticket-picker');goStep(1);renderTicketPicker();updatePickerBar();showToast(evData.soldOutMsg||'The selected ticket quantity is no longer available.');return;
+  if(eventSoldOut() || (eventCapacity()>0 && Number(evData.totalBooked||0)+selectedTicketCount()>eventCapacity())){
+    pickerQuantities=tickets.map(()=>0);selectedSeats=[];document.getElementById('panel1').classList.add('ticket-picker');goStep(1);renderTicketPicker();updatePickerBar();showToast(evData.soldOutMsg||'This event is sold out.');return;
   }
   if(!document.getElementById('tcCheck').checked){ showToast('Please agree to Terms & Conditions'); return; }
   const ticketName = selectedTicketLabel();
@@ -1248,7 +1226,7 @@ function toggleSectionSeat(sectionId){
   const section=(evData.seatingPlan?.sections||[]).find((item,index)=>(item.id||`section-${index}`)===sectionId);
   if(!section) return;
   const capacity=Math.max(1,Number(section.capacity)||1);
-  const ticketCount=selectedTicketCount();
+  const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
   const chosen=selectedSeats.find(id=>id.startsWith(`${sectionId}-`));
   if(chosen){
     selectedSeats.splice(selectedSeats.indexOf(chosen),1);
@@ -1276,7 +1254,7 @@ function toggleSeat(seatId, sofa){
   }
   const idx = selectedSeats.indexOf(seatId);
   if(idx === -1){
-    const ticketCount=selectedTicketCount();
+    const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
     if(ticketCount && selectedSeats.length >= ticketCount){ showToast(`You selected ${ticketCount} ticket${ticketCount===1?'':'s'} — remove a seat to change it`); return; }
     selectedSeats.push(seatId);
     el.style.background = "#1242c5"; el.style.color = "#fff"; el.style.boxShadow = "0 0 0 2px #2f6bff";
@@ -1303,7 +1281,6 @@ async function init(){
         if(!(await inviteAccessAllowed())) { showInviteGate(); return; }
         tickets = Array.isArray(evData.tickets) ? evData.tickets : [];
         pickerQuantities = tickets.map(()=>0);
-        pickerGroupQuantities = tickets.map(()=>0);
         document.getElementById("evNameDisplay").textContent = evData.name||passedName;
         document.getElementById("evVenueDisplay").textContent = (evData.venueName||"")+(evData.city?", "+evData.city:"");
         document.getElementById("rEventName").textContent = evData.name||passedName;
@@ -1347,10 +1324,8 @@ async function init(){
           evData={id:liveSnap.id,...liveSnap.data()};
           tickets=Array.isArray(evData.tickets)?evData.tickets:[];
           if(pickerQuantities.length!==tickets.length) pickerQuantities=tickets.map(()=>0);
-          if(pickerGroupQuantities.length!==tickets.length) pickerGroupQuantities=tickets.map(()=>0);
           if(eventSoldOut()){
             pickerQuantities=tickets.map(()=>0);
-            pickerGroupQuantities=tickets.map(()=>0);
             selectedSeats=[];
             if(!document.getElementById('panel1').classList.contains('active')){document.getElementById('panel1').classList.add('ticket-picker');goStep(1);}
             renderTicketPicker();
