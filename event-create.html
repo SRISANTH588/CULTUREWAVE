@@ -1813,7 +1813,7 @@
         <div class="grid-3">
           <div class="field"><label for="tGroupMin">Min. persons <span class="req">*</span></label><input id="tGroupMin" type="number" min="2" placeholder="e.g. 3" oninput="updateBulkPreview()" /></div>
           <div class="field"><label for="tGroupMax">Max. persons</label><input id="tGroupMax" type="number" min="2" placeholder="e.g. 10" oninput="updateBulkPreview()" /></div>
-          <div class="field"><label for="tGroupPrice">Price per person (₹)</label><input id="tGroupPrice" type="number" min="0" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
+          <div class="field"><label for="tGroupPrice">Price per person (₹) <span class="req">*</span></label><input id="tGroupPrice" type="number" min="1" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
         </div>
         <div id="bulkPreview" style="margin-top:0.55rem;font-size:0.76rem;color:#065f46;font-weight:700;"></div>
       </div>
@@ -2691,8 +2691,8 @@ function renderPerDateTicketCards() {
       <div style="display:flex;flex-direction:column;gap:0.4rem;">
         ${dtix.length ? dtix.map((t, ti) => `
           <div class="ticket-row">
-            <div><div class="tr-name">${t.name}</div>${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);">${t.desc}</div>` : ''}</div>
-            <span class="tr-price">${t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
+            <div><div class="tr-name">${t.name}</div>${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);">${t.desc}</div>` : ''}${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}</div>
+            <span class="tr-price">${t.bulk && Number(t.price) === 0 && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + Number(t.bulk.pricePerPerson).toLocaleString('en-IN') + '/person group' : Number(t.price) === 0 ? 'Free' : '&#8377;' + Number(t.price).toLocaleString('en-IN')}</span>
             <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
             <button class="tr-del" onclick="removePerDateTicket('${d.date}',${ti})">&#10005;</button>
           </div>`).join('') : `<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.82rem;border:1px dashed var(--border);border-radius:10px;">No tickets for this date yet</div>`}
@@ -2746,6 +2746,7 @@ window.addTicket = () => {
   const name = document.getElementById('tName').value.trim();
   if (!name) { alert('Ticket name is required.'); return; }
   const bulkOn = document.getElementById('toggleBulk').classList.contains('on');
+  const groupPriceInput = document.getElementById('tGroupPrice').value.trim();
   const ticket = {
     name,
     price: Number(document.getElementById('tPrice').value || 0),
@@ -2754,10 +2755,12 @@ window.addTicket = () => {
     bulk: bulkOn ? {
       minPersons: Number(document.getElementById('tGroupMin').value || 0),
       maxPersons: Number(document.getElementById('tGroupMax').value || 0),
-      pricePerPerson: Number(document.getElementById('tGroupPrice').value || 0),
+      pricePerPerson: Number(groupPriceInput || 0),
     } : null,
   };
   if (bulkOn && !ticket.bulk.minPersons) { alert('Please enter minimum persons for group pricing.'); return; }
+  if (bulkOn && (!groupPriceInput || Number(groupPriceInput) <= 0)) { alert('Please enter a group price greater than ₹0 per person.'); return; }
+  if (bulkOn && ticket.bulk.maxPersons && ticket.bulk.maxPersons < ticket.bulk.minPersons) { alert('Maximum persons must be greater than or equal to minimum persons.'); return; }
   if (activePerDateIdx !== null) {
     const dateStr = eventDates[activePerDateIdx].date;
     if (!perDateTickets[dateStr]) perDateTickets[dateStr] = [];
@@ -2784,7 +2787,7 @@ function renderTickets() {
         ${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);margin-top:0.1rem;">${t.desc}</div>` : ''}
         ${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;margin-top:0.2rem;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}
       </div>
-      <span class="tr-price">${t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
+      <span class="tr-price">${t.bulk && Number(t.price) === 0 && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + Number(t.bulk.pricePerPerson).toLocaleString('en-IN') + '/person group' : t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
       <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
       <button class="tr-del" onclick="removeTicket(${i})">&#10005;</button>
     </div>`).join('');

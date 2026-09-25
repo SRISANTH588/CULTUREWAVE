@@ -1059,7 +1059,9 @@ async function renderEvent(data){
   document.getElementById('nightVenueCopy').textContent = `2.1km • ${data.venueName||'Raasta'} • ${data.city||'Madhapur, Hyderabad'}`;
 
   // highlights strip
-  const price0 = (data.tickets||[])[0]?.price || data.price || 0;
+  const firstTicket = (data.tickets||[])[0] || {};
+  const firstGroupPrice = Number(firstTicket.bulk?.pricePerPerson||0);
+  const price0 = Number(firstTicket.price)>0 ? Number(firstTicket.price) : firstGroupPrice>0 ? firstGroupPrice : Number(data.price||0);
   const mins = Number(data.duration||0);
   const durationLabel = mins ? (mins >= 60 ? (mins/60 % 1 === 0 ? (mins/60)+' Hrs' : (mins/60).toFixed(1)+' Hrs') : mins+' Mins') : '';
   function fmtShortDate(ts){
@@ -1171,7 +1173,11 @@ async function renderEvent(data){
 
   if(tickets.length){
     document.getElementById('ticketsList').innerHTML = tickets.map((t,i)=>{
-      const priceStr = t.price ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
+      const groupMin = Number(t.bulk?.minPersons || 0);
+      const groupMax = Number(t.bulk?.maxPersons || 0);
+      const groupPrice = Number(t.bulk?.pricePerPerson || 0);
+      const priceStr = Number(t.price)>0 ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : groupPrice>0 ? `&#8377;${groupPrice.toLocaleString('en-IN')} / person` : 'Free';
+      const groupLabel = groupMin && groupPrice > 0 ? `Group ${groupMin}${groupMax ? '–'+groupMax : '+'} people · ₹${groupPrice.toLocaleString('en-IN')}/person` : '';
       const firstDate = Array.isArray(data.eventDates)&&data.eventDates[0];
       const dateLabel = firstDate ? new Date(firstDate.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : fmtDate(eventStart);
       const venueLabel = data.venueName||data.city||'Venue TBA';
@@ -1189,6 +1195,7 @@ async function renderEvent(data){
           </div>
           <div style="text-align:right;">
             <div style="font-size:1.1rem;font-weight:900;color:#fff;">${priceStr}</div>
+            ${groupLabel?`<div style="font-size:.62rem;font-weight:800;color:#d9c6ff;margin-top:.25rem;white-space:nowrap;">${esc(groupLabel)}</div>`:''}
             ${t.qty?`<div style="font-size:.65rem;color:rgba(255,255,255,.65);">${Number(t.qty).toLocaleString('en-IN')} seats</div>`:''}
           </div>
         </div>
