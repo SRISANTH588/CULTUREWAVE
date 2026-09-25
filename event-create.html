@@ -2990,7 +2990,7 @@ async function saveEvent(status) {
     onlinePlatform: document.getElementById('onlinePlatform').value,
     eventDates,
     startDate: eventDates.length ? eventDates[0].date : '',
-    capacity: Number(document.getElementById('capacity').value || 0) || tickets.reduce((sum,ticket)=>sum+Math.max(0,Number(ticket.qty||0)),0),
+    capacity: tickets.reduce((sum,ticket)=>sum+Math.max(0,Number(ticket.qty||ticket.inventory||0)),0) || Number(document.getElementById('capacity').value || 0),
     duration: Number(document.getElementById('eventDuration').value || 0),
     language: document.getElementById('eventLanguage').value.trim(),
     layoutType: document.getElementById('layoutType').value,

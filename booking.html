@@ -465,9 +465,9 @@ function ticketMax(ticket){
 function ticketMinRequired(ticket){ return Number(ticket?.bulk?.minPersons||0)>0 && Number(ticket?.bulk?.pricePerPerson||0)>0 ? Number(ticket.bulk.minPersons) : 1; }
 function eventCapacity(){
   const explicit=Number(evData.capacity||0);
-  if(explicit>0) return explicit;
   const finite=tickets.map(t=>Number(t.qty||t.inventory||0)).filter(n=>n>0);
-  return finite.length ? finite.reduce((sum,n)=>sum+n,0) : 0;
+  const ticketTypeCapacity=finite.reduce((sum,n)=>sum+n,0);
+  return ticketTypeCapacity || explicit;
 }
 function remainingEventCapacity(){
   const cap=eventCapacity();
