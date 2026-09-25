@@ -3003,8 +3003,9 @@
             try {
               const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
               dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-              const time = dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-              dateStr += ' \u00b7 ' + time;
+              const firstDate = Array.isArray(d.eventDates) ? d.eventDates[0] : null;
+              const eventTime = d.startTime || d.time || firstDate?.startTime || firstDate?.time || firstDate?.slots?.[0]?.start || '';
+              if (eventTime) dateStr += ' \u00b7 ' + eventTime;
             } catch(e){}
           }
           const slide = document.createElement('div');
