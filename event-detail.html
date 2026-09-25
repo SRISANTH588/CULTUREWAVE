@@ -4,6 +4,15 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>CultureWave | Event</title>
+  <meta name="description" content="Explore event details, venue information, tickets and registration on CultureWave."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="CultureWave"/>
+  <meta property="og:title" content="Events in Hyderabad | CultureWave"/>
+  <meta property="og:description" content="Explore event details, venue information, tickets and registration on CultureWave."/>
+  <meta property="og:image" content="https://culturewave.in/herosection.jpeg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Events in Hyderabad | CultureWave"/>
+  <meta name="twitter:description" content="Explore event details, venue information, tickets and registration on CultureWave."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
@@ -902,6 +911,85 @@ async function renderEvent(data){
   updateRegistrationStatus(data);
   ownerUid = data.ownerId;
   document.title = `${data.name||'Event'} | CultureWave`;
+  const seoDescription = String(data.summary || data.description || `${data.name || 'Event'} at ${data.venueName || data.city || 'a local venue'}. Explore event details and ticket options on CultureWave.`).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
+  const setSeoMeta = (selector, attribute, value) => {
+    let element = document.head.querySelector(selector);
+    if (!element) {
+      element = document.createElement('meta');
+      document.head.appendChild(element);
+    }
+    element.setAttribute(attribute, value);
+  };
+  const eventCanonical = new URL(location.pathname, location.origin);
+  if (eventId) eventCanonical.searchParams.set('eventId', eventId);
+  let canonicalLink = document.head.querySelector('link[rel="canonical"]');
+  if (!canonicalLink) {
+    canonicalLink = document.createElement('link');
+    canonicalLink.rel = 'canonical';
+    document.head.appendChild(canonicalLink);
+  }
+  canonicalLink.href = eventCanonical.href;
+  setSeoMeta('meta[name="description"]', 'name', 'description');
+  document.head.querySelector('meta[name="description"]').content = seoDescription;
+  setSeoMeta('meta[property="og:title"]', 'property', 'og:title');
+  document.head.querySelector('meta[property="og:title"]').content = document.title;
+  setSeoMeta('meta[property="og:description"]', 'property', 'og:description');
+  document.head.querySelector('meta[property="og:description"]').content = seoDescription;
+  setSeoMeta('meta[property="og:url"]', 'property', 'og:url');
+  document.head.querySelector('meta[property="og:url"]').content = eventCanonical.href;
+  setSeoMeta('meta[property="og:image"]', 'property', 'og:image');
+  document.head.querySelector('meta[property="og:image"]').content = new URL(data.cardImgUrl || data.coverUrl || 'party.jpg', location.href).href;
+  setSeoMeta('meta[name="twitter:title"]', 'name', 'twitter:title');
+  document.head.querySelector('meta[name="twitter:title"]').content = document.title;
+  setSeoMeta('meta[name="twitter:description"]', 'name', 'twitter:description');
+  document.head.querySelector('meta[name="twitter:description"]').content = seoDescription;
+  setSeoMeta('meta[name="twitter:image"]', 'name', 'twitter:image');
+  document.head.querySelector('meta[name="twitter:image"]').content = document.head.querySelector('meta[property="og:image"]').content;
+  if (eventId) {
+    let eventSchema = document.getElementById('eventStructuredData');
+    if (!eventSchema) {
+      eventSchema = document.createElement('script');
+      eventSchema.id = 'eventStructuredData';
+      eventSchema.type = 'application/ld+json';
+      document.head.appendChild(eventSchema);
+    }
+    const eventStartForSchema = getEventStart(data);
+    const eventOffer = (data.tickets || []).find(ticket => Number.isFinite(Number(ticket.price)));
+    const eventSchemaData = {
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: data.name || 'CultureWave Event',
+      description: seoDescription,
+      url: eventCanonical.href,
+      image: [new URL(data.cardImgUrl || data.coverUrl || 'party.jpg', location.href).href],
+      eventStatus: 'https://schema.org/EventScheduled',
+      organizer: { '@type': 'Organization', name: 'CultureWave', url: 'https://culturewave.in/' }
+    };
+    if (eventStartForSchema) eventSchemaData.startDate = eventStartForSchema.toISOString();
+    if (data.venueName || data.city || data.address) {
+      eventSchemaData.location = {
+        '@type': 'Place',
+        name: data.venueName || data.city || 'Venue to be announced',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: data.address || undefined,
+          addressLocality: data.city || undefined,
+          addressRegion: 'Telangana',
+          addressCountry: 'IN'
+        }
+      };
+    }
+    if (eventOffer) {
+      eventSchemaData.offers = {
+        '@type': 'Offer',
+        price: Number(eventOffer.price),
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock',
+        url: eventCanonical.href
+      };
+    }
+    eventSchema.textContent = JSON.stringify(eventSchemaData);
+  }
   renderNightOffers([...(Array.isArray(data.coupons) ? data.coupons : []), ...(Array.isArray(data.offers) ? data.offers : [])]);
   renderNightArtists(data.artists);
   renderNightDetails(data);
