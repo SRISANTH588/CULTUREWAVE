@@ -1775,7 +1775,7 @@ function renderWebReqTable(reqs) {
     <td style="font-size:.74rem;color:var(--muted);">${fmtDate(r.createdAt)}</td>
     <td><div class="btn-row">
       <button class="btn sm" onclick="viewWebReq('${r.id}')">View</button>
-      <a href="https://wa.me/${(r.contactPhone||'').replace(/[^0-9]/g,'')}" target="_blank" class="btn sm success">WhatsApp</a>
+      <a href="https://wa.me/${(r.contactPhone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(`Hi ${r.contactName||'there'}, I’m contacting you from CultureWave about your website request for ${r.bizName||'your business'}. How can we help?`)}" target="_blank" rel="noopener noreferrer" class="btn sm success">WhatsApp</a>
     </div></td>
   </tr>`).join('');
 }
