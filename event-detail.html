@@ -1178,7 +1178,10 @@ async function renderEvent(data){
       const groupMin = Number(t.bulk?.minPersons || 0);
       const groupMax = Number(t.bulk?.maxPersons || 0);
       const groupPrice = Number(t.bulk?.pricePerPerson || 0);
-      const priceStr = groupMin && groupPrice>0 ? `&#8377;${(groupMin*groupPrice).toLocaleString('en-IN')} group` : Number(t.price)>0 ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
+      const inventory = Number(t.qty||t.inventory||0);
+      const remaining = t.available ?? t.remaining;
+      const ticketSoldOut = t.soldOut===true || (remaining!=null && Number(remaining)<=0) || (inventory>0 && Number(t.booked||t.soldCount||0)>=inventory);
+      const priceStr = ticketSoldOut ? 'SOLD OUT' : groupMin && groupPrice>0 ? `&#8377;${(groupMin*groupPrice).toLocaleString('en-IN')} group` : Number(t.price)>0 ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
       const groupLabel = groupMin && groupPrice > 0 ? `${groupMin}${groupMax ? '–'+groupMax : '+'} people · ₹${groupPrice.toLocaleString('en-IN')}/person` : '';
       const firstDate = Array.isArray(data.eventDates)&&data.eventDates[0];
       const dateLabel = firstDate ? new Date(firstDate.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : fmtDate(eventStart);
@@ -1196,7 +1199,7 @@ async function renderEvent(data){
             ${showVenue?`<div style="font-size:.72rem;color:rgba(255,255,255,.75);margin-top:.15rem;">&#128205; ${esc(venueLabel)}</div>`:''}
           </div>
           <div style="text-align:right;">
-            <div style="font-size:1.1rem;font-weight:900;color:#fff;">${priceStr}</div>
+            <div style="font-size:${ticketSoldOut?'.82rem':'1.1rem'};font-weight:900;color:${ticketSoldOut?'#fecaca':'#fff'};">${priceStr}</div>
             ${groupLabel?`<div style="font-size:.62rem;font-weight:800;color:#d9c6ff;margin-top:.25rem;white-space:nowrap;">${esc(groupLabel)}</div>`:''}
             ${t.qty?`<div style="font-size:.65rem;color:rgba(255,255,255,.65);">${Number(t.qty).toLocaleString('en-IN')} seats</div>`:''}
           </div>

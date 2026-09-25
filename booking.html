@@ -909,10 +909,11 @@ async function saveBooking(data){
     }
     // Ensure seatIds is always a proper array of strings
     const seatIds = Array.isArray(data.seatIds) ? data.seatIds.map(String).filter(Boolean) : [];
+    const ticketItems = selectedTicketItems().map(item=>({ticketIndex:item.index,ticketName:item.ticket.name||'Ticket',quantity:item.quantity}));
     const doc = {
       bookingId: data.bookingId, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
-      ticketItems: selectedTicketItems().map(item=>({ticketIndex:item.index,ticketName:item.ticket.name||'Ticket',quantity:item.quantity})),
+      ticketItems,
       amount: data.amount, seats: data.seats, seatIds: seatIds,
       status: data.status, paymentId: data.paymentId||null,
       customerName: data.name, customerEmail: String(data.email||'').trim().toLowerCase(),
@@ -944,7 +945,7 @@ async function saveBooking(data){
         const evSnap = await db.collection('events').doc(eventId).get();
         if(evSnap.exists){
           const evTickets = evSnap.data().tickets || [];
-          const bookedItems = Array.isArray(data.ticketItems) && data.ticketItems.length ? data.ticketItems : [{ticketIndex:-1,ticketName:(data.ticketName||'').split(' × ')[0],quantity:data.seats||1}];
+          const bookedItems = ticketItems.length ? ticketItems : [{ticketIndex:-1,ticketName:(data.ticketName||'').split(' × ')[0],quantity:data.seats||1}];
           bookedItems.forEach(item=>{
             const tIdx = Number.isInteger(Number(item.ticketIndex)) && Number(item.ticketIndex)>=0 && evTickets[Number(item.ticketIndex)]?.name===item.ticketName
               ? Number(item.ticketIndex)
