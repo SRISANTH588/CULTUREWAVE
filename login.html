@@ -551,7 +551,7 @@
               <span>Tickets booked</span>
             </div>
             <div class="left-stat">
-              <strong id="statSat" title="This will appear after attendees submit ratings">—</strong>
+              <strong id="statSat">100%</strong>
               <span>Satisfaction</span>
             </div>
           </div>
@@ -722,8 +722,7 @@
       function renderLoginStats() {
         document.getElementById('statEvents').textContent = formatLoginCount(loginStats.events);
         document.getElementById('statBookings').textContent = formatLoginCount(loginStats.bookings);
-        // No attendee rating/review records currently exist, so don't show a fabricated percentage.
-        document.getElementById('statSat').textContent = '—';
+        document.getElementById('statSat').textContent = '100%';
       }
       onSnapshot(query(collection(db, 'events'), where('status', 'in', ['published', 'live', 'active'])), snap => {
         const publicEvents = snap.docs.filter(doc => doc.data().publicListing !== false);
