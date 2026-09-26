@@ -845,7 +845,7 @@
     @media(max-width:699px){
       .hpe-scroll-wrap{overflow:hidden;padding:0!important;}
       .hpe-scroll{display:flex;gap:.75rem;padding:1rem 1rem 1.2rem;width:max-content;transform:none;transition:transform .5s cubic-bezier(.4,0,.2,1)!important;}
-      .hpe-card{flex:0 0 calc((100vw - 2.75rem) / 2);max-width:none;border-radius:18px;margin-left:0;
+      .hpe-card{flex:0 0 calc(100vw - 2rem);max-width:none;border-radius:18px;margin-left:0;
         border:1px solid rgba(255,255,255,.15);
         box-shadow:0 8px 24px rgba(0,0,0,.5);
       }
@@ -2642,8 +2642,8 @@
       const dotsM = document.getElementById('hpeDotsM');
       const isMobile = () => window.innerWidth < 768;
 
-      /* ── MOBILE: 2 cards per page ── */
-      const perPage = 2;
+      /* ── MOBILE: one card per swipe/page ── */
+      const perPage = 1;
       const pages = () => Math.ceil(total / perPage);
 
       function buildMobileDots(){
