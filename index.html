@@ -2031,10 +2031,10 @@
 
 
 
-  <!-- COMING UP IN A FEW DAYS -->
+  <!-- COMING UP IN THE NEXT 21 DAYS -->
   <section class="cup-section" data-site-section="home-partners">
     <div class="trn-inner">
-    <div class="cup-head"><span class="cup-kicker">COMING UP IN A FEW DAYS</span><span class="cup-heading-main">Good things are coming</span><span class="cup-heading-sub">✦ Handpicked experiences, arriving soon.</span></div>
+    <div class="cup-head"><span class="cup-kicker">COMING UP IN THE NEXT 21 DAYS</span><span class="cup-heading-main">Good things are coming</span><span class="cup-heading-sub">✦ Handpicked experiences, arriving soon.</span></div>
     <div class="cup-scroll" id="cupScroll"></div>
     </div>
   </section>
@@ -2046,6 +2046,11 @@
     <div class="ev-grid" id="trnGrid"></div>
     </div>
   </section>
+  <style>
+    @media (min-width: 768px) {
+      #latestBuzzSection { display: none !important; }
+    }
+  </style>
 
   <!-- FEATURED EVENTS -->
   <section class="trn-section" id="events" data-site-section="home-events">
@@ -2375,7 +2380,7 @@
         try{
           const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');
           const diff=(dt-now)/(1000*60*60*24);
-          return diff>=0 && diff<=7;
+          return diff>=0 && diff<=21;
         }catch(e){return false;}
       }).slice(0,10);
       const scroll=document.getElementById('cupScroll');
