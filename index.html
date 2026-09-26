@@ -2761,7 +2761,8 @@
   (async function loadSceneStealer(){
     try{
       const scroll = document.getElementById('ssScroll');
-      if(!scroll) return;
+      const section = document.querySelector('.ss-section');
+      if(!scroll || !section) return;
       const now = new Date();
       const snap = await _idb.collection('events').limit(200).get();
       const docs = snap.docs
@@ -2779,8 +2780,16 @@
           return pa - pb;
         })
         .slice(0, 12);
-      if(!docs.length){ document.querySelector('.ss-section').style.display='none'; return; }
-      docs.forEach(doc => {
+      const hasValidCoupon = d => {
+        const couponSource = [d.coupons,d.discountCoupons,d.offers,d.couponCodes,d.promos]
+          .find(source => Array.isArray(source) && source.length) || [];
+        return couponSource.some(c => c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0);
+      };
+      const couponDocs = docs.filter(doc => hasValidCoupon(doc.data()));
+      if(!couponDocs.length){ section.hidden = true; return; }
+      section.hidden = false;
+      section.style.display = '';
+      couponDocs.forEach(doc => {
         const d = doc.data();
         const price = d.tickets?.[0]?.price || d.price || 0;
         const priceStr = price ? '\u20b9' + Number(price).toLocaleString('en-IN') : 'Free';
