@@ -705,11 +705,12 @@ function goToProfile(){
 }
 
 function showMobileDetailTab(tab){
+  const helpTarget = document.getElementById('mobileFaqsSection')?.hidden ? 'nightHelp' : 'mobileFaqsSection';
   const targets = {
     about: 'nightAbout',
     photos: 'nightPhotos',
     venue: 'nightVenue',
-    help: 'nightHelp'
+    help: helpTarget
   };
   document.querySelectorAll('[data-mob-tab]').forEach(button => button.classList.toggle('active', button.dataset.mobTab === tab));
   const target = document.getElementById(targets[tab]) || document.getElementById('nightAbout');
@@ -846,7 +847,8 @@ function renderNightDetails(data){
 }
 
 function syncMobileTabs(){
-  const sections = [['about','nightAbout'],['photos','nightPhotos'],['venue','nightVenue'],['help','nightHelp']];
+  const helpTarget = document.getElementById('mobileFaqsSection')?.hidden ? 'nightHelp' : 'mobileFaqsSection';
+  const sections = [['about','nightAbout'],['photos','nightPhotos'],['venue','nightVenue'],['help',helpTarget]];
   const marker = window.scrollY + 155;
   let active = 'about';
   sections.forEach(([tab,id]) => { const el=document.getElementById(id); if(el && el.offsetTop <= marker) active=tab; });
