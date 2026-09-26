@@ -204,7 +204,7 @@
     .night-faqs{margin-top:2.2rem;}
 
     /* Phone-only event-detail refinements. Desktop keeps its existing layout. */
-    @media (max-width:768px){
+    @media (max-width:768px), (min-width:769px){
       body{background:#05070c;color:#f8fafc;padding-bottom:calc(104px + env(safe-area-inset-bottom));}
       .topbar,.mobile-nav,.desktop-hero-stage .hero-banner{display:none!important;}
       .mob-topbar{height:70px;display:grid!important;grid-template-columns:42px 1fr 42px;padding:.7rem 1rem;background:rgba(5,7,12,.94);border:0;position:sticky;top:0;backdrop-filter:blur(18px);}
@@ -249,7 +249,7 @@
       .shell{display:none!important;}.nightlife-mobile{display:block;padding:0 1.45rem calc(10rem + env(safe-area-inset-bottom));color:#f7f7f8;}.nightlife-mobile h2{font-size:1.45rem;letter-spacing:-.05em;line-height:1.1;margin:0 0 1rem;font-weight:900;}.night-offers{margin:0 0 2.7rem;}.night-offer-card{min-height:112px;display:flex;align-items:center;gap:.9rem;padding:1rem 1.15rem;background:linear-gradient(135deg,#123d33,#0b2824);border:1px solid #3d806d;border-radius:22px;box-shadow:0 14px 30px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.08);}.offer-brand{width:48px;height:58px;display:grid;place-items:center;line-height:1;background:linear-gradient(145deg,#ff2780,#c5105a);box-shadow:0 8px 18px rgba(232,20,107,.25);color:#fff;font-weight:900;text-align:center;border-radius:13px;font-size:.72rem;}.night-offer-card span:nth-child(2){display:flex;flex:1;flex-direction:column;gap:.28rem}.night-offer-card strong{font-size:1.05rem}.night-offer-card small{font-size:.78rem;color:#b7d5ca}.night-offer-card>b{padding:.35rem .5rem;border-radius:999px;background:rgba(255,105,36,.16);color:#ff793e;font-size:.76rem}.night-about{scroll-margin-top:135px}.night-about p{font-size:1rem;line-height:1.56;color:#e0e0e3;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}.night-about.expanded p{-webkit-line-clamp:unset}.night-about button{border:0;background:transparent;color:#ff661d;font-weight:800;padding:.15rem 0 .9rem;font-size:.92rem}.night-details{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 1rem;padding:1.4rem;background:#11151d;border:1px solid #292e37;border-radius:25px}.night-details>div{display:flex;align-items:center;gap:.85rem}.night-details i{width:45px;height:45px;border-radius:13px;background:#372016;color:#ff641c;display:grid;place-items:center;font-size:1.25rem;font-style:normal}.night-details span{font-size:.8rem;color:#c2c4c9}.night-details strong{display:block;color:#fff;font-size:1rem;margin-top:.2rem}.night-divider{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:center;margin:3rem 0 2.3rem}.night-divider span{height:1px;background:#7c818c}.night-divider b{font-size:.77rem;letter-spacing:.2em;white-space:nowrap}.night-photos,.night-venue{scroll-margin-top:135px;margin-bottom:3rem}.night-gallery{display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:120px 120px;gap:.55rem}.night-gallery img{width:100%;height:100%;object-fit:cover;border-radius:19px;background:#1a1e27;cursor:pointer}.night-gallery img:first-child{grid-row:span 2}.night-gallery img:nth-child(n+4){display:none}.night-venue{position:relative}.night-venue p{color:#c4c7ce;font-size:.93rem}.night-venue button{position:absolute;right:0;bottom:-.1rem;width:48px;height:48px;border:0;border-radius:14px;background:linear-gradient(145deg,#ff6b2d,#e34212);color:#fff;font-size:1.45rem;box-shadow:0 10px 22px rgba(225,66,18,.3)}.night-help{box-sizing:border-box;width:100%;display:flex;align-items:center;gap:.8rem;text-align:left;text-decoration:none;cursor:pointer;padding:1rem 1.1rem;background:#4a3005;border:1px solid #805712;color:#ffbd25;border-radius:19px;margin-bottom:1.2rem}.night-help i{font-size:2rem;font-style:normal}.night-help span{font-size:.91rem;font-weight:800;line-height:1.25;flex:1}.night-help b{width:35px;height:35px;display:grid;place-items:center;border-radius:50%;background:#7a5204;font-size:1.8rem}.night-terms{border-top:1px solid #272b33;border-bottom:1px solid #272b33;padding:.2rem 0}.night-terms summary{padding:1.15rem 0;font-weight:900;font-size:1.15rem;list-style:none;display:flex;justify-content:space-between}.night-terms p{padding:0 0 1rem;line-height:1.6;color:#c5c8cf}.night-terms[open] summary span{transform:rotate(180deg)}
     }
 
-    @media (max-width:768px){
+    @media (max-width:768px), (min-width:769px){
       .night-seating-map{margin-top:1rem;padding:.65rem;border:1px solid #343945;border-radius:16px;background:#171b23;overflow-x:auto;}
       .night-seating-map img{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:10px;}
       .night-org-card{margin:1rem 0 0;padding:1rem 1.1rem;border:1px solid #2c323b;border-radius:20px;background:#11151d;}
@@ -261,7 +261,6 @@
 
     /* The event poster is a compact card on desktop instead of spanning the page. */
     @media (min-width:769px){
-      .mob-detail-tabs,.mob-gallery-section,.nightlife-mobile,.mob-poster-actions{display:none!important;}
       .desktop-hero-stage .hero-banner{display:none!important;}
       .desktop-hero-stage .mob-poster{display:block;width:min(1120px,calc(100% - 2rem));max-width:100%;height:auto;aspect-ratio:21/9;object-fit:cover;margin:0 auto;position:relative;z-index:3;}
       .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;}
@@ -273,7 +272,7 @@
     /* Nightlife event detail polish — scoped to this page so the existing Firebase
        booking and event rendering logic remains intact. */
     .mob-poster-copy{display:none}
-    @media (max-width:768px){
+    @media (max-width:768px), (min-width:769px){
       .desktop-hero-stage{position:relative;padding:0 0 .1rem}
       .mob-topbar{display:none!important}.mob-poster-actions{display:flex;justify-content:space-between;align-items:center;margin:.8rem 1.2rem .25rem}.mob-poster-action{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid rgba(232,235,241,.3);border-radius:50%;background:rgba(5,7,11,.72);box-shadow:0 4px 10px rgba(0,0,0,.22);backdrop-filter:blur(10px);color:#fff;transition:transform .18s ease,background .18s ease}.mob-poster-action:hover,.mob-poster-action:focus-visible{background:rgba(29,32,38,.82);transform:scale(1.05);outline:none}.mob-poster-action svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
       .mob-poster{display:block!important;aspect-ratio:3/4;object-fit:cover}
@@ -293,7 +292,7 @@
       .night-about p{margin:0}.night-details{margin-top:.2rem}.night-share-card{margin:1.2rem 0 0;padding:1rem 1.1rem;border:1px solid #2c323b;border-radius:20px;background:#11151d}.night-share-card h3{margin:0 0 .78rem;font-size:.96rem;color:#fff}.night-share-actions{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}.night-share-actions button{height:42px;border:1px solid #343a45;border-radius:12px;background:#1b2029;color:#fff;font-size:.79rem;font-weight:800}.night-share-actions button:first-child{border-color:#356053;background:#15342c;color:#d5f1de}.night-gallery{grid-template-rows:127px 127px}.night-open-gallery{width:100%;margin-top:.8rem;padding:.8rem;border:1px solid #343a45;border-radius:13px;background:#1b2029;color:#fff;font:inherit;font-size:.82rem;font-weight:800}.night-photos{margin-bottom:2.7rem}.night-artists{margin:0 0 2.7rem}.night-artists-track{display:flex;gap:.75rem;overflow-x:auto;padding:0 .1rem .25rem;scroll-snap-type:x proximity}.night-artist-card{flex:0 0 128px;overflow:hidden;border:1px solid #2c323b;border-radius:18px;background:#11151d;scroll-snap-align:start}.night-artist-card img{display:block;width:100%;aspect-ratio:1/1.14;object-fit:cover;background:#1b2029}.night-artist-card strong{display:block;padding:.7rem .75rem;color:#fff;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       .mob-register-bar{display:grid;grid-template-columns:1fr auto;gap:.75rem;padding:.7rem;overflow:hidden;background:#242a31;border:1px solid #3a4048;border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,.5);left:1rem;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));}.mob-register-bar::before{display:none}.mob-reg-left{padding:.12rem .35rem}.mob-reg-label{display:none}.mob-reg-price{font-size:1.03rem}.mob-reg-btn{height:48px;margin:0;min-width:132px;font-size:.9rem;background:#1242c5;color:#fff}.night-help{margin-top:.35rem}
     }
-    @media(max-width:768px){
+    @media(max-width:768px), (min-width:769px){
       .night-offers h2{font-size:1.1rem;letter-spacing:-.025em;margin:0 0 .55rem;color:#f5f5f7}
       .night-offer-card{width:100%;min-height:0;gap:.75rem;padding:.6rem .8rem;background:linear-gradient(145deg,#202023,#19191c);border-color:#39393e;border-radius:22px;box-shadow:0 12px 28px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.045);text-align:left}
       .offer-brand{width:58px;height:58px;display:grid;place-items:center;background:linear-gradient(145deg,#3214a5,#6d35ed);box-shadow:0 9px 22px rgba(81,42,220,.35);color:#e4d5ff;border-radius:18px;flex:none}
@@ -302,6 +301,9 @@
       .night-offer-card strong{font-size:1.08rem;font-weight:800;line-height:1.25;color:#f7f7f8;letter-spacing:-.025em}
       .night-offer-card small{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;line-height:1.25;color:#b9b9c1}
       .night-offer-card>b{flex:none;padding:.28rem .42rem;border-radius:999px;background:rgba(255,255,255,.08);color:#c8c4d2;font-size:.67rem;font-weight:800}
+    }
+    @media (min-width:769px){
+      .mob-event-header,.mob-detail-tabs,.nightlife-mobile{width:min(760px,100%);margin-left:auto;margin-right:auto;}
     }
   </style>
 </head>
