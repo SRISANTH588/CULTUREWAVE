@@ -262,9 +262,10 @@
     /* The event poster is a compact card on desktop instead of spanning the page. */
     @media (min-width:769px){
       .mob-detail-tabs,.mob-gallery-section,.nightlife-mobile,.mob-poster-actions{display:none!important;}
-      .desktop-hero-stage .mob-poster{display:block;width:min(960px,calc(100% - 2rem));max-width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;margin:2rem auto;position:relative;z-index:3;}
-      .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;padding-bottom:3rem;}
-      .desktop-hero-stage.has-desktop-background .hero-banner{height:420px!important;background:transparent!important;}
+      .desktop-hero-stage .hero-banner{display:none!important;}
+      .desktop-hero-stage .mob-poster{display:block;width:min(1120px,calc(100% - 2rem));max-width:100%;height:auto;aspect-ratio:21/9;object-fit:cover;margin:0 auto;position:relative;z-index:3;}
+      .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;}
+      .desktop-hero-stage.has-desktop-background .hero-banner{display:block!important;height:420px!important;background:transparent!important;}
       .desktop-hero-stage.has-desktop-background .hero-banner-overlay{display:block;background:linear-gradient(to bottom,rgba(10,15,30,.12),rgba(10,15,30,.62));}
       .desktop-hero-stage.has-desktop-background .mob-poster{margin:-92px auto 0;}
     }
