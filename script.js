@@ -115,7 +115,7 @@ async function createOrder() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       amount: total * 100,
-      merchantName: "cityvibe",
+      merchantName: "CultureWave",
       upiId: "merchant@upi",
       receipt: `pp_${Date.now()}`,
       note: `Tickets for ${selectedEvent.name}`,

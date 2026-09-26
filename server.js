@@ -72,7 +72,7 @@ const localDevAccounts = new Map([
       password: "SASI@2006",
       role: "admin",
       name: "Srisanth",
-      email: "srisanth@cityvibe.local",
+      email: "srisanth@culturewave.in",
     },
   ],
   [
@@ -82,7 +82,7 @@ const localDevAccounts = new Map([
       password: "sasi",
       role: "client",
       name: "Sasi",
-      email: "sasi@cityvibe.local",
+      email: "sasi@culturewave.in",
       onboardingComplete: false,
     },
   ],
@@ -135,7 +135,7 @@ function parseCookies(cookieHeader = "") {
 
 function getSession(req) {
   const cookies = parseCookies(req.headers.cookie);
-  const sessionId = cookies.cityvibe_session;
+  const sessionId = cookies.culturewave_session;
   if (!sessionId) return null;
   return sessions.get(sessionId) || null;
 }
@@ -147,7 +147,7 @@ function requireSession(req) {
 }
 
 function setSessionCookie(res, sessionId) {
-  res.setHeader("Set-Cookie", `cityvibe_session=${encodeURIComponent(sessionId)}; HttpOnly; Path=/; SameSite=Lax`);
+  res.setHeader("Set-Cookie", `culturewave_session=${encodeURIComponent(sessionId)}; HttpOnly; Path=/; SameSite=Lax`);
 }
 
 function createSession(user) {
@@ -322,7 +322,7 @@ const server = http.createServer(async (req, res) => {
         password,
         role: "client",
         name: fullName,
-        email: `${username.toLowerCase()}@cityvibe.local`,
+        email: `${username.toLowerCase()}@culturewave.in`,
       };
       demoAccounts.set(username.toUpperCase(), account);
       const session = createSession(account);
@@ -412,9 +412,9 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "POST" && url.pathname === "/api/auth/logout") {
     const cookies = parseCookies(req.headers.cookie);
-    const sessionId = cookies.cityvibe_session;
+    const sessionId = cookies.culturewave_session;
     if (sessionId) sessions.delete(sessionId);
-    res.setHeader("Set-Cookie", "cityvibe_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
+    res.setHeader("Set-Cookie", "culturewave_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
     return send(res, 200, { success: true });
   }
 
@@ -1013,7 +1013,7 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
   if (req.method === "GET" && url.pathname.startsWith("/dashboard/")) {
     const session = requireSession(req);
     if (!session) {
-      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cityvibe Dashboard</title></head><body style="font-family:system-ui;background:#f6f8ff;color:#10203f;display:grid;place-items:center;min-height:100vh;margin:0"><div style="background:#fff;border:1px solid #dbe5ff;border-radius:24px;padding:24px;max-width:480px;width:calc(100% - 32px)"><h1>Sign in required</h1><p>Please go back to the login page and sign in with Firebase first.</p><a href="/login.html">Go to login</a></div></body></html>`;
+      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CultureWave Dashboard</title></head><body style="font-family:system-ui;background:#f6f8ff;color:#10203f;display:grid;place-items:center;min-height:100vh;margin:0"><div style="background:#fff;border:1px solid #dbe5ff;border-radius:24px;padding:24px;max-width:480px;width:calc(100% - 32px)"><h1>Sign in required</h1><p>Please go back to the login page and sign in with Firebase first.</p><a href="/login.html">Go to login</a></div></body></html>`;
       return send(res, 401, html, { "Content-Type": "text/html; charset=utf-8" });
     }
     const parts = url.pathname.split("/").filter(Boolean);
@@ -1037,5 +1037,5 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
 });
 
 server.listen(3000, "127.0.0.1", () => {
-  console.log("cityvibe running on http://127.0.0.1:3000");
+  console.log("CultureWave running on http://127.0.0.1:3000");
 });

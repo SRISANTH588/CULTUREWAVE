@@ -13,8 +13,8 @@ const auth = getAuth();
 const db = getFirestore();
 
 const ACCOUNTS = [
-  { email: "srisanth@cityvibe.local", password: "SASI@2006", name: "Srisanth", role: "admin" },
-  { email: "sasi@cityvibe.local",     password: "Sasi@123",  name: "Sasi",     role: "client" },
+  { email: "srisanth@culturewave.in", password: "SASI@2006", name: "Srisanth", role: "admin" },
+  { email: "sasi@culturewave.in",     password: "Sasi@123",  name: "Sasi",     role: "client" },
 ];
 
 async function upsertAccount({ email, password, name, role }) {

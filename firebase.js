@@ -17,7 +17,7 @@ const db = getFirestore(app);
 
 // Convert username → email (supports plain email too)
 function toEmail(input) {
-  return input.includes("@") ? input : `${input.toLowerCase()}@cityvibe.local`;
+  return input.includes("@") ? input : `${input.toLowerCase()}@culturewave.in`;
 }
 
 // Get current logged-in user with role from Firestore

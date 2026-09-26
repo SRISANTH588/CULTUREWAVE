@@ -475,7 +475,7 @@
   <section class="night-photos" id="nightPhotos"><h2>Photos &amp; Videos</h2><div id="nightGallery" class="night-gallery"></div><button class="night-open-gallery" id="nightOpenGallery" type="button" onclick="openNightGallery()" hidden>Open gallery</button></section>
   <section class="night-artists" id="nightArtists" hidden><h2>Featured Artists</h2><div class="night-artists-track" id="nightArtistsTrack"></div></section>
   <section class="night-venue" id="nightVenue"><h2>Venue &amp; seating</h2><p id="nightVenueCopy">2.1km • Raasta • Madhapur, Hyderabad</p><div class="night-seating-map" id="nightSeatingPlan" hidden></div><button type="button" onclick="openDirections()" aria-label="Get directions">↗</button></section>
-  <a class="night-help" id="nightHelpLink" href="https://wa.me/916305183601?text=Hi%20CultureWave%2C%20I%20need%20help%20with%20this%20event." target="_blank" rel="noopener noreferrer" aria-label="Contact CultureWave support on WhatsApp"><i aria-hidden="true">◖</i><span>Have queries or need help with<br>something? Hit us up</span><b aria-hidden="true">›</b></a>
+  <a class="night-help" id="nightHelpLink" href="https://wa.me/919848047428?text=Hi%20CultureWave%2C%20I%20need%20help%20with%20this%20event." target="_blank" rel="noopener noreferrer" aria-label="Contact CultureWave support on WhatsApp"><i aria-hidden="true">◖</i><span>Have queries or need help with<br>something? Hit us up</span><b aria-hidden="true">›</b></a>
   <details class="night-terms event-info-accordion" id="mobileEventInfo" hidden>
     <summary>Event information <span aria-hidden="true">⌄</span></summary>
     <div class="event-info-content">
@@ -953,7 +953,7 @@ function updateRegistrationStatus(data){
 async function renderEvent(data){
   evData = data;
   const helpLink=document.getElementById('nightHelpLink');
-  if(helpLink) helpLink.href=`https://wa.me/916305183601?text=${encodeURIComponent(`Hi CultureWave, I need help with ${data.name||'this event'}.`)}`;
+  if(helpLink) helpLink.href=`https://wa.me/919848047428?text=${encodeURIComponent(`Hi CultureWave, I need help with ${data.name||'this event'}.`)}`;
   const ticketCapacity=(data.tickets||[]).reduce((sum,ticket)=>sum+Math.max(0,Number(ticket.qty||ticket.inventory||0)),0);
   const displayCapacity=ticketCapacity||Number(data.capacity||0);
   updateRegistrationStatus(data);
