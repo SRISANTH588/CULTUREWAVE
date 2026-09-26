@@ -1030,7 +1030,7 @@ async function renderEvent(data){
 
   // Optional wide background is displayed on tablet and desktop only.
   const hero = document.getElementById('heroBanner');
-  const posterSrc = data.cardImgUrl || data.coverUrl || 'party.jpg';
+  const posterSrc = data.coverUrl || data.cardImgUrl || 'party.jpg';
   const desktopBackgroundSrc = data.desktopBackgroundUrl;
   if(desktopBackgroundSrc) {
     hero.classList.add('has-desktop-background');
