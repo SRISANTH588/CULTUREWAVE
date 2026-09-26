@@ -1014,7 +1014,7 @@
     }
     .hs-card{border:0!important;border-radius:20px;overflow:hidden;background:#171717!important;box-shadow:0 10px 28px rgba(0,0,0,.35)!important;transition:box-shadow .25s ease;}
     .hs-card:hover{box-shadow:0 16px 36px rgba(0,0,0,.45)!important;}
-    .hs-poster{width:100%;aspect-ratio:3/4;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}
+    .hs-poster{width:100%;aspect-ratio:3/4;display:block;background-image:var(--hs-cover-image,var(--hs-card-image,var(--hs-fallback-image)));background-size:cover;background-position:center;position:relative;overflow:hidden;}
     @media(min-width:701px){.hs-poster{aspect-ratio:21/9;}}
     .hs-poster-inner{width:100%;height:100%;display:block;background:none!important;}
     /* mobile: info inside card */
@@ -3004,7 +3004,6 @@
         if (!docs.length) { document.getElementById('heroSlider').style.display='none'; return; }
         docs.forEach(function(doc, i) {
           const d = doc.data(), id = doc.id;
-          const img = d.cardImgUrl || d.coverUrl || '';
           const price = d.tickets?.[0]?.price || d.price || 0;
           const priceStr = price ? '\u20b9' + Number(price).toLocaleString('en-IN') : 'Free';
           let dateStr = '';
@@ -3020,7 +3019,7 @@
           const slide = document.createElement('div');
           slide.className = 'hs-slide';
           slide.innerHTML = `<div class="hs-card" onclick="location.href='event-detail.html?eventId=${id}'" style="cursor:pointer">
-            <div class="hs-poster" style="${img ? "background:url('" + img + "') center/cover no-repeat" : _bgGrads[i%_bgGrads.length]};">
+            <div class="hs-poster">
               <div class="hs-poster-inner"></div>
             </div>
             <div class="hs-info">
@@ -3029,6 +3028,10 @@
               <div class="hs-venue">${d.venue||d.city||'India'} &middot; ${priceStr}</div>
             </div>
           </div>`;
+          const poster = slide.querySelector('.hs-poster');
+          if (d.cardImgUrl) poster.style.setProperty('--hs-card-image', `url("${d.cardImgUrl}")`);
+          if (d.coverUrl) poster.style.setProperty('--hs-cover-image', `url("${d.coverUrl}")`);
+          poster.style.setProperty('--hs-fallback-image', _bgGrads[i%_bgGrads.length]);
           track.appendChild(slide);
           // dot
           var dot = document.createElement('button');
