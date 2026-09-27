@@ -664,11 +664,11 @@ const sourceBackUrl = (() => {
   try {
     const source = new URL(document.referrer);
     const sourcePage = source.pathname.split('/').pop().toLowerCase();
-    if (source.origin === location.origin && ['home.html', 'client-profile.html'].includes(sourcePage)) {
+    if (source.origin === location.origin && ['', 'index.html', 'home.html', 'client-profile.html'].includes(sourcePage)) {
       return source.pathname + source.search + source.hash;
     }
   } catch(e) {}
-  return 'Home.html';
+  return location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1) || '/';
 })();
 document.querySelectorAll('.mob-detail-home, .mob-poster-action').forEach(link => {
   link.href = sourceBackUrl;
