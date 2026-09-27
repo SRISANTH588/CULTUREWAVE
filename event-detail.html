@@ -1066,10 +1066,10 @@ async function renderEvent(data){
   renderNightDetails(data);
   const eventStart = getEventStart(data);
 
-  // Optional wide background is displayed on tablet and desktop only.
+  // Use the cover image for the desktop hero and the card image for the mobile poster.
   const hero = document.getElementById('heroBanner');
   const posterSrc = data.cardImgUrl || data.coverUrl || 'party.jpg';
-  const desktopBackgroundSrc = data.desktopBackgroundUrl;
+  const desktopBackgroundSrc = data.coverUrl || data.desktopBackgroundUrl || data.cardImgUrl;
   if(desktopBackgroundSrc) {
     hero.classList.add('has-desktop-background');
     const desktopStage = document.getElementById('desktopHeroStage');
