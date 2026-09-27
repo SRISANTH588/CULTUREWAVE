@@ -12,7 +12,20 @@
     const slug = decodeURIComponent(parts.pop() || '').trim().toLowerCase();
     const basePath = parts.length ? `/${parts.join('/')}/` : '/';
     if (/^[a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?$/.test(slug)) {
-      location.replace(`${basePath}client-profile.html?handle=${encodeURIComponent(slug)}&pretty=1`);
+      fetch(`${basePath}client-profile.html`)
+        .then(response => {
+          if (!response.ok) throw new Error('Profile page could not be loaded.');
+          return response.text();
+        })
+        .then(html => {
+          document.open();
+          document.write(html);
+          document.close();
+        })
+        .catch(() => {
+          document.title = 'Page not found | CultureWave';
+          document.getElementById('message').textContent = 'Profile page could not be loaded.';
+        });
     } else {
       document.title = 'Page not found | CultureWave';
       document.getElementById('message').textContent = 'Page not found.';
