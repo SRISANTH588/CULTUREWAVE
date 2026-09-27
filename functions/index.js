@@ -1,4 +1,4 @@
-const {onDocumentUpdated} = require('firebase-functions/v2/firestore');
+const {onDocumentCreated, onDocumentDeleted, onDocumentUpdated} = require('firebase-functions/v2/firestore');
 const {defineString} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
@@ -8,6 +8,76 @@ const db = getFirestore();
 const emailServiceId = defineString('EMAILJS_SERVICE_ID', {default: 'service_esppdwf'});
 const emailPublicKey = defineString('EMAILJS_PUBLIC_KEY', {default: 'PDb2vpOIeLkbZBBFP'});
 const waitlistTemplateId = defineString('EMAILJS_WAITLIST_TEMPLATE_ID');
+const followerTemplateId = defineString('EMAILJS_FOLLOWER_EVENT_TEMPLATE_ID', {default: ''});
+
+function sendEmail(templateId, templateParams) {
+  return fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      service_id: emailServiceId.value(),
+      template_id: templateId,
+      user_id: emailPublicKey.value(),
+      template_params: templateParams,
+    }),
+  });
+}
+
+exports.updateOrganiserFollowerCount = onDocumentCreated({
+  document: 'users/{userId}/following/{organiserId}',
+  region: 'asia-south1',
+}, async (event) => {
+  const organiserId = event.params.organiserId;
+  await db.collection('organisers').doc(organiserId).update({followers: FieldValue.increment(1)});
+});
+
+exports.decreaseOrganiserFollowerCount = onDocumentDeleted({
+  document: 'users/{userId}/following/{organiserId}',
+  region: 'asia-south1',
+}, async (event) => {
+  const organiserId = event.params.organiserId;
+  await db.collection('organisers').doc(organiserId).update({followers: FieldValue.increment(-1)});
+});
+
+exports.emailFollowersAboutNewEvent = onDocumentCreated({
+  document: 'events/{eventId}',
+  region: 'asia-south1',
+  retry: true,
+}, async (event) => {
+  const data = event.data.data();
+  if (!['published', 'live', 'active'].includes(String(data.status || '').toLowerCase())) return;
+  const templateId = followerTemplateId.value();
+  if (!templateId) {
+    console.warn('Follower event emails are disabled: EMAILJS_FOLLOWER_EVENT_TEMPLATE_ID is not configured.');
+    return;
+  }
+  const ownerId = data.ownerId || data.organiserId;
+  if (!ownerId) return;
+  const organiser = await db.collection('organisers').doc(ownerId).get();
+  const followers = await db.collectionGroup('following').where('organiserId', '==', ownerId).limit(500).get();
+  if (followers.empty) return;
+  const userIds = [...new Set(followers.docs.map((doc) => doc.ref.parent.parent.id))];
+  const users = await Promise.all(userIds.map((uid) => db.collection('users').doc(uid).get()));
+  const eventName = data.name || data.title || 'New event';
+  const eventUrl = `https://culturewave.in/event-detail.html?eventId=${encodeURIComponent(event.params.eventId)}`;
+  for (const user of users) {
+    const email = user.data()?.email;
+    if (!email) continue;
+    const response = await sendEmail(templateId, {
+      to_email: email,
+      to_name: user.data()?.name || user.data()?.displayName || 'CultureWave member',
+      organiser_name: organiser.data()?.name || 'An organiser you follow',
+      event_name: eventName,
+      event_url: eventUrl,
+      reply_to: 'support.culturewave@gmail.com',
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      console.error(`Follower event email failed for ${user.id}: ${response.status} ${body}`);
+      throw new Error(`EmailJS failed to send a follower event email: ${response.status}`);
+    }
+  }
+});
 
 function availableSpots(event) {
   if (!['published', 'live', 'active'].includes(String(event.status || '').toLowerCase())) return 0;

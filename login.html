@@ -701,7 +701,7 @@
             <span id="footerText">Don't have an account?</span>
             <a href="#" id="signupCta"> Sign Up</a>
           </div>
-          <a class="back-home-link" href="index.html">← Back to Home</a>
+          <a class="back-home-link" href="Home.html">← Back to Home</a>
         </div>
       </div>
     </div>
@@ -783,7 +783,7 @@
         // A booking link must take precedence over the normal dashboard redirect.
         // Only accept a same-site relative path to avoid an open-redirect URL.
         const next = new URLSearchParams(location.search).get('next');
-        if (next && /^booking\.html(?:[?#]|$)/.test(next)) {
+        if (next && /^(?:booking\.html|client-profile\.html|[a-z0-9._-]+)(?:[?#]|$)/i.test(next) && !next.startsWith('//')) {
           window.location.href = next;
           return;
         }

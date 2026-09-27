@@ -70,6 +70,15 @@ service cloud.firestore {
       allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
       allow create: if true;
       allow update, delete: if request.auth != null && (request.auth.uid == uid || isAdmin());
+
+      match /following/{organiserId} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null && request.auth.uid == uid &&
+          request.resource.data.organiserId == organiserId &&
+          exists(/databases/$(database)/documents/organisers/$(organiserId));
+        allow delete: if request.auth != null && request.auth.uid == uid;
+        allow update: if false;
+      }
     }
 
     // Authenticated users can read/write their own data
