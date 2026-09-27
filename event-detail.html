@@ -660,11 +660,15 @@ async function getCurrentUser() {
 
 const params = new URLSearchParams(location.search);
 const eventId = params.get('eventId');
+let hasKnownInternalSource = false;
 const sourceBackUrl = (() => {
   try {
     const source = new URL(document.referrer);
     const sourcePage = source.pathname.split('/').pop().toLowerCase();
-    if (source.origin === location.origin && ['', 'index.html', 'home.html', 'client-profile.html'].includes(sourcePage)) {
+    const sameSite = source.protocol === location.protocol && source.port === location.port &&
+      source.hostname.replace(/^www\./, '') === location.hostname.replace(/^www\./, '');
+    if (sameSite && ['', 'index.html', 'home.html', 'client-profile.html'].includes(sourcePage)) {
+      hasKnownInternalSource = true;
       return source.pathname + source.search + source.hash;
     }
   } catch(e) {}
@@ -673,6 +677,12 @@ const sourceBackUrl = (() => {
 document.querySelectorAll('.mob-detail-home, .mob-poster-action').forEach(link => {
   link.href = sourceBackUrl;
   link.setAttribute('aria-label', 'Back to previous page');
+  link.addEventListener('click', event => {
+    if (hasKnownInternalSource && history.length > 1) {
+      event.preventDefault();
+      history.back();
+    }
+  });
 });
 let evData = {};
 let ownerUid = null;
