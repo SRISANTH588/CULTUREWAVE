@@ -455,11 +455,12 @@ async function init(){
     renderProfile({uid, ...(userSnap.exists ? userSnap.data() : { name: 'Organiser' })});
   }, error => console.error('Could not watch organiser profile:', error));
 
-  const snap = await db.collection('events').where('ownerId','==',uid).limit(50).get();
-  const events = snap.docs
-    .map(d=>({id:d.id,...d.data()}))
-    .filter(e=>(e.status||'').toLowerCase()==='published');
-  renderEvents(events);
+  db.collection('events').where('ownerId','==',uid).limit(50).onSnapshot(snap => {
+    const events = snap.docs
+      .map(d=>({id:d.id,...d.data()}))
+      .filter(e=>(e.status||'').toLowerCase()==='published');
+    renderEvents(events);
+  }, error => console.error('Could not watch organiser events:', error));
 }
 
 init();
