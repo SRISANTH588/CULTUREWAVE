@@ -229,6 +229,12 @@ async function getCurrentUser() {
 
 const params = new URLSearchParams(location.search);
 const targetUid = params.get('uid');
+let targetHandle = (params.get('handle') || '').trim().toLowerCase();
+const prettyProfileRoute = params.get('pretty') === '1';
+if (!targetHandle && !targetUid) {
+  const lastPathPart = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '').trim().toLowerCase();
+  if (lastPathPart && lastPathPart !== 'client-profile.html' && /^[a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?$/.test(lastPathPart)) targetHandle = lastPathPart;
+}
 let isOwner = false;
 let profileData = {};
 let isFollowing = false;
@@ -347,6 +353,11 @@ function renderEvents(events){
 
 function renderProfile(data){
   profileData = data;
+  const publicHandle = String(data.handle || targetHandle || '').trim().toLowerCase();
+  if(publicHandle && (prettyProfileRoute || targetUid || targetHandle)){
+    const basePath = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1);
+    history.replaceState(null, '', `${basePath}${encodeURIComponent(publicHandle)}`);
+  }
   const initials = (data.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const avatarEl = document.getElementById('profileAvatar');
   if(data.avatarUrl){
@@ -400,7 +411,20 @@ function renderProfile(data){
 async function init(){
   try{ const user = await getCurrentUser(); if(user) myUid = user.uid; }catch(e){}
 
-  const uid = targetUid || myUid;
+  let uid = targetUid || null;
+  if(!uid && targetHandle){
+    try{
+      const handleSnap = await db.collection('organisers').where('handle','==',targetHandle).limit(1).get();
+      if(!handleSnap.empty) uid = handleSnap.docs[0].id;
+    }catch(e){ console.error('Could not look up profile handle:', e); }
+    if(!uid){
+      document.getElementById('profileName').textContent = 'Profile not found';
+      document.getElementById('profileHandle').textContent = '@'+targetHandle;
+      document.getElementById('eventsGrid').innerHTML = `<div class="empty"><div class="empty-icon">🔎</div><strong>No profile found</strong><span>Check the profile address and try again.</span></div>`;
+      return;
+    }
+  }
+  uid = uid || myUid;
   targetProfileUid = uid;
   if(!uid){
     document.getElementById('profileName').textContent = 'Sign in to view your profile';

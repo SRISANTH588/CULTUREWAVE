@@ -484,6 +484,19 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  const profileHandleMatch = url.pathname.match(/^\/([a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?)\/?$/i);
+  if (req.method === "GET" && profileHandleMatch && !["api", "logout", "dashboard", "onboarding", "pay"].includes(profileHandleMatch[1].toLowerCase())) {
+    try {
+      const profiles = await admin.firestore().collection("organisers").where("handle", "==", profileHandleMatch[1].toLowerCase()).limit(1).get();
+      if (!profiles.empty) {
+        const html = await readFile(join(publicDir, "client-profile.html"), "utf8");
+        return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
+      }
+    } catch (error) {
+      console.error("Public profile route lookup failed:", error);
+    }
+  }
+
   if (req.method === "GET" && extname(url.pathname)) {
     try {
       const filePath = join(publicDir, url.pathname.slice(1));

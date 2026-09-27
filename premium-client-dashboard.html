@@ -1697,7 +1697,7 @@ Spots are limited — grab yours now! 🔥"></textarea>
                   <span class="url-prefix">culturewave.in/</span>
                   <input class="url-input" id="pfHandle" type="text" placeholder="yourbrand"/>
                 </div>
-                <div class="url-hint">Only lowercase letters, numbers, hyphens, and underscores are allowed</div>
+                <div class="url-hint">Use lowercase letters, numbers, dots, hyphens, or underscores.</div>
               </div>
             </div>
           </div>
@@ -2526,7 +2526,7 @@ if(coverInput) coverInput.addEventListener('change', function(){
 // handle slug validation
 const pfHandleEl = document.getElementById('pfHandle');
 if(pfHandleEl) pfHandleEl.addEventListener('input', function(){
-  this.value = this.value.toLowerCase().replace(/[^a-z0-9_-]/g,'');
+  this.value = this.value.toLowerCase().replace(/[^a-z0-9._-]/g,'').replace(/^[._-]+|[._-]+$/g,'');const h=this.value.trim();if(h){const base=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);const url=location.origin+base+encodeURIComponent(h);const publicUrl=document.getElementById('pfPublicUrl'),view=document.getElementById('pfViewBtn'),copy=document.getElementById('pfCopyBtn');if(publicUrl)publicUrl.textContent=url;if(view)view.href=url;if(copy)copy.onclick=()=>navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!'));}
 });
 
 // ── PROFILE ──
@@ -2547,6 +2547,14 @@ async function loadProfile(uid) {
   const snap = await getDoc(doc(db,'organisers',uid));
   if(snap.exists()){
     const d = snap.data();
+    const publicHandle = String(d.handle||'').trim().toLowerCase();
+    if(publicHandle){
+      const basePath = location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);
+      const publicUrl = location.origin + basePath + encodeURIComponent(publicHandle);
+      if(pfUrl) pfUrl.textContent = publicUrl;
+      if(pfView) pfView.href = publicUrl;
+      if(pfCopy) pfCopy.onclick = () => navigator.clipboard.writeText(publicUrl).then(()=>showToast('Profile link copied!'));
+    }
     const g = id => document.getElementById(id);
     if(g('pfName')) g('pfName').value = d.name||'';
     if(g('pfHandle')) g('pfHandle').value = d.handle||'';

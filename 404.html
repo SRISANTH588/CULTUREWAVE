@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>CultureWave</title>
+</head>
+<body>
+  <p id="message">Opening profile…</p>
+  <script>
+    const parts = location.pathname.split('/').filter(Boolean);
+    const slug = decodeURIComponent(parts.pop() || '').trim().toLowerCase();
+    const basePath = parts.length ? `/${parts.join('/')}/` : '/';
+    if (/^[a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?$/.test(slug)) {
+      location.replace(`${basePath}client-profile.html?handle=${encodeURIComponent(slug)}&pretty=1`);
+    } else {
+      document.title = 'Page not found | CultureWave';
+      document.getElementById('message').textContent = 'Page not found.';
+    }
+  </script>
+</body>
+</html>
