@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const handle = (params.get('handle') || '').trim().toLowerCase();
+      if (!handle) return;
+      const basePath = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1);
+      history.replaceState(null, '', `${basePath}${encodeURIComponent(handle)}`);
+    })();
+  </script>
   <title>CultureWave | Organiser Profile</title>
   <meta name="robots" content="noindex, nofollow"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -231,10 +240,6 @@ const params = new URLSearchParams(location.search);
 const targetUid = params.get('uid');
 let targetHandle = (params.get('handle') || '').trim().toLowerCase();
 const prettyProfileRoute = params.get('pretty') === '1';
-if(targetHandle && prettyProfileRoute){
-  const basePath = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1);
-  history.replaceState(null, '', `${basePath}${encodeURIComponent(targetHandle)}`);
-}
 if (!targetHandle && !targetUid) {
   const lastPathPart = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '').trim().toLowerCase();
   if (lastPathPart && lastPathPart !== 'client-profile.html' && /^[a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?$/.test(lastPathPart)) targetHandle = lastPathPart;
