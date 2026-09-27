@@ -33,7 +33,9 @@
     .verified-badge{display:inline-flex;align-items:center;gap:.25rem;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;font-size:.62rem;font-weight:900;padding:.2rem .55rem;border-radius:999px;letter-spacing:.06em;}
     .premium-badge{display:inline-flex;align-items:center;gap:.25rem;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:.62rem;font-weight:900;padding:.2rem .55rem;border-radius:999px;letter-spacing:.06em;}
     .profile-handle{font-size:.8rem;color:var(--muted);font-weight:700;margin-bottom:.35rem;}
-    .profile-bio{font-size:.88rem;color:#475569;line-height:1.65;margin-bottom:.6rem;}
+    .description-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:1.25rem 1.5rem;margin-top:1rem;box-shadow:0 4px 18px rgba(18,66,197,.06);}
+    .description-card h2{font-size:.95rem;font-weight:900;color:var(--text);margin-bottom:.5rem;}
+    .profile-description{font-size:.88rem;color:#475569;line-height:1.65;white-space:pre-wrap;}
     .socials{display:flex;gap:.4rem;flex-wrap:wrap;}
     .social-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .7rem;border-radius:999px;background:#f1f5f9;border:1px solid var(--border);font-size:.72rem;font-weight:700;color:var(--muted);transition:all .2s;}
     .social-chip:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
@@ -118,22 +120,8 @@
       <a class="nav-link" href="login.html">Login</a>
       <a class="nav-cta" href="login.html">Get Started</a>
     </div>
-    <button class="hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
   </div>
 </header>
-
-<nav class="mobile-nav" id="mobileNav">
-  <a href="events.html">Events</a>
-  <a href="restaurants.html">Restaurants</a>
-  <a href="features.html">Features</a>
-  <a href="pricing.html">Pricing</a>
-  <div class="mobile-nav-ctas">
-    <a class="nav-link" href="login.html">Login</a>
-    <a class="nav-cta" href="login.html">Get Started</a>
-  </div>
-</nav>
 
 <!-- BANNER -->
 <div class="banner" id="bannerEl">
@@ -153,7 +141,6 @@
           <span class="premium-badge" id="premiumBadge" style="display:none;">✨ Premium</span>
         </div>
         <div class="profile-handle" id="profileHandle">@handle</div>
-        <div class="profile-bio" id="profileBio"></div>
         <div class="socials" id="profileSocials"></div>
       </div>
     </div>
@@ -161,6 +148,11 @@
       <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share Profile</button>
     </div>
   </div>
+
+  <section class="description-card" id="descriptionCard" style="display:none;">
+    <h2>About</h2>
+    <p class="profile-description" id="profileDescription"></p>
+  </section>
 
   <!-- STATS -->
   <div class="stats-row">
@@ -377,7 +369,9 @@ function renderProfile(data){
 
   document.getElementById('profileName').textContent = data.name||'Organiser';
   document.getElementById('profileHandle').textContent = '@'+(data.handle||data.uid?.slice(0,8)||'organiser');
-  document.getElementById('profileBio').textContent = data.bio||'';
+  const description = (data.bio||'').trim();
+  document.getElementById('profileDescription').textContent = description;
+  document.getElementById('descriptionCard').style.display = description ? '' : 'none';
   document.getElementById('statFollowers').textContent = (data.followers||0).toLocaleString('en-IN');
   document.title = `${data.name||'Organiser'} | CultureWave`;
 
@@ -441,18 +435,6 @@ async function init(){
 }
 
 init();
-</script>
-<script>
-  const ham = document.getElementById('hamburger');
-  const mNav = document.getElementById('mobileNav');
-  if(ham) ham.addEventListener('click', () => {
-    ham.classList.toggle('open');
-    mNav.classList.toggle('open');
-    document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
-  });
-  if(mNav) mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    ham.classList.remove('open'); mNav.classList.remove('open'); document.body.style.overflow = '';
-  }));
 </script>
 </body>
 </html>
