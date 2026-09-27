@@ -664,10 +664,9 @@ let hasKnownInternalSource = false;
 const sourceBackUrl = (() => {
   try {
     const source = new URL(document.referrer);
-    const sourcePage = source.pathname.split('/').pop().toLowerCase();
     const sameSite = source.protocol === location.protocol && source.port === location.port &&
       source.hostname.replace(/^www\./, '') === location.hostname.replace(/^www\./, '');
-    if (sameSite && ['', 'index.html', 'home.html', 'client-profile.html'].includes(sourcePage)) {
+    if (sameSite) {
       hasKnownInternalSource = true;
       return source.pathname + source.search + source.hash;
     }
