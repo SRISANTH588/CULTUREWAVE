@@ -2146,38 +2146,38 @@ function buildWAMessage(p, type) {
   const successUrl = ticketOrigin + '/success.html?bookingId=' + encodeURIComponent(p.bookingId || p.id || id) + '&event=' + encodeURIComponent(event) + '&eventId=' + encodeURIComponent(p.eventId || '') + '&amount=' + encodeURIComponent(amt) + '&status=Confirmed&type=' + encodeURIComponent(bkType);
 
   if (type === 'organizer') {
-    return `✅ *New Booking Alert*
+    return `*NEW BOOKING ALERT*
 
-🎫 *${event}*
-👤 Guest: ${name}
-🪑 ${bkType === 'restaurant' ? 'Guests' : 'Seats'}: ${seats}
-💰 Amount: ${amt}
-🗓️ Date: ${date}
-🔖 Booking ID: ${id}
+*Event:* ${event}
+Guest: ${name}
+${bkType === 'restaurant' ? 'Guests' : 'Seats'}: ${seats}
+Amount: ${amt}
+Date: ${date}
+Booking ID: ${id}
 
-📱 *QR Code & Ticket:*
+*QR Code & Ticket:*
 ${successUrl}
 
 _Scan QR at entry to verify this booking._
 
-— CultureWave`;
+CultureWave`;
   } else {
-    return `🎉 *Booking Confirmed!*
+    return `*BOOKING CONFIRMED*
 
 Hi ${name}, your booking is confirmed.
 
-🎫 *${event}*
-🪑 ${bkType === 'restaurant' ? 'Guests' : 'Seats'}: ${seats}
-💰 Amount Paid: ${amt}
-🗓️ Date: ${date}
-🔖 Booking ID: ${id}
+*Event:* ${event}
+${bkType === 'restaurant' ? 'Guests' : 'Seats'}: ${seats}
+Amount Paid: ${amt}
+Date: ${date}
+Booking ID: ${id}
 
-📱 *Your E-Ticket & QR Code:*
+*Your E-Ticket & QR Code:*
 ${successUrl}
 
 Show this QR code at the ${bkType === 'restaurant' ? 'restaurant reception' : 'venue entry'}.
 
-Thank you for booking with CultureWave! 💙`;
+Thank you for booking with CultureWave!`;
   }
 }
 
