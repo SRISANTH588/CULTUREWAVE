@@ -324,7 +324,7 @@
 
 <!-- MOBILE TOP BAR -->
 <div class="mob-topbar" id="mobTopbar">
-  <a class="mob-detail-back mob-detail-home" href="index.html" aria-label="Home">⌂</a>
+  <a class="mob-detail-back mob-detail-home" href="Home.html" aria-label="Home">⌂</a>
   <div class="mob-detail-nav-title" id="mobDetailNavTitle">Event details</div>
   <button class="mob-detail-share" type="button" onclick="openShare()" aria-label="Share event">Share event</button>
   <div class="mob-topbar-org" onclick="goToProfile()">
@@ -660,6 +660,20 @@ async function getCurrentUser() {
 
 const params = new URLSearchParams(location.search);
 const eventId = params.get('eventId');
+const sourceBackUrl = (() => {
+  try {
+    const source = new URL(document.referrer);
+    const sourcePage = source.pathname.split('/').pop().toLowerCase();
+    if (source.origin === location.origin && ['home.html', 'client-profile.html'].includes(sourcePage)) {
+      return source.pathname + source.search + source.hash;
+    }
+  } catch(e) {}
+  return 'Home.html';
+})();
+document.querySelectorAll('.mob-detail-home, .mob-poster-action').forEach(link => {
+  link.href = sourceBackUrl;
+  link.setAttribute('aria-label', 'Back to previous page');
+});
 let evData = {};
 let ownerUid = null;
 let nightGalleryImages = [];
