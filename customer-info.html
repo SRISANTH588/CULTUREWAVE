@@ -126,7 +126,8 @@
 
         // Client-owned events are the source of truth; bookings are joined by eventId.
         const eventSnap=await db.collection('events').where('ownerId','==',user.uid).get();
-        const events=eventSnap.docs.map(doc=>({id:doc.id,...doc.data()}));
+        const events=eventSnap.docs.map(doc=>({id:doc.id,...doc.data()}))
+          .filter(event=>['published','live','active'].includes(String(event.status||'').trim().toLowerCase()));
         document.getElementById('eventCount').textContent=events.length;
         const results=await Promise.all(events.map(async event=>{
           try{
