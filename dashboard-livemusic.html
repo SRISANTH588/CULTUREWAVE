@@ -1031,7 +1031,15 @@ function renderCustomerInfoPanel(){
   const rows=activeBookings.filter(b=>{
     const ev=allEvents.find(item=>item.id===(b.eventId||b.event_id));
     const bookingEventId=b.eventId||b.event_id||b.eventName||'unknown';
-    const haystack=[b.customerName,b.name,b.guestName,b.attendeeName,b.email,b.customerEmail,b.phone,b.customerPhone,b.eventName,ev?.name,b.ticketName,b.ticketType].join(' ').toLowerCase();
+    const values=[];
+    const collect=(value,depth=0)=>{
+      if(value==null||depth>3)return;
+      if(typeof value==='string'||typeof value==='number'||typeof value==='boolean'){values.push(String(value));return;}
+      if(Array.isArray(value)){value.forEach(item=>collect(item,depth+1));return;}
+      if(typeof value==='object')Object.values(value).forEach(item=>collect(item,depth+1));
+    };
+    collect(b);collect(ev?.name);collect(ev?.venue);collect(ev?.city);
+    const haystack=values.join(' ').toLowerCase();
     return (!selectedEvent||bookingEventId===selectedEvent)&&(!q||haystack.includes(q));
   });
   if(!rows.length){list.innerHTML=`<div class="card" style="text-align:center;padding:2.5rem;color:#6b7280;">${activeBookings.length?'No bookings match your filters.':'No active customer bookings yet.'}</div>`;return;}
