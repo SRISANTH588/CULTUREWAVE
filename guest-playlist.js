@@ -13,8 +13,8 @@ async function loadPlaylist() {
   const eventId = new URLSearchParams(location.search).get('eventId');
   const snapshot = await getDocs(query(collection(db, 'playlists')));
   const playlists = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+  const updatedAt = item => item.updatedAt?.toDate?.().getTime() || (item.updatedAt?.seconds || 0) * 1000 || new Date(item.updatedAt || 0).getTime();
   const newestFirst = [...playlists].sort((a, b) => {
-    const updatedAt = item => item.updatedAt?.toDate?.().getTime() || (item.updatedAt?.seconds || 0) * 1000 || new Date(item.updatedAt || 0).getTime();
     return updatedAt(b) - updatedAt(a);
   });
   const playlist = (eventId && playlists.find(item => item.eventId === eventId))
@@ -32,12 +32,22 @@ async function loadPlaylist() {
     eventHeading.hidden = true;
   }
 
-  const songs = Array.isArray(playlist.songs) ? playlist.songs : [];
+  const relatedPlaylists = playlists
+    .filter(item => playlist.eventId ? item.eventId === playlist.eventId : item.isDefault || !item.eventId)
+    .sort((a, b) => updatedAt(a) - updatedAt(b));
+  const combinedSongs = relatedPlaylists.flatMap(item => Array.isArray(item.songs) ? item.songs : []);
+  const seenSongs = new Set();
+  const songs = combinedSongs.filter(song => {
+    const key = [song.title, song.artist, song.url, song.lyrics || song.lyricsText || song.lyricsUrl].join('\u0000');
+    if (seenSongs.has(key)) return false;
+    seenSongs.add(key);
+    return true;
+  });
   const songList = document.getElementById('songs');
   songList.innerHTML = songs.length
     ? songs.map((song, index) => {
       const lyrics = song.lyrics || song.lyricsText || song.lyricsUrl || '';
-      return `<article class="song"><button class="song-trigger" type="button" aria-expanded="false" style="grid-column:1/-1;display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer"><span class="number">${index + 1}</span><span><strong>${esc(song.title || 'Untitled song')}</strong>${song.artist ? `<small>${esc(song.artist)}</small>` : ''}</span><span aria-hidden="true" style="color:#ff9abb;font-size:1.1rem">Lyrics ⌄</span></button><div class="lyrics" hidden style="grid-column:1/-1"><p style="white-space:pre-wrap">${esc(lyrics)}</p></div>${song.url ? `<a class="play" href="${esc(song.url)}" target="_blank" rel="noopener">Play ↗</a>` : ''}</article>`;
+      return `<article class="song"><button class="song-trigger" type="button" aria-expanded="false" style="grid-column:1/-1;display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:center;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer"><span class="number">${index + 1}</span><span><strong>${esc(song.title || 'Untitled song')}</strong>${song.artist ? `<small>${esc(song.artist)}</small>` : ''}</span></button><div class="lyrics" hidden style="grid-column:1/-1"><p style="white-space:pre-wrap">${esc(lyrics)}</p></div>${song.url ? `<a class="play" href="${esc(song.url)}" target="_blank" rel="noopener">Play ↗</a>` : ''}</article>`;
     }).join('')
     : '<p class="status">Songs will be added soon.</p>';
   songList.addEventListener('click', event => {
