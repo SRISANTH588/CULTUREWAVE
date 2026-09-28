@@ -66,15 +66,15 @@
     const qrUrl=b=>`https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data=${encodeURIComponent(JSON.stringify({bookingId:b.bookingId||b.id,eventId:b.eventId,event:b.eventName,customer:b.customerName,seats:b.seats||b.quantity||b.tickets||1}))}`;
     const reminderText=b=>[
       `Hi ${b.customerName||'there'}! Here is your CultureWave event reminder:`,
-      `🎉 Event: ${b.eventName||'Event'}`,
-      `📅 Date: ${bookingDate(b)}`,
-      `📍 Venue: ${b.venueName||b.venue||b.city||'See event details'}`,
-      `🎟️ Ticket: ${b.ticketName||'General'} × ${b.seats||b.quantity||b.tickets||1}`,
-      `🔖 Booking: #${bookingRef(b)}`,
-      `✅ Status: ${b.status||'confirmed'}`,
-      `🖼️ Event card: ${eventUrl(b)}`,
-      ...(b.eventCardImgUrl?[`🎨 Event poster: ${b.eventCardImgUrl}`]:[]),
-      `▦ Booking QR code: ${qrUrl(b)}`,
+      `Event: ${b.eventName||'Event'}`,
+      `Date: ${bookingDate(b)}`,
+      `Venue: ${b.venueName||b.venue||b.city||'See event details'}`,
+      `Ticket: ${b.ticketName||'General'} x ${b.seats||b.quantity||b.tickets||1}`,
+      `Booking: #${bookingRef(b)}`,
+      `Status: ${b.status||'confirmed'}`,
+      `Event card: ${eventUrl(b)}`,
+      ...(b.eventCardImgUrl?[`Event poster: ${b.eventCardImgUrl}`]:[]),
+      `Booking QR code: ${qrUrl(b)}`,
       'See you there!'
     ].join('\n');
     function downloadBooking(b){
