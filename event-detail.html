@@ -259,14 +259,13 @@
       .night-org-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}.night-org-row strong{display:block;font-size:.92rem;}.night-org-row small{display:block;margin-top:.14rem;color:#aeb4c0;font-size:.75rem;}
     }
 
-    /* The event poster is a compact card on desktop instead of spanning the page. */
+    /* Desktop uses the event cover as a wide 21:9 hero image. */
     @media (min-width:769px){
-      .desktop-hero-stage .hero-banner{display:none!important;}
-      .desktop-hero-stage .mob-poster{display:block;width:min(1120px,calc(100% - 2rem));max-width:100%;height:auto;aspect-ratio:21/9;object-fit:cover;margin:0 auto;position:relative;z-index:3;}
-      .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;}
-      .desktop-hero-stage.has-desktop-background .hero-banner{display:block!important;height:420px!important;background:transparent!important;}
-      .desktop-hero-stage.has-desktop-background .hero-banner-overlay{display:block;background:linear-gradient(to bottom,rgba(10,15,30,.12),rgba(10,15,30,.62));}
-      .desktop-hero-stage.has-desktop-background .mob-poster{margin:-92px auto 0;}
+      .desktop-hero-stage{width:min(1120px,calc(100% - 2rem));margin:0 auto;}
+      .desktop-hero-stage .hero-banner{display:block!important;width:100%;height:auto!important;aspect-ratio:21/9;background-size:cover;background-position:center;}
+      .desktop-hero-stage .hero-banner img{object-fit:cover;}
+      .desktop-hero-stage.has-desktop-background{background-image:none;}
+      .desktop-hero-stage .mob-poster{display:none!important;}
     }
 
     /* Nightlife event detail polish — scoped to this page so the existing Firebase
