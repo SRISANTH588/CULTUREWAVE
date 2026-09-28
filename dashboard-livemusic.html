@@ -565,6 +565,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   </div>
   <div class="page-body">
     <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <select id="ciEventFilter" onchange="window.renderCustomerInfoPanel&&window.renderCustomerInfoPanel()" style="min-width:220px;max-width:100%;padding:.65rem .8rem;border:1px solid var(--border);border-radius:9px;background:#fff;color:#374151;font:inherit;">
+        <option value="">All events</option>
+      </select>
       <div class="search-box"><span>🔍</span><input type="search" id="ciSearch" placeholder="Search attendee, event, email or phone..." oninput="window.renderCustomerInfoPanel&&window.renderCustomerInfoPanel()"/></div>
     </div>
     <div id="ciBookingsList" style="display:grid;gap:.8rem;"></div>
@@ -1011,18 +1014,27 @@ function loadBookings(uid){const q=query(collection(db,'bookings'),where('organi
 function renderCustomerInfoPanel(){
   const list=document.getElementById('ciBookingsList');if(!list)return;
   const activeBookings=allBookings.filter(b=>b.cancelled!==true&&!['cancelled','canceled'].includes(String(b.status||'').toLowerCase()));
-  const eventIds=new Set(activeBookings.map(b=>b.eventId).filter(Boolean));
   const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
   set('ciBookingCount',activeBookings.length);
   set('ciAttendeeCount',activeBookings.reduce((sum,b)=>sum+Number(b.tickets||b.ticketQuantity||b.quantity||b.seats||1),0));
   set('ciEventCount',new Set(activeBookings.map(b=>b.eventId||b.eventName).filter(Boolean)).size);
+  const eventFilter=document.getElementById('ciEventFilter');
+  if(eventFilter){
+    const selected=eventFilter.value;
+    const usedEvents=new Map();
+    activeBookings.forEach(b=>{const id=b.eventId||b.event_id||b.eventName||'unknown';const ev=allEvents.find(item=>item.id===(b.eventId||b.event_id));usedEvents.set(id,b.eventName||ev?.name||'Event');});
+    eventFilter.innerHTML='<option value="">All events</option>'+[...usedEvents.entries()].sort((a,b)=>a[1].localeCompare(b[1])).map(([id,name])=>`<option value="${esc(id)}">${esc(name)}</option>`).join('');
+    if([...eventFilter.options].some(option=>option.value===selected))eventFilter.value=selected;
+  }
+  const selectedEvent=eventFilter?.value||'';
   const q=(document.getElementById('ciSearch')?.value||'').trim().toLowerCase();
   const rows=activeBookings.filter(b=>{
     const ev=allEvents.find(item=>item.id===(b.eventId||b.event_id));
+    const bookingEventId=b.eventId||b.event_id||b.eventName||'unknown';
     const haystack=[b.customerName,b.name,b.guestName,b.attendeeName,b.email,b.customerEmail,b.phone,b.customerPhone,b.eventName,ev?.name,b.ticketName,b.ticketType].join(' ').toLowerCase();
-    return !q||haystack.includes(q);
+    return (!selectedEvent||bookingEventId===selectedEvent)&&(!q||haystack.includes(q));
   });
-  if(!rows.length){list.innerHTML=`<div class="card" style="text-align:center;padding:2.5rem;color:#6b7280;">${activeBookings.length?'No bookings match your search.':'No active customer bookings yet.'}</div>`;return;}
+  if(!rows.length){list.innerHTML=`<div class="card" style="text-align:center;padding:2.5rem;color:#6b7280;">${activeBookings.length?'No bookings match your filters.':'No active customer bookings yet.'}</div>`;return;}
   const formatDate=value=>{if(!value)return'—';const date=value?.toDate?value.toDate():new Date(value);return Number.isNaN(date.getTime())?'—':date.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});};
   list.innerHTML=rows.map(b=>{
     const ev=allEvents.find(item=>item.id===(b.eventId||b.event_id));
