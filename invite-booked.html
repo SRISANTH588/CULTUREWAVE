@@ -32,6 +32,7 @@
     .invite-value{display:block;color:#f1f1f3;font-size:.82rem;font-weight:800;overflow-wrap:anywhere}
     .invite-value.accent{color:#2dca8d}
     .invite-message{grid-column:1/-1;margin-top:.55rem;padding:.9rem 1rem;border:1px solid #252831;border-radius:13px;background:#0b0d13;color:#c1c2c8;font-size:.82rem;line-height:1.6;white-space:pre-wrap}
+    .invite-greeting{display:block;margin-bottom:.55rem;color:#f1d26d;font-size:.95rem;font-weight:800}
     .invite-qr-area{display:flex;flex-direction:column;align-items:center;gap:.55rem}
     .invite-qr-box{width:140px;height:140px;padding:.55rem;display:grid;place-items:center;border:1px solid #35363c;border-radius:16px;background:#fff}
     .invite-qr-box canvas{width:120px!important;height:120px!important}
@@ -75,7 +76,7 @@
           <div class="invite-detail"><span class="invite-label">Time</span><span class="invite-value" id="eventTime">To be announced</span></div>
           <div class="invite-detail"><span class="invite-label">Pass type</span><span class="invite-value" id="ticketType">Premium Invitation Ticket</span></div>
           <div class="invite-detail"><span class="invite-label">Ticket number</span><span class="invite-value" id="ticketNumber">1 of 1</span></div>
-          <div class="invite-message"><span class="invite-label">Your invitation message</span><span id="inviteMessage"></span></div>
+          <div class="invite-message"><span class="invite-label">Your invitation message</span><strong class="invite-greeting" id="inviteGreeting">Dear Guest,</strong><span id="inviteMessage"></span></div>
         </div>
         <div class="invite-qr-area"><div class="invite-qr-box"><canvas id="inviteQr" width="120" height="120"></canvas></div><strong class="invite-value">Your entry QR</strong><span class="invite-qr-caption">Show this code to the event team when you arrive.</span></div>
       </section>
@@ -97,14 +98,15 @@
       const passType=ticket.toLowerCase().includes('invitation')?'Premium Invitation Ticket':ticket;
       const ticketNumber=Math.max(1,Number(get('ticketNumber','1'))||1);
       const ticketCount=Math.max(1,Number(get('ticketCount',get('seats','1')))||1);
-      const message=get('message',`You’re invited to ${event}. We look forward to welcoming you for a memorable experience. Please show your invitation QR code at the venue for entry.`);
+      const organiserMessage=get('message');
+      const message=`You are cordially invited to ${event}. Join us for a special experience with great people and memorable moments.${organiserMessage?`\n\n${organiserMessage}`:''}\n\nWe look forward to welcoming you. Please show your invitation QR code at the venue for entry.`;
       const cancelled=get('status','confirmed').toLowerCase()==='cancelled';
       const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
-      set('eventName',event);set('guestName',guest);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketNumber',`${ticketNumber} of ${ticketCount}`);set('inviteMessage',message);set('bookingIdLabel',bookingId?`Booking ID: ${bookingId.slice(-10).toUpperCase()}`:'');
+      set('eventName',event);set('guestName',guest);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketNumber',`${ticketNumber} of ${ticketCount}`);set('inviteGreeting',`Dear ${guest},`);set('inviteMessage',message);set('bookingIdLabel',bookingId?`Booking ID: ${bookingId.slice(-10).toUpperCase()}`:'');
       document.title=`Invitation Confirmed | ${event}`;
       if(cancelled){document.getElementById('invitePage').classList.add('invite-cancelled');set('inviteCheck','×');set('pageTitle','Invitation cancelled');set('pageSubtitle','This invitation is no longer valid for entry.');set('ticketStatus','Cancelled');document.getElementById('whatsappButton').style.display='none';}
       const shareUrl=new URL(location.href);shareUrl.hash='';
-      const shareText=`Premium invitation for ${guest}\nYou’re invited to ${event}.\nDate: ${date}\nTime: ${time}\nVenue: ${venue}\n\nOpen your premium invitation and ticket here:\n${shareUrl.toString()}`;
+      const shareText=`Premium invitation for ${guest}\n\nDear ${guest},\nYou are cordially invited to ${event}. Join us for a special experience with great people and memorable moments.\n\nDate: ${date}\nTime: ${time}\nVenue: ${venue}\n\nOpen your premium invitation and ticket here:\n${shareUrl.toString()}`;
       document.getElementById('whatsappButton').href=`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
       if(bookingId&&eventId&&window.QRCode){QRCode.toCanvas(document.getElementById('inviteQr'),shareUrl.toString(),{width:120,margin:1,color:{dark:'#0a0f1e',light:'#ffffff'}});}
       else set('pageSubtitle','This invitation link is missing ticket details. Contact the event organiser.');
