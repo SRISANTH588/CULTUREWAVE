@@ -24,11 +24,11 @@ async function loadPlaylist() {
   if (!playlist) throw new Error('No playlist has been published yet.');
 
   const eventHeading = document.getElementById('eventName');
-  if (playlist.eventId) {
+  if (eventHeading && playlist.eventId) {
     const eventSnapshot = await getDoc(doc(db, 'events', playlist.eventId));
     const event = eventSnapshot.exists() ? eventSnapshot.data() : {};
     eventHeading.textContent = event.name || event.title || event.eventName || 'Event Playlist';
-  } else {
+  } else if (eventHeading) {
     eventHeading.hidden = true;
   }
 
