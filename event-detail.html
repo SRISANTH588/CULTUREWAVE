@@ -1069,6 +1069,11 @@ async function renderEvent(data){
   // Optional wide background is displayed on tablet and desktop only.
   const hero = document.getElementById('heroBanner');
   const posterSrc = data.cardImgUrl || data.coverUrl || 'party.jpg';
+  const desktopCoverSrc = data.coverUrl || posterSrc;
+  const mobPoster = document.getElementById('mobPoster');
+  const setPosterImage = () => { mobPoster.src = window.matchMedia('(min-width:769px)').matches ? desktopCoverSrc : posterSrc; };
+  setPosterImage();
+  window.matchMedia('(min-width:769px)').addEventListener('change', setPosterImage);
   const desktopBackgroundSrc = data.desktopBackgroundUrl;
   if(desktopBackgroundSrc) {
     hero.classList.add('has-desktop-background');
@@ -1079,10 +1084,7 @@ async function renderEvent(data){
   hero.style.backgroundSize = 'cover';
   hero.style.backgroundPosition = 'center';
 
-  // mobile poster
-  const mobPoster = document.getElementById('mobPoster');
-  if(posterSrc){ mobPoster.src = posterSrc; } else { mobPoster.style.display='none'; }
-
+  // mobile poster image is assigned above so its source follows the viewport.
   // mobile event header
   document.getElementById('mobEvTitle').textContent = data.name||'Untitled Event';
   document.getElementById('mobEvSummary').textContent = data.summary||data.tagline||'';
