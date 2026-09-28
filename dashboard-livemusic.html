@@ -569,6 +569,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <option value="">All events</option>
       </select>
       <div class="search-box"><span>🔍</span><input type="search" id="ciSearch" placeholder="Search attendee, event, email or phone..." oninput="window.renderCustomerInfoPanel&&window.renderCustomerInfoPanel()"/></div>
+      <div style="display:flex;gap:.5rem;margin-left:auto;flex-wrap:wrap;">
+        <button type="button" class="prem-btn-ghost" onclick="window.downloadCustomerBookingsExcel&&window.downloadCustomerBookingsExcel()">⬇ Excel</button>
+        <button type="button" class="prem-btn-ghost" onclick="window.downloadCustomerBookingsPdf&&window.downloadCustomerBookingsPdf()">⬇ PDF</button>
+      </div>
     </div>
     <div id="ciBookingsList" style="display:grid;gap:.8rem;"></div>
   </div>
@@ -1056,10 +1060,57 @@ function renderCustomerInfoPanel(){
     const eventDate=b.eventDate||b.date||ev?.startDate||ev?.eventDates?.[0]?.date;
     const venue=b.venueName||b.venue||ev?.venueName||ev?.venue||ev?.city||'—';
     const checkedIn=b.checkedIn===true||b.checkedInAt||b.attendanceStatus==='checked-in';
-    return `<article class="card" style="margin:0;padding:1rem 1.1rem;"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;"><div style="min-width:220px;flex:1;"><div style="font-weight:800;font-size:1rem;color:#1a1a2e;">${esc(guest)}</div><div style="font-size:.86rem;color:#6b7280;margin-top:.25rem;">${esc(eventName)}</div><div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.45rem;font-size:.78rem;color:#9ca3af;">${email?`<span>✉ ${esc(email)}</span>`:''}${phone?`<span>☎ ${esc(phone)}</span>`:''}</div></div><span style="padding:.25rem .65rem;border-radius:999px;background:${status==='paid'?'#dcfce7':'#fff7ed'};color:${status==='paid'?'#15803d':'#c2410c'};font-size:.72rem;font-weight:700;">${esc(status)}</span></div><details style="margin-top:.85rem;border-top:1px solid var(--border);padding-top:.65rem;"><summary style="cursor:pointer;color:#be123c;font-size:.8rem;font-weight:700;">View booking details</summary><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin-top:.8rem;">${[['Booking ID',b.bookingId||b.id],['Event date',formatDate(eventDate)],['Venue',venue],['Ticket',b.ticketName||b.ticketType||b.ticket||'General admission'],['Quantity',quantity],['Amount',amount?money(amount):'Free'],['Booked on',formatDate(b.createdAt)],['Check-in',checkedIn?'Checked in':'Not checked in']].map(([label,value])=>`<div><div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:700;">${label}</div><div style="font-size:.82rem;color:#374151;margin-top:.2rem;overflow-wrap:anywhere;">${esc(value)}</div></div>`).join('')}</div></details></article>`;
+    const digits=String(phone||'').replace(/\D/g,'');
+    const whatsappPhone=digits.length===10?'91'+digits:digits.length===11&&digits.startsWith('0')?'91'+digits.slice(1):digits;
+    const reminder=`Hi ${guest}, this is a reminder about your booking for ${eventName}.${eventDate?' Event date: '+formatDate(eventDate)+'.':''}${venue&&venue!=='—'?' Venue: '+venue+'.':''} We look forward to seeing you!`;
+    const whatsappUrl=whatsappPhone?`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(reminder)}`:'';
+    return `<article class="card" style="margin:0;padding:1rem 1.1rem;"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;"><div style="min-width:220px;flex:1;"><div style="font-weight:800;font-size:1rem;color:#1a1a2e;">${esc(guest)}</div><div style="font-size:.86rem;color:#6b7280;margin-top:.25rem;">${esc(eventName)}</div><div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.45rem;font-size:.78rem;color:#9ca3af;">${email?`<span>✉ ${esc(email)}</span>`:''}${phone?`<span>☎ ${esc(phone)}</span>`:''}</div></div><span style="padding:.25rem .65rem;border-radius:999px;background:${status==='paid'?'#dcfce7':'#fff7ed'};color:${status==='paid'?'#15803d':'#c2410c'};font-size:.72rem;font-weight:700;">${esc(status)}</span></div><div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.75rem;">${whatsappUrl?`<a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .75rem;border-radius:8px;background:#16a34a;color:#fff;font-size:.76rem;font-weight:700;text-decoration:none;">WhatsApp reminder</a>`:`<span style="font-size:.74rem;color:#9ca3af;">No phone number for WhatsApp</span>`}<details style="flex:1 1 100%;margin-top:.1rem;border-top:1px solid var(--border);padding-top:.65rem;"><summary style="cursor:pointer;color:#be123c;font-size:.8rem;font-weight:700;">View booking details</summary><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin-top:.8rem;">${[['Booking ID',b.bookingId||b.id],['Event date',formatDate(eventDate)],['Venue',venue],['Ticket',b.ticketName||b.ticketType||b.ticket||'General admission'],['Quantity',quantity],['Amount',amount?money(amount):'Free'],['Booked on',formatDate(b.createdAt)],['Check-in',checkedIn?'Checked in':'Not checked in']].map(([label,value])=>`<div><div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:700;">${label}</div><div style="font-size:.82rem;color:#374151;margin-top:.2rem;overflow-wrap:anywhere;">${esc(value)}</div></div>`).join('')}</div></details></div></article>`;
   }).join('');
 }
 window.renderCustomerInfoPanel=renderCustomerInfoPanel;
+function getCustomerInfoExportRows(){
+  const selectedEvent=document.getElementById('ciEventFilter')?.value||'';
+  const q=(document.getElementById('ciSearch')?.value||'').trim().toLowerCase();
+  return allBookings.filter(b=>b.cancelled!==true&&!['cancelled','canceled'].includes(String(b.status||'').toLowerCase())).filter(b=>{
+    const ev=allEvents.find(item=>item.id===(b.eventId||b.event_id));
+    const eventId=b.eventId||b.event_id||b.eventName||'unknown';
+    const values=[];const collect=(value,depth=0)=>{if(value==null||depth>3)return;if(typeof value==='string'||typeof value==='number'||typeof value==='boolean'){values.push(String(value));return;}if(Array.isArray(value)){value.forEach(item=>collect(item,depth+1));return;}if(typeof value==='object')Object.values(value).forEach(item=>collect(item,depth+1));};collect(b);collect(ev?.name);collect(ev?.venue);collect(ev?.city);
+    return(!selectedEvent||eventId===selectedEvent)&&(!q||values.join(' ').toLowerCase().includes(q));
+  }).map(b=>{
+    const ev=allEvents.find(item=>item.id===(b.eventId||b.event_id));
+    const rawDate=b.eventDate||b.date||ev?.startDate||ev?.eventDates?.[0]?.date;
+    const date=rawDate?.toDate?rawDate.toDate():rawDate?new Date(rawDate):null;
+    const booked=b.createdAt?.toDate?b.createdAt.toDate():b.createdAt?new Date(b.createdAt):null;
+    return{
+      'Attendee':b.customerName||b.attendeeName||b.guestName||b.name||b.customer?.name||b.guest?.name||'Guest',
+      'Email':b.customerEmail||b.email||b.guestEmail||b.customer?.email||b.guest?.email||'',
+      'Phone':b.customerPhone||b.phone||b.mobile||b.guestPhone||b.customer?.phone||b.guest?.phone||'',
+      'Event':b.eventName||ev?.name||'Event',
+      'Event Date':date&&!Number.isNaN(date.getTime())?date.toLocaleDateString('en-IN'): '',
+      'Venue':b.venueName||b.venue||ev?.venueName||ev?.venue||ev?.city||'',
+      'Ticket':b.ticketName||b.ticketType||b.ticket||'General admission',
+      'Quantity':Number(b.tickets||b.ticketQuantity||b.quantity||b.seats||1),
+      'Amount':Number(b.amount||b.totalAmount||0),
+      'Status':b.status||'confirmed',
+      'Booking ID':b.bookingId||b.id,
+      'Booked On':booked&&!Number.isNaN(booked.getTime())?booked.toLocaleDateString('en-IN'):'',
+      'Check-in':b.checkedIn===true||b.checkedInAt||b.attendanceStatus==='checked-in'?'Checked in':'Not checked in'
+    };
+  });
+}
+window.downloadCustomerBookingsExcel=function(){
+  const rows=getCustomerInfoExportRows();if(!rows.length){showToast('No bookings to export');return;}
+  const headers=Object.keys(rows[0]);const csv=[headers,...rows.map(row=>headers.map(header=>row[header]))].map(line=>line.map(value=>'"'+String(value??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='event-bookings.csv';a.click();URL.revokeObjectURL(url);showToast('Bookings exported for Excel');
+};
+window.downloadCustomerBookingsPdf=function(){
+  const rows=getCustomerInfoExportRows();if(!rows.length){showToast('No bookings to export');return;}
+  const headers=['Attendee','Phone','Event','Event Date','Ticket','Quantity','Amount','Status','Booking ID'];
+  const escPdf=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const table=`<table><thead><tr>${headers.map(h=>`<th>${escPdf(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${headers.map(h=>`<td>${escPdf(row[h])}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>Event Bookings</title><style>body{font:12px Arial,sans-serif;color:#222;padding:24px}h1{font-size:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:6px;text-align:left;overflow-wrap:anywhere}th{background:#f1f1f1}button{margin:0 0 16px;padding:8px 14px}@media print{button{display:none}body{padding:0}}</style></head><body><button onclick="window.print()">Save as PDF / Print</button><h1>Event Bookings</h1>${table}</body></html>`;
+  const blob=new Blob([docHtml],{type:'text/html'});const url=URL.createObjectURL(blob);window.open(url,'_blank');setTimeout(()=>URL.revokeObjectURL(url),60000);
+};
 function renderOverview(){const el=id=>document.getElementById(id);if(el('mEvents'))el('mEvents').textContent=allEvents.length;if(el('planUsageLabel'))el('planUsageLabel').textContent=allEvents.length+' events created';}
 function renderOverviewBookings(bookings){
   const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
