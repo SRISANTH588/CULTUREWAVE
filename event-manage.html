@@ -490,7 +490,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 <!-- INVITATIONS PANEL -->
 <div class="panel" id="panel-invitations">
   <div class="card">
-    <div class="card-head"><div><h2>Invite guests</h2><p>Create complimentary tickets that appear in attendee bookings and work with event check-in.</p></div></div>
+    <div class="card-head"><div><h2>Invite guests</h2><p>Add each guest and the number of complimentary tickets to create. Every ticket gets its own QR code for event check-in.</p></div></div>
     <div id="invitationRows" style="display:flex;flex-direction:column;gap:.75rem;"></div>
     <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem;">
       <button class="tb-btn" type="button" onclick="addInvitationRow()">＋ Add guest</button>
@@ -1681,11 +1681,6 @@ function prefillTickets(){
 }
 
 let invitationRowCount=0;
-function invitationTicketOptions(){
-  const tickets=Array.isArray(eventData?.tickets)?eventData.tickets:[];
-  if(!tickets.length)return '<option value="0">General admission</option>';
-  return tickets.map((ticket,index)=>`<option value="${index}">${esc(ticket.name||'General')} · ${ticket.price?money(ticket.price):'Free'}</option>`).join('');
-}
 function renderInvitationRows(){
   const host=document.getElementById('invitationRows');if(!host)return;
   if(!host.children.length)addInvitationRow();
@@ -1695,7 +1690,7 @@ window.addInvitationRow=function(){
   const id=++invitationRowCount;
   const row=document.createElement('div');row.className='invitation-row';row.dataset.invitationRow=String(id);
   row.style.cssText='display:grid;grid-template-columns:1.2fr 1.3fr 1fr 1.2fr auto;gap:.55rem;align-items:end;padding:.8rem;background:#f8f9fa;border:1px solid var(--border);border-radius:10px;';
-  row.innerHTML=`<label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">GUEST NAME<input data-field="name" autocomplete="name" placeholder="Guest name" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">EMAIL<input data-field="email" type="email" autocomplete="email" placeholder="guest@example.com" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">PHONE<input data-field="phone" type="tel" autocomplete="tel" placeholder="Phone (optional)" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">TICKET TYPE<select data-field="ticket" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;background:#fff;font:inherit;font-size:.82rem;">${invitationTicketOptions()}</select></label><button type="button" aria-label="Remove guest" title="Remove guest" onclick="this.closest('.invitation-row').remove()" style="padding:.55rem;color:#c92a2a;font-size:1.1rem;">×</button>`;
+  row.innerHTML=`<label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">GUEST NAME<input data-field="name" autocomplete="name" placeholder="Guest name" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">EMAIL<input data-field="email" type="email" autocomplete="email" placeholder="guest@example.com" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">PHONE<input data-field="phone" type="tel" autocomplete="tel" placeholder="Phone (optional)" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">NUMBER OF TICKETS<input data-field="ticketCount" type="number" min="1" max="249" step="1" value="1" inputmode="numeric" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><button type="button" aria-label="Remove guest" title="Remove guest" onclick="this.closest('.invitation-row').remove()" style="padding:.55rem;color:#c92a2a;font-size:1.1rem;">×</button>`;
   host.appendChild(row);
 };
 
@@ -1709,40 +1704,42 @@ window.issueInvitations=async function(){
     name:row.querySelector('[data-field="name"]').value.trim(),
     email:row.querySelector('[data-field="email"]').value.trim().toLowerCase(),
     phone:row.querySelector('[data-field="phone"]').value.trim(),
-    ticketIndex:Number(row.querySelector('[data-field="ticket"]').value||0)
+    ticketCount:Number(row.querySelector('[data-field="ticketCount"]').value||0)
   }));
   if(!guests.length||guests.some(guest=>!guest.name)){status.textContent='Enter a name for every guest before generating tickets.';return;}
-  if(guests.length>249){status.textContent='Generate up to 249 guest tickets at a time.';return;}
+  if(guests.some(guest=>!Number.isInteger(guest.ticketCount)||guest.ticketCount<1)){status.textContent='Enter at least one ticket for every guest.';return;}
+  const totalTickets=guests.reduce((total,guest)=>total+guest.ticketCount,0);
+  if(totalTickets>249){status.textContent='Generate up to 249 individual tickets at a time.';return;}
   if(guests.some(guest=>guest.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email))){status.textContent='Check the email address format and try again.';return;}
   button.disabled=true;button.textContent='Generating…';status.textContent='Creating attendee records and tickets…';
   try{
-    const tickets=Array.isArray(eventData.tickets)?eventData.tickets:[];
     const batch=db.batch();const issued=[];
     guests.forEach(guest=>{
-      const chosen=tickets[guest.ticketIndex]||{name:'General admission',price:0};
-      const bookingRef=db.collection('bookings').doc();
-      const bookingId=bookingRef.id;
-      const ticketName=chosen.name||'General admission';
-      const data={bookingId,eventId,eventName:eventData.name||'Event',ticketName,
-        ticketItems:[{ticketIndex:guest.ticketIndex,ticketName,quantity:1}],
-        amount:0,seats:1,seatIds:[],status:'confirmed',paymentId:null,
-        customerName:guest.name,customerEmail:guest.email,customerPhone:guest.phone,
-        userId:null,organiserId:user.uid,ownerId:user.uid,source:'organiser_invitation',
-        invitation:true,eventDate:eventData.startDate||eventData.date||null,
-        venueName:eventData.venueName||eventData.venue||null,city:eventData.city||null,
-        eventEmoji:eventData.emoji||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-      batch.set(bookingRef,data);
-      batch.set(db.collection('payments').doc(bookingId),data);
-      issued.push({bookingId,name:guest.name,email:guest.email,ticketName});
+      for(let index=0;index<guest.ticketCount;index++){
+        const bookingRef=db.collection('bookings').doc();
+        const bookingId=bookingRef.id;
+        const ticketName='Invitation Ticket';
+        const data={bookingId,eventId,eventName:eventData.name||'Event',ticketName,
+          ticketItems:[{ticketName,quantity:1}],
+          amount:0,seats:1,seatIds:[],status:'confirmed',paymentId:null,
+          customerName:guest.name,customerEmail:guest.email,customerPhone:guest.phone,
+          userId:null,organiserId:user.uid,ownerId:user.uid,source:'organiser_invitation',
+          invitation:true,eventDate:eventData.startDate||eventData.date||null,
+          venueName:eventData.venueName||eventData.venue||null,city:eventData.city||null,
+          eventEmoji:eventData.emoji||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+        batch.set(bookingRef,data);
+        batch.set(db.collection('payments').doc(bookingId),data);
+        issued.push({bookingId,name:guest.name,email:guest.email,ticketName,ticketNumber:index+1,ticketCount:guest.ticketCount});
+      }
     });
-    batch.update(db.collection('events').doc(eventId),{totalBooked:firebase.firestore.FieldValue.increment(guests.length)});
+    batch.update(db.collection('events').doc(eventId),{totalBooked:firebase.firestore.FieldValue.increment(totalTickets)});
     await batch.commit();
     const base=location.href.split('?')[0].replace(/event-manage\.html$/,'');
     const list=document.getElementById('issuedInvitationTickets');
     list.innerHTML=issued.map(ticket=>{
       const params=new URLSearchParams({bookingId:ticket.bookingId,event:eventData.name||'Event',guest:ticket.name,amount:'0',status:'Confirmed',eventId,ticket:ticket.ticketName,seats:'1',date:eventData.startDate||eventData.date||'',time:eventData.startTime||eventData.time||''});
       const url=base+'success.html?'+params.toString();
-      return `<article style="display:flex;align-items:center;gap:1.2rem;max-width:620px;padding:1.1rem;border:1px solid #dce4f5;border-radius:16px;background:linear-gradient(120deg,#fff,#f7f9ff);box-shadow:0 8px 24px rgba(18,66,197,.08);"><div style="flex:1;min-width:0;"><div style="font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.35rem;">Event Invitation</div><div style="font-size:1.05rem;font-weight:800;overflow-wrap:anywhere;">${esc(ticket.name)}</div><div style="font-size:.84rem;color:#495057;margin-top:.2rem;">${esc(eventData.name||'Event')}</div><div style="font-size:.76rem;color:var(--muted);margin-top:.25rem;">${esc(ticket.ticketName)} · Complimentary</div><div style="font-size:.68rem;color:var(--muted);margin-top:.45rem;">Ticket ID: ${esc(ticket.bookingId)}</div><div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.75rem;"><a class="tb-btn primary" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open ticket</a><button class="tb-btn invitation-copy-link" data-ticket-url="${url.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" type="button">Copy link</button></div></div><div style="flex:none;text-align:center;background:#fff;padding:.5rem;border:1px solid var(--border);border-radius:12px;"><canvas id="invitationQr_${ticket.bookingId}" width="144" height="144" aria-label="Valid ticket QR code for ${esc(ticket.name)}"></canvas><div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:.15rem;">SCAN FOR ENTRY</div></div></article>`;
+      return `<article style="display:flex;align-items:center;gap:1.2rem;max-width:620px;padding:1.1rem;border:1px solid #dce4f5;border-radius:16px;background:linear-gradient(120deg,#fff,#f7f9ff);box-shadow:0 8px 24px rgba(18,66,197,.08);"><div style="flex:1;min-width:0;"><div style="font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.35rem;">Event Invitation</div><div style="font-size:1.05rem;font-weight:800;overflow-wrap:anywhere;">${esc(ticket.name)}</div><div style="font-size:.84rem;color:#495057;margin-top:.2rem;">${esc(eventData.name||'Event')}</div><div style="font-size:.76rem;color:var(--muted);margin-top:.25rem;">Ticket ${ticket.ticketNumber} of ${ticket.ticketCount} · Complimentary</div><div style="font-size:.68rem;color:var(--muted);margin-top:.45rem;">Ticket ID: ${esc(ticket.bookingId)}</div><div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.75rem;"><a class="tb-btn primary" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open ticket</a><button class="tb-btn invitation-copy-link" data-ticket-url="${url.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" type="button">Copy link</button></div></div><div style="flex:none;text-align:center;background:#fff;padding:.5rem;border:1px solid var(--border);border-radius:12px;"><canvas id="invitationQr_${ticket.bookingId}" width="144" height="144" aria-label="Valid ticket QR code for ${esc(ticket.name)}"></canvas><div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:.15rem;">SCAN FOR ENTRY</div></div></article>`;
     }).join('');
     issued.forEach(ticket=>{
       const canvas=document.getElementById('invitationQr_'+ticket.bookingId);
@@ -1754,7 +1751,7 @@ window.issueInvitations=async function(){
       if(navigator.clipboard?.writeText)navigator.clipboard.writeText(url).then(()=>showToast('Ticket link copied')).catch(()=>prompt('Copy ticket link:',url));
       else prompt('Copy ticket link:',url);
     }));
-    status.textContent=`${issued.length} guest ticket${issued.length===1?'':'s'} created. Guests are now listed in bookings and can be checked in by scanning their ticket QR.`;
+    status.textContent=`${issued.length} individual ticket${issued.length===1?'':'s'} created for ${guests.length} guest${guests.length===1?'':'s'}. Each ticket has its own QR code and attendee booking.`;
     document.getElementById('invitationRows').innerHTML='';addInvitationRow();
   }catch(error){console.error('Could not issue invitation tickets:',error);status.textContent=error.code==='permission-denied'?'Could not create tickets. Confirm you are signed in as the event owner and retry.':'Ticket generation failed. Please retry.';}
   finally{button.disabled=false;button.textContent='Generate tickets';}
