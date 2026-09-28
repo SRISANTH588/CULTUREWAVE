@@ -4,85 +4,50 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
-  <title>CultureWave | Invitation Confirmed</title>
+  <title>Premium Invitation | CultureWave</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
-    body{background:#171719;color:#f5f5f6;font-family:Manrope,Arial,sans-serif}
-    .invite-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:3rem 1.4rem 7rem;background:radial-gradient(ellipse 75% 24% at 50% 0,rgba(20,144,96,.2),transparent 66%),#171719}
-    .invite-status{width:100%;max-width:680px;text-align:center;padding:0 1rem 1.8rem}
-    .invite-premium-badge{display:inline-flex;align-items:center;gap:.4rem;margin:0 auto 1rem;padding:.42rem .8rem;border:1px solid rgba(241,210,109,.32);border-radius:999px;background:rgba(241,210,109,.08);color:#f1d26d;font-size:.65rem;font-weight:800;letter-spacing:.17em;text-transform:uppercase}
-    .invite-check{width:4.8rem;height:4.8rem;margin:0 auto 1.2rem;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 26%,#7df0bb,#28c982 32%,#067349 100%);border:3px solid rgba(211,255,234,.64);box-shadow:0 0 0 7px rgba(53,218,143,.13),0 14px 30px rgba(0,0,0,.32);font-size:2rem}
-    .invite-status h1{margin:0 0 .5rem;color:#26bf84;font-size:clamp(1.8rem,5vw,2.5rem);letter-spacing:-.06em;font-weight:800}
-    .invite-status p{margin:0;color:#aaaab0;font-size:.92rem;line-height:1.6}
-    .invite-id{display:inline-block;margin-top:1rem;color:#a7a7ab;font-size:.75rem;letter-spacing:.08em}
-    .invite-ticket{width:100%;max-width:680px;overflow:hidden;border:1px solid rgba(255,255,255,.07);border-radius:22px;background:#05070d;box-shadow:0 16px 48px rgba(0,0,0,.24)}
-    .invite-ticket-head{padding:1.5rem 1.6rem;background:linear-gradient(135deg,#0a0f1e,#1242c5 58%,#2f6bff);display:flex;align-items:center;gap:1rem}
-    .invite-event-icon{width:3.4rem;height:3.4rem;flex:none;display:grid;place-items:center;border-radius:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);font-size:1.6rem}
-    .invite-ticket-head h2{margin:0 0 .3rem;color:white;font-size:1.16rem;letter-spacing:-.04em}
-    .invite-ticket-head p{margin:0;color:rgba(255,255,255,.68);font-size:.8rem}
-    .invite-ticket-body{display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:center;padding:1.6rem}
-    .invite-details{display:grid;grid-template-columns:1fr 1fr;gap:.2rem 1.2rem}
-    .invite-detail{min-width:0;padding:.7rem 0;border-bottom:1px dashed #35363c}
-    .invite-detail:nth-last-child(-n+2){border-bottom:0}
-    .invite-label{display:block;margin-bottom:.28rem;color:#a7a8ae;font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-    .invite-value{display:block;color:#f1f1f3;font-size:.82rem;font-weight:800;overflow-wrap:anywhere}
-    .invite-value.accent{color:#2dca8d}
-    .invite-message{grid-column:1/-1;margin-top:.55rem;padding:.9rem 1rem;border:1px solid #252831;border-radius:13px;background:#0b0d13;color:#c1c2c8;font-size:.82rem;line-height:1.6;white-space:pre-wrap}
-    .invite-greeting{display:block;margin-bottom:.55rem;color:#f1d26d;font-size:.95rem;font-weight:800}
-    .invite-qr-area{display:flex;flex-direction:column;align-items:center;gap:.55rem}
-    .invite-qr-box{width:140px;height:140px;padding:.55rem;display:grid;place-items:center;border:1px solid #35363c;border-radius:16px;background:#fff}
-    .invite-qr-box canvas{width:120px!important;height:120px!important}
-    .invite-qr-caption{max-width:140px;text-align:center;color:#a7a8ae;font-size:.64rem;line-height:1.4}
-    .invite-actions{position:fixed;z-index:5;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:.7rem;padding:.8rem max(1rem,calc((100vw - 680px)/2)) calc(env(safe-area-inset-bottom) + .8rem);background:linear-gradient(transparent,#121214 25%)}
-    .invite-btn{min-height:52px;border:1px solid #414248;border-radius:15px;display:flex;align-items:center;justify-content:center;gap:.45rem;background:#27282c;color:#f5f5f6;text-decoration:none;font:800 .84rem Manrope,Arial,sans-serif}
-    .invite-btn.whatsapp{border-color:#25d366;background:#25d366;color:#10351d}
-    .invite-cancelled .invite-check{background:#7f1d1d;border-color:rgba(255,255,255,.2)}
-    .invite-cancelled .invite-status h1{color:#ff7777}
-    .invite-cancelled .invite-qr-area{opacity:.35}
-    .cancelled-label{display:none;margin:0 auto 1rem;padding:.7rem 1rem;border-radius:12px;background:#7f1d1d;color:#fff;font-size:.75rem;font-weight:800;text-align:center}
-    .invite-cancelled .cancelled-label{display:block}
-    @media(max-width:600px){.invite-page{align-items:stretch;padding:2.5rem 1.2rem 7rem}.invite-status{max-width:none;padding-bottom:1.55rem}.invite-ticket{max-width:none;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}.invite-ticket-head{padding:0 0 1rem;background:transparent}.invite-event-icon{display:none}.invite-ticket-head h2{font-size:1.08rem}.invite-ticket-body{display:block;padding:0}.invite-details{padding:1rem;border:1px solid rgba(255,255,255,.05);border-radius:18px;background:#05070d}.invite-detail{padding:.65rem 0}.invite-message{margin-top:.8rem}.invite-qr-area{margin:1.2rem auto}.invite-actions{padding-left:1.2rem;padding-right:1.2rem}.invite-btn{min-height:55px}}
-    @media print{body{background:#171719!important}.topbar,.site-footer,.invite-actions{display:none!important}.invite-page{padding:1rem;min-height:0}.invite-ticket{box-shadow:none}.invite-actions{display:none}}
+    :root{--paper:#f7f2e9;--paper-light:#fffdf8;--ink:#211d1a;--muted:#777068;--wine:#64283b;--wine-dark:#351923;--gold:#bd9657;--line:#e7dccb}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',Arial,sans-serif}
+    .topbar{height:68px;padding:0 max(22px,calc((100vw - 1120px)/2));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(53,25,35,.1);background:rgba(255,253,248,.82)}
+    .brand{font-size:1.05rem;font-weight:800;letter-spacing:-.045em;color:var(--wine-dark)}.brand small{display:block;margin-top:2px;color:var(--muted);font-size:.57rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase}
+    .top-label{color:var(--wine);font-size:.64rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+    .page{width:min(960px,calc(100% - 32px));margin:52px auto 110px}
+    .hero{text-align:center;margin:0 auto 30px;max-width:780px}.eyebrow{color:var(--gold);font-size:.68rem;font-weight:800;letter-spacing:.24em;text-transform:uppercase}.hero h1{margin:12px 0 4px;font:600 clamp(2.7rem,7vw,5rem)/1.05 'Playfair Display',Georgia,serif;color:var(--wine-dark);letter-spacing:-.045em}.hero .event-name{margin:15px 0 0;color:var(--wine);font-size:clamp(.9rem,2vw,1.12rem);font-weight:800;letter-spacing:.2em;text-transform:uppercase}.hero-rule{width:94px;height:1px;margin:22px auto;background:var(--gold)}
+    .invitation{position:relative;max-width:820px;margin:auto;padding:clamp(25px,5vw,54px);background:var(--paper-light);border:1px solid var(--line);box-shadow:0 22px 65px rgba(53,25,35,.09)}.invitation:before{content:'✦';position:absolute;top:17px;left:50%;transform:translateX(-50%);color:var(--gold);font-size:.8rem}
+    .greeting{text-align:center;margin:0 0 15px;font:500 clamp(1.25rem,3vw,1.8rem) 'Playfair Display',Georgia,serif;color:var(--wine-dark)}
+    .message{text-align:center;max-width:650px;margin:0 auto;color:#59524b;font-size:.94rem;line-height:1.8;white-space:pre-line}.message .custom{display:block;margin-top:12px}
+    .details{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:34px 0 0;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.detail{padding:4px 18px;text-align:center}.detail+.detail{border-left:1px solid var(--line)}.detail-label{display:block;margin-bottom:7px;color:var(--gold);font-size:.62rem;font-weight:800;letter-spacing:.17em;text-transform:uppercase}.detail-value{color:var(--ink);font-size:.9rem;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+    .entry{display:grid;grid-template-columns:1fr auto;align-items:center;gap:24px;margin-top:26px}.entry-copy h2{margin:0 0 8px;font:600 1.35rem 'Playfair Display',Georgia,serif;color:var(--wine-dark)}.entry-copy p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.65}.entry-meta{margin-top:12px;color:var(--wine);font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.qr-box{width:142px;height:142px;padding:10px;display:grid;place-items:center;border:1px solid var(--line);background:white}.qr-box canvas{width:120px!important;height:120px!important}.qr-caption{margin-top:7px;text-align:center;color:var(--muted);font-size:.58rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+    .cancelled-notice{display:none;margin:0 auto 20px;padding:12px 16px;background:#7f1d1d;color:#fff;text-align:center;font-size:.74rem;font-weight:800;letter-spacing:.12em}.cancelled .cancelled-notice{display:block}.cancelled .qr-box{opacity:.35}.cancelled .hero h1{color:#8b263c}
+    .actions{position:fixed;z-index:5;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:10px;padding:14px 18px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(transparent,rgba(247,242,233,.98) 24%)}.button{min-width:180px;min-height:48px;padding:0 20px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--wine);background:var(--wine);color:white;text-decoration:none;font:800 .78rem 'DM Sans',Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.button.secondary{background:transparent;color:var(--wine)}.button:hover{filter:brightness(1.08)}
+    @media(max-width:650px){.topbar{height:58px;padding:0 18px}.page{margin:38px auto 100px}.hero{margin-bottom:22px}.invitation{padding:38px 20px 25px}.message{font-size:.86rem}.details{grid-template-columns:1fr;gap:0;margin-top:26px;padding:7px 0}.detail{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:12px 2px;text-align:left}.detail+.detail{border-left:0;border-top:1px solid var(--line)}.detail-label{margin:2px 0 0}.detail-value{text-align:right}.entry{grid-template-columns:1fr;justify-items:center;text-align:center;gap:18px}.entry-copy h2{font-size:1.25rem}.entry-meta{line-height:1.6}.actions{padding-left:14px;padding-right:14px}.button{flex:1;min-width:0;padding:0 10px;font-size:.69rem}}
+    @media print{body{background:white}.topbar,.actions{display:none}.page{margin:0 auto;width:100%}.invitation{box-shadow:none}.entry{break-inside:avoid}}
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="nav-wrap">
-      <div class="brand-block"><div class="logo">CultureWave</div><div class="brand-sub">by OGSHOOTS LUXE</div></div>
-      <nav class="topnav"><a href="Home.html">Home</a><a href="events.html">Events</a></nav>
-      <div class="auth-actions"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="events.html">Explore Events</a></div>
-    </div>
-  </header>
-  <main class="invite-page" id="invitePage">
-    <section class="invite-status">
-      <div class="invite-premium-badge" id="premiumBadge">✦ Premium Invitation</div>
-      <div class="invite-check" id="inviteCheck">✓</div>
-      <h1 id="pageTitle">Your premium invitation is confirmed!</h1>
-      <p id="pageSubtitle">You’re on the guest list. Keep this page handy and show your entry QR at the venue.</p>
-      <div class="invite-id" id="bookingIdLabel"></div>
-    </section>
-    <article class="invite-ticket">
-      <div class="cancelled-label">THIS INVITATION HAS BEEN CANCELLED</div>
-      <header class="invite-ticket-head"><div class="invite-event-icon">🎟️</div><div><h2 id="eventName">Event</h2><p id="eventVenue">Venue to be announced</p></div></header>
-      <section class="invite-ticket-body">
-        <div class="invite-details">
-          <div class="invite-detail"><span class="invite-label">Invited guest</span><span class="invite-value" id="guestName">Guest</span></div>
-          <div class="invite-detail"><span class="invite-label">Entry</span><span class="invite-value accent" id="ticketStatus">Premium guest invitation</span></div>
-          <div class="invite-detail"><span class="invite-label">Date</span><span class="invite-value" id="eventDate">To be announced</span></div>
-          <div class="invite-detail"><span class="invite-label">Time</span><span class="invite-value" id="eventTime">To be announced</span></div>
-          <div class="invite-detail"><span class="invite-label">Pass type</span><span class="invite-value" id="ticketType">Premium Invitation Ticket</span></div>
-          <div class="invite-detail"><span class="invite-label">Ticket number</span><span class="invite-value" id="ticketNumber">1 of 1</span></div>
-          <div class="invite-message"><span class="invite-label">Your invitation message</span><strong class="invite-greeting" id="inviteGreeting">Dear Guest,</strong><span id="inviteMessage"></span></div>
-        </div>
-        <div class="invite-qr-area"><div class="invite-qr-box"><canvas id="inviteQr" width="120" height="120"></canvas></div><strong class="invite-value">Your entry QR</strong><span class="invite-qr-caption">Show this code to the event team when you arrive.</span></div>
+  <header class="topbar"><div class="brand">CultureWave<small>By OGSHOOTS LUXE</small></div><div class="top-label">Premium Guest Invitation</div></header>
+  <main class="page" id="invitePage">
+    <div class="cancelled-notice">THIS INVITATION HAS BEEN CANCELLED</div>
+    <section class="hero"><div class="eyebrow">You are personally invited</div><h1>You’re invited</h1><div class="event-name" id="eventName">Your event</div><div class="hero-rule"></div></section>
+    <article class="invitation">
+      <h2 class="greeting" id="inviteGreeting">Dear Guest,</h2>
+      <p class="message" id="inviteMessage"></p>
+      <section class="details" aria-label="Event details">
+        <div class="detail"><span class="detail-label">Date</span><strong class="detail-value" id="eventDate">To be announced</strong></div>
+        <div class="detail"><span class="detail-label">Time</span><strong class="detail-value" id="eventTime">To be announced</strong></div>
+        <div class="detail"><span class="detail-label">Venue</span><strong class="detail-value" id="eventVenue">To be announced</strong></div>
+      </section>
+      <section class="entry">
+        <div class="entry-copy"><h2>Your guest pass</h2><p>This invitation includes premium guest entry. Please have your QR ready when you arrive so the event team can check you in.</p><div class="entry-meta"><span id="ticketType">Premium Invitation Ticket</span> · Ticket <span id="ticketNumber">1 of 1</span><br/><span id="bookingIdLabel"></span></div></div>
+        <div><div class="qr-box"><canvas id="inviteQr" width="120" height="120"></canvas></div><div class="qr-caption">Scan for event entry</div></div>
       </section>
     </article>
   </main>
-  <div class="invite-actions"><a class="invite-btn whatsapp" id="whatsappButton" href="#">WhatsApp invitation</a><a class="invite-btn" href="Home.html">Done</a></div>
+  <div class="actions"><a class="button" id="whatsappButton" href="#">Send invitation on WhatsApp</a><a class="button secondary" href="Home.html">CultureWave home</a></div>
   <script>
     (()=>{
       const p=new URLSearchParams(location.search);
@@ -93,25 +58,24 @@
       const event=get('event','Event invitation');
       const date=get('date','To be announced');
       const time=get('time','To be announced');
-      const venue=get('venue','To be announced');
+      const venue=get('venue','Venue to be announced');
       const ticket=get('ticket','Invitation Ticket');
       const passType=ticket.toLowerCase().includes('invitation')?'Premium Invitation Ticket':ticket;
       const ticketNumber=Math.max(1,Number(get('ticketNumber','1'))||1);
       const ticketCount=Math.max(1,Number(get('ticketCount',get('seats','1')))||1);
       const organiserMessage=get('message');
-      const message=`You are cordially invited to ${event}. Join us for a special experience with great people and memorable moments.${organiserMessage?`\n\n${organiserMessage}`:''}\n\nWe look forward to welcoming you. Please show your invitation QR code at the venue for entry.`;
+      const message=`We are delighted to invite you to ${event} for an evening of wonderful moments, great company, and a memorable experience.${organiserMessage?`\n\n${organiserMessage}`:''}\n\nWe look forward to welcoming you. Please present your personal guest pass at the venue.`;
       const cancelled=get('status','confirmed').toLowerCase()==='cancelled';
       const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
-      set('eventName',event);set('guestName',guest);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketNumber',`${ticketNumber} of ${ticketCount}`);set('inviteGreeting',`Dear ${guest},`);set('inviteMessage',message);set('bookingIdLabel',bookingId?`Booking ID: ${bookingId.slice(-10).toUpperCase()}`:'');
-      document.title=`Invitation Confirmed | ${event}`;
-      if(cancelled){document.getElementById('invitePage').classList.add('invite-cancelled');set('inviteCheck','×');set('pageTitle','Invitation cancelled');set('pageSubtitle','This invitation is no longer valid for entry.');set('ticketStatus','Cancelled');document.getElementById('whatsappButton').style.display='none';}
+      set('eventName',event);set('inviteGreeting',`Dear ${guest},`);set('inviteMessage',message);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketNumber',`${ticketNumber} of ${ticketCount}`);set('bookingIdLabel',bookingId?`Invitation ID ${bookingId.slice(-10).toUpperCase()}`:'');
+      document.title=`Premium Invitation for ${guest} | ${event}`;
+      if(cancelled){document.getElementById('invitePage').classList.add('cancelled');document.getElementById('whatsappButton').style.display='none';}
       const shareUrl=new URL(location.href);shareUrl.hash='';
-      const shareText=`Premium invitation for ${guest}\n\nDear ${guest},\nYou are cordially invited to ${event}. Join us for a special experience with great people and memorable moments.\n\nDate: ${date}\nTime: ${time}\nVenue: ${venue}\n\nOpen your premium invitation and ticket here:\n${shareUrl.toString()}`;
+      const shareText=`A premium invitation for ${guest}\n\nDear ${guest},\nYou are invited to ${event}.\nDate: ${date}\nTime: ${time}\nVenue: ${venue}\n\n${organiserMessage||'We look forward to welcoming you for a memorable experience.'}\n\nYour personal guest pass and event details:\n${shareUrl.toString()}`;
       document.getElementById('whatsappButton').href=`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-      if(bookingId&&eventId&&window.QRCode){QRCode.toCanvas(document.getElementById('inviteQr'),shareUrl.toString(),{width:120,margin:1,color:{dark:'#0a0f1e',light:'#ffffff'}});}
-      else set('pageSubtitle','This invitation link is missing ticket details. Contact the event organiser.');
+      if(bookingId&&eventId&&window.QRCode)QRCode.toCanvas(document.getElementById('inviteQr'),shareUrl.toString(),{width:120,margin:1,color:{dark:'#351923',light:'#ffffff'}});
+      else set('inviteMessage',`${message}\n\nYour entry QR is not available. Please contact the event organiser.`);
     })();
   </script>
-  <script src="auth-nav.js"></script>
 </body>
 </html>
