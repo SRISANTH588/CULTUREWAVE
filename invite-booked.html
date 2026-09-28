@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Your Event Invitation | CultureWave</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet"/>
+<style>
+:root{--ink:#171719;--paper:#fff8ee;--brown:#8b4c2b;--muted:#77747b;--green:#29c987;--line:#e9dfd4;}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse 80% 30% at 50% 0,rgba(43,202,137,.14),transparent 70%),#171719;color:#f6f5f3;font-family:Inter,Arial,sans-serif}
+.topbar{height:68px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;padding:0 max(22px,calc((100vw - 1080px)/2));}.brand{font-size:1.08rem;font-weight:800;letter-spacing:-.04em}.brand small{display:block;margin-top:2px;color:#aaa;font-size:.58rem;font-weight:500;letter-spacing:.12em}
+.page{width:min(960px,calc(100% - 32px));margin:42px auto 64px}.intro{text-align:center;margin-bottom:22px}.eyebrow{color:#f1d26d;font-size:.7rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase}.intro h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:.55rem 0 .3rem;letter-spacing:-.055em}.intro p{margin:0;color:#b9b8bd;font-size:.92rem}
+.invite-card{max-width:760px;margin:auto;background:var(--paper);color:#24180f;border-radius:24px;overflow:hidden;border:1px solid #ead9c4;box-shadow:0 22px 70px rgba(0,0,0,.3)}
+.invite-head{position:relative;padding:26px 230px 18px 28px;background:radial-gradient(ellipse at 50% 35%,rgba(255,255,255,.98),rgba(255,248,238,.95) 68%),linear-gradient(135deg,#f7ead9,#fffaf3);text-align:center}.invite-head:before{content:"";position:absolute;left:-125px;top:-135px;width:260px;height:260px;border-radius:50%;border:1px solid rgba(155,100,55,.18);box-shadow:0 0 0 20px rgba(155,100,55,.035),0 0 0 42px rgba(155,100,55,.025)}
+.event-name{position:relative;font-size:.85rem;font-weight:600;letter-spacing:.28em;text-transform:uppercase;line-height:1.5}.invite-qr{position:absolute;right:22px;top:20px;width:172px;padding:10px;background:#fff;border:1px solid #c7a989;border-radius:14px;box-shadow:0 5px 14px rgba(83,54,31,.12);text-align:center}.invite-qr canvas{width:100%;height:auto;display:block}.qr-label{font-size:.62rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;margin-top:6px}.qr-sub{font-size:.58rem;color:#716457;margin-top:2px}
+.invite-body{position:relative;text-align:center;padding:16px 220px 24px 34px;background:radial-gradient(ellipse at 50% 40%,#fffaf4,var(--paper) 72%)}.dear{font-family:Georgia,serif;font-size:1.35rem}.guest-name{display:block;margin:8px auto 16px;padding:8px 12px;max-width:100%;overflow-wrap:anywhere;background:linear-gradient(177deg,transparent 5%,rgba(193,148,107,.23) 10%,rgba(193,148,107,.24) 84%,transparent 94%);font-size:clamp(1.25rem,3.4vw,2.25rem);font-weight:850;letter-spacing:.04em;text-transform:uppercase}.youre{font-size:.88rem;letter-spacing:.5em;text-transform:uppercase}.invited{font-family:'Permanent Marker',cursive,sans-serif;color:var(--brown);font-size:clamp(3rem,8vw,5.2rem);line-height:1.08;transform:rotate(-3deg);margin:2px 0 12px}.message{max-width:590px;margin:0 auto;color:#40352d;font-size:.9rem;line-height:1.65}.details{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:17px 24px;border-top:1px solid var(--line);background:#fffaf5}.detail{text-align:center}.detail-label{font-size:.62rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8e8073}.detail-value{margin-top:5px;font-size:.88rem;font-weight:800;color:#21180f}.ticket-meta{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;padding:13px 18px;background:#f7eee4;color:#735a45;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}.ticket-id{font-family:monospace;letter-spacing:.04em}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:20px auto 0}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:#27282c;color:#f7f6f4;font:700 .86rem Inter,Arial,sans-serif;text-decoration:none;cursor:pointer}.btn.whatsapp{background:#25d366;color:#10351d;border-color:#25d366}.btn:hover{filter:brightness(1.06)}.notice{text-align:center;margin-top:14px;color:#99989e;font-size:.75rem}
+.cancelled .invite-card{filter:grayscale(.55)}.cancelled .invite-qr{opacity:.45}.cancelled-note{display:none;padding:10px;text-align:center;background:#c92a2a;color:#fff;font-weight:800}.cancelled .cancelled-note{display:block}
+@media(max-width:650px){.topbar{height:58px;padding:0 18px}.page{margin:26px auto 48px}.intro{margin-bottom:18px}.invite-head{padding:18px 18px 160px}.event-name{padding:0 20px}.invite-qr{top:64px;right:50%;transform:translateX(50%);width:132px}.invite-body{padding:4px 18px 24px}.details{grid-template-columns:1fr;gap:14px}.detail{display:flex;justify-content:space-between;gap:12px;text-align:left}.detail-value{margin-top:0;text-align:right}.ticket-meta{font-size:.62rem;gap:12px}.btn{flex:1;min-width:150px}}
+@media print{body{background:#fff;color:#111}.topbar,.intro,.actions,.notice{display:none!important}.page{width:100%;margin:0}.invite-card{max-width:none;border-radius:0;box-shadow:none}.invite-head,.invite-body,.details,.ticket-meta{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="brand">CultureWave<small>BY OGSHOOTS LUXE</small></div><div style="font-size:.7rem;color:#aaa;letter-spacing:.12em;font-weight:700;">EVENT INVITATION</div></header>
+<main class="page" id="invitePage">
+  <div class="intro"><div class="eyebrow">A personal invitation</div><h1>You’re on the guest list</h1><p>Show the QR code at the venue for entry.</p></div>
+  <article class="invite-card">
+    <div class="cancelled-note">THIS INVITATION HAS BEEN CANCELLED</div>
+    <div class="invite-head"><div class="event-name" id="eventName">Event invitation</div><div class="invite-qr"><canvas id="inviteQr" width="260" height="260"></canvas><div class="qr-label">Your ticket</div><div class="qr-sub">Scan for event entry</div></div></div>
+    <section class="invite-body"><div class="dear">Dear</div><strong class="guest-name" id="guestName">Guest</strong><div class="youre">You’re</div><div class="invited">Invited</div><p class="message" id="inviteMessage"></p></section>
+    <section class="details"><div class="detail"><span class="detail-label">Date</span><strong class="detail-value" id="eventDate">To be announced</strong></div><div class="detail"><span class="detail-label">Time</span><strong class="detail-value" id="eventTime">To be announced</strong></div><div class="detail"><span class="detail-label">Venue</span><strong class="detail-value" id="eventVenue">To be announced</strong></div></section>
+    <div class="ticket-meta"><span id="ticketType">Invitation ticket</span><span id="ticketQuantity">Ticket 1 of 1</span><span class="ticket-id" id="ticketId"></span></div>
+  </article>
+  <div class="actions"><a class="btn whatsapp" id="whatsappButton" href="#">Send on WhatsApp</a><button class="btn" type="button" onclick="window.print()">Print invitation</button></div>
+  <p class="notice" id="ticketNotice">This ticket QR is linked to the event check-in record.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+(()=>{
+  const p=new URLSearchParams(location.search);
+  const get=(key,fallback='')=>p.get(key)||fallback;
+  const bookingId=get('bookingId');
+  const eventId=get('eventId');
+  const guest=get('guest','Guest');
+  const eventName=get('event','Event invitation');
+  const date=get('date','To be announced');
+  const time=get('time','To be announced');
+  const venue=get('venue','To be announced');
+  const ticketName=get('ticket','Invitation ticket');
+  const ticketNumber=Math.max(1,Number(get('ticketNumber','1'))||1);
+  const ticketCount=Math.max(1,Number(get('ticketCount',get('seats','1')))||1);
+  const message=get('message',`We’re so happy to have you at ${eventName}! Get ready for an evening filled with music, good people and great vibes. Let’s jam, connect and create memories together!`);
+  const status=get('status','confirmed').toLowerCase();
+  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  set('eventName',eventName);set('guestName',guest);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('inviteMessage',message);set('ticketType',ticketName);set('ticketQuantity',`Ticket ${ticketNumber} of ${ticketCount}`);set('ticketId',bookingId?`ID ${bookingId.slice(-10).toUpperCase()}`:'');
+  document.title=`Invitation for ${guest} | ${eventName}`;
+  if(status==='cancelled'){document.getElementById('invitePage').classList.add('cancelled');document.getElementById('whatsappButton').style.display='none';}
+  const shareUrl=location.href;
+  const whatsAppMessage=`Hi ${guest}! You’re invited to ${eventName}.${date?`\nDate: ${date}`:''}${time?`\nTime: ${time}`:''}${venue?`\nVenue: ${venue}`:''}\n\nYour invitation and ticket: ${shareUrl}`;
+  document.getElementById('whatsappButton').href=`https://wa.me/?text=${encodeURIComponent(whatsAppMessage)}`;
+  const qrUrl=new URL(location.href);qrUrl.hash='';
+  if(bookingId&&window.QRCode)QRCode.toCanvas(document.getElementById('inviteQr'),qrUrl.toString(),{width:260,margin:2,color:{dark:'#111111',light:'#ffffff'}});
+  else document.getElementById('ticketNotice').textContent='Ticket QR is unavailable. Contact the organiser.';
+  if(!eventId)document.getElementById('ticketNotice').textContent='This invitation link is missing its event reference.';
+})();
+</script>
+</body>
+</html>
