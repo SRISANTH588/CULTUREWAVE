@@ -13,14 +13,16 @@ async function loadPlaylist() {
   const eventId = new URLSearchParams(location.search).get('eventId');
   const snapshot = await getDocs(query(collection(db, 'playlists')));
   const playlists = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+  const newestFirst = [...playlists].sort((a, b) => {
+    const updatedAt = item => item.updatedAt?.toDate?.().getTime() || (item.updatedAt?.seconds || 0) * 1000 || new Date(item.updatedAt || 0).getTime();
+    return updatedAt(b) - updatedAt(a);
+  });
   const playlist = (eventId && playlists.find(item => item.eventId === eventId))
-    || playlists.find(item => item.isDefault)
-    || playlists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0))[0];
+    || (eventId ? playlists.find(item => item.isDefault) : newestFirst[0])
+    || newestFirst[0];
 
   if (!playlist) throw new Error('No playlist has been published yet.');
 
-  document.getElementById('title').textContent = playlist.title || 'Event Playlist';
-  document.getElementById('description').textContent = playlist.description || '';
   const songs = Array.isArray(playlist.songs) ? playlist.songs : [];
   const songList = document.getElementById('songs');
   songList.innerHTML = songs.length
