@@ -62,6 +62,8 @@
     const bookingDate=b=>formatDate(b.eventDate||b.startDate||b.date)||'Date to be announced';
     const bookingRef=b=>String(b.bookingId||b.id||'').slice(-8).toUpperCase();
     const amount=b=>{const n=Number(b.totalAmount??b.amount??b.price??0);return n?`₹${n.toLocaleString('en-IN')}`:'Free';};
+    const eventUrl=b=>`${location.origin}/event-detail.html?eventId=${encodeURIComponent(b.eventId||'')}`;
+    const qrUrl=b=>`https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data=${encodeURIComponent(JSON.stringify({bookingId:b.bookingId||b.id,eventId:b.eventId,event:b.eventName,customer:b.customerName,seats:b.seats||b.quantity||b.tickets||1}))}`;
     const reminderText=b=>[
       `Hi ${b.customerName||'there'}! Here is your CultureWave event reminder:`,
       `🎉 Event: ${b.eventName||'Event'}`,
@@ -70,6 +72,9 @@
       `🎟️ Ticket: ${b.ticketName||'General'} × ${b.seats||b.quantity||b.tickets||1}`,
       `🔖 Booking: #${bookingRef(b)}`,
       `✅ Status: ${b.status||'confirmed'}`,
+      `🖼️ Event card: ${eventUrl(b)}`,
+      ...(b.eventCardImgUrl?[`🎨 Event poster: ${b.eventCardImgUrl}`]:[]),
+      `▦ Booking QR code: ${qrUrl(b)}`,
       'See you there!'
     ].join('\n');
     function downloadBooking(b){
@@ -115,7 +120,7 @@
         const results=await Promise.all(events.map(async event=>{
           try{
             const snap=await db.collection('bookings').where('eventId','==',event.id).get();
-            return snap.docs.map(doc=>({id:doc.id,...doc.data(),eventId:doc.id,eventName:doc.data().eventName||event.name||'Event',eventDate:doc.data().eventDate||event.startDate||event.date,eventCardImgUrl:event.cardImgUrl||event.coverUrl||'',venueName:doc.data().venueName||event.venueName||event.venue||event.city||''}));
+            return snap.docs.map(doc=>({id:doc.id,...doc.data(),eventId:event.id,eventName:doc.data().eventName||event.name||'Event',eventDate:doc.data().eventDate||event.startDate||event.date,eventCardImgUrl:event.cardImgUrl||event.coverUrl||'',venueName:doc.data().venueName||event.venueName||event.venue||event.city||''}));
           }catch(err){console.warn('Unable to load bookings for event',event.id,err);return [];}
         }));
         const bookings=results.flat().sort((a,b)=>{
