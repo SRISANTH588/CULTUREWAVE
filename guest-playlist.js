@@ -11,13 +11,15 @@ const esc = value => String(value || '').replace(/[&<>"']/g, character => ({
 async function loadPlaylist() {
   const status = document.getElementById('status');
   const eventId = new URLSearchParams(location.search).get('eventId');
+  const playlistId = new URLSearchParams(location.search).get('playlistId');
   const snapshot = await getDocs(query(collection(db, 'playlists')));
   const playlists = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
   const updatedAt = item => item.updatedAt?.toDate?.().getTime() || (item.updatedAt?.seconds || 0) * 1000 || new Date(item.updatedAt || 0).getTime();
   const newestFirst = [...playlists].sort((a, b) => {
     return updatedAt(b) - updatedAt(a);
   });
-  const playlist = (eventId && playlists.find(item => item.eventId === eventId))
+  const playlist = (playlistId && playlists.find(item => item.id === playlistId))
+    || (eventId && playlists.find(item => item.eventId === eventId))
     || (eventId ? playlists.find(item => item.isDefault) : newestFirst[0])
     || newestFirst[0];
 
