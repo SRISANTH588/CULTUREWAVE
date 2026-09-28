@@ -132,7 +132,8 @@
         const results=await Promise.all(events.map(async event=>{
           try{
             const snap=await db.collection('bookings').where('eventId','==',event.id).get();
-            return snap.docs.map(doc=>({id:doc.id,...doc.data(),eventId:event.id,eventName:doc.data().eventName||event.name||'Event',eventDate:doc.data().eventDate||event.startDate||event.date,eventCardImgUrl:event.cardImgUrl||event.coverUrl||'',venueName:doc.data().venueName||event.venueName||event.venue||event.city||''}));
+            return snap.docs.map(doc=>({id:doc.id,...doc.data(),eventId:event.id,eventName:doc.data().eventName||event.name||'Event',eventDate:doc.data().eventDate||event.startDate||event.date,eventCardImgUrl:doc.data().cardImgUrl||event.coverUrl||'',venueName:doc.data().venueName||event.venueName||event.venue||event.city||''}))
+              .filter(booking=>booking.cancelled!==true&&!['cancelled','canceled'].includes(String(booking.status||'').trim().toLowerCase()));
           }catch(err){console.warn('Unable to load bookings for event',event.id,err);return [];}
         }));
         const bookings=results.flat().sort((a,b)=>{
