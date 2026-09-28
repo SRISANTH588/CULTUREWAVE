@@ -521,6 +521,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div id="invitationStatus" aria-live="polite" style="font-size:.82rem;color:var(--muted);margin-top:.75rem;"></div>
     <div id="issuedInvitationTickets" style="display:flex;flex-direction:column;gap:.6rem;margin-top:.75rem;"></div>
   </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Issued invitation tickets</h2><p>Guest invitations are listed separately from regular bookings and ticket sales.</p></div><span id="invitationHistoryCount" class="bk-count">0 tickets</span></div>
+    <div id="invitationHistoryRows" style="display:flex;flex-direction:column;gap:.5rem;"><div style="padding:1rem;text-align:center;color:var(--muted);">No invitation tickets issued yet.</div></div>
+  </div>
 </div>
 
 <!-- REMINDERS PANEL -->
@@ -970,6 +974,8 @@ function avatarColor(name){
 
 function normStatus(s){const v=(s||'draft').toLowerCase();return v==='published'?'published':v==='archived'?'archived':'unpublished';}
 function normBookingStatus(s){const v=(s||'pending').toLowerCase();return (v==='confirmed'||v==='paid')?'paid':v;}
+function isInvitationBooking(b){return b?.invitation===true||String(b?.source||'').toLowerCase()==='organiser_invitation';}
+function mainBookings(){return allBookings.filter(b=>!isInvitationBooking(b));}
 
 function bookingName(b){return b.customerName||b.customer?.name||b.customer?.fullName||b.buyerName||b.buyer?.name||b.attendeeName||b.fullName||b.name||'Guest';}
 function bookingPhone(b){return b.customerPhone||b.customer?.phone||b.buyerPhone||b.buyer?.phone||b.phone||'';}
@@ -1110,17 +1116,36 @@ function syncManagedBookings(){
       db.collection('events').doc(eventId).update({totalBooked:attendeeCount})
         .catch(error=>console.warn('Could not refresh public attendee count:',error.message));
     }
-    renderBookings();renderBookingStats();renderAnalytics();renderCiRecent();
+    renderBookings();renderBookingStats();renderAnalytics();renderCiRecent();renderInvitationHistory();
+}
+
+function renderInvitationHistory(){
+  const invites=allBookings.filter(isInvitationBooking);
+  const count=document.getElementById('invitationHistoryCount');
+  const rows=document.getElementById('invitationHistoryRows');
+  if(!count||!rows)return;
+  const guests=new Set(invites.map(b=>String(b.customerEmail||bookingName(b)).toLowerCase()));
+  count.textContent=`${invites.length} ticket${invites.length===1?'':'s'} · ${guests.size} guest${guests.size===1?'':'s'}`;
+  if(!invites.length){rows.innerHTML='<div style="padding:1rem;text-align:center;color:var(--muted);">No invitation tickets issued yet.</div>';return;}
+  const base=location.href.split('?')[0].replace(/event-manage\.html$/,'');
+  rows.innerHTML=invites.slice().sort((a,b)=>bookingName(a).localeCompare(bookingName(b))).map(ticket=>{
+    const id=ticket.bookingId||ticket.id;
+    const params=new URLSearchParams({bookingId:id,event:eventData?.name||'Event',guest:bookingName(ticket),amount:'0',status:'Confirmed',eventId,ticket:ticket.ticketName||'Invitation Ticket',seats:'1'});
+    const url=base+'success.html?'+params.toString();
+    const status=normBookingStatus(ticket.status);
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.7rem;flex-wrap:wrap;padding:.75rem .85rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:700;">${esc(bookingName(ticket))}</div><div style="font-size:.74rem;color:var(--muted);">${esc(bookingEmail(ticket))} · ${esc(ticket.ticketName||'Invitation Ticket')} · ${esc(id)}</div></div><span class="pill ${status==='cancelled'?'cancelled':'free'}">${status==='cancelled'?'cancelled':'invited'}</span><div style="display:flex;gap:.4rem;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open ticket</a><button class="tb-btn" type="button" onclick="openBookingMenu('${ticket.id}')">Manage</button></div></div>`;
+  }).join('');
 }
 
 function renderBookingStats(){
-  const paid=allBookings.filter(b=>normBookingStatus(b.status)==='paid');
+  const regularBookings=mainBookings();
+  const paid=regularBookings.filter(b=>normBookingStatus(b.status)==='paid');
   const totalRev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
   const totalTickets=paid.reduce((s,b)=>s+Number(b.seats||b.tickets||1),0);
-  document.getElementById('bkTotal').textContent=allBookings.length;
+  document.getElementById('bkTotal').textContent=regularBookings.length;
   document.getElementById('bkRevenue').textContent=money(totalRev);
   document.getElementById('bkTickets').textContent=totalTickets;
-  document.getElementById('bkCountLabel').textContent=allBookings.length+' booking'+(allBookings.length!==1?'s':'');
+  document.getElementById('bkCountLabel').textContent=regularBookings.length+' booking'+(regularBookings.length!==1?'s':'');
   const ciTotalEl=document.getElementById('ciTotal');
   const ciCheckedInEl=document.getElementById('ciCheckedIn');
   const ciProgressEl=document.getElementById('ciProgress');
@@ -1143,7 +1168,7 @@ function renderBookingStats(){
   ttEl.innerHTML=topT.length?topT.map(([n,d])=>'<div style="margin-bottom:.65rem;"><div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:600;margin-bottom:.3rem;"><span>'+esc(n)+'</span><span style="color:var(--blue);">'+money(d.rev)+'</span></div><div style="height:5px;border-radius:999px;background:#f1f3f5;overflow:hidden;"><div style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--blue-2));width:'+Math.round(d.rev/maxR*100)+'%;"></div></div><div style="font-size:.72rem;color:var(--muted);margin-top:.2rem;">'+d.sold+' sold &middot; '+d.bookings+' bookings</div></div>').join(''):'<div style="font-size:.82rem;color:var(--muted);">No paid bookings yet</div>';
 
   const srcMap={};
-  allBookings.forEach(b=>{const src=b.source||b.utm_source||'ORGANIC / DIRECT';if(!srcMap[src])srcMap[src]=0;srcMap[src]++;});
+  regularBookings.forEach(b=>{const src=b.source||b.utm_source||'ORGANIC / DIRECT';if(!srcMap[src])srcMap[src]=0;srcMap[src]++;});
   const topS=Object.entries(srcMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const maxS=topS[0]?.[1]||1;
   const tsEl=document.getElementById('topSourcesEl');
@@ -1152,7 +1177,7 @@ function renderBookingStats(){
 
 function renderBookings(){
   const q=(document.getElementById('bkSearch')?.value||'').trim().toLowerCase();
-  let rows=allBookings;
+  let rows=mainBookings();
   if(q) rows=rows.filter(b=>{
     const n=bookingName(b).toLowerCase();
     const p=bookingPhone(b).toLowerCase();
@@ -1345,7 +1370,7 @@ window.resendTicket=async function(){
 
 window.exportBookings=function(){
   const rows=[['Name','Phone','Ticket','Qty','Amount','Status','Date','Source']];
-  allBookings.forEach(b=>{
+  mainBookings().forEach(b=>{
     const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN'):'';
     rows.push([bookingName(b)==='Guest'?'':bookingName(b),bookingPhone(b),b.ticketName||b.customer?.ticket||b.event?.ticketName||'General',b.seats||b.tickets||1,b.amount||0,normBookingStatus(b.status||'pending'),date,b.source||'direct']);
   });
@@ -1574,7 +1599,7 @@ function renderAnalytics(){
   const s=cutoff.toLocaleDateString('en-IN',{year:'numeric',month:'2-digit',day:'2-digit'});
   const e=now.toLocaleDateString('en-IN',{year:'numeric',month:'2-digit',day:'2-digit'});
   document.getElementById('anDateRange').textContent='📅 '+s+' — '+e;
-  const cur=allBookings.filter(b=>{const d=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return d>=cutoff;});
+  const cur=mainBookings().filter(b=>{const d=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return d>=cutoff;});
   const paid=cur.filter(b=>normBookingStatus(b.status)==='paid');
   const failed=cur.filter(b=>normBookingStatus(b.status)==='failed');
   const pending=cur.filter(b=>normBookingStatus(b.status)==='pending');
