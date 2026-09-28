@@ -564,15 +564,18 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     </div>
   </div>
   <div class="page-body">
-    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:1rem;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:.85rem;">
+      <div style="font-size:.9rem;font-weight:800;color:#1a1a2e;">All Event Bookings</div>
+      <div style="display:flex;gap:.55rem;flex-wrap:wrap;">
+        <button type="button" onclick="window.downloadCustomerBookingsExcel&&window.downloadCustomerBookingsExcel()" style="display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1rem;border:0;border-radius:9px;background:#15803d;color:#fff;font-size:.82rem;font-weight:800;cursor:pointer;">⬇ Download Excel</button>
+        <button type="button" onclick="window.downloadCustomerBookingsPdf&&window.downloadCustomerBookingsPdf()" style="display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1rem;border:0;border-radius:9px;background:#be123c;color:#fff;font-size:.82rem;font-weight:800;cursor:pointer;">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;padding:.75rem;background:#fff;border:1px solid var(--border);border-radius:12px;">
       <select id="ciEventFilter" onchange="window.renderCustomerInfoPanel&&window.renderCustomerInfoPanel()" style="min-width:220px;max-width:100%;padding:.65rem .8rem;border:1px solid var(--border);border-radius:9px;background:#fff;color:#374151;font:inherit;">
         <option value="">All events</option>
       </select>
       <div class="search-box"><span>🔍</span><input type="search" id="ciSearch" placeholder="Search attendee, event, email or phone..." oninput="window.renderCustomerInfoPanel&&window.renderCustomerInfoPanel()"/></div>
-      <div style="display:flex;gap:.5rem;margin-left:auto;flex-wrap:wrap;">
-        <button type="button" class="prem-btn-ghost" onclick="window.downloadCustomerBookingsExcel&&window.downloadCustomerBookingsExcel()">⬇ Excel</button>
-        <button type="button" class="prem-btn-ghost" onclick="window.downloadCustomerBookingsPdf&&window.downloadCustomerBookingsPdf()">⬇ PDF</button>
-      </div>
     </div>
     <div id="ciBookingsList" style="display:grid;gap:.8rem;"></div>
   </div>
