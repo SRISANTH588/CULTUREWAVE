@@ -45,7 +45,7 @@
         <div class="detail"><span class="detail-label">Venue</span><strong class="detail-value" id="eventVenue">To be announced</strong></div>
       </section>
       <section class="entry">
-        <div class="entry-copy"><h2>Your guest pass</h2><p>This invitation includes premium guest entry. Please have your QR ready when you arrive so the event team can check you in.</p><div class="entry-meta"><span id="ticketType">Premium Invitation Ticket</span> · Ticket <span id="ticketNumber">1 of 1</span><br/><span id="bookingIdLabel"></span></div></div>
+        <div class="entry-copy"><h2>Your guest pass</h2><p>This invitation includes premium guest entry. Please have your QR ready when you arrive so the event team can check you in.</p><div class="entry-meta"><span id="ticketType">Premium Invitation Ticket</span> · <span id="ticketQuantity">1 ticket assigned to this guest</span><br/><span id="bookingIdLabel"></span></div></div>
         <div><div class="qr-box"><canvas id="inviteQr" width="120" height="120"></canvas></div><div class="qr-caption" id="qrCaption">Scan for event entry</div></div>
       </section>
     </article>
@@ -65,13 +65,12 @@
       const venue=get('venue','Venue to be announced');
       const ticket=get('ticket','Invitation Ticket');
       const passType=ticket.toLowerCase().includes('invitation')?'Premium Invitation Ticket':ticket;
-      const ticketNumber=Math.max(1,Number(get('ticketNumber','1'))||1);
       const ticketCount=Math.max(1,Number(get('ticketCount',get('seats','1')))||1);
       let organiserMessage=get('message');
       const cancelled=get('status','confirmed').toLowerCase()==='cancelled';
       const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
       const fillMessage=()=>set('inviteMessage',`We are delighted to invite you to ${event} for an evening of wonderful moments, great company, and a memorable experience.${organiserMessage?`\n\n${organiserMessage}`:''}\n\nWe look forward to welcoming you. Please present your personal guest pass at the venue.`);
-      set('eventName',event);set('inviteGreeting',`Dear ${guestWithHonorific},`);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketNumber',`${ticketNumber} of ${ticketCount}`);set('bookingIdLabel',bookingId?`Invitation ID ${bookingId.slice(-10).toUpperCase()}`:'');fillMessage();
+      set('eventName',event);set('inviteGreeting',`Dear ${guestWithHonorific},`);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketQuantity',`${ticketCount} ticket${ticketCount===1?'':'s'} assigned to this guest`);set('bookingIdLabel',bookingId?`Invitation ID ${bookingId.slice(-10).toUpperCase()}`:'');fillMessage();
       document.title=`Premium Invitation for ${guest} | ${event}`;
       if(cancelled){document.getElementById('invitePage').classList.add('cancelled');document.getElementById('whatsappButton').style.display='none';}
       const shareUrl=new URL(location.href);shareUrl.hash='';

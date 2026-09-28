@@ -978,7 +978,8 @@ function invitationEventDetails(){
 function invitationPageUrl(ticket){
   const details=invitationEventDetails();
   const id=ticket.bookingId||ticket.id;
-  const params=new URLSearchParams({bookingId:id,eventId,event:eventData?.name||'Event',guest:ticket.name||bookingName(ticket),date:details.date,time:details.time,venue:details.venue,message:details.message,ticket:ticket.ticketName||'Invitation Ticket',seats:'1',ticketNumber:String(ticket.ticketNumber||1),ticketCount:String(ticket.ticketCount||ticket.seats||1),status:normBookingStatus(ticket.status)==='cancelled'||ticket.cancelled?'cancelled':'confirmed'});
+  const quantity=Math.max(1,Number(ticket.ticketCount||ticket.seats||ticket.tickets||1));
+  const params=new URLSearchParams({bookingId:id,eventId,event:eventData?.name||'Event',guest:ticket.name||bookingName(ticket),date:details.date,time:details.time,venue:details.venue,message:details.message,ticket:ticket.ticketName||'Invitation Ticket',seats:String(quantity),ticketCount:String(quantity),status:normBookingStatus(ticket.status)==='cancelled'||ticket.cancelled?'cancelled':'confirmed'});
   return new URL(`/invite-booked.html?${params.toString()}`,location.origin).toString();
 }
 function invitationWhatsAppUrl(ticket,url){
@@ -1139,16 +1140,16 @@ function renderInvitationHistory(){
   const count=document.getElementById('invitationHistoryCount');
   const rows=document.getElementById('invitationHistoryRows');
   if(!count||!rows)return;
-  const guests=new Set(invites.map(b=>String(b.customerEmail||bookingName(b)).toLowerCase()));
-  count.textContent=`${invites.length} ticket${invites.length===1?'':'s'} · ${guests.size} guest${guests.size===1?'':'s'}`;
+  const ticketQuantity=invites.reduce((total,booking)=>total+Math.max(1,Number(booking.seats||booking.tickets||1)),0);
+  count.textContent=`${ticketQuantity} ticket${ticketQuantity===1?'':'s'} · ${invites.length} invitation${invites.length===1?'':'s'}`;
   if(!invites.length){rows.innerHTML='<div style="padding:1rem;text-align:center;color:var(--muted);">No invitation tickets issued yet.</div>';return;}
-  const base=location.href.split('?')[0].replace(/event-manage\.html$/,'');
   rows.innerHTML=invites.slice().sort((a,b)=>bookingName(a).localeCompare(bookingName(b))).map(ticket=>{
     const id=ticket.bookingId||ticket.id;
+    const quantity=Math.max(1,Number(ticket.seats||ticket.tickets||1));
     const url=invitationPageUrl(ticket);
     const status=normBookingStatus(ticket.status);
     const whatsappUrl=invitationWhatsAppUrl(ticket,url);
-    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.7rem;flex-wrap:wrap;padding:.75rem .85rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:700;">${esc(bookingName(ticket))}</div><div style="font-size:.74rem;color:var(--muted);">${esc(bookingEmail(ticket))} · ${esc(ticket.ticketName||'Invitation Ticket')} · ${esc(id)}</div></div><span class="pill ${status==='cancelled'?'cancelled':'free'}">${status==='cancelled'?'cancelled':'invited'}</span><div style="display:flex;gap:.4rem;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">WhatsApp</a><button class="tb-btn" type="button" onclick="openBookingMenu('${ticket.id}')">Manage</button></div></div>`;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.7rem;flex-wrap:wrap;padding:.75rem .85rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:700;">${esc(bookingName(ticket))}</div><div style="font-size:.74rem;color:var(--muted);">${esc(bookingEmail(ticket))} · ${esc(ticket.ticketName||'Invitation Ticket')} × ${quantity} · ${esc(id)}</div></div><span class="pill ${status==='cancelled'?'cancelled':'free'}">${status==='cancelled'?'cancelled':'invited'}</span><div style="display:flex;gap:.4rem;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">WhatsApp</a><button class="tb-btn" type="button" onclick="openBookingMenu('${ticket.id}')">Manage</button></div></div>`;
   }).join('');
 }
 
@@ -1821,28 +1822,26 @@ window.issueInvitations=async function(){
   if(!guests.length||guests.some(guest=>!guest.name)){status.textContent='Enter a name for every guest before generating tickets.';return;}
   if(guests.some(guest=>!Number.isInteger(guest.ticketCount)||guest.ticketCount<1)){status.textContent='Enter at least one ticket for every guest.';return;}
   const totalTickets=guests.reduce((total,guest)=>total+guest.ticketCount,0);
-  if(totalTickets>249){status.textContent='Generate up to 249 individual tickets at a time.';return;}
+  if(totalTickets>249){status.textContent='Generate invitations for up to 249 tickets at a time.';return;}
   if(guests.some(guest=>guest.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email))){status.textContent='Check the email address format and try again.';return;}
-  button.disabled=true;button.textContent='Generating…';status.textContent='Creating attendee records and tickets…';
+  button.disabled=true;button.textContent='Generating…';status.textContent='Creating one attendee invitation per guest…';
   try{
     const batch=db.batch();const issued=[];
     guests.forEach(guest=>{
-      for(let index=0;index<guest.ticketCount;index++){
-        const bookingRef=db.collection('bookings').doc();
-        const bookingId=bookingRef.id;
-        const ticketName='Invitation Ticket';
-        const data={bookingId,eventId,eventName:eventData.name||'Event',ticketName,
-          ticketItems:[{ticketName,quantity:1}],
-          amount:0,seats:1,seatIds:[],status:'confirmed',paymentId:null,
-          customerName:guest.name,customerEmail:guest.email,customerPhone:guest.phone,
-          userId:null,organiserId:user.uid,ownerId:user.uid,source:'organiser_invitation',
-          invitation:true,eventDate:eventData.startDate||eventData.date||null,
-          venueName:eventData.venueName||eventData.venue||null,city:eventData.city||null,
-          eventEmoji:eventData.emoji||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-        batch.set(bookingRef,data);
-        batch.set(db.collection('payments').doc(bookingId),data);
-        issued.push({bookingId,name:guest.name||'INVITED GUEST',email:guest.email,phone:guest.phone,ticketName,ticketNumber:index+1,ticketCount:guest.ticketCount});
-      }
+      const bookingRef=db.collection('bookings').doc();
+      const bookingId=bookingRef.id;
+      const ticketName='Invitation Ticket';
+      const data={bookingId,eventId,eventName:eventData.name||'Event',ticketName,
+        ticketItems:[{ticketName,quantity:guest.ticketCount}],
+        amount:0,seats:guest.ticketCount,tickets:guest.ticketCount,seatIds:[],status:'confirmed',paymentId:null,
+        customerName:guest.name,customerEmail:guest.email,customerPhone:guest.phone,
+        userId:null,organiserId:user.uid,ownerId:user.uid,source:'organiser_invitation',
+        invitation:true,eventDate:eventData.startDate||eventData.date||null,
+        venueName:eventData.venueName||eventData.venue||null,city:eventData.city||null,
+        eventEmoji:eventData.emoji||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+      batch.set(bookingRef,data);
+      batch.set(db.collection('payments').doc(bookingId),data);
+      issued.push({bookingId,name:guest.name||'INVITED GUEST',email:guest.email,phone:guest.phone,ticketName,ticketCount:guest.ticketCount,seats:guest.ticketCount});
     });
     batch.update(db.collection('events').doc(eventId),{totalBooked:firebase.firestore.FieldValue.increment(totalTickets)});
     await batch.commit();
@@ -1850,9 +1849,9 @@ window.issueInvitations=async function(){
     list.innerHTML=issued.map(ticket=>{
       const url=invitationPageUrl({...ticket,status:'confirmed'});
       const whatsappUrl=invitationWhatsAppUrl(ticket,url);
-      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.85rem 1rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:800;">${esc(ticket.name)}</div><div style="font-size:.76rem;color:var(--muted);">Ticket ${ticket.ticketNumber} of ${ticket.ticketCount} · ${esc(ticket.bookingId)}</div></div><div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite page</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Send WhatsApp invite</a></div></div>`;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.85rem 1rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:800;">${esc(ticket.name)}</div><div style="font-size:.76rem;color:var(--muted);">${ticket.ticketCount} ticket${ticket.ticketCount===1?'':'s'} assigned to this guest · ${esc(ticket.bookingId)}</div></div><div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite page</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Send WhatsApp invite</a></div></div>`;
     }).join('');
-    status.textContent=`${issued.length} individual invitation${issued.length===1?'':'s'} created. Use WhatsApp to send each guest their invitation page and ticket link.`;
+    status.textContent=`${issued.length} guest invitation${issued.length===1?'':'s'} created with ${totalTickets} ticket${totalTickets===1?'':'s'} assigned across those guests.`;
     document.getElementById('invitationRows').innerHTML='';addInvitationRow();
   }catch(error){console.error('Could not issue invitation tickets:',error);status.textContent=error.code==='permission-denied'?'Could not create tickets. Confirm you are signed in as the event owner and retry.':'Ticket generation failed. Please retry.';}
   finally{button.disabled=false;button.textContent='Generate tickets';}
