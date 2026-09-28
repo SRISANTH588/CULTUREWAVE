@@ -219,7 +219,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <button class="sb-item" data-view="sales"><span class="sb-icon">💰</span> Sales Summary</button>
     <div class="sb-section-label">Payment Pages</div>
     <button class="sb-item" data-view="events"><span class="sb-icon">🎵</span> Music Events</button>
-    <a class="sb-item" id="customerInfoSidebarLink" href="customer-info.html" hidden><span class="sb-icon">🧾</span> Customer Info</a>
+    <button class="sb-item" id="customerInfoSidebarLink" data-view="customer-info" hidden><span class="sb-icon">🧾</span> Customer Info</button>
     <button class="sb-item" data-view="popups"><span class="sb-icon">🎸</span> Live Concerts</button>
     <button class="sb-item" data-view="dining"><span class="sb-icon">🎤</span> Open Mic Nights</button>
     <button class="sb-item" data-view="playlists"><span class="sb-icon">🎶</span> Guest Playlists</button>
@@ -252,7 +252,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div class="topbar-title" id="pageTitle">🎵 Live Music Dashboard</div>
     </div>
     <div class="topbar-right">
-      <a class="tb-link" href="index.html" target="_blank">⬡ View website</a>
+      <a class="tb-link" href="Home.html" target="_blank">⬡ View website</a>
       <button class="tb-icon-btn">🔔<span class="tb-dot"></span></button>
       <button class="tb-user-btn" onclick="switchView('personal-info')">
         <div class="tb-user-avatar" id="topAvatar">M</div>
@@ -543,6 +543,31 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- CUSTOMER INFO -->
+<div class="view" data-view="customer-info">
+  <div class="prem-hdr">
+    <div class="prem-hdr-top">
+      <div class="prem-hdr-left">
+        <div class="prem-badge">🧾 Customer Info</div>
+        <div class="prem-title">Customer Info</div>
+        <div class="prem-sub">Attendee and booking details for your events, all in one place.</div>
+      </div>
+      <div class="prem-actions"><button class="prem-btn-white" onclick="window.renderCustomerInfoPanel&&window.renderCustomerInfoPanel()">↻ Refresh</button></div>
+    </div>
+    <div class="prem-stats">
+      <div class="prem-stat"><div class="prem-stat-lbl">Bookings</div><div class="prem-stat-val" id="ciBookingCount">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Attendees</div><div class="prem-stat-val" id="ciAttendeeCount">0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Events</div><div class="prem-stat-val" id="ciEventCount">0</div></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <div class="search-box"><span>🔍</span><input type="search" id="ciSearch" placeholder="Search attendee, event, email or phone..." oninput="window.renderCustomerInfoPanel&&window.renderCustomerInfoPanel()"/></div>
+    </div>
+    <div id="ciBookingsList" style="display:grid;gap:.8rem;"></div>
   </div>
 </div>
 
@@ -886,12 +911,13 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-var _titles={overview:'🎵 Dashboard',events:'🎵 Music Events',popups:'🎸 Live Concerts',dining:'🎤 Open Mic Nights',playlists:'🎶 Guest Playlists',analytics:'📈 Analytics',sales:'💰 Sales Summary',payouts:'🏦 Payouts',instagram:'📸 Instagram',whatsapp:'💬 WhatsApp',surveys:'📋 Survey Forms',inquiries:'✉ Inquiries','personal-info':'🪪 Brand & Profile',settings:'⚙ Settings'};
+var _titles={overview:'🎵 Dashboard',events:'🎵 Music Events','customer-info':'🧾 Customer Info',popups:'🎸 Live Concerts',dining:'🎤 Open Mic Nights',playlists:'🎶 Guest Playlists',analytics:'📈 Analytics',sales:'💰 Sales Summary',payouts:'🏦 Payouts',instagram:'📸 Instagram',whatsapp:'💬 WhatsApp',surveys:'📋 Survey Forms',inquiries:'✉ Inquiries','personal-info':'🪪 Brand & Profile',settings:'⚙ Settings'};
 function switchView(name){
   document.querySelectorAll('.view').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
   document.querySelectorAll('.sb-item[data-view]').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
   var pt=document.getElementById('pageTitle');if(pt)pt.textContent=_titles[name]||name;
   if(name==='events'){renderEvents();}
+  if(name==='customer-info'&&window.renderCustomerInfoPanel){window.renderCustomerInfoPanel();}
   if(name==='personal-info'){var pv=document.querySelector('.view[data-view="personal-info"]');if(pv){pv.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});pv.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});var def=document.getElementById('bp-basic');var defBtn=document.querySelector('.brand-sidenav-item[data-panel="bp-basic"]');if(def)def.style.display='flex';if(defBtn)defBtn.classList.add('active');}}
   try{localStorage.setItem('livemusicDashView',name);}catch(e){}
 }
@@ -948,7 +974,7 @@ function renderPlan(user){
 document.getElementById('logoutBtn').onclick=()=>logout();
 try{const saved=localStorage.getItem('livemusicDashView');if(saved)switchView(saved);}catch(e){}
 function normStatus(s){const v=(s||'draft').toLowerCase();return(v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished';}
-function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();},err=>console.error('Unable to load events:',err));}
+function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();renderCustomerInfoPanel();},err=>console.error('Unable to load events:',err));}
 function playlistEventName(id){const ev=allEvents.find(e=>e.id===id);return ev?.name||'Default playlist';}
 function fillPlaylistEvents(){const select=document.getElementById('playlistEvent');if(!select)return;const selected=select.value;select.innerHTML='<option value="">Default for all verified guests</option>'+allEvents.map(e=>`<option value="${e.id}">${esc(e.name||'Untitled event')}</option>`).join('');select.value=selected;}
 document.getElementById('playlistEvent').addEventListener('change',function(){this.dataset.touched='true';const eventId=this.value||null;const existing=allPlaylists.find(p=>eventId?p.eventId===eventId:p.isDefault||!p.eventId);this.dataset.editId=existing?.id||'';const preview=document.getElementById('guestPlaylistPreviewLink');if(preview)preview.href=existing?`guest-playlist.html?playlistId=${encodeURIComponent(existing.id)}`:eventId?`guest-playlist.html?eventId=${encodeURIComponent(eventId)}`:'guest-playlist.html';playlistDraftSongs=existing&&Array.isArray(existing.songs)?existing.songs.map(song=>({...song})):[];clearPlaylistSongFields();renderPlaylistDraftSongs();});
@@ -981,7 +1007,39 @@ const createEvBtn=document.getElementById("createEvBtn");if(createEvBtn)createEv
 document.getElementById('evSearch').addEventListener('input',renderEvents);
 document.getElementById('evRefresh').onclick=()=>renderEvents();
 renderEvents();
-function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);},error=>{console.error('Could not load organizer bookings:',error);const count=document.getElementById('mBookings');if(count)count.textContent='—';const activity=document.getElementById('overviewActivity');if(activity)activity.innerHTML='<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">Bookings could not be loaded. Refresh to try again.</div>';});}
+function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);renderCustomerInfoPanel();},error=>{console.error('Could not load organizer bookings:',error);const count=document.getElementById('mBookings');if(count)count.textContent='—';const activity=document.getElementById('overviewActivity');if(activity)activity.innerHTML='<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">Bookings could not be loaded. Refresh to try again.</div>';});}
+function renderCustomerInfoPanel(){
+  const list=document.getElementById('ciBookingsList');if(!list)return;
+  const activeBookings=allBookings.filter(b=>b.cancelled!==true&&!['cancelled','canceled'].includes(String(b.status||'').toLowerCase()));
+  const eventIds=new Set(activeBookings.map(b=>b.eventId).filter(Boolean));
+  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  set('ciBookingCount',activeBookings.length);
+  set('ciAttendeeCount',activeBookings.reduce((sum,b)=>sum+Number(b.tickets||b.ticketQuantity||b.quantity||b.seats||1),0));
+  set('ciEventCount',new Set(activeBookings.map(b=>b.eventId||b.eventName).filter(Boolean)).size);
+  const q=(document.getElementById('ciSearch')?.value||'').trim().toLowerCase();
+  const rows=activeBookings.filter(b=>{
+    const ev=allEvents.find(item=>item.id===(b.eventId||b.event_id));
+    const haystack=[b.customerName,b.name,b.guestName,b.attendeeName,b.email,b.customerEmail,b.phone,b.customerPhone,b.eventName,ev?.name,b.ticketName,b.ticketType].join(' ').toLowerCase();
+    return !q||haystack.includes(q);
+  });
+  if(!rows.length){list.innerHTML=`<div class="card" style="text-align:center;padding:2.5rem;color:#6b7280;">${activeBookings.length?'No bookings match your search.':'No active customer bookings yet.'}</div>`;return;}
+  const formatDate=value=>{if(!value)return'—';const date=value?.toDate?value.toDate():new Date(value);return Number.isNaN(date.getTime())?'—':date.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});};
+  list.innerHTML=rows.map(b=>{
+    const ev=allEvents.find(item=>item.id===(b.eventId||b.event_id));
+    const eventName=b.eventName||ev?.name||'Event';
+    const guest=b.customerName||b.attendeeName||b.guestName||b.name||'Guest';
+    const email=b.customerEmail||b.email||b.guestEmail||'';
+    const phone=b.customerPhone||b.phone||b.mobile||b.guestPhone||'';
+    const status=String(b.status||'confirmed').toLowerCase();
+    const quantity=Number(b.tickets||b.ticketQuantity||b.quantity||b.seats||1);
+    const amount=Number(b.amount||b.totalAmount||0);
+    const eventDate=b.eventDate||b.date||ev?.startDate||ev?.eventDates?.[0]?.date;
+    const venue=b.venueName||b.venue||ev?.venueName||ev?.venue||ev?.city||'—';
+    const checkedIn=b.checkedIn===true||b.checkedInAt||b.attendanceStatus==='checked-in';
+    return `<article class="card" style="margin:0;padding:1rem 1.1rem;"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;"><div style="min-width:220px;flex:1;"><div style="font-weight:800;font-size:1rem;color:#1a1a2e;">${esc(guest)}</div><div style="font-size:.86rem;color:#6b7280;margin-top:.25rem;">${esc(eventName)}</div><div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.45rem;font-size:.78rem;color:#9ca3af;">${email?`<span>✉ ${esc(email)}</span>`:''}${phone?`<span>☎ ${esc(phone)}</span>`:''}</div></div><span style="padding:.25rem .65rem;border-radius:999px;background:${status==='paid'?'#dcfce7':'#fff7ed'};color:${status==='paid'?'#15803d':'#c2410c'};font-size:.72rem;font-weight:700;">${esc(status)}</span></div><details style="margin-top:.85rem;border-top:1px solid var(--border);padding-top:.65rem;"><summary style="cursor:pointer;color:#be123c;font-size:.8rem;font-weight:700;">View booking details</summary><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin-top:.8rem;">${[['Booking ID',b.bookingId||b.id],['Event date',formatDate(eventDate)],['Venue',venue],['Ticket',b.ticketName||b.ticketType||b.ticket||'General admission'],['Quantity',quantity],['Amount',amount?money(amount):'Free'],['Booked on',formatDate(b.createdAt)],['Check-in',checkedIn?'Checked in':'Not checked in']].map(([label,value])=>`<div><div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:700;">${label}</div><div style="font-size:.82rem;color:#374151;margin-top:.2rem;overflow-wrap:anywhere;">${esc(value)}</div></div>`).join('')}</div></details></article>`;
+  }).join('');
+}
+window.renderCustomerInfoPanel=renderCustomerInfoPanel;
 function renderOverview(){const el=id=>document.getElementById(id);if(el('mEvents'))el('mEvents').textContent=allEvents.length;if(el('planUsageLabel'))el('planUsageLabel').textContent=allEvents.length+' events created';}
 function renderOverviewBookings(bookings){
   const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
