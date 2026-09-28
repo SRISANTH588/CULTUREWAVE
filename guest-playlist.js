@@ -22,9 +22,18 @@ async function loadPlaylist() {
   document.getElementById('title').textContent = playlist.title || 'Event Playlist';
   document.getElementById('description').textContent = playlist.description || '';
   const songs = Array.isArray(playlist.songs) ? playlist.songs : [];
-  document.getElementById('songs').innerHTML = songs.length
-    ? songs.map((song, index) => `<article class="song"><span class="number">${index + 1}</span><div><strong>${esc(song.title)}</strong>${song.artist ? `<small>${esc(song.artist)}</small>` : ''}</div>${song.url ? `<a class="play" href="${esc(song.url)}" target="_blank" rel="noopener">Play ↗</a>` : ''}${song.lyrics ? `<details class="lyrics"><summary>View lyrics</summary><p>${esc(song.lyrics)}</p></details>` : ''}</article>`).join('')
+  const songList = document.getElementById('songs');
+  songList.innerHTML = songs.length
+    ? songs.map((song, index) => `<article class="song"><button class="song-trigger" type="button" aria-expanded="false" style="grid-column:1/-1;display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left"><span class="number">${index + 1}</span><span><strong>${esc(song.title || 'Untitled song')}</strong>${song.artist ? `<small>${esc(song.artist)}</small>` : ''}</span><span aria-hidden="true" style="color:#ff9abb;font-size:1.1rem">⌄</span></button><div class="lyrics" hidden style="grid-column:1/-1"><p style="white-space:pre-wrap">${song.lyrics ? esc(song.lyrics) : ''}</p></div>${song.url ? `<a class="play" href="${esc(song.url)}" target="_blank" rel="noopener">Play ↗</a>` : ''}</article>`).join('')
     : '<p class="status">Songs will be added soon.</p>';
+  songList.addEventListener('click', event => {
+    const trigger = event.target.closest('.song-trigger');
+    if (!trigger) return;
+    const lyrics = trigger.nextElementSibling;
+    const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+    trigger.setAttribute('aria-expanded', String(!isOpen));
+    lyrics.hidden = isOpen;
+  });
 
   status.hidden = true;
   document.getElementById('content').hidden = false;
