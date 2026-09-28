@@ -24,7 +24,10 @@ async function loadPlaylist() {
   const songs = Array.isArray(playlist.songs) ? playlist.songs : [];
   const songList = document.getElementById('songs');
   songList.innerHTML = songs.length
-    ? songs.map((song, index) => `<article class="song"><button class="song-trigger" type="button" aria-expanded="false" style="grid-column:1/-1;display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left"><span class="number">${index + 1}</span><span><strong>${esc(song.title || 'Untitled song')}</strong>${song.artist ? `<small>${esc(song.artist)}</small>` : ''}</span><span aria-hidden="true" style="color:#ff9abb;font-size:1.1rem">⌄</span></button><div class="lyrics" hidden style="grid-column:1/-1"><p style="white-space:pre-wrap">${song.lyrics ? esc(song.lyrics) : ''}</p></div>${song.url ? `<a class="play" href="${esc(song.url)}" target="_blank" rel="noopener">Play ↗</a>` : ''}</article>`).join('')
+    ? songs.map((song, index) => {
+      const lyrics = song.lyrics || song.lyricsText || song.lyricsUrl || '';
+      return `<article class="song"><button class="song-trigger" type="button" aria-expanded="false" style="grid-column:1/-1;display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer"><span class="number">${index + 1}</span><span><strong>${esc(song.title || 'Untitled song')}</strong>${song.artist ? `<small>${esc(song.artist)}</small>` : ''}</span><span aria-hidden="true" style="color:#ff9abb;font-size:1.1rem">Lyrics ⌄</span></button><div class="lyrics" hidden style="grid-column:1/-1"><p style="white-space:pre-wrap">${esc(lyrics)}</p></div>${song.url ? `<a class="play" href="${esc(song.url)}" target="_blank" rel="noopener">Play ↗</a>` : ''}</article>`;
+    }).join('')
     : '<p class="status">Songs will be added soon.</p>';
   songList.addEventListener('click', event => {
     const trigger = event.target.closest('.song-trigger');
