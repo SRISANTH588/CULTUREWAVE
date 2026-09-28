@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Manage Event | CultureWave</title>
   <meta name="robots" content="noindex, nofollow"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --blue:#3b5bdb;--blue-2:#4c6ef5;--blue-light:#e7f5ff;--blue-soft:#f0f4ff;
@@ -156,6 +156,24 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem;}
 .modal-overlay.open{display:flex;}
 .modal-box{background:#fff;border-radius:16px;width:100%;max-width:480px;padding:1.5rem;box-shadow:0 24px 80px rgba(0,0,0,.2);}
+.invitation-poster{position:relative;isolation:isolate;overflow:hidden;width:100%;aspect-ratio:16/9;min-height:420px;padding:1.6rem 2rem 1.15rem;background:radial-gradient(ellipse at 50% 35%,rgba(255,255,255,.97),rgba(255,248,238,.96) 65%),linear-gradient(135deg,#f7ead9,#fffaf3);border:1px solid #e9d8c3;border-radius:16px;color:#24180f;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;box-shadow:0 12px 34px rgba(99,61,30,.13);}
+.invitation-poster:before,.invitation-poster:after{content:"";position:absolute;z-index:-1;border:1px solid rgba(155,100,55,.16);border-radius:50%;width:270px;height:270px;pointer-events:none;}
+.invitation-poster:before{left:-175px;bottom:-130px;box-shadow:0 0 0 18px rgba(155,100,55,.035),0 0 0 38px rgba(155,100,55,.025);}
+.invitation-poster:after{right:-180px;top:-145px;box-shadow:0 0 0 20px rgba(155,100,55,.035),0 0 0 42px rgba(155,100,55,.025);}
+.invitation-poster-head{font-size:clamp(.75rem,1.4vw,1.1rem);font-weight:600;letter-spacing:.38em;text-transform:uppercase;padding:0 150px;line-height:1.5;}
+.invitation-poster-body{width:100%;max-width:720px;margin:auto;padding:0 145px 0 0;}
+.invitation-poster-dear{font-family:Georgia,serif;font-size:clamp(1rem,2vw,1.45rem);margin-bottom:.3rem;}
+.invitation-poster-name{display:block;margin:0 auto .65rem;max-width:100%;overflow-wrap:anywhere;background:rgba(190,143,99,.12);padding:.35rem .8rem;font-size:clamp(1.2rem,3vw,2.3rem);font-weight:850;letter-spacing:.04em;text-transform:uppercase;}
+.invitation-poster-kicker{font-size:.86rem;letter-spacing:.48em;text-transform:uppercase;margin:.3rem 0;}
+.invitation-poster-word{font-family:'Permanent Marker',cursive, sans-serif;font-size:clamp(2.3rem,6vw,4.7rem);line-height:1.12;color:#8b4c2b;transform:rotate(-3deg);text-shadow:1px 2px 0 rgba(139,76,43,.1);}
+.invitation-poster-message{font-size:clamp(.68rem,1.25vw,.94rem);line-height:1.55;margin:.75rem auto 0;max-width:600px;color:#40352d;}
+.invitation-poster-details{width:100%;display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;border-top:1px solid rgba(119,78,45,.2);padding-top:.8rem;font-size:clamp(.64rem,1.15vw,.85rem);font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
+.invitation-poster-detail{display:flex;align-items:center;gap:.45rem;}
+.invitation-poster-qr{position:absolute;right:1.45rem;top:50%;transform:translateY(-50%);width:132px;padding:.55rem .55rem .45rem;background:rgba(255,255,255,.82);border:1px solid #c7a989;border-radius:12px;box-shadow:0 5px 14px rgba(83,54,31,.12);}
+.invitation-poster-qr canvas{display:block;width:100%;height:auto;}
+.invitation-poster-qr-label{font-size:.58rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin-top:.35rem;}
+.invitation-poster-footer{font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:#725b49;}
+@media(max-width:700px){.invitation-poster{aspect-ratio:auto;min-height:560px;padding:1.35rem 1rem 1rem;}.invitation-poster-head{padding:0 0 155px;letter-spacing:.24em;}.invitation-poster-qr{top:74px;right:50%;transform:translateX(50%);width:118px;}.invitation-poster-body{padding:0;}.invitation-poster-name{font-size:1.4rem;}.invitation-poster-word{font-size:3rem;}.invitation-poster-details{gap:.55rem;}.invitation-poster-detail{flex-basis:100%;justify-content:center;}}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
 .modal-head h3{font-size:1rem;font-weight:800;}
 .modal-close{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:#f8f9fa;display:grid;place-items:center;cursor:pointer;font-size:.9rem;}
@@ -895,6 +913,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1735,17 +1754,33 @@ window.issueInvitations=async function(){
     batch.update(db.collection('events').doc(eventId),{totalBooked:firebase.firestore.FieldValue.increment(totalTickets)});
     await batch.commit();
     const base=location.href.split('?')[0].replace(/event-manage\.html$/,'');
+    const inviteDateValue=eventData.startDate||eventData.date||'';
+    const inviteDateLabel=(()=>{const d=inviteDateValue?.toDate?inviteDateValue.toDate():new Date(inviteDateValue);return inviteDateValue&&!Number.isNaN(d.getTime())?d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):String(inviteDateValue||'Date to be announced');})();
+    const inviteTimeLabel=eventData.startTime||eventData.time||eventData.eventTime||'Time to be announced';
+    const inviteVenue=eventData.venueName||eventData.venue||eventData.location||eventData.city||'Venue to be announced';
+    const inviteDescription=eventData.description||eventData.shortDescription||`We're so happy to have you at ${eventData.name||'our event'}! Get ready for music, good people and great vibes.`;
     const list=document.getElementById('issuedInvitationTickets');
     list.innerHTML=issued.map(ticket=>{
-      const params=new URLSearchParams({bookingId:ticket.bookingId,event:eventData.name||'Event',guest:ticket.name,amount:'0',status:'Confirmed',eventId,ticket:ticket.ticketName,seats:'1',date:eventData.startDate||eventData.date||'',time:eventData.startTime||eventData.time||''});
+      const params=new URLSearchParams({bookingId:ticket.bookingId,event:eventData.name||'Event',guest:ticket.name,amount:'0',status:'Confirmed',eventId,ticket:ticket.ticketName,seats:'1',date:inviteDateValue?.toDate?inviteDateValue.toDate().toISOString():inviteDateValue,time:inviteTimeLabel});
       const url=base+'success.html?'+params.toString();
-      return `<article style="display:flex;align-items:center;gap:1.2rem;max-width:620px;padding:1.1rem;border:1px solid #dce4f5;border-radius:16px;background:linear-gradient(120deg,#fff,#f7f9ff);box-shadow:0 8px 24px rgba(18,66,197,.08);"><div style="flex:1;min-width:0;"><div style="font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.35rem;">Event Invitation</div><div style="font-size:1.05rem;font-weight:800;overflow-wrap:anywhere;">${esc(ticket.name)}</div><div style="font-size:.84rem;color:#495057;margin-top:.2rem;">${esc(eventData.name||'Event')}</div><div style="font-size:.76rem;color:var(--muted);margin-top:.25rem;">Ticket ${ticket.ticketNumber} of ${ticket.ticketCount} · Complimentary</div><div style="font-size:.68rem;color:var(--muted);margin-top:.45rem;">Ticket ID: ${esc(ticket.bookingId)}</div><div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.75rem;"><a class="tb-btn primary" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open ticket</a><button class="tb-btn invitation-copy-link" data-ticket-url="${url.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" type="button">Copy link</button></div></div><div style="flex:none;text-align:center;background:#fff;padding:.5rem;border:1px solid var(--border);border-radius:12px;"><canvas id="invitationQr_${ticket.bookingId}" width="144" height="144" aria-label="Valid ticket QR code for ${esc(ticket.name)}"></canvas><div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:.15rem;">SCAN FOR ENTRY</div></div></article>`;
+      const posterId='invitationPoster_'+ticket.bookingId;
+      return `<article style="width:100%;max-width:980px;"><div class="invitation-poster" id="${posterId}"><div class="invitation-poster-head">${esc(eventData.name||'CultureWave Event')}</div><div class="invitation-poster-qr"><canvas id="invitationQr_${ticket.bookingId}" width="240" height="240" aria-label="Invitation ticket QR code"></canvas><div class="invitation-poster-qr-label">Your ticket</div></div><div class="invitation-poster-body"><div class="invitation-poster-dear">Dear</div><strong class="invitation-poster-name">${esc(ticket.name)}</strong><div class="invitation-poster-kicker">You’re</div><div class="invitation-poster-word">Invited</div><p class="invitation-poster-message">${esc(inviteDescription)}</p></div><div class="invitation-poster-details"><div class="invitation-poster-detail"><span>▣</span>${esc(inviteDateLabel)}</div><div class="invitation-poster-detail"><span>◷</span>${esc(inviteTimeLabel)}</div><div class="invitation-poster-detail"><span>⌖</span>${esc(inviteVenue)}</div></div><div class="invitation-poster-footer">Music &nbsp;•&nbsp; People &nbsp;•&nbsp; Good Vibes &nbsp; · &nbsp; Ticket ${ticket.ticketNumber} of ${ticket.ticketCount}</div></div><div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.55rem;"><button class="tb-btn primary invitation-download-poster" data-poster-id="${posterId}" data-guest="${esc(ticket.name)}" type="button">Download invitation poster</button><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open ticket page</a><button class="tb-btn invitation-copy-link" data-ticket-url="${url.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" type="button">Copy ticket link</button></div></article>`;
     }).join('');
     issued.forEach(ticket=>{
       const canvas=document.getElementById('invitationQr_'+ticket.bookingId);
-      const qrData=JSON.stringify({id:ticket.bookingId,event:eventData.name||'Event',amount:0,date:eventData.startDate||eventData.date||'',issuer:'CultureWave',type:'event'});
-      if(window.QRCode&&canvas)QRCode.toCanvas(canvas,qrData,{width:144,margin:1,color:{dark:'#0a0f1e',light:'#ffffff'}},error=>{if(error)console.error('Could not render invitation QR:',error);});
+      const params=new URLSearchParams({bookingId:ticket.bookingId,event:eventData.name||'Event',guest:ticket.name,amount:'0',status:'Confirmed',eventId,ticket:ticket.ticketName,seats:'1',date:inviteDateValue?.toDate?inviteDateValue.toDate().toISOString():inviteDateValue,time:inviteTimeLabel});
+      const successTicketUrl=base+'success.html?'+params.toString();
+      ticket.ticketUrl=successTicketUrl;
+      if(window.QRCode&&canvas)QRCode.toCanvas(canvas,successTicketUrl,{width:240,margin:2,color:{dark:'#14110f',light:'#ffffff'}},error=>{if(error)console.error('Could not render invitation QR:',error);});
     });
+    list.querySelectorAll('.invitation-download-poster').forEach(downloadButton=>downloadButton.addEventListener('click',async()=>{
+      const poster=document.getElementById(downloadButton.dataset.posterId);
+      if(!poster||!window.html2canvas){showToast('Could not prepare the poster');return;}
+      downloadButton.disabled=true;downloadButton.textContent='Preparing poster…';
+      try{if(document.fonts?.ready)await document.fonts.ready;const canvas=await html2canvas(poster,{scale:2,useCORS:true,backgroundColor:'#fff8ee'});const link=document.createElement('a');link.download=`${(downloadButton.dataset.guest||'guest').replace(/[^a-z0-9]+/gi,'-')}-invitation.png`;link.href=canvas.toDataURL('image/png');link.click();}
+      catch(error){console.error('Invitation poster download failed:',error);showToast('Poster download failed');}
+      finally{downloadButton.disabled=false;downloadButton.textContent='Download invitation poster';}
+    }));
     list.querySelectorAll('.invitation-copy-link').forEach(copyButton=>copyButton.addEventListener('click',()=>{
       const url=copyButton.dataset.ticketUrl;
       if(navigator.clipboard?.writeText)navigator.clipboard.writeText(url).then(()=>showToast('Ticket link copied')).catch(()=>prompt('Copy ticket link:',url));

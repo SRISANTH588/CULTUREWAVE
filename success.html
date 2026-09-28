@@ -422,6 +422,10 @@
 
         <div class="sc-ticket-body" id="ticketBody">
           <div class="sc-details-grid">
+            <div class="sc-detail" id="guestNameDetail" style="display:none;">
+              <span class="sc-detail-label">Invited Guest</span>
+              <span class="sc-detail-value" id="dGuestName">—</span>
+            </div>
             <div class="sc-detail">
               <span class="sc-detail-label">Booking ID</span>
               <span class="sc-detail-value blue" id="dBookingId">—</span>
@@ -572,6 +576,7 @@
     const params    = new URLSearchParams(window.location.search);
     const bookingId  = params.get("bookingId") || "";
     const eventName  = params.get("event")     || "Your Booking";
+    const guestName  = params.get("guest")     || params.get("name") || "";
     const amount     = params.get("amount")    || "—";
     const status     = (params.get("status")   || "").toLowerCase();
     const failReason = params.get("reason")    || "";
@@ -719,6 +724,10 @@
       document.getElementById("ticketVenue").textContent = venue;
 
       // ticket details
+      if (guestName) {
+        document.getElementById("dGuestName").textContent = guestName;
+        document.getElementById("guestNameDetail").style.display = "grid";
+      }
       document.getElementById("dBookingId").textContent = shortId;
       document.getElementById("dStatus").textContent    = isRestaurant ? "✅ Reserved" : "✅ Confirmed";
       document.getElementById("dAmount").textContent    = amount;
