@@ -160,19 +160,23 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .invitation-poster:before,.invitation-poster:after{content:"";position:absolute;z-index:-1;border:1px solid rgba(155,100,55,.16);border-radius:50%;width:270px;height:270px;pointer-events:none;}
 .invitation-poster:before{left:-175px;bottom:-130px;box-shadow:0 0 0 18px rgba(155,100,55,.035),0 0 0 38px rgba(155,100,55,.025);}
 .invitation-poster:after{right:-180px;top:-145px;box-shadow:0 0 0 20px rgba(155,100,55,.035),0 0 0 42px rgba(155,100,55,.025);}
-.invitation-poster-head{font-size:clamp(.75rem,1.4vw,1.1rem);font-weight:600;letter-spacing:.38em;text-transform:uppercase;padding:0 150px;line-height:1.5;}
-.invitation-poster-body{width:100%;max-width:720px;margin:auto;padding:0 145px 0 0;}
+.invitation-poster-art{position:absolute;z-index:0;pointer-events:none;opacity:.78;}
+.invitation-poster-guitar{left:-24px;top:-26px;width:174px;height:100%;}
+.invitation-poster-mic{right:2.5%;bottom:9%;width:94px;height:150px;}
+.invitation-poster-head{position:relative;z-index:1;font-size:clamp(.75rem,1.4vw,1.1rem);font-weight:600;letter-spacing:.38em;text-transform:uppercase;padding:0 150px;line-height:1.5;}
+.invitation-poster-head:before,.invitation-poster-head:after{content:"";display:inline-block;width:clamp(22px,5vw,72px);height:1px;background:#74563d;vertical-align:middle;margin:0 .7rem;}
+.invitation-poster-body{position:relative;z-index:1;width:100%;max-width:720px;margin:auto;padding:0 145px 0 0;}
 .invitation-poster-dear{font-family:Georgia,serif;font-size:clamp(1rem,2vw,1.45rem);margin-bottom:.3rem;}
-.invitation-poster-name{display:block;margin:0 auto .65rem;max-width:100%;overflow-wrap:anywhere;background:rgba(190,143,99,.12);padding:.35rem .8rem;font-size:clamp(1.2rem,3vw,2.3rem);font-weight:850;letter-spacing:.04em;text-transform:uppercase;}
+.invitation-poster-name{display:block;margin:0 auto .65rem;max-width:100%;overflow-wrap:anywhere;background:linear-gradient(177deg,transparent 5%,rgba(193,148,107,.22) 10%,rgba(193,148,107,.24) 84%,transparent 94%);padding:.42rem .8rem;font-size:clamp(1.2rem,3vw,2.3rem);font-weight:850;letter-spacing:.04em;text-transform:uppercase;}
 .invitation-poster-kicker{font-size:.86rem;letter-spacing:.48em;text-transform:uppercase;margin:.3rem 0;}
 .invitation-poster-word{font-family:'Permanent Marker',cursive, sans-serif;font-size:clamp(2.3rem,6vw,4.7rem);line-height:1.12;color:#8b4c2b;transform:rotate(-3deg);text-shadow:1px 2px 0 rgba(139,76,43,.1);}
 .invitation-poster-message{font-size:clamp(.68rem,1.25vw,.94rem);line-height:1.55;margin:.75rem auto 0;max-width:600px;color:#40352d;}
-.invitation-poster-details{width:100%;display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;border-top:1px solid rgba(119,78,45,.2);padding-top:.8rem;font-size:clamp(.64rem,1.15vw,.85rem);font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
+.invitation-poster-details{position:relative;z-index:1;width:100%;display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;border-top:1px solid rgba(119,78,45,.2);padding-top:.8rem;font-size:clamp(.64rem,1.15vw,.85rem);font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
 .invitation-poster-detail{display:flex;align-items:center;gap:.45rem;}
-.invitation-poster-qr{position:absolute;right:1.45rem;top:50%;transform:translateY(-50%);width:132px;padding:.55rem .55rem .45rem;background:rgba(255,255,255,.82);border:1px solid #c7a989;border-radius:12px;box-shadow:0 5px 14px rgba(83,54,31,.12);}
+.invitation-poster-qr{position:absolute;z-index:2;right:1.45rem;top:50%;transform:translateY(-50%);width:132px;padding:.55rem .55rem .45rem;background:rgba(255,255,255,.9);border:1px solid #c7a989;border-radius:12px;box-shadow:0 5px 14px rgba(83,54,31,.12);}
 .invitation-poster-qr canvas{display:block;width:100%;height:auto;}
-.invitation-poster-qr-label{font-size:.58rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin-top:.35rem;}
-.invitation-poster-footer{font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:#725b49;}
+.invitation-poster-qr-label{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-top:.35rem;line-height:1.5;}
+.invitation-poster-footer{position:relative;z-index:1;font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:#725b49;}
 @media(max-width:700px){.invitation-poster{aspect-ratio:auto;min-height:560px;padding:1.35rem 1rem 1rem;}.invitation-poster-head{padding:0 0 155px;letter-spacing:.24em;}.invitation-poster-qr{top:74px;right:50%;transform:translateX(50%);width:118px;}.invitation-poster-body{padding:0;}.invitation-poster-name{font-size:1.4rem;}.invitation-poster-word{font-size:3rem;}.invitation-poster-details{gap:.55rem;}.invitation-poster-detail{flex-basis:100%;justify-content:center;}}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
 .modal-head h3{font-size:1rem;font-weight:800;}
@@ -905,6 +909,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
         <button onclick="downloadInvoice()" style="display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:9px;background:var(--blue);color:#fff;font-weight:700;font-size:.84rem;border:0;cursor:pointer;">&#11015;&#65039; Download Invoice</button>
         <button onclick="resendTicket()" style="display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:9px;background:#fff;color:var(--text);font-weight:700;font-size:.84rem;border:1.5px solid var(--border);cursor:pointer;">&#128231; Resend Ticket</button>
+        <button id="cancelManagedTicketBtn" onclick="cancelManagedTicket()" style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:9px;background:#fff5f5;color:#c92a2a;font-weight:700;font-size:.84rem;border:1px solid #ffc9c9;cursor:pointer;">Cancel ticket</button>
       </div>
 
     </div>
@@ -1223,10 +1228,51 @@ window.openBookingMenu=function(id){
   set('bmdMethod',method.toUpperCase());
   const stEl=document.getElementById('bmdStatus');
   if(stEl){stEl.textContent=status.toUpperCase();stEl.style.color=statusColor;}
+  const cancelBtn=document.getElementById('cancelManagedTicketBtn');
+  if(cancelBtn){
+    const cancelled=normBookingStatus(status)==='cancelled';
+    cancelBtn.disabled=cancelled||Boolean(b.checkedIn);
+    cancelBtn.textContent=cancelled?'Ticket cancelled':b.checkedIn?'Already checked in':'Cancel ticket';
+    cancelBtn.style.opacity=cancelBtn.disabled?'.55':'1';
+    cancelBtn.style.cursor=cancelBtn.disabled?'not-allowed':'pointer';
+  }
 
   // store current booking id for actions
   document.getElementById('bookingModal')._currentBooking=b;
   document.getElementById('bookingModal').classList.add('open');
+};
+
+window.cancelManagedTicket=async function(){
+  const modal=document.getElementById('bookingModal');
+  const booking=modal?._currentBooking;
+  if(!booking)return;
+  if(booking.checkedIn){showToast('This ticket is already checked in');return;}
+  if(normBookingStatus(booking.status)==='cancelled'){showToast('This ticket is already cancelled');return;}
+  const quantity=Math.max(1,Number(booking.seats||booking.tickets||1));
+  const guest=bookingName(booking);
+  if(!confirm(`Cancel ${quantity} ticket${quantity===1?'':'s'} for ${guest}? The booking will be removed from active attendees and its QR code will no longer allow entry.`))return;
+  const button=document.getElementById('cancelManagedTicketBtn');
+  if(button){button.disabled=true;button.textContent='Cancelling…';}
+  try{
+    const bookingId=booking.bookingId||booking.id;
+    const cancelledAt=serverTimestamp();
+    const update={status:'cancelled',cancelled:true,cancelledAt,cancelledBy:auth.currentUser?.uid||null};
+    const batch=db.batch();
+    batch.update(db.collection('bookings').doc(booking.id),update);
+    batch.set(db.collection('payments').doc(bookingId),{bookingId,eventId,...update},{merge:true});
+    await batch.commit();
+    booking.status='cancelled';booking.cancelled=true;
+    const setCancelled=items=>items.forEach(item=>{if(item.id===booking.id||item.bookingId===bookingId){item.status='cancelled';item.cancelled=true;}});
+    setCancelled(allBookingDocs);setCancelled(allPaymentBookingDocs);
+    const statusEl=document.getElementById('bmdStatus');if(statusEl){statusEl.textContent='CANCELLED';statusEl.style.color='#c92a2a';}
+    if(button){button.disabled=true;button.textContent='Ticket cancelled';}
+    syncManagedBookings();
+    showToast('Ticket cancelled');
+  }catch(error){
+    console.error('Could not cancel booking:',error);
+    showToast(error.code==='permission-denied'?'You do not have permission to cancel this ticket':'Could not cancel ticket. Please retry');
+    if(button){button.disabled=false;button.textContent='Cancel ticket';}
+  }
 };
 
 window.downloadInvoice=function(){
@@ -1436,6 +1482,7 @@ window.processCheckIn=function(val){
   }catch(_){}
   const b=allBookings.find(x=>x.id===ticketId||x.bookingId===ticketId||x.ticketId===ticketId);
   if(!b){showCiModal(null,'invalid');return;}
+  if(normBookingStatus(b.status)==='cancelled'||b.cancelled){showCiModal(b,'cancelled');return;}
   if(b.checkedIn){showCiModal(b,'already');return;}
   ciPendingBooking=b;
   showCiModal(b,'confirm');
@@ -1460,6 +1507,12 @@ function showCiModal(b,type){
     hdr.style.background='#c92a2a';title.textContent='Invalid Ticket';
     sub.textContent='This QR code could not be verified';
     reason.textContent='Reason: No matching booking was found for this QR code.';
+    reason.style.display='block';
+    checkBtn.style.display='none';cancelBtn.style.gridColumn='1/-1';
+  } else if(type==='cancelled'){
+    hdr.style.background='#c92a2a';title.textContent='Cancelled Ticket';
+    sub.textContent='This ticket is no longer valid for entry';
+    reason.textContent='Reason: The organiser cancelled this booking.';
     reason.style.display='block';
     checkBtn.style.display='none';cancelBtn.style.gridColumn='1/-1';
   } else if(type==='already'){
@@ -1748,7 +1801,7 @@ window.issueInvitations=async function(){
           eventEmoji:eventData.emoji||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
         batch.set(bookingRef,data);
         batch.set(db.collection('payments').doc(bookingId),data);
-        issued.push({bookingId,name:guest.name,email:guest.email,ticketName,ticketNumber:index+1,ticketCount:guest.ticketCount});
+        issued.push({bookingId,name:guest.name||'INVITED GUEST',email:guest.email,ticketName,ticketNumber:index+1,ticketCount:guest.ticketCount});
       }
     });
     batch.update(db.collection('events').doc(eventId),{totalBooked:firebase.firestore.FieldValue.increment(totalTickets)});
@@ -1758,13 +1811,13 @@ window.issueInvitations=async function(){
     const inviteDateLabel=(()=>{const d=inviteDateValue?.toDate?inviteDateValue.toDate():new Date(inviteDateValue);return inviteDateValue&&!Number.isNaN(d.getTime())?d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):String(inviteDateValue||'Date to be announced');})();
     const inviteTimeLabel=eventData.startTime||eventData.time||eventData.eventTime||'Time to be announced';
     const inviteVenue=eventData.venueName||eventData.venue||eventData.location||eventData.city||'Venue to be announced';
-    const inviteDescription=eventData.description||eventData.shortDescription||`We're so happy to have you at ${eventData.name||'our event'}! Get ready for music, good people and great vibes.`;
+    const inviteDescription=eventData.description||eventData.shortDescription||`We're so happy to have you at ${eventData.name||'our event'}! Get ready for an evening filled with music, good people and great vibes. Let's jam, connect and create memories together!`;
     const list=document.getElementById('issuedInvitationTickets');
     list.innerHTML=issued.map(ticket=>{
       const params=new URLSearchParams({bookingId:ticket.bookingId,event:eventData.name||'Event',guest:ticket.name,amount:'0',status:'Confirmed',eventId,ticket:ticket.ticketName,seats:'1',date:inviteDateValue?.toDate?inviteDateValue.toDate().toISOString():inviteDateValue,time:inviteTimeLabel});
       const url=base+'success.html?'+params.toString();
       const posterId='invitationPoster_'+ticket.bookingId;
-      return `<article style="width:100%;max-width:980px;"><div class="invitation-poster" id="${posterId}"><div class="invitation-poster-head">${esc(eventData.name||'CultureWave Event')}</div><div class="invitation-poster-qr"><canvas id="invitationQr_${ticket.bookingId}" width="240" height="240" aria-label="Invitation ticket QR code"></canvas><div class="invitation-poster-qr-label">Your ticket</div></div><div class="invitation-poster-body"><div class="invitation-poster-dear">Dear</div><strong class="invitation-poster-name">${esc(ticket.name)}</strong><div class="invitation-poster-kicker">You’re</div><div class="invitation-poster-word">Invited</div><p class="invitation-poster-message">${esc(inviteDescription)}</p></div><div class="invitation-poster-details"><div class="invitation-poster-detail"><span>▣</span>${esc(inviteDateLabel)}</div><div class="invitation-poster-detail"><span>◷</span>${esc(inviteTimeLabel)}</div><div class="invitation-poster-detail"><span>⌖</span>${esc(inviteVenue)}</div></div><div class="invitation-poster-footer">Music &nbsp;•&nbsp; People &nbsp;•&nbsp; Good Vibes &nbsp; · &nbsp; Ticket ${ticket.ticketNumber} of ${ticket.ticketCount}</div></div><div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.55rem;"><button class="tb-btn primary invitation-download-poster" data-poster-id="${posterId}" data-guest="${esc(ticket.name)}" type="button">Download invitation poster</button><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open ticket page</a><button class="tb-btn invitation-copy-link" data-ticket-url="${url.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" type="button">Copy ticket link</button></div></article>`;
+      return `<article style="width:100%;max-width:980px;"><div class="invitation-poster" id="${posterId}"><svg class="invitation-poster-art invitation-poster-guitar" viewBox="0 0 180 540" aria-hidden="true"><g fill="none" stroke="#69472f" stroke-linecap="round" stroke-linejoin="round"><path d="M69 7 111 24 91 214" stroke-width="18"/><path d="M47 211c-9 27-32 48-35 94-4 57 30 78 69 63 33-12 62-43 57-83-4-31-27-51-48-63l21-174" stroke-width="7"/><circle cx="77" cy="289" r="35" stroke-width="6"/><path d="m63 11 58 23M83 215l19 6M82 208l7 166M93 210l6 164" stroke-width="2"/><path d="M18 401c33-17 80-15 121 7M19 420c40-17 82-14 125 7" stroke-width="2" opacity=".55"/></g></svg><svg class="invitation-poster-art invitation-poster-mic" viewBox="0 0 110 170" aria-hidden="true"><g fill="none" stroke="#493a30" stroke-linecap="round" stroke-linejoin="round"><rect x="37" y="5" width="36" height="79" rx="18" stroke-width="5"/><path d="M29 56v13a26 26 0 0 0 52 0V56M55 96v39m-22 0h44" stroke-width="5"/><path d="M42 24h26M42 35h26M42 46h26" stroke-width="3"/><path d="m55 135 0 19m-13 0h26" stroke-width="4"/></g></svg><div class="invitation-poster-head">${esc(eventData.name||'CultureWave Event')}</div><div class="invitation-poster-qr"><canvas id="invitationQr_${ticket.bookingId}" width="240" height="240" aria-label="Invitation ticket QR code"></canvas><div class="invitation-poster-qr-label">Your ticket<br>success.html</div></div><div class="invitation-poster-body"><div class="invitation-poster-dear">Dear</div><strong class="invitation-poster-name">${esc(ticket.name||'INVITED GUEST')}</strong><div class="invitation-poster-kicker">You’re</div><div class="invitation-poster-word">Invited</div><p class="invitation-poster-message">${esc(inviteDescription)}</p></div><div class="invitation-poster-details"><div class="invitation-poster-detail"><span>▣</span>${esc(inviteDateLabel)}</div><div class="invitation-poster-detail"><span>◷</span>${esc(inviteTimeLabel)}</div><div class="invitation-poster-detail"><span>⌖</span>${esc(inviteVenue)}</div></div><div class="invitation-poster-footer">Music &nbsp;•&nbsp; People &nbsp;•&nbsp; Good Vibes</div></div><div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.55rem;"><button class="tb-btn primary invitation-download-poster" data-poster-id="${posterId}" data-guest="${esc(ticket.name||'INVITED GUEST')}" type="button">Download invitation poster</button><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open ticket page</a><button class="tb-btn invitation-copy-link" data-ticket-url="${url.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" type="button">Copy ticket link</button></div></article>`;
     }).join('');
     issued.forEach(ticket=>{
       const canvas=document.getElementById('invitationQr_'+ticket.bookingId);
