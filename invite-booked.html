@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
-  <title>Premium Invitation | CultureWave</title>
+  <title>Event Invitation | CultureWave</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -32,7 +32,7 @@
   </style>
 </head>
 <body>
-  <header class="topbar"><div class="brand">CultureWave<small>By OGSHOOTS LUXE</small></div><div class="top-label">Premium Guest Invitation</div></header>
+  <header class="topbar"><div class="brand">CultureWave<small>By OGSHOOTS LUXE</small></div><div class="top-label">Guest Invitation</div></header>
   <main class="page" id="invitePage">
     <div class="cancelled-notice">THIS INVITATION HAS BEEN CANCELLED</div>
     <section class="hero"><div class="eyebrow">You are personally invited</div><h1>You’re invited</h1><div class="event-name" id="eventName">Your event</div><div class="hero-rule"></div></section>
@@ -45,7 +45,7 @@
         <div class="detail"><span class="detail-label">Venue</span><strong class="detail-value" id="eventVenue">To be announced</strong></div>
       </section>
       <section class="entry">
-        <div class="entry-copy"><h2>Your guest pass</h2><p>This invitation includes premium guest entry. Please have your QR ready when you arrive so the event team can check you in.</p><div class="entry-meta"><span id="ticketType">Premium Invitation Ticket</span> · <span id="ticketQuantity">1 ticket assigned to this guest</span><br/><span id="bookingIdLabel"></span></div></div>
+        <div class="entry-copy"><h2>Your guest pass</h2><p>This invitation includes guest entry. Please have your QR ready when you arrive so the event team can check you in.</p><div class="entry-meta"><span id="ticketType">Invitation Ticket</span> · <span id="ticketQuantity">1 ticket assigned to this guest</span><br/><span id="bookingIdLabel"></span></div></div>
         <div><div class="qr-box"><canvas id="inviteQr" width="120" height="120"></canvas></div><div class="qr-caption" id="qrCaption">Scan for event entry</div></div>
       </section>
     </article>
@@ -64,18 +64,18 @@
       const time=get('time','To be announced');
       const venue=get('venue','Venue to be announced');
       const ticket=get('ticket','Invitation Ticket');
-      const passType=ticket.toLowerCase().includes('invitation')?'Premium Invitation Ticket':ticket;
+      const passType=ticket.toLowerCase().includes('invitation')?'Invitation Ticket':ticket;
       const ticketCount=Math.max(1,Number(get('ticketCount',get('seats','1')))||1);
       let organiserMessage=get('message');
       const cancelled=get('status','confirmed').toLowerCase()==='cancelled';
       const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
       const fillMessage=()=>set('inviteMessage',`We are delighted to invite you to ${event} for an evening of wonderful moments, great company, and a memorable experience.${organiserMessage?`\n\n${organiserMessage}`:''}\n\nWe look forward to welcoming you. Please present your personal guest pass at the venue.`);
       set('eventName',event);set('inviteGreeting',`Dear ${guestWithHonorific},`);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketQuantity',`${ticketCount} ticket${ticketCount===1?'':'s'} assigned to this guest`);set('bookingIdLabel',bookingId?`Invitation ID ${bookingId.slice(-10).toUpperCase()}`:'');fillMessage();
-      document.title=`Premium Invitation for ${guest} | ${event}`;
+      document.title=`Invitation for ${guest} | ${event}`;
       if(cancelled){document.getElementById('invitePage').classList.add('cancelled');document.getElementById('whatsappButton').style.display='none';}
       const shareUrl=new URL(location.href);shareUrl.hash='';
       const refreshWhatsApp=()=>{
-        const shareText=`A premium invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are invited to ${document.getElementById('eventName').textContent}.\nDate: ${document.getElementById('eventDate').textContent}\nTime: ${document.getElementById('eventTime').textContent}\nVenue: ${document.getElementById('eventVenue').textContent}\n\n${organiserMessage||'We look forward to welcoming you for a memorable experience.'}\n\nYour personal guest pass and event details:\n${shareUrl.toString()}`;
+        const shareText=`An invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are invited to ${document.getElementById('eventName').textContent}.\nDate: ${document.getElementById('eventDate').textContent}\nTime: ${document.getElementById('eventTime').textContent}\nVenue: ${document.getElementById('eventVenue').textContent}\n\n${organiserMessage||'We look forward to welcoming you for a memorable experience.'}\n\nYour personal guest pass and event details:\n${shareUrl.toString()}`;
         document.getElementById('whatsappButton').href=`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
       };
       refreshWhatsApp();
@@ -102,7 +102,7 @@
           if(!snapshot.exists)return;
           const data=snapshot.data()||{};
           if(['','event invitation','your event'].includes(event.trim().toLowerCase())&&data.name){
-            event=data.name;set('eventName',event);document.title=`Premium Invitation for ${guest} | ${event}`;fillMessage();
+            event=data.name;set('eventName',event);document.title=`Invitation for ${guest} | ${event}`;fillMessage();
           }
           const dates=Array.isArray(data.eventDates)?data.eventDates:[];
           const dateItem=dates.find(item=>item?.date)||dates[0]||{};

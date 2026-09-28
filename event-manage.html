@@ -987,7 +987,7 @@ function invitationWhatsAppUrl(ticket,url){
   const guest=ticket.name||bookingName(ticket);
   const guestWithHonorific=/\s+garu$/i.test(guest)?guest:`${guest} Garu`;
   const eventName=eventData?.name||'our event';
-  const message=`A premium invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are cordially invited to ${eventName} for a memorable experience.\n\n${details.message}\n\nDate: ${details.date}\nTime: ${details.time}\nVenue: ${details.venue}\n\nYour personal invitation and guest pass:\n${url}`;
+  const message=`An invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are cordially invited to ${eventName} for a memorable experience.\n\n${details.message}\n\nDate: ${details.date}\nTime: ${details.time}\nVenue: ${details.venue}\n\nYour personal invitation and guest pass:\n${url}`;
   const phone=String(ticket.phone||ticket.customerPhone||'').replace(/\D/g,'');
   const recipient=phone.length===10?'91'+phone:phone;
   return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}${recipient?`&phone=${encodeURIComponent(recipient)}`:''}`;
