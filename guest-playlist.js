@@ -1,4 +1,4 @@
-import { collection, db, getDocs, query } from './firebase.js';
+import { collection, db, doc, getDoc, getDocs, query } from './firebase.js';
 
 const esc = value => String(value || '').replace(/[&<>"']/g, character => ({
   '&': '&amp;',
@@ -22,6 +22,15 @@ async function loadPlaylist() {
     || newestFirst[0];
 
   if (!playlist) throw new Error('No playlist has been published yet.');
+
+  const eventHeading = document.getElementById('eventName');
+  if (playlist.eventId) {
+    const eventSnapshot = await getDoc(doc(db, 'events', playlist.eventId));
+    const event = eventSnapshot.exists() ? eventSnapshot.data() : {};
+    eventHeading.textContent = event.name || event.title || event.eventName || 'Event Playlist';
+  } else {
+    eventHeading.hidden = true;
+  }
 
   const songs = Array.isArray(playlist.songs) ? playlist.songs : [];
   const songList = document.getElementById('songs');
