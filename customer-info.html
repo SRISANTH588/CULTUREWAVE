@@ -28,27 +28,24 @@
   </style>
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="Home.html">CultureWave</a><a class="back" href="customer-dashboard.html">← Back to dashboard</a></header>
+  <header class="topbar"><a class="brand" href="Home.html">CultureWave</a><a class="back" href="premium-client-dashboard.html">← Back to client dashboard</a></header>
   <main>
-    <section class="hero"><div class="eyebrow">Your account</div><h1>Customer Info</h1><p>Review the contact details and account information saved to your CultureWave profile.</p></section>
+    <section class="hero"><div class="eyebrow">Client tools</div><h1>Customer Info</h1><p>View your event bookings, download booking details, and prepare WhatsApp reminders for attendees.</p></section>
     <section class="card" aria-labelledby="accountHeading">
-      <h2 id="accountHeading">Customer details</h2>
-      <div id="loading" class="state" role="status">Loading your account information…</div>
+      <h2 id="accountHeading">Client account</h2>
+      <div id="loading" class="state" role="status">Loading your client events…</div>
       <div id="account" hidden>
-        <div class="identity"><div class="avatar" id="avatar">U</div><div><div class="identity-name" id="name">—</div><div class="identity-email" id="email">—</div></div></div>
+        <div class="identity"><div class="avatar" id="avatar">C</div><div><div class="identity-name" id="name">—</div><div class="identity-email" id="email">—</div></div></div>
         <div class="details">
-          <div class="detail"><div class="label">Phone</div><div class="value" id="phone">Not added</div></div>
-          <div class="detail"><div class="label">Member since</div><div class="value" id="joined">—</div></div>
+          <div class="detail"><div class="label">Your events</div><div class="value" id="eventCount">—</div></div>
           <div class="detail"><div class="label">Total bookings</div><div class="value" id="bookings">—</div></div>
-          <div class="detail"><div class="label">Account type</div><div class="value">Customer</div></div>
         </div>
-        <div class="actions"><a class="button" href="customer-service.html">Contact support</a></div>
       </div>
       <div id="error" class="state error" role="alert" hidden></div>
     </section>
     <section class="card" aria-labelledby="bookingsHeading">
       <h2 id="bookingsHeading">All bookings</h2>
-      <div id="bookingsLoading" class="state" role="status">Loading your bookings…</div>
+      <div id="bookingsLoading" class="state" role="status">Finding bookings for your events…</div>
       <div id="bookingList" class="booking-list" hidden></div>
     </section>
   </main>
@@ -76,39 +73,64 @@
       'See you there!'
     ].join('\n');
     function downloadBooking(b){
-      const lines=['CULTUREWAVE BOOKING',`Event: ${b.eventName||'Event'}`,`Date: ${bookingDate(b)}`,`Venue: ${b.venueName||b.venue||b.city||'—'}`,`Booking ID: #${bookingRef(b)}`,`Customer: ${b.customerName||'—'}`,`Email: ${b.customerEmail||'—'}`,`Phone: ${b.customerPhone||'—'}`,`Ticket: ${b.ticketName||'General'}`,`Quantity: ${b.seats||b.quantity||b.tickets||1}`,`Amount: ${amount(b)}`,`Status: ${b.status||'confirmed'}`];
-      const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`culturewave-booking-${bookingRef(b)||'details'}.txt`;a.click();URL.revokeObjectURL(url);
+      const textLines=['CULTUREWAVE BOOKING',`Event: ${b.eventName||'Event'}`,`Date: ${bookingDate(b)}`,`Venue: ${b.venueName||b.venue||b.city||'—'}`,`Booking ID: #${bookingRef(b)}`,`Customer: ${b.customerName||'—'}`,`Email: ${b.customerEmail||'—'}`,`Phone: ${b.customerPhone||'—'}`,`Ticket: ${b.ticketName||'General'}`,`Quantity: ${b.seats||b.quantity||b.tickets||1}`,`Amount: ${amount(b)}`,`Status: ${b.status||'confirmed'}`];
+      const safe=value=>String(value??'—').replace(/[\\()]/g,'\\$&');
+      const stream=['BT','/F1 18 Tf','50 790 Td',`(${safe(textLines[0])}) Tj`,'/F1 11 Tf'];
+      textLines.slice(1).forEach(line=>stream.push('0 -28 Td',`(${safe(line)}) Tj`));stream.push('ET');
+      const content=stream.join('\n');
+      const objects=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',`<< /Length ${new TextEncoder().encode(content).length} >>\nstream\n${content}\nendstream`];
+      let pdf='%PDF-1.4\n',offsets=[0];
+      objects.forEach((object,index)=>{offsets.push(new TextEncoder().encode(pdf).length);pdf+=`${index+1} 0 obj\n${object}\nendobj\n`;});
+      const xref=new TextEncoder().encode(pdf).length;pdf+=`xref\n0 ${objects.length+1}\n0000000000 65535 f \n`+offsets.slice(1).map(offset=>`${String(offset).padStart(10,'0')} 00000 n \n`).join('')+`trailer\n<< /Size ${objects.length+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+      const blob=new Blob([pdf],{type:'application/pdf'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`culturewave-booking-${bookingRef(b)||'details'}.pdf`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
     }
+    const whatsappPhone=value=>String(value||'').replace(/[^\d]/g,'');
     function renderBookings(bookings){
       const el=document.getElementById('bookingList'),loading=document.getElementById('bookingsLoading');loading.hidden=true;el.hidden=false;
       if(!bookings.length){el.innerHTML='<div class="empty">No bookings found for this account yet.</div>';return;}
       el.innerHTML=bookings.map((b,i)=>{
-        const status=String(b.status||'confirmed').toLowerCase(),image=b.cardImgUrl||b.coverUrl||b.eventImage||'';
+        const status=String(b.status||'confirmed').toLowerCase(),image=b.eventCardImgUrl||b.cardImgUrl||b.coverUrl||b.eventImage||'';
         const cover=image?`background-image:url('${esc(image).replace(/\\/g,'')}')`:'';
-        return `<article class="booking"><div class="event-cover" style="${cover}"><div class="event-cover-content"><h3>${esc(b.eventName||'Event')}</h3><p>📅 ${esc(bookingDate(b))} &nbsp;·&nbsp; 📍 ${esc(b.venueName||b.venue||b.city||'Venue details unavailable')}</p></div></div><div class="booking-content"><span class="status ${status==='pending'?'pending':status==='cancelled'?'cancelled':''}">${esc(status)}</span><div class="booking-meta"><div><div class="label">Booking ID</div><div class="value">#${esc(bookingRef(b))}</div></div><div><div class="label">Customer</div><div class="value">${esc(b.customerName||'—')}</div></div><div><div class="label">Contact</div><div class="value">${esc(b.customerPhone||b.customerEmail||'—')}</div></div><div><div class="label">Ticket</div><div class="value">${esc(b.ticketName||'General')}</div></div><div><div class="label">Quantity</div><div class="value">${esc(b.seats||b.quantity||b.tickets||1)}</div></div><div><div class="label">Amount</div><div class="value">${esc(amount(b))}</div></div></div><div class="booking-actions"><button class="button primary" type="button" data-download="${i}">⬇ Download booking</button><a class="button" target="_blank" rel="noopener noreferrer" href="https://wa.me/?text=${encodeURIComponent(reminderText(b))}">💬 WhatsApp reminder</a></div></div></article>`;
+        const phone=whatsappPhone(b.customerPhone||b.phone||'');
+        const waHref=`https://wa.me/${phone}?text=${encodeURIComponent(reminderText(b))}`;
+        return `<article class="booking"><div class="event-cover" style="${cover}"><div class="event-cover-content"><h3>${esc(b.eventName||'Event')}</h3><p>📅 ${esc(bookingDate(b))} &nbsp;·&nbsp; 📍 ${esc(b.venueName||b.venue||b.city||'Venue details unavailable')}</p></div></div><div class="booking-content"><span class="status ${status==='pending'?'pending':status==='cancelled'?'cancelled':''}">${esc(status)}</span><div class="booking-meta"><div><div class="label">Booking ID</div><div class="value">#${esc(bookingRef(b))}</div></div><div><div class="label">Customer</div><div class="value">${esc(b.customerName||'—')}</div></div><div><div class="label">Contact</div><div class="value">${esc(b.customerPhone||b.customerEmail||'—')}</div></div><div><div class="label">Ticket</div><div class="value">${esc(b.ticketName||'General')}</div></div><div><div class="label">Quantity</div><div class="value">${esc(b.seats||b.quantity||b.tickets||1)}</div></div><div><div class="label">Amount</div><div class="value">${esc(amount(b))}</div></div></div><div class="booking-actions"><button class="button primary" type="button" data-download="${i}">⬇ Download PDF</button><a class="button" target="_blank" rel="noopener noreferrer" href="${waHref}">💬 WhatsApp reminder</a></div></div></article>`;
       }).join('');
       el.querySelectorAll('[data-download]').forEach(button=>button.addEventListener('click',()=>downloadBooking(bookings[Number(button.dataset.download)])));
     }
     auth.onAuthStateChanged(async user=>{
       if(!user){location.replace('login.html');return;}
       try{
-        const [userSnap,bookingSnap]=await Promise.all([
-          db.collection('users').doc(user.uid).get().catch(()=>null),
-          db.collection('bookings').where('customerEmail','==',user.email).get().catch(()=>null)
-        ]);
+        const userSnap=await db.collection('users').doc(user.uid).get().catch(()=>null);
         const data=userSnap&&userSnap.exists?userSnap.data():{};
         const name=data.name||user.displayName||user.email.split('@')[0];
-        document.getElementById('avatar').textContent=name.trim().charAt(0).toUpperCase()||'U';
+        document.getElementById('avatar').textContent=name.trim().charAt(0).toUpperCase()||'C';
         document.getElementById('name').textContent=name;
         document.getElementById('email').textContent=user.email||'—';
-        document.getElementById('phone').textContent=data.whatsapp||data.phone||'Not added';
-        document.getElementById('joined').textContent=formatDate(data.createdAt)||formatDate(user.metadata.creationTime)||'—';
-        const bookings=bookingSnap?bookingSnap.docs.map(doc=>({id:doc.id,...doc.data()})):[];
-        document.getElementById('bookings').textContent=bookingSnap?bookingSnap.size:'Unavailable';
+        document.getElementById('account').hidden=false;
+
+        // Client-owned events are the source of truth; bookings are joined by eventId.
+        const eventSnap=await db.collection('events').where('ownerId','==',user.uid).get();
+        const events=eventSnap.docs.map(doc=>({id:doc.id,...doc.data()}));
+        document.getElementById('eventCount').textContent=events.length;
+        const results=await Promise.all(events.map(async event=>{
+          try{
+            const snap=await db.collection('bookings').where('eventId','==',event.id).get();
+            return snap.docs.map(doc=>({id:doc.id,...doc.data(),eventId:doc.id,eventName:doc.data().eventName||event.name||'Event',eventDate:doc.data().eventDate||event.startDate||event.date,eventCardImgUrl:event.cardImgUrl||event.coverUrl||'',venueName:doc.data().venueName||event.venueName||event.venue||event.city||''}));
+          }catch(err){console.warn('Unable to load bookings for event',event.id,err);return [];}
+        }));
+        const bookings=results.flat().sort((a,b)=>{
+          const date=value=>value?.toDate?value.toDate().getTime():new Date(value||0).getTime();
+          return date(b.createdAt)-date(a.createdAt);
+        });
+        document.getElementById('bookings').textContent=bookings.length;
         renderBookings(bookings);
         document.getElementById('loading').hidden=true;
-        document.getElementById('account').hidden=false;
-      }catch(err){console.error('Unable to load customer info:',err);showError('We could not load your customer information. Please refresh the page or contact support.');}
+      }catch(err){
+        console.error('Unable to load client event bookings:',err);
+        showError('We could not load your events and bookings. Check that this account has client access, then refresh the page.');
+        document.getElementById('bookingsLoading').hidden=true;
+        const list=document.getElementById('bookingList');list.hidden=false;list.innerHTML='<div class="empty">Bookings could not be loaded.</div>';
+      }
     });
   </script>
 </body>
