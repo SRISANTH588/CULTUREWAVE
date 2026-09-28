@@ -44,8 +44,9 @@
       <div id="error" class="state error" role="alert" hidden></div>
     </section>
     <section class="card" aria-labelledby="bookingsHeading">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem"><h2 id="bookingsHeading" style="margin:0">Bookings for your events</h2><div class="actions" style="margin:0"><button class="button" id="remindAll" type="button" disabled>Prepare WhatsApp reminders</button><button class="button primary" id="downloadAll" type="button" disabled>Download all attendees PDF</button></div></div>
-      <p style="font-size:.76rem;color:var(--muted);margin:-.45rem 0 1rem">Opens a prefilled WhatsApp chat for each attendee with a phone number. Review and send each reminder in WhatsApp.</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem"><h2 id="bookingsHeading" style="margin:0">Bookings for your events</h2><div class="actions" style="margin:0"><button class="button" id="remindAll" type="button" disabled>Show WhatsApp reminders</button><button class="button primary" id="downloadAll" type="button" disabled>Download attendees Excel</button></div></div>
+      <p style="font-size:.76rem;color:var(--muted);margin:-.45rem 0 1rem">Excel file includes every attendee and booking. WhatsApp links open one at a time to avoid browser pop-up blocking.</p>
+      <div id="reminderQueue" class="state" hidden style="margin-bottom:1rem"></div>
       <div id="bookingsLoading" class="state" role="status">Finding bookings for your events…</div>
       <div id="bookingList" class="booking-list" hidden></div>
     </section>
@@ -81,39 +82,24 @@
     let currentBookings=[];
     function downloadAllBookings(){
       if(!currentBookings.length)return;
-      const safe=value=>String(value??'-').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7E]/g,'?').replace(/[\\()]/g,'\\$&');
-      const lines=['CULTUREWAVE - ATTENDEE BOOKINGS',`Generated: ${new Date().toLocaleString('en-IN')}`,`Total bookings: ${currentBookings.length}`,''];
-      currentBookings.forEach((b,index)=>lines.push(`ATTENDEE ${index+1}`,`Event: ${b.eventName||'Event'}`,`Event date: ${bookingDate(b)}`,`Venue: ${b.venueName||b.venue||b.city||'-'}`,`Booking ID: #${bookingRef(b)}`,`Name: ${b.customerName||'-'}`,`Email: ${b.customerEmail||'-'}`,`Phone: ${b.customerPhone||b.phone||'-'}`,`Ticket: ${b.ticketName||'General'}`,`Quantity: ${b.seats||b.quantity||b.tickets||1}`,`Amount: ${amount(b)}`,`Status: ${b.status||'confirmed'}`,'----------------------------------------',''));
-      const pages=[];for(let i=0;i<lines.length;i+=24)pages.push(lines.slice(i,i+24));
-      const objects=[];const add=value=>(objects.push(value),objects.length);
-      const catalogId=add(''),pagesId=add(''),fontId=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'),pageIds=[];
-      pages.forEach(page=>{
-        const commands=['BT','/F1 15 Tf','50 790 Td'];
-        page.forEach((line,index)=>{if(index>0)commands.push('0 -29 Td');commands.push(index===0&&line.includes('ATTENDEE')?'/F1 12 Tf':'/F1 10 Tf',`(${safe(line)}) Tj`);});
-        commands.push('ET');const content=commands.join('\n');
-        const contentId=add(`<< /Length ${new TextEncoder().encode(content).length} >>\nstream\n${content}\nendstream`);
-        const pageId=add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 ${fontId} 0 R >> >> /Contents ${contentId} 0 R >>`);pageIds.push(pageId);
-      });
-      objects[catalogId-1]='<< /Type /Catalog /Pages '+pagesId+' 0 R >>';
-      objects[pagesId-1]=`<< /Type /Pages /Kids [${pageIds.map(id=>`${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`;
-      let pdf='%PDF-1.4\n',offsets=[0];
-      objects.forEach((object,index)=>{offsets.push(new TextEncoder().encode(pdf).length);pdf+=`${index+1} 0 obj\n${object}\nendobj\n`;});
-      const xref=new TextEncoder().encode(pdf).length;pdf+=`xref\n0 ${objects.length+1}\n0000000000 65535 f \n`+offsets.slice(1).map(offset=>`${String(offset).padStart(10,'0')} 00000 n \n`).join('')+`trailer\n<< /Size ${objects.length+1} /Root ${catalogId} 0 R >>\nstartxref\n${xref}\n%%EOF`;
-      const blob=new Blob([pdf],{type:'application/pdf'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='culturewave-all-attendees.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      const columns=['Event','Event Date','Venue','Booking ID','Attendee Name','Email','Phone','Ticket','Quantity','Amount','Status'];
+      const cell=value=>{let text=String(value??'');if(/^[=+@\-]/.test(text))text="'"+text;return `"${text.replace(/"/g,'""')}"`;};
+      const rows=[columns,...currentBookings.map(b=>[b.eventName||'Event',bookingDate(b),b.venueName||b.venue||b.city||'',bookingRef(b),b.customerName||'',b.customerEmail||'',b.customerPhone||b.phone||'',b.ticketName||'General',b.seats||b.quantity||b.tickets||1,amount(b),b.status||'confirmed'])];
+      const csv='\ufeff'+rows.map(row=>row.map(cell).join(',')).join('\r\n');
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='culturewave-all-attendees.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
     }
     document.getElementById('downloadAll').addEventListener('click',downloadAllBookings);
-    const whatsappPhone=value=>String(value||'').replace(/[^\d]/g,'');
+    const whatsappPhone=value=>{let digits=String(value||'').replace(/[^\d]/g,'');if(digits.length===10)digits='91'+digits;else if(digits.length===11&&digits.startsWith('0'))digits='91'+digits.slice(1);return digits;};
     function prepareAllReminders(){
       const recipients=currentBookings.filter(b=>whatsappPhone(b.customerPhone||b.phone));
-      if(!recipients.length){alert('No attendee phone numbers are available for WhatsApp reminders.');return;}
-      let opened=0;
-      recipients.forEach(b=>{
+      const queue=document.getElementById('reminderQueue');
+      if(!recipients.length){queue.hidden=false;queue.textContent='No attendee phone numbers are available for WhatsApp reminders.';return;}
+      queue.hidden=false;
+      queue.innerHTML=`<strong style="display:block;margin-bottom:.5rem">WhatsApp reminder links (${recipients.length})</strong><div style="display:grid;gap:.4rem">${recipients.map((b,index)=>{
         const phone=whatsappPhone(b.customerPhone||b.phone);
         const href=`https://wa.me/${phone}?text=${encodeURIComponent(reminderText(b))}`;
-        const tab=window.open(href,`culturewave-reminder-${index}`);
-        if(tab){opened++;tab.opener=null;}
-      });
-      if(opened<recipients.length)alert(`Opened ${opened} of ${recipients.length} WhatsApp chats. Your browser blocked some pop-ups; allow pop-ups for this page and try again. Send each prepared reminder in WhatsApp.`);
+        return `<a class="button" style="justify-content:flex-start" target="_blank" rel="noopener noreferrer" href="${href}">Attendee ${index+1}: ${esc(b.customerName||'Guest')} — ${esc(b.eventName||'Event')}</a>`;
+      }).join('')}</div><div style="margin-top:.6rem;font-size:.76rem">Open each chat and tap Send. WhatsApp does not allow one link to send messages to multiple people.</div>`;
     }
     document.getElementById('remindAll').addEventListener('click',prepareAllReminders);
     function renderBookings(bookings){
