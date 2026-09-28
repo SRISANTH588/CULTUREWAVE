@@ -219,6 +219,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <button class="sb-item" data-view="sales"><span class="sb-icon">💰</span> Sales Summary</button>
     <div class="sb-section-label">Payment Pages</div>
     <button class="sb-item" data-view="events"><span class="sb-icon">🎵</span> Music Events</button>
+    <a class="sb-item" id="customerInfoSidebarLink" href="customer-info.html" hidden><span class="sb-icon">🧾</span> Customer Info</a>
     <button class="sb-item" data-view="popups"><span class="sb-icon">🎸</span> Live Concerts</button>
     <button class="sb-item" data-view="dining"><span class="sb-icon">🎤</span> Open Mic Nights</button>
     <button class="sb-item" data-view="playlists"><span class="sb-icon">🎶</span> Guest Playlists</button>
@@ -910,6 +911,8 @@ const user=await getCurrentUser();
 if(!user){location.href='login.html';}
 else{
   myUid=user.uid;window.myUid=myUid;
+  const customerInfoLink=document.getElementById('customerInfoSidebarLink');
+  if(customerInfoLink&&String(user.email||'').trim().toLowerCase()==='community.vij@gmail.com')customerInfoLink.hidden=false;
   renderPlan(user);
   onSnapshot(doc(db,'users',myUid), snap=>{
     if(snap.exists()) renderPlan({...user,...snap.data()});
