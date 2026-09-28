@@ -954,7 +954,8 @@ function normBookingStatus(s){const v=(s||'pending').toLowerCase();return (v==='
 function isInvitationBooking(b){return b?.invitation===true||String(b?.source||'').toLowerCase()==='organiser_invitation';}
 function mainBookings(){return allBookings.filter(b=>!isInvitationBooking(b));}
 function invitationEventDetails(){
-  const firstDate=(eventData?.eventDates||[]).find(item=>item?.date)||eventData?.eventDates?.[0]||{};
+  const eventDates=Array.isArray(eventData?.eventDates)?eventData.eventDates:[];
+  const firstDate=eventDates.find(item=>item?.date)||eventDates[0]||{};
   const rawDate=eventData?.startDate||eventData?.date||firstDate.date||'';
   let date='To be announced';
   if(rawDate?.toDate){
@@ -965,9 +966,10 @@ function invitationEventDetails(){
     const value=dateOnly?new Date(Number(dateOnly[1]),Number(dateOnly[2])-1,Number(dateOnly[3])):new Date(rawDate);
     date=!Number.isNaN(value.getTime())?value.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):String(rawDate);
   }
-  const firstSlot=(firstDate.slots||[])[0]||{};
-  const startTime=eventData?.startTime||eventData?.time||eventData?.eventTime||firstDate.startTime||firstDate.time||firstSlot.start||'';
-  const endTime=eventData?.endTime||eventData?.finishTime||firstDate.endTime||firstDate.finishTime||firstSlot.end||'';
+  const firstSlot=(firstDate.slots||firstDate.timeSlots||[])[0]||{};
+  const firstSession=(Array.isArray(eventData?.sessions)?eventData.sessions:[]).find(item=>!firstDate.date||item.date===firstDate.date)||{};
+  const startTime=eventData?.startTime||eventData?.time||eventData?.eventTime||eventData?.timing||firstDate.startTime||firstDate.time||firstSlot.start||firstSlot.startTime||firstSession.start||firstSession.startTime||'';
+  const endTime=eventData?.endTime||eventData?.finishTime||firstDate.endTime||firstDate.finishTime||firstSlot.end||firstSlot.endTime||firstSession.end||firstSession.endTime||'';
   const time=startTime?(endTime?`${startTime} – ${endTime}`:startTime):'Time to be announced';
   const venue=[eventData?.venueName||eventData?.venue||eventData?.location||eventData?.address,eventData?.city].filter(Boolean).join(', ')||'Venue to be announced';
   const message=eventData?.invitationMessage||eventData?.description||eventData?.shortDescription||`We’re so happy to have you at ${eventData?.name||'our event'}! Get ready for an evening filled with music, good people and great vibes. Let’s jam, connect and create memories together!`;
@@ -977,13 +979,14 @@ function invitationPageUrl(ticket){
   const details=invitationEventDetails();
   const id=ticket.bookingId||ticket.id;
   const params=new URLSearchParams({bookingId:id,eventId,event:eventData?.name||'Event',guest:ticket.name||bookingName(ticket),date:details.date,time:details.time,venue:details.venue,message:details.message,ticket:ticket.ticketName||'Invitation Ticket',seats:'1',ticketNumber:String(ticket.ticketNumber||1),ticketCount:String(ticket.ticketCount||ticket.seats||1),status:normBookingStatus(ticket.status)==='cancelled'||ticket.cancelled?'cancelled':'confirmed'});
-  return new URL(`invite-booked.html?${params.toString()}`,location.href).toString();
+  return new URL(`/invite-booked.html?${params.toString()}`,location.origin).toString();
 }
 function invitationWhatsAppUrl(ticket,url){
   const details=invitationEventDetails();
   const guest=ticket.name||bookingName(ticket);
+  const guestWithHonorific=/\s+garu$/i.test(guest)?guest:`${guest} Garu`;
   const eventName=eventData?.name||'our event';
-  const message=`Hi ${guest}! You’re invited to ${eventName}.\nDate: ${details.date}\nTime: ${details.time}\nVenue: ${details.venue}\n\nOpen your invitation and ticket here:\n${url}`;
+  const message=`A premium invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are cordially invited to ${eventName} for a memorable experience.\n\n${details.message}\n\nDate: ${details.date}\nTime: ${details.time}\nVenue: ${details.venue}\n\nYour personal invitation and guest pass:\n${url}`;
   const phone=String(ticket.phone||ticket.customerPhone||'').replace(/\D/g,'');
   const recipient=phone.length===10?'91'+phone:phone;
   return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}${recipient?`&phone=${encodeURIComponent(recipient)}`:''}`;

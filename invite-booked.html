@@ -58,7 +58,8 @@
       const bookingId=get('bookingId');
       const eventId=get('eventId');
       const guest=get('guest','Guest');
-      const event=get('event','Event invitation');
+      const guestWithHonorific=/\s+garu$/i.test(guest)?guest:`${guest} Garu`;
+      let event=get('event','Event invitation');
       const date=get('date','To be announced');
       const time=get('time','To be announced');
       const venue=get('venue','Venue to be announced');
@@ -70,12 +71,12 @@
       const cancelled=get('status','confirmed').toLowerCase()==='cancelled';
       const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
       const fillMessage=()=>set('inviteMessage',`We are delighted to invite you to ${event} for an evening of wonderful moments, great company, and a memorable experience.${organiserMessage?`\n\n${organiserMessage}`:''}\n\nWe look forward to welcoming you. Please present your personal guest pass at the venue.`);
-      set('eventName',event);set('inviteGreeting',`Dear ${guest},`);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketNumber',`${ticketNumber} of ${ticketCount}`);set('bookingIdLabel',bookingId?`Invitation ID ${bookingId.slice(-10).toUpperCase()}`:'');fillMessage();
+      set('eventName',event);set('inviteGreeting',`Dear ${guestWithHonorific},`);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketNumber',`${ticketNumber} of ${ticketCount}`);set('bookingIdLabel',bookingId?`Invitation ID ${bookingId.slice(-10).toUpperCase()}`:'');fillMessage();
       document.title=`Premium Invitation for ${guest} | ${event}`;
       if(cancelled){document.getElementById('invitePage').classList.add('cancelled');document.getElementById('whatsappButton').style.display='none';}
       const shareUrl=new URL(location.href);shareUrl.hash='';
       const refreshWhatsApp=()=>{
-        const shareText=`A premium invitation for ${guest}\n\nDear ${guest},\nYou are invited to ${document.getElementById('eventName').textContent}.\nDate: ${document.getElementById('eventDate').textContent}\nTime: ${document.getElementById('eventTime').textContent}\nVenue: ${document.getElementById('eventVenue').textContent}\n\n${organiserMessage||'We look forward to welcoming you for a memorable experience.'}\n\nYour personal guest pass and event details:\n${shareUrl.toString()}`;
+        const shareText=`A premium invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are invited to ${document.getElementById('eventName').textContent}.\nDate: ${document.getElementById('eventDate').textContent}\nTime: ${document.getElementById('eventTime').textContent}\nVenue: ${document.getElementById('eventVenue').textContent}\n\n${organiserMessage||'We look forward to welcoming you for a memorable experience.'}\n\nYour personal guest pass and event details:\n${shareUrl.toString()}`;
         document.getElementById('whatsappButton').href=`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
       };
       refreshWhatsApp();
@@ -101,6 +102,9 @@
         firebase.firestore().collection('events').doc(eventId).get().then(snapshot=>{
           if(!snapshot.exists)return;
           const data=snapshot.data()||{};
+          if(['','event invitation','your event'].includes(event.trim().toLowerCase())&&data.name){
+            event=data.name;set('eventName',event);document.title=`Premium Invitation for ${guest} | ${event}`;fillMessage();
+          }
           const dates=Array.isArray(data.eventDates)?data.eventDates:[];
           const dateItem=dates.find(item=>item?.date)||dates[0]||{};
           const rawDate=data.startDate||data.date||dateItem.date||'';
@@ -110,10 +114,10 @@
             else {const iso=String(rawDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);value=iso?new Date(+iso[1],+iso[2]-1,+iso[3]):new Date(rawDate);}
             if(value&&!Number.isNaN(value.getTime()))set('eventDate',value.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
           }
-          const slot=(dateItem.slots||[])[0]||{};
+          const slot=(dateItem.slots||dateItem.timeSlots||[])[0]||{};
           const session=(data.sessions||[]).find(item=>!rawDate||item.date===rawDate)||{};
-          const start=data.startTime||data.time||data.eventTime||dateItem.startTime||dateItem.time||slot.start||session.start||'';
-          const end=data.endTime||data.finishTime||dateItem.endTime||dateItem.finishTime||slot.end||session.end||'';
+          const start=data.startTime||data.time||data.eventTime||data.timing||dateItem.startTime||dateItem.time||slot.start||slot.startTime||session.start||session.startTime||'';
+          const end=data.endTime||data.finishTime||dateItem.endTime||dateItem.finishTime||slot.end||slot.endTime||session.end||session.endTime||'';
           if(['','time to be announced'].includes(time.trim().toLowerCase())&&start)set('eventTime',end?`${start} – ${end}`:start);
           const location=[data.venueName||data.venue||data.location||data.address,data.city].filter(Boolean).join(', ');
           if(['','venue to be announced'].includes(venue.trim().toLowerCase())&&location)set('eventVenue',location);
