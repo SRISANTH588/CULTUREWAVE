@@ -188,6 +188,27 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    match /foodOrders/{id} {
+      allow create: if request.resource.data.restaurantId is string &&
+        exists(/databases/$(database)/documents/restaurants/$(request.resource.data.restaurantId)) &&
+        get(/databases/$(database)/documents/restaurants/$(request.resource.data.restaurantId)).data.status in ['published', 'live', 'active'] &&
+        get(/databases/$(database)/documents/restaurants/$(request.resource.data.restaurantId)).data.menuItems is list &&
+        request.resource.data.ownerId == get(/databases/$(database)/documents/restaurants/$(request.resource.data.restaurantId)).data.ownerId &&
+        request.resource.data.customerName is string &&
+        request.resource.data.customerPhone is string &&
+        request.resource.data.items is list && request.resource.data.items.size() > 0 &&
+        request.resource.data.total is number && request.resource.data.total > 0 &&
+        request.resource.data.status == 'new' &&
+        request.resource.data.paymentStatus == 'pay_at_venue';
+      allow read: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+      allow update: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin()) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']);
+      allow delete: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
     match /clientProjects/{id} {
       allow read, write: if request.auth != null;
     }

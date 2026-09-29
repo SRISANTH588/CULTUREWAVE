@@ -1665,6 +1665,18 @@ See you soon! &#127860;</textarea>
           </div>
         </div>
       </div>
+      <div class="card">
+        <div class="card-head"><h2>🍴 Food Menu & Event Orders</h2><p>Add dishes guests can preorder for pickup at your restaurant, including during events at your venue. Guests pay at the venue when they collect their food.</p></div>
+        <div class="grid-3" style="align-items:end;">
+          <div class="field"><label for="foodItemName">Dish name</label><input id="foodItemName" placeholder="e.g. Paneer tikka roll" /></div>
+          <div class="field"><label for="foodItemCategory">Category</label><input id="foodItemCategory" placeholder="e.g. Snacks" /></div>
+          <div class="field"><label for="foodItemPrice">Price (₹)</label><input id="foodItemPrice" type="number" min="1" placeholder="e.g. 180" /></div>
+        </div>
+        <div class="field" style="margin-top:.65rem;"><label for="foodItemDescription">Short description (optional)</label><input id="foodItemDescription" placeholder="Ingredients or serving details" /></div>
+        <button type="button" class="add-ticket-btn" style="margin-top:.75rem;" onclick="addFoodMenuItem()">＋ Add menu item</button>
+        <div id="foodMenuList" style="display:grid;gap:.5rem;margin-top:.75rem;"></div>
+        <div class="field" style="margin-top:.75rem;"><label for="foodOrderWhatsapp">Food order WhatsApp</label><input id="foodOrderWhatsapp" type="tel" placeholder="Country code + number, e.g. 919876543210" /><span class="field-hint">After placing an order, guests can send the ready-to-share order details to your team on WhatsApp.</span></div>
+      </div>
       <div class="step-actions">
         <button class="btn-ghost" onclick="goStep(11)">← Back</button>
         <button class="btn-success" id="createEventBtn">🚀 Create Event</button>
@@ -1865,7 +1877,24 @@ let eventType = 'in-person';
 let tickets = [];
 let coupons = [];
 let faqs = [];
+let foodMenuItems = [];
 let uid = null;
+
+window.addFoodMenuItem = function() {
+  const name = document.getElementById('foodItemName').value.trim();
+  const price = Number(document.getElementById('foodItemPrice').value);
+  if (!name || !Number.isFinite(price) || price < 1) { alert('Enter a dish name and a price greater than zero.'); return; }
+  foodMenuItems.push({ name, price, category: document.getElementById('foodItemCategory').value.trim(), description: document.getElementById('foodItemDescription').value.trim(), available: true });
+  ['foodItemName','foodItemPrice','foodItemCategory','foodItemDescription'].forEach(id => document.getElementById(id).value = '');
+  renderFoodMenuItems();
+};
+window.removeFoodMenuItem = function(index) { foodMenuItems.splice(index, 1); renderFoodMenuItems(); };
+function renderFoodMenuItems() {
+  const list = document.getElementById('foodMenuList');
+  list.innerHTML = foodMenuItems.length ? foodMenuItems.map((item,i)=>`<div class="ticket-row"><span class="tr-name">${escapeHtml(item.name)}${item.category?' · '+escapeHtml(item.category):''}</span><span class="tr-price">₹${Number(item.price).toLocaleString('en-IN')}</span><button type="button" class="tr-del" aria-label="Remove ${escapeHtml(item.name)}" onclick="removeFoodMenuItem(${i})">×</button></div>`).join('') : '<div class="field-hint">No dishes added yet. Add menu items to accept food orders.</div>';
+}
+function escapeHtml(value) { return String(value||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+renderFoodMenuItems();
 
 // ── AUTH ──
 async function loadUser() {
@@ -2377,6 +2406,8 @@ async function saveEvent(status) {
     totalSeats: Number(document.getElementById('totalSeats').value || 0),
     seatingNotes: document.getElementById('seatingNotes').value.trim(),
     ownerWhatsapp: document.getElementById('ownerWhatsapp').value.trim(),
+    foodOrderWhatsapp: document.getElementById('foodOrderWhatsapp').value.trim() || document.getElementById('ownerWhatsapp').value.trim(),
+    menuItems: foodMenuItems,
     ownerWAEnabled: document.getElementById('ownerWAEnabled').classList.contains('on'),
     ownerWATemplate: document.getElementById('ownerWATemplate').value.trim(),
     guestWATemplate: document.getElementById('guestWATemplate').value.trim(),

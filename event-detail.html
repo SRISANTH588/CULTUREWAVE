@@ -528,6 +528,12 @@
       <div id="ticketsList"></div>
     </div>
 
+    <section class="section" id="foodAtEvent" style="display:none;border:1px solid #eadfc9;background:#fbf7ee;border-radius:16px;padding:1.1rem 1.25rem;">
+      <div class="section-title">🍴 Order food at the venue</div>
+      <p style="color:#716650;margin:.25rem 0 .85rem;">Preorder from the venue restaurant and collect during the event.</p>
+      <div id="foodAtEventLinks" style="display:flex;gap:.65rem;flex-wrap:wrap;"></div>
+    </section>
+
     <!-- SEATING PLAN -->
     <div class="section" id="seatingPlanSection" style="display:none;">
       <div class="section-title"><span class="mob-seating-title">Venue &amp; seating plan</span><span class="desktop-seating-title">Seating Plan</span></div>
@@ -975,6 +981,7 @@ function updateRegistrationStatus(data){
 
 async function renderEvent(data){
   evData = data;
+  showFoodOrderingForEvent(data);
   const helpLink=document.getElementById('nightHelpLink');
   if(helpLink) helpLink.href=`https://wa.me/919848047428?text=${encodeURIComponent(`Hi CultureWave, I need help with ${data.name||'this event'}.`)}`;
   const ticketCapacity=(data.tickets||[]).reduce((sum,ticket)=>sum+Math.max(0,Number(ticket.qty||ticket.inventory||0)),0);
@@ -1357,6 +1364,26 @@ async function renderEvent(data){
       }
     }catch(e){ console.error('org load error',e); }
   }
+}
+
+async function showFoodOrderingForEvent(data) {
+  const section = document.getElementById('foodAtEvent');
+  const links = document.getElementById('foodAtEventLinks');
+  if (!section || !links || !data.venueName) return;
+  try {
+    const snap = await db.collection('restaurants').where('venueName', '==', data.venueName).limit(20).get();
+    const matches = snap.docs.filter(doc => {
+      const restaurant = doc.data();
+      return ['published','live','active'].includes(String(restaurant.status||'').toLowerCase()) && Array.isArray(restaurant.menuItems) && restaurant.menuItems.length;
+    });
+    if (!matches.length) return;
+    links.innerHTML = matches.map(doc => {
+      const name = doc.data().name || data.venueName;
+      const href = `food-order.html?restaurantId=${encodeURIComponent(doc.id)}&eventId=${encodeURIComponent(data.id || eventId || '')}&eventName=${encodeURIComponent(data.name || '')}&venue=${encodeURIComponent(data.venueName || '')}`;
+      return `<a href="${href}" style="display:inline-flex;align-items:center;padding:.7rem 1rem;border-radius:9px;background:#b58a49;color:#fff;font-weight:800;text-decoration:none;">Order from ${esc(name)} →</a>`;
+    }).join('');
+    section.style.display = '';
+  } catch (error) { console.warn('Venue food menu:', error.message); }
 }
 
 async function init(){

@@ -502,7 +502,10 @@
                 </div>
                 <div class="rs-footer">
                   <div class="rs-price">${priceStr}</div>
-                  <a class="rs-book" href="booking.html?type=restaurant&name=${encodeURIComponent(d.name||'')}&venue=${encodeURIComponent((d.area||d.city||''))}&price=${price}">Reserve Table &rarr;</a>
+                  <div style="display:flex;gap:.45rem;flex-wrap:wrap;justify-content:flex-end;">
+                    <a class="rs-book" href="booking.html?type=restaurant&name=${encodeURIComponent(d.name||'')}&venue=${encodeURIComponent((d.area||d.city||''))}&price=${price}">Reserve Table</a>
+                    ${(Array.isArray(d.menuItems)&&d.menuItems.length)?`<a class="rs-book" href="food-order.html?restaurantId=${encodeURIComponent(id)}">Order Food</a>`:''}
+                  </div>
                 </div>
               </div>`;
             grid.insertBefore(article, ctaCard);
