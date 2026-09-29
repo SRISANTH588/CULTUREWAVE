@@ -3191,8 +3191,6 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   try {
     const user = await getCurrentUser();
     if (!user) return location.href = 'login.html';
-    const customerInfoLink = document.getElementById('customerInfoSidebarLink');
-    if (customerInfoLink && String(user.email||'').trim().toLowerCase() === 'community.vij@gmail.com') customerInfoLink.hidden = false;
     myUid = user.uid;
     window.myUid = user.uid;
 

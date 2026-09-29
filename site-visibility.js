@@ -4,7 +4,7 @@ import { db, doc, onSnapshot } from "./firebase.js";
 const settingsRef = doc(db, "platformSettings", "siteVisibility");
 
 const controlSelectors = {
-  "nav-home": '.topnav a[href="Home.html"],.mobile-nav a[href="Home.html"],.mobile-bottom-nav a[href="Home.html"]',
+  "nav-home": '.topnav a[href="index.html"],.mobile-nav a[href="index.html"],.mobile-bottom-nav a[href="index.html"]',
   "nav-events": '.topnav a[href="events.html"],.mobile-nav a[href="events.html"],.mobile-bottom-nav a[href="events.html"]',
   "nav-restaurants": '.topnav a[href="restaurants.html"],.mobile-nav a[href="restaurants.html"],.mobile-bottom-nav a[href="restaurants.html"]',
   "nav-how-it-works": '.topnav a[href="how-it-works.html"],.mobile-nav a[href="how-it-works.html"]',

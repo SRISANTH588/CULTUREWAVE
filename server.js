@@ -424,7 +424,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && url.pathname === "/") {
-    const html = await readFile(join(publicDir, "Home.html"), "utf8");
+    const html = await readFile(join(publicDir, "index.html"), "utf8");
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
   }
 
