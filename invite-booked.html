@@ -99,8 +99,19 @@
 
       const refreshWhatsApp=()=>{
         const guestWithHonorific=guestHonorific(guest);
-        const shareText=`An invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are invited to ${event}.\nDate: ${date}\nTime: ${time}\nVenue: ${venue}\n\n${organiserMessage||'We look forward to welcoming you for a memorable experience.'}\n\nYour personal guest pass:\n${shareUrl()}`;
-        document.getElementById('whatsappButton').href=`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+        const lines=[
+          `🎉 *${event}*`,
+          venue&&venue!=='Venue to be announced'?`📍 ${venue}`:'',
+          date&&date!=='To be announced'?`📅 ${date}${time&&time!=='To be announced'?' · '+time:''}`:'',
+          '',
+          `An invitation for *${guestWithHonorific}*`,
+          '',
+          organiserMessage||'We look forward to welcoming you for a memorable experience.',
+          '',
+          'Your personal guest pass:',
+          shareUrl()
+        ].filter(l=>l!==undefined);
+        document.getElementById('whatsappButton').href=`https://api.whatsapp.com/send?text=${encodeURIComponent(lines.join('\n'))}`;
       };
 
       const qrCanvas=document.getElementById('inviteQr');

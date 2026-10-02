@@ -731,7 +731,25 @@ function openShare(){
 }
 function closeShare(){ document.getElementById('shareModal').classList.remove('open'); }
 function copyLink(){ if(evData.allowSharing===false) return; navigator.clipboard.writeText(getShareUrl()).then(()=>showToast('Link copied!')); closeShare(); }
-function shareWA(){ if(evData.allowSharing===false) return; const eventName=evData.name||'this event'; window.open(`https://wa.me/?text=${encodeURIComponent(`Hi! I thought you might like ${eventName}. Check it out and book here: ${getShareUrl()}`)}`, '_blank'); }
+function shareWA(){
+  if(evData.allowSharing===false) return;
+  const name=evData.name||'this event';
+  const venue=[evData.venueName||evData.venue||evData.location,evData.city].filter(Boolean).join(', ');
+  const date=evData.dateLabel||evData.startDate||'';
+  const time=evData.startTime||evData.time||'';
+  const price=Number(evData.price||0);
+  const priceStr=price>0?`\n🎟️ Tickets from ₹${price}`:'\n🎟️ Free entry';
+  const lines=[
+    `🎉 *${name}*`,
+    venue?`📍 ${venue}`:'',
+    date?`📅 ${date}${time?' · '+time:''}`:'',
+    priceStr,
+    '',
+    'Book your spot on CultureWave:',
+    getShareUrl()
+  ].filter(l=>l!==undefined);
+  window.open(`https://wa.me/?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+}
 function shareTwitter(){ if(evData.allowSharing===false) return; window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this event on CultureWave!')}&url=${encodeURIComponent(getShareUrl())}`, '_blank'); }
 function shareEmail(){ if(evData.allowSharing===false) return; window.open(`mailto:?subject=${encodeURIComponent(evData.name||'Event')}&body=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
 
