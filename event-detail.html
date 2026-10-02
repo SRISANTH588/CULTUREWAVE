@@ -735,7 +735,8 @@ function shareWA(){
   if(evData.allowSharing===false) return;
   const name=evData.name||'this event';
   const venue=[evData.venueName||evData.venue||evData.location,evData.city].filter(Boolean).join(', ');
-  const date=evData.dateLabel||evData.startDate||'';
+  const eventStart=getEventStart(evData);
+  const date=evData.dateLabel||(eventStart?fmtDate(eventStart):'');
   const time=evData.startTime||evData.time||'';
   const price=Number(evData.price||0);
   const priceStr=price>0?`\n🎟️ Tickets from ₹${price}`:'\n🎟️ Free entry';
