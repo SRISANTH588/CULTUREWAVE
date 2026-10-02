@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <title>Event Invitation | CultureWave</title>
+  <meta property="og:title" id="ogTitle" content="You're invited | CultureWave" />
+  <meta property="og:description" id="ogDesc" content="You have received a personal invitation. Tap to view your guest pass." />
+  <meta property="og:image" content="https://culturewave.in/banner.jpeg" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -56,74 +61,109 @@
       const p=new URLSearchParams(location.search);
       const get=(key,fallback='')=>p.get(key)||fallback;
       const bookingId=get('bookingId');
-      const eventId=get('eventId');
-      const guest=get('guest','Guest');
-      const guestWithHonorific=/\s+garu$/i.test(guest)?guest:`${guest} Garu`;
+
+      // Fields that can come from URL params OR Firestore booking doc
+      let eventId=get('eventId');
+      let guest=get('guest','Guest');
       let event=get('event','Event invitation');
-      const date=get('date','To be announced');
-      const time=get('time','To be announced');
-      const venue=get('venue','Venue to be announced');
-      const ticket=get('ticket','Invitation Ticket');
-      const passType=ticket.toLowerCase().includes('invitation')?'Invitation Ticket':ticket;
-      const ticketCount=Math.max(1,Number(get('ticketCount',get('seats','1')))||1);
+      let date=get('date','To be announced');
+      let time=get('time','To be announced');
+      let venue=get('venue','Venue to be announced');
+      let ticket=get('ticket','Invitation Ticket');
       let organiserMessage=get('message');
-      const cancelled=get('status','confirmed').toLowerCase()==='cancelled';
+      let ticketCount=Math.max(1,Number(get('ticketCount',get('seats','1')))||1);
+      let cancelled=get('status','confirmed').toLowerCase()==='cancelled';
+
       const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+      const guestHonorific=g=>/\s+garu$/i.test(g)?g:`${g} Garu`;
+
       const fillMessage=()=>set('inviteMessage',`We are delighted to invite you to ${event} for an evening of wonderful moments, great company, and a memorable experience.${organiserMessage?`\n\n${organiserMessage}`:''}\n\nWe look forward to welcoming you. Please present your personal guest pass at the venue.`);
-      set('eventName',event);set('inviteGreeting',`Dear ${guestWithHonorific},`);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketQuantity',`${ticketCount} ticket${ticketCount===1?'':'s'} assigned to this guest`);set('bookingIdLabel',bookingId?`Invitation ID ${bookingId.slice(-10).toUpperCase()}`:'');fillMessage();
-      document.title=`Invitation for ${guest} | ${event}`;
-      if(cancelled){document.getElementById('invitePage').classList.add('cancelled');document.getElementById('whatsappButton').style.display='none';}
-      const shareUrl=new URL(location.href);shareUrl.hash='';
+
+      const render=()=>{
+        const guestWithHonorific=guestHonorific(guest);
+        const passType=ticket.toLowerCase().includes('invitation')?'Invitation Ticket':ticket;
+        set('eventName',event);set('inviteGreeting',`Dear ${guestWithHonorific},`);set('eventDate',date);set('eventTime',time);set('eventVenue',venue);set('ticketType',passType);set('ticketQuantity',`${ticketCount} ticket${ticketCount===1?'':'s'} assigned to this guest`);set('bookingIdLabel',bookingId?`Invitation ID ${bookingId.slice(-10).toUpperCase()}`:'');fillMessage();
+        document.title=`Invitation for ${guest} | ${event}`;
+        // Update OG tags dynamically (helps for re-shares)
+        const ogTitle=document.getElementById('ogTitle');if(ogTitle)ogTitle.content=`Invitation for ${guestWithHonorific} | ${event}`;
+        const ogDesc=document.getElementById('ogDesc');if(ogDesc)ogDesc.content=`${date} · ${time} · ${venue}`;
+        if(cancelled){document.getElementById('invitePage').classList.add('cancelled');document.getElementById('whatsappButton').style.display='none';}
+        refreshWhatsApp();
+        renderQr();
+      };
+
+      const shareUrl=()=>{
+        const u=new URL(location.href);u.search=`?bookingId=${encodeURIComponent(bookingId)}`;u.hash='';
+        return u.toString();
+      };
+
       const refreshWhatsApp=()=>{
-        const shareText=`An invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are invited to ${document.getElementById('eventName').textContent}.\nDate: ${document.getElementById('eventDate').textContent}\nTime: ${document.getElementById('eventTime').textContent}\nVenue: ${document.getElementById('eventVenue').textContent}\n\n${organiserMessage||'We look forward to welcoming you for a memorable experience.'}\n\nYour personal guest pass and event details:\n${shareUrl.toString()}`;
+        const guestWithHonorific=guestHonorific(guest);
+        const shareText=`An invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are invited to ${event}.\nDate: ${date}\nTime: ${time}\nVenue: ${venue}\n\n${organiserMessage||'We look forward to welcoming you for a memorable experience.'}\n\nYour personal guest pass:\n${shareUrl()}`;
         document.getElementById('whatsappButton').href=`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
       };
-      refreshWhatsApp();
+
       const qrCanvas=document.getElementById('inviteQr');
-      const qrData=JSON.stringify({id:bookingId,type:'invitation'});
+      const qrData=()=>JSON.stringify({id:bookingId,type:'invitation'});
       let qrFallbackStarted=false;
       const loadQrImageFallback=()=>{
-        if(qrFallbackStarted)return;
-        qrFallbackStarted=true;
-        const image=document.createElement('img');
-        image.alt='Invitation entry QR code';image.width=120;image.height=120;
+        if(qrFallbackStarted)return;qrFallbackStarted=true;
+        const image=document.createElement('img');image.alt='Invitation entry QR code';image.width=120;image.height=120;
         image.onerror=()=>set('qrCaption','QR unavailable. Contact the event organiser.');
-        image.src=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrData)}`;
+        image.src=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrData())}`;
         qrCanvas.replaceWith(image);
       };
-      if(bookingId&&window.QRCode?.toCanvas){
-        try{QRCode.toCanvas(qrCanvas,qrData,{width:120,margin:1,color:{dark:'#351923',light:'#ffffff'}},error=>{if(error)loadQrImageFallback();});}
-        catch(error){loadQrImageFallback();}
-      }else if(bookingId)loadQrImageFallback();
-      else set('qrCaption','QR unavailable. Contact the event organiser.');
+      const renderQr=()=>{
+        if(bookingId&&window.QRCode?.toCanvas){try{QRCode.toCanvas(qrCanvas,qrData(),{width:120,margin:1,color:{dark:'#351923',light:'#ffffff'}},error=>{if(error)loadQrImageFallback();});}catch(e){loadQrImageFallback();}}
+        else if(bookingId)loadQrImageFallback();
+        else set('qrCaption','QR unavailable. Contact the event organiser.');
+      };
 
-      if(eventId&&window.firebase?.firestore){
-        firebase.firestore().collection('events').doc(eventId).get().then(snapshot=>{
-          if(!snapshot.exists)return;
-          const data=snapshot.data()||{};
-          if(['','event invitation','your event'].includes(event.trim().toLowerCase())&&data.name){
-            event=data.name;set('eventName',event);document.title=`Invitation for ${guest} | ${event}`;fillMessage();
+      // If all params are in URL, render immediately
+      const hasUrlParams=p.has('event')&&p.has('guest');
+      if(hasUrlParams){render();}
+
+      // Always try to load from Firestore booking doc for fresh data
+      if(bookingId&&window.firebase?.firestore){
+        firebase.firestore().collection('bookings').doc(bookingId).get().then(snap=>{
+          if(!snap.exists){
+            if(!hasUrlParams)render();
+            return;
           }
-          const dates=Array.isArray(data.eventDates)?data.eventDates:[];
-          const dateItem=dates.find(item=>item?.date)||dates[0]||{};
-          const rawDate=data.startDate||data.date||dateItem.date||'';
-          if(['','to be announced'].includes(date.trim().toLowerCase())&&rawDate){
-            let value;
-            if(rawDate?.toDate)value=rawDate.toDate();
-            else {const iso=String(rawDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);value=iso?new Date(+iso[1],+iso[2]-1,+iso[3]):new Date(rawDate);}
-            if(value&&!Number.isNaN(value.getTime()))set('eventDate',value.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+          const d=snap.data()||{};
+          guest=d.customerName||d.customer?.name||d.name||guest;
+          eventId=d.eventId||eventId;
+          ticket=d.ticketName||d.ticket||ticket;
+          ticketCount=Math.max(1,Number(d.ticketCount||d.seats||d.tickets||ticketCount)||1);
+          cancelled=(d.status||'').toLowerCase()==='cancelled'||d.cancelled===true||cancelled;
+          // Load event details from the event doc
+          if(eventId){
+            return firebase.firestore().collection('events').doc(eventId).get().then(esnap=>{
+              if(esnap.exists){
+                const ev=esnap.data()||{};
+                event=ev.name||event;
+                organiserMessage=organiserMessage||ev.invitationMessage||ev.description||ev.shortDescription||'';
+                const dates=Array.isArray(ev.eventDates)?ev.eventDates:[];
+                const dateItem=dates.find(i=>i?.date)||dates[0]||{};
+                const rawDate=ev.startDate||ev.date||dateItem.date||'';
+                if(rawDate){
+                  let val;if(rawDate?.toDate)val=rawDate.toDate();else{const iso=String(rawDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);val=iso?new Date(+iso[1],+iso[2]-1,+iso[3]):new Date(rawDate);}
+                  if(val&&!Number.isNaN(val.getTime()))date=val.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+                }
+                const slot=(dateItem.slots||dateItem.timeSlots||[])[0]||{};
+                const session=(ev.sessions||[]).find(i=>!dateItem.date||i.date===dateItem.date)||{};
+                const start=ev.startTime||ev.time||ev.eventTime||ev.timing||dateItem.startTime||dateItem.time||slot.start||slot.startTime||session.start||session.startTime||'';
+                const end=ev.endTime||ev.finishTime||dateItem.endTime||dateItem.finishTime||slot.end||slot.endTime||session.end||session.endTime||'';
+                if(start)time=end?`${start} – ${end}`:start;
+                const loc=[ev.venueName||ev.venue||ev.location||ev.address,ev.city].filter(Boolean).join(', ');
+                if(loc)venue=loc;
+              }
+              render();
+            });
           }
-          const slot=(dateItem.slots||dateItem.timeSlots||[])[0]||{};
-          const session=(data.sessions||[]).find(item=>!rawDate||item.date===rawDate)||{};
-          const start=data.startTime||data.time||data.eventTime||data.timing||dateItem.startTime||dateItem.time||slot.start||slot.startTime||session.start||session.startTime||'';
-          const end=data.endTime||data.finishTime||dateItem.endTime||dateItem.finishTime||slot.end||slot.endTime||session.end||session.endTime||'';
-          if(['','time to be announced'].includes(time.trim().toLowerCase())&&start)set('eventTime',end?`${start} – ${end}`:start);
-          const location=[data.venueName||data.venue||data.location||data.address,data.city].filter(Boolean).join(', ');
-          if(['','venue to be announced'].includes(venue.trim().toLowerCase())&&location)set('eventVenue',location);
-          if(!organiserMessage)organiserMessage=data.invitationMessage||data.description||data.shortDescription||'';
-          fillMessage();refreshWhatsApp();
-        }).catch(error=>console.warn('Could not load invitation event details:',error));
-      }
+          render();
+        }).catch(err=>{console.warn('Could not load booking:',err);if(!hasUrlParams)render();});
+      } else if(!hasUrlParams){render();}
     })();
   </script>
 </body>

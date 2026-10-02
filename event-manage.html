@@ -976,11 +976,8 @@ function invitationEventDetails(){
   return {date,time,venue,message};
 }
 function invitationPageUrl(ticket){
-  const details=invitationEventDetails();
   const id=ticket.bookingId||ticket.id;
-  const quantity=Math.max(1,Number(ticket.ticketCount||ticket.seats||ticket.tickets||1));
-  const params=new URLSearchParams({bookingId:id,eventId,event:eventData?.name||'Event',guest:ticket.name||bookingName(ticket),date:details.date,time:details.time,venue:details.venue,message:details.message,ticket:ticket.ticketName||'Invitation Ticket',seats:String(quantity),ticketCount:String(quantity),status:normBookingStatus(ticket.status)==='cancelled'||ticket.cancelled?'cancelled':'confirmed'});
-  return new URL(`/invite-booked.html?${params.toString()}`,location.origin).toString();
+  return new URL(`invite-booked.html?bookingId=${encodeURIComponent(id)}`,location.href).toString();
 }
 function invitationWhatsAppUrl(ticket,url){
   const details=invitationEventDetails();
