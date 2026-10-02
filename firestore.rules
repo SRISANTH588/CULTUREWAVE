@@ -111,13 +111,16 @@ service cloud.firestore {
     }
 
     match /bookings/{id} {
-      allow read: if request.auth != null && (
+      allow read: if
+        // Guest opening their own invite link — bookingId is the secret
+        id == resource.data.bookingId ||
+        (request.auth != null && (
         resource.data.userId == request.auth.uid ||
         resource.data.organiserId == request.auth.uid ||
         resource.data.ownerId == request.auth.uid || isAdmin()
         || (resource.data.eventId != null &&
           get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.ownerId == request.auth.uid)
-      );
+      ));
       allow create: if request.resource.data.eventId is string &&
         (ownsEvent(request.resource.data.eventId) || inviteAllowsBooking(request.resource.data.eventId));
       allow update: if true;
