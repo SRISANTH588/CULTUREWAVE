@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "culturewave",
+  "compatibility_date": "2026-10-01",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "exclude": [
+      "node_modules",
+      "node_modules/**",
+      "functions/node_modules",
+      "functions/node_modules/**",
+      ".git",
+      ".git/**",
+      ".wrangler",
+      ".wrangler/**",
+      "firebase-debug.log",
+      ".env",
+      ".env.*"
+    ]
+  }
+}
