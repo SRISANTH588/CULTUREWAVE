@@ -185,28 +185,32 @@ function continueToBrand(){
   document.getElementById('step3').style.display='';
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="module">
 import{auth,db,updateProfile,doc,setDoc,serverTimestamp}from'./firebase.js?v=email-otp-20261004';
-import{signInWithCustomToken}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import{createUserWithEmailAndPassword}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
-const emailOtpApi='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
-let otpRequestedEmail='';
-async function emailOtpRequest(path,payload){
-  const response=await fetch(`${emailOtpApi}/${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  const result=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(result.error||'OTP service is temporarily unavailable.');
-  return result;
-}
+const EMAILJS_SERVICE_ID='service_esppdwf';
+const EMAILJS_PUBLIC_KEY='PDb2vpOIeLkbZBBFP';
+const EMAILJS_OTP_TEMPLATE_ID='template_8ho2pwf';
+emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
+let otpRequestedEmail='',generatedEmailOtp='';
 document.getElementById('sendEmailOtp').addEventListener('click',async function(){
   const email=document.getElementById('femail').value.trim().toLowerCase();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setStatus('Enter a valid email address first.','warning','st1');return;}
   const button=this;button.disabled=true;button.textContent='Sending…';
   try{
-    await emailOtpRequest('sendListerEmailOtp',{email});
+    generatedEmailOtp=String(Math.floor(100000+Math.random()*900000));
+    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_OTP_TEMPLATE_ID,{
+      to_email:email,
+      to_name:'New Lister',
+      otp_code:generatedEmailOtp,
+      reply_to:'support.culturewave@gmail.com'
+    });
     otpRequestedEmail=email;
     document.getElementById('emailOtpArea').style.display='flex';
     setStatus('Verification code sent. Check your inbox and spam folder.','success','st1');
-  }catch(error){setStatus(error.message||'Could not send the verification code. Please try again.','warning','st1');}
+  }catch(error){console.error('Signup EmailJS OTP send failed:',error);setStatus('Could not send the code. Check your EmailJS template settings and try again.','warning','st1');}
   finally{button.disabled=false;button.textContent='Send OTP';}
 });
 document.getElementById('verifyEmailOtp').addEventListener('click',async function(){
@@ -214,15 +218,20 @@ document.getElementById('verifyEmailOtp').addEventListener('click',async functio
   if(!/^\d{6}$/.test(code)){setStatus('Enter the 6-digit code from your email.','warning','st1');return;}
   const email=document.getElementById('femail').value.trim().toLowerCase();
   if(!otpRequestedEmail||otpRequestedEmail!==email){setStatus('Tap Send OTP first for this email address.','warning','st1');return;}
+  if(code!==generatedEmailOtp){setStatus('That code is incorrect. Check your email and try again.','warning','st1');return;}
   const button=this;button.disabled=true;button.textContent='Verifying…';
   try{
-    const result=await emailOtpRequest('verifyListerEmailOtp',{email,otp:code});
-    const signedIn=await signInWithCustomToken(auth,result.token);
-    window.verifiedEmailUser=signedIn.user;
+    const starterPassword=crypto.randomUUID()+crypto.randomUUID()+'Aa1!';
+    const credential=await createUserWithEmailAndPassword(auth,email,starterPassword);
+    window.verifiedEmailUser=credential.user;
     window.emailVerified=true;
+    generatedEmailOtp='';
     setStatus('Email verified.','success','st1');
   }
-  catch(error){setStatus(error.message||'Could not verify the code. Please try again.','warning','st1');}
+  catch(error){
+    const message=error.code==='auth/email-already-in-use'?'An account already uses this email. Please log in instead.':error.message||'Could not verify the code. Please try again.';
+    setStatus(message,'warning','st1');
+  }
   finally{button.disabled=false;button.textContent='Verify';}
 });
 
