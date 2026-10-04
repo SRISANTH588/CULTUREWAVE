@@ -189,8 +189,20 @@ import{auth,db,updateProfile,doc,setDoc,serverTimestamp,RecaptchaVerifier,signIn
 
 let phoneConfirmation=null,phoneRecaptcha=null;
 function phoneError(error){
-  const messages={'auth/operation-not-allowed':'Phone sign-in is not enabled in Firebase Authentication.','auth/invalid-phone-number':'Enter a valid 10-digit Indian mobile number.','auth/invalid-verification-code':'That OTP is incorrect. Check the SMS and try again.','auth/code-expired':'That OTP expired. Tap Send OTP to request another.','auth/too-many-requests':'Too many attempts. Wait a while and try again.','auth/captcha-check-failed':'reCAPTCHA could not be verified. Reload the page and try again.'};
-  return messages[error.code]||error.message||'Could not verify this number. Please try again.';
+  const messages={
+    'auth/operation-not-allowed':'Phone sign-in is disabled. In Firebase Console, enable Authentication → Sign-in method → Phone.',
+    'auth/unauthorized-domain':'This website is not authorized for phone sign-in. Add its domain under Firebase Authentication → Settings → Authorized domains.',
+    'auth/invalid-phone-number':'Enter a valid 10-digit Indian mobile number.',
+    'auth/invalid-verification-code':'That OTP is incorrect. Check the SMS and try again.',
+    'auth/code-expired':'That OTP expired. Tap Send OTP to request another.',
+    'auth/too-many-requests':'Too many attempts. Wait before requesting another OTP.',
+    'auth/quota-exceeded':'Firebase SMS quota has been reached. Try later or check the project’s phone authentication limits.',
+    'auth/billing-not-enabled':'Firebase requires billing to send verification SMS for this project. Check the project billing plan.',
+    'auth/captcha-check-failed':'reCAPTCHA could not be verified. Reload the page and try again.',
+    'auth/invalid-app-credential':'reCAPTCHA verification failed. Check the authorized domain and try again.',
+    'auth/network-request-failed':'Network request failed. Check your internet connection and try again.'
+  };
+  return messages[error.code]||`${error.message||'Could not send or verify the OTP.'} (${error.code||'unknown error'})`;
 }
 document.getElementById('sendPhoneOtp').addEventListener('click',async function(){
   const phone=document.getElementById('fphone').value.trim();
