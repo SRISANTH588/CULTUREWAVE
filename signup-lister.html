@@ -147,9 +147,6 @@ function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=m
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="module">
-import{auth,db,doc,setDoc,serverTimestamp}from'./firebase.js?v=email-otp-20261004';
-import{createUserWithEmailAndPassword}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-
 const EMAILJS_SERVICE_ID='service_esppdwf';
 const EMAILJS_PUBLIC_KEY='PDb2vpOIeLkbZBBFP';
 const EMAILJS_OTP_TEMPLATE_ID='template_8ho2pwf';
@@ -185,28 +182,16 @@ document.getElementById('verifyEmailOtp').addEventListener('click',async functio
   if(code!==generatedEmailOtp){setStatus('That code is incorrect. Check your email and try again.','warning','st1');return;}
   const button=this;button.disabled=true;button.textContent='Verifying…';
   try{
-    const starterPassword=crypto.randomUUID()+crypto.randomUUID()+'Aa1!';
-    const credential=await createUserWithEmailAndPassword(auth,email,starterPassword);
-    await setDoc(doc(db,'users',credential.user.uid),{
-      name:email.split('@')[0],
-      email,
-      phone:'',
-      whatsapp:'',
-      role:'lister',
-      emailVerificationRequired:false,
-      emailVerifiedByOtp:true,
-      category:CAT,
-      dashboard:DASH,
-      createdAt:serverTimestamp()
-    });
+    sessionStorage.setItem('cw_lister_verified_email',email);
+    sessionStorage.setItem('cw_lister_cat',CAT);
+    sessionStorage.setItem('cw_lister_dash',DASH);
     generatedEmailOtp='';
-    try{sessionStorage.removeItem('cw_lister_cat');sessionStorage.removeItem('cw_lister_dash');sessionStorage.removeItem('cw_lister_role');}catch(e){}
     setStatus('Email verified. Opening vendor onboarding…','success','st1');
     window.location.assign('vendor-onboarding.html');
   }
   catch(error){
-    const message=error.code==='auth/email-already-in-use'?'An account already uses this email. Please log in instead.':error.message||'Could not verify the code. Please try again.';
-    setStatus(message,'warning','st1');
+    console.error('Could not continue after email verification:',error);
+    setStatus('Email verified, but we could not open onboarding. Please continue to vendor onboarding manually.','warning','st1');
   }
   finally{button.disabled=false;button.textContent='Verify';}
 });

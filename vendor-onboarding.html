@@ -78,6 +78,13 @@
   <footer class="page-footer"><span>© CultureWave <b>· Vendor onboarding</b></span><span><a href="vendor-onboarding-help.html">Vendor onboarding help</a> · <b>Contact the CultureWave team</b></span></footer>
   <script type="module">
     const $=id=>document.getElementById(id);
+    try {
+      const verifiedEmail=sessionStorage.getItem('cw_lister_verified_email');
+      if(verifiedEmail&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(verifiedEmail)){
+        $('contactEmail').value=verifiedEmail;
+        $('contactEmail').readOnly=true;
+      }
+    } catch {}
     function notice(id,message,type='error'){const e=$(id);e.textContent=message;e.className='notice show '+type;}
     function clearNotice(id){const e=$(id);e.textContent='';e.className='notice';}
     function setBusy(button,busy,text){button.disabled=busy;if(busy)button.dataset.old=text||button.textContent;button.textContent=busy?'Please wait…':(button.dataset.old||text||button.textContent);}
