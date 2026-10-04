@@ -767,7 +767,9 @@
 
       function toFirebaseEmail(input) {
         const value = input.trim().toLowerCase();
-        return value.includes("@") ? value : `${value}@culturewave.in`;
+        if (value.includes("@")) return value;
+        if (value === "srisanth") return "srisanth@cityvibe.local";
+        return `${value}@culturewave.in`;
       }
 
       async function getUserData(uid) {
