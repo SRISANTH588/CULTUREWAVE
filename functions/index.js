@@ -265,9 +265,10 @@ exports.verifyOnboardingOtp = endpoint(async req => {
   return {sessionToken};
 });
 
-exports.submitVendorApplication = endpoint(async (req,res,session) => {
+exports.submitVendorApplication = endpoint(async req => {
   const p=req.body.application||{};
-  if (clean(p.contact?.email,180).toLowerCase()!==session.email) throw new Error('Verified email does not match this application.');
+  const email=clean(p.contact?.email,180).toLowerCase();
+  if(req.body.emailVerified!==true||!/^\S+@\S+\.\S+$/.test(email))throw new Error('Verify your email once on the signup page before submitting.');
   const contactName=clean(p.contact?.name,120), businessName=clean(p.vendor?.registeredName,180), phone=clean(p.contact?.phone,32);
   const required=[contactName,businessName,phone,clean(p.vendor?.businessType,80),clean(p.vendor?.category,100),clean(p.address?.line1,600),clean(p.address?.city,80),clean(p.address?.state,80),clean(p.address?.pincode,16),clean(p.bank?.accountNumber,30),clean(p.bank?.ifsc,11),clean(p.bank?.beneficiaryName,140),clean(p.bank?.accountType,20)];
   if (required.some(value=>!value)) throw new Error('Complete all required vendor, address, payout, and listing fields.');
@@ -277,8 +278,8 @@ exports.submitVendorApplication = endpoint(async (req,res,session) => {
   if(!/^[0-9]{9,24}$/.test(clean(p.bank?.accountNumber,30))||!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(clean(p.bank?.ifsc,11).toUpperCase()))throw new Error('Enter a valid bank account number and IFSC.');
   if (!p.consent) throw new Error('Please accept the onboarding consent.');
   const files=Array.isArray(req.body.files)?req.body.files:[];
-  const required=['pan','aadhaar'];
-  for (const kind of required) if(!files.some(f=>f.kind===kind)) throw new Error(`Upload the ${kind.toUpperCase()} document.`);
+  const requiredKinds=['pan','aadhaar'];
+  for (const kind of requiredKinds) if(!files.some(f=>f.kind===kind)) throw new Error(`Upload the ${kind.toUpperCase()} document.`);
   if(files.length>12)throw new Error('You can upload up to 12 documents.');
   const now=new Date(), counter=db.collection('onboardingCounters').doc(String(now.getUTCFullYear()));
   const applicationId=await db.runTransaction(async tx=>{const snap=await tx.get(counter);const next=(snap.exists?snap.data().last:0)+1;tx.set(counter,{last:next});return `ONB-${now.getUTCFullYear()}-${String(next).padStart(6,'0')}`;});
@@ -296,10 +297,10 @@ exports.submitVendorApplication = endpoint(async (req,res,session) => {
     stored.push({type:clean(f.kind,80),name:clean(f.name,120),path,contentType:mime,size:bytes.length,uploadedAt:now.toISOString()});
   }
   const ref=db.collection('vendorOnboarding').doc(applicationId);
-  const application={applicationId,email:session.email,name:contactName,contact:p.contact||{},vendor:p.vendor||{},business:p.business||{},address:p.address||{},listing:p.listing||{},bank:p.bank||{},identity:{pan:clean(p.identity?.pan,10).toUpperCase(),aadhaar:clean(p.identity?.aadhaar,12)},documents:stored,status:'NEW',agreementStatus:'NOT_SENT',submittedAt:FieldValue.serverTimestamp(),createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp(),consentAt:FieldValue.serverTimestamp(),userId:null};
-  await ref.set(application); await session.ref.update({used:true,applicationId}); await writeActivity(applicationId,'Application Submitted','applicant');
+  const application={applicationId,email,name:contactName,contact:{...(p.contact||{}),email},vendor:p.vendor||{},business:p.business||{},address:p.address||{},listing:p.listing||{},bank:p.bank||{},identity:{pan:clean(p.identity?.pan,10).toUpperCase(),aadhaar:clean(p.identity?.aadhaar,12)},documents:stored,status:'NEW',agreementStatus:'NOT_SENT',submittedAt:FieldValue.serverTimestamp(),createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp(),consentAt:FieldValue.serverTimestamp(),userId:null};
+  await ref.set(application); await writeActivity(applicationId,'Application Submitted','applicant');
   return {applicationId,status:'NEW'};
-},{session:true});
+});
 
 exports.createAgreementRequest = endpoint(async (req,res,uid) => {
   const id=clean(req.body.applicationId,40), subject=clean(req.body.subject,200), body=clean(req.body.message,8000), terms=clean(req.body.terms,20000);
