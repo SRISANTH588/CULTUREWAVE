@@ -269,7 +269,7 @@ exports.submitVendorApplication = endpoint(async (req,res,session) => {
   const p=req.body.application||{};
   if (clean(p.contact?.email,180).toLowerCase()!==session.email) throw new Error('Verified email does not match this application.');
   const contactName=clean(p.contact?.name,120), businessName=clean(p.vendor?.registeredName,180), phone=clean(p.contact?.phone,32);
-  const required=[contactName,businessName,phone,clean(p.vendor?.businessType,80),clean(p.vendor?.category,100),clean(p.address?.line1,600),clean(p.address?.city,80),clean(p.address?.state,80),clean(p.address?.pincode,16),clean(p.bank?.accountNumber,30),clean(p.bank?.ifsc,11),clean(p.bank?.beneficiaryName,140),clean(p.bank?.accountType,20),clean(p.listing?.name,120),clean(p.listing?.category,100),clean(p.listing?.description,2000)];
+  const required=[contactName,businessName,phone,clean(p.vendor?.businessType,80),clean(p.vendor?.category,100),clean(p.address?.line1,600),clean(p.address?.city,80),clean(p.address?.state,80),clean(p.address?.pincode,16),clean(p.bank?.accountNumber,30),clean(p.bank?.ifsc,11),clean(p.bank?.beneficiaryName,140),clean(p.bank?.accountType,20)];
   if (required.some(value=>!value)) throw new Error('Complete all required vendor, address, payout, and listing fields.');
   if(typeof p.vendor?.hasGst!=='boolean'||!['yes','no'].includes(p.vendor?.itrFiledResponse))throw new Error('Provide your GST and ITR answers.');
   if(p.vendor.hasGst&&!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(clean(p.vendor.gstin,15).toUpperCase()))throw new Error('Enter a valid GSTIN or select No GSTIN.');
