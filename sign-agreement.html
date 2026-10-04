@@ -59,7 +59,8 @@ async function loadAgreement(){
   if(!token){$('terms').textContent='This agreement link is missing its secure token. Open the link from the CultureWave email.';$('signingPanel').hidden=true;return}
   try{
     agreement=await api('getSigningData',{token});
-    $('applicationDetails').innerHTML=[['Application ID',agreement.applicationId],['Lister name',agreement.name],['Business name',agreement.vendor?.registeredName],['Email',agreement.email],['Phone',agreement.contact?.phone]].map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
+    const address=[agreement.vendor?.address||agreement.address?.line1,agreement.address?.city||agreement.vendor?.city,agreement.address?.state,agreement.address?.pincode].filter(Boolean).join(', ');
+    $('applicationDetails').innerHTML=[['Application ID',agreement.applicationId],['Lister name',agreement.name],['Business name',agreement.vendor?.registeredName],['Registered address',address],['Email',agreement.email],['Phone',agreement.contact?.phone],['GSTIN',agreement.vendor?.hasGst&&agreement.vendor?.gstin?agreement.vendor.gstin:'Not registered / not provided']].map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
     $('terms').textContent=agreement.terms||'No agreement terms were provided.';
     if(agreement.signed){await showSigned();return}
     setupCanvas();
