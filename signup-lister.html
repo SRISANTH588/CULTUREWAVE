@@ -113,7 +113,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="card-cat-pill" id="cardPill">✦ New Lister</div>
       <div class="card-head">
         <h2>Create your <span>account</span></h2>
-        <p>Fill in your details — we'll send a verification link to your email.</p>
+        <p>Fill in your details. Verify your mobile number by SMS and your email before logging in.</p>
       </div>
       <div class="status" id="st1"></div>
       <div class="form">
@@ -126,9 +126,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           <div class="input-wrap"><span class="input-icon">📧</span><input id="femail" type="email" placeholder="you@example.com" autocomplete="email"/></div>
         </div>
         <div class="field">
-          <span class="field-label">Phone Number <span style="font-size:.6rem;color:#64748b;font-weight:800;letter-spacing:.06em;">· NO OTP REQUIRED</span></span>
-          <div class="input-wrap"><span class="input-icon">📱</span><span class="wa-pre">+91</span><input id="fphone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" autocomplete="tel"/></div>
+          <span class="field-label">Phone Number <span style="font-size:.6rem;color:#1242c5;font-weight:800;letter-spacing:.06em;">· SMS VERIFICATION REQUIRED</span></span>
+          <div class="input-wrap"><span class="input-icon">📱</span><span class="wa-pre">+91</span><input id="fphone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" autocomplete="tel"/><button class="eye" id="sendPhoneOtp" type="button" style="white-space:nowrap;font-weight:800;color:#1242c5;">Send OTP</button></div>
         </div>
+        <div id="phoneOtpArea" class="field" style="display:none;">
+          <span class="field-label">SMS verification code</span>
+          <div class="input-wrap"><span class="input-icon">🔐</span><input id="phoneOtp" type="text" placeholder="6-digit code" maxlength="6" inputmode="numeric" autocomplete="one-time-code"/><button class="eye" id="verifyPhoneOtp" type="button" style="white-space:nowrap;font-weight:800;color:#1242c5;">Verify</button></div>
+        </div>
+        <div id="phoneRecaptcha"></div>
         <div class="field">
           <span class="field-label">Password</span>
           <div class="input-wrap"><span class="input-icon">🔒</span><input id="fpass" type="password" placeholder="Min 6 characters" autocomplete="new-password"/><button class="eye" type="button" onclick="toggleEye(this)">◔</button></div>
@@ -178,6 +183,11 @@ document.getElementById('cardPill').textContent=label;
 
 function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=msg;el.dataset.k=k||'';}
 function toggleEye(btn){var i=btn.previousElementSibling;i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'◔':'◉';}
+window.phoneVerified=false;
+window.verifiedPhoneUser=null;
+document.getElementById('fphone').addEventListener('input',function(){
+  if(window.phoneVerified){window.phoneVerified=false;window.verifiedPhoneUser=null;document.getElementById('phoneOtpArea').style.display='none';setStatus('Phone number changed. Verify it again with SMS OTP.','warning','st1');}
+});
 
 function continueToBrand(){
   var name=document.getElementById('fname').value.trim();
@@ -187,13 +197,42 @@ function continueToBrand(){
   if(!name){setStatus('Enter your full name.','warning','st1');return;}
   if(!email||!email.includes('@')){setStatus('Enter a valid email.','warning','st1');return;}
   if(!/^\d{10}$/.test(phone)){setStatus('Enter a valid 10-digit phone number.','warning','st1');return;}
+  if(!window.phoneVerified||window.verifiedPhoneUser?.phoneNumber!=='+91'+phone){setStatus('Verify your mobile number with the SMS OTP before continuing.','warning','st1');return;}
   if(!pass||pass.length<6){setStatus('Password must be at least 6 characters.','warning','st1');return;}
   document.getElementById('step1').style.display='none';
   document.getElementById('step3').style.display='';
 }
 </script>
 <script type="module">
-import{auth,db,createUserWithEmailAndPassword,updateProfile,sendEmailVerification,doc,setDoc,serverTimestamp}from'./firebase.js';
+import{auth,db,EmailAuthProvider,linkWithCredential,updateProfile,sendEmailVerification,doc,setDoc,serverTimestamp,RecaptchaVerifier,signInWithPhoneNumber}from'./firebase.js';
+
+let phoneConfirmation=null,phoneRecaptcha=null;
+function phoneError(error){
+  const messages={'auth/operation-not-allowed':'Phone sign-in is not enabled in Firebase Authentication.','auth/invalid-phone-number':'Enter a valid 10-digit Indian mobile number.','auth/invalid-verification-code':'That OTP is incorrect. Check the SMS and try again.','auth/code-expired':'That OTP expired. Tap Send OTP to request another.','auth/too-many-requests':'Too many attempts. Wait a while and try again.','auth/captcha-check-failed':'reCAPTCHA could not be verified. Reload the page and try again.'};
+  return messages[error.code]||error.message||'Could not verify this number. Please try again.';
+}
+document.getElementById('sendPhoneOtp').addEventListener('click',async function(){
+  const phone=document.getElementById('fphone').value.trim();
+  if(!/^\d{10}$/.test(phone)){setStatus('Enter a valid 10-digit Indian mobile number first.','warning','st1');return;}
+  const button=this;button.disabled=true;button.textContent='Sending…';
+  try{
+    if(phoneRecaptcha){try{phoneRecaptcha.clear();}catch(e){}}
+    phoneRecaptcha=new RecaptchaVerifier(auth,'phoneRecaptcha',{size:'invisible'});
+    phoneConfirmation=await signInWithPhoneNumber(auth,'+91'+phone,phoneRecaptcha);
+    document.getElementById('phoneOtpArea').style.display='flex';
+    setStatus('OTP sent by SMS. Enter the 6-digit code.','success','st1');
+  }catch(error){if(phoneRecaptcha){try{phoneRecaptcha.clear();}catch(e){}phoneRecaptcha=null;}setStatus(phoneError(error),'warning','st1');}
+  finally{button.disabled=false;button.textContent='Send OTP';}
+});
+document.getElementById('verifyPhoneOtp').addEventListener('click',async function(){
+  const code=document.getElementById('phoneOtp').value.trim();
+  if(!/^\d{6}$/.test(code)){setStatus('Enter the 6-digit code from your SMS.','warning','st1');return;}
+  if(!phoneConfirmation){setStatus('Tap Send OTP first.','warning','st1');return;}
+  const button=this;button.disabled=true;button.textContent='Verifying…';
+  try{const result=await phoneConfirmation.confirm(code);window.verifiedPhoneUser=result.user;window.phoneVerified=true;setStatus('Mobile number verified.','success','st1');}
+  catch(error){setStatus(phoneError(error),'warning','st1');}
+  finally{button.disabled=false;button.textContent='Verify';}
+});
 
 window.createBrandPage=async function(){
   var brand=document.getElementById('fbrand').value.trim();
@@ -207,9 +246,10 @@ window.createBrandPage=async function(){
   var phone=document.getElementById('fphone').value.trim();
   var pass=document.getElementById('fpass').value;
   if(!/^\d{10}$/.test(phone)){setStatus('Go back and enter a valid 10-digit phone number.','warning','st3');return;}
+  if(!window.phoneVerified||!window.verifiedPhoneUser||window.verifiedPhoneUser.phoneNumber!=='+91'+phone){setStatus('Go back and verify your mobile number first.','warning','st3');return;}
   setStatus('Creating your account…','info','st3');
   try{
-    var cred=await createUserWithEmailAndPassword(auth,email,pass);
+    var cred=await linkWithCredential(window.verifiedPhoneUser,EmailAuthProvider.credential(email,pass));
     await updateProfile(cred.user,{displayName:name});
     await setDoc(doc(db,'users',cred.user.uid),{
       name,email,
