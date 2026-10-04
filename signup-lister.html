@@ -148,6 +148,7 @@ function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=m
 <script type="module">
 const API='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
 let otpRequestedEmail='';
+function otpErrorMessage(error){const message=String(error?.message||'');if(error instanceof TypeError||/load failed|failed to fetch|networkerror/i.test(message))return 'The secure Firebase OTP endpoint is not deployed or reachable yet. EmailJS is configured as the email sender; the onboarding Functions must be deployed before signup verification can work.';return message||'Could not complete email verification. Please try again.';}
 document.getElementById('femail').addEventListener('input',function(){
   const email=this.value.trim().toLowerCase();
   if(otpRequestedEmail&&otpRequestedEmail!==email){otpRequestedEmail='';document.getElementById('emailOtpArea').style.display='none';setStatus('Email changed. Request a new verification code.','warning','st1');}
@@ -162,7 +163,7 @@ document.getElementById('sendEmailOtp').addEventListener('click',async function(
     otpRequestedEmail=email;
     document.getElementById('emailOtpArea').style.display='flex';
     setStatus('Verification code sent. Check your inbox and spam folder.','success','st1');
-  }catch(error){console.error('Signup OTP send failed:',error);setStatus(error.message||'Could not send the code. Please try again.','warning','st1');}
+  }catch(error){console.error('Signup OTP send failed:',error);setStatus(otpErrorMessage(error),'warning','st1');}
   finally{button.disabled=false;button.textContent='Send OTP';}
 });
 document.getElementById('verifyEmailOtp').addEventListener('click',async function(){
@@ -183,7 +184,7 @@ document.getElementById('verifyEmailOtp').addEventListener('click',async functio
   }
   catch(error){
     console.error('Could not continue after email verification:',error);
-    setStatus(error.message||'Could not verify this code. Request a new one and try again.','warning','st1');
+    setStatus(otpErrorMessage(error),'warning','st1');
   }
   finally{button.disabled=false;button.textContent='Verify';}
 });
