@@ -163,7 +163,16 @@ service cloud.firestore {
     }
 
     match /kyc/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      // Identity data should be handled only by trusted Admin SDK routes.
+      allow read, write: if isAdmin();
+    }
+
+    // Vendor onboarding contains PAN, Aadhaar and banking data. Keep all
+    // application reads and writes in a trusted Admin SDK endpoint.
+    match /vendorApplications/{uid} {
+      // Application data includes government IDs and financial account details.
+      // Keep all application reads and writes in the Admin SDK only.
+      allow read, write: if isAdmin();
     }
 
     match /organisers/{uid} {

@@ -1,6 +1,7 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getBytes, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Convert username → email (supports plain email too)
 function toEmail(input) {
@@ -70,10 +72,12 @@ function getPublicBase() {
 }
 
 export {
-  app, auth, db,
+  app, auth, db, storage,
   toEmail, getCurrentUser, requireAuth, logout, getPublicBase,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification,
   GoogleAuthProvider, signInWithPopup, updateProfile,
+  RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged,
+  ref, uploadBytes, getBytes, deleteObject,
   doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
   collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp
 };

@@ -365,6 +365,7 @@
   <nav class="sb-nav">
     <button class="sb-item" data-view="users"><span class="si-icon">👥</span> Members <span class="si-badge" id="badgeUsers">0</span></button>
     <button class="sb-item" data-view="events"><span class="si-icon">🎪</span> Live Events <span class="si-badge green" id="badgeEvents">0</span></button>
+    <button class="sb-item" data-view="new-listers"><span class="si-icon">🧾</span> New Listers <span class="si-badge orange" id="badgeNewListers">0</span></button>
     <button class="sb-item" data-view="campaigns"><span class="si-icon">🚀</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
     <button class="sb-item" data-view="payments"><span class="si-icon">💳</span> Transactions <span class="si-badge" id="badgePayments">0</span></button>
     <button class="sb-item" data-view="whatsapp"><span class="si-icon">💬</span> WA Dispatch <span class="si-badge green" id="badgeWA">0</span></button>
@@ -670,6 +671,25 @@
         <table class="data-table">
           <thead><tr><th>Member</th><th>Email</th><th>Phone</th><th>Role</th><th>Verified</th><th>Joined</th><th>Actions</th></tr></thead>
           <tbody id="usersTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       VIEW: NEW LISTER APPLICATIONS
+  ══════════════════════════════════════════ -->
+  <div class="view" data-view="new-listers">
+    <div style="background:linear-gradient(135deg,#17427c,#2454d6 58%,#6d8ff0);border-radius:20px;padding:1.5rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.78;margin-bottom:.55rem;">Vendor onboarding</div>
+      <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">New Listers</div>
+      <div style="font-size:.88rem;opacity:.8;margin-top:.3rem;">Review vendor details, verification documents and application status.</div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;">
+        <table class="data-table" style="min-width:850px;">
+          <thead><tr><th>Contact</th><th>Registered vendor</th><th>City</th><th>Mobile</th><th>Submitted</th><th>Status</th><th>Review</th></tr></thead>
+          <tbody id="newListersTable"><tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">Loading applications…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1306,18 +1326,29 @@
   </div>
 </div>
 
+<!-- Vendor Application Detail Modal -->
+<div class="modal-overlay" id="vendorAppModal">
+  <div class="modal modal-lg">
+    <h3>🧾 Vendor application</h3>
+    <div id="vendorAppDetail"></div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('vendorAppModal')">Close</button></div>
+  </div>
+</div>
+
 <script type="module">
 import { app, auth, db, getCurrentUser, logout,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
-  query, orderBy, limit, onSnapshot, serverTimestamp, getDocs, getDoc
+  query, orderBy, limit, onSnapshot, serverTimestamp, getDocs, getDoc,
+  storage, ref, getBytes
 } from "./firebase.js";
 
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[];
+let allVendorApplications=[];
 
 // ── HELPERS ──
-const esc = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const esc = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const money = v => '₹'+Number(v||0).toLocaleString('en-IN');
 const fmtDate = ts => { if(!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); };
 
@@ -1359,6 +1390,7 @@ window.updateTicketRequestStatus = async function(id, status) {
 // ── NAVIGATION ──
 const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', users:'Member Management', events:'Live Events',
+  'new-listers':'New Listers',
   campaigns:'Campaigns', payments:'Transactions', refunds:'Refunds',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
   restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', 'site-visibility':'Content Visibility', settings:'Platform Settings'
@@ -1368,11 +1400,45 @@ window.showView = function(name) {
   document.querySelectorAll('.sb-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view===name));
   document.getElementById('pageTitle').textContent = viewTitles[name] || name;
   if(name==='analytics') renderAnalytics();
+  if(name==='new-listers') renderNewListers();
   if(name==='credits') renderCreditsView();
   if(name==='activity') renderActivityLog();
   if(name==='whatsapp') { syncWABookings(); filterWA(); }
 };
 document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
+
+function renderNewListers(){
+  const tbody=document.getElementById('newListersTable');
+  if(!allVendorApplications.length){tbody.innerHTML='<tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">No vendor applications yet.</td></tr>';return;}
+  tbody.innerHTML=allVendorApplications.map(a=>{
+    const status=a.status||'pending',badge=status==='approved'?'green':status==='rejected'?'red':'orange';
+    return `<tr><td><strong>${esc(a.contact?.name||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.contact?.email||'')}</div></td><td>${esc(a.vendor?.registeredName||'—')}</td><td>${esc(a.vendor?.city||'—')}</td><td>${esc(a.mobile||a.contact?.phone||'—')}</td><td>${fmtDate(a.createdAt)}</td><td><span class="badge ${badge}">${esc(status)}</span></td><td><button class="btn sm primary" data-review-id="${esc(a.id)}">Review</button></td></tr>`;
+  }).join('');
+  tbody.querySelectorAll('[data-review-id]').forEach(btn=>btn.addEventListener('click',()=>openVendorApplication(btn.dataset.reviewId)));
+}
+function detailSection(title,rows){return `<section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px;"><strong style="display:block;margin-bottom:.65rem;color:var(--blue);">${title}</strong><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.65rem;">${rows.map(([label,value])=>`<div><small style="display:block;color:var(--muted);margin-bottom:.2rem;">${label}</small><strong style="font-size:.82rem;overflow-wrap:anywhere;">${esc(value||'—')}</strong></div>`).join('')}</div></section>`;}
+window.openVendorApplication=function(id){
+  const a=allVendorApplications.find(x=>x.id===id);if(!a)return;
+  const docButton=(label,file)=>file?.path?`<button type="button" class="btn sm vendor-doc-download" data-path="${esc(file.path)}" data-name="${esc(file.name||label)}" style="margin:.25rem .3rem .25rem 0;">Download ${esc(label)}</button>`:`<span style="display:inline-block;margin:.3rem;color:var(--muted);font-size:.8rem;">${esc(label)}: not uploaded</span>`;
+  const additional=Array.isArray(a.documents?.additional)?a.documents.additional:[];
+  document.getElementById('vendorAppDetail').innerHTML=`
+    ${detailSection('Point of contact',[['Name',a.contact?.name],['Mobile',a.contact?.phone||a.mobile],['LoU email',a.contact?.email]])}
+    ${detailSection('Registered vendor',[['Name',a.vendor?.registeredName],['Address',a.vendor?.address],['City',a.vendor?.city],['GSTIN',a.vendor?.hasGst?a.vendor?.gstin:'No GSTIN'],['Last 2 years ITR filed',a.vendor?.itrFiled?'Yes':'No']])}
+    ${detailSection('Bank details',[['Beneficiary',a.bank?.beneficiaryName],['Account number',a.bank?.accountNumber],['IFSC',a.bank?.ifsc],['Account type',a.bank?.accountType]])}
+    ${detailSection('Identity details',[['PAN',a.identity?.pan],['Aadhaar',a.identity?.aadhaar],['Status',a.status]])}
+    <section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px;"><strong style="display:block;margin-bottom:.55rem;color:var(--blue);">Verification documents</strong>${docButton('PAN',a.documents?.pan)}${docButton('Aadhaar',a.documents?.aadhaar)}${additional.map(d=>docButton(d.type||'Supporting document',d.file)).join('')}</section>
+    <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;"><label for="vendorStatus" style="font-size:.8rem;font-weight:700;">Application status</label><select id="vendorStatus" style="border:1px solid var(--border);border-radius:8px;padding:.5rem .65rem;">${['pending','approved','rejected'].map(s=>`<option value="${s}" ${s===(a.status||'pending')?'selected':''}>${s}</option>`).join('')}</select><button class="btn primary" id="saveVendorStatus">Save status</button></div>`;
+  document.querySelectorAll('.vendor-doc-download').forEach(btn=>btn.addEventListener('click',()=>downloadListerDocument(id,btn.dataset.path,btn.dataset.name)));
+  document.getElementById('saveVendorStatus').addEventListener('click',()=>saveVendorApplicationStatus(id));
+  openModal('vendorAppModal');
+};
+async function downloadListerDocument(id,path,name){
+  try{if(!allVendorApplications.some(a=>a.id===id))throw new Error('Application not found');const bytes=await getBytes(ref(storage,path));const url=URL.createObjectURL(new Blob([bytes]));const link=document.createElement('a');link.href=url;link.download=name||'vendor-document';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){showToast('Could not download document: '+(e.message||'access denied'),'error');}
+}
+async function saveVendorApplicationStatus(id){
+  const status=document.getElementById('vendorStatus')?.value;if(!['pending','approved','rejected'].includes(status))return;
+  try{await updateDoc(doc(db,'vendorApplications',id),{status,reviewedBy:auth.currentUser.uid,updatedAt:serverTimestamp()});showToast('Vendor application status updated','success');}catch(e){showToast('Could not update status: '+(e.message||'access denied'),'error');}
+}
 
 // ── PUBLIC SITE VISIBILITY ──
 const siteVisibilityRef = doc(db, 'platformSettings', 'siteVisibility');
@@ -1461,6 +1527,7 @@ document.getElementById('saveContentVisibility').addEventListener('click', async
 (async function bootstrap() {
   const user = await getCurrentUser();
   if (!user) { window.location.href = 'login.html'; return; }
+  if (user.role !== 'admin') { window.location.href = 'login.html'; return; }
   const init = (user.name||'A').trim().charAt(0).toUpperCase();
   document.getElementById('adminName').textContent = user.email || 'admin';
   document.getElementById('sbName').textContent = user.name || 'Admin';
@@ -1976,6 +2043,15 @@ onSnapshot(query(collection(db,'users'),orderBy('createdAt','desc'),limit(200)),
   renderUsersTable(allUsers);
   renderOverviewUsers();
   updateStats();
+});
+
+onSnapshot(query(collection(db,'vendorApplications'),orderBy('createdAt','desc'),limit(300)), snap => {
+  allVendorApplications=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const pending=allVendorApplications.filter(a=>(a.status||'pending')==='pending').length;
+  document.getElementById('badgeNewListers').textContent=pending;
+  renderNewListers();
+}, error => {
+  document.getElementById('newListersTable').innerHTML=`<tr><td colspan="7" style="padding:1.4rem;color:var(--red);">Could not load vendor applications: ${esc(error.message)}</td></tr>`;
 });
 
 onSnapshot(query(collection(db,'events'),orderBy('createdAt','desc'),limit(200)), snap => {
