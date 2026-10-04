@@ -162,3 +162,225 @@ exports.notifyWaitlistWhenSpotsOpen = onDocumentUpdated({
     });
   }
 });
+
+// Secure lister onboarding API. No user account is created until approveLister.
+const {onRequest} = require('firebase-functions/v2/https');
+const {getAuth} = require('firebase-admin/auth');
+const {getStorage} = require('firebase-admin/storage');
+const {randomBytes, randomInt, createHash, timingSafeEqual} = require('node:crypto');
+const {PDFDocument, StandardFonts, rgb} = require('pdf-lib');
+const onboardingOtpTemplate = defineString('EMAILJS_ONBOARDING_OTP_TEMPLATE_ID', {default: 'template_8ho2pwf'});
+const onboardingNoticeTemplate = defineString('EMAILJS_ONBOARDING_NOTICE_TEMPLATE_ID', {default: ''});
+const onboardingOtpPepper = defineString('ONBOARDING_OTP_PEPPER');
+const bucket = getStorage().bucket();
+const API_ORIGINS = new Set([
+  'https://culturewave.in', 'https://www.culturewave.in',
+  'https://srisanth588.github.io', 'http://localhost:5500', 'http://127.0.0.1:5500',
+]);
+const sha = value => createHash('sha256').update(String(value)).digest('hex');
+const randomToken = () => randomBytes(32).toString('base64url');
+const clean = (value, max=5000) => String(value ?? '').trim().slice(0, max);
+const sendOnboardingMail = async (to, subject, message, name='Lister', actionUrl='') => {
+  const templateId = onboardingNoticeTemplate.value();
+  if (!templateId) throw new Error('Configure EMAILJS_ONBOARDING_NOTICE_TEMPLATE_ID before sending onboarding emails.');
+  const response = await sendEmail(templateId, {
+    to_email: to, to_name: name, subject, message, message_html: message.replace(/\n/g, '<br>'), action_url: actionUrl,
+    reply_to: 'support.culturewave@gmail.com',
+  });
+  if (!response.ok) throw new Error(`EmailJS failed (${response.status}): ${(await response.text()).slice(0, 300)}`);
+};
+const writeActivity = (id, action, performedBy, metadata={}) => db.collection('onboardingActivity').add({applicationId:id, action, performedBy, metadata, timestamp:FieldValue.serverTimestamp()});
+async function cors(req, res) {
+  const origin = req.get('origin') || '';
+  if (API_ORIGINS.has(origin)) res.set('Access-Control-Allow-Origin', origin);
+  res.set('Vary', 'Origin');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Max-Age', '3600');
+  if (req.method === 'OPTIONS') { res.status(204).send(''); return false; }
+  if (req.method !== 'POST') { res.status(405).json({error:'Use POST.'}); return false; }
+  return true;
+}
+async function appSession(req) {
+  const token = req.get('authorization')?.replace(/^Bearer\s+/i, '') || req.body?.sessionToken || '';
+  if (token.length < 40) throw new Error('Verify your email again to continue.');
+  const ref = db.collection('onboardingSessions').doc(sha(token));
+  const snap = await ref.get();
+  if (!snap.exists || snap.data().expiresAt.toMillis() < Date.now() || snap.data().used) throw new Error('Your verified session expired. Please verify your email again.');
+  return {email:snap.data().email, ref, data:snap.data()};
+}
+async function adminUser(req) {
+  const idToken = req.get('authorization')?.replace(/^Bearer\s+/i, '') || '';
+  if (!idToken) throw new Error('Admin sign-in required.');
+  const decoded = await getAuth().verifyIdToken(idToken);
+  const user = await db.collection('users').doc(decoded.uid).get();
+  if (!user.exists || user.data().role !== 'admin') throw new Error('Administrator access required.');
+  return decoded.uid;
+}
+function endpoint(handler, {admin=false, session=false}={}) {
+  return onRequest({region:'asia-south1', cors:false, maxInstances:10, timeoutSeconds:120, memory:'512MiB'}, async (req,res) => {
+    try {
+      if (!await cors(req,res)) return;
+      const actor = admin ? await adminUser(req) : session ? await appSession(req) : null;
+      const result = await handler(req,res,actor);
+      if (!res.headersSent) res.status(200).json(result || {ok:true});
+    } catch (error) {
+      console.error('Onboarding API error:', error);
+      if (!res.headersSent) res.status(error.status || 400).json({error:error.message || 'Request failed.'});
+    }
+  });
+}
+
+exports.sendOnboardingOtp = endpoint(async req => {
+  const email = clean(req.body.email, 180).toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Enter a valid email address.');
+  const ip=(req.headers['x-forwarded-for']||req.ip||'unknown').toString().split(',')[0].trim();
+  const rateRef=db.collection('onboardingRateLimits').doc(sha(ip));
+  await db.runTransaction(async tx=>{const snap=await tx.get(rateRef),now=Date.now(),data=snap.exists?snap.data():{};if(data.windowStart&&now-data.windowStart.toMillis()<60*60_000&&data.count>=8)throw new Error('Too many verification emails were requested. Please try again later.');const fresh=!data.windowStart||now-data.windowStart.toMillis()>=60*60_000;tx.set(rateRef,{windowStart:fresh?new Date(now):data.windowStart,count:fresh?1:(data.count||0)+1});});
+  const id = sha(email), ref = db.collection('onboardingOtp').doc(id), now = Date.now();
+  const old = await ref.get();
+  if (old.exists && old.data().lastSentAt && now - old.data().lastSentAt.toMillis() < 60_000) throw new Error('Please wait one minute before requesting another code.');
+  const code = String(randomInt(100000,1000000));
+  await ref.set({email, codeHash:sha(`${onboardingOtpPepper.value()}:${code}`), expiresAt:new Date(now+10*60_000), attempts:0, lastSentAt:new Date(now)});
+  const response = await sendEmail(onboardingOtpTemplate.value(), {to_email:email, to_name:'New Lister', otp_code:code, reply_to:'support.culturewave@gmail.com'});
+  if (!response.ok) { await ref.delete(); throw new Error(`Could not send verification email (${response.status}).`); }
+  return {ok:true};
+});
+
+exports.verifyOnboardingOtp = endpoint(async req => {
+  const email = clean(req.body.email,180).toLowerCase(), code = clean(req.body.code,6);
+  const ref = db.collection('onboardingOtp').doc(sha(email)), snap = await ref.get();
+  if (!snap.exists) throw new Error('Request a new verification code.');
+  const data = snap.data();
+  if (data.expiresAt.toMillis() < Date.now()) { await ref.delete(); throw new Error('That code expired. Request a new one.'); }
+  if (data.attempts >= 5) { await ref.delete(); throw new Error('Too many attempts. Request a new code.'); }
+  const submitted = Buffer.from(sha(`${onboardingOtpPepper.value()}:${code}`));
+  const expected = Buffer.from(data.codeHash);
+  if (submitted.length !== expected.length || !timingSafeEqual(submitted,expected)) {
+    await ref.update({attempts:FieldValue.increment(1)}); throw new Error('That code is incorrect.');
+  }
+  await ref.delete();
+  const sessionToken=randomToken();
+  await db.collection('onboardingSessions').doc(sha(sessionToken)).set({email,createdAt:FieldValue.serverTimestamp(),expiresAt:new Date(Date.now()+24*60*60_000),used:false});
+  return {sessionToken};
+});
+
+exports.submitVendorApplication = endpoint(async (req,res,session) => {
+  const p=req.body.application||{};
+  if (clean(p.contact?.email,180).toLowerCase()!==session.email) throw new Error('Verified email does not match this application.');
+  const contactName=clean(p.contact?.name,120), businessName=clean(p.vendor?.registeredName,180), phone=clean(p.contact?.phone,32);
+  const required=[contactName,businessName,phone,clean(p.vendor?.businessType,80),clean(p.vendor?.category,100),clean(p.address?.line1,600),clean(p.address?.city,80),clean(p.address?.state,80),clean(p.address?.pincode,16),clean(p.bank?.accountNumber,30),clean(p.bank?.ifsc,11),clean(p.bank?.beneficiaryName,140),clean(p.bank?.accountType,20),clean(p.listing?.name,120),clean(p.listing?.category,100),clean(p.listing?.description,2000)];
+  if (required.some(value=>!value)) throw new Error('Complete all required vendor, address, payout, and listing fields.');
+  if(typeof p.vendor?.hasGst!=='boolean'||!['yes','no'].includes(p.vendor?.itrFiledResponse))throw new Error('Provide your GST and ITR answers.');
+  if(p.vendor.hasGst&&!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(clean(p.vendor.gstin,15).toUpperCase()))throw new Error('Enter a valid GSTIN or select No GSTIN.');
+  if(!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(clean(p.identity?.pan,10).toUpperCase())||!/^\d{12}$/.test(clean(p.identity?.aadhaar,12)))throw new Error('Enter valid PAN and Aadhaar numbers.');
+  if(!/^[0-9]{9,24}$/.test(clean(p.bank?.accountNumber,30))||!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(clean(p.bank?.ifsc,11).toUpperCase()))throw new Error('Enter a valid bank account number and IFSC.');
+  if (!p.consent) throw new Error('Please accept the onboarding consent.');
+  const files=Array.isArray(req.body.files)?req.body.files:[];
+  const required=['pan','aadhaar'];
+  for (const kind of required) if(!files.some(f=>f.kind===kind)) throw new Error(`Upload the ${kind.toUpperCase()} document.`);
+  if(files.length>12)throw new Error('You can upload up to 12 documents.');
+  const now=new Date(), counter=db.collection('onboardingCounters').doc(String(now.getUTCFullYear()));
+  const applicationId=await db.runTransaction(async tx=>{const snap=await tx.get(counter);const next=(snap.exists?snap.data().last:0)+1;tx.set(counter,{last:next});return `ONB-${now.getUTCFullYear()}-${String(next).padStart(6,'0')}`;});
+  const stored=[];
+  for(const f of files){
+    const mime=clean(f.mime,50), data=String(f.dataUrl||'');
+    if(!['image/png','image/jpeg'].includes(mime)||!/^data:image\/(png|jpeg);base64,/.test(data))throw new Error('Documents must be PNG or JPEG images.');
+    const bytes=Buffer.from(data.split(',')[1]||'','base64');
+    if(!bytes.length||bytes.length>1024*1024)throw new Error('Each document must be smaller than 1 MB.');
+    const validPng=bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+    const validJpeg=bytes[0]===0xff&&bytes[1]===0xd8&&bytes[2]===0xff;
+    if((mime==='image/png'&&!validPng)||(mime==='image/jpeg'&&!validJpeg))throw new Error('An uploaded image has an invalid file format.');
+    const path=`vendor-onboarding/${applicationId}/${randomBytes(18).toString('hex')}`;
+    await bucket.file(path).save(bytes,{metadata:{contentType:mime,metadata:{applicationId,documentType:clean(f.kind,80),originalName:clean(f.name,120)}}});
+    stored.push({type:clean(f.kind,80),name:clean(f.name,120),path,contentType:mime,size:bytes.length,uploadedAt:now.toISOString()});
+  }
+  const ref=db.collection('vendorOnboarding').doc(applicationId);
+  const application={applicationId,email:session.email,name:contactName,contact:p.contact||{},vendor:p.vendor||{},business:p.business||{},address:p.address||{},listing:p.listing||{},bank:p.bank||{},identity:{pan:clean(p.identity?.pan,10).toUpperCase(),aadhaar:clean(p.identity?.aadhaar,12)},documents:stored,status:'NEW',agreementStatus:'NOT_SENT',submittedAt:FieldValue.serverTimestamp(),createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp(),consentAt:FieldValue.serverTimestamp(),userId:null};
+  await ref.set(application); await session.ref.update({used:true,applicationId}); await writeActivity(applicationId,'Application Submitted','applicant');
+  return {applicationId,status:'NEW'};
+},{session:true});
+
+exports.createAgreementRequest = endpoint(async (req,res,uid) => {
+  const id=clean(req.body.applicationId,40), subject=clean(req.body.subject,200), body=clean(req.body.message,8000), terms=clean(req.body.terms,20000);
+  if(!subject||!body||terms.length<100)throw new Error('Provide an email subject, message, and agreement terms (at least 100 characters).');
+  const ref=db.collection('vendorOnboarding').doc(id), snap=await ref.get();if(!snap.exists)throw new Error('Application not found.');
+  const a=snap.data();if(['APPROVED','REJECTED','SIGNED'].includes(a.status))throw new Error('This application is already closed for agreement requests.');
+  const previous=await db.collection('onboardingSigningTokens').where('applicationId','==',id).where('used','==',false).get();
+  if(!previous.empty){const batch=db.batch();previous.docs.forEach(d=>batch.delete(d.ref));await batch.commit();}
+  const signingToken=randomToken(), tokenHash=sha(signingToken), signingUrl=`https://culturewave.in/sign-agreement.html?token=${encodeURIComponent(signingToken)}`;
+  await db.collection('onboardingSigningTokens').doc(tokenHash).set({applicationId:id,email:a.email,expiresAt:new Date(Date.now()+7*24*60*60_000),used:false});
+  const message=`${body}\n\nApplication ID: ${id}\n\nReview & sign the agreement: ${signingUrl}`;
+  await sendOnboardingMail(a.email,subject,message,a.name,signingUrl);
+  await ref.update({status:'SIGNUP_REQUEST_SENT',agreementStatus:'SENT',agreementTerms:terms,agreementVersion:'v1',agreementRequestedAt:FieldValue.serverTimestamp(),agreementRequestedBy:uid,updatedAt:FieldValue.serverTimestamp()});
+  await writeActivity(id,'Signup Request Sent',uid);
+  return {ok:true};
+},{admin:true});
+
+exports.getSigningData = endpoint(async req => {
+  const token=clean(req.body.token,200);if(token.length<40)throw new Error('Signing link is invalid.');
+  const ref=db.collection('onboardingSigningTokens').doc(sha(token)), snap=await ref.get();
+  if(!snap.exists||snap.data().used||snap.data().expiresAt.toMillis()<Date.now())throw new Error('This signing link is expired or already used.');
+  const aSnap=await db.collection('vendorOnboarding').doc(snap.data().applicationId).get();if(!aSnap.exists)throw new Error('Application not found.');
+  if(aSnap.data().status==='SIGNUP_REQUEST_SENT')await aSnap.ref.update({status:'AWAITING_SIGNATURE',updatedAt:FieldValue.serverTimestamp()});
+  await writeActivity(aSnap.id,'Agreement Opened','applicant');
+  const a=aSnap.data();return {applicationId:a.applicationId,email:a.email,name:a.name,vendor:a.vendor,business:a.business,contact:a.contact,terms:a.agreementTerms};
+});
+
+exports.signAgreement = endpoint(async req => {
+  const token=clean(req.body.token,200), signature=String(req.body.signature||'');
+  if(!/^data:image\/png;base64,/.test(signature))throw new Error('Capture your signature before submitting.');
+  const tokenRef=db.collection('onboardingSigningTokens').doc(sha(token));
+  const tokenSnap=await tokenRef.get();if(!tokenSnap.exists||tokenSnap.data().used||tokenSnap.data().expiresAt.toMillis()<Date.now())throw new Error('This signing link is expired or already used.');
+  if(!req.body.accepted)throw new Error('Accept the agreement terms to sign.');
+  const id=tokenSnap.data().applicationId, ref=db.collection('vendorOnboarding').doc(id), snap=await ref.get();if(!snap.exists)throw new Error('Application not found.');
+  const a=snap.data(), signedAt=new Date().toISOString(), signingReference=randomBytes(12).toString('hex'), pdf=await PDFDocument.create();let page=pdf.addPage([612,792]);const font=await pdf.embedFont(StandardFonts.Helvetica), bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+  const pdfText=value=>String(value||'').replace(/₹/g,'INR ').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').normalize('NFKD').replace(/[^\x20-\x7E]/g,'?');
+  const draw=(text,x,y,size=10,f=font)=>page.drawText(pdfText(text).slice(0,180),{x,y,size,font:f,color:rgb(.12,.16,.23),maxWidth:510});
+  draw('CULTUREWAVE VENDOR AGREEMENT',50,746,18,bold);draw(`Agreement version: ${a.agreementVersion||'v1'}`,50,728,9);draw(`Application ID: ${id}`,50,710,11,bold);draw(`Lister: ${a.name}`,50,691);draw(`Business: ${a.vendor?.registeredName||''}`,50,674);draw(`Email: ${a.email}`,50,657);draw(`Phone: ${a.contact?.phone||''}`,50,640);draw(`Business address: ${a.address?.line1||''}, ${a.address?.city||''}, ${a.address?.state||''}`,50,623,9);
+  let y=590;for(const line of String(a.agreementTerms||'').split('\n')){if(y<145){page=pdf.addPage([612,792]);y=746;} draw(line,50,y,10);y-=15;}
+  draw('Signing status: SIGNED',50,115,10,bold);draw('Electronic signature',50,99,10,bold);const img=await pdf.embedPng(Buffer.from(signature.split(',')[1],'base64'));page.drawImage(img,{x:50,y:32,width:Math.min(200,img.width),height:Math.min(58,img.height)});
+  draw(`Signed by ${a.name} on ${signedAt}`,275,80,9);draw(`Signing reference: ${signingReference}`,275,64,8);
+  const path=`vendor-onboarding/${id}/SIGNED_VENDOR_AGREEMENT.pdf`, pdfBytes=await pdf.save();await bucket.file(path).save(Buffer.from(pdfBytes),{metadata:{contentType:'application/pdf',metadata:{applicationId:id,private:'true'}}});
+  await ref.update({status:'SIGNED',agreementStatus:'SIGNED',signedAgreement:{path,name:'SIGNED_VENDOR_AGREEMENT.pdf',signedAt:FieldValue.serverTimestamp(),signingReference,agreementVersion:a.agreementVersion||'v1'},updatedAt:FieldValue.serverTimestamp()});
+  await tokenRef.update({used:true,usedAt:FieldValue.serverTimestamp()});await writeActivity(id,'Agreement Signed','applicant');await writeActivity(id,'PDF Generated','system');return {ok:true};
+});
+
+exports.adminOnboardingAction = endpoint(async (req,res,uid) => {
+  const id=clean(req.body.applicationId,40), action=clean(req.body.action,40), ref=db.collection('vendorOnboarding').doc(id), snap=await ref.get();
+  if(!snap.exists)throw new Error('Application not found.');const a=snap.data();
+  if(action==='review'){
+    if(a.status==='NEW'){await ref.update({status:'UNDER_REVIEW',reviewedAt:FieldValue.serverTimestamp(),reviewedBy:uid,updatedAt:FieldValue.serverTimestamp()});await writeActivity(id,'Admin Reviewed',uid);}
+    return {ok:true};
+  }
+  if(action==='documentUrl'){
+    const path=clean(req.body.path,500);if(!a.documents?.some(d=>d.path===path)&&a.signedAgreement?.path!==path)throw new Error('Document does not belong to this application.');
+    const file=bucket.file(path), download=Boolean(req.body.download), name=clean(req.body.name,120).replace(/[\r\n"\\]/g,'_');
+    const [url]=await file.getSignedUrl({action:'read',expires:Date.now()+5*60_000,responseDisposition:download?`attachment; filename="${name||'onboarding-document'}"`:'inline'});return {url};
+  }
+  if(action==='resendApprovalEmail'){
+    if(a.status!=='APPROVED'||!a.userId)throw new Error('This application has no approved lister account.');
+    const link=await getAuth().generatePasswordResetLink(a.email,{url:'https://culturewave.in/login.html'});
+    await sendOnboardingMail(a.email,'Your Lister Account Has Been Approved',`Dear ${a.name},\n\nYour application ${id} is approved and your lister account is active. Set your password and sign in here: ${link}\n\nCultureWave Vendor Onboarding Team`,a.name,link);
+    await writeActivity(id,'Approval Email Sent',uid,{resent:true});return {ok:true,emailSent:true};
+  }
+  if(action==='approve'){
+    if(a.status!=='SIGNED'||a.agreementStatus!=='SIGNED'||!a.signedAgreement?.path)throw new Error('A signed agreement is required before approval.');
+    if(!onboardingNoticeTemplate.value())throw new Error('Configure the EmailJS onboarding notice template before approving listers.');
+    const required=['pan','aadhaar'];for(const kind of required)if(!a.documents?.some(d=>d.type===kind))throw new Error(`The ${kind.toUpperCase()} document is missing.`);
+    const auth=getAuth();let user;try{user=await auth.getUserByEmail(a.email);if(user.disabled)throw new Error('This email already belongs to a disabled account.');}catch(e){if(e.code!=='auth/user-not-found')throw e;user=await auth.createUser({email:a.email,emailVerified:true,displayName:a.name,disabled:false});}
+    const userRef=db.collection('users').doc(user.uid);await userRef.set({uid:user.uid,name:a.name,email:a.email,phone:a.contact?.phone||'',role:'lister',status:'active',emailVerified:true,createdAt:FieldValue.serverTimestamp(),onboardingApplicationId:id},{merge:true});
+    await db.collection('organisers').doc(user.uid).set({ownerId:user.uid,name:a.listing?.name||a.vendor?.registeredName||a.name,businessName:a.vendor?.registeredName||'',email:a.email,phone:a.contact?.phone||'',status:'active',createdAt:FieldValue.serverTimestamp()},{merge:true});
+    await ref.update({status:'APPROVED',approvedAt:FieldValue.serverTimestamp(),approvedBy:uid,userId:user.uid,updatedAt:FieldValue.serverTimestamp()});await writeActivity(id,'Admin Approved',uid);await writeActivity(id,'Account Created','system',{userId:user.uid});
+    const link=await auth.generatePasswordResetLink(a.email,{url:'https://culturewave.in/login.html'});
+    try{await sendOnboardingMail(a.email,'Your Lister Account Has Been Approved',`Dear ${a.name},\n\nCongratulations! Your application ${id} is approved and your lister account is active. Set your password and sign in here: ${link}\n\nCultureWave Vendor Onboarding Team`,a.name,link);await writeActivity(id,'Approval Email Sent','system');return {ok:true,userId:user.uid,emailSent:true};}
+    catch(error){await writeActivity(id,'Approval Email Failed','system',{error:error.message});return {ok:true,userId:user.uid,emailSent:false,emailError:'Account was approved, but the approval email could not be sent. Check the EmailJS onboarding email template configuration.'};}
+  }
+  if(action==='reject'){
+    const reason=clean(req.body.reason,2000);if(reason.length<5)throw new Error('Enter a rejection reason.');if(a.status==='APPROVED')throw new Error('An approved application cannot be rejected.');
+    await ref.update({status:'REJECTED',rejectedAt:FieldValue.serverTimestamp(),rejectedBy:uid,rejectionReason:reason,updatedAt:FieldValue.serverTimestamp()});await writeActivity(id,'Admin Rejected',uid,{reason});
+    try{await sendOnboardingMail(a.email,'Update Regarding Your Lister Application',`Dear ${a.name},\n\nWe reviewed your lister application ${id}. Unfortunately, it could not be approved at this time.\n\nReason: ${reason}\n\nPlease contact support.culturewave@gmail.com if you need clarification.`,a.name);await writeActivity(id,'Rejection Email Sent','system');return {ok:true,emailSent:true};}
+    catch(error){await writeActivity(id,'Rejection Email Failed','system',{error:error.message});return {ok:true,emailSent:false,emailError:'Application was rejected, but the email could not be sent. Check the EmailJS onboarding email template configuration.'};}
+  }
+  throw new Error('Unknown admin action.');
+},{admin:true});

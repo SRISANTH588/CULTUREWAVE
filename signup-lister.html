@@ -145,33 +145,24 @@ document.getElementById('cardPill').textContent=label;
 
 function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=msg;el.dataset.k=k||'';}
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="module">
-const EMAILJS_SERVICE_ID='service_esppdwf';
-const EMAILJS_PUBLIC_KEY='PDb2vpOIeLkbZBBFP';
-const EMAILJS_OTP_TEMPLATE_ID='template_8ho2pwf';
-emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
-let otpRequestedEmail='',generatedEmailOtp='';
+const API='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
+let otpRequestedEmail='';
 document.getElementById('femail').addEventListener('input',function(){
   const email=this.value.trim().toLowerCase();
-  if(otpRequestedEmail&&otpRequestedEmail!==email){otpRequestedEmail='';generatedEmailOtp='';document.getElementById('emailOtpArea').style.display='none';setStatus('Email changed. Request a new verification code.','warning','st1');}
+  if(otpRequestedEmail&&otpRequestedEmail!==email){otpRequestedEmail='';document.getElementById('emailOtpArea').style.display='none';setStatus('Email changed. Request a new verification code.','warning','st1');}
 });
 document.getElementById('sendEmailOtp').addEventListener('click',async function(){
   const email=document.getElementById('femail').value.trim().toLowerCase();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setStatus('Enter a valid email address first.','warning','st1');return;}
   const button=this;button.disabled=true;button.textContent='Sending…';
   try{
-    generatedEmailOtp=String(Math.floor(100000+Math.random()*900000));
-    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_OTP_TEMPLATE_ID,{
-      to_email:email,
-      to_name:'New Lister',
-      otp_code:generatedEmailOtp,
-      reply_to:'support.culturewave@gmail.com'
-    });
+    const response=await fetch(API+'/sendOnboardingOtp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    const result=await response.json();if(!response.ok)throw new Error(result.error||'Could not send verification code.');
     otpRequestedEmail=email;
     document.getElementById('emailOtpArea').style.display='flex';
     setStatus('Verification code sent. Check your inbox and spam folder.','success','st1');
-  }catch(error){console.error('Signup EmailJS OTP send failed:',error);setStatus('Could not send the code. Check your EmailJS template settings and try again.','warning','st1');}
+  }catch(error){console.error('Signup OTP send failed:',error);setStatus(error.message||'Could not send the code. Please try again.','warning','st1');}
   finally{button.disabled=false;button.textContent='Send OTP';}
 });
 document.getElementById('verifyEmailOtp').addEventListener('click',async function(){
@@ -179,19 +170,20 @@ document.getElementById('verifyEmailOtp').addEventListener('click',async functio
   if(!/^\d{6}$/.test(code)){setStatus('Enter the 6-digit code from your email.','warning','st1');return;}
   const email=document.getElementById('femail').value.trim().toLowerCase();
   if(!otpRequestedEmail||otpRequestedEmail!==email){setStatus('Tap Send OTP first for this email address.','warning','st1');return;}
-  if(code!==generatedEmailOtp){setStatus('That code is incorrect. Check your email and try again.','warning','st1');return;}
   const button=this;button.disabled=true;button.textContent='Verifying…';
   try{
+    const response=await fetch(API+'/verifyOnboardingOtp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code})});
+    const result=await response.json();if(!response.ok)throw new Error(result.error||'The verification code could not be verified.');
     sessionStorage.setItem('cw_lister_verified_email',email);
+    sessionStorage.setItem('cw_onboarding_session',result.sessionToken);
     sessionStorage.setItem('cw_lister_cat',CAT);
     sessionStorage.setItem('cw_lister_dash',DASH);
-    generatedEmailOtp='';
     setStatus('Email verified. Opening vendor onboarding…','success','st1');
     window.location.assign('vendor-onboarding.html');
   }
   catch(error){
     console.error('Could not continue after email verification:',error);
-    setStatus('Email verified, but we could not open onboarding. Please continue to vendor onboarding manually.','warning','st1');
+    setStatus(error.message||'Could not verify this code. Request a new one and try again.','warning','st1');
   }
   finally{button.disabled=false;button.textContent='Verify';}
 });

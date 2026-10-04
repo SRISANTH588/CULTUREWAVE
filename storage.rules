@@ -23,11 +23,17 @@ service firebase.storage {
       allow read, write: if canAccessKyc(uid);
     }
 
+    // Onboarding files are uploaded and served with short-lived signed URLs
+    // issued only by the trusted Functions API.
+    match /vendor-onboarding/{allPaths=**} {
+      allow read, write: if false;
+    }
+
     match /{allPaths=**} {
       // The application folder is excluded here so this broad rule cannot
       // override the private-document access rules above.
-      allow read: if request.auth != null && !allPaths.matches('vendorApplications/.*');
-      allow write: if request.auth != null && !allPaths.matches('vendorApplications/.*');
+      allow read: if request.auth != null && !allPaths.matches('vendorApplications/.*') && !allPaths.matches('vendor-onboarding/.*');
+      allow write: if request.auth != null && !allPaths.matches('vendorApplications/.*') && !allPaths.matches('vendor-onboarding/.*');
     }
   }
 }

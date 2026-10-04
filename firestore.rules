@@ -60,16 +60,23 @@ service cloud.firestore {
         (get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid || isAdmin());
     }
 
-    // Anyone can write/read their own OTP (needed for signup before auth exists)
+    // Legacy client OTP storage is disabled. New onboarding OTPs are server only.
     match /emailOtps/{email} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
-    // Users can read/write their own doc; anyone can create (signup)
+    // User documents are self-readable; privileged accounts are server created.
     match /users/{uid} {
       allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
-      allow create: if true;
-      allow update, delete: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      // Lister/admin accounts are provisioned only by trusted server code.
+      // Preserve ordinary customer sign-up without granting a privileged role.
+      allow create: if request.auth != null && request.auth.uid == uid &&
+        request.resource.data.role in ['client', 'customer'] &&
+        request.resource.data.status != 'admin';
+      allow update: if isAdmin() || (request.auth != null && request.auth.uid == uid &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.status == resource.data.status);
+      allow delete: if isAdmin();
 
       match /following/{organiserId} {
         allow read: if request.auth != null && request.auth.uid == uid;
@@ -173,6 +180,26 @@ service cloud.firestore {
       // Application data includes government IDs and financial account details.
       // Keep all application reads and writes in the Admin SDK only.
       allow read, write: if isAdmin();
+    }
+
+    match /vendorOnboarding/{applicationId} {
+      allow read, write: if isAdmin();
+    }
+    match /onboardingCounters/{counterId} {
+      allow read, write: if false;
+    }
+    match /onboardingOtp/{documentId} {
+      allow read, write: if false;
+    }
+    match /onboardingSessions/{documentId} {
+      allow read, write: if false;
+    }
+    match /onboardingActivity/{activityId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /onboardingSigningTokens/{tokenHash} {
+      allow read, write: if false;
     }
 
     match /organisers/{uid} {

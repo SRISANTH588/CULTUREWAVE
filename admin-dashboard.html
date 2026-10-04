@@ -685,11 +685,15 @@
       <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">New Lister</div>
       <div style="font-size:.88rem;opacity:.8;margin-top:.3rem;">Review vendor details, verification documents and application status.</div>
     </div>
+    <div class="card" style="padding:.8rem 1rem;display:flex;gap:.65rem;flex-wrap:wrap;align-items:center;">
+      <input id="listerSearch" placeholder="Search application, name, business or email" oninput="renderNewListers()" style="flex:1;min-width:220px;border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;">
+      <select id="listerStatusFilter" onchange="renderNewListers()" style="border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;background:white"><option value="">All statuses</option><option>NEW</option><option>UNDER_REVIEW</option><option>SIGNUP_REQUEST_SENT</option><option>AWAITING_SIGNATURE</option><option>SIGNED</option><option>APPROVED</option><option>REJECTED</option></select>
+    </div>
     <div class="card" style="padding:0;overflow:hidden;">
       <div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;">
         <table class="data-table" style="min-width:850px;">
-          <thead><tr><th>Contact</th><th>Registered vendor</th><th>City</th><th>Mobile</th><th>Submitted</th><th>Status</th><th>Review</th></tr></thead>
-          <tbody id="newListersTable"><tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">Loading applications…</td></tr></tbody>
+          <thead><tr><th>Application ID</th><th>Lister / Email</th><th>Business</th><th>Phone</th><th>Category</th><th>Submitted</th><th>Status</th><th>Agreement</th><th>Documents</th><th>Actions</th></tr></thead>
+          <tbody id="newListersTable"><tr><td colspan="10" style="padding:1.4rem;color:var(--muted);">Loading applications…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1335,11 +1339,14 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="listerEmailModal"><div class="modal modal-lg"><h3>✉ Send signup and agreement request</h3><div id="listerEmailFields"></div><div class="modal-actions"><button class="btn" onclick="closeModal('listerEmailModal')">Cancel</button><button class="btn primary" id="sendListerEmail">Send Email</button></div></div></div>
+<div class="modal-overlay" id="listerRejectModal"><div class="modal"><h3>Reject application</h3><p style="color:var(--muted);font-size:.85rem">The applicant will receive this reason. No account will be created.</p><textarea id="listerRejectReason" rows="5" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:.7rem;margin-top:.6rem" placeholder="Reason for rejection / action required"></textarea><div class="modal-actions"><button class="btn" onclick="closeModal('listerRejectModal')">Cancel</button><button class="btn" id="confirmListerReject" style="background:#b42318;color:#fff">Reject Application</button></div></div></div>
+<div class="modal-overlay" id="listerApproveModal"><div class="modal"><h3>Approve lister</h3><p style="color:var(--muted);font-size:.85rem">This creates the active lister account and sends the account setup email. Confirm that you reviewed the application and signed agreement.</p><div class="modal-actions"><button class="btn" onclick="closeModal('listerApproveModal')">Cancel</button><button class="btn" id="confirmListerApprove" style="background:#138451;color:#fff">Approve Lister</button></div></div></div>
+
 <script type="module">
 import { app, auth, db, getCurrentUser, logout,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
   query, orderBy, limit, onSnapshot, serverTimestamp, getDocs, getDoc,
-  storage, ref, getBytes
 } from "./firebase.js";
 
 // ── STATE ──
@@ -1409,36 +1416,51 @@ document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventList
 
 function renderNewListers(){
   const tbody=document.getElementById('newListersTable');
-  if(!allVendorApplications.length){tbody.innerHTML='<tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">No vendor applications yet.</td></tr>';return;}
-  tbody.innerHTML=allVendorApplications.map(a=>{
-    const status=a.status||'pending',badge=status==='approved'?'green':status==='rejected'?'red':'orange';
-    return `<tr><td><strong>${esc(a.contact?.name||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.contact?.email||'')}</div></td><td>${esc(a.vendor?.registeredName||'—')}</td><td>${esc(a.vendor?.city||'—')}</td><td>${esc(a.mobile||a.contact?.phone||'—')}</td><td>${fmtDate(a.createdAt)}</td><td><span class="badge ${badge}">${esc(status)}</span></td><td><button class="btn sm primary" data-review-id="${esc(a.id)}">Review</button></td></tr>`;
+  const term=(document.getElementById('listerSearch')?.value||'').trim().toLowerCase(),filter=document.getElementById('listerStatusFilter')?.value||'';
+  const rows=allVendorApplications.filter(a=>(!filter||a.status===filter)&&(!term||[a.applicationId,a.name,a.email,a.vendor?.registeredName,a.contact?.phone,a.vendor?.category,a.listing?.category].some(v=>String(v||'').toLowerCase().includes(term))));
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="10" style="padding:1.4rem;color:var(--muted);">No matching applications.</td></tr>';return;}
+  tbody.innerHTML=rows.map(a=>{
+    const status=a.status||'NEW',badge=status==='APPROVED'?'green':status==='REJECTED'?'red':status==='SIGNED'?'blue':'orange';
+    return `<tr><td><strong>${esc(a.applicationId||a.id)}</strong></td><td><strong>${esc(a.name||a.contact?.name||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.email||a.contact?.email||'')}</div></td><td>${esc(a.vendor?.registeredName||'—')}</td><td>${esc(a.contact?.phone||'—')}</td><td>${esc(a.listing?.category||a.vendor?.category||'—')}</td><td>${fmtDate(a.submittedAt||a.createdAt)}</td><td><span class="badge ${badge}">${esc(status.replaceAll('_',' '))}</span></td><td>${esc(a.agreementStatus||'NOT SENT')}</td><td>${(a.documents||[]).length} file(s)</td><td><button class="btn sm primary" data-review-id="${esc(a.id)}">Open</button></td></tr>`;
   }).join('');
   tbody.querySelectorAll('[data-review-id]').forEach(btn=>btn.addEventListener('click',()=>openVendorApplication(btn.dataset.reviewId)));
 }
 function detailSection(title,rows){return `<section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px;"><strong style="display:block;margin-bottom:.65rem;color:var(--blue);">${title}</strong><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.65rem;">${rows.map(([label,value])=>`<div><small style="display:block;color:var(--muted);margin-bottom:.2rem;">${label}</small><strong style="font-size:.82rem;overflow-wrap:anywhere;">${esc(value||'—')}</strong></div>`).join('')}</div></section>`;}
 window.openVendorApplication=function(id){
   const a=allVendorApplications.find(x=>x.id===id);if(!a)return;
-  const docButton=(label,file)=>file?.path?`<button type="button" class="btn sm vendor-doc-download" data-path="${esc(file.path)}" data-name="${esc(file.name||label)}" style="margin:.25rem .3rem .25rem 0;">Download ${esc(label)}</button>`:`<span style="display:inline-block;margin:.3rem;color:var(--muted);font-size:.8rem;">${esc(label)}: not uploaded</span>`;
-  const additional=Array.isArray(a.documents?.additional)?a.documents.additional:[];
+  const docs=Array.isArray(a.documents)?a.documents:[];
+  const docButtons=docs.map(file=>`<div style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--border);"><strong style="font-size:.8rem;min-width:150px">${esc(file.type)} · ${esc(file.name)}</strong><button type="button" class="btn sm vendor-doc-action" data-kind="preview" data-path="${esc(file.path)}">Preview</button><button type="button" class="btn sm vendor-doc-action" data-kind="download" data-path="${esc(file.path)}" data-name="${esc(file.name)}">Download</button></div>`).join('');
+  const signed=a.signedAgreement?.path?`<div style="display:flex;gap:.45rem;flex-wrap:wrap;margin:.65rem 0"><b>Agreement: SIGNED</b><button class="btn sm vendor-doc-action" data-kind="preview" data-path="${esc(a.signedAgreement.path)}">View PDF</button><button class="btn sm vendor-doc-action" data-kind="download" data-path="${esc(a.signedAgreement.path)}" data-name="SIGNED_VENDOR_AGREEMENT.pdf">Download PDF</button><button class="btn sm vendor-doc-action" data-kind="share" data-path="${esc(a.signedAgreement.path)}">Share PDF</button></div>`:`<div style="margin:.65rem 0"><b>Agreement: ${esc(a.agreementStatus||'NOT SENT')}</b></div>`;
+  const canReview=a.status==='SIGNED';
   document.getElementById('vendorAppDetail').innerHTML=`
-    ${detailSection('Point of contact',[['Name',a.contact?.name],['Mobile',a.contact?.phone||a.mobile],['LoU email',a.contact?.email]])}
-    ${detailSection('Registered vendor',[['Name',a.vendor?.registeredName],['Address',a.vendor?.address],['City',a.vendor?.city],['GSTIN',a.vendor?.hasGst?a.vendor?.gstin:'No GSTIN'],['Last 2 years ITR filed',a.vendor?.itrFiled?'Yes':'No']])}
+    ${detailSection('Applicant information',[['Application ID',a.applicationId],['Name',a.name],['Email',a.email],['Phone',a.contact?.phone],['Alternate phone',a.contact?.alternatePhone]])}
+    ${detailSection('Business information',[['Business name',a.vendor?.registeredName],['Business type',a.vendor?.businessType],['Category',a.vendor?.category],['Description',a.vendor?.description],['Years operating',a.vendor?.yearsInOperation],['Website',a.vendor?.website],['Instagram',a.vendor?.instagram],['Address',a.address?.line1],['City / State',`${a.address?.city||''}, ${a.address?.state||''}`],['Country / pincode',`${a.address?.country||''} ${a.address?.pincode||''}`],['GSTIN',a.vendor?.hasGst?a.vendor?.gstin:'Not registered'],['Last 2 years ITR filed',a.vendor?.itrFiled?'Yes':'No']])}
+    ${detailSection('Listing information',[['Listing name',a.listing?.name],['Category',a.listing?.category],['Description',a.listing?.description],['Services',a.listing?.services],['Pricing',a.listing?.pricing]])}
     ${detailSection('Bank details',[['Beneficiary',a.bank?.beneficiaryName],['Account number',a.bank?.accountNumber],['IFSC',a.bank?.ifsc],['Account type',a.bank?.accountType]])}
-    ${detailSection('Identity details',[['PAN',a.identity?.pan],['Aadhaar',a.identity?.aadhaar],['Status',a.status]])}
-    <section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px;"><strong style="display:block;margin-bottom:.55rem;color:var(--blue);">Verification documents</strong>${docButton('PAN',a.documents?.pan)}${docButton('Aadhaar',a.documents?.aadhaar)}${additional.map(d=>docButton(d.type||'Supporting document',d.file)).join('')}</section>
-    <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;"><label for="vendorStatus" style="font-size:.8rem;font-weight:700;">Application status</label><select id="vendorStatus" style="border:1px solid var(--border);border-radius:8px;padding:.5rem .65rem;">${['pending','approved','rejected'].map(s=>`<option value="${s}" ${s===(a.status||'pending')?'selected':''}>${s}</option>`).join('')}</select><button class="btn primary" id="saveVendorStatus">Save status</button></div>`;
-  document.querySelectorAll('.vendor-doc-download').forEach(btn=>btn.addEventListener('click',()=>downloadListerDocument(id,btn.dataset.path,btn.dataset.name)));
-  document.getElementById('saveVendorStatus').addEventListener('click',()=>saveVendorApplicationStatus(id));
+    ${detailSection('KYC details',[['PAN',a.identity?.pan],['Aadhaar',a.identity?.aadhaar]])}
+    <section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px;"><strong style="display:block;margin-bottom:.55rem;color:var(--blue);">Uploaded documents</strong>${docButtons||'<span>No documents</span>'}${signed}</section>
+    <section style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0"><button class="btn primary" id="sendListerRequest">Send Signup Request</button>${canReview?'<button class="btn" id="approveLister" style="background:#138451;color:#fff">Approve Lister</button>':''}${a.status==='APPROVED'?'<button class="btn" id="resendListerEmail">Resend Approval Email</button>':''}<button class="btn" id="rejectLister" style="background:#b42318;color:#fff">Reject Application</button></section>
+    <section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px"><strong>Application activity</strong><div id="listerActivity" style="margin-top:.6rem;color:var(--muted);font-size:.82rem">Loading timeline…</div></section>`;
+  document.querySelectorAll('.vendor-doc-action').forEach(btn=>btn.addEventListener('click',()=>adminDocumentAction(id,btn.dataset.path,btn.dataset.name,btn.dataset.kind)));
+  document.getElementById('sendListerRequest').addEventListener('click',()=>openListerEmail(a));
+  document.getElementById('approveLister')?.addEventListener('click',()=>approveLister(id));
+  document.getElementById('resendListerEmail')?.addEventListener('click',async()=>{try{await adminOnboardingCall({action:'resendApprovalEmail',applicationId:id});showToast('Approval email sent again.','success')}catch(e){showToast(e.message||'Could not resend email.','error')}});
+  document.getElementById('rejectLister').addEventListener('click',()=>openListerReject(id));
   openModal('vendorAppModal');
+  adminOnboardingCall({action:'review',applicationId:id}).catch(e=>showToast(e.message||'Could not mark application under review.','error'));
+  loadListerActivity(id);
 };
-async function downloadListerDocument(id,path,name){
-  try{if(!allVendorApplications.some(a=>a.id===id))throw new Error('Application not found');const bytes=await getBytes(ref(storage,path));const url=URL.createObjectURL(new Blob([bytes]));const link=document.createElement('a');link.href=url;link.download=name||'vendor-document';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){showToast('Could not download document: '+(e.message||'access denied'),'error');}
+async function adminOnboardingCall(payload,endpointName='adminOnboardingAction'){const user=auth.currentUser;if(!user)throw new Error('Sign in again to continue.');const token=await user.getIdToken();const response=await fetch('https://asia-south1-ogshootsluxe-36740.cloudfunctions.net/'+endpointName,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(payload)});const result=await response.json();if(!response.ok)throw new Error(result.error||'Admin action failed.');return result;}
+async function adminDocumentAction(applicationId,path,name,kind){try{const {url}=await adminOnboardingCall({action:'documentUrl',applicationId,path,download:kind==='download',name});if(kind==='preview'){window.open(url,'_blank','noopener');return}if(kind==='share'){await navigator.clipboard.writeText(url);showToast('Secure document link copied. It expires in 5 minutes.','success');return}window.open(url,'_blank','noopener');}catch(e){showToast(e.message||'Could not open this document.','error');}}
+function openListerEmail(a){
+  const fields=document.getElementById('listerEmailFields');
+  const body=`Dear ${a.name||a.contact?.name||'Lister'},\n\nThank you for your interest in becoming a lister on CultureWave. Your application ${a.applicationId||a.id} has been received. We have prepared your vendor agreement for review and electronic signature. Our team will review your signed agreement and application before approval.\n\nRegards,\nCultureWave Vendor Onboarding Team`;
+  fields.innerHTML=`<label style="display:block;margin:.6rem 0 .25rem">To</label><input id="requestTo" value="${esc(a.email||a.contact?.email)}" readonly style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px"><label style="display:block;margin:.6rem 0 .25rem">Subject</label><input id="requestSubject" value="Vendor Signup &amp; Agreement Request – Culture Wave" style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px"><label style="display:block;margin:.6rem 0 .25rem">Email message</label><textarea id="requestMessage" rows="7" style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px">${esc(body)}</textarea><label style="display:block;margin:.6rem 0 .25rem">Agreement terms <small>(review and enter your approved terms)</small></label><textarea id="requestTerms" rows="8" placeholder="Enter the approved vendor agreement terms. These exact terms will appear in the signing document." style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px"></textarea>`;
+  document.getElementById('sendListerEmail').onclick=async()=>{const button=document.getElementById('sendListerEmail');button.disabled=true;try{await adminOnboardingCall({applicationId:a.applicationId||a.id,subject:document.getElementById('requestSubject').value,message:document.getElementById('requestMessage').value,terms:document.getElementById('requestTerms').value},'createAgreementRequest');closeModal('listerEmailModal');closeModal('vendorAppModal');showToast('Signup request sent.','success');}catch(e){showToast(e.message||'Could not send email.','error');}finally{button.disabled=false;}};openModal('listerEmailModal');
 }
-async function saveVendorApplicationStatus(id){
-  const status=document.getElementById('vendorStatus')?.value;if(!['pending','approved','rejected'].includes(status))return;
-  try{await updateDoc(doc(db,'vendorApplications',id),{status,reviewedBy:auth.currentUser.uid,updatedAt:serverTimestamp()});showToast('Vendor application status updated','success');}catch(e){showToast('Could not update status: '+(e.message||'access denied'),'error');}
-}
+let rejectingListerId='';function openListerReject(id){rejectingListerId=id;document.getElementById('listerRejectReason').value='';document.getElementById('confirmListerReject').onclick=async()=>{const button=document.getElementById('confirmListerReject');button.disabled=true;try{const result=await adminOnboardingCall({action:'reject',applicationId:rejectingListerId,reason:document.getElementById('listerRejectReason').value});closeModal('listerRejectModal');closeModal('vendorAppModal');showToast(result.emailSent?'Application rejected and applicant notified.':(result.emailError||'Application rejected.'),result.emailSent?'success':'error');}catch(e){showToast(e.message||'Could not reject application.','error');}finally{button.disabled=false;}};openModal('listerRejectModal');}
+async function approveLister(id){document.getElementById('confirmListerApprove').onclick=async()=>{const button=document.getElementById('confirmListerApprove');button.disabled=true;try{const result=await adminOnboardingCall({action:'approve',applicationId:id});closeModal('listerApproveModal');closeModal('vendorAppModal');showToast(result.emailSent?'Lister approved. Account created and approval email sent.':(result.emailError||'Lister approved.'),result.emailSent?'success':'error');}catch(e){showToast(e.message||'Could not approve application.','error');}finally{button.disabled=false;}};openModal('listerApproveModal');}
+async function loadListerActivity(id){const el=document.getElementById('listerActivity');try{const snap=await getDocs(collection(db,'onboardingActivity'));const entries=snap.docs.map(d=>d.data()).filter(x=>x.applicationId===id).sort((a,b)=>((b.timestamp?.toMillis?.()||0)-(a.timestamp?.toMillis?.()||0)));el.innerHTML=entries.length?entries.map(x=>`<div style="padding:.45rem 0;border-bottom:1px solid var(--border)"><strong>${esc(x.action)}</strong><span style="float:right">${fmtDate(x.timestamp)}</span><div>${esc(x.performedBy||'')}</div></div>`).join(''):'No activity recorded yet.';}catch(e){el.textContent='Activity timeline is unavailable.';}}
 
 // ── PUBLIC SITE VISIBILITY ──
 const siteVisibilityRef = doc(db, 'platformSettings', 'siteVisibility');
@@ -2045,13 +2067,13 @@ onSnapshot(query(collection(db,'users'),orderBy('createdAt','desc'),limit(200)),
   updateStats();
 });
 
-onSnapshot(query(collection(db,'vendorApplications'),orderBy('createdAt','desc'),limit(300)), snap => {
+onSnapshot(query(collection(db,'vendorOnboarding'),orderBy('submittedAt','desc'),limit(300)), snap => {
   allVendorApplications=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const pending=allVendorApplications.filter(a=>(a.status||'pending')==='pending').length;
+  const pending=allVendorApplications.filter(a=>!['APPROVED','REJECTED'].includes(a.status)).length;
   document.getElementById('badgeNewListers').textContent=pending;
   renderNewListers();
 }, error => {
-  document.getElementById('newListersTable').innerHTML=`<tr><td colspan="7" style="padding:1.4rem;color:var(--red);">Could not load vendor applications: ${esc(error.message)}</td></tr>`;
+  document.getElementById('newListersTable').innerHTML=`<tr><td colspan="10" style="padding:1.4rem;color:var(--red);">Could not load vendor applications: ${esc(error.message)}</td></tr>`;
 });
 
 onSnapshot(query(collection(db,'events'),orderBy('createdAt','desc'),limit(200)), snap => {
