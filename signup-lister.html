@@ -127,35 +127,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           <span class="field-label">Email verification code</span>
           <div class="input-wrap"><span class="input-icon">🔐</span><input id="emailOtp" type="text" placeholder="6-digit code" maxlength="6" inputmode="numeric" autocomplete="one-time-code"/><button class="eye" id="verifyEmailOtp" type="button" style="white-space:nowrap;font-weight:800;color:#1242c5;">Verify</button></div>
         </div>
-        <div class="divider"></div>
-        <button class="submit-btn" type="button" onclick="continueToBrand()">Continue →</button>
       </div>
       <div class="card-footer">Already have an account? <a href="login.html">Login here</a></div>
-    </div>
-
-    <!-- STEP 2: BRAND PAGE -->
-    <div id="step3" style="display:none;">
-      <div class="card-head">
-        <h2>Create your <span>brand page</span></h2>
-        <p>This is where your customers will find you online.</p>
-      </div>
-      <div class="status" id="st3"></div>
-      <div class="form">
-        <div class="field">
-          <span class="field-label">Brand Name</span>
-          <div class="input-wrap"><span class="input-icon">🏷️</span><input id="fbrand" type="text" placeholder="e.g., Mountain Adventures" autocomplete="organization"/></div>
-        </div>
-        <div class="field">
-          <span class="field-label">Bio</span>
-          <div class="input-wrap" style="align-items:flex-start;padding:.75rem .9rem;"><textarea id="fbio" rows="3" placeholder="Tell customers what you do..." style="flex:1;border:0;outline:0;background:transparent;color:#0a0f1e;font-size:.9rem;font-family:inherit;resize:none;"></textarea></div>
-        </div>
-        <div class="field">
-          <span class="field-label">City</span>
-          <div class="input-wrap"><span class="input-icon">📍</span><input id="fcity" type="text" placeholder="e.g., Mumbai" autocomplete="address-level2"/></div>
-        </div>
-        <button class="submit-btn" type="button" onclick="createBrandPage()">Create brand page →</button>
-      </div>
-      <div id="verifyNotice" class="card-footer" style="display:none;"></div>
     </div>
 
 <script>
@@ -171,23 +144,10 @@ document.getElementById('leftCatName').textContent=CAT_NAMES[CAT]||'your events'
 document.getElementById('cardPill').textContent=label;
 
 function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=msg;el.dataset.k=k||'';}
-window.emailVerified=false;
-window.verifiedEmailUser=null;
-document.getElementById('femail').addEventListener('input',function(){
-  if(window.emailVerified){window.emailVerified=false;window.verifiedEmailUser=null;document.getElementById('emailOtpArea').style.display='none';setStatus('Email changed. Verify it again with the email code.','warning','st1');}
-});
-
-function continueToBrand(){
-  var email=document.getElementById('femail').value.trim().toLowerCase();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setStatus('Enter a valid email address.','warning','st1');return;}
-  if(!window.emailVerified||window.verifiedEmailUser?.email?.toLowerCase()!==email){setStatus('Verify your email using the code we sent before continuing.','warning','st1');return;}
-  document.getElementById('step1').style.display='none';
-  document.getElementById('step3').style.display='';
-}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="module">
-import{auth,db,updateProfile,doc,setDoc,serverTimestamp}from'./firebase.js?v=email-otp-20261004';
+import{auth,db,doc,setDoc,serverTimestamp}from'./firebase.js?v=email-otp-20261004';
 import{createUserWithEmailAndPassword}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const EMAILJS_SERVICE_ID='service_esppdwf';
@@ -195,6 +155,10 @@ const EMAILJS_PUBLIC_KEY='PDb2vpOIeLkbZBBFP';
 const EMAILJS_OTP_TEMPLATE_ID='template_8ho2pwf';
 emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
 let otpRequestedEmail='',generatedEmailOtp='';
+document.getElementById('femail').addEventListener('input',function(){
+  const email=this.value.trim().toLowerCase();
+  if(otpRequestedEmail&&otpRequestedEmail!==email){otpRequestedEmail='';generatedEmailOtp='';document.getElementById('emailOtpArea').style.display='none';setStatus('Email changed. Request a new verification code.','warning','st1');}
+});
 document.getElementById('sendEmailOtp').addEventListener('click',async function(){
   const email=document.getElementById('femail').value.trim().toLowerCase();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setStatus('Enter a valid email address first.','warning','st1');return;}
@@ -223,10 +187,22 @@ document.getElementById('verifyEmailOtp').addEventListener('click',async functio
   try{
     const starterPassword=crypto.randomUUID()+crypto.randomUUID()+'Aa1!';
     const credential=await createUserWithEmailAndPassword(auth,email,starterPassword);
-    window.verifiedEmailUser=credential.user;
-    window.emailVerified=true;
+    await setDoc(doc(db,'users',credential.user.uid),{
+      name:email.split('@')[0],
+      email,
+      phone:'',
+      whatsapp:'',
+      role:'lister',
+      emailVerificationRequired:false,
+      emailVerifiedByOtp:true,
+      category:CAT,
+      dashboard:DASH,
+      createdAt:serverTimestamp()
+    });
     generatedEmailOtp='';
-    setStatus('Email verified.','success','st1');
+    try{sessionStorage.removeItem('cw_lister_cat');sessionStorage.removeItem('cw_lister_dash');sessionStorage.removeItem('cw_lister_role');}catch(e){}
+    setStatus('Email verified. Opening vendor onboarding…','success','st1');
+    window.location.assign('vendor-onboarding.html');
   }
   catch(error){
     const message=error.code==='auth/email-already-in-use'?'An account already uses this email. Please log in instead.':error.message||'Could not verify the code. Please try again.';
@@ -234,57 +210,6 @@ document.getElementById('verifyEmailOtp').addEventListener('click',async functio
   }
   finally{button.disabled=false;button.textContent='Verify';}
 });
-
-window.createBrandPage=async function(){
-  var brand=document.getElementById('fbrand').value.trim();
-  var bio=document.getElementById('fbio').value.trim();
-  var city=document.getElementById('fcity').value.trim();
-  if(!brand){setStatus('Enter your brand name.','warning','st3');return;}
-  if(!bio){setStatus('Enter a bio for your brand.','warning','st3');return;}
-  if(!city){setStatus('Enter your city.','warning','st3');return;}
-  var email=document.getElementById('femail').value.trim().toLowerCase();
-  if(!window.emailVerified||!window.verifiedEmailUser||window.verifiedEmailUser.email?.toLowerCase()!==email){setStatus('Go back and verify your email first.','warning','st3');return;}
-  setStatus('Creating your account…','info','st3');
-  try{
-    var user=window.verifiedEmailUser;
-    await updateProfile(user,{displayName:brand});
-    await setDoc(doc(db,'users',user.uid),{
-      name:brand,
-      email,
-      phone:'',
-      whatsapp:'',
-      role:'lister',
-      emailVerificationRequired:false,
-      category:CAT,
-      dashboard:DASH,
-      brandName:brand,
-      bio,
-      city,
-      createdAt:serverTimestamp()
-    });
-    await setDoc(doc(db,'organisers',user.uid),{
-      name:brand,
-      bio,
-      city,
-      category:CAT,
-      dashboard:DASH,
-      phone:'',
-      whatsapp:'',
-      ownerName:brand,
-      ownerEmail:email,
-      followers:0,
-      verified:false,
-      createdAt:serverTimestamp()
-    });
-    try{sessionStorage.removeItem('cw_lister_cat');sessionStorage.removeItem('cw_lister_dash');sessionStorage.removeItem('cw_lister_role');}catch(e){}
-    setStatus('Account created. Opening vendor onboarding…','success','st3');
-    window.location.assign('vendor-onboarding.html');
-  }catch(e){
-    var msg=e.code==='auth/credential-already-in-use'?'This mobile number is already connected to an account. Please log in.':e.message;
-    document.getElementById('st3').innerHTML=msg;
-    document.getElementById('st3').dataset.k='warning';
-  }
-};
 </script>
 </body>
 </html>
