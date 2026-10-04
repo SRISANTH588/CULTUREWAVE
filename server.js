@@ -2,7 +2,7 @@ import http from "node:http";
 import { readFile, access } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createHmac, randomUUID } from "node:crypto";
+import { createHmac, randomUUID, randomBytes, randomInt, createHash, timingSafeEqual } from "node:crypto";
 import * as admin from "firebase-admin";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
@@ -107,11 +107,17 @@ function send(res, statusCode, payload, headers = {}) {
   res.end(isJson ? JSON.stringify(payload) : payload);
 }
 
-function readBody(req) {
+function readBody(req, maxBytes = 20 * 1024 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on("data", (chunk) => chunks.push(chunk));
+    let size = 0;
+    req.on("data", chunk => {
+      size += chunk.length;
+      if (size > maxBytes) return;
+      chunks.push(chunk);
+    });
     req.on("end", () => {
+      if (size > maxBytes) return reject(Object.assign(new Error("Request is too large."), { statusCode: 413 }));
       const raw = Buffer.concat(chunks).toString("utf8");
       if (!raw) return resolve({});
       try {
@@ -122,6 +128,43 @@ function readBody(req) {
     });
     req.on("error", reject);
   });
+}
+
+const sha256 = value => createHash("sha256").update(String(value)).digest("hex");
+const onboardingClean = (value, max = 5000) => String(value ?? "").trim().slice(0, max);
+const onboardingCorsOrigins = new Set([
+  "https://culturewave.in", "https://www.culturewave.in",
+  "http://localhost:3000", "http://localhost:5500", "http://127.0.0.1:3000", "http://127.0.0.1:5500",
+]);
+function prepareOnboardingCors(req, res) {
+  const origin = req.headers.origin || "";
+  const configuredOrigin = process.env.APP_BASE_URL || "";
+  let sameOrigin = false;
+  try { sameOrigin = Boolean(origin && new URL(origin).host === req.headers.host); } catch {}
+  if (origin && !sameOrigin && origin !== configuredOrigin && !onboardingCorsOrigins.has(origin)) return false;
+  if (origin) res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Max-Age", "3600");
+  return true;
+}
+function onboardingEmailConfig() {
+  const serviceId = process.env.EMAILJS_SERVICE_ID || "service_esppdwf";
+  const publicKey = process.env.EMAILJS_PUBLIC_KEY || "PDb2vpOIeLkbZBBFP";
+  const templateId = process.env.EMAILJS_ONBOARDING_OTP_TEMPLATE_ID || "template_8ho2pwf";
+  const pepper = process.env.ONBOARDING_OTP_PEPPER || process.env.SESSION_SECRET || "";
+  if (!pepper || pepper.length < 32) throw new Error("Configure ONBOARDING_OTP_PEPPER with a random secret of at least 32 characters.");
+  return { serviceId, publicKey, templateId, pepper };
+}
+async function sendOnboardingOtpEmail(email, code) {
+  const { serviceId, publicKey, templateId } = onboardingEmailConfig();
+  const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ service_id: serviceId, template_id: templateId, user_id: publicKey,
+      template_params: { to_email: email, to_name: "New Lister", otp_code: code, reply_to: "support.culturewave@gmail.com" } }),
+  });
+  if (!response.ok) throw new Error(`EmailJS could not send the verification code (${response.status}).`);
 }
 
 function parseCookies(cookieHeader = "") {
@@ -241,6 +284,115 @@ function verifyRazorpaySignature(orderId, paymentId, signature, secret) {
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
+
+  if (url.pathname.startsWith("/api/onboarding/")) {
+    if (!prepareOnboardingCors(req, res)) return send(res, 403, { error: "This website is not allowed to use the onboarding API." });
+    if (req.method === "OPTIONS") { res.writeHead(204); return res.end(); }
+    if (req.method !== "POST") return send(res, 405, { error: "Use POST." });
+
+    try {
+      if (req.method === "GET") return send(res, 200, { ok: true, service: "onboarding" });
+
+      if (url.pathname === "/api/onboarding/send-otp") {
+        const body = await readBody(req, 16 * 1024);
+        const email = onboardingClean(body.email, 180).toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return send(res, 400, { error: "Enter a valid email address." });
+        const { pepper } = onboardingEmailConfig();
+        const db = admin.firestore(), now = Date.now();
+        const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim();
+        const rateRef = db.collection("onboardingRateLimits").doc(sha256(ip));
+        await db.runTransaction(async tx => {
+          const snap = await tx.get(rateRef), data = snap.exists ? snap.data() : {};
+          const start = data.windowStart?.toMillis?.() || 0;
+          if (start && now - start < 60 * 60_000 && data.count >= 8) throw Object.assign(new Error("Too many verification emails. Please try again later."), { statusCode: 429 });
+          const fresh = !start || now - start >= 60 * 60_000;
+          tx.set(rateRef, { windowStart: fresh ? new Date(now) : data.windowStart, count: fresh ? 1 : (data.count || 0) + 1 });
+        });
+        const otpRef = db.collection("onboardingOtp").doc(sha256(email));
+        const old = await otpRef.get();
+        const lastSent = old.exists ? (old.data().lastSentAt?.toMillis?.() || 0) : 0;
+        if (lastSent && now - lastSent < 60_000) return send(res, 429, { error: "Wait one minute before requesting another code." });
+        const code = String(randomInt(100000, 1000000));
+        await otpRef.set({ email, codeHash: sha256(`${pepper}:${code}`), expiresAt: new Date(now + 10 * 60_000), attempts: 0, lastSentAt: new Date(now) });
+        try { await sendOnboardingOtpEmail(email, code); }
+        catch (error) { await otpRef.delete(); throw error; }
+        return send(res, 200, { ok: true });
+      }
+
+      if (url.pathname === "/api/onboarding/verify-otp") {
+        const body = await readBody(req, 16 * 1024);
+        const email = onboardingClean(body.email, 180).toLowerCase(), code = onboardingClean(body.code, 6);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(code)) return send(res, 400, { error: "Enter your email and the 6-digit code." });
+        const { pepper } = onboardingEmailConfig(), db = admin.firestore();
+        const otpRef = db.collection("onboardingOtp").doc(sha256(email)), snap = await otpRef.get();
+        if (!snap.exists) return send(res, 400, { error: "Request a new verification code." });
+        const data = snap.data(), expiresAt = data.expiresAt?.toMillis?.() || new Date(data.expiresAt).getTime();
+        if (expiresAt < Date.now()) { await otpRef.delete(); return send(res, 400, { error: "That code expired. Request a new one." }); }
+        if ((data.attempts || 0) >= 5) { await otpRef.delete(); return send(res, 429, { error: "Too many attempts. Request a new code." }); }
+        const submitted = Buffer.from(sha256(`${pepper}:${code}`)), expected = Buffer.from(String(data.codeHash || ""));
+        if (submitted.length !== expected.length || !timingSafeEqual(submitted, expected)) {
+          await otpRef.update({ attempts: admin.firestore.FieldValue.increment(1) });
+          return send(res, 400, { error: "That code is incorrect." });
+        }
+        await otpRef.delete();
+        const sessionToken = randomBytes(32).toString("base64url");
+        await db.collection("onboardingSessions").doc(sha256(sessionToken)).set({ email, createdAt: admin.firestore.FieldValue.serverTimestamp(), expiresAt: new Date(Date.now() + 24 * 60 * 60_000), used: false });
+        return send(res, 200, { ok: true, sessionToken });
+      }
+
+      if (url.pathname === "/api/onboarding/submit-application") {
+        const body = await readBody(req, 20 * 1024 * 1024), db = admin.firestore();
+        const sessionToken = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+        if (sessionToken.length < 40) return send(res, 401, { error: "Your signup verification expired. Verify your email once at signup and try again." });
+        const sessionRef = db.collection("onboardingSessions").doc(sha256(sessionToken)), sessionSnap = await sessionRef.get();
+        if (!sessionSnap.exists) return send(res, 401, { error: "Your signup verification expired. Verify your email once at signup and try again." });
+        const session = sessionSnap.data(), expiresAt = session.expiresAt?.toMillis?.() || new Date(session.expiresAt).getTime();
+        if (session.used || expiresAt < Date.now()) return send(res, 401, { error: "Your signup verification expired. Verify your email once at signup and try again." });
+        const p = body.application || {};
+        if (onboardingClean(p.contact?.email, 180).toLowerCase() !== session.email) return send(res, 400, { error: "Use the same email address you verified at signup." });
+        const required = [onboardingClean(p.contact?.name, 120), onboardingClean(p.vendor?.registeredName, 180), onboardingClean(p.contact?.phone, 32), onboardingClean(p.vendor?.businessType, 80), onboardingClean(p.vendor?.category, 100), onboardingClean(p.address?.line1, 600), onboardingClean(p.address?.city, 80), onboardingClean(p.address?.state, 80), onboardingClean(p.address?.pincode, 6), onboardingClean(p.bank?.accountNumber, 30), onboardingClean(p.bank?.ifsc, 11), onboardingClean(p.bank?.beneficiaryName, 140), onboardingClean(p.bank?.accountType, 20)];
+        if (required.some(value => !value)) return send(res, 400, { error: "Complete all required vendor, address, tax, contact, and bank details." });
+        if (!/^\d{6}$/.test(onboardingClean(p.address?.pincode, 6))) return send(res, 400, { error: "Enter a valid 6-digit pincode." });
+        if (typeof p.vendor?.hasGst !== "boolean" || !["yes", "no"].includes(p.vendor?.itrFiledResponse)) return send(res, 400, { error: "Provide your GST and ITR answers." });
+        if (p.vendor.hasGst && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(onboardingClean(p.vendor.gstin, 15).toUpperCase())) return send(res, 400, { error: "Enter a valid GSTIN or select No GSTIN." });
+        if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(onboardingClean(p.identity?.pan, 10).toUpperCase()) || !/^\d{12}$/.test(onboardingClean(p.identity?.aadhaar, 12))) return send(res, 400, { error: "Enter valid PAN and Aadhaar numbers." });
+        if (!/^[0-9]{9,24}$/.test(onboardingClean(p.bank?.accountNumber, 30)) || !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(onboardingClean(p.bank?.ifsc, 11).toUpperCase())) return send(res, 400, { error: "Enter a valid bank account number and IFSC." });
+        if (!p.consent) return send(res, 400, { error: "Please accept the onboarding consent." });
+        const files = Array.isArray(body.files) ? body.files : [];
+        for (const kind of ["pan", "aadhaar"]) if (!files.some(file => file.kind === kind)) return send(res, 400, { error: `Upload the ${kind.toUpperCase()} document.` });
+        if (files.length > 12) return send(res, 400, { error: "You can upload up to 12 documents." });
+        const validatedFiles = [];
+        for (const file of files) {
+          const mime = onboardingClean(file.mime, 50), data = String(file.dataUrl || "");
+          if (!["image/png", "image/jpeg"].includes(mime) || !/^data:image\/(png|jpeg);base64,/.test(data)) return send(res, 400, { error: "Documents must be PNG or JPEG images." });
+          const bytes = Buffer.from(data.split(",")[1] || "", "base64");
+          if (!bytes.length || bytes.length > 1024 * 1024) return send(res, 400, { error: "Each document must be 1 MB or smaller." });
+          const validPng = bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+          const validJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+          if ((mime === "image/png" && !validPng) || (mime === "image/jpeg" && !validJpeg)) return send(res, 400, { error: "An uploaded image has an invalid file format." });
+          validatedFiles.push({ file, mime, bytes });
+        }
+        const now = new Date(), counterRef = db.collection("onboardingCounters").doc(String(now.getUTCFullYear()));
+        const applicationId = await db.runTransaction(async tx => { const snap = await tx.get(counterRef); const next = (snap.exists ? snap.data().last : 0) + 1; tx.set(counterRef, { last: next }); return `ONB-${now.getUTCFullYear()}-${String(next).padStart(6, "0")}`; });
+        const bucket = admin.storage().bucket(), stored = [];
+        for (const { file, mime, bytes } of validatedFiles) {
+          const name = onboardingClean(file.name, 120), type = onboardingClean(file.kind, 80), path = `vendor-onboarding/${applicationId}/${randomBytes(18).toString("hex")}`;
+          await bucket.file(path).save(bytes, { metadata: { contentType: mime, metadata: { applicationId, documentType: type, originalName: name } } });
+          stored.push({ type, name, path, contentType: mime, size: bytes.length, uploadedAt: now.toISOString() });
+        }
+        const application = { applicationId, email: session.email, name: onboardingClean(p.contact?.name, 120), contact: p.contact || {}, vendor: p.vendor || {}, business: p.business || {}, address: p.address || {}, listing: {}, bank: p.bank || {}, identity: { pan: onboardingClean(p.identity?.pan, 10).toUpperCase(), aadhaar: onboardingClean(p.identity?.aadhaar, 12) }, documents: stored, status: "NEW", agreementStatus: "NOT_SENT", submittedAt: admin.firestore.FieldValue.serverTimestamp(), createdAt: admin.firestore.FieldValue.serverTimestamp(), updatedAt: admin.firestore.FieldValue.serverTimestamp(), consentAt: admin.firestore.FieldValue.serverTimestamp(), userId: null };
+        await db.collection("vendorOnboarding").doc(applicationId).set(application);
+        await sessionRef.update({ used: true, applicationId });
+        await db.collection("onboardingActivity").add({ applicationId, action: "Application Submitted", performedBy: "applicant", metadata: {}, timestamp: admin.firestore.FieldValue.serverTimestamp() });
+        return send(res, 200, { applicationId, status: "NEW" });
+      }
+
+      return send(res, 404, { error: "Onboarding endpoint not found." });
+    } catch (error) {
+      console.error("Lister onboarding API error:", error);
+      return send(res, error.statusCode || 500, { error: error.message || "Onboarding request failed." });
+    }
+  }
 
   if (req.method === "POST" && url.pathname === "/api/auth/verify") {
     try {
@@ -991,6 +1143,9 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
   if (req.method === "GET" && url.pathname === "/api") {
     return send(res, 200, {
       endpoints: [
+        "POST /api/onboarding/send-otp",
+        "POST /api/onboarding/verify-otp",
+        "POST /api/onboarding/submit-application",
         "POST /api/auth/verify",
         "GET /api/auth/me",
         "POST /api/auth/logout",
@@ -1049,6 +1204,7 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
   return send(res, 404, "Not found");
 });
 
-server.listen(3000, "127.0.0.1", () => {
-  console.log("CultureWave running on http://127.0.0.1:3000");
+const port = Number(process.env.PORT || 3000);
+server.listen(port, "0.0.0.0", () => {
+  console.log(`CultureWave running on port ${port}`);
 });
