@@ -2,7 +2,7 @@ export const CULTUREWAVE_AGREEMENT = `EVENT LISTING AND COLLABORATION AGREEMENT
 
 This Event Listing and Collaboration Agreement ("Agreement") is entered into between CultureWave India ("CultureWave") and the merchant/lister identified by the registered name, registered address and authorized signatory in the Merchant Details and Signature section below, on the Effective Date recorded when the Merchant digitally signs this Agreement.
 
-1. Capitalized terms used but not defined in this Agreement have the meanings assigned to them in the CultureWave Terms and Conditions available at https://culturewave.in/terms-and-conditions.html ("Merchant Terms").
+1. Capitalized terms used but not defined in this Agreement have the meanings assigned to them in the CultureWave Vendor Terms and Conditions available at https://culturewave.in/vendor-terms-and-conditions.html ("Merchant Terms").
 
 2. CultureWave operates an online platform ("Platform") that enables transactions between merchants and buyers, including purchases of tickets for events hosted by Merchants and listed on CultureWave. The Merchant wishes to use CultureWave's event listing and ticketing services subject to the Merchant Terms and this Agreement. Details of the event (the "Event") and other deliverables are set out in Annexure A.
 

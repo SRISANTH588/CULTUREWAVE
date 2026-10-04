@@ -75,7 +75,7 @@
             <div class="field full"><label for="aadhaarFile">Upload Aadhaar <span class="req">*</span></label><div class="filebox"><div class="upload-title"><span>↑</span> Aadhaar image</div><input id="aadhaarFile" type="file" accept="image/png,image/jpeg" required><div class="hint">PNG, JPG or JPEG · up to 1 MB</div></div></div>
             <div class="form-section"><span class="section-icon">＋</span><div><strong>Supporting documents</strong><small>Add any other documents that support your application</small></div></div>
             <div class="field full"><label>Additional documents</label><div class="hint" style="margin:0 0 8px">PNG, JPG or JPEG · up to 1 MB each.</div><div id="additionalDocs"></div><button class="button secondary" type="button" id="addDocument" style="margin-top:10px">＋ Add a document</button></div>
-            <div class="field full"><label class="checkbox"><input id="consent" type="checkbox" required><span>I confirm that the information is accurate and consent to CultureWave using it for vendor onboarding and verification.</span></label></div>
+            <div class="field full"><label class="checkbox"><input id="consent" type="checkbox" required><span>I confirm that my application information is accurate, agree to the CultureWave Vendor Terms and Conditions, and consent to CultureWave using my information for vendor onboarding and verification.</span></label><div class="hint"><a href="vendor-terms-and-conditions.html" target="_blank" rel="noopener">Read the Vendor Terms and Conditions</a> · <a href="privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a></div></div>
           </div>
           <div id="submitNotice" class="notice"></div><div class="security-note"><span aria-hidden="true">◆</span> <b>Private information stays protected</b> and is used for vendor review</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px"><button class="button secondary" type="button" id="backStep">← Back</button><button class="button" type="button" id="submitApplication" style="flex:1">Submit for review</button></div>
@@ -86,7 +86,7 @@
     <section class="card success" id="successCard" style="display:none"><div class="success-icon">✓</div><h2>Application submitted</h2><p>Your vendor onboarding application has been submitted. Our team will review it and contact you about the agreement and next steps.</p><span class="status-pill">Pending admin review</span><p>Application ID: <strong id="submittedApplicationId"></strong></p></section>
     <div id="existingApplication" class="card" style="display:none;text-align:center;max-width:620px;margin:auto"><h2>Application already received</h2><p class="sub" style="margin:10px 0 15px">We already have a vendor application for this account. Contact CultureWave if you need to update your details.</p><span id="existingStatus" class="status-pill"></span></div>
   </main>
-  <footer class="page-footer"><span>© CultureWave <b>· Vendor onboarding</b></span><span><a href="vendor-onboarding-help.html">Vendor onboarding help</a> · <b>Contact the CultureWave team</b></span></footer>
+  <footer class="page-footer"><span>© CultureWave <b>· Vendor onboarding</b></span><span><a href="vendor-terms-and-conditions.html">Vendor Terms</a> · <a href="vendor-onboarding-help.html">Vendor onboarding help</a> · <b>Contact the CultureWave team</b></span></footer>
   <script type="module">
     import {db,auth} from './firebase.js';
     import {signInAnonymously,deleteUser,signOut} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
