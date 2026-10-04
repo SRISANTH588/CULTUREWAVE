@@ -69,6 +69,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .input-icon{font-size:.95rem;flex:none;}
 .wa-pre{font-size:.8rem;color:#6b7280;padding-right:.25rem;}
 .eye{color:#94a3b8;font-size:.82rem;padding:0;line-height:1;}
+#phoneRecaptcha:empty{display:none;}
+#phoneRecaptcha:not(:empty){display:flex;justify-content:center;min-height:78px;margin:.25rem 0 .4rem;}
 .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(18,66,197,.15),transparent);margin:.1rem 0 .4rem;}
 
 .submit-btn{width:100%;min-height:50px;border-radius:13px;background:linear-gradient(135deg,#2f6bff,#1242c5);color:#fff;font-size:.92rem;font-weight:800;box-shadow:0 8px 24px rgba(18,66,197,.3);transition:transform .15s,box-shadow .15s;letter-spacing:-.01em;}
@@ -210,7 +212,8 @@ document.getElementById('sendPhoneOtp').addEventListener('click',async function(
   const button=this;button.disabled=true;button.textContent='Sending…';
   try{
     if(phoneRecaptcha){try{phoneRecaptcha.clear();}catch(e){}}
-    phoneRecaptcha=new RecaptchaVerifier(auth,'phoneRecaptcha',{size:'invisible'});
+    phoneRecaptcha=new RecaptchaVerifier(auth,'phoneRecaptcha',{size:'normal'});
+    setStatus('Complete the security check to request your SMS code.','info','st1');
     phoneConfirmation=await signInWithPhoneNumber(auth,'+91'+phone,phoneRecaptcha);
     document.getElementById('phoneOtpArea').style.display='flex';
     setStatus('OTP sent by SMS. Enter the 6-digit code.','success','st1');
