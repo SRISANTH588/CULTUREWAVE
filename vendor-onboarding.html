@@ -33,10 +33,11 @@
             <div class="field"><label for="vendorName">Registered vendor name <span class="req">*</span></label><input class="control" id="vendorName" required maxlength="140" autocomplete="organization"></div>
             <div class="field"><label for="businessType">Business type <span class="req">*</span></label><select class="control" id="businessType" required><option value="">Select business type</option><option>Sole proprietor</option><option>Partnership</option><option>Private limited company</option><option>LLP</option><option>Trust / Society</option><option>Individual / Not registered</option><option>Other</option></select></div>
             <div class="field"><label for="category">Business category <span class="req">*</span></label><select class="control" id="category" required><option value="">Select category</option><option>Nightlife</option><option>Dining</option><option>Live music</option><option>Workshops</option><option>Experiences</option><option>Other</option></select></div>
-            <div class="field"><label for="city">City <span class="req">*</span></label><input class="control" id="city" required maxlength="80" autocomplete="address-level2"></div>
+            <div class="field"><label for="city">City <span class="req">*</span></label><input class="control" id="city" required maxlength="80" autocomplete="address-level2" list="citySuggestions" placeholder="Type a city name"><datalist id="citySuggestions"></datalist><div class="hint" id="cityLookupHint">Start typing to find your city and state.</div></div>
+            <div class="field"><label for="postalArea">Area / Post office</label><select class="control" id="postalArea" disabled><option value="">Choose city first</option></select><div class="hint">Select your area to fill the matching pincode.</div></div>
             <div class="field full"><label for="address">Registered address <span class="req">*</span></label><textarea class="control" id="address" required maxlength="600" aria-describedby="addressCount"></textarea><div class="hint" id="addressCount">0 / 600</div></div>
             <div class="field"><label for="state">State <span class="req">*</span></label><input class="control" id="state" required maxlength="80" autocomplete="address-level1"></div>
-            <div class="field"><label for="pincode">Pincode <span class="req">*</span></label><input class="control" id="pincode" required inputmode="numeric" maxlength="10" autocomplete="postal-code"></div>
+            <div class="field"><label for="pincode">Pincode <span class="req">*</span></label><input class="control" id="pincode" required inputmode="numeric" maxlength="6" autocomplete="postal-code" pattern="[0-9]{6}" title="Enter a valid 6-digit Indian pincode"></div>
             <div class="field"><label for="altPhone">Alternate phone</label><input class="control" id="altPhone" type="tel" maxlength="32" autocomplete="tel"></div>
             <div class="field"><label for="years">Years in operation</label><input class="control" id="years" type="number" min="0" max="150"></div>
             <div class="field full"><label for="businessDescription">Business description</label><textarea class="control" id="businessDescription" maxlength="1500"></textarea></div>
@@ -110,6 +111,38 @@
     function notice(id,message,type='error'){const e=$(id);e.textContent=message;e.className='notice show '+type;}
     function clearNotice(id){const e=$(id);e.textContent='';e.className='notice';}
     function setBusy(button,busy,text){button.disabled=busy;if(busy)button.dataset.old=text||button.textContent;button.textContent=busy?'Please wait…':(button.dataset.old||text||button.textContent);}
+    const cityInput=$('city'),stateInput=$('state'),pinInput=$('pincode'),areaSelect=$('postalArea'),cityHints=$('citySuggestions'),cityHint=$('cityLookupHint');
+    let cityTimer,pinTimer,cityLookupId=0,pinLookupId=0;
+    const postalApi='https://api.postalpincode.in';
+    function setAreaOptions(offices){
+      const unique=new Map();
+      offices.forEach(po=>{const pin=String(po.Pincode||'');if(!/^\d{6}$/.test(pin))return;const label=`${po.Name||po.District||'Post office'} · ${pin}`;unique.set(`${label}|${po.State}`,{label,pin,state:po.State||'',name:po.Name||''})});
+      areaSelect.innerHTML='<option value="">Select your area / post office</option>';
+      for(const item of unique.values()){const option=document.createElement('option');option.value=`${item.pin}|${item.state}|${item.name}`;option.textContent=item.label;areaSelect.append(option)}
+      areaSelect.disabled=unique.size===0;
+      const pins=[...new Set([...unique.values()].map(item=>item.pin))];
+      if(pins.length===1){pinInput.value=pins[0];if(unique.size===1){areaSelect.selectedIndex=1;stateInput.value=[...unique.values()][0].state}}
+    }
+    async function fetchPostal(path){const response=await fetch(`${postalApi}/${path}`);if(!response.ok)throw new Error('Postal lookup unavailable');const rows=await response.json();const result=Array.isArray(rows)?rows[0]:null;if(!result||result.Status!=='Success'||!Array.isArray(result.PostOffice))return [];return result.PostOffice}
+    async function lookupCity(query){
+      const requestId=++cityLookupId,term=query.trim();
+      if(term.length<3){cityHints.replaceChildren();areaSelect.innerHTML='<option value="">Type at least 3 letters of your city</option>';areaSelect.disabled=true;cityHint.textContent='Type at least 3 letters to look up city, state and pincodes.';return}
+      cityHint.textContent='Finding matching cities and post offices…';
+      try{
+        const offices=await fetchPostal(`postoffice/${encodeURIComponent(term)}`);if(requestId!==cityLookupId)return;
+        const cities=new Map();offices.forEach(po=>{if(po.District&&po.State)cities.set(`${po.District}|${po.State}`,{city:po.District,state:po.State})});
+        cityHints.replaceChildren();for(const item of [...cities.values()].slice(0,80)){const option=document.createElement('option');option.value=item.city;option.label=item.state;cityHints.append(option)}
+        const exact=offices.filter(po=>String(po.District||'').toLowerCase()===term.toLowerCase());
+        const matches=exact.length?exact:offices.filter(po=>String(po.District||'').toLowerCase().includes(term.toLowerCase()));
+        const states=[...new Set(matches.map(po=>po.State).filter(Boolean))];
+        if(states.length===1){stateInput.value=states[0];setAreaOptions(matches);cityHint.textContent=matches.length?'State filled automatically. Select your area to fill the matching pincode.':'State found; enter the pincode if it is not listed.'}
+        else if(states.length>1){setAreaOptions(matches);cityHint.textContent='More than one matching state found. Choose the correct area to fill the state and pincode.'}
+        else{setAreaOptions(offices);cityHint.textContent=offices.length?'Choose the matching post office below to fill state and pincode.':'No matching city found. Enter state and pincode manually.'}
+      }catch(error){if(requestId!==cityLookupId)return;areaSelect.innerHTML='<option value="">Postal lookup unavailable — enter state and pincode manually</option>';areaSelect.disabled=true;cityHint.textContent='Could not load postal details. You can enter state and pincode manually.';console.warn('India postal lookup failed:',error)}
+    }
+    cityInput.addEventListener('input',()=>{clearTimeout(cityTimer);stateInput.value='';pinInput.value='';cityTimer=setTimeout(()=>lookupCity(cityInput.value),350)});
+    areaSelect.addEventListener('change',()=>{const [pin,state]=areaSelect.value.split('|');if(pin&&state){pinInput.value=pin;stateInput.value=state}});
+    pinInput.addEventListener('input',()=>{pinInput.value=pinInput.value.replace(/\D/g,'').slice(0,6);clearTimeout(pinTimer);if(pinInput.value.length!==6)return;const requested=pinInput.value,id=++pinLookupId;pinTimer=setTimeout(async()=>{try{const offices=await fetchPostal(`pincode/${requested}`);if(id!==pinLookupId||pinInput.value!==requested||!offices.length)return;const po=offices[0];if(po.District)cityInput.value=po.District;if(po.State)stateInput.value=po.State;const matched=offices.find(item=>String(item.Pincode)===requested);if(matched){setAreaOptions([matched]);areaSelect.selectedIndex=1}cityHint.textContent='City and state filled from this 6-digit pincode.'}catch(error){console.warn('Pincode lookup failed:',error)}},350)});
     $('contactPhone').addEventListener('input',e=>{e.target.value=e.target.value.replace(/[^\d+\s()-]/g,'').slice(0,20)});
     $('address').addEventListener('input',e=>{$('addressCount').textContent=e.target.value.length+' / 600'});
     document.querySelectorAll('input[name="hasGst"]').forEach(x=>x.addEventListener('change',()=>{const show=document.querySelector('input[name="hasGst"]:checked')?.value==='yes';$('gstField').style.display=show?'block':'none';$('gstin').required=show;if(!show)$('gstin').value='';}));
