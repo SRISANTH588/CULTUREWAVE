@@ -183,7 +183,66 @@ service cloud.firestore {
     }
 
     match /vendorOnboarding/{applicationId} {
-      allow read, write: if isAdmin();
+      // Public listers may create a new application only through a short-lived
+      // anonymous Firebase identity. Applicant data and KYC images remain
+      // readable only by administrators; applicants cannot change submissions.
+      allow create: if request.auth != null &&
+        request.auth.token.firebase.sign_in_provider == 'anonymous' &&
+        request.resource.data.keys().hasOnly([
+          'applicationId', 'email', 'emailVerified', 'applicantUid', 'name', 'contact',
+          'vendor', 'business', 'address', 'listing', 'bank', 'identity', 'consent',
+          'documents', 'documentIds', 'status', 'agreementStatus', 'userId',
+          'submittedAt', 'createdAt', 'updatedAt', 'consentAt'
+        ]) &&
+        request.resource.data.applicationId == applicationId &&
+        request.resource.data.applicantUid == request.auth.uid &&
+        request.resource.data.emailVerified == true &&
+        request.resource.data.email is string && request.resource.data.email.size() <= 180 &&
+        request.resource.data.email == request.resource.data.contact.email &&
+        request.resource.data.name is string && request.resource.data.name.size() > 0 &&
+        request.resource.data.status == 'NEW' &&
+        request.resource.data.agreementStatus == 'NOT_SENT' &&
+        request.resource.data.userId == null && request.resource.data.consent == true &&
+        request.resource.data.documents is list && request.resource.data.documents.size() >= 2 && request.resource.data.documents.size() <= 12 &&
+        request.resource.data.documentIds is list && request.resource.data.documentIds.size() == request.resource.data.documents.size() &&
+        request.resource.data.submittedAt == request.time && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+
+      match /documents/{fileId} {
+        allow get, list: if isAdmin();
+        allow create: if request.auth != null &&
+          request.auth.token.firebase.sign_in_provider == 'anonymous' &&
+          request.resource.data.keys().hasOnly([
+            'applicationId', 'fileId', 'applicantUid', 'type', 'name',
+            'contentType', 'size', 'dataUrl', 'uploadedAt'
+          ]) &&
+          request.resource.data.applicationId == applicationId &&
+          request.resource.data.fileId == fileId &&
+          request.resource.data.applicantUid == request.auth.uid &&
+          request.resource.data.type in ['pan', 'aadhaar', 'Business registration', 'Address proof', 'Cancelled cheque', 'GST certificate', 'MSME / Udyam', 'Other'] &&
+          request.resource.data.contentType == 'image/jpeg' &&
+          request.resource.data.dataUrl is string && request.resource.data.dataUrl.size() <= 560000 &&
+          request.resource.data.dataUrl.matches('^data:image/jpeg;base64,.*') &&
+          request.resource.data.size is int && request.resource.data.size <= 450000 &&
+          request.resource.data.uploadedAt == request.time &&
+          getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.applicantUid == request.auth.uid &&
+          getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.documentIds.hasAny([fileId]);
+        allow update, delete: if isAdmin();
+      }
+
+      match /activity/{activityId} {
+        allow get, list: if isAdmin();
+        allow create: if request.auth != null &&
+          request.auth.token.firebase.sign_in_provider == 'anonymous' &&
+          request.resource.data.keys().hasOnly(['applicationId', 'action', 'performedBy', 'applicantUid', 'timestamp']) &&
+          request.resource.data.applicationId == applicationId &&
+          request.resource.data.action == 'Application Submitted' &&
+          request.resource.data.performedBy == 'applicant' &&
+          request.resource.data.applicantUid == request.auth.uid &&
+          request.resource.data.timestamp == request.time &&
+          getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.applicantUid == request.auth.uid;
+        allow update, delete: if isAdmin();
+      }
     }
     match /onboardingCounters/{counterId} {
       allow read, write: if false;
