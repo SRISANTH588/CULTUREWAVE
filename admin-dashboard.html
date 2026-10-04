@@ -1352,7 +1352,7 @@ import { app, auth, db, getCurrentUser, logout,
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[];
-let allVendorApplications=[];
+let allVendorApplications=[],activeVendorApplicationId=null;
 
 // ── HELPERS ──
 const esc = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -1366,8 +1366,8 @@ window.showToast = function(msg, type='') {
 };
 
 window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
-window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
-document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); if(id==='vendorAppModal') activeVendorApplicationId=null; };
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m){m.classList.remove('open');if(m.id==='vendorAppModal')activeVendorApplicationId=null;} }));
 
 function renderTicketRequests(requests) {
   const list = document.getElementById('ticketRequestList');
@@ -1421,13 +1421,16 @@ function renderNewListers(){
   if(!rows.length){tbody.innerHTML='<tr><td colspan="10" style="padding:1.4rem;color:var(--muted);">No matching applications.</td></tr>';return;}
   tbody.innerHTML=rows.map(a=>{
     const status=a.status||'NEW',badge=status==='APPROVED'?'green':status==='REJECTED'?'red':status==='SIGNED'?'blue':'orange';
-    return `<tr><td><strong>${esc(a.applicationId||a.id)}</strong></td><td><strong>${esc(a.name||a.contact?.name||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.email||a.contact?.email||'')}</div></td><td>${esc(a.vendor?.registeredName||'—')}</td><td>${esc(a.contact?.phone||'—')}</td><td>${esc(a.listing?.category||a.vendor?.category||'—')}</td><td>${fmtDate(a.submittedAt||a.createdAt)}</td><td><span class="badge ${badge}">${esc(status.replaceAll('_',' '))}</span></td><td>${esc(a.agreementStatus||'NOT SENT')}</td><td>${(a.documents||[]).length} file(s)</td><td><button class="btn sm primary" data-review-id="${esc(a.id)}">Open</button></td></tr>`;
+    const agreementCell=`<strong>${esc(a.agreementStatus||'NOT SENT')}</strong>${a.signedAgreement?.path?`<div><button class="btn sm vendor-doc-action" data-kind="preview" data-path="${esc(a.signedAgreement.path)}" data-application-id="${esc(a.id)}">Preview PDF</button></div>`:''}`;
+    return `<tr><td><strong>${esc(a.applicationId||a.id)}</strong></td><td><strong>${esc(a.name||a.contact?.name||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.email||a.contact?.email||'')}</div></td><td>${esc(a.vendor?.registeredName||'—')}</td><td>${esc(a.contact?.phone||'—')}</td><td>${esc(a.listing?.category||a.vendor?.category||'—')}</td><td>${fmtDate(a.submittedAt||a.createdAt)}</td><td><span class="badge ${badge}">${esc(status.replaceAll('_',' '))}</span></td><td>${agreementCell}</td><td>${(a.documents||[]).length} file(s)</td><td><button class="btn sm primary" data-review-id="${esc(a.id)}">Open</button></td></tr>`;
   }).join('');
   tbody.querySelectorAll('[data-review-id]').forEach(btn=>btn.addEventListener('click',()=>openVendorApplication(btn.dataset.reviewId)));
+  tbody.querySelectorAll('.vendor-doc-action').forEach(btn=>btn.addEventListener('click',()=>adminDocumentAction(btn.dataset.applicationId,btn.dataset.path,'SIGNED_VENDOR_AGREEMENT.pdf','preview')));
 }
 function detailSection(title,rows){return `<section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px;"><strong style="display:block;margin-bottom:.65rem;color:var(--blue);">${title}</strong><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.65rem;">${rows.map(([label,value])=>`<div><small style="display:block;color:var(--muted);margin-bottom:.2rem;">${label}</small><strong style="font-size:.82rem;overflow-wrap:anywhere;">${esc(value||'—')}</strong></div>`).join('')}</div></section>`;}
 window.openVendorApplication=function(id){
   const a=allVendorApplications.find(x=>x.id===id);if(!a)return;
+  activeVendorApplicationId=id;
   const docs=Array.isArray(a.documents)?a.documents:[];
   const docButtons=docs.map(file=>`<div style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--border);"><strong style="font-size:.8rem;min-width:150px">${esc(file.type)} · ${esc(file.name)}</strong><button type="button" class="btn sm vendor-doc-action" data-kind="preview" data-path="${esc(file.path)}">Preview</button><button type="button" class="btn sm vendor-doc-action" data-kind="download" data-path="${esc(file.path)}" data-name="${esc(file.name)}">Download</button></div>`).join('');
   const signed=a.signedAgreement?.path?`<div style="display:flex;gap:.45rem;flex-wrap:wrap;margin:.65rem 0"><b>Agreement: SIGNED</b><button class="btn sm vendor-doc-action" data-kind="preview" data-path="${esc(a.signedAgreement.path)}">View PDF</button><button class="btn sm vendor-doc-action" data-kind="download" data-path="${esc(a.signedAgreement.path)}" data-name="SIGNED_VENDOR_AGREEMENT.pdf">Download PDF</button><button class="btn sm vendor-doc-action" data-kind="share" data-path="${esc(a.signedAgreement.path)}">Share PDF</button></div>`:`<div style="margin:.65rem 0"><b>Agreement: ${esc(a.agreementStatus||'NOT SENT')}</b></div>`;
@@ -2068,10 +2071,13 @@ onSnapshot(query(collection(db,'users'),orderBy('createdAt','desc'),limit(200)),
 });
 
 onSnapshot(query(collection(db,'vendorOnboarding'),orderBy('submittedAt','desc'),limit(300)), snap => {
+  const previous=new Map(allVendorApplications.map(a=>[a.id,a]));
   allVendorApplications=snap.docs.map(d=>({id:d.id,...d.data()}));
   const pending=allVendorApplications.filter(a=>!['APPROVED','REJECTED'].includes(a.status)).length;
   document.getElementById('badgeNewListers').textContent=pending;
   renderNewListers();
+  const openId=activeVendorApplicationId,oldApp=previous.get(openId),newApp=allVendorApplications.find(a=>a.id===openId),openModals=document.querySelectorAll('.modal-overlay.open');
+  if(openId&&oldApp&&newApp&&openModals.length===1&&openModals[0].id==='vendorAppModal'&&(oldApp.status!==newApp.status||oldApp.agreementStatus!==newApp.agreementStatus||oldApp.signedAgreement?.path!==newApp.signedAgreement?.path))window.openVendorApplication(openId);
 }, error => {
   document.getElementById('newListersTable').innerHTML=`<tr><td colspan="10" style="padding:1.4rem;color:var(--red);">Could not load vendor applications: ${esc(error.message)}</td></tr>`;
 });

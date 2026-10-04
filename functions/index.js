@@ -320,11 +320,28 @@ exports.createAgreementRequest = endpoint(async (req,res,uid) => {
 exports.getSigningData = endpoint(async req => {
   const token=clean(req.body.token,200);if(token.length<40)throw new Error('Signing link is invalid.');
   const ref=db.collection('onboardingSigningTokens').doc(sha(token)), snap=await ref.get();
-  if(!snap.exists||snap.data().used||snap.data().expiresAt.toMillis()<Date.now())throw new Error('This signing link is expired or already used.');
+  if(!snap.exists||snap.data().expiresAt.toMillis()<Date.now())throw new Error('This signing link is expired.');
   const aSnap=await db.collection('vendorOnboarding').doc(snap.data().applicationId).get();if(!aSnap.exists)throw new Error('Application not found.');
-  if(aSnap.data().status==='SIGNUP_REQUEST_SENT')await aSnap.ref.update({status:'AWAITING_SIGNATURE',updatedAt:FieldValue.serverTimestamp()});
-  await writeActivity(aSnap.id,'Agreement Opened','applicant');
-  const a=aSnap.data();return {applicationId:a.applicationId,email:a.email,name:a.name,vendor:a.vendor,business:a.business,contact:a.contact,terms:a.agreementTerms};
+  const a=aSnap.data(),signed=a.status==='SIGNED'||a.agreementStatus==='SIGNED';
+  if(snap.data().used&&!signed)throw new Error('This signing link has already been used.');
+  if(!signed&&a.status==='SIGNUP_REQUEST_SENT')await aSnap.ref.update({status:'AWAITING_SIGNATURE',updatedAt:FieldValue.serverTimestamp()});
+  if(!signed)await writeActivity(aSnap.id,'Agreement Opened','applicant');
+  return {applicationId:a.applicationId,email:a.email,name:a.name,vendor:a.vendor,business:a.business,contact:a.contact,terms:a.agreementTerms,signed,signedAt:a.signedAgreement?.signedAt?.toDate?.()?.toISOString()||null};
+});
+
+// The one-time signing token remains read-only until its original seven-day expiry
+// so the signer can reopen the completed agreement. It can never sign a second time.
+exports.getSignedAgreement = endpoint(async req => {
+  const token=clean(req.body.token,200);if(token.length<40)throw new Error('Signing link is invalid.');
+  const tokenSnap=await db.collection('onboardingSigningTokens').doc(sha(token)).get();
+  if(!tokenSnap.exists||tokenSnap.data().expiresAt.toMillis()<Date.now())throw new Error('This agreement link has expired.');
+  const aSnap=await db.collection('vendorOnboarding').doc(tokenSnap.data().applicationId).get();
+  if(!aSnap.exists)throw new Error('Application not found.');
+  const a=aSnap.data();if(!tokenSnap.data().used||a.status!=='SIGNED'||a.agreementStatus!=='SIGNED'||!a.signedAgreement?.path)throw new Error('The agreement has not been signed yet.');
+  const file=bucket.file(a.signedAgreement.path),expires=Date.now()+10*60_000;
+  const [previewUrl]=await file.getSignedUrl({action:'read',expires,responseDisposition:'inline; filename="SIGNED_VENDOR_AGREEMENT.pdf"'});
+  const [downloadUrl]=await file.getSignedUrl({action:'read',expires,responseDisposition:'attachment; filename="SIGNED_VENDOR_AGREEMENT.pdf"'});
+  return {previewUrl,downloadUrl,signedAt:a.signedAgreement.signedAt?.toDate?.()?.toISOString()||null,signingReference:a.signedAgreement.signingReference};
 });
 
 exports.signAgreement = endpoint(async req => {
@@ -334,7 +351,11 @@ exports.signAgreement = endpoint(async req => {
   const tokenSnap=await tokenRef.get();if(!tokenSnap.exists||tokenSnap.data().used||tokenSnap.data().expiresAt.toMillis()<Date.now())throw new Error('This signing link is expired or already used.');
   if(!req.body.accepted)throw new Error('Accept the agreement terms to sign.');
   const id=tokenSnap.data().applicationId, ref=db.collection('vendorOnboarding').doc(id), snap=await ref.get();if(!snap.exists)throw new Error('Application not found.');
-  const a=snap.data(), signedAt=new Date().toISOString(), signingReference=randomBytes(12).toString('hex'), pdf=await PDFDocument.create();let page=pdf.addPage([612,792]);const font=await pdf.embedFont(StandardFonts.Helvetica), bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+  const a=snap.data();if(a.status==='SIGNED'||a.agreementStatus==='SIGNED'||a.signedAgreement?.path)throw new Error('This agreement has already been signed and is locked.');
+  const claim=await db.runTransaction(async tx=>{const latest=await tx.get(tokenRef);if(!latest.exists||latest.data().used||latest.data().expiresAt.toMillis()<Date.now())return false;const state=latest.data(),locked=state.signing&&(state.signingStartedAt?.toMillis?.()||Date.now())>Date.now()-5*60_000;if(locked)return false;tx.update(tokenRef,{signing:true,signingStartedAt:FieldValue.serverTimestamp()});return true;});
+  if(!claim)throw new Error('This agreement is already being signed or has already been signed. Refresh the page to view the signed copy.');
+  try {
+  const signedAt=new Date().toISOString(), signingReference=randomBytes(12).toString('hex'), pdf=await PDFDocument.create();let page=pdf.addPage([612,792]);const font=await pdf.embedFont(StandardFonts.Helvetica), bold=await pdf.embedFont(StandardFonts.HelveticaBold);
   const pdfText=value=>String(value||'').replace(/₹/g,'INR ').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').normalize('NFKD').replace(/[^\x20-\x7E]/g,'?');
   const draw=(text,x,y,size=10,f=font)=>page.drawText(pdfText(text).slice(0,180),{x,y,size,font:f,color:rgb(.12,.16,.23),maxWidth:510});
   draw('CULTUREWAVE VENDOR AGREEMENT',50,746,18,bold);draw(`Agreement version: ${a.agreementVersion||'v1'}`,50,728,9);draw(`Application ID: ${id}`,50,710,11,bold);draw(`Lister: ${a.name}`,50,691);draw(`Business: ${a.vendor?.registeredName||''}`,50,674);draw(`Email: ${a.email}`,50,657);draw(`Phone: ${a.contact?.phone||''}`,50,640);draw(`Business address: ${a.address?.line1||''}, ${a.address?.city||''}, ${a.address?.state||''}`,50,623,9);
@@ -343,7 +364,8 @@ exports.signAgreement = endpoint(async req => {
   draw(`Signed by ${a.name} on ${signedAt}`,275,80,9);draw(`Signing reference: ${signingReference}`,275,64,8);
   const path=`vendor-onboarding/${id}/SIGNED_VENDOR_AGREEMENT.pdf`, pdfBytes=await pdf.save();await bucket.file(path).save(Buffer.from(pdfBytes),{metadata:{contentType:'application/pdf',metadata:{applicationId:id,private:'true'}}});
   await ref.update({status:'SIGNED',agreementStatus:'SIGNED',signedAgreement:{path,name:'SIGNED_VENDOR_AGREEMENT.pdf',signedAt:FieldValue.serverTimestamp(),signingReference,agreementVersion:a.agreementVersion||'v1'},updatedAt:FieldValue.serverTimestamp()});
-  await tokenRef.update({used:true,usedAt:FieldValue.serverTimestamp()});await writeActivity(id,'Agreement Signed','applicant');await writeActivity(id,'PDF Generated','system');return {ok:true};
+  await tokenRef.update({used:true,signing:false,usedAt:FieldValue.serverTimestamp()});await writeActivity(id,'Agreement Signed','applicant');await writeActivity(id,'PDF Generated','system');return {ok:true};
+  } catch(error) { await tokenRef.update({signing:false}).catch(()=>{}); throw error; }
 });
 
 exports.adminOnboardingAction = endpoint(async (req,res,uid) => {

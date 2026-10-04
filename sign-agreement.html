@@ -1,11 +1,91 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>CultureWave | Vendor Agreement</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap" rel="stylesheet"><style>
-:root{--ink:#172033;--muted:#70798a;--gold:#a8793f;--line:#e8e3da}*{box-sizing:border-box}body{margin:0;background:#f7f5f1;color:var(--ink);font:15px "DM Sans",sans-serif}.top{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 max(5vw,20px);font:800 1.2rem Manrope,sans-serif}.top b{color:var(--gold)}main{width:min(860px,calc(100% - 28px));margin:40px auto}.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:clamp(22px,5vw,44px);box-shadow:0 20px 60px #30230f10}h1{font:800 clamp(1.65rem,4vw,2.35rem) Manrope,sans-serif;letter-spacing:-.045em;margin:5px 0 10px}.muted{color:var(--muted);line-height:1.6}.badge{display:inline-block;padding:6px 11px;border:1px solid #eadbc3;background:#fffaf0;color:#916b3b;border-radius:30px;font-size:.72rem;font-weight:800;letter-spacing:.06em}.details{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}.detail{padding:13px;border:1px solid var(--line);border-radius:12px;overflow-wrap:anywhere}.detail small{display:block;color:var(--muted);margin-bottom:5px}.terms{white-space:pre-wrap;line-height:1.7;background:#fbfaf7;border:1px solid var(--line);padding:20px;border-radius:14px;max-height:430px;overflow:auto}.signature{width:100%;height:170px;border:1px dashed #b9ad9b;border-radius:12px;background:#fff;touch-action:none}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.button{border:0;border-radius:11px;padding:13px 18px;background:linear-gradient(135deg,#b8894d,#93652f);color:white;font-weight:800;cursor:pointer}.button.secondary{background:#f5f2ec;color:#5c4930}.button:disabled{opacity:.55}.check{display:flex;gap:9px;line-height:1.5;margin-top:16px}.notice{display:none;margin-top:15px;padding:13px;border-radius:10px;background:#fff0ef;color:#a4261d}.notice.show{display:block}.notice.ok{background:#eaf8f0;color:#126242}.success{display:none;text-align:center;padding:35px 10px}.success.show{display:block}.success strong{font-size:1.25rem}@media(max-width:600px){main{margin:20px auto}.details{grid-template-columns:1fr}.card{border-radius:16px}}
-</style></head><body><header class="top">Culture<b>Wave</b></header><main><article class="card" id="agreementCard"><span class="badge">SECURE VENDOR AGREEMENT</span><h1>Review and sign</h1><p class="muted">Review the application details and agreement terms below. Signing submits the agreement to the CultureWave team; it does not create or activate a lister account.</p><div id="applicationDetails" class="details"></div><h2>Agreement terms</h2><div id="terms" class="terms">Loading agreement…</div><h2 style="margin-top:28px">Electronic signature</h2><p class="muted">Draw your signature in the box using your mouse, trackpad, or touch screen.</p><canvas id="signature" class="signature" aria-label="Signature canvas"></canvas><div class="actions"><button class="button secondary" id="clearSignature" type="button">Clear signature</button></div><label class="check"><input type="checkbox" id="accepted"><span>I have reviewed the agreement and agree to sign it electronically. I understand that my account remains subject to admin approval.</span></label><div class="notice" id="notice"></div><button class="button" id="submitSignature" style="width:100%;margin-top:18px">Sign and submit agreement</button></article><section class="card success" id="success"><span class="badge">AGREEMENT SUBMITTED</span><h1>Thank you</h1><p class="muted">Your signed agreement has been securely sent to the CultureWave team. Your lister account is still pending admin approval.</p><strong id="successId"></strong></section></main>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>CultureWave | Vendor Agreement</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#172033;--muted:#70798a;--gold:#a8793f;--line:#e8e3da;--green:#18734e}*{box-sizing:border-box}body{margin:0;background:#f7f5f1;color:var(--ink);font:15px "DM Sans",sans-serif}.top{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 max(5vw,20px);font:800 1.2rem Manrope,sans-serif}.top b{color:var(--gold)}main{width:min(900px,calc(100% - 28px));margin:36px auto 60px}.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:clamp(22px,5vw,44px);box-shadow:0 20px 60px #30230f10;margin-bottom:18px}h1{font:800 clamp(1.65rem,4vw,2.35rem) Manrope,sans-serif;letter-spacing:-.045em;margin:8px 0 10px}h2{font:800 1.15rem Manrope,sans-serif;margin:28px 0 12px}.muted{color:var(--muted);line-height:1.65}.badge{display:inline-block;padding:6px 11px;border:1px solid #eadbc3;background:#fffaf0;color:#916b3b;border-radius:30px;font-size:.72rem;font-weight:800;letter-spacing:.06em}.badge.signed{border-color:#cce8da;background:#effaf4;color:var(--green)}.details{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}.detail{padding:13px;border:1px solid var(--line);border-radius:12px;overflow-wrap:anywhere}.detail small{display:block;color:var(--muted);margin-bottom:5px}.terms{white-space:pre-wrap;line-height:1.7;background:#fbfaf7;border:1px solid var(--line);padding:20px;border-radius:14px;max-height:430px;overflow:auto}.signature{display:block;width:100%;height:170px;border:1px dashed #b9ad9b;border-radius:12px;background:#fff;touch-action:none}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;border-radius:11px;padding:13px 18px;background:linear-gradient(135deg,#b8894d,#93652f);color:white;font-weight:800;cursor:pointer}.button.secondary{background:#f5f2ec;color:#5c4930}.button:disabled{opacity:.55;cursor:wait}.check{display:flex;gap:9px;line-height:1.5;margin-top:16px}.notice{display:none;margin-top:15px;padding:13px;border-radius:10px;background:#fff0ef;color:#a4261d;line-height:1.5}.notice.show{display:block}.notice.ok{background:#eaf8f0;color:#126242}.signed-meta{margin:10px 0 18px;color:var(--muted);line-height:1.6}.pdf-frame{display:block;width:100%;height:min(78vh,900px);min-height:480px;border:1px solid var(--line);border-radius:12px;background:#f3f4f6}.footnote{font-size:.83rem;color:var(--muted);margin-top:12px}@media(max-width:600px){main{margin:20px auto}.details{grid-template-columns:1fr}.card{border-radius:16px}.pdf-frame{height:68vh;min-height:400px}}
+  </style>
+</head>
+<body>
+  <header class="top">Culture<b>Wave</b></header>
+  <main>
+    <article class="card" id="agreementCard">
+      <span class="badge" id="statusBadge">SECURE VENDOR AGREEMENT</span>
+      <h1 id="pageTitle">Review and sign</h1>
+      <p class="muted" id="intro">Review the application details and agreement terms below. Signing submits the agreement to the CultureWave team; it does not create or activate a lister account.</p>
+      <div id="applicationDetails" class="details"></div>
+      <h2>Agreement terms</h2>
+      <div id="terms" class="terms">Loading agreement…</div>
+      <section id="signingPanel">
+        <h2>Electronic signature</h2>
+        <p class="muted">Draw your signature in the box using a mouse, trackpad, or touch screen. Submitting finalizes this agreement. After signing, the agreement is locked and cannot be changed.</p>
+        <canvas id="signature" class="signature" aria-label="Draw your electronic signature"></canvas>
+        <div class="actions"><button class="button secondary" id="clearSignature" type="button">Clear signature</button></div>
+        <label class="check"><input type="checkbox" id="accepted"><span>I have reviewed the agreement and agree to sign it electronically. I understand that my account remains subject to admin approval.</span></label>
+        <div class="notice" id="notice" role="alert" aria-live="polite"></div>
+        <button class="button" id="submitSignature" style="width:100%;margin-top:18px" type="button">Sign and submit agreement</button>
+      </section>
+    </article>
+    <section class="card" id="signedPanel" hidden>
+      <span class="badge signed">SIGNED · LOCKED</span>
+      <h1>Signed agreement</h1>
+      <p class="muted">This is the final signed copy. It is read-only and cannot be edited or signed again.</p>
+      <div class="signed-meta" id="signedMeta"></div>
+      <div class="actions" style="margin:0 0 16px"><a class="button" id="downloadPdf" href="#" rel="noopener">Download signed PDF</a></div>
+      <iframe class="pdf-frame" id="pdfPreview" title="Preview of the final signed vendor agreement PDF"></iframe>
+      <p class="footnote">For your privacy, the document preview and download links expire after 10 minutes. Reopen this secure agreement link to create fresh links.</p>
+    </section>
+    <div class="notice" id="loadNotice" role="alert" aria-live="polite"></div>
+  </main>
 <script type="module">
-const API='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net',token=new URLSearchParams(location.search).get('token')||'',$=id=>document.getElementById(id);let agreement=null;
+const API='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
+const token=new URLSearchParams(location.search).get('token')||'';
+const $=id=>document.getElementById(id);
+let agreement=null,hasInk=false;
 const esc=s=>String(s||'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function notice(text,ok=false){const el=$('notice');el.textContent=text;el.className='notice show'+(ok?' ok':'')}
-try{const response=await fetch(API+'/getSigningData',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});const data=await response.json();if(!response.ok)throw new Error(data.error||'This agreement link is invalid or expired.');agreement=data;$('applicationDetails').innerHTML=[['Application ID',data.applicationId],['Lister name',data.name],['Business name',data.vendor?.registeredName],['Email',data.email],['Phone',data.contact?.phone]].map(([k,v])=>`<div class="detail"><small>${k}</small><strong>${esc(v)}</strong></div>`).join('');$('terms').textContent=data.terms||'No agreement terms were provided.';}catch(e){$('terms').textContent=e.message;$('submitSignature').disabled=true;}
-const canvas=$('signature'),ctx=canvas.getContext('2d');let drawing=false,hasInk=false;function sizeCanvas(){const box=canvas.getBoundingClientRect(),ratio=window.devicePixelRatio||1;canvas.width=box.width*ratio;canvas.height=box.height*ratio;ctx.scale(ratio,ratio);ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#172033'}sizeCanvas();window.addEventListener('resize',sizeCanvas);function point(e){const r=canvas.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}}canvas.addEventListener('pointerdown',e=>{drawing=true;canvas.setPointerCapture(e.pointerId);const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});canvas.addEventListener('pointermove',e=>{if(!drawing)return;const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke();hasInk=true});canvas.addEventListener('pointerup',()=>drawing=false);canvas.addEventListener('pointercancel',()=>drawing=false);$('clearSignature').onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);hasInk=false};$('submitSignature').onclick=async()=>{if(!hasInk){notice('Add your signature in the box first.');return}if(!$('accepted').checked){notice('Please confirm that you accept the agreement.');return}const button=$('submitSignature');button.disabled=true;button.textContent='Submitting securely…';try{const response=await fetch(API+'/signAgreement',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,signature:canvas.toDataURL('image/png'),accepted:true})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Could not submit signature.');$('agreementCard').style.display='none';$('successId').textContent='Application '+agreement.applicationId;$('success').classList.add('show');$('success').style.display='block'}catch(e){notice(e.message||'Could not submit signature.');button.disabled=false;button.textContent='Sign and submit agreement'}};
-</script></body></html>
+async function api(name,body){const response=await fetch(`${API}/${name}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let result={};try{result=await response.json()}catch{}if(!response.ok)throw new Error(result.error||'The agreement service is unavailable. Please try again.');return result}
+async function showSigned(){
+  $('signingPanel').hidden=true;$('statusBadge').textContent='SIGNED · LOCKED';$('statusBadge').classList.add('signed');$('pageTitle').textContent='Signed agreement';$('intro').textContent='Your agreement has been signed and submitted to the CultureWave team. Your lister account remains subject to admin approval.';
+  $('signedPanel').hidden=false;$('signedMeta').textContent=`Application ${agreement.applicationId}${agreement.signedAt?` · Signed ${new Date(agreement.signedAt).toLocaleString()}`:''}`;
+  try{const files=await api('getSignedAgreement',{token});$('pdfPreview').src=files.previewUrl;$('downloadPdf').href=files.downloadUrl;$('signedMeta').textContent=`Application ${agreement.applicationId}${files.signedAt?` · Signed ${new Date(files.signedAt).toLocaleString()}`:''}${files.signingReference?` · Reference ${files.signingReference}`:''}`;}
+  catch(error){$('signedMeta').textContent=`Application ${agreement.applicationId}. ${error.message}`;$('downloadPdf').hidden=true;$('pdfPreview').hidden=true;}
+}
+async function loadAgreement(){
+  if(!token){$('terms').textContent='This agreement link is missing its secure token. Open the link from the CultureWave email.';$('signingPanel').hidden=true;return}
+  try{
+    agreement=await api('getSigningData',{token});
+    $('applicationDetails').innerHTML=[['Application ID',agreement.applicationId],['Lister name',agreement.name],['Business name',agreement.vendor?.registeredName],['Email',agreement.email],['Phone',agreement.contact?.phone]].map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
+    $('terms').textContent=agreement.terms||'No agreement terms were provided.';
+    if(agreement.signed){await showSigned();return}
+    setupCanvas();
+  }catch(error){$('terms').textContent=error.message;$('signingPanel').hidden=true}
+}
+function setupCanvas(){
+  const canvas=$('signature'),ctx=canvas.getContext('2d');let drawing=false;
+  function sizeCanvas(){const box=canvas.getBoundingClientRect(),ratio=window.devicePixelRatio||1;canvas.width=Math.max(1,box.width*ratio);canvas.height=Math.max(1,box.height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#172033'}
+  sizeCanvas();window.addEventListener('resize',sizeCanvas,{passive:true});
+  function point(event){const rect=canvas.getBoundingClientRect();return{x:event.clientX-rect.left,y:event.clientY-rect.top}}
+  canvas.addEventListener('pointerdown',event=>{drawing=true;canvas.setPointerCapture(event.pointerId);const p=point(event);ctx.beginPath();ctx.moveTo(p.x,p.y)});
+  canvas.addEventListener('pointermove',event=>{if(!drawing)return;const p=point(event);ctx.lineTo(p.x,p.y);ctx.stroke();hasInk=true});
+  canvas.addEventListener('pointerup',()=>drawing=false);canvas.addEventListener('pointercancel',()=>drawing=false);
+  $('clearSignature').onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);hasInk=false};
+}
+$('submitSignature').onclick=async()=>{
+  if(!hasInk){notice('Add your signature in the box first.');return}
+  if(!$('accepted').checked){notice('Please confirm that you accept the agreement.');return}
+  const button=$('submitSignature');button.disabled=true;button.textContent='Submitting securely…';
+  try{await api('signAgreement',{token,signature:$('signature').toDataURL('image/png'),accepted:true});agreement.signed=true;agreement.signedAt=new Date().toISOString();$('notice').className='notice';await showSigned()}
+  catch(error){
+    try{const latest=await api('getSigningData',{token});if(latest.signed){agreement=latest;await showSigned();return}}catch{}
+    notice(error.message||'Could not submit your signature.');button.disabled=false;button.textContent='Sign and submit agreement';
+  }
+};
+loadAgreement();
+</script>
+</body>
+</html>
