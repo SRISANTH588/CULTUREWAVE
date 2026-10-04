@@ -187,7 +187,8 @@ document.getElementById('verifyEmailOtp').addEventListener('click',async functio
     sessionStorage.setItem('cw_lister_dash',DASH);
     generatedEmailOtp='';
     setStatus('Email verified. Opening vendor onboarding…','success','st1');
-    window.location.assign('vendor-onboarding.html');
+    const basePath=location.pathname.startsWith('/CULTUREWAVE/')?'/CULTUREWAVE/':'/';
+    window.location.assign(new URL(basePath+'vendor-onboarding.html',location.origin).href);
   }catch(error){console.error('Could not save verified email:',error);setStatus('Email verified, but this browser could not continue. Please enable session storage and try again.','warning','st1');}
 });
 </script>
