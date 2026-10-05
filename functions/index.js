@@ -320,7 +320,7 @@ exports.createAgreementRequest = endpoint(async (req,res,uid) => {
   const signingToken=randomToken(), tokenHash=sha(signingToken), signingUrl=`https://culturewave.in/sign-agreement?token=${encodeURIComponent(signingToken)}`;
   const tokenRef=db.collection('onboardingSigningTokens').doc(tokenHash);
   await tokenRef.set({applicationId:id,email:a.email,expiresAt:new Date(Date.now()+7*24*60*60_000),used:false});
-  const message=`${body}\n\nApplication ID: ${id}\n\nReview & sign the agreement: ${signingUrl}`;
+  const message=`${body}\n\nApplication ID: ${id}\n\nReview & sign the agreement: ${signingUrl}\n\nSigning page: https://culturewave.in/sign-agreement`;
   await ref.update({status:'SIGNUP_REQUEST_SENT',agreementStatus:'SENT',agreementPdf:{path:agreementPath,name:pdfName,pageCount:parsedPdf.getPageCount()},agreementServiceFeePercent,agreementVersion:'CultureWave-PDF-v1',agreementRequestedAt:FieldValue.serverTimestamp(),agreementRequestedBy:uid,updatedAt:FieldValue.serverTimestamp()});
   try { await sendOnboardingMail(a.email,subject,message,a.name,signingUrl); }
   catch(error) {
