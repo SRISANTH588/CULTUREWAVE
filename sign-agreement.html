@@ -16,10 +16,9 @@
     <article class="card" id="agreementCard">
       <span class="badge" id="statusBadge">VENDOR AGREEMENT</span>
       <h1 id="pageTitle">Review and sign</h1>
-      <p class="muted" id="intro">Review the agreement PDF below and enter your details. No account login is required. Your signature will be emailed to CultureWave for manual review. This page does not enforce one-time signing or generate a final signed PDF. Read the <a href="vendor-terms-and-conditions.html" target="_blank" rel="noopener">Vendor Terms and Conditions</a> before signing.</p>
+      <p class="muted" id="intro">Review the agreement below and enter your details. No account login is required. Your signature will be emailed to CultureWave for manual review. Read the <a href="vendor-terms-and-conditions.html" target="_blank" rel="noopener">Vendor Terms and Conditions</a> before signing.</p>
       <div id="applicationDetails" class="details"></div>
-      <h2>Agreement PDF</h2><iframe id="agreementPdf" class="pdf-frame" title="Agreement PDF for review"></iframe>
-      <p class="footnote" id="pdfDownloadRow" hidden><a id="agreementPdfDownload" href="#" target="_blank" rel="noopener">Open or download the agreement PDF</a></p>
+      <h2>Agreement</h2><div id="agreementTerms" class="terms"></div>
       <section id="signingPanel">
         <h2>Electronic signature</h2>
         <p class="muted">Confirm your full name, address, and signing date, then draw your signature in the box.</p>
@@ -32,12 +31,13 @@
         <button class="button" id="submitSignature" style="width:100%;margin-top:18px" type="button">Sign and submit agreement</button>
       </section>
     </article>
-    <section class="card" id="signedPanel" hidden><span class="badge signed">SUBMITTED FOR REVIEW</span><h1>Signature submitted</h1><p class="muted">Your signature details were emailed to CultureWave for manual review. Keep your copy of the agreement PDF.</p><div class="signed-meta" id="signedMeta"></div></section>
+    <section class="card" id="signedPanel" hidden><span class="badge signed">SUBMITTED FOR REVIEW</span><h1>Signature submitted</h1><p class="muted">Your signature details were emailed to CultureWave for manual review.</p><div class="signed-meta" id="signedMeta"></div></section>
     <div class="notice" id="loadNotice" role="alert" aria-live="polite"></div>
   </main>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="module">
 import { EMAILJS_SIGNATURE_TEMPLATE_ID } from './emailjs-agreement-config.js?v=20261005';
+import { CULTUREWAVE_AGREEMENT } from './agreement-template.js';
 const EMAILJS_SERVICE_ID='service_wvzjnnx',EMAILJS_PUBLIC_KEY='JXh4QRP2kafFxlPQo';
 emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
 const encoded=location.hash.slice(1);
@@ -51,16 +51,17 @@ async function showSigned(){
 async function loadAgreement(){
   try{
     if(!encoded)throw new Error('This agreement link is missing its details. Ask CultureWave to resend the signing link.');
-    agreement=JSON.parse(decodeURIComponent(escape(atob(encoded.replace(/-/g,'+').replace(/_/g,'/')))));
-    if(!agreement.applicationId||!agreement.pdfUrl||!/^https:\/\//i.test(agreement.pdfUrl))throw new Error('This signing link is incomplete. Ask CultureWave to resend it.');
+    const decoded=JSON.parse(decodeURIComponent(escape(atob(encoded.replace(/-/g,'+').replace(/_/g,'/')))));
+    agreement=decoded.i?{applicationId:decoded.i,email:decoded.e,name:decoded.n,businessName:decoded.b,address:decoded.a,fee:decoded.f}:decoded;
+    if(!agreement.applicationId||!Number.isFinite(Number(agreement.fee)))throw new Error('This signing link is incomplete. Ask CultureWave to resend it.');
     const address=agreement.address||'';
     $('applicationDetails').innerHTML=[['Application ID',agreement.applicationId],['Applicant name',agreement.name],['Business name',agreement.businessName],['Email',agreement.email],['Registered address',address],['Agreed service fee',`${agreement.fee}%`]].map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
-    $('agreementPdf').src=agreement.pdfUrl;$('agreementPdfDownload').href=agreement.pdfUrl;$('pdfDownloadRow').hidden=false;
+    $('agreementTerms').textContent=CULTUREWAVE_AGREEMENT.replace('{{SERVICE_FEE_PERCENT}}',String(agreement.fee));
     $('signerName').value=agreement.name||'';$('signerAddress').value=address;
     $('emailAddress').value=agreement.email||'';
     const indiaToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());$('signingDate').value=indiaToday;$('signingDate').max=indiaToday;
     setupCanvas();
-  }catch(error){$('applicationDetails').textContent=error.message;$('agreementPdf').hidden=true;$('signingPanel').hidden=true}
+  }catch(error){$('applicationDetails').textContent=error.message;$('agreementTerms').hidden=true;$('signingPanel').hidden=true}
 }
 function setupCanvas(){
   const canvas=$('signature'),ctx=canvas.getContext('2d');let drawing=false;
@@ -77,7 +78,7 @@ $('submitSignature').onclick=async()=>{
   if(!$('signerName').value.trim()||!$('signerAddress').value.trim()||!$('emailAddress').value.trim()||!$('signingDate').value){notice('Complete your name, address, email, and signing date.');return}
   if(!$('accepted').checked){notice('Please confirm that you accept the agreement.');return}
   const button=$('submitSignature');button.disabled=true;button.textContent='Submitting securely…';
-  try{if(EMAILJS_SIGNATURE_TEMPLATE_ID.startsWith('REPLACE_')||EMAILJS_SIGNATURE_TEMPLATE_ID==='template_caj3zqw')throw new Error('Signature template is not configured correctly. Do not use the booking confirmation template.');const signature=$('signature').toDataURL('image/png');const signerEmail=$('emailAddress').value.trim();const signerName=$('signerName').value.trim();const signerAddress=$('signerAddress').value.trim();const signingDate=$('signingDate').value;const message=`Agreement signature submission\nApplication: ${agreement.applicationId}\nSigner: ${signerName}\nAddress: ${signerAddress}\nDate: ${signingDate}\nSigner email: ${signerEmail}\nPDF: ${agreement.pdfUrl}\nAgreement PDF must be combined with the signature manually for the signed record.`;await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_SIGNATURE_TEMPLATE_ID,{to_email:'support.culturewave@gmail.com',to_name:'CultureWave Vendor Onboarding',name:signerName,subject:`Signed agreement · ${agreement.applicationId}`,message,applicationId:agreement.applicationId,signerName,signerAddress,signingDate,signerEmail,pdfUrl:agreement.pdfUrl,reply_to:signerEmail,signature_image:signature,signature_filename:`signature-${agreement.applicationId}.png`});$('notice').className='notice';await showSigned()}
+  try{if(EMAILJS_SIGNATURE_TEMPLATE_ID.startsWith('REPLACE_')||EMAILJS_SIGNATURE_TEMPLATE_ID==='template_caj3zqw')throw new Error('Signature template is not configured correctly.');const signature=$('signature').toDataURL('image/png');const signerEmail=$('emailAddress').value.trim();const signerName=$('signerName').value.trim();const signerAddress=$('signerAddress').value.trim();const signingDate=$('signingDate').value;const message=`Agreement signature submission\nApplication: ${agreement.applicationId}\nSigner: ${signerName}\nAddress: ${signerAddress}\nDate: ${signingDate}\nSigner email: ${signerEmail}\nAgreed service fee: ${agreement.fee}%\nAgreement: CultureWave Event Listing and Collaboration Agreement`;await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_SIGNATURE_TEMPLATE_ID,{to_email:'support.culturewave@gmail.com',to_name:'CultureWave Vendor Onboarding',name:signerName,subject:`Signed agreement · ${agreement.applicationId}`,message,message_html:esc(message).replace(/\n/g,'<br>'),applicationId:agreement.applicationId,signerName,signerAddress,signingDate,signerEmail,serviceFeePercent:agreement.fee,reply_to:signerEmail,signature_image:signature,signature_filename:`signature-${agreement.applicationId}.png`});$('notice').className='notice';await showSigned()}
   catch(error){notice(error.text||error.message||'EmailJS could not send your signature.');button.disabled=false;button.textContent='Sign and submit agreement'}
 };
 loadAgreement();
