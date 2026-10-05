@@ -2,6 +2,7 @@ const {onDocumentCreated, onDocumentDeleted, onDocumentUpdated} = require('fireb
 const {defineString} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
+const {PDFDocument, StandardFonts, rgb} = require('pdf-lib');
 
 initializeApp();
 const db = getFirestore();
@@ -168,7 +169,6 @@ const {onRequest} = require('firebase-functions/v2/https');
 const {getAuth} = require('firebase-admin/auth');
 const {getStorage} = require('firebase-admin/storage');
 const {randomBytes, randomInt, createHash, timingSafeEqual} = require('node:crypto');
-const {PDFDocument, StandardFonts, rgb} = require('pdf-lib');
 const onboardingOtpTemplate = defineString('EMAILJS_ONBOARDING_OTP_TEMPLATE_ID', {default: 'template_8ho2pwf'});
 const onboardingNoticeTemplate = defineString('EMAILJS_ONBOARDING_NOTICE_TEMPLATE_ID', {default: ''});
 const onboardingOtpPepper = defineString('ONBOARDING_OTP_PEPPER');
@@ -302,26 +302,31 @@ exports.submitVendorApplication = endpoint(async (req,res,session) => {
 },{session:true});
 
 exports.createAgreementRequest = endpoint(async (req,res,uid) => {
-  const id=clean(req.body.applicationId,40), subject=clean(req.body.subject,200), body=clean(req.body.message,8000), terms=clean(req.body.terms,20000), serviceFeePercent=Number(req.body.serviceFeePercent);
-  if(!subject||!body||terms.length<100)throw new Error('Provide an email subject, message, and agreement terms (at least 100 characters).');
+  const id=clean(req.body.applicationId,40), subject=clean(req.body.subject,200), body=clean(req.body.message,8000), terms='', serviceFeePercent=Number(req.body.serviceFeePercent), agreementPdf=req.body.agreementPdf||{};
+  if(!subject||!body)throw new Error('Provide an email subject and message.');
   if(!Number.isFinite(serviceFeePercent)||serviceFeePercent<0||serviceFeePercent>100)throw new Error('Enter an agreed service fee from 0 to 100 percent.');
-  if(!terms.includes('{{SERVICE_FEE_PERCENT}}'))throw new Error('The editable CultureWave agreement must include the service fee variable.');
-  const finalTerms=terms.replaceAll('{{SERVICE_FEE_PERCENT}}',String(serviceFeePercent));
-  if(finalTerms.includes('{{'))throw new Error('Resolve every template variable in the agreement before sending.');
+  const pdfName=clean(agreementPdf.name,160), pdfData=String(agreementPdf.dataUrl||'');
+  if(!pdfName.toLowerCase().endsWith('.pdf')||!/^data:application\/pdf;base64,/.test(pdfData))throw new Error('Upload the agreement as a PDF before sending.');
+  const pdfBytes=Buffer.from(pdfData.split(',')[1]||'','base64');
+  if(!pdfBytes.length||pdfBytes.length>8*1024*1024||!pdfBytes.subarray(0,5).equals(Buffer.from('%PDF-')))throw new Error('The agreement PDF is invalid or exceeds the 8 MB limit.');
+  const parsedPdf=await PDFDocument.load(pdfBytes,{ignoreEncryption:false});
+  if(parsedPdf.getPageCount()>100)throw new Error('The agreement PDF can contain up to 100 pages.');
   const ref=db.collection('vendorOnboarding').doc(id), snap=await ref.get();if(!snap.exists)throw new Error('Application not found.');
   const a=snap.data();if(['APPROVED','REJECTED','SIGNED'].includes(a.status))throw new Error('This application is already closed for agreement requests.');
+  const agreementPath=`vendor-onboarding/${id}/AGREEMENT_${randomBytes(10).toString('hex')}.pdf`;
+  await bucket.file(agreementPath).save(pdfBytes,{metadata:{contentType:'application/pdf',metadata:{applicationId:id,private:'true',originalName:pdfName}}});
   const previous=await db.collection('onboardingSigningTokens').where('applicationId','==',id).where('used','==',false).get();
   if(!previous.empty){const batch=db.batch();previous.docs.forEach(d=>batch.delete(d.ref));await batch.commit();}
-  const signingToken=randomToken(), tokenHash=sha(signingToken), signingUrl=`https://culturewave.in/sign-agreement.html?token=${encodeURIComponent(signingToken)}`;
+  const signingToken=randomToken(), tokenHash=sha(signingToken), signingUrl=`https://culturewave.in/sign-agreement?token=${encodeURIComponent(signingToken)}`;
   const tokenRef=db.collection('onboardingSigningTokens').doc(tokenHash);
   await tokenRef.set({applicationId:id,email:a.email,expiresAt:new Date(Date.now()+7*24*60*60_000),used:false});
   const message=`${body}\n\nApplication ID: ${id}\n\nReview & sign the agreement: ${signingUrl}`;
-  await ref.update({status:'SIGNUP_REQUEST_SENT',agreementStatus:'SENT',agreementTerms:finalTerms,agreementServiceFeePercent,agreementVersion:'CultureWave-v1',agreementRequestedAt:FieldValue.serverTimestamp(),agreementRequestedBy:uid,updatedAt:FieldValue.serverTimestamp()});
+  await ref.update({status:'SIGNUP_REQUEST_SENT',agreementStatus:'SENT',agreementPdf:{path:agreementPath,name:pdfName,pageCount:parsedPdf.getPageCount()},agreementServiceFeePercent,agreementVersion:'CultureWave-PDF-v1',agreementRequestedAt:FieldValue.serverTimestamp(),agreementRequestedBy:uid,updatedAt:FieldValue.serverTimestamp()});
   try { await sendOnboardingMail(a.email,subject,message,a.name,signingUrl); }
   catch(error) {
     const rollback={status:a.status||'NEW',agreementStatus:a.agreementStatus||'NOT_SENT',updatedAt:FieldValue.serverTimestamp()};
-    for(const key of ['agreementTerms','agreementServiceFeePercent','agreementVersion','agreementRequestedAt','agreementRequestedBy'])rollback[key]=Object.prototype.hasOwnProperty.call(a,key)?a[key]:FieldValue.delete();
-    await Promise.all([ref.update(rollback),tokenRef.delete()]);
+    for(const key of ['agreementTerms','agreementServiceFeePercent','agreementVersion','agreementRequestedAt','agreementRequestedBy','agreementPdf'])rollback[key]=Object.prototype.hasOwnProperty.call(a,key)?a[key]:FieldValue.delete();
+    await Promise.all([ref.update(rollback),tokenRef.delete(),bucket.file(agreementPath).delete().catch(()=>{})]);
     throw error;
   }
   await writeActivity(id,'Signup Request Sent',uid);
@@ -337,7 +342,9 @@ exports.getSigningData = endpoint(async req => {
   if(snap.data().used&&!signed)throw new Error('This signing link has already been used.');
   if(!signed&&a.status==='SIGNUP_REQUEST_SENT')await aSnap.ref.update({status:'AWAITING_SIGNATURE',updatedAt:FieldValue.serverTimestamp()});
   if(!signed)await writeActivity(aSnap.id,'Agreement Opened','applicant');
-  return {applicationId:a.applicationId,email:a.email,name:a.name,vendor:a.vendor,business:a.business,contact:a.contact,terms:a.agreementTerms,signed,signedAt:a.signedAgreement?.signedAt?.toDate?.()?.toISOString()||null};
+  let agreementPdfUrl=null;
+  if(a.agreementPdf?.path){const [url]=await bucket.file(a.agreementPdf.path).getSignedUrl({action:'read',expires:Date.now()+10*60_000,responseDisposition:'inline; filename="CULTUREWAVE_AGREEMENT.pdf"'});agreementPdfUrl=url;}
+  return {applicationId:a.applicationId,email:a.email,name:a.name,vendor:a.vendor,business:a.business,address:a.address,contact:a.contact,terms:a.agreementTerms,agreementPdfUrl,agreementPdfName:a.agreementPdf?.name||null,signed,signedAt:a.signedAgreement?.signedAt?.toDate?.()?.toISOString()||null};
 });
 
 // The one-time signing token remains read-only until its original seven-day expiry
@@ -356,8 +363,9 @@ exports.getSignedAgreement = endpoint(async req => {
 });
 
 exports.signAgreement = endpoint(async req => {
-  const token=clean(req.body.token,200), signature=String(req.body.signature||'');
+  const token=clean(req.body.token,200), signature=String(req.body.signature||''), signerName=clean(req.body.signerName,180), signerAddress=clean(req.body.signerAddress,600), signingDate=clean(req.body.signingDate,10);
   if(!/^data:image\/png;base64,/.test(signature))throw new Error('Capture your signature before submitting.');
+  if(!signerName||!signerAddress||!/^(\d{4})-(\d{2})-(\d{2})$/.test(signingDate)||Number(signingDate.slice(5,7))<1||Number(signingDate.slice(5,7))>12||Number(signingDate.slice(8,10))<1||Number(signingDate.slice(8,10))>31||signingDate>new Date().toISOString().slice(0,10))throw new Error('Enter your full name, address, and a valid signing date no later than today.');
   const tokenRef=db.collection('onboardingSigningTokens').doc(sha(token));
   const tokenSnap=await tokenRef.get();if(!tokenSnap.exists||tokenSnap.data().used||tokenSnap.data().expiresAt.toMillis()<Date.now())throw new Error('This signing link is expired or already used.');
   if(!req.body.accepted)throw new Error('Accept the agreement terms to sign.');
@@ -366,22 +374,17 @@ exports.signAgreement = endpoint(async req => {
   const claim=await db.runTransaction(async tx=>{const latest=await tx.get(tokenRef);if(!latest.exists||latest.data().used||latest.data().expiresAt.toMillis()<Date.now())return false;const state=latest.data(),locked=state.signing&&(state.signingStartedAt?.toMillis?.()||Date.now())>Date.now()-5*60_000;if(locked)return false;tx.update(tokenRef,{signing:true,signingStartedAt:FieldValue.serverTimestamp()});return true;});
   if(!claim)throw new Error('This agreement is already being signed or has already been signed. Refresh the page to view the signed copy.');
   try {
-  const signedAt=new Date().toISOString(), signingReference=randomBytes(12).toString('hex'), pdf=await PDFDocument.create();let page=pdf.addPage([612,792]);const font=await pdf.embedFont(StandardFonts.Helvetica), bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+  const signedAt=new Date(`${signingDate}T12:00:00+05:30`).toISOString(), signingReference=randomBytes(12).toString('hex');
+  const sourceBytes=a.agreementPdf?.path?(await bucket.file(a.agreementPdf.path).download())[0]:null;
+  if(!sourceBytes)throw new Error('The agreement PDF is unavailable. Ask CultureWave to resend the agreement.');
+  const pdf=await PDFDocument.load(sourceBytes), page=pdf.addPage([612,792]);const font=await pdf.embedFont(StandardFonts.Helvetica), bold=await pdf.embedFont(StandardFonts.HelveticaBold);
   const pdfText=value=>String(value||'').replace(/₹/g,'INR ').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').normalize('NFKD').replace(/[^\x20-\x7E]/g,'?');
   const draw=(text,x,y,size=10,f=font)=>page.drawText(pdfText(text),{x,y,size,font:f,color:rgb(.12,.16,.23),maxWidth:510});
-  draw('CULTUREWAVE INDIA',50,746,11,bold);draw('EVENT LISTING AND COLLABORATION AGREEMENT',50,721,17,bold);
-  draw(`Agreement version: ${a.agreementVersion||'CultureWave-v1'}`,50,697,9);draw(`Application ID: ${id}`,50,680,10,bold);
-  draw(`Effective date: ${new Date(signedAt).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric'})}`,50,663,9);
-  draw('Merchant / lister',50,632,11,bold);draw(`Registered name: ${a.vendor?.registeredName||a.name}`,50,613);draw(`Authorized signatory: ${a.contact?.name||a.name}`,50,596);draw(`Registered address: ${a.vendor?.address||a.address?.line1||''}, ${a.address?.city||a.vendor?.city||''}, ${a.address?.state||''} ${a.address?.pincode||''}`,50,579,9);draw(`Email: ${a.email}`,50,560);draw(`Phone: ${a.contact?.phone||''}`,50,543);draw(`GSTIN: ${a.vendor?.hasGst&&a.vendor?.gstin?a.vendor.gstin:'Not registered / not provided'}`,50,526,9);
-  draw('Agreement terms',50,493,12,bold);
-  let y=472;const wrapLine=(line,size=9.5)=>{const words=pdfText(line).split(/\s+/);let current='';const lines=[];for(const word of words){const candidate=current?`${current} ${word}`:word;if(font.widthOfTextAtSize(candidate,size)>510&&current){lines.push(current);current=word}else current=candidate}if(current)lines.push(current);return lines};
-  for(const paragraph of String(a.agreementTerms||'').split('\n')){const lines=wrapLine(paragraph);if(!lines.length){y-=8;continue}for(const line of lines){if(y<48){page=pdf.addPage([612,792]);y=748;}draw(line,50,y,9.5);y-=14}y-=4;}
-  page=pdf.addPage([612,792]);draw('MERCHANT ELECTRONIC SIGNATURE',50,746,16,bold);draw('The lister identified below signed this CultureWave agreement electronically.',50,721,10);
-  draw(`Application ID: ${id}`,50,683,10,bold);draw(`Merchant / business: ${a.vendor?.registeredName||a.name}`,50,660);draw(`Authorized signatory: ${a.contact?.name||a.name}`,50,641);draw(`Registered address: ${a.vendor?.address||a.address?.line1||''}, ${a.address?.city||a.vendor?.city||''}, ${a.address?.state||''} ${a.address?.pincode||''}`,50,622,9);draw(`Email: ${a.email}`,50,602);draw(`Phone: ${a.contact?.phone||''}`,50,583);draw(`GSTIN: ${a.vendor?.hasGst&&a.vendor?.gstin?a.vendor.gstin:'Not registered / not provided'}`,50,564,9);
-  draw('Digital signature',50,522,11,bold);const img=await pdf.embedPng(Buffer.from(signature.split(',')[1],'base64'));const scale=Math.min(220/img.width,70/img.height);page.drawImage(img,{x:50,y:438,width:img.width*scale,height:img.height*scale});
-  draw(`Signed by: ${a.contact?.name||a.name}`,300,493,9,bold);draw(`Signed on: ${new Date(signedAt).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'medium'})} IST`,300,475,9);draw('Signing status: SIGNED',300,457,9,bold);draw(`Signing reference: ${signingReference}`,300,439,8);
+  draw('MERCHANT ELECTRONIC SIGNATURE',50,746,16,bold);draw('The lister identified below signed the attached CultureWave agreement electronically.',50,721,10);
+  draw(`Application ID: ${id}`,50,683,10,bold);draw(`Merchant / business: ${a.vendor?.registeredName||a.name}`,50,660);draw(`Authorized signatory: ${signerName}`,50,641);draw(`Address: ${signerAddress}`,50,622,9);draw(`Email: ${a.email}`,50,602);draw(`Signing date: ${signingDate}`,50,583);draw('Digital signature',50,548,11,bold);const img=await pdf.embedPng(Buffer.from(signature.split(',')[1],'base64'));const scale=Math.min(220/img.width,70/img.height);page.drawImage(img,{x:50,y:448,width:img.width*scale,height:img.height*scale});
+  draw(`Signed by: ${signerName}`,300,522,9,bold);draw(`Signed on: ${new Date(signedAt).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'medium'})} IST`,300,504,9);draw('Signing status: SIGNED',300,486,9,bold);draw(`Signing reference: ${signingReference}`,300,468,8);
   const path=`vendor-onboarding/${id}/SIGNED_VENDOR_AGREEMENT.pdf`, pdfBytes=await pdf.save();await bucket.file(path).save(Buffer.from(pdfBytes),{metadata:{contentType:'application/pdf',metadata:{applicationId:id,private:'true'}}});
-  await ref.update({status:'SIGNED',agreementStatus:'SIGNED',signedAgreement:{path,name:'SIGNED_VENDOR_AGREEMENT.pdf',signedAt:FieldValue.serverTimestamp(),signingReference,agreementVersion:a.agreementVersion||'v1'},updatedAt:FieldValue.serverTimestamp()});
+  await ref.update({status:'SIGNED',agreementStatus:'SIGNED',signedAgreement:{path,name:'SIGNED_VENDOR_AGREEMENT.pdf',signedAt:FieldValue.serverTimestamp(),signingReference,signerName,signerAddress,signingDate,agreementVersion:a.agreementVersion||'PDF-v1'},updatedAt:FieldValue.serverTimestamp()});
   await tokenRef.update({used:true,signing:false,usedAt:FieldValue.serverTimestamp()});await writeActivity(id,'Agreement Signed','applicant');await writeActivity(id,'PDF Generated','system');return {ok:true};
   } catch(error) { await tokenRef.update({signing:false}).catch(()=>{}); throw error; }
 });
