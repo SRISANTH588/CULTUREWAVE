@@ -6,8 +6,8 @@ const {PDFDocument, StandardFonts, rgb} = require('pdf-lib');
 
 initializeApp();
 const db = getFirestore();
-const emailServiceId = defineString('EMAILJS_SERVICE_ID', {default: 'service_wvzjnnx'});
-const emailPublicKey = defineString('EMAILJS_PUBLIC_KEY', {default: 'JXh4QRP2kafFxlPQo'});
+const emailServiceId = defineString('EMAILJS_SERVICE_ID', {default: 'service_esppdwf'});
+const emailPublicKey = defineString('EMAILJS_PUBLIC_KEY', {default: 'PDb2vpOIeLkbZBBFP'});
 const waitlistTemplateId = defineString('EMAILJS_WAITLIST_TEMPLATE_ID');
 const followerTemplateId = defineString('EMAILJS_FOLLOWER_EVENT_TEMPLATE_ID', {default: ''});
 function sendEmail(templateId, templateParams) {

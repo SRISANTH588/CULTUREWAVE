@@ -712,7 +712,7 @@
         GoogleAuthProvider, signInWithPopup, updateProfile,
         doc, setDoc, getDoc, collection, query, where, getDocs, onSnapshot } from "./firebase.js";
 
-      emailjs.init({ publicKey: 'JXh4QRP2kafFxlPQo' });
+      emailjs.init({ publicKey: 'PDb2vpOIeLkbZBBFP' });
 
       let loginStats = { events: 0, bookings: 0 };
       function formatLoginCount(value) {
@@ -836,7 +836,7 @@
         setStatus('Sending OTP...', 'info');
         try {
           // Use EmailJS to send OTP
-          await emailjs.send('service_wvzjnnx', 'template_8ho2pwf', {
+          await emailjs.send('service_esppdwf', 'template_8ho2pwf', {
             to_email: email, to_name: 'User',
             otp_code: loginOtpGenerated,
             reply_to: 'support.culturewave@gmail.com'
