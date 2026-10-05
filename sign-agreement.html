@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
+<meta name="robots" content="noindex,nofollow">
   <title>CultureWave | Vendor Agreement</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
   <style>
@@ -14,60 +14,51 @@
   <header class="top">Culture<b>Wave</b></header>
   <main>
     <article class="card" id="agreementCard">
-      <span class="badge" id="statusBadge">SECURE VENDOR AGREEMENT</span>
+      <span class="badge" id="statusBadge">VENDOR AGREEMENT</span>
       <h1 id="pageTitle">Review and sign</h1>
-      <p class="muted" id="intro">Review the agreement PDF below. Enter your details and sign electronically; no account login is required. Read the <a href="vendor-terms-and-conditions.html" target="_blank" rel="noopener">Vendor Terms and Conditions</a> before signing.</p>
+      <p class="muted" id="intro">Review the agreement PDF below and enter your details. No account login is required. Your signature will be emailed to CultureWave for manual review. This page does not enforce one-time signing or generate a final signed PDF. Read the <a href="vendor-terms-and-conditions.html" target="_blank" rel="noopener">Vendor Terms and Conditions</a> before signing.</p>
       <div id="applicationDetails" class="details"></div>
       <h2>Agreement PDF</h2><iframe id="agreementPdf" class="pdf-frame" title="Agreement PDF for review"></iframe>
       <p class="footnote" id="pdfDownloadRow" hidden><a id="agreementPdfDownload" href="#" target="_blank" rel="noopener">Open or download the agreement PDF</a></p>
       <section id="signingPanel">
         <h2>Electronic signature</h2>
-        <p class="muted">Confirm your full name, address, and signing date, then draw your signature in the box. After signing, the agreement is locked.</p>
-        <div class="field-grid"><label>Full name<input id="signerName" autocomplete="name" required></label><label>Signing date<input id="signingDate" type="date" required></label><label class="wide">Address<textarea id="signerAddress" rows="3" autocomplete="street-address" required></textarea></label></div>
+        <p class="muted">Confirm your full name, address, and signing date, then draw your signature in the box.</p>
+        <div class="field-grid"><label>Full name<input id="signerName" autocomplete="name" required></label><label>Signing date<input id="signingDate" type="date" required></label><label class="wide">Address<textarea id="signerAddress" rows="3" autocomplete="street-address" required></textarea></label><label class="wide">Email<input id="emailAddress" type="email" autocomplete="email" required></label></div>
         <label>Signature</label>
         <canvas id="signature" class="signature" aria-label="Draw your electronic signature"></canvas>
         <div class="actions"><button class="button secondary" id="clearSignature" type="button">Clear signature</button></div>
-        <label class="check"><input type="checkbox" id="accepted"><span>I have reviewed the agreement and agree to sign it electronically. I understand that my account remains subject to admin approval.</span></label>
+        <label class="check"><input type="checkbox" id="accepted"><span>I have reviewed this agreement and agree to sign it electronically. I understand that CultureWave will review my signed submission manually.</span></label>
         <div class="notice" id="notice" role="alert" aria-live="polite"></div>
         <button class="button" id="submitSignature" style="width:100%;margin-top:18px" type="button">Sign and submit agreement</button>
       </section>
     </article>
-    <section class="card" id="signedPanel" hidden>
-      <span class="badge signed">SIGNED · LOCKED</span>
-      <h1>Signed agreement</h1>
-      <p class="muted">This is the final signed copy. It is read-only and cannot be edited or signed again.</p>
-      <div class="signed-meta" id="signedMeta"></div>
-      <div class="actions" style="margin:0 0 16px"><a class="button" id="downloadPdf" href="#" rel="noopener">Download signed PDF</a></div>
-      <iframe class="pdf-frame" id="pdfPreview" title="Preview of the final signed vendor agreement PDF"></iframe>
-      <p class="footnote">For your privacy, the document preview and download links expire after 10 minutes. Reopen this secure agreement link to create fresh links.</p>
-    </section>
+    <section class="card" id="signedPanel" hidden><span class="badge signed">SUBMITTED FOR REVIEW</span><h1>Signature submitted</h1><p class="muted">Your signature details were emailed to CultureWave for manual review. Keep your copy of the agreement PDF.</p><div class="signed-meta" id="signedMeta"></div></section>
     <div class="notice" id="loadNotice" role="alert" aria-live="polite"></div>
   </main>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="module">
-const API='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
-const token=new URLSearchParams(location.search).get('token')||new URLSearchParams(location.hash.slice(1)).get('token')||'';
+import { EMAILJS_SIGNATURE_TEMPLATE_ID } from './emailjs-agreement-config.js';
+const EMAILJS_SERVICE_ID='service_esppdwf',EMAILJS_PUBLIC_KEY='PDb2vpOIeLkbZBBFP';
+emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
+const encoded=location.hash.slice(1);
 const $=id=>document.getElementById(id);
 let agreement=null,hasInk=false;
 const esc=s=>String(s||'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function notice(text,ok=false){const el=$('notice');el.textContent=text;el.className='notice show'+(ok?' ok':'')}
-async function api(name,body){const response=await fetch(`${API}/${name}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let result={};try{result=await response.json()}catch{}if(!response.ok)throw new Error(result.error||'The agreement service is unavailable. Please try again.');return result}
 async function showSigned(){
-  $('signingPanel').hidden=true;$('statusBadge').textContent='SIGNED · LOCKED';$('statusBadge').classList.add('signed');$('pageTitle').textContent='Signed agreement';$('intro').textContent='Your agreement has been signed and submitted to the CultureWave team. Your lister account remains subject to admin approval.';
-  $('signedPanel').hidden=false;$('signedMeta').textContent=`Application ${agreement.applicationId}${agreement.signedAt?` · Signed ${new Date(agreement.signedAt).toLocaleString()}`:''}`;
-  try{const files=await api('getSignedAgreement',{token});$('pdfPreview').src=files.previewUrl;$('downloadPdf').href=files.downloadUrl;$('signedMeta').textContent=`Application ${agreement.applicationId}${files.signedAt?` · Signed ${new Date(files.signedAt).toLocaleString()}`:''}${files.signingReference?` · Reference ${files.signingReference}`:''}`;}
-  catch(error){$('signedMeta').textContent=`Application ${agreement.applicationId}. ${error.message}`;$('downloadPdf').hidden=true;$('pdfPreview').hidden=true;}
+  $('signingPanel').hidden=true;$('statusBadge').textContent='SUBMITTED FOR REVIEW';$('statusBadge').classList.add('signed');$('pageTitle').textContent='Signature submitted';$('intro').textContent='Your signature details were emailed to CultureWave for manual review.';$('signedPanel').hidden=false;$('signedMeta').textContent=`Application ${agreement.applicationId} · Submitted ${new Date().toLocaleString()}`;
 }
 async function loadAgreement(){
-  if(!token){$('applicationDetails').textContent='This agreement link is missing its secure token. Open the link from the CultureWave email.';$('signingPanel').hidden=true;return}
   try{
-    agreement=await api('getSigningData',{token});
-    const address=[agreement.vendor?.address||agreement.address?.line1,agreement.address?.city||agreement.vendor?.city,agreement.address?.state,agreement.address?.pincode].filter(Boolean).join(', ');
-    $('applicationDetails').innerHTML=[['Application ID',agreement.applicationId],['Applicant name',agreement.name],['Business name',agreement.vendor?.registeredName],['Registered address',address],['Email',agreement.email],['Phone',agreement.contact?.phone]].map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
-    if(!agreement.agreementPdfUrl)throw new Error('The agreement PDF is missing. Please contact CultureWave.');
-    $('agreementPdf').src=agreement.agreementPdfUrl;$('agreementPdfDownload').href=agreement.agreementPdfUrl;$('pdfDownloadRow').hidden=false;
-    $('signerName').value=agreement.contact?.name||agreement.name||'';$('signerAddress').value=address;
+    if(!encoded)throw new Error('This agreement link is missing its details. Ask CultureWave to resend the signing link.');
+    agreement=JSON.parse(decodeURIComponent(escape(atob(encoded.replace(/-/g,'+').replace(/_/g,'/')))));
+    if(!agreement.applicationId||!agreement.pdfUrl||!/^https:\/\//i.test(agreement.pdfUrl))throw new Error('This signing link is incomplete. Ask CultureWave to resend it.');
+    const address=agreement.address||'';
+    $('applicationDetails').innerHTML=[['Application ID',agreement.applicationId],['Applicant name',agreement.name],['Business name',agreement.businessName],['Email',agreement.email],['Registered address',address],['Agreed service fee',`${agreement.fee}%`]].map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
+    $('agreementPdf').src=agreement.pdfUrl;$('agreementPdfDownload').href=agreement.pdfUrl;$('pdfDownloadRow').hidden=false;
+    $('signerName').value=agreement.name||'';$('signerAddress').value=address;
+    $('emailAddress').value=agreement.email||'';
     const indiaToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());$('signingDate').value=indiaToday;$('signingDate').max=indiaToday;
-    if(agreement.signed){await showSigned();return}
     setupCanvas();
   }catch(error){$('applicationDetails').textContent=error.message;$('agreementPdf').hidden=true;$('signingPanel').hidden=true}
 }
@@ -83,13 +74,11 @@ function setupCanvas(){
 }
 $('submitSignature').onclick=async()=>{
   if(!hasInk){notice('Add your signature in the box first.');return}
+  if(!$('signerName').value.trim()||!$('signerAddress').value.trim()||!$('emailAddress').value.trim()||!$('signingDate').value){notice('Complete your name, address, email, and signing date.');return}
   if(!$('accepted').checked){notice('Please confirm that you accept the agreement.');return}
   const button=$('submitSignature');button.disabled=true;button.textContent='Submitting securely…';
-  try{await api('signAgreement',{token,signature:$('signature').toDataURL('image/png'),signerName:$('signerName').value,signerAddress:$('signerAddress').value,signingDate:$('signingDate').value,accepted:true});agreement.signed=true;agreement.signedAt=new Date().toISOString();$('notice').className='notice';await showSigned()}
-  catch(error){
-    try{const latest=await api('getSigningData',{token});if(latest.signed){agreement=latest;await showSigned();return}}catch{}
-    notice(error.message||'Could not submit your signature.');button.disabled=false;button.textContent='Sign and submit agreement';
-  }
+  try{if(EMAILJS_SIGNATURE_TEMPLATE_ID.startsWith('REPLACE_'))throw new Error('Signature receipt template is not configured. Set EMAILJS_SIGNATURE_TEMPLATE_ID in emailjs-agreement-config.js after creating the EmailJS template.');const signature=$('signature').toDataURL('image/png');const signerEmail=$('emailAddress').value.trim();const message=`Agreement signature submission\nApplication: ${agreement.applicationId}\nSigner: ${$('signerName').value.trim()}\nAddress: ${$('signerAddress').value.trim()}\nDate: ${$('signingDate').value}\nSigner email: ${signerEmail}\nPDF: ${agreement.pdfUrl}\nAgreement PDF must be combined with the signature manually for the signed record.`;await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_SIGNATURE_TEMPLATE_ID,{to_email:'support.culturewave@gmail.com',to_name:'CultureWave Vendor Onboarding',subject:`Signed agreement · ${agreement.applicationId}`,message,message_html:message.replace(/\n/g,'<br>'),reply_to:signerEmail,signature_image:signature,signature_filename:`signature-${agreement.applicationId}.png`});$('notice').className='notice';await showSigned()}
+  catch(error){notice(error.text||error.message||'EmailJS could not send your signature.');button.disabled=false;button.textContent='Sign and submit agreement'}
 };
 loadAgreement();
 </script>

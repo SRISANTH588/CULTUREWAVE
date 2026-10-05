@@ -1,35 +1,21 @@
-# Vendor onboarding deployment setup
+# Vendor onboarding on Firebase Spark
 
-The browser pages are configured for Firebase project `ogshootsluxe-36740`, Functions region `asia-south1`. The secure flow will not work on the live site until the Functions and rules are deployed.
+This agreement email and signature flow uses the EmailJS browser SDK, so it does not require Firebase Functions or a Blaze upgrade.
 
-## Firebase requirements
+## Setup
 
-1. Upgrade the Firebase project from Spark to Blaze. Cloud Functions deployment requires billing to be enabled. Set a budget alert in Google Cloud before deploying.
-2. Create the EmailJS **onboarding notice** template. Configure its recipient as `{{to_email}}`, subject as `{{subject}}`, body as `{{message_html}}` (or `{{message}}`), and reply-to as `{{reply_to}}`. The signing and password setup links are included in the message/action URL.
-3. Confirm the existing OTP template `template_8ho2pwf` accepts `to_email`, `to_name`, and `otp_code`.
-4. From the repository root, install the Functions dependencies with `npm --prefix functions install`.
-5. Create the project environment file `functions/.env.ogshootsluxe-36740` with:
+1. In the EmailJS template used by `admin-dashboard.html`, set the recipient to `{{to_email}}`, subject to `{{subject}}`, body to `{{message_html}}` (or `{{message}}`), and reply-to to `{{reply_to}}`.
+2. The admin composer asks for a public HTTPS URL for the agreement PDF. The agreement PDF is linked in the email and previewed on the signing page. Public URLs are visible to anyone who gets the link, so use a dedicated PDF without government ID, bank details or another applicant's private information.
+3. Create a separate EmailJS template for `sign-agreement.html`, with recipient `{{to_email}}`, subject `{{subject}}`, body `{{message_html}}` (or `{{message}}`), and reply-to `{{reply_to}}`.
+4. Add a **Variable Attachment** for the signer image with parameter `signature_image` and filename `{{signature_filename}}` if your EmailJS plan and template support dynamic attachments.
+5. Put the new signature receipt template ID in `emailjs-agreement-config.js` in place of `REPLACE_WITH_SIGNATURE_RECEIPT_TEMPLATE_ID`.
+6. Keep the EmailJS account's allowed origins and send limits configured in the EmailJS dashboard. These browser calls use a public key; never place an EmailJS private key in client code.
 
-   ```env
-   EMAILJS_ONBOARDING_OTP_TEMPLATE_ID=template_8ho2pwf
-   EMAILJS_ONBOARDING_NOTICE_TEMPLATE_ID=your_onboarding_notice_template_id
-   ONBOARDING_OTP_PEPPER=use_a_long_random_secret_at_least_32_characters
-   ```
+## Manual agreement steps
 
-   Generate a fresh random pepper locally. Never commit the project `.env` file or paste its value into a public issue/chat.
-6. Deploy the endpoints and access rules:
+1. Host the final PDF at a public HTTPS URL before sending. Anyone with that URL can view the PDF, so do not use a document containing unrelated personal or banking data.
+2. Send the agreement from the vendor application modal. EmailJS sends the message directly and the link opens `/sign-agreement` without login.
+3. The signer reviews the PDF, enters name/address/date, draws a signature, accepts the terms, and submits. EmailJS sends the details and signature image to `support.culturewave@gmail.com`.
+4. An administrator verifies the email, manually combines the signature with the agreement PDF, and updates the application after review. The app does not create a locked signed PDF or prevent repeat submissions on Spark.
 
-   ```sh
-   firebase deploy --only functions,firestore:rules,storage
-   ```
-
-## EmailJS template variables
-
-The OTP email must render `{{otp_code}}` and be addressed to `{{to_email}}`. The onboarding notice template should include `{{message_html}}`, with recipient and subject variables above. Test both templates from the EmailJS dashboard before accepting live applications.
-
-## Important notes
-
-- Do not use Firebase client SDK calls to create lister users. Account provisioning is restricted to the admin approval Function.
-- The generated agreement PDF records the terms shown, applicant details, signature image, signing time, and reference. This in-app signature is not Aadhaar eSign or a certificate from a licensed digital-signature provider. If the agreement requires certified eSign, integrate an approved signing provider before treating it as such.
-- PAN, Aadhaar, and bank information are sensitive. Keep admin access limited, do not create public download URLs, and set a document-retention policy. Admin document links expire after five minutes.
-- `firebase-debug.log` and the existing uncommitted `firebase.js` changes were present before this work; review them separately before committing.
+This browser signature is not Aadhaar eSign or a certificate from a licensed digital-signature provider.
