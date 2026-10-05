@@ -43,7 +43,7 @@ This Event Listing and Collaboration Agreement ("Agreement") is entered into bet
 20. This Agreement and its Annexures are the agreement between the parties for the Event listing and collaboration described here. Any amendment must be recorded in writing and accepted by both parties.
 
 MERCHANT DETAILS AND SIGNATURE
-The Merchant name, registered address, authorized signatory, email, phone, optional GSTIN, signing date and electronic signature shown in the final pages of this Agreement are incorporated into and form part of this Agreement.
+The Merchant's details and electronic signature below are incorporated into and form part of this Agreement. Merchant name: {{MERCHANT_NAME}}. Business name: {{BUSINESS_NAME}}. Registered address: {{REGISTERED_ADDRESS}}. Email: {{MERCHANT_EMAIL}}. Signing date: {{SIGNING_DATE}}.
 
 ANNEXURE A — EVENT DETAILS AND OTHER DELIVERABLES
 Event Details ("Event"): Events hosted by the Merchant and submitted for listing on CultureWave. The event name, date, venue, description, deliverables and other event-specific details displayed in the applicable CultureWave listing form part of this Annexure.
