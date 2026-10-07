@@ -7,6 +7,11 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    function isAnonymousApplicant() {
+      return request.auth != null &&
+        request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
     // Public booking pages may update only the aggregate attendee counter.
     // Event fields and attendee details remain owner/admin controlled.
     function attendeeCountIncrement() {
@@ -206,7 +211,34 @@ service cloud.firestore {
         request.resource.data.documents is list && request.resource.data.documents.size() >= 2 && request.resource.data.documents.size() <= 12 &&
         request.resource.data.documentIds is list && request.resource.data.documentIds.size() == request.resource.data.documents.size() &&
         request.resource.data.submittedAt == request.time && request.resource.data.createdAt == request.time;
-      allow read, update, delete: if isAdmin();
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isAnonymousApplicant() &&
+        resource.data.status != 'SIGNED' &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status', 'agreementStatus', 'signedAgreement', 'updatedAt'
+        ]) &&
+        request.resource.data.status == 'SIGNED' &&
+        request.resource.data.agreementStatus == 'SIGNED' &&
+        request.resource.data.updatedAt == request.time &&
+        request.resource.data.signedAgreement is map &&
+        request.resource.data.signedAgreement.keys().hasOnly([
+          'path', 'name', 'tokenHash', 'signerName', 'signerAddress',
+          'signingDate', 'signerEmail', 'signedAt'
+        ]) &&
+        request.resource.data.signedAgreement.path == 'firestore-signed:final' &&
+        request.resource.data.signedAgreement.name == 'SIGNED_VENDOR_AGREEMENT.pdf' &&
+        request.resource.data.signedAgreement.tokenHash is string &&
+        request.resource.data.signedAgreement.signerName is string &&
+        request.resource.data.signedAgreement.signerAddress is string &&
+        request.resource.data.signedAgreement.signingDate is string &&
+        request.resource.data.signedAgreement.signerEmail is string &&
+        request.resource.data.signedAgreement.signedAt == request.time &&
+        get(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.applicationId == applicationId &&
+        getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.used == true &&
+        getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.signerUid == request.auth.uid &&
+        getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.signedAgreementId == 'final'
+      );
 
       match /documents/{fileId} {
         allow get, list: if isAdmin();
@@ -243,6 +275,48 @@ service cloud.firestore {
           getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.applicantUid == request.auth.uid;
         allow update, delete: if isAdmin();
       }
+
+      match /signedAgreement/{agreementId} {
+        allow get: if isAdmin() || (
+          isAnonymousApplicant() && agreementId == 'final' &&
+          resource.data.applicationId == applicationId &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(resource.data.tokenHash)).data.applicationId == applicationId &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(resource.data.tokenHash)).data.used == true
+        );
+        allow list: if isAdmin();
+        allow create: if isAdmin() || (
+          isAnonymousApplicant() && agreementId == 'final' &&
+          request.resource.data.keys().hasOnly([
+            'applicationId', 'tokenHash', 'signerUid', 'signerName',
+            'signerAddress', 'signerEmail', 'signingDate', 'serviceFeePercent',
+            'dataUrl', 'signatureDataUrl', 'contentType', 'size', 'createdAt'
+          ]) &&
+          request.resource.data.applicationId == applicationId &&
+          request.resource.data.tokenHash is string &&
+          request.resource.data.signerUid == request.auth.uid &&
+          request.resource.data.signerName is string &&
+          request.resource.data.signerAddress is string &&
+          request.resource.data.signerEmail is string &&
+          request.resource.data.signingDate is string &&
+          request.resource.data.serviceFeePercent is number &&
+          request.resource.data.contentType == 'application/pdf' &&
+          request.resource.data.dataUrl is string &&
+          request.resource.data.dataUrl.size() <= 900000 &&
+          request.resource.data.dataUrl.matches('^data:application/pdf;base64,.*') &&
+          request.resource.data.signatureDataUrl is string &&
+          request.resource.data.signatureDataUrl.size() <= 100000 &&
+          request.resource.data.signatureDataUrl.matches('^data:image/png;base64,.*') &&
+          request.resource.data.size is int && request.resource.data.size <= 675000 &&
+          request.resource.data.createdAt == request.time &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.applicationId == applicationId &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.used == false &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.expiresAt > request.time &&
+          getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.used == true &&
+          getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.signerUid == request.auth.uid &&
+          getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.signedAgreementId == agreementId
+        );
+        allow update, delete: if isAdmin();
+      }
     }
     match /onboardingCounters/{counterId} {
       allow read, write: if false;
@@ -258,7 +332,41 @@ service cloud.firestore {
       allow write: if false;
     }
     match /onboardingSigningTokens/{tokenHash} {
-      allow read, write: if false;
+      allow get: if isAdmin() || (isAnonymousApplicant() &&
+        ((resource.data.used == false && resource.data.expiresAt > request.time) ||
+         (resource.data.used == true && resource.data.signedAgreementId == 'final')));
+      allow list: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly([
+          'applicationId', 'email', 'name', 'businessName', 'address',
+          'fee', 'agreementText', 'createdAt', 'expiresAt', 'used', 'signerUid'
+        ]) &&
+        request.resource.data.applicationId is string &&
+        request.resource.data.email is string &&
+        request.resource.data.name is string &&
+        request.resource.data.businessName is string &&
+        request.resource.data.address is string &&
+        request.resource.data.fee is number &&
+        request.resource.data.agreementText is string &&
+        request.resource.data.agreementText.size() <= 30000 &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.expiresAt is timestamp &&
+        request.resource.data.used == false && request.resource.data.signerUid == null;
+      allow update: if isAdmin() || (
+        isAnonymousApplicant() && resource.data.used == false &&
+        resource.data.expiresAt > request.time &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'used', 'signerUid', 'signedAgreementId', 'signedAt'
+        ]) &&
+        request.resource.data.used == true &&
+        request.resource.data.signerUid == request.auth.uid &&
+        request.resource.data.signedAgreementId == 'final' &&
+        request.resource.data.signedAt == request.time &&
+        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.status == 'SIGNED' &&
+        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.signedAgreement.tokenHash == tokenHash &&
+        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)/signedAgreement/final).data.tokenHash == tokenHash
+      );
+      allow delete: if isAdmin();
     }
 
     match /organisers/{uid} {

@@ -16,7 +16,7 @@
     <article class="card" id="agreementCard">
       <span class="badge" id="statusBadge">VENDOR AGREEMENT</span>
       <h1 id="pageTitle">Review and sign</h1>
-      <p class="muted" id="intro">Review the agreement below and enter your details. No account login is required. Your signature will be emailed to CultureWave for manual review. Read the <a href="vendor-terms-and-conditions.html" target="_blank" rel="noopener">Vendor Terms and Conditions</a> before signing.</p>
+      <p class="muted" id="intro">Review the agreement below and enter your details. No account login is required. Your signed agreement PDF will be saved for CultureWave's review. Read the <a href="vendor-terms-and-conditions.html" target="_blank" rel="noopener">Vendor Terms and Conditions</a> before signing.</p>
       <div id="applicationDetails" class="details"></div>
       <h2>Agreement</h2><div id="agreementTerms" class="terms"></div>
       <section class="terms" aria-label="Personalized merchant details" style="margin-top:14px"><h3>Merchant details and signature</h3><p><strong>Name:</strong> <span id="previewSignerName">—</span></p><p><strong>Business:</strong> <span id="previewBusinessName">—</span></p><p><strong>Address:</strong> <span id="previewSignerAddress">—</span></p><p><strong>Email:</strong> <span id="previewSignerEmail">—</span></p><p><strong>Signing date:</strong> <span id="previewSigningDate">—</span></p><div><strong>Signature:</strong><p id="signaturePlaceholder">Your signature will appear here after you sign.</p><img id="agreementSignaturePreview" alt="Your electronic signature" hidden style="max-width:min(100%,420px);height:100px;object-fit:contain;object-position:left center;border-bottom:1px solid var(--line)"></div></section>
@@ -32,35 +32,51 @@
         <button class="button" id="submitSignature" style="width:100%;margin-top:18px" type="button">Sign and submit agreement</button>
       </section>
     </article>
-    <section class="card" id="signedPanel" hidden><span class="badge signed">SUBMITTED FOR REVIEW</span><h1>Signature submitted</h1><p class="muted">Your signature details were emailed to CultureWave for manual review.</p><div class="signed-meta" id="signedMeta"></div></section>
+    <section class="card" id="signedPanel" hidden><span class="badge signed">SIGNED AND SAVED</span><h1>Signature submitted</h1><p class="muted">Your signed agreement PDF is saved. You can download it or share it with the CultureWave team.</p><div class="signed-meta" id="signedMeta"></div><div class="actions"><button class="button" id="downloadSignedPdf" type="button">Download signed PDF</button><button class="button secondary" id="shareSignedPdf" type="button">Share signed PDF</button></div></section>
     <div class="notice" id="loadNotice" role="alert" aria-live="polite"></div>
   </main>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="module">
 import { EMAILJS_SIGNATURE_TEMPLATE_ID } from './emailjs-agreement-config.js?v=20261005';
 import { CULTUREWAVE_AGREEMENT } from './agreement-template.js?v=20261005-current-agreement';
+import { app } from './firebase.js';
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { doc, getDoc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { PDFDocument, StandardFonts, rgb } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
+const signingApp=getApps().find(firebaseApp=>firebaseApp.name==='agreement-signer')||initializeApp(app.options,'agreement-signer');
+const signingAuth=getAuth(signingApp),signingDb=getFirestore(signingApp);
 const EMAILJS_SERVICE_ID='service_wvzjnnx',EMAILJS_PUBLIC_KEY='JXh4QRP2kafFxlPQo';
 emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
-const encoded=location.hash.slice(1);
+const signingToken=location.hash.replace(/^#(?:token=)?/,'');
 const $=id=>document.getElementById(id);
-let agreement=null,hasInk=false;
+let agreement=null,hasInk=false,tokenHash='',tokenRef=null,signedRecordRef=null,signedPdfDataUrl='';
 const esc=s=>String(s||'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function notice(text,ok=false){const el=$('notice');el.textContent=text;el.className='notice show'+(ok?' ok':'')}
 async function showSigned(){
-  $('signingPanel').hidden=true;$('statusBadge').textContent='SUBMITTED FOR REVIEW';$('statusBadge').classList.add('signed');$('pageTitle').textContent='Signature submitted';$('intro').textContent='Your signature details were emailed to CultureWave for manual review.';$('signedPanel').hidden=false;$('signedMeta').textContent=`Application ${agreement.applicationId} · Submitted ${new Date().toLocaleString()}`;
+  $('signingPanel').hidden=true;$('statusBadge').textContent='SIGNED AND SAVED';$('statusBadge').classList.add('signed');$('pageTitle').textContent='Signature submitted';$('intro').textContent='Your signature is saved. This agreement cannot be signed a second time.';$('signedPanel').hidden=false;$('signedMeta').textContent=`Application ${agreement.applicationId} · Saved ${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}`;$('downloadSignedPdf').onclick=()=>downloadPdf(signedPdfDataUrl,`SIGNED_VENDOR_AGREEMENT_${agreement.applicationId}.pdf`);$('shareSignedPdf').onclick=shareVendorPdf;
 }
+async function sha256Hex(value){const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));return Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('')}
+function formatAgreementDate(value){return value?new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'long',year:'numeric'}).format(new Date(`${value}T12:00:00+05:30`)):'________________'}
 async function loadAgreement(){
   try{
-    if(!encoded)throw new Error('This agreement link is missing its details. Ask CultureWave to resend the signing link.');
-    const decoded=JSON.parse(decodeURIComponent(escape(atob(encoded.replace(/-/g,'+').replace(/_/g,'/')))));
-    agreement=decoded.i?{applicationId:decoded.i,email:decoded.e,name:decoded.n,businessName:decoded.b,address:decoded.a,fee:decoded.f,text:decoded.v===2?decoded.t:null}:{...decoded,text:decoded.v===2?decoded.text:null};
-    if(!agreement.applicationId||!Number.isFinite(Number(agreement.fee)))throw new Error('This signing link is incomplete. Ask CultureWave to resend it.');
+    if(!signingToken)throw new Error('This agreement link is outdated. Ask CultureWave to send a fresh signing link.');
+    if(!signingAuth.currentUser||!signingAuth.currentUser.isAnonymous)await signInAnonymously(signingAuth);
+    tokenHash=await sha256Hex(signingToken);tokenRef=doc(signingDb,'onboardingSigningTokens',tokenHash);
+    const tokenSnapshot=await getDoc(tokenRef);if(!tokenSnapshot.exists())throw new Error('This agreement link is expired or invalid. Ask CultureWave to resend it.');
+    const tokenData=tokenSnapshot.data(),expiresAt=tokenData.expiresAt?.toDate?.()||new Date(tokenData.expiresAt);
+    if(!tokenData.used&&expiresAt.getTime()<Date.now())throw new Error('This signing link has expired. Ask CultureWave to resend it.');
+    agreement={applicationId:tokenData.applicationId,email:tokenData.email,name:tokenData.name,businessName:tokenData.businessName,address:tokenData.address,fee:tokenData.fee,text:tokenData.agreementText};
+    if(!agreement.applicationId||!Number.isFinite(Number(agreement.fee))||!agreement.text)throw new Error('This signing link is incomplete. Ask CultureWave to resend it.');
+    signedRecordRef=doc(signingDb,'vendorOnboarding',agreement.applicationId,'signedAgreement','final');
     const address=agreement.address||'';
     $('applicationDetails').innerHTML=[['Application ID',agreement.applicationId],['Applicant name',agreement.name],['Business name',agreement.businessName],['Email',agreement.email],['Registered address',address],['Agreed service fee',`${agreement.fee}%`]].map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
     $('signerName').value=agreement.name||'';$('signerAddress').value=address;
     $('emailAddress').value=agreement.email||'';
     const indiaToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());$('signingDate').value=indiaToday;$('signingDate').max=indiaToday;
     setupCanvas();['signerName','signerAddress','emailAddress','signingDate'].forEach(id=>$(id).addEventListener('input',renderAgreementPreview));renderAgreementPreview();
+    if(tokenData.used){const signedSnapshot=await getDoc(signedRecordRef);if(!signedSnapshot.exists())throw new Error('This agreement is already signed. Contact CultureWave to get your saved copy.');const saved=signedSnapshot.data();signedPdfDataUrl=saved.dataUrl;$('signerName').value=saved.signerName;$('signerAddress').value=saved.signerAddress;$('emailAddress').value=saved.signerEmail;$('signingDate').value=saved.signingDate;renderAgreementPreview();if(saved.signatureDataUrl){$('agreementSignaturePreview').src=saved.signatureDataUrl;$('agreementSignaturePreview').hidden=false;$('signaturePlaceholder').hidden=true}await showSigned()}
   }catch(error){$('applicationDetails').textContent=error.message;$('agreementTerms').hidden=true;$('signingPanel').hidden=true}
 }
 function renderAgreementPreview(){
@@ -71,6 +87,32 @@ function renderAgreementPreview(){
   $('previewSignerName').textContent=signerName||'—';$('previewBusinessName').textContent=agreement.businessName||'—';$('previewSignerAddress').textContent=signerAddress||'—';$('previewSignerEmail').textContent=signerEmail||'—';$('previewSigningDate').textContent=dateText==='________________'?'—':dateText;
   $('agreementSignaturePreview').hidden=!hasInk;$('signaturePlaceholder').hidden=hasInk;if(hasInk)$('agreementSignaturePreview').src=$('signature').toDataURL('image/png');
 }
+function printablePdfText(value){return String(value||'').replace(/⸻/g,'------------------------------').replace(/₹/g,'INR ').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').normalize('NFKD').replace(/[^\x20-\x7E]/g,'?')}
+async function buildSignedAgreementPdf(text,signatureDataUrl,details){
+  const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold),signatureBytes=Uint8Array.from(atob(signatureDataUrl.split(',')[1]),character=>character.charCodeAt(0)),signatureImage=await pdf.embedPng(signatureBytes),signatureScale=Math.min(260/signatureImage.width,90/signatureImage.height),signatureWidth=signatureImage.width*signatureScale,signatureHeight=signatureImage.height*signatureScale,pageWidth=612,pageHeight=792,left=56,right=56,top=54,bottom=54,size=9.5,lineHeight=13;
+  pdf.setTitle(`Signed CultureWave Agreement - ${details.applicationId}`);pdf.setAuthor('CultureWave India');pdf.setSubject(`Electronically signed vendor agreement ${details.applicationId}`);
+  let page=pdf.addPage([pageWidth,pageHeight]),y=pageHeight-top;
+  const nextPage=()=>{page=pdf.addPage([pageWidth,pageHeight]);y=pageHeight-top};
+  const wrap=(value,currentFont,currentSize,maxWidth)=>{const words=printablePdfText(value).split(/\s+/);const lines=[];let line='';for(const word of words){const candidate=line?`${line} ${word}`:word;if(currentFont.widthOfTextAtSize(candidate,currentSize)>maxWidth&&line){lines.push(line);line=word}else line=candidate}if(line)lines.push(line);return lines};
+  for(const paragraph of String(text).split(/\r?\n/)){
+    if(!paragraph.trim()){y-=lineHeight;if(y<bottom)nextPage();continue}
+    if(/^signature:\s*$/i.test(paragraph.trim())){if(y<bottom+signatureHeight+40)nextPage();page.drawText('Signature:',{x:left,y,size:10,font:bold,color:rgb(.10,.13,.19)});y-=18;page.drawImage(signatureImage,{x:left,y:y-signatureHeight,width:signatureWidth,height:signatureHeight});y-=signatureHeight+22;continue}
+    const isHeading=/^(EVENT LISTING|ANNEXURE|SIGNED BY MERCHANT|PAYMENT TERMS)/i.test(paragraph.trim()),currentFont=isHeading?bold:font,currentSize=isHeading?11:size;
+    for(const line of wrap(paragraph,currentFont,currentSize,pageWidth-left-right)){
+      if(y<bottom)nextPage();page.drawText(line,{x:left,y,size:currentSize,font:currentFont,color:rgb(.10,.13,.19),maxWidth:pageWidth-left-right});y-=isHeading?lineHeight+2:lineHeight;
+    }
+  }
+  page=pdf.addPage([pageWidth,pageHeight]);y=pageHeight-top;
+  page.drawText('ELECTRONIC SIGNATURE DETAILS',{x:left,y,size:16,font:bold,color:rgb(.10,.13,.19)});y-=34;
+  const detailLines=[['Application ID',details.applicationId],['Merchant name',details.signerName],['Business name',details.businessName],['Registered address',details.signerAddress],['Email',details.signerEmail],['Agreed service fee',`${details.fee}%`],['Signing date',formatAgreementDate(details.signingDate)]];
+  for(const [label,value] of detailLines){const lines=wrap(`${label}: ${value}`,font,10,pageWidth-left-right);for(const line of lines){if(y<bottom)nextPage();page.drawText(line,{x:left,y,size:10,font,color:rgb(.10,.13,.19)});y-=16}}
+  y-=12;if(y<140)nextPage();page.drawText('Merchant signature',{x:left,y,size:11,font:bold,color:rgb(.10,.13,.19)});y-=18;
+  page.drawImage(signatureImage,{x:left,y:y-signatureHeight,width:signatureWidth,height:signatureHeight});y-=signatureHeight+18;
+  page.drawText(`Signed electronically by ${printablePdfText(details.signerName)} on ${printablePdfText(formatAgreementDate(details.signingDate))}.`,{x:left,y,size:9,font,color:rgb(.25,.29,.36),maxWidth:pageWidth-left-right});
+  const bytes=await pdf.save();if(bytes.length>670000)throw new Error('The signed PDF is too large to save securely. Shorten the agreement text and try again.');let binary='';for(let offset=0;offset<bytes.length;offset+=0x8000)binary+=String.fromCharCode(...bytes.subarray(offset,offset+0x8000));return`data:application/pdf;base64,${btoa(binary)}`;
+}
+async function downloadPdf(dataUrl,fileName){const blob=await(await fetch(dataUrl)).blob(),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=fileName;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
+async function shareVendorPdf(){if(!signedPdfDataUrl)return;const blob=await(await fetch(signedPdfDataUrl)).blob(),file=new File([blob],`SIGNED_VENDOR_AGREEMENT_${agreement.applicationId}.pdf`,{type:'application/pdf'});if(navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:'Signed CultureWave vendor agreement'});return}await downloadPdf(signedPdfDataUrl,file.name);$('signedMeta').textContent+=' · File sharing is unavailable on this device; the PDF was downloaded.'}
 function setupCanvas(){
   const canvas=$('signature'),ctx=canvas.getContext('2d');let drawing=false;
   function sizeCanvas(){const box=canvas.getBoundingClientRect(),ratio=window.devicePixelRatio||1;canvas.width=Math.max(1,box.width*ratio);canvas.height=Math.max(1,box.height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#172033'}
@@ -86,8 +128,23 @@ $('submitSignature').onclick=async()=>{
   if(!$('signerName').value.trim()||!$('signerAddress').value.trim()||!$('emailAddress').value.trim()||!$('signingDate').value){notice('Complete your name, address, email, and signing date.');return}
   if(!$('accepted').checked){notice('Please confirm that you accept the agreement.');return}
   const button=$('submitSignature');button.disabled=true;button.textContent='Submitting securely…';
-  try{if(EMAILJS_SIGNATURE_TEMPLATE_ID.startsWith('REPLACE_')||EMAILJS_SIGNATURE_TEMPLATE_ID==='template_caj3zqw')throw new Error('Signature template is not configured correctly.');const signature=$('signature').toDataURL('image/png');const signerEmail=$('emailAddress').value.trim();const signerName=$('signerName').value.trim();const signerAddress=$('signerAddress').value.trim();const signingDate=$('signingDate').value;const values={SERVICE_FEE_PERCENT:String(agreement.fee),MERCHANT_NAME:signerName,BUSINESS_NAME:agreement.businessName||'',REGISTERED_ADDRESS:signerAddress,MERCHANT_EMAIL:signerEmail,SIGNING_DATE:new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'long',year:'numeric'}).format(new Date(`${signingDate}T12:00:00+05:30`))};const signedAgreementText=(agreement.text||CULTUREWAVE_AGREEMENT).replace(/\{\{([A-Z_]+)\}\}/g,(marker,key)=>values[key]??marker);const message=`Agreement signature submission\nApplication: ${agreement.applicationId}\nSigner: ${signerName}\nAddress: ${signerAddress}\nDate: ${signingDate}\nSigner email: ${signerEmail}\nAgreed service fee: ${agreement.fee}%`;const messageHtml=`${esc(message).replace(/\n/g,'<br>')}<hr><h3>Signed agreement text</h3><pre style="white-space:pre-wrap;font:inherit">${esc(signedAgreementText)}</pre>`;await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_SIGNATURE_TEMPLATE_ID,{to_email:'support.culturewave@gmail.com',to_name:'CultureWave Vendor Onboarding',name:signerName,subject:`Signed agreement · ${agreement.applicationId}`,message,message_html:messageHtml,applicationId:agreement.applicationId,signerName,signerAddress,signingDate,signerEmail,serviceFeePercent:agreement.fee,reply_to:signerEmail,signature_image:signature,signature_filename:`signature-${agreement.applicationId}.png`});$('notice').className='notice';await showSigned()}
-  catch(error){notice(error.text||error.message||'EmailJS could not send your signature.');button.disabled=false;button.textContent='Sign and submit agreement'}
+  try{
+    const signature=$('signature').toDataURL('image/png'),signerEmail=$('emailAddress').value.trim(),signerName=$('signerName').value.trim(),signerAddress=$('signerAddress').value.trim(),signingDate=$('signingDate').value,todayIndia=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(signingDate)||signingDate>todayIndia)throw new Error('Choose a valid signing date that is not in the future.');
+    const values={SERVICE_FEE_PERCENT:String(agreement.fee),MERCHANT_NAME:signerName,BUSINESS_NAME:agreement.businessName||'',REGISTERED_ADDRESS:signerAddress,MERCHANT_EMAIL:signerEmail,SIGNING_DATE:formatAgreementDate(signingDate)};
+    const signedAgreementText=(agreement.text||CULTUREWAVE_AGREEMENT).replace(/\{\{([A-Z_]+)\}\}/g,(marker,key)=>values[key]??marker);
+    signedPdfDataUrl=await buildSignedAgreementPdf(signedAgreementText,signature,{applicationId:agreement.applicationId,signerName,signerAddress,signerEmail,businessName:agreement.businessName||'',signingDate,fee:agreement.fee});
+    const pdfBytes=Math.floor((signedPdfDataUrl.length-`data:application/pdf;base64,`.length)*.75),signerUid=signingAuth.currentUser.uid;
+    await runTransaction(signingDb,async transaction=>{
+      const latestToken=await transaction.get(tokenRef);if(!latestToken.exists()||latestToken.data().used||latestToken.data().expiresAt.toDate().getTime()<Date.now())throw new Error('This agreement has already been signed or expired. Refresh to view the saved PDF.');
+      transaction.set(signedRecordRef,{applicationId:agreement.applicationId,tokenHash,signerUid,signerName,signerAddress,signerEmail,signingDate,serviceFeePercent:Number(agreement.fee),dataUrl:signedPdfDataUrl,signatureDataUrl:signature,contentType:'application/pdf',size:pdfBytes,createdAt:serverTimestamp()});
+      transaction.update(tokenRef,{used:true,signerUid,signedAgreementId:'final',signedAt:serverTimestamp()});
+      transaction.update(doc(signingDb,'vendorOnboarding',agreement.applicationId),{status:'SIGNED',agreementStatus:'SIGNED',signedAgreement:{path:'firestore-signed:final',name:'SIGNED_VENDOR_AGREEMENT.pdf',tokenHash,signerName,signerAddress,signingDate,signerEmail,signedAt:serverTimestamp()},updatedAt:serverTimestamp()});
+    });await showSigned();
+    const message=`Vendor agreement signed and saved.\nApplication: ${agreement.applicationId}\nSigner: ${signerName}\nEmail: ${signerEmail}\nDate: ${signingDate}\nThe signed PDF is available in Admin Dashboard > Vendor Applications.`;
+    try{if(!EMAILJS_SIGNATURE_TEMPLATE_ID.startsWith('REPLACE_')&&EMAILJS_SIGNATURE_TEMPLATE_ID!=='template_caj3zqw')await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_SIGNATURE_TEMPLATE_ID,{to_email:'support.culturewave@gmail.com',to_name:'CultureWave Vendor Onboarding',name:signerName,subject:`Signed agreement · ${agreement.applicationId}`,message,message_html:esc(message).replace(/\n/g,'<br>'),applicationId:agreement.applicationId,signerName,signerAddress,signingDate,signerEmail,serviceFeePercent:agreement.fee,reply_to:signerEmail});}
+    catch{ $('signedMeta').textContent+=` · Admin email notification could not be sent; the PDF is saved in the dashboard.` }
+  }catch(error){const locked=error.code==='permission-denied'||error.code==='failed-precondition'||/already signed|already used/i.test(error.message||'');notice(locked?'This agreement has already been signed or expired. Refresh to view the saved PDF.':error.message||'Could not save the signed agreement. Check your connection and try again.');button.disabled=false;button.textContent='Sign and submit agreement'}
 };
 loadAgreement();
 </script>
