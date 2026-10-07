@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+  <title>Activate CultureWave Lister Account</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:#f4f7ff;color:#172033;font:16px system-ui,-apple-system,sans-serif}.card{width:min(560px,100%);padding:clamp(24px,6vw,44px);background:#fff;border:1px solid #dce5f8;border-radius:22px;box-shadow:0 24px 70px #14388316}h1{margin:12px 0;font-size:clamp(1.6rem,5vw,2.1rem)}p{line-height:1.6;color:#64748b}.brand{color:#2457d6;font-size:1.15rem;font-weight:850}.field{display:grid;gap:7px;margin:20px 0}.field input{padding:13px;border:1px solid #d6deec;border-radius:10px;font:inherit}.button{width:100%;padding:14px;border:0;border-radius:11px;background:#2457d6;color:#fff;font:700 1rem system-ui;cursor:pointer}.button:disabled{opacity:.6}.status{display:none;margin-top:16px;padding:13px;border-radius:10px;background:#fff1f0;color:#a5261c;line-height:1.5}.status.show{display:block}.status.ok{background:#ecfdf3;color:#17603a}
+  </style>
+</head>
+<body>
+  <main class="card"><div class="brand">CultureWave</div><h1>Activate your lister account</h1><p>Confirm the email address that received this secure sign-in link and choose a password for future dashboard logins.</p><label class="field">Email address<input id="email" type="email" autocomplete="email" required></label><label class="field">Create a password<input id="password" type="password" autocomplete="new-password" minlength="8" required></label><label class="field">Confirm password<input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></label><button id="activate" class="button" type="button">Verify email and activate account</button><div id="status" class="status" role="status" aria-live="polite"></div></main>
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { EmailAuthProvider, isSignInWithEmailLink, linkWithCredential, signInWithEmailLink, updatePassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { doc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    const paramsFromLink=(()=>{const queue=[location.href],seen=new Set(),state={};while(queue.length&&seen.size<12){const raw=queue.shift();if(!raw||seen.has(raw))continue;seen.add(raw);try{const url=new URL(raw,location.origin);for(const key of ['activation','applicationId'])if(!state[key]&&url.searchParams.has(key))state[key]=url.searchParams.get(key);for(const key of ['continueUrl','continueURL','link','deep_link_id']){const nested=url.searchParams.get(key);if(nested)queue.push(nested)}}catch{}}return state})();
+    const emailInput=document.getElementById('email'),button=document.getElementById('activate'),status=document.getElementById('status');
+    const say=(message,ok=false)=>{status.textContent=message;status.className='status show'+(ok?' ok':'')};
+    emailInput.value='';
+    async function hashToken(value){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));return Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,'0')).join('')}
+    async function activate(uid,email){
+      const rawToken=paramsFromLink.activation;if(!rawToken)throw new Error('This activation link is missing its approval token. Ask CultureWave to send a new activation email.');
+      const tokenHash=await hashToken(rawToken),tokenRef=doc(db,'onboardingActivationTokens',tokenHash);
+      await runTransaction(db,async transaction=>{
+        const tokenSnapshot=await transaction.get(tokenRef);if(!tokenSnapshot.exists())throw new Error('This activation link is invalid or expired. Ask CultureWave to send a new one.');
+        const token=tokenSnapshot.data(),expiresAt=token.expiresAt?.toDate?.()||new Date(token.expiresAt);
+        if(token.email.toLowerCase()!==email.toLowerCase()||token.applicationId!==paramsFromLink.applicationId)throw new Error('This activation link does not match the verified email.');
+        if(token.used){if(token.activatedBy===uid)return;throw new Error('This activation link has already been used. Contact CultureWave if you need help.')}
+        if(expiresAt.getTime()<Date.now())throw new Error('This activation link has expired. Ask CultureWave to send a new one.');
+        const userRef=doc(db,'users',uid),organiserRef=doc(db,'organisers',uid),applicationRef=doc(db,'vendorOnboarding',token.applicationId),userSnapshot=await transaction.get(userRef);
+        if(userSnapshot.exists()&&!['client','customer','lister'].includes(userSnapshot.data().role))throw new Error('This email already has a different account type. Contact CultureWave support.');
+        const profile={uid,name:token.name||email,email,phone:token.phone||'',role:'lister',status:'active',emailVerified:true,onboardingApplicationId:token.applicationId,activationTokenHash:tokenHash};
+        if(userSnapshot.exists())transaction.set(userRef,{...userSnapshot.data(),...profile,updatedAt:serverTimestamp()});else transaction.set(userRef,{...profile,createdAt:serverTimestamp()});
+        transaction.set(organiserRef,{ownerId:uid,name:token.businessName||token.name||email,businessName:token.businessName||'',email,phone:token.phone||'',status:'active',createdAt:serverTimestamp()},{merge:true});
+        transaction.update(applicationRef,{userId:uid,accountSetupStatus:'ACTIVE',updatedAt:serverTimestamp()});
+        transaction.update(tokenRef,{used:true,activatedBy:uid,activatedAt:serverTimestamp()});
+      });
+    }
+    button.addEventListener('click',async()=>{
+      const email=emailInput.value.trim(),password=document.getElementById('password').value,confirmPassword=document.getElementById('confirmPassword').value;if(!email){say('Enter the email address that received this link.');return}if(password.length<8){say('Choose a password with at least 8 characters.');return}if(password!==confirmPassword){say('The passwords do not match.');return}
+      const existingUser=auth.currentUser?.email?.toLowerCase()===email.toLowerCase()&&auth.currentUser.emailVerified?auth.currentUser:null;if(!existingUser&&!isSignInWithEmailLink(auth,location.href)){say('Open the account activation link from your email on this page, then try again.');return}
+      button.disabled=true;button.textContent='Verifying…';
+      try{const user=existingUser||(await signInWithEmailLink(auth,email,location.href)).user;try{await linkWithCredential(user,EmailAuthProvider.credential(email,password))}catch(error){if(error.code==='auth/provider-already-linked')await updatePassword(user,password);else throw error}await activate(user.uid,user.email||email);say('Your lister account is active. Opening your dashboard…',true);button.textContent='Account activated';setTimeout(()=>location.assign('premium-client-dashboard.html'),1100)}catch(error){say(error.code==='auth/credential-already-in-use'?'This email already has a password login. Sign in to that account first, then ask CultureWave to resend the activation link.':error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Verify email and activate account'}
+    });
+  </script>
+</body>
+</html>

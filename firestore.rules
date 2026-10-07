@@ -12,6 +12,27 @@ service cloud.firestore {
         request.auth.token.firebase.sign_in_provider == 'anonymous';
     }
 
+    function validListerActivation(uid, applicationId, tokenHash) {
+      let token = get(/databases/$(database)/documents/onboardingActivationTokens/$(tokenHash)).data;
+      let tokenAfter = getAfter(/databases/$(database)/documents/onboardingActivationTokens/$(tokenHash)).data;
+      let applicationAfter = getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data;
+      let userAfter = getAfter(/databases/$(database)/documents/users/$(uid)).data;
+      return request.auth != null && request.auth.uid == uid &&
+        request.auth.token.email_verified == true &&
+        token.applicationId == applicationId &&
+        token.email == request.auth.token.email &&
+        token.used == false && token.expiresAt > request.time &&
+        tokenAfter.used == true && tokenAfter.activatedBy == uid &&
+        applicationAfter.status == 'APPROVED' &&
+        applicationAfter.email == request.auth.token.email &&
+        applicationAfter.activationTokenHash == tokenHash &&
+        applicationAfter.accountSetupStatus == 'ACTIVE' &&
+        applicationAfter.userId == uid &&
+        userAfter.role == 'lister' &&
+        userAfter.onboardingApplicationId == applicationId &&
+        userAfter.activationTokenHash == tokenHash;
+    }
+
     // Public booking pages may update only the aggregate attendee counter.
     // Event fields and attendee details remain owner/admin controlled.
     function attendeeCountIncrement() {
@@ -75,12 +96,19 @@ service cloud.firestore {
       allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
       // Lister/admin accounts are provisioned only by trusted server code.
       // Preserve ordinary customer sign-up without granting a privileged role.
-      allow create: if request.auth != null && request.auth.uid == uid &&
+      allow create: if (request.auth != null && request.auth.uid == uid &&
         request.resource.data.role in ['client', 'customer'] &&
-        request.resource.data.status != 'admin';
+        request.resource.data.status != 'admin') ||
+        (request.resource.data.role == 'lister' &&
+         request.resource.data.uid == uid &&
+         validListerActivation(uid, request.resource.data.onboardingApplicationId, request.resource.data.activationTokenHash));
       allow update: if isAdmin() || (request.auth != null && request.auth.uid == uid &&
         request.resource.data.role == resource.data.role &&
-        request.resource.data.status == resource.data.status);
+        request.resource.data.status == resource.data.status) ||
+        (request.auth != null && request.auth.uid == uid &&
+         resource.data.role in ['client', 'customer'] &&
+         request.resource.data.role == 'lister' &&
+         validListerActivation(uid, request.resource.data.onboardingApplicationId, request.resource.data.activationTokenHash));
       allow delete: if isAdmin();
 
       match /following/{organiserId} {
@@ -238,6 +266,14 @@ service cloud.firestore {
         getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.used == true &&
         getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.signerUid == request.auth.uid &&
         getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.signedAgreementId == 'final'
+      ) || (request.auth != null &&
+        resource.data.status == 'APPROVED' &&
+        resource.data.email == request.auth.token.email &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['userId', 'accountSetupStatus', 'updatedAt']) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.accountSetupStatus == 'ACTIVE' &&
+        request.resource.data.updatedAt == request.time &&
+        validListerActivation(request.auth.uid, applicationId, resource.data.get('activationTokenHash', ''))
       );
 
       match /documents/{fileId} {
@@ -366,6 +402,40 @@ service cloud.firestore {
         getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.signedAgreement.tokenHash == tokenHash &&
         getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)/signedAgreement/final).data.tokenHash == tokenHash
       );
+      allow delete: if isAdmin();
+    }
+
+    match /onboardingActivationTokens/{tokenHash} {
+      allow get: if isAdmin() || (request.auth != null &&
+        resource.data.email == request.auth.token.email &&
+        resource.data.expiresAt > request.time &&
+        (resource.data.used == false || resource.data.activatedBy == request.auth.uid));
+      allow list: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly([
+          'applicationId', 'email', 'name', 'businessName', 'phone',
+          'createdAt', 'expiresAt', 'used', 'activatedBy'
+        ]) &&
+        request.resource.data.applicationId is string &&
+        request.resource.data.email is string &&
+        request.resource.data.name is string &&
+        request.resource.data.businessName is string &&
+        request.resource.data.phone is string &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.expiresAt is timestamp &&
+        request.resource.data.used == false &&
+        request.resource.data.activatedBy == null;
+      allow update: if request.auth != null &&
+        resource.data.used == false &&
+        resource.data.email == request.auth.token.email &&
+        resource.data.expiresAt > request.time &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'activatedBy', 'activatedAt']) &&
+        request.resource.data.used == true &&
+        request.resource.data.activatedBy == request.auth.uid &&
+        request.resource.data.activatedAt == request.time &&
+        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.userId == request.auth.uid &&
+        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.accountSetupStatus == 'ACTIVE' &&
+        getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'lister';
       allow delete: if isAdmin();
     }
 
