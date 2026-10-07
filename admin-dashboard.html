@@ -1347,6 +1347,7 @@
 <script type="module">
 import { EMAILJS_AGREEMENT_TEMPLATE_ID } from './emailjs-agreement-config.js?v=20261005';
 import { CULTUREWAVE_AGREEMENT } from './agreement-template.js?v=20261005-agreement-text';
+import { runTransaction } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { app, auth, db, getCurrentUser, logout,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
   query, orderBy, limit, onSnapshot, serverTimestamp, getDocs, getDoc,
@@ -1468,7 +1469,7 @@ function openListerEmail(a){
   fields.innerHTML=`<label style="display:block;margin:.6rem 0 .25rem">To</label><input id="requestTo" value="${esc(a.email||a.contact?.email)}" readonly style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px"><label style="display:block;margin:.6rem 0 .25rem">Subject</label><input id="requestSubject" value="Vendor Signup &amp; Agreement Request – Culture Wave" style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px"><label style="display:block;margin:.6rem 0 .25rem">Agreed service fee (%)</label><input id="requestFeePercent" type="number" min="0" max="100" step="0.01" required value="${esc(fee)}" style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px"><label style="display:block;margin:.6rem 0 .25rem">Email message</label><textarea id="requestMessage" rows="6" style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px">${esc(body)}</textarea><label style="display:block;margin:.6rem 0 .25rem">Agreement text (shown on the signing page)</label><textarea id="requestAgreementText" rows="12" maxlength="30000" style="width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px;white-space:pre-wrap">${esc(CULTUREWAVE_AGREEMENT)}</textarea><small style="display:block;color:var(--muted);margin-top:.35rem">Use {{MERCHANT_NAME}}, {{BUSINESS_NAME}}, {{REGISTERED_ADDRESS}}, {{MERCHANT_EMAIL}}, {{SIGNING_DATE}}, and {{SERVICE_FEE_PERCENT}} where signer or fee details should appear.</small>`;
   document.getElementById('sendListerEmail').onclick=async()=>{
     const button=document.getElementById('sendListerEmail');button.disabled=true;
-    let tokenRef=null,applicationRef=null,applicationStatusBefore=null,agreementStatusBefore=null,applicationUpdated=false;
+    let tokenRef=null,applicationRef=null,applicationStatusBefore=null,agreementStatusBefore=null,applicationUpdated=false,emailAccepted=false;
     try{
       if(EMAILJS_AGREEMENT_TEMPLATE_ID.startsWith('REPLACE_')||EMAILJS_AGREEMENT_TEMPLATE_ID==='template_caj3zqw')throw new Error(`Agreement template config is invalid (${EMAILJS_AGREEMENT_TEMPLATE_ID}). Expected template_q90dxqn; reload the latest admin page.`);
       const feeInput=document.getElementById('requestFeePercent');if(!feeInput.reportValidity())throw new Error('Enter the agreed service fee.');
@@ -1480,15 +1481,16 @@ function openListerEmail(a){
       const tokenHash=Array.from(new Uint8Array(tokenDigest),byte=>byte.toString(16).padStart(2,'0')).join('');
       tokenRef=doc(db,'onboardingSigningTokens',tokenHash);
       await setDoc(tokenRef,{applicationId,email,name,businessName:a.vendor?.registeredName||'',address,fee,agreementText,createdAt:serverTimestamp(),expiresAt:new Date(Date.now()+7*24*60*60*1000),used:false,signerUid:null});
-      await updateDoc(applicationRef,{status:'SIGNUP_REQUEST_SENT',agreementStatus:'SENT',agreementTerms:agreementText,agreementServiceFeePercent:fee,agreementTokenHash:tokenHash,updatedAt:serverTimestamp()});applicationUpdated=true;
+      await updateDoc(applicationRef,{status:'SIGNUP_REQUEST_SENT',agreementStatus:'SENDING',agreementTerms:agreementText,agreementServiceFeePercent:fee,agreementTokenHash:tokenHash,updatedAt:serverTimestamp()});applicationUpdated=true;
       const signingUrl=`https://culturewave.in/sign-agreement#${token}`;
       const plainMessage=document.getElementById('requestMessage').value;
       const messageHtml=`${esc(plainMessage).replace(/\n/g,'<br>')}<br><br>Application ID: ${esc(applicationId)}<br>Agreed service fee: ${esc(fee)}%<br><br><a href="${signingUrl}">Review and sign the agreement</a>`;
       button.textContent='Sending email…';
       await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_AGREEMENT_TEMPLATE_ID,{to_email:email,to_name:name,name,subject:document.getElementById('requestSubject').value,message:plainMessage,message_html:messageHtml,reply_to:'support.culturewave@gmail.com'});
-      tokenRef=null;
+      emailAccepted=true;tokenRef=null;
+      await runTransaction(db,async transaction=>{const latest=await transaction.get(applicationRef);if(!latest.exists())throw new Error('Email was sent, but the application record is missing.');if(latest.data().agreementStatus==='SIGNED'||latest.data().status==='SIGNED')return;transaction.update(applicationRef,{status:'SIGNUP_REQUEST_SENT',agreementStatus:'SENT',agreementEmailSentAt:serverTimestamp(),updatedAt:serverTimestamp()});});
       closeModal('listerEmailModal');closeModal('vendorAppModal');showToast('Agreement email sent via EmailJS.','success');
-    }catch(e){if(tokenRef)await deleteDoc(tokenRef).catch(()=>{});if(applicationUpdated&&applicationRef&&applicationStatusBefore)await updateDoc(applicationRef,{status:applicationStatusBefore,agreementStatus:agreementStatusBefore,agreementTokenHash:'',updatedAt:serverTimestamp()}).catch(()=>{});showToast(e.text||e.message||'Could not send the agreement.','error');}
+    }catch(e){if(!emailAccepted){if(tokenRef)await deleteDoc(tokenRef).catch(()=>{});if(applicationUpdated&&applicationRef&&applicationStatusBefore)await updateDoc(applicationRef,{status:applicationStatusBefore,agreementStatus:agreementStatusBefore,agreementTokenHash:'',updatedAt:serverTimestamp()}).catch(()=>{});showToast(e.text||e.message||'Could not send the agreement.','error');}else{closeModal('listerEmailModal');closeModal('vendorAppModal');showToast('EmailJS accepted the email, but the dashboard status could not be refreshed. Reload the dashboard; the signing link remains active.','error');}}
     finally{button.disabled=false;button.textContent='Send Email';}
   };
   openModal('listerEmailModal');
