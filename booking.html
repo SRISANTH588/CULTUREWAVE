@@ -210,6 +210,50 @@
       .bk-panel#panel3 .bk-nav .bk-btn-next,
       .bk-panel#panel4 .bk-nav .bk-btn-next{width:220px;height:46px;min-height:46px;justify-self:end;font-size:.9rem;}
     }
+    /* Ticket chooser styling based on the supplied mobile reference. */
+    #ticketSelectionSheet{margin:0 -1.2rem;padding:1.5rem 1.15rem 2rem;border-radius:30px 30px 0 0;background:#05070d;min-height:55vh;}
+    #ticketSelectionSheet>.bk-picker-label{margin:0 0 1.15rem;color:#c5c9d2;font-size:.78rem;letter-spacing:.16em;}
+    #ticketSelectionSheet .bk-picker-intro{display:none;}
+    #pickerTicketList{overflow:hidden;padding:0 .95rem;border:1px solid rgba(255,255,255,.045);border-radius:26px;background:#101216;}
+    #pickerTicketList .bk-picker-ticket{display:grid;grid-template-columns:minmax(0,1fr) 116px;align-items:start;gap:.75rem 1rem;margin:0;padding:1.25rem .05rem;border:0;border-bottom:1px dashed rgba(210,215,225,.2);border-radius:0;background:transparent;box-shadow:none;min-height:0;}
+    #pickerTicketList .bk-picker-ticket:last-child{border-bottom:0;}
+    .bk-picker-ticket-copy{min-width:0;}
+    #pickerTicketList .bk-picker-ticket-name{display:block;color:#e5e6e9;font-size:.95rem;font-weight:800;line-height:1.4;letter-spacing:-.025em;text-transform:none;}
+    #pickerTicketList .bk-picker-ticket-price{display:block;position:static;margin:.25rem 0 0;color:#f3f4f6;font-size:.95rem;font-weight:900;}
+    #pickerTicketList .bk-picker-add,#pickerTicketList .bk-picker-qty{grid-column:2;grid-row:1;justify-self:stretch;align-self:start;min-width:0;width:100%;height:48px;margin:0;border:1px solid #242832;border-radius:13px;background:#05070d;color:#19b981;font-size:.95rem;font-weight:900;letter-spacing:.02em;box-shadow:none;}
+    #pickerTicketList .bk-picker-add:disabled{color:#8a909b;background:#191c22;}
+    #pickerTicketList .bk-picker-qty{display:flex;justify-content:space-around;align-items:center;gap:.25rem;border-color:rgba(31,190,137,.5);background:#07130f;color:#fff;}
+    #pickerTicketList .bk-picker-qty button{color:#38d39b;}
+    #pickerTicketList .bk-picker-ticket-bottom{display:contents;}
+    #pickerTicketList .bk-picker-availability{grid-column:1/-1;color:#fca5a5;}
+    #pickerTicketList .bk-picker-details{grid-column:1/-1;justify-self:start;margin-top:.05rem;padding:.35rem .7rem;border:1px solid #353a44;border-radius:999px;background:transparent;color:#c6cad2;font-size:.75rem;font-weight:700;}
+    #pickerTicketList .bk-picker-desc{grid-column:1/-1;margin:-.2rem 0 .1rem;color:#aeb4c0;font-size:.8rem;line-height:1.55;}
+    #pickerTicketList .bk-picker-desc:not(.open){display:none;}
+    @media(max-width:380px){#pickerTicketList .bk-picker-ticket{grid-template-columns:minmax(0,1fr) 96px;gap:.65rem;}#pickerTicketList .bk-picker-add,#pickerTicketList .bk-picker-qty{height:44px;}}
+    .checkout-method-trigger{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:.22rem;min-width:0;padding:.25rem .2rem;border:0;background:transparent;color:#f4f5f7;text-align:left;cursor:pointer;}
+    .checkout-method-trigger small{color:#a8abb3;font-size:.58rem;font-weight:900;letter-spacing:.09em;}
+    .checkout-method-trigger strong{max-width:42vw;overflow:hidden;color:#f5f6f8;font-size:.79rem;font-weight:900;text-overflow:ellipsis;white-space:nowrap;}
+    .checkout-method-trigger .method-trigger-change{color:#30c895;font-size:.62rem;font-weight:800;}
+    .payment-method-sheet{position:fixed;inset:0;z-index:150;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.68);backdrop-filter:blur(5px);}
+    .payment-method-sheet.open{display:flex;}
+    .payment-method-card{width:min(100%,560px);max-height:min(82vh,760px);overflow:auto;padding:1.25rem 1.2rem calc(env(safe-area-inset-bottom) + 1.1rem);border:1px solid rgba(255,255,255,.08);border-radius:26px 26px 0 0;background:#f1f1f6;color:#25262b;box-shadow:0 -18px 55px rgba(0,0,0,.35);}
+    .payment-method-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .payment-method-sheet-head h2{font-size:1.16rem;font-weight:900;letter-spacing:-.04em;}
+    .payment-method-sheet-head p{margin-top:.2rem;color:#777983;font-size:.8rem;}
+    .payment-method-close{width:38px;height:38px;border:1px solid #dedfe5;border-radius:50%;background:#fff;color:#4a4b52;font-size:1.3rem;}
+    .payment-method-group{margin-top:1rem;}
+    .payment-method-group-title{margin:0 0 .6rem  .4rem;color:#494a52;font-size:.88rem;font-weight:900;}
+    .payment-method-options{overflow:hidden;border:1px solid #e8e8ed;border-radius:20px;background:#fff;box-shadow:0 8px 24px rgba(26,28,38,.05);}
+    .payment-method-option{display:flex;align-items:center;gap:.8rem;width:100%;min-height:68px;padding:.8rem .95rem;border:0;border-bottom:1px dashed #e7e7eb;background:#fff;color:#292a30;text-align:left;}
+    .payment-method-option:last-child{border-bottom:0;}
+    .payment-method-option.selected{background:#f2fbf7;}
+    .payment-method-icon{display:grid;place-items:center;width:40px;height:40px;flex:none;border:1px solid #e4e5e9;border-radius:11px;background:#fff;font-size:1.05rem;font-weight:900;}
+    .payment-method-option-copy{flex:1;min-width:0;}
+    .payment-method-option-copy strong{display:block;font-size:.9rem;font-weight:800;}
+    .payment-method-option-copy small{display:block;margin-top:.18rem;color:#7c7e86;font-size:.72rem;}
+    .payment-method-radio{display:grid;place-items:center;width:22px;height:22px;flex:none;border:2px solid #d1d3d8;border-radius:50%;color:#fff;font-size:.7rem;}
+    .payment-method-option.selected .payment-method-radio{border-color:#20a979;background:#20a979;}
+    .payment-method-help{margin:.85rem .3rem 0;color:#777983;font-size:.68rem;line-height:1.5;}
   </style>
 </head>
 <body>
@@ -322,7 +366,15 @@
         <div class="bk-tc"><input type="checkbox" id="tcCheck"/><label for="tcCheck">I agree to the <a href="terms-and-conditions.html" target="_blank">Terms &amp; Conditions</a> and <a href="refund-policy.html" target="_blank">Refund Policy</a>.</label></div>
         <div class="bk-nav">
           <button class="bk-btn-back" onclick="returnToTicketPicker()">← Back</button>
+          <button class="checkout-method-trigger" id="paymentMethodTrigger" type="button" onclick="openPaymentMethodSheet()"><small>PAY USING ⌃</small><strong id="preferredPaymentLabel">UPI apps</strong><span class="method-trigger-change">Change method</span></button>
           <button class="bk-btn-next" id="submitBtn" onclick="submitBooking()">Pay ₹0</button>
+        </div>
+        <div class="payment-method-sheet" id="paymentMethodSheet" onclick="if(event.target===this)closePaymentMethodSheet()">
+          <section class="payment-method-card" role="dialog" aria-modal="true" aria-labelledby="paymentMethodTitle">
+            <div class="payment-method-sheet-head"><div><h2 id="paymentMethodTitle">Payment Options</h2><p id="paymentMethodAmount">Choose your preferred method</p></div><button type="button" class="payment-method-close" onclick="closePaymentMethodSheet()" aria-label="Close payment options">×</button></div>
+            <div class="payment-method-group"><h3 class="payment-method-group-title">Preferred Payment</h3><div class="payment-method-options" id="preferredPaymentOptions"></div></div>
+            <p class="payment-method-help">Your choice is saved on this device. Razorpay shows the methods enabled for this checkout. Card can be preselected; choose UPI, netbanking or wallet in Razorpay.</p>
+          </section>
         </div>
       </div>
 
@@ -420,6 +472,15 @@ let selectedSeats = [];
 let bookedSeats = [];
 let pickerQuantities = [];
 let bookingInitStarted = false;
+const preferredPaymentStorageKey='culturewave:preferred-payment-method';
+const paymentMethodChoices=[
+  {id:'upi',label:'UPI apps',description:'Pay using an available UPI app',icon:'↗',group:'Preferred Payment'},
+  {id:'card',label:'Credit & debit cards',description:'Visa, Mastercard, RuPay and more',icon:'＋',group:'Cards'},
+  {id:'netbanking',label:'Netbanking',description:'Pay through your bank',icon:'▤',group:'Other options'},
+  {id:'wallet',label:'Wallets',description:'Use a supported wallet',icon:'◉',group:'Other options'}
+];
+let preferredPaymentMethod='upi';
+try{const stored=localStorage.getItem(preferredPaymentStorageKey);if(paymentMethodChoices.some(item=>item.id===stored))preferredPaymentMethod=stored;}catch(_){ }
 const inviteTokenParam = urlP.get('inviteToken') || '';
 function inviteSessionKey(){ return `inviteAccess:${eventId}`; }
 async function inviteAccessAllowed(){
@@ -594,10 +655,10 @@ function renderTicketPicker(){
     return;
   }
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-top"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span></div>${groupHint?`<div style="margin-top:.45rem;color:#45d49c;font-size:.74rem;font-weight:700;">${groupHint}</div>`:''}${description?`<p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}<div class="bk-picker-ticket-bottom">${sold?'<span class="bk-picker-availability">Sold out</span>':''}${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}</div></article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-copy"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span>${groupHint?`<div style="margin-top:.4rem;color:#45d49c;font-size:.72rem;font-weight:700;">${groupHint}</div>`:''}</div>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" aria-label="Remove one ticket" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" aria-label="Add one ticket" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}${description?`<button type="button" class="bk-picker-details" aria-expanded="false" onclick="togglePickerDetails(${index},this)">Details ⌄</button><p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}${sold?'<span class="bk-picker-availability">Sold out</span>':''}</article>`; }).join('');
   updatePickerBar();
 }
-function togglePickerDetails(index){ const el=document.getElementById('pickerDesc'+index); if(el) el.classList.toggle('open'); }
+function togglePickerDetails(index,button){ const el=document.getElementById('pickerDesc'+index); if(el){const open=el.classList.toggle('open');button?.setAttribute('aria-expanded',String(open));if(button)button.innerHTML=open?'Details ⌃':'Details ⌄';} }
 function changePickerQty(index, change){
   const max = ticketMax(tickets[index]);
   const currentForThis = pickerQuantities[index] || 0;
@@ -781,6 +842,33 @@ function goStep3(){
   goStep(3);
 }
 
+function renderPreferredPayment(){
+  const selected=paymentMethodChoices.find(item=>item.id===preferredPaymentMethod)||paymentMethodChoices[0];
+  const label=document.getElementById('preferredPaymentLabel');
+  if(label)label.textContent=selected.label;
+  const target=document.getElementById('preferredPaymentOptions');
+  if(!target)return;
+  target.innerHTML=paymentMethodChoices.map(item=>`<button type="button" class="payment-method-option${item.id===preferredPaymentMethod?' selected':''}" aria-pressed="${item.id===preferredPaymentMethod}" onclick="setPreferredPayment('${item.id}')"><span class="payment-method-icon" aria-hidden="true">${item.icon}</span><span class="payment-method-option-copy"><strong>${item.label}</strong><small>${item.description}</small></span><span class="payment-method-radio" aria-hidden="true">${item.id===preferredPaymentMethod?'✓':''}</span></button>`).join('');
+}
+function openPaymentMethodSheet(){
+  renderPreferredPayment();
+  const total=document.getElementById('b_total')?.textContent||'₹0';
+  document.getElementById('paymentMethodAmount').textContent=`To pay: ${total}`;
+  document.getElementById('paymentMethodSheet').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePaymentMethodSheet(){
+  document.getElementById('paymentMethodSheet').classList.remove('open');
+  document.body.style.overflow='';
+}
+function setPreferredPayment(method){
+  if(!paymentMethodChoices.some(item=>item.id===method))return;
+  preferredPaymentMethod=method;
+  try{localStorage.setItem(preferredPaymentStorageKey,method);}catch(_){ }
+  renderPreferredPayment();
+  closePaymentMethodSheet();
+}
+
 // ── BILL ──
 function updateBill(){
   const subtotal = selectedTicketSubtotal();
@@ -804,6 +892,8 @@ function updateBill(){
   document.getElementById("b_fee").textContent = fee ? fmt(fee) : "₹0";
   document.getElementById("b_total").textContent = total ? fmt(total) : "Free";
   document.getElementById("rTotal").textContent = total ? fmt(total) : "Free";
+  const methodAmount=document.getElementById('paymentMethodAmount');
+  if(methodAmount)methodAmount.textContent=`To pay: ${total?fmt(total):'Free'}`;
 }
 
 // ── COUPON ──
@@ -1115,7 +1205,8 @@ async function submitBooking(){
     name: "CultureWave",
     description: eventName,
     prefill: { name, email, contact: phone },
-    theme: { color: "#1242c5" },
+    ...(preferredPaymentMethod==='card'?{method:'card'}:{}),
+    theme: { color: "#1dae79", backdrop_color: "#090b10" },
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
       submitBtn.textContent = "Verifying payment...";
@@ -1360,6 +1451,7 @@ async function init(){
   buildTickets();
 }
 
+renderPreferredPayment();
 bookingAuth.onAuthStateChanged(async user => {
   if(bookingInitStarted) return;
   bookingInitStarted = true;
