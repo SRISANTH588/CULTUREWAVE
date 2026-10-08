@@ -223,7 +223,7 @@
 <div style="width:100%;max-width:100%;overflow-x:hidden;">
 <div class="bk-stepper-wrap">
   <div class="bk-stepper">
-    <div class="bk-step active" id="tab1"><div class="bk-step-num">1</div><span class="bk-step-lbl">Your Details</span></div>
+    <div class="bk-step active" id="tab1"><div class="bk-step-num">1</div><span class="bk-step-lbl">Contact</span></div>
     <div class="bk-conn"></div>
     <div class="bk-step" id="tab2"><div class="bk-step-num">2</div><span class="bk-step-lbl">Seats</span></div>
     <div class="bk-conn"></div>
@@ -252,40 +252,6 @@
           <div id="guestContactCard" class="bk-card" style="margin:0 0 1.25rem;background:#151922;border-color:#343a45;color:#fff;"><h2 style="color:#fff;">Your Details</h2><p class="sub" style="color:#aeb4c0;">Enter your contact details to continue as a guest.</p><div class="bk-field"><span class="bk-label">Full Name *</span><div class="bk-input"><span>👤</span><input type="text" id="bookName" placeholder="Your full name" autocomplete="name"/></div></div><div class="bk-field"><span class="bk-label">Phone Number *</span><div class="bk-input"><span>📱</span><input type="tel" id="bookPhone" placeholder="10-digit number" autocomplete="tel"/></div></div><div class="bk-field"><span class="bk-label">Email Address *</span><div class="bk-input"><span>✉️</span><input type="email" id="bookEmail" placeholder="you@example.com" autocomplete="email"/></div></div><button type="button" class="bk-picker-proceed" style="width:100%;margin-top:.25rem;" onclick="continueToTicketSelection()">Continue to seat selection</button></div><div class="bk-picker-sheet" id="ticketSelectionSheet" style="display:none;"><div class="bk-picker-label">CHOOSE TICKETS</div><p class="bk-picker-intro">Choose a pass to reserve your place at this event.</p><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div><div id="pickerSeatMount"></div></div>
         </section>
         <div class="bk-picker-bar" id="pickerBar"><div class="bk-picker-total"><small id="pickerCount">0 tickets</small><strong id="pickerTotal">₹0</strong></div><button class="bk-picker-proceed" type="button" onclick="showBookingDetails()">Next</button></div>
-        <div class="bk-card">
-          <h2>Your Details</h2>
-          <p class="sub">We'll send your booking confirmation to these details.</p>
-          <div class="bk-row">
-            <div class="bk-field">
-              <span class="bk-label">Full Name *</span>
-              <div class="bk-input"><span>👤</span><input type="text" id="bookName" placeholder="Your full name"/></div>
-            </div>
-            <div class="bk-field">
-              <span class="bk-label">WhatsApp Number *</span>
-              <div class="bk-input"><span>📱</span><input type="tel" id="bookPhone" placeholder="10-digit number"/></div>
-            </div>
-          </div>
-          <div class="bk-field">
-              <span class="bk-label">Email Address *</span>
-            <div class="bk-verify-row">
-              <div class="bk-input"><span>✉️</span><input type="email" id="bookEmail" placeholder="you@gmail.com"/></div>
-              <button class="bk-verify-btn" id="sendOtpBtn" type="button" onclick="sendOtp()" style="display:none">Verify</button>
-              <span class="bk-verify-tag pending" id="verifyTag" style="display:none">Unverified</span>
-            </div>
-            <div class="bk-otp-wrap" id="otpWrap" style="display:none;">
-              <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6"/>
-              <button onclick="verifyOtp()">Confirm</button>
-            </div>
-          </div>
-        </div>
-        <!-- EVENT INFO CARD -->
-        <div class="bk-card">
-          <h2 id="evNameDisplay">Loading event...</h2>
-          <p class="sub" id="evVenueDisplay">—</p>
-        </div>
-        <div>
-          <button class="bk-btn-next" onclick="goStep2()">Continue → Select Seats</button>
-        </div>
       </div>
 
       <!-- STEP 2: SEATS -->
@@ -1308,8 +1274,6 @@ async function init(){
         if(!(await inviteAccessAllowed())) { showInviteGate(); return; }
         tickets = Array.isArray(evData.tickets) ? evData.tickets : [];
         pickerQuantities = tickets.map(()=>0);
-        document.getElementById("evNameDisplay").textContent = evData.name||passedName;
-        document.getElementById("evVenueDisplay").textContent = (evData.venueName||"")+(evData.city?", "+evData.city:"");
         document.getElementById("rEventName").textContent = evData.name||passedName;
         document.getElementById("rVenue").textContent = evData.venueName||evData.city||"";
         // seating plan
