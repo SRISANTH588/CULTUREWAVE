@@ -1,5 +1,5 @@
 const {onDocumentCreated, onDocumentDeleted, onDocumentUpdated} = require('firebase-functions/v2/firestore');
-const {defineString} = require('firebase-functions/params');
+const {defineString, defineSecret} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 const {PDFDocument, StandardFonts, rgb} = require('pdf-lib');
@@ -168,14 +168,15 @@ exports.notifyWaitlistWhenSpotsOpen = onDocumentUpdated({
 const {onRequest} = require('firebase-functions/v2/https');
 const {getAuth} = require('firebase-admin/auth');
 const {getStorage} = require('firebase-admin/storage');
-const {randomBytes, randomInt, createHash, timingSafeEqual} = require('node:crypto');
+const {randomBytes, randomInt, createHash, createHmac, timingSafeEqual} = require('node:crypto');
 const onboardingOtpTemplate = defineString('EMAILJS_ONBOARDING_OTP_TEMPLATE_ID', {default: 'template_8ho2pwf'});
 const onboardingNoticeTemplate = defineString('EMAILJS_ONBOARDING_NOTICE_TEMPLATE_ID', {default: ''});
 const onboardingOtpPepper = defineString('ONBOARDING_OTP_PEPPER');
 const bucket = getStorage().bucket();
 const API_ORIGINS = new Set([
   'https://culturewave.in', 'https://www.culturewave.in',
-  'https://srisanth588.github.io', 'http://localhost:5500', 'http://127.0.0.1:5500',
+  'https://srisanth588.github.io', 'http://localhost:3000', 'http://127.0.0.1:3000',
+  'http://localhost:5500', 'http://127.0.0.1:5500',
 ]);
 const sha = value => createHash('sha256').update(String(value)).digest('hex');
 const randomToken = () => randomBytes(32).toString('base64url');
@@ -217,8 +218,8 @@ async function adminUser(req) {
   if (!user.exists || user.data().role !== 'admin') throw new Error('Administrator access required.');
   return decoded.uid;
 }
-function endpoint(handler, {admin=false, session=false}={}) {
-  return onRequest({region:'asia-south1', cors:false, maxInstances:10, timeoutSeconds:120, memory:'512MiB'}, async (req,res) => {
+function endpoint(handler, {admin=false, session=false, secrets=[]}={}) {
+  return onRequest({region:'asia-south1', cors:false, maxInstances:10, timeoutSeconds:120, memory:'512MiB', secrets}, async (req,res) => {
     try {
       if (!await cors(req,res)) return;
       const actor = admin ? await adminUser(req) : session ? await appSession(req) : null;
@@ -230,6 +231,97 @@ function endpoint(handler, {admin=false, session=false}={}) {
     }
   });
 }
+
+const razorpayKeyId = defineSecret('RAZORPAY_KEY_ID');
+const razorpayKeySecret = defineSecret('RAZORPAY_KEY_SECRET');
+const razorpayReceipt = value => clean(value, 40).replace(/[^a-zA-Z0-9_-]/g, '') || `cw_${Date.now()}`;
+
+exports.createRazorpayOrder = endpoint(async req => {
+  const amount = Math.round(Number(req.body.amount));
+  if (!Number.isSafeInteger(amount) || amount < 100) throw new Error('Payment amount is invalid.');
+  const customer = req.body.customer || {};
+  const event = req.body.event || {};
+  const method = ['upi', 'card', 'netbanking', 'wallet'].includes(customer.method) ? customer.method : 'upi';
+  const receipt = razorpayReceipt(req.body.receipt);
+  const auth = Buffer.from(`${razorpayKeyId.value()}:${razorpayKeySecret.value()}`).toString('base64');
+  const response = await fetch('https://api.razorpay.com/v1/orders', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', Authorization: `Basic ${auth}`},
+    body: JSON.stringify({
+      amount,
+      currency: 'INR',
+      receipt,
+      notes: {
+        eventId: clean(event.id, 120),
+        eventName: clean(event.name, 200),
+        customerName: clean(customer.name, 160),
+        customerEmail: clean(customer.email, 180),
+        customerPhone: clean(customer.phone, 32),
+        tickets: String(Math.max(1, Number(customer.tickets) || 1)),
+        preferredMethod: method,
+      },
+    }),
+  });
+  const order = await response.json();
+  if (!response.ok || !order.id) {
+    console.error('Razorpay order creation failed:', response.status, order.error?.description || 'Unknown provider error');
+    throw new Error('Razorpay could not start this payment. Please try again.');
+  }
+  await db.collection('razorpayOrders').doc(order.id).set({
+    orderId: order.id,
+    amount,
+    currency: 'INR',
+    receipt,
+    status: 'created',
+    method,
+    event: {id: clean(event.id, 120), name: clean(event.name, 200)},
+    customer: {
+      name: clean(customer.name, 160),
+      email: clean(customer.email, 180).toLowerCase(),
+      phone: clean(customer.phone, 32),
+      tickets: Math.max(1, Number(customer.tickets) || 1),
+    },
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  return {success: true, provider: 'razorpay', keyId: razorpayKeyId.value(), razorpayOrderId: order.id, amount, currency: 'INR'};
+}, {secrets: [razorpayKeyId, razorpayKeySecret]});
+
+exports.verifyRazorpayPayment = endpoint(async req => {
+  const {razorpay_order_id: orderId, razorpay_payment_id: paymentId, razorpay_signature: signature} = req.body;
+  if (!orderId || !paymentId || !signature) throw new Error('Razorpay payment details are incomplete.');
+  const expected = createHmac('sha256', razorpayKeySecret.value()).update(`${orderId}|${paymentId}`).digest();
+  let received;
+  try { received = Buffer.from(signature, 'hex'); } catch (_) { throw new Error('Invalid Razorpay payment signature.'); }
+  if (received.length !== expected.length || !timingSafeEqual(received, expected)) throw new Error('Invalid Razorpay payment signature.');
+
+  const orderRef = db.collection('razorpayOrders').doc(orderId);
+  const orderSnap = await orderRef.get();
+  if (!orderSnap.exists) throw new Error('Razorpay order was not found. Contact support before retrying.');
+  const savedOrder = orderSnap.data();
+  if (savedOrder.status === 'captured' && savedOrder.paymentId === paymentId) return {success: true, verified: true, method: savedOrder.actualMethod || savedOrder.method};
+
+  const auth = Buffer.from(`${razorpayKeyId.value()}:${razorpayKeySecret.value()}`).toString('base64');
+  const response = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}`, {headers: {Authorization: `Basic ${auth}`}});
+  let payment = await response.json();
+  if (!response.ok || payment.order_id !== orderId || Number(payment.amount) !== Number(savedOrder.amount)) {
+    throw new Error('Razorpay payment does not match this booking order.');
+  }
+  if (payment.status === 'authorized') {
+    const captureResponse = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}/capture`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', Authorization: `Basic ${auth}`},
+      body: JSON.stringify({amount: savedOrder.amount, currency: savedOrder.currency}),
+    });
+    payment = await captureResponse.json();
+    if (!captureResponse.ok) {
+      console.error('Razorpay capture failed:', captureResponse.status, payment.error?.description || 'Unknown provider error');
+      throw new Error('Payment was authorized but could not be captured. Please contact support.');
+    }
+  }
+  if (payment.status !== 'captured') throw new Error('Razorpay has not confirmed a captured payment for this order.');
+  await orderRef.update({status: 'captured', paymentId, actualMethod: payment.method || savedOrder.method, capturedAt: FieldValue.serverTimestamp()});
+  return {success: true, verified: true, method: payment.method || savedOrder.method};
+}, {secrets: [razorpayKeyId, razorpayKeySecret]});
 
 exports.sendOnboardingOtp = endpoint(async req => {
   const email = clean(req.body.email, 180).toLowerCase();

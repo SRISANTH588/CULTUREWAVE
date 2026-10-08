@@ -254,6 +254,8 @@
     .payment-method-radio{display:grid;place-items:center;width:22px;height:22px;flex:none;border:2px solid #d1d3d8;border-radius:50%;color:#fff;font-size:.7rem;}
     .payment-method-option.selected .payment-method-radio{border-color:#20a979;background:#20a979;}
     .payment-method-help{margin:.85rem .3rem 0;color:#777983;font-size:.68rem;line-height:1.5;}
+    /* Keep iOS Safari from zooming the page when a small form field receives focus. */
+    @media(max-width:768px){.bk-input input,.bk-input select,.bk-otp-wrap input,.bk-coupon-row input,#couponSheetInput{font-size:16px!important;}}
   </style>
 </head>
 <body>
@@ -373,7 +375,7 @@
           <section class="payment-method-card" role="dialog" aria-modal="true" aria-labelledby="paymentMethodTitle">
             <div class="payment-method-sheet-head"><div><h2 id="paymentMethodTitle">Payment Options</h2><p id="paymentMethodAmount">Choose your preferred method</p></div><button type="button" class="payment-method-close" onclick="closePaymentMethodSheet()" aria-label="Close payment options">×</button></div>
             <div class="payment-method-group"><h3 class="payment-method-group-title">Preferred Payment</h3><div class="payment-method-options" id="preferredPaymentOptions"></div></div>
-            <p class="payment-method-help">Your choice is saved on this device. Razorpay shows the methods enabled for this checkout. Card can be preselected; choose UPI, netbanking or wallet in Razorpay.</p>
+            <p class="payment-method-help">Your selected payment type opens in Razorpay Checkout. Available apps and banks depend on Razorpay and your account.</p>
           </section>
         </div>
       </div>
@@ -473,6 +475,7 @@ let bookedSeats = [];
 let pickerQuantities = [];
 let bookingInitStarted = false;
 const preferredPaymentStorageKey='culturewave:preferred-payment-method';
+const razorpayFunctionsUrl='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
 const paymentMethodChoices=[
   {id:'upi',label:'UPI apps',description:'Pay using an available UPI app',icon:'↗',group:'Preferred Payment'},
   {id:'card',label:'Credit & debit cards',description:'Visa, Mastercard, RuPay and more',icon:'＋',group:'Cards'},
@@ -655,7 +658,7 @@ function renderTicketPicker(){
     return;
   }
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-copy"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span>${groupHint?`<div style="margin-top:.4rem;color:#45d49c;font-size:.72rem;font-weight:700;">${groupHint}</div>`:''}</div>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" aria-label="Remove one ticket" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" aria-label="Add one ticket" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}${description?`<button type="button" class="bk-picker-details" aria-expanded="false" onclick="togglePickerDetails(${index},this)">Details ⌄</button><p class="bk-picker-desc" id="pickerDesc${index}">${String(description)}</p>`:''}${sold?'<span class="bk-picker-availability">Sold out</span>':''}</article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-copy"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span>${groupHint?`<div style="margin-top:.4rem;color:#45d49c;font-size:.72rem;font-weight:700;">${groupHint}</div>`:''}</div>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" aria-label="Remove one ticket" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" aria-label="Add one ticket" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}${description?`<button type="button" class="bk-picker-details" aria-expanded="true" onclick="togglePickerDetails(${index},this)">Details ⌃</button><p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}${sold?'<span class="bk-picker-availability">Sold out</span>':''}</article>`; }).join('');
   updatePickerBar();
 }
 function togglePickerDetails(index,button){ const el=document.getElementById('pickerDesc'+index); if(el){const open=el.classList.toggle('open');button?.setAttribute('aria-expanded',String(open));if(button)button.innerHTML=open?'Details ⌃':'Details ⌄';} }
@@ -868,6 +871,10 @@ function setPreferredPayment(method){
   renderPreferredPayment();
   closePaymentMethodSheet();
 }
+function preferredRazorpayConfig(method){
+  const methodNames={upi:'UPI apps',card:'Credit & debit cards',netbanking:'Netbanking',wallet:'Wallets'};
+  return {display:{blocks:{preferred:{name:methodNames[method]||'Payment method',instruments:[{method}]}},sequence:['block.preferred'],preferences:{show_default_blocks:false}}};
+}
 
 // ── BILL ──
 function updateBill(){
@@ -1065,7 +1072,7 @@ async function saveBooking(data){
       eventName: data.eventName, ticketName: data.ticketName,
       ticketItems,
       amount: data.amount, seats: data.seats, seatIds: seatIds,
-      status: data.status, paymentId: data.paymentId||null,
+      status: data.status, paymentId: data.paymentId||null, paymentMethod:data.method||null,
       customerName: data.name, customerEmail: String(data.email||'').trim().toLowerCase(),
       customerPhone: data.phone, userId: userId,
       organiserId: organiserId,
@@ -1198,48 +1205,55 @@ async function submitBooking(){
     return;
   }
 
+  const amountInPaise=Math.round(total*100);
+  let orderData;
+  try{
+    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:amountInPaise,receipt:bid,customer:{name,email,phone,method:preferredPaymentMethod,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
+    orderData=await orderResponse.json();
+    if(!orderResponse.ok||!orderData.success||orderData.provider!=='razorpay'||!orderData.razorpayOrderId||!orderData.keyId) throw new Error(orderData.error||'Live Razorpay order service is unavailable.');
+  }catch(orderError){
+    console.error('Razorpay order creation failed:',orderError);
+    submitBtn.disabled=false;submitBtn.textContent=`Pay ${fmt(total)}`;
+    showPaymentError(orderError.message||'Could not start payment. Please try again.');
+    return;
+  }
   const options = {
-    key: "rzp_live_TfQxJ9jyHm051R",
-    amount: Math.round(total * 100),
+    key: orderData.keyId,
+    order_id: orderData.razorpayOrderId,
+    amount: amountInPaise,
     currency: "INR",
     name: "CultureWave",
     description: eventName,
     prefill: { name, email, contact: phone },
     ...(preferredPaymentMethod==='card'?{method:'card'}:{}),
+    config: preferredRazorpayConfig(preferredPaymentMethod),
     theme: { color: "#1dae79", backdrop_color: "#090b10" },
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
       submitBtn.textContent = "Verifying payment...";
-      // Verify payment via Razorpay fetch API
       let verified = false;
-      let paymentStatus = '';
-      let paymentMethod = 'Razorpay';
+      let verificationMessage='Payment signature verification failed.';
       try{
-        const res = await fetch(`https://api.razorpay.com/v1/payments/${pid}`, {
-          headers: { 'Authorization': 'Basic ' + btoa('rzp_live_TfQxJ9jyHm051R:') }
-        });
-        if(res.ok){
-          const pData = await res.json();
-          paymentStatus = pData.status;
-          paymentMethod = pData.method || 'Razorpay';
-          verified = pData.status === 'captured' || pData.status === 'authorized';
-        }
+        const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)});
+        const verificationData=await verification.json();
+        verified=verification.ok&&verificationData.verified===true;
+        if(!verified)verificationMessage=verificationData.error||verificationMessage;
       }catch(verifyErr){
-        console.warn('Verification fetch failed, trusting handler:', verifyErr);
-        // Razorpay handler only fires on success, so trust it as fallback
-        verified = true;
+        console.error('Payment signature verification failed:',verifyErr);
+        verificationMessage='Could not verify this payment with the booking server. Contact support before retrying.';
       }
       if(!verified){
         submitBtn.disabled = false;
         submitBtn.textContent = `Pay ${fmt(total)}`;
-        showPaymentError(`Payment not completed. Status: ${paymentStatus||'unknown'}. Please try again or contact support.`);
+        showPaymentError(verificationMessage);
         return;
       }
+      const selectedPaymentLabel=paymentMethodChoices.find(item=>item.id===preferredPaymentMethod)?.label||'Razorpay';
       document.getElementById("rStatus").textContent = "✅ Confirmed";
-      await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, name, email, phone });
+      await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:selectedPaymentLabel, name, email, phone });
       await fetchBookedSeats();
       if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
-      const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
+      const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:selectedPaymentLabel });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     },
@@ -1251,7 +1265,12 @@ async function submitBooking(){
       }
     }
   };
-  new Razorpay(options).open();
+  try{new Razorpay(options).open();}
+  catch(checkoutError){
+    console.error('Could not open Razorpay Checkout:',checkoutError);
+    submitBtn.disabled=false;submitBtn.textContent=`Pay ${fmt(total)}`;
+    showPaymentError('Could not open Razorpay Checkout. Please try again.');
+  }
 }
 
 // ── SEATING PLAN ──
