@@ -2928,8 +2928,16 @@ async function saveEvent(status) {
     alert('Please complete all required Event Details before publishing.');
     return;
   }
-  if (!uid) { await loadUser(); }
-  if (!uid) { alert("Please sign in to save."); return; }
+  let saveUser = auth.currentUser;
+  if (!saveUser) {
+    saveUser = await new Promise(resolve => {
+      let unsubscribe = () => {};
+      unsubscribe = auth.onAuthStateChanged(user => { unsubscribe(); resolve(user); });
+    });
+  }
+  if (!saveUser) { alert("Please sign in to save."); return; }
+  // Use the same Auth instance and UID that Firestore security rules validate.
+  uid = saveUser.uid;
 
   const saveButton = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
   if (cardImgFile || coverFile || logoFile || seatingPlanFile) {
@@ -3055,6 +3063,7 @@ async function saveEvent(status) {
     alert('Add invited guest emails, an invite code, or enable the private invite link.'); return;
   }
 
+  let saveStage = editId ? 'updating the event' : 'creating the event';
   try {
     const btn = saveButton;
     btn.textContent = 'Saving...';
@@ -3062,13 +3071,13 @@ async function saveEvent(status) {
     if (editId) {
       const {createdAt, ...updatePayload} = payload;
       await db.collection('events').doc(editId).update({...updatePayload, inviteCode:firebase.firestore.FieldValue.delete(), guestEmails:firebase.firestore.FieldValue.delete(), inviteToken:firebase.firestore.FieldValue.delete(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-      if(inviteAccessConfig.inviteOnly)saveButton.textContent='Finishing invite setup…';
+      if(inviteAccessConfig.inviteOnly){saveStage='saving private-event access';saveButton.textContent='Finishing invite setup…';}
       await saveEventInviteAccess(editId,uid,inviteAccessConfig);
       localStorage.removeItem(getLocalDraftKey());
       window.location.href = 'event-manage.html?eventId=' + editId;
     } else {
       const created=await addDoc(collection(db, 'events'), payload);
-      if(inviteAccessConfig.inviteOnly){saveButton.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
+      if(inviteAccessConfig.inviteOnly){saveStage='saving private-event access';saveButton.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
       localStorage.removeItem(getLocalDraftKey());
       const fromParam = new URLSearchParams(location.search).get('from');
       const dashboardBySource = {
@@ -3081,7 +3090,7 @@ async function saveEvent(status) {
     }
   } catch (err) {
     console.error('Event save failed:', err);
-    alert('Could not save the event. ' + (err.message || 'Please check your connection and try again.'));
+    alert('Could not save the event while ' + saveStage + '. ' + (err.message || 'Please check your connection and try again.'));
     const publishButton = document.getElementById('publishBtn');
     const draftButton = document.getElementById('saveDraftBtn');
     if (publishButton) { publishButton.textContent = editId ? 'Save Changes' : 'Publish Event'; publishButton.disabled = false; }
