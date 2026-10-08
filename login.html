@@ -945,26 +945,33 @@
 
       document.getElementById("googleLoginBtn").addEventListener("click", async () => {
         setStatus("Opening Google sign-in...", "info");
+        let user = null;
         try {
-          const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
-          const snap = await getDoc(doc(db, "users", user.uid));
-          if (!snap.exists()) {
-            // A Firebase account may legitimately predate its profile document.
-            // Preserve it and create the missing customer profile instead of
-            // deleting the account and incorrectly directing them to sign up.
-            await setDoc(doc(db, "users", user.uid), {
-              name: user.displayName || user.email.split('@')[0],
-              email: user.email,
-              role: 'customer',
-              createdAt: Date.now()
-            }, { merge: true });
-          }
-          setStatus("Signed in! Redirecting...", "success");
-          redirect(user.uid);
+          ({ user } = await signInWithPopup(auth, new GoogleAuthProvider()));
         } catch (err) {
           if (err.code !== "auth/popup-closed-by-user") setStatus(err.message, "warning");
           else setStatus("", "info");
+          return;
         }
+
+        // Profile maintenance is best effort. A Firestore rules problem should
+        // not turn a successful Google Authentication sign-in into a login failure.
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const snap = await getDoc(userRef);
+          if (!snap.exists()) {
+            await setDoc(userRef, {
+              name: user.displayName || user.email?.split('@')[0] || 'Customer',
+              email: user.email || '',
+              role: 'customer',
+              createdAt: Date.now()
+            });
+          }
+        } catch (profileError) {
+          console.warn('Google sign-in succeeded, but customer profile could not be read or created:', profileError);
+        }
+        setStatus("Signed in! Redirecting...", "success");
+        redirect(user.uid);
       });
 
       setMode("login");
