@@ -249,7 +249,7 @@
         <section class="bk-ticket-picker" id="ticketPicker">
           <div class="bk-picker-head"><button class="bk-picker-back" type="button" onclick="history.back()" aria-label="Back">‹</button><div><div class="bk-picker-title" id="pickerEventTitle">Loading event…</div><div class="bk-picker-location" id="pickerEventLocation"></div></div></div>
           <div class="bk-picker-info"><div class="bk-picker-date"><b id="pickerDay">—</b><strong id="pickerDate">—</strong></div><div class="bk-picker-time"><strong id="pickerTime">—</strong></div></div>
-          <div class="bk-picker-sheet"><div class="bk-picker-label">CHOOSE TICKETS</div><p class="bk-picker-intro">Choose a pass to reserve your place at this event.</p><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div><div id="pickerSeatMount"></div></div>
+          <div id="guestContactCard" class="bk-card" style="margin:0 0 1.25rem;background:#151922;border-color:#343a45;color:#fff;"><h2 style="color:#fff;">Your Details</h2><p class="sub" style="color:#aeb4c0;">Enter your contact details to continue as a guest.</p><div class="bk-field"><span class="bk-label">Full Name *</span><div class="bk-input"><span>👤</span><input type="text" id="bookName" placeholder="Your full name" autocomplete="name"/></div></div><div class="bk-field"><span class="bk-label">Phone Number *</span><div class="bk-input"><span>📱</span><input type="tel" id="bookPhone" placeholder="10-digit number" autocomplete="tel"/></div></div><div class="bk-field"><span class="bk-label">Email Address *</span><div class="bk-input"><span>✉️</span><input type="email" id="bookEmail" placeholder="you@example.com" autocomplete="email"/></div></div><button type="button" class="bk-picker-proceed" style="width:100%;margin-top:.25rem;" onclick="continueToTicketSelection()">Continue to seat selection</button></div><div class="bk-picker-sheet" id="ticketSelectionSheet" style="display:none;"><div class="bk-picker-label">CHOOSE TICKETS</div><p class="bk-picker-intro">Choose a pass to reserve your place at this event.</p><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div><div id="pickerSeatMount"></div></div>
         </section>
         <div class="bk-picker-bar" id="pickerBar"><div class="bk-picker-total"><small id="pickerCount">0 tickets</small><strong id="pickerTotal">₹0</strong></div><button class="bk-picker-proceed" type="button" onclick="showBookingDetails()">Next</button></div>
         <div class="bk-card">
@@ -441,11 +441,6 @@ async function inviteAccessAllowed(){
   if(bookingAuth.currentUser.email&&await makeClaim('email'))return true;
   if(inviteTokenParam&&await makeClaim('link',{inviteToken:inviteTokenParam}))return true;
   return false;
-}
-async function ensureBookingSession(){
-  if(bookingAuth.currentUser) return bookingAuth.currentUser;
-  const credential = await bookingAuth.signInAnonymously();
-  return credential.user;
 }
 function showInviteGate(){
   document.getElementById('inviteAccessGate').style.display='block';
@@ -665,6 +660,19 @@ function showBookingDetails(){
   document.getElementById('panel1').classList.remove('ticket-picker');
   document.getElementById('pickerBar').classList.remove('show');
   goStep3();
+}
+function continueToTicketSelection(){
+  const name=document.getElementById('bookName').value.trim();
+  const phone=document.getElementById('bookPhone').value.trim();
+  const email=document.getElementById('bookEmail').value.trim();
+  if(!name){showToast('Enter your full name');return;}
+  if(phone.replace(/\D/g,'').length<10){showToast('Enter a valid phone number');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Enter a valid email address');return;}
+  document.getElementById('guestContactCard').style.display='none';
+  document.getElementById('ticketSelectionSheet').style.display='block';
+  const button=document.querySelector('.bk-picker-proceed');
+  if(button) button.textContent='Checkout';
+  updatePickerBar();
 }
 function returnToTicketPicker(){
   document.getElementById('panel1').classList.add('ticket-picker');
@@ -957,8 +965,9 @@ function goStep4(){
 async function saveBooking(data){
   try{
     const ts = firebase.firestore.FieldValue.serverTimestamp();
-    let userId = null;
-    try { const u = firebase.auth().currentUser; if(u) userId = u.uid; } catch(e){}
+    // Ticket checkout is a guest booking even when the browser has a separate
+    // signed-in CultureWave session.
+    const userId = null;
     // Resolve organiserId — try evData fields first, then fetch event doc directly
     let organiserId = evData.ownerId || evData.organiserId || null;
     if(!organiserId && eventId){
@@ -1028,7 +1037,7 @@ async function saveBooking(data){
 async function sendEmail(data){
   try{
     // Use the email entered for this booking, or the signed-in account email.
-    const accountEmail = firebase.auth().currentUser?.email || data.email;
+    const accountEmail = data.email;
     if(!accountEmail) throw new Error('No email address is available for this booking.');
     await emailjs.send(EJ_SVC, EJ_TPL, {
       to_name: data.name, to_email: accountEmail,
@@ -1184,59 +1193,21 @@ function applyBookedSeats(seats){
 async function fetchBookedSeats(){
   if(!eventId) return;
   try{
-    const [bookingsSnap, paymentsSnap, eventSnap] = await Promise.all([
-      db.collection("bookings").where("eventId","==",eventId).get(),
-      db.collection("payments").where("eventId","==",eventId).get(),
-      db.collection('events').doc(eventId).get()
-    ]);
-    const seats = [];
-    const seen = new Set();
-    [...bookingsSnap.docs, ...paymentsSnap.docs].forEach(doc=>{
-      if(seen.has(doc.id)) return;
-      seen.add(doc.id);
-      const booking = doc.data();
-      if(isConfirmedBooking(booking)) seats.push(...bookingSeatIds(booking));
-    });
-    if(eventSnap.exists && Array.isArray(eventSnap.data().bookedSeats)) seats.push(...eventSnap.data().bookedSeats.map(String).filter(Boolean));
+    const eventSnap=await db.collection('events').doc(eventId).get();
+    const seats=eventSnap.exists&&Array.isArray(eventSnap.data().bookedSeats)?eventSnap.data().bookedSeats.map(String).filter(Boolean):[];
     applyBookedSeats(seats);
-  }catch(e){ console.error('fetchBookedSeats:',e); }
+  }catch(e){console.error('fetchBookedSeats:',e);}
 }
 
 function watchBookedSeats(){
   if(!eventId) return;
-  // Watch bookings collection for real-time seat updates
-  db.collection("bookings").where("eventId","==",eventId).onSnapshot(snap=>{
-    const seats = [];
-    snap.forEach(doc=>{
-      const d = doc.data();
-      if(isConfirmedBooking(d)) seats.push(...bookingSeatIds(d));
-    });
-    // Also merge from event doc bookedSeats
-    db.collection('events').doc(eventId).get().then(evSnap=>{
-      if(evSnap.exists){
-        const evSeats = evSnap.data().bookedSeats || [];
-        if(Array.isArray(evSeats)) seats.push(...evSeats.map(String).filter(Boolean));
-      }
-      applyBookedSeats(seats);
-      if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
-        renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
-      }
-    }).catch(()=>{
-      applyBookedSeats(seats);
-      if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
-        renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
-      }
-    });
-  }, e=>console.error('watchBookedSeats:',e));
-  // Also watch the event doc's bookedSeats field directly
+  // The public event document exposes booked seats; attendee records remain private.
   db.collection('events').doc(eventId).onSnapshot(evSnap=>{
-    if(!evSnap.exists) return;
-    const evSeats = (evSnap.data().bookedSeats || []).map(String).filter(Boolean);
-    applyBookedSeats([...bookedSeats, ...evSeats]);
-    if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
-      renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
-    }
-  }, ()=>{});
+    if(!evSnap.exists)return;
+    const evSeats=(evSnap.data().bookedSeats||[]).map(String).filter(Boolean);
+    applyBookedSeats(evSeats);
+    if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan,document.getElementById('seatingContainer'));
+  },error=>console.error('watchBookedSeats:',error));
 }
 
 function renderSeating(layout, container){
@@ -1331,7 +1302,6 @@ async function init(){
   document.getElementById('panel1').classList.add('ticket-picker');
   if(eventId){
     try{
-      await ensureBookingSession();
       const snap = await db.collection("events").doc(eventId).get();
       if(snap.exists){
         evData = {id:snap.id,...snap.data()};
@@ -1402,32 +1372,8 @@ async function init(){
 }
 
 bookingAuth.onAuthStateChanged(async user => {
-  if(!user){
-    try { await ensureBookingSession(); }
-    catch(error){
-      console.error('Guest booking session could not start:', error);
-      document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">Unable to start booking. Please refresh and try again.</div>';
-    }
-    return;
-  }
   if(bookingInitStarted) return;
   bookingInitStarted = true;
-  if(!user.isAnonymous){
-    const nameInput = document.getElementById('bookName');
-    const emailInput = document.getElementById('bookEmail');
-    if(user.displayName && !nameInput.value) nameInput.value = user.displayName;
-    if(user.email && !emailInput.value) {
-      emailInput.value = user.email;
-      emailVerified = true;
-    }
-    try {
-      const profile = await db.collection('users').doc(user.uid).get();
-      const data = profile.exists ? profile.data() : {};
-      if(!nameInput.value && data.name) nameInput.value = data.name;
-      const phone = data.phone || data.whatsapp || '';
-      if(phone && !document.getElementById('bookPhone').value) document.getElementById('bookPhone').value = String(phone).replace(/^\+91\s?/, '');
-    } catch(e) { console.warn('Could not load customer profile:', e); }
-  }
   init();
 });
 

@@ -162,7 +162,9 @@ service cloud.firestore {
           get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.ownerId == request.auth.uid)
       ));
       allow create: if request.resource.data.eventId is string &&
-        (ownsEvent(request.resource.data.eventId) || inviteAllowsBooking(request.resource.data.eventId));
+        (request.auth == null
+          ? get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.get('inviteOnly', false) != true
+          : (ownsEvent(request.resource.data.eventId) || inviteAllowsBooking(request.resource.data.eventId)));
       allow update: if true;
       allow delete: if request.auth != null;
     }
@@ -194,7 +196,9 @@ service cloud.firestore {
           get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.ownerId == request.auth.uid)
       );
       allow create: if request.resource.data.eventId is string &&
-        (ownsEvent(request.resource.data.eventId) || inviteAllowsBooking(request.resource.data.eventId));  // event owners can issue invitation tickets
+        (request.auth == null
+          ? get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.get('inviteOnly', false) != true
+          : (ownsEvent(request.resource.data.eventId) || inviteAllowsBooking(request.resource.data.eventId)));  // event owners can issue invitation tickets
       allow update, delete: if request.auth != null;
     }
 
