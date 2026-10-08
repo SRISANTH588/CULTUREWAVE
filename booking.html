@@ -266,11 +266,11 @@
             </div>
           </div>
           <div class="bk-field">
-            <span class="bk-label">Gmail Address *</span>
+              <span class="bk-label">Email Address *</span>
             <div class="bk-verify-row">
               <div class="bk-input"><span>✉️</span><input type="email" id="bookEmail" placeholder="you@gmail.com"/></div>
-              <button class="bk-verify-btn" id="sendOtpBtn" onclick="sendOtp()">Verify</button>
-              <span class="bk-verify-tag pending" id="verifyTag">Unverified</span>
+              <button class="bk-verify-btn" id="sendOtpBtn" type="button" onclick="sendOtp()" style="display:none">Verify</button>
+              <span class="bk-verify-tag pending" id="verifyTag" style="display:none">Unverified</span>
             </div>
             <div class="bk-otp-wrap" id="otpWrap" style="display:none;">
               <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6"/>
@@ -428,6 +428,7 @@ let generatedOtp = "";
 let selectedSeats = [];
 let bookedSeats = [];
 let pickerQuantities = [];
+let bookingInitStarted = false;
 const inviteTokenParam = urlP.get('inviteToken') || '';
 function inviteSessionKey(){ return `inviteAccess:${eventId}`; }
 async function inviteAccessAllowed(){
@@ -440,6 +441,11 @@ async function inviteAccessAllowed(){
   if(bookingAuth.currentUser.email&&await makeClaim('email'))return true;
   if(inviteTokenParam&&await makeClaim('link',{inviteToken:inviteTokenParam}))return true;
   return false;
+}
+async function ensureBookingSession(){
+  if(bookingAuth.currentUser) return bookingAuth.currentUser;
+  const credential = await bookingAuth.signInAnonymously();
+  return credential.user;
 }
 function showInviteGate(){
   document.getElementById('inviteAccessGate').style.display='block';
@@ -648,7 +654,14 @@ function showBookingDetails(){
   const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
   if(hasSeating && !isImagePlan && selectedSeats.length !== ticketCount){ showToast(`Please select ${ticketCount} seat${ticketCount===1?'':'s'}`); return; }
   const phone = document.getElementById('bookPhone').value.trim();
-  if(!phone || phone.length < 10){ showToast('Add a valid WhatsApp number in your profile before booking'); return; }
+  if(!phone || phone.replace(/\D/g,'').length < 10){ showToast('Enter a valid WhatsApp number'); return; }
+  const name = document.getElementById('bookName').value.trim();
+  const email = document.getElementById('bookEmail').value.trim();
+  if(!name){ showToast('Enter your full name'); return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Enter a valid email address'); return; }
+  if(!emailVerified && bookingAuth.currentUser?.email !== email){
+    emailVerified = true; // Guest email is collected for booking confirmation; verification is optional.
+  }
   document.getElementById('panel1').classList.remove('ticket-picker');
   document.getElementById('pickerBar').classList.remove('show');
   goStep3();
@@ -711,9 +724,8 @@ function goStep2(){
   const phone = document.getElementById("bookPhone").value.trim();
   const email = document.getElementById("bookEmail").value.trim();
   if(!name){ showToast("Enter your full name"); return; }
-  if(!phone || phone.length < 10){ showToast("Enter a valid WhatsApp number"); return; }
-  if(!email || !email.includes("@")){ showToast("Enter a valid email"); return; }
-  if(!emailVerified){ showToast("Please verify your email first"); return; }
+  if(!phone || phone.replace(/\D/g,'').length < 10){ showToast("Enter a valid WhatsApp number"); return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast("Enter a valid email"); return; }
   document.getElementById("rName").textContent = name;
   goStep(2);
 }
@@ -1015,11 +1027,9 @@ async function saveBooking(data){
 // ── SEND EMAIL ──
 async function sendEmail(data){
   try{
-    // The account email is authoritative. It cannot be replaced by a value
-    // typed into checkout, so a confirmation always goes to the account that
-    // made the booking.
+    // Use the email entered for this booking, or the signed-in account email.
     const accountEmail = firebase.auth().currentUser?.email || data.email;
-    if(!accountEmail) throw new Error('No account email is available for this booking.');
+    if(!accountEmail) throw new Error('No email address is available for this booking.');
     await emailjs.send(EJ_SVC, EJ_TPL, {
       to_name: data.name, to_email: accountEmail,
       recipient_email: accountEmail, user_email: accountEmail,
@@ -1075,9 +1085,8 @@ async function submitBooking(){
   const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
   const total = afterDiscount + fee;
   const name = document.getElementById("bookName").value.trim();
-  // Always bind a booking to the signed-in account, rather than allowing a
-  // stale form value to become the confirmation recipient.
-  const email = bookingAuth.currentUser?.email || document.getElementById("bookEmail").value.trim();
+  // Use the email the customer provided for this booking.
+  const email = document.getElementById("bookEmail").value.trim() || bookingAuth.currentUser?.email || "";
   const phone = document.getElementById("bookPhone").value.trim();
   const eventName = evData.name||passedName||"Event";
   const eventDate = evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || '';
@@ -1322,6 +1331,7 @@ async function init(){
   document.getElementById('panel1').classList.add('ticket-picker');
   if(eventId){
     try{
+      await ensureBookingSession();
       const snap = await db.collection("events").doc(eventId).get();
       if(snap.exists){
         evData = {id:snap.id,...snap.data()};
@@ -1391,35 +1401,33 @@ async function init(){
   buildTickets();
 }
 
-// Booking is available only to signed-in customers.  Keep the full event URL so
-// the login page can return the customer to the exact ticket they chose.
 bookingAuth.onAuthStateChanged(async user => {
   if(!user){
-    const returnTo = location.pathname.split('/').pop() + location.search;
-    location.replace('login.html?next=' + encodeURIComponent(returnTo));
+    try { await ensureBookingSession(); }
+    catch(error){
+      console.error('Guest booking session could not start:', error);
+      document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">Unable to start booking. Please refresh and try again.</div>';
+    }
     return;
   }
-
-  // Use the account profile for booking details and treat the signed-in account
-  // as the verified identity—there is no second, client-side email OTP step.
-  const nameInput = document.getElementById('bookName');
-  const emailInput = document.getElementById('bookEmail');
-  if(user.displayName) nameInput.value = user.displayName;
-  if(user.email) {
-    emailInput.value = user.email;
-    emailInput.readOnly = true;
-    emailVerified = true;
-    document.getElementById('verifyTag').textContent = '✓ Signed in';
-    document.getElementById('verifyTag').className = 'bk-verify-tag ok';
-    document.getElementById('sendOtpBtn').style.display = 'none';
+  if(bookingInitStarted) return;
+  bookingInitStarted = true;
+  if(!user.isAnonymous){
+    const nameInput = document.getElementById('bookName');
+    const emailInput = document.getElementById('bookEmail');
+    if(user.displayName && !nameInput.value) nameInput.value = user.displayName;
+    if(user.email && !emailInput.value) {
+      emailInput.value = user.email;
+      emailVerified = true;
+    }
+    try {
+      const profile = await db.collection('users').doc(user.uid).get();
+      const data = profile.exists ? profile.data() : {};
+      if(!nameInput.value && data.name) nameInput.value = data.name;
+      const phone = data.phone || data.whatsapp || '';
+      if(phone && !document.getElementById('bookPhone').value) document.getElementById('bookPhone').value = String(phone).replace(/^\+91\s?/, '');
+    } catch(e) { console.warn('Could not load customer profile:', e); }
   }
-  try {
-    const profile = await db.collection('users').doc(user.uid).get();
-    const data = profile.exists ? profile.data() : {};
-    if(!nameInput.value && data.name) nameInput.value = data.name;
-    const phone = data.phone || data.whatsapp || '';
-    if(phone) document.getElementById('bookPhone').value = String(phone).replace(/^\+91\s?/, '');
-  } catch(e) { console.warn('Could not load customer profile:', e); }
   init();
 });
 
