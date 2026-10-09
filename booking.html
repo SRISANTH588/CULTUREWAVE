@@ -1136,7 +1136,8 @@ async function submitBooking(){
   let orderData;
   try{
     const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:amountInPaise,receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
-    orderData=await orderResponse.json();
+    const orderResponseText=await orderResponse.text();
+    try{orderData=JSON.parse(orderResponseText);}catch(_){throw new Error(orderResponse.status===404?'Razorpay payment service is not deployed yet. Please contact support.':'Could not reach the payment service. Please try again.');}
     if(!orderResponse.ok||!orderData.success||orderData.provider!=='razorpay'||!orderData.razorpayOrderId||!orderData.keyId) throw new Error(orderData.error||'Live Razorpay order service is unavailable.');
   }catch(orderError){
     console.error('Razorpay order creation failed:',orderError);
