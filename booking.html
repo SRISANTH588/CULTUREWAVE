@@ -442,7 +442,6 @@ let generatedOtp = "";
 let selectedSeats = [];
 let bookedSeats = [];
 let pickerQuantities = [];
-let bookingInitStarted = false;
 const razorpayFunctionsUrl='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
 try{localStorage.removeItem('culturewave:preferred-payment-method');}catch(_){ }
 const inviteTokenParam = urlP.get('inviteToken') || '';
@@ -1333,21 +1332,21 @@ async function init(){
       const snap = await db.collection("events").doc(eventId).get();
       if(snap.exists){
         evData = {id:snap.id,...snap.data()};
+        if(evData.inviteOnly === true) await bookingAuthReady;
         if(!(await inviteAccessAllowed())) { showInviteGate(); return; }
         tickets = Array.isArray(evData.tickets) ? evData.tickets : [];
         pickerQuantities = tickets.map(()=>0);
+        applyBookedSeats(Array.isArray(evData.bookedSeats)?evData.bookedSeats.map(String):[]);
         document.getElementById("rEventName").textContent = evData.name||passedName;
         document.getElementById("rVenue").textContent = evData.venueName||evData.city||"";
         // seating plan
         if(evData.seatingPlanUrl){
-          await fetchBookedSeats();
           const img = document.createElement("img");
           img.src = evData.seatingPlanUrl;
           img.style = "width:100%;border-radius:10px;";
           document.getElementById("seatingContainer").appendChild(img);
           document.getElementById("seatingWrap").style.display = "";
         } else if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
-          await fetchBookedSeats();
           renderSeating(evData.seatingPlan, document.getElementById("seatingContainer"));
           document.getElementById("seatingWrap").style.display = "";
         }
@@ -1397,12 +1396,8 @@ async function init(){
   buildTickets();
 }
 
-renderPreferredPayment();
-bookingAuth.onAuthStateChanged(async user => {
-  if(bookingInitStarted) return;
-  bookingInitStarted = true;
-  init();
-});
+const bookingAuthReady=new Promise(resolve=>bookingAuth.onAuthStateChanged(resolve,()=>resolve(null)));
+init();
 
 // hamburger
 const ham=document.getElementById("hamburger"),mNav=document.getElementById("mobileNav");
