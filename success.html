@@ -358,12 +358,14 @@
       .sc-help-icon{background:linear-gradient(135deg,#ff7a18,#ff5a12);box-shadow:none;}
       .sc-help-title small{color:#aaabb1;}
       .sc-help-contact{background:#2b2c31;color:#f1d26d;}
-      .sc-details-grid{grid-template-columns:1fr;gap:0;}
-      .sc-detail:nth-child(odd){padding-right:0;}
+      .sc-details-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:0;padding:1rem .8rem;}
+      .sc-detail{min-width:0;padding:.7rem .5rem;border-bottom:1px dashed #35363c;}
+      .sc-detail:nth-child(odd){padding-right:.5rem;}
       .sc-detail:nth-child(even){text-align:left;}
-      .sc-detail:nth-last-child(-n+2){border-bottom:1px dashed #35363c;}
-      .sc-detail:last-child{border-bottom:0;}
-      .sc-detail-value{overflow-wrap:anywhere;}
+      .sc-detail:nth-child(3n){padding-right:.2rem;}
+      .sc-detail:nth-last-child(-n+3){border-bottom:0;}
+      .sc-detail-value{overflow-wrap:anywhere;font-size:.72rem;line-height:1.35;}
+      .sc-detail-label{font-size:.54rem;letter-spacing:.1em;}
       .sc-page{padding-bottom:calc(10rem + env(safe-area-inset-bottom));}
     }
   </style>
