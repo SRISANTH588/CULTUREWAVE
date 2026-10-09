@@ -241,7 +241,7 @@ exports.createRazorpayOrder = endpoint(async req => {
   if (!Number.isSafeInteger(amount) || amount < 100) throw new Error('Payment amount is invalid.');
   const customer = req.body.customer || {};
   const event = req.body.event || {};
-  const method = ['upi', 'card', 'netbanking', 'wallet'].includes(customer.method) ? customer.method : 'upi';
+  const method = ['upi', 'card', 'netbanking', 'wallet'].includes(customer.method) ? customer.method : 'checkout';
   const receipt = razorpayReceipt(req.body.receipt);
   const auth = Buffer.from(`${razorpayKeyId.value()}:${razorpayKeySecret.value()}`).toString('base64');
   const response = await fetch('https://api.razorpay.com/v1/orders', {

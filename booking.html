@@ -206,8 +206,8 @@
       .bk-picker-total small{font-size:.88rem;}
       .bk-picker-total strong{font-size:1.35rem;}
       .bk-picker-proceed{height:54px;font-size:1.05rem;}
-      .bk-panel#panel3 .bk-nav{grid-template-columns:minmax(0,1fr) auto;}
-      .bk-panel#panel3 .bk-nav .bk-btn-next,
+      .bk-panel#panel3 .bk-nav{grid-template-columns:1fr;}
+      .bk-panel#panel3 .bk-nav .bk-btn-next{grid-column:1;width:100%;height:52px;min-height:52px;justify-self:stretch;font-size:.95rem;}
       .bk-panel#panel4 .bk-nav .bk-btn-next{width:220px;height:46px;min-height:46px;justify-self:end;font-size:.9rem;}
     }
     /* Ticket chooser styling based on the supplied mobile reference. */
@@ -230,32 +230,9 @@
     #pickerTicketList .bk-picker-desc{grid-column:1/-1;margin:-.2rem 0 .1rem;color:#aeb4c0;font-size:.8rem;line-height:1.55;}
     #pickerTicketList .bk-picker-desc:not(.open){display:none;}
     @media(max-width:380px){#pickerTicketList .bk-picker-ticket{grid-template-columns:minmax(0,1fr) 96px;gap:.65rem;}#pickerTicketList .bk-picker-add,#pickerTicketList .bk-picker-qty{height:44px;}}
-    .checkout-method-trigger{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:.22rem;min-width:0;padding:.25rem .2rem;border:0;background:transparent;color:#f4f5f7;text-align:left;cursor:pointer;}
-    .checkout-method-trigger small{color:#a8abb3;font-size:.58rem;font-weight:900;letter-spacing:.09em;}
-    .checkout-method-trigger strong{max-width:42vw;overflow:hidden;color:#f5f6f8;font-size:.79rem;font-weight:900;text-overflow:ellipsis;white-space:nowrap;}
-    .checkout-method-trigger .method-trigger-change{color:#30c895;font-size:.62rem;font-weight:800;}
-    .payment-method-sheet{position:fixed;inset:0;z-index:150;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.68);backdrop-filter:blur(5px);}
-    .payment-method-sheet.open{display:flex;}
-    .payment-method-card{width:min(100%,560px);max-height:min(82vh,760px);overflow:auto;padding:1.25rem 1.2rem calc(env(safe-area-inset-bottom) + 1.1rem);border:1px solid rgba(255,255,255,.08);border-radius:26px 26px 0 0;background:#f1f1f6;color:#25262b;box-shadow:0 -18px 55px rgba(0,0,0,.35);}
-    .payment-method-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
-    .payment-method-sheet-head h2{font-size:1.16rem;font-weight:900;letter-spacing:-.04em;}
-    .payment-method-sheet-head p{margin-top:.2rem;color:#777983;font-size:.8rem;}
-    .payment-method-close{width:38px;height:38px;border:1px solid #dedfe5;border-radius:50%;background:#fff;color:#4a4b52;font-size:1.3rem;}
-    .payment-method-group{margin-top:1rem;}
-    .payment-method-group-title{margin:0 0 .6rem  .4rem;color:#494a52;font-size:.88rem;font-weight:900;}
-    .payment-method-options{overflow:hidden;border:1px solid #e8e8ed;border-radius:20px;background:#fff;box-shadow:0 8px 24px rgba(26,28,38,.05);}
-    .payment-method-option{display:flex;align-items:center;gap:.8rem;width:100%;min-height:68px;padding:.8rem .95rem;border:0;border-bottom:1px dashed #e7e7eb;background:#fff;color:#292a30;text-align:left;}
-    .payment-method-option:last-child{border-bottom:0;}
-    .payment-method-option.selected{background:#f2fbf7;}
-    .payment-method-icon{display:grid;place-items:center;width:40px;height:40px;flex:none;border:1px solid #e4e5e9;border-radius:11px;background:#fff;font-size:1.05rem;font-weight:900;}
-    .payment-method-option-copy{flex:1;min-width:0;}
-    .payment-method-option-copy strong{display:block;font-size:.9rem;font-weight:800;}
-    .payment-method-option-copy small{display:block;margin-top:.18rem;color:#7c7e86;font-size:.72rem;}
-    .payment-method-radio{display:grid;place-items:center;width:22px;height:22px;flex:none;border:2px solid #d1d3d8;border-radius:50%;color:#fff;font-size:.7rem;}
-    .payment-method-option.selected .payment-method-radio{border-color:#20a979;background:#20a979;}
-    .payment-method-help{margin:.85rem .3rem 0;color:#777983;font-size:.68rem;line-height:1.5;}
     /* Keep iOS Safari from zooming the page when a small form field receives focus. */
     @media(max-width:768px){.bk-input input,.bk-input select,.bk-otp-wrap input,.bk-coupon-row input,#couponSheetInput{font-size:16px!important;}}
+    .bk-panel#panel3 .bk-btn-next{grid-column:1/-1!important;width:100%!important;justify-self:stretch!important;}
   </style>
 </head>
 <body>
@@ -368,15 +345,7 @@
         <div class="bk-tc"><input type="checkbox" id="tcCheck"/><label for="tcCheck">I agree to the <a href="terms-and-conditions.html" target="_blank">Terms &amp; Conditions</a> and <a href="refund-policy.html" target="_blank">Refund Policy</a>.</label></div>
         <div class="bk-nav">
           <button class="bk-btn-back" onclick="returnToTicketPicker()">← Back</button>
-          <button class="checkout-method-trigger" id="paymentMethodTrigger" type="button" onclick="openPaymentMethodSheet()"><small>PAY USING ⌃</small><strong id="preferredPaymentLabel">UPI apps</strong><span class="method-trigger-change">Change method</span></button>
           <button class="bk-btn-next" id="submitBtn" onclick="submitBooking()">Pay ₹0</button>
-        </div>
-        <div class="payment-method-sheet" id="paymentMethodSheet" onclick="if(event.target===this)closePaymentMethodSheet()">
-          <section class="payment-method-card" role="dialog" aria-modal="true" aria-labelledby="paymentMethodTitle">
-            <div class="payment-method-sheet-head"><div><h2 id="paymentMethodTitle">Payment Options</h2><p id="paymentMethodAmount">Choose your preferred method</p></div><button type="button" class="payment-method-close" onclick="closePaymentMethodSheet()" aria-label="Close payment options">×</button></div>
-            <div class="payment-method-group"><h3 class="payment-method-group-title">Preferred Payment</h3><div class="payment-method-options" id="preferredPaymentOptions"></div></div>
-            <p class="payment-method-help">Your selected payment type opens in Razorpay Checkout. Available apps and banks depend on Razorpay and your account.</p>
-          </section>
         </div>
       </div>
 
@@ -474,16 +443,8 @@ let selectedSeats = [];
 let bookedSeats = [];
 let pickerQuantities = [];
 let bookingInitStarted = false;
-const preferredPaymentStorageKey='culturewave:preferred-payment-method';
 const razorpayFunctionsUrl='https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
-const paymentMethodChoices=[
-  {id:'upi',label:'UPI apps',description:'Pay using an available UPI app',icon:'↗',group:'Preferred Payment'},
-  {id:'card',label:'Credit & debit cards',description:'Visa, Mastercard, RuPay and more',icon:'＋',group:'Cards'},
-  {id:'netbanking',label:'Netbanking',description:'Pay through your bank',icon:'▤',group:'Other options'},
-  {id:'wallet',label:'Wallets',description:'Use a supported wallet',icon:'◉',group:'Other options'}
-];
-let preferredPaymentMethod='upi';
-try{const stored=localStorage.getItem(preferredPaymentStorageKey);if(paymentMethodChoices.some(item=>item.id===stored))preferredPaymentMethod=stored;}catch(_){ }
+try{localStorage.removeItem('culturewave:preferred-payment-method');}catch(_){ }
 const inviteTokenParam = urlP.get('inviteToken') || '';
 function inviteSessionKey(){ return `inviteAccess:${eventId}`; }
 async function inviteAccessAllowed(){
@@ -845,37 +806,6 @@ function goStep3(){
   goStep(3);
 }
 
-function renderPreferredPayment(){
-  const selected=paymentMethodChoices.find(item=>item.id===preferredPaymentMethod)||paymentMethodChoices[0];
-  const label=document.getElementById('preferredPaymentLabel');
-  if(label)label.textContent=selected.label;
-  const target=document.getElementById('preferredPaymentOptions');
-  if(!target)return;
-  target.innerHTML=paymentMethodChoices.map(item=>`<button type="button" class="payment-method-option${item.id===preferredPaymentMethod?' selected':''}" aria-pressed="${item.id===preferredPaymentMethod}" onclick="setPreferredPayment('${item.id}')"><span class="payment-method-icon" aria-hidden="true">${item.icon}</span><span class="payment-method-option-copy"><strong>${item.label}</strong><small>${item.description}</small></span><span class="payment-method-radio" aria-hidden="true">${item.id===preferredPaymentMethod?'✓':''}</span></button>`).join('');
-}
-function openPaymentMethodSheet(){
-  renderPreferredPayment();
-  const total=document.getElementById('b_total')?.textContent||'₹0';
-  document.getElementById('paymentMethodAmount').textContent=`To pay: ${total}`;
-  document.getElementById('paymentMethodSheet').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closePaymentMethodSheet(){
-  document.getElementById('paymentMethodSheet').classList.remove('open');
-  document.body.style.overflow='';
-}
-function setPreferredPayment(method){
-  if(!paymentMethodChoices.some(item=>item.id===method))return;
-  preferredPaymentMethod=method;
-  try{localStorage.setItem(preferredPaymentStorageKey,method);}catch(_){ }
-  renderPreferredPayment();
-  closePaymentMethodSheet();
-}
-function preferredRazorpayConfig(method){
-  const methodNames={upi:'UPI apps',card:'Credit & debit cards',netbanking:'Netbanking',wallet:'Wallets'};
-  return {display:{blocks:{preferred:{name:methodNames[method]||'Payment method',instruments:[{method}]}},sequence:['block.preferred'],preferences:{show_default_blocks:false}}};
-}
-
 // ── BILL ──
 function updateBill(){
   const subtotal = selectedTicketSubtotal();
@@ -899,8 +829,6 @@ function updateBill(){
   document.getElementById("b_fee").textContent = fee ? fmt(fee) : "₹0";
   document.getElementById("b_total").textContent = total ? fmt(total) : "Free";
   document.getElementById("rTotal").textContent = total ? fmt(total) : "Free";
-  const methodAmount=document.getElementById('paymentMethodAmount');
-  if(methodAmount)methodAmount.textContent=`To pay: ${total?fmt(total):'Free'}`;
 }
 
 // ── COUPON ──
@@ -1208,7 +1136,7 @@ async function submitBooking(){
   const amountInPaise=Math.round(total*100);
   let orderData;
   try{
-    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:amountInPaise,receipt:bid,customer:{name,email,phone,method:preferredPaymentMethod,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
+    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:amountInPaise,receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
     orderData=await orderResponse.json();
     if(!orderResponse.ok||!orderData.success||orderData.provider!=='razorpay'||!orderData.razorpayOrderId||!orderData.keyId) throw new Error(orderData.error||'Live Razorpay order service is unavailable.');
   }catch(orderError){
@@ -1225,18 +1153,18 @@ async function submitBooking(){
     name: "CultureWave",
     description: eventName,
     prefill: { name, email, contact: phone },
-    ...(preferredPaymentMethod==='card'?{method:'card'}:{}),
-    config: preferredRazorpayConfig(preferredPaymentMethod),
     theme: { color: "#1dae79", backdrop_color: "#090b10" },
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
       submitBtn.textContent = "Verifying payment...";
       let verified = false;
+      let paymentMethod='Razorpay';
       let verificationMessage='Payment signature verification failed.';
       try{
         const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)});
         const verificationData=await verification.json();
         verified=verification.ok&&verificationData.verified===true;
+        paymentMethod=verificationData.method||paymentMethod;
         if(!verified)verificationMessage=verificationData.error||verificationMessage;
       }catch(verifyErr){
         console.error('Payment signature verification failed:',verifyErr);
@@ -1248,12 +1176,11 @@ async function submitBooking(){
         showPaymentError(verificationMessage);
         return;
       }
-      const selectedPaymentLabel=paymentMethodChoices.find(item=>item.id===preferredPaymentMethod)?.label||'Razorpay';
       document.getElementById("rStatus").textContent = "✅ Confirmed";
-      await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:selectedPaymentLabel, name, email, phone });
+      await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone });
       await fetchBookedSeats();
       if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
-      const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:selectedPaymentLabel });
+      const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     },
