@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Experiences in Hyderabad | CultureWave</title>
+  <meta name="description" content="Discover memorable experiences, activities and things to do in Hyderabad with CultureWave."/>
+  <link rel="canonical" href="https://culturewave.in/category-experiences.html"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="CultureWave"/>
+  <meta property="og:title" content="Experiences in Hyderabad | CultureWave"/>
+  <meta property="og:description" content="Discover memorable experiences, activities and things to do in Hyderabad with CultureWave."/>
+  <meta property="og:url" content="https://culturewave.in/category-experiences.html"/>
+  <meta property="og:image" content="https://culturewave.in/herosection.jpeg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Experiences in Hyderabad | CultureWave"/>
+  <meta name="twitter:description" content="Discover memorable experiences, activities and things to do in Hyderabad with CultureWave."/>
+  <meta name="twitter:image" content="https://culturewave.in/herosection.jpeg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+
+    /* Shared category page layout inspired by the mobile event feed */
+    body{background:#201d23!important;color:#f7f5f8;}
+    .cat-hero{min-height:300px;height:clamp(300px,52vw,520px);align-items:flex-end;background:#201d23;}
+    .cat-hero-bg{filter:brightness(.38);background-position:center 35%;}
+    .cat-hero-overlay{background:linear-gradient(90deg,rgba(32,29,35,.86),rgba(32,29,35,.12)),linear-gradient(0deg,#201d23 0%,transparent 45%);}
+    .cat-hero-inner{max-width:1240px;padding:0 1rem 1.5rem;}
+    .cat-pill{display:none;}
+    .cat-hero h1{font-size:clamp(2.7rem,8vw,5.6rem);text-transform:uppercase;letter-spacing:-.035em;margin:0;text-shadow:0 4px 24px #000;}
+    .cat-hero-desc{display:none;}
+    .cat-hero-meta{display:none;}
+    .cat-body{max-width:1240px;padding:0 1rem 4rem;}
+    .cat-filter-row{display:none;}
+    .cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem 1rem;}
+    .cat-card{position:relative;min-width:0;background:transparent;border:0;border-radius:0;overflow:visible;display:grid;grid-template-columns:54px minmax(0,1fr);column-gap:.55rem;row-gap:.55rem;transition:none;}
+    .cat-card:hover{transform:none;box-shadow:none;}
+    .cat-card-banner{grid-column:1/-1;height:auto;aspect-ratio: .78;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:13px;background:#302d34;}
+    .cat-card-banner-bg{inset:0;background-size:cover;background-position:center;}
+    .cat-card-banner::after{display:none;}
+    .cat-card-tag{display:none;}
+    .cat-card-body{display:contents;}
+    .cat-card-body h3{grid-column:2;grid-row:2;margin:.1rem 0 0;font-size:clamp(.82rem,2.5vw,1.05rem);line-height:1.35;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;color:#f5f3f6;}
+    .cat-card-venue{grid-column:2;grid-row:3;margin-top:-.45rem;font-size:clamp(.68rem,2vw,.82rem);line-height:1.4;color:#aaa5af;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;}
+    .cat-card-venue::before{content:none;}
+    .cat-card-desc{display:none;}
+    .cat-card-footer{display:contents;}
+    .cat-card-price{position:absolute;left:0;right:0;top:calc((100vw - 2rem - 1rem) / 2 * 1.282 - 2.05rem);z-index:2;padding:.55rem .7rem;background:rgba(236,24,131,.9);color:#fff;font-size:.78rem;}
+    .cat-card-price strong{color:#fff;font-size:.78rem;}
+    .cat-card-btn{grid-column:1;grid-row:2 / span 2;display:grid;place-items:center;align-self:start;min-height:54px;padding:.35rem;border-radius:12px;background:#39363e;box-shadow:none;color:#fff;font-size:.76rem;line-height:1.2;text-align:center;}
+    .cat-empty{grid-column:1/-1;padding:3rem 1rem;color:#aaa5af;}
+    .cat-empty span{font-size:2.2rem;}
+    @media(min-width:700px){
+      .cat-hero-inner{padding:0 2rem 2rem;}
+      .cat-body{padding-left:2rem;padding-right:2rem;}
+      .cat-grid{gap:2rem 1.5rem;}
+      .cat-card-price{top:auto;bottom:calc(100% - ((100vw - 4rem - 4.5rem) / 4 * 1.282));}
+    }
+    @media(max-width:560px){
+      .cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.1rem .75rem;}
+      .cat-hero{height:300px;min-height:300px;}
+      .cat-hero h1{font-size:2.7rem;}
+      .cat-body{padding-left:.95rem;padding-right:.95rem;}
+      .cat-card-price{top:calc((100vw - 2rem - .75rem) / 2 * 1.282 - 2.05rem);}
+      .cat-card-btn{min-height:48px;}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="nav-wrap">
+    <div class="brand-block"><a class="logo" href="index.html">CultureWave</a><div class="brand-sub">by OGSHOOTS LUXE</div></div>
+    <nav class="topnav"><a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a><a href="how-it-works.html">How it works</a></nav>
+    <div class="auth-actions"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a></div>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div></header>
+  <nav class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a><a href="how-it-works.html">How it works</a><a href="login.html">Get Started</a></nav>
+
+  <section class="community-hero"><div class="community-hero-bg"></div><div class="community-hero-overlay"></div><div class="community-hero-inner">
+    <div class="community-pill">✨ Experiences</div>
+    <h1>Find your next<br/><span>great experience.</span></h1>
+    <p class="community-desc">Discover memorable activities, immersive attractions, and things to do around you.</p>
+  </div></section>
+
+  <main class="community-body"><div class="community-heading"><div><h2>Experiences &amp; things to do</h2><p>Pick something memorable near you.</p></div><a class="community-button" href="events.html">Browse all events</a></div><div class="community-grid" id="communityGrid"><div class="community-empty"><span>✨</span>Loading experiences...</div></div></main>
+
+  <footer class="site-footer">
+  <div class="footer-glow-top"></div>
+  <div class="footer-wrap">
+    <div class="footer-branding">
+      <div class="footer-brand">CultureWave</div>
+      <p>Premium events, workshops &amp; restaurant bookings — all in one seamless flow.</p>
+      <div class="footer-socials">
+        <a class="footer-social-button" href="https://www.instagram.com/culturewave.app?stkn=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="footer-social-button" href="mailto:support.culturewave@gmail.com" aria-label="Email">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+        </a>
+        <a class="footer-social-button" href="tel:+916305183601" aria-label="Phone">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Explore</div>
+      <div class="footer-links">
+        <a href="events.html">Events</a>
+        <a href="restaurants.html">Restaurants</a>
+        <a href="features.html">For Organizers</a>
+        <a href="how-it-works.html">How it works</a>
+        <a href="booking.html">Book Now</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
+        <a href="refund-policy.html">Refund Policy</a>
+        <a href="customer-service.html">Customer Service</a>
+      </div>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-col-title" style="border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.6rem;margin-bottom:.2rem;">Contact</div>
+      <div class="footer-contact-row">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <span style="white-space:nowrap;font-size:.78rem;"><a href="tel:+916305183601" style="color:inherit;text-decoration:none;">6305183601</a> | <a href="tel:+919848047428" style="color:inherit;text-decoration:none;">9848047428</a></span>
+      </div>
+      <a class="footer-contact-row" href="mailto:support.culturewave@gmail.com">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg></span>
+        <span>support.culturewave@gmail.com</span>
+      </a>
+      <a class="footer-contact-row" href="https://www.instagram.com/culturewave.app?stkn=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span>
+        <span>@culturewave.app</span>
+      </a>
+      <div class="footer-contact-row">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+        <span>Vijayawada, India</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-bottom">
+    <span>© 2025 OG SHOOTS. All rights reserved. Made with <span class="footer-heart">♥</span> in India.</span>
+    <span class="footer-credit">Developed by <strong>Srisanth Boddu</strong></span>
+    <span class="footer-owned">Owned by OGSHOOTS LUXE</span>
+  </div>
+</footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+  if(!firebase.apps.length){firebase.initializeApp({apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",authDomain:"ogshootsluxe-36740.firebaseapp.com",projectId:"ogshootsluxe-36740",storageBucket:"ogshootsluxe-36740.firebasestorage.app",messagingSenderId:"5471814825",appId:"1:5471814825:web:07e84f2f88486da817d5b8"});}
+  const db=firebase.firestore();
+  const CATEGORY_KEYWORDS=['experience','adventure','activity','attraction'];
+  const CATEGORY_LABEL='Experiences';
+  const grid=document.getElementById('catGrid');
+  const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  function eventDate(value){
+    if(!value)return {day:'TBA',month:''};
+    const date=value.toDate?value.toDate():new Date(String(value).slice(0,10)+'T00:00:00');
+    if(Number.isNaN(date.getTime()))return {day:'TBA',month:''};
+    return {day:date.toLocaleDateString('en-IN',{day:'2-digit'}),month:date.toLocaleDateString('en-IN',{month:'short'}).toUpperCase()};
+  }
+  async function loadCategoryEvents(){
+    try{
+      const snap=await db.collection('events').limit(300).get();
+      const city=localStorage.getItem('culturewaveCity');
+      const docs=snap.docs.filter(doc=>{
+        const data=doc.data(),status=String(data.status||'').toLowerCase();
+        const hay=[data.category||'',data.name||'',data.tags||'',data.description||'',data.summary||''].join(' ').toLowerCase();
+        return data.publicListing!==false&&['published','live','active'].includes(status)&&CATEGORY_KEYWORDS.some(word=>hay.includes(word))&&(!city||!data.city||String(data.city).toLowerCase()===city.toLowerCase());
+      }).slice(0,60);
+      const count=document.getElementById('statCount');if(count)count.textContent=docs.length;
+      if(!docs.length){grid.innerHTML=`<div class="cat-empty"><span>✨</span>No ${escapeHtml(CATEGORY_LABEL.toLowerCase())} listed yet. Check back soon.</div>`;return;}
+      grid.innerHTML=docs.map(doc=>{
+        const data=doc.data(),id=encodeURIComponent(doc.id),image=data.cardImgUrl||data.coverUrl||data.imageUrl||'';
+        const price=Number(data.tickets?.[0]?.price??data.price??0),date=eventDate(data.startDate||data.eventDate);
+        const venue=[data.venueName||data.venue||data.city||'Location TBA',data.city&&data.venueName?data.city:''].filter(Boolean).join(' · ');
+        const priceLabel=price?`Starts at ₹${price.toLocaleString('en-IN')}`:'Free';
+        return `<article class="cat-card" data-price="${price?'paid':'free'}">
+          <a class="cat-card-banner" href="event-detail.html?eventId=${id}&amp;source=category-experiences.html" aria-label="View ${escapeHtml(data.name||CATEGORY_LABEL+' event')}"><div class="cat-card-banner-bg" style="${image?`background-image:url(&quot;${escapeHtml(image)}&quot;)`:''}"></div></a>
+          <div class="cat-card-price"><strong>${priceLabel}</strong></div>
+          <a class="cat-card-btn" href="event-detail.html?eventId=${id}&amp;source=category-experiences.html"><span>${date.day}<br/>${date.month}</span></a>
+          <div class="cat-card-body"><h3>${escapeHtml(data.name||'Untitled event')}</h3><div class="cat-card-venue">${escapeHtml(venue)}</div><p class="cat-card-desc">${escapeHtml(data.summary||data.description||'')}</p><div class="cat-card-footer"><div class="cat-card-price">${priceLabel}</div><a class="cat-card-btn" href="event-detail.html?eventId=${id}&amp;source=category-experiences.html">Book Now →</a></div></div>
+        </article>`;
+      }).join('');
+    }catch(error){grid.innerHTML='<div class="cat-empty"><span>⚠️</span>Events could not be loaded. Please try again.</div>';}
+  }
+  loadCategoryEvents();
+</script>
+</body>
+</html>
