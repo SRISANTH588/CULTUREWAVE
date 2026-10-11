@@ -21,6 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="styles.css"/>
   <style>
+    html{scrollbar-gutter:stable;}
     :root{--accent:#065f46;--accent2:#34d399;}
     body{background:#080808;}
     .cat-hero{position:relative;min-height:480px;display:flex;align-items:flex-end;overflow:hidden;}
@@ -35,8 +36,8 @@
     .cat-hero-stat{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.35);}
     .cat-hero-stat strong{color:#fff;font-size:1.1rem;display:block;}
     .cat-body{max-width:1240px;margin:0 auto;padding:3rem 1.4rem 5rem;}
-    .cat-filter-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:2rem;}
-    .cat-chip{border:1.5px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.45);border-radius:999px;padding:.45rem 1rem;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:inherit;}
+    .cat-filter-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:2rem;}
+    .cat-chip{box-sizing:border-box;flex:0 0 auto;white-space:nowrap;appearance:none;border:1.5px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.45);border-radius:999px;padding:.45rem 1rem;font-size:.82rem;font-weight:700;line-height:1.2;cursor:pointer;transition:background-color .18s,color .18s,border-color .18s;}
     .cat-chip:hover{border-color:var(--accent2);color:#6ee7b7;}
     .cat-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(6,95,70,.4);}
     .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
