@@ -744,13 +744,18 @@ function showToast(msg){
 function slugifyEventName(name){
   return String(name || 'event').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'event';
 }
-function getEventPath(name){
+function getEventPath(name,id=eventId){
   const slug = encodeURIComponent(slugifyEventName(name));
-  return eventPathParts.length === 2
+  const path = eventPathParts.length === 2
     ? `/${encodeURIComponent(eventPathParts[0])}/${slug}`
     : `/event/${slug}`;
+  return id ? `${path}?eventId=${encodeURIComponent(id)}` : path;
 }
-function getPublicEventUrl(data=evData){ return `${location.origin}/event/${encodeURIComponent(slugifyEventName(data.name))}`; }
+function getPublicEventUrl(data=evData){
+  const path=`/event/${encodeURIComponent(slugifyEventName(data.name))}`;
+  const id=data.id||eventId;
+  return `${location.origin}${id?`${path}?eventId=${encodeURIComponent(id)}`:path}`;
+}
 function getShareUrl(){ return getPublicEventUrl(); }
 
 function openShare(){
@@ -1096,7 +1101,7 @@ async function renderEvent(data){
     }
     element.setAttribute(attribute, value);
   };
-  const eventCanonical = new URL(`/event/${encodeURIComponent(slugifyEventName(data.name))}`, location.origin);
+  const eventCanonical = new URL(getPublicEventUrl(data));
   let canonicalLink = document.head.querySelector('link[rel="canonical"]');
   if (!canonicalLink) {
     canonicalLink = document.createElement('link');
@@ -1493,7 +1498,7 @@ async function init(){
   if (resolvedEventId && eventSlug) {
     const byId = await db.collection('events').doc(resolvedEventId).get();
     if (byId.exists && slugifyEventName(byId.data().name) !== eventSlug) {
-      history.replaceState(null, '', getEventPath(byId.data().name));
+      history.replaceState(null, '', getEventPath(byId.data().name,resolvedEventId));
     }
   }
   if (!resolvedEventId && eventSlug) {
@@ -1524,7 +1529,7 @@ async function init(){
   eventId = resolvedEventId;
   const data = {id:snap.id,...snap.data()};
   if (!eventSlug || eventSlug !== slugifyEventName(data.name)) {
-    history.replaceState(null, '', getEventPath(data.name));
+    history.replaceState(null, '', getEventPath(data.name,resolvedEventId));
   }
   await renderEvent(data);
 
