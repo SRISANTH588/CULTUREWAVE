@@ -473,7 +473,7 @@ async function init(){
 
   db.collection('events').where('ownerId','==',uid).limit(50).onSnapshot(snap => {
     const events = snap.docs
-      .map(d=>({id:d.id,...d.data()}))
+      .map(d=>({...d.data(),id:d.id}))
       .filter(e=>(e.status||'').toLowerCase()==='published');
     renderEvents(events);
   }, error => console.error('Could not watch organiser events:', error));
