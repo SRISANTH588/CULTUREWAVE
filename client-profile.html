@@ -259,7 +259,9 @@ function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function slugifyEventName(name){ return String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event'; }
 function getProfileEventUrl(ev){
   const handle=String(profileData.handle||targetHandle||'').trim().toLowerCase();
-  return handle ? `/${encodeURIComponent(handle)}/${encodeURIComponent(slugifyEventName(ev.name))}` : `event-detail.html?eventId=${encodeURIComponent(ev.id)}`;
+  const eventId=String(ev.id||'').trim();
+  const eventUrl=handle ? `/${encodeURIComponent(handle)}/${encodeURIComponent(slugifyEventName(ev.name))}` : 'event-detail.html';
+  return `${eventUrl}${eventId?`?eventId=${encodeURIComponent(eventId)}`:''}`;
 }
 
 function showToast(msg){
@@ -368,10 +370,8 @@ function renderEvents(events){
 function renderProfile(data){
   profileData = data;
   const publicHandle = String(data.handle || targetHandle || '').trim().toLowerCase();
-  if(publicHandle && (prettyProfileRoute || targetUid || targetHandle)){
-    const basePath = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1);
-    history.replaceState(null, '', `${basePath}${encodeURIComponent(publicHandle)}`);
-  }
+  // Keep the current route intact: profile event cards depend on its base path,
+  // and rewriting it here can make event links resolve to the wrong route.
   const initials = (data.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const avatarEl = document.getElementById('profileAvatar');
   if(data.avatarUrl){
