@@ -1620,9 +1620,8 @@ async function init(){
           document.getElementById("receiptBanner").appendChild(img);
         }
         renderTicketPicker();
-        // Standalone booking links should open on checkout. The embedded version
-        // stays in the ticket/details flow so the event page can collect a booking.
-        if(resumeCheckout || !embeddedBooking){
+        // Always open the booking page on checkout, including legacy embedded links.
+        {
           let draft=null;
           const draftKey=`culturewave:checkout-draft:${eventId}`;
           if(resumeCheckout){
