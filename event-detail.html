@@ -221,6 +221,8 @@
       .mob-info-row{padding:.05rem 0;}.mob-info-icon-box{width:45px;min-width:45px;height:45px;border-radius:12px;background:#171b23!important;}
       .mob-info-text-title{color:#fff;font-size:.9rem;}.mob-info-text-sub{color:#aeb4c0;}
       .mob-detail-tabs{position:sticky;top:70px;z-index:25;display:grid;grid-template-columns:repeat(4,1fr);gap:.18rem;margin:1rem 1.2rem 1.4rem;padding:.25rem;background:#292d36;border:1px solid #4a4e58;border-radius:999px;}
+      .mob-detail-tabs-spacer{height:0;}
+      .mob-detail-tabs.is-fixed{position:fixed;top:var(--mob-detail-tabs-top,70px);left:1.2rem;right:1.2rem;width:auto;z-index:45;margin:0!important;}
       .mob-detail-tabs button{height:39px;border:0;border-radius:999px;background:transparent;color:#e5e7eb;font-size:.84rem;font-weight:800;}.mob-detail-tabs button.active{background:#fff;color:#10131a;}
       .shell{padding:0 1.4rem;background:#05070c;}.section,.mob-section-card{background:#0f1219!important;border-color:#292e38!important;color:#fff;box-shadow:none!important;}
       .section-title,.mob-section-label{color:#fff!important;}.section-title::before{background:#ff5a19;}.description{color:#d2d6de!important;}
@@ -450,6 +452,7 @@
 </div>
 
 <!-- Phone-only quick navigation, inspired by the event discovery flow. -->
+<div class="mob-detail-tabs-spacer" id="mobDetailTabsSpacer" aria-hidden="true"></div>
 <nav class="mob-detail-tabs" aria-label="Event details sections">
   <button class="active" type="button" data-mob-tab="about" onclick="showMobileDetailTab('about')">About</button>
   <button type="button" data-mob-tab="photos" onclick="showMobileDetailTab('photos')">Photos</button>
@@ -931,9 +934,32 @@ function syncMobileTabs(){
   sections.forEach(([tab,id]) => { const el=document.getElementById(id); if(el && el.offsetTop <= marker) active=tab; });
   document.querySelectorAll('[data-mob-tab]').forEach(button => button.classList.toggle('active',button.dataset.mobTab===active));
 }
+function pinMobileDetailTabs(){
+  const tabs=document.querySelector('.mob-detail-tabs');
+  const spacer=document.getElementById('mobDetailTabsSpacer');
+  if(!tabs||!spacer)return;
+  if(!window.matchMedia('(max-width: 768px)').matches){
+    tabs.classList.remove('is-fixed');
+    tabs.style.removeProperty('--mob-detail-tabs-top');
+    spacer.style.height='0';
+    return;
+  }
+  if(tabs.dataset.pinned==='true')return;
+  const tabsStyle=getComputedStyle(tabs);
+  const originalTop=tabs.getBoundingClientRect().top+window.scrollY;
+  const flowSpace=tabs.offsetHeight+parseFloat(tabsStyle.marginTop||0)+parseFloat(tabsStyle.marginBottom||0);
+  tabs.style.setProperty('--mob-detail-tabs-top',`${Math.max(0,originalTop)}px`);
+  spacer.style.height=`${flowSpace}px`;
+  tabs.classList.add('is-fixed');
+  tabs.dataset.pinned='true';
+}
 window.addEventListener('scroll', syncMobileTabs, {passive:true});
 requestAnimationFrame(syncMobileTabs);
-window.addEventListener('resize', syncMobileTabs, {passive:true});
+window.addEventListener('resize',()=>{
+  const tabs=document.querySelector('.mob-detail-tabs');
+  if(tabs){tabs.dataset.pinned='';tabs.classList.remove('is-fixed');tabs.style.removeProperty('--mob-detail-tabs-top');}
+  requestAnimationFrame(()=>{pinMobileDetailTabs();syncMobileTabs();});
+},{passive:true});
 if('ResizeObserver' in window){
   const tabsAnchorObserver=new ResizeObserver(()=>{
     const tabs=document.querySelector('.mob-detail-tabs');
@@ -1424,6 +1450,7 @@ async function renderEvent(data){
       }
     }catch(e){ console.error('org load error',e); }
   }
+  requestAnimationFrame(pinMobileDetailTabs);
 }
 
 async function showFoodOrderingForEvent(data) {
