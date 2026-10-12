@@ -305,11 +305,11 @@
     .bk-panel#panel3 .checkout-remember{margin:0 1.2rem 1rem;padding:1rem 0;border-color:#393a3e;}
     .bk-panel#panel3 .bk-tc{margin:0 1.2rem 1rem;}
     .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr;align-items:center;gap:.7rem;margin:0;padding:.65rem 1.2rem calc(env(safe-area-inset-bottom) + .65rem);border-top:1px solid #38393d;background:#18191c;}
-    .checkout-pay-action{min-width:0;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.45rem .6rem .45rem .8rem;border-radius:15px;background:#f7f7f8;color:#161719;}
-    .checkout-pay-action>div{display:flex;flex-direction:column;gap:.05rem;}
-    .checkout-pay-action>div strong{font-size:.9rem;white-space:nowrap;}
-    .checkout-pay-action>div small{font-size:.65rem;}
-    .checkout-pay-action .bk-btn-next{width:auto!important;height:46px!important;min-height:46px!important;padding:0 .75rem;border-radius:12px;background:transparent!important;box-shadow:none!important;color:#161719;font-size:.87rem;font-weight:900;white-space:nowrap;}
+    .bk-panel#panel3 .checkout-pay-action{width:100%;min-width:0;min-height:52px;display:flex;align-items:center;justify-content:flex-end;gap:.7rem;padding:0;background:transparent;color:#f4f4f5;}
+    .checkout-pay-action>div{display:flex;flex-direction:column;gap:.05rem;margin-right:auto;}
+    .checkout-pay-action>div strong{color:#f4f4f5;font-size:.9rem;white-space:nowrap;}
+    .checkout-pay-action>div small{color:#a5a6ac;font-size:.65rem;}
+    .bk-panel#panel3 .checkout-pay-action .bk-btn-next{width:auto!important;height:42px!important;min-height:42px!important;padding:0 1rem;border-radius:12px;background:#ff5a00!important;box-shadow:none!important;color:#fff!important;font-size:.84rem;font-weight:800;white-space:nowrap;}
     .bk-panel#panel3 .bk-btn-next{grid-column:1/-1!important;width:100%!important;justify-self:stretch!important;}
     .bk-panel#panel3 .checkout-pay-action .bk-btn-next{grid-column:auto!important;width:auto!important;justify-self:auto!important;}
     }
@@ -907,6 +907,7 @@ function syncCheckoutInvoice(){
   const email=document.getElementById('bookEmail').value.trim();
   document.getElementById('checkoutInvoiceContact').textContent=[phone,email].filter(Boolean).join(' · ')||'Add your phone number and email address';
 }
+['bookName','bookPhone','bookEmail'].forEach(id=>document.getElementById(id)?.addEventListener('input',syncCheckoutInvoice));
 function saveCheckoutContactDetails(){
   const name=document.getElementById('checkoutEditName').value.trim();
   const phone=document.getElementById('checkoutEditPhone').value.trim();
@@ -1783,6 +1784,7 @@ async function init(){
             document.getElementById('bookEmail').value=draft.email||'';
             restoreDraftTicketSelections(draft);
             selectedSeats=Array.isArray(draft.seats)?draft.seats.map(String):[];
+            syncCheckoutInvoice();
             localStorage.removeItem(draftKey);
           }else{
             const requestedByIndex=Number.isInteger(passedTicketIndex)&&passedTicketIndex>=0&&passedTicketIndex<tickets.length?passedTicketIndex:-1;
