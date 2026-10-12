@@ -668,7 +668,7 @@ async function getCurrentUser() {
 const params = new URLSearchParams(location.search);
 const eventPathParts = location.pathname.split('/').filter(Boolean).map(part => { try { return decodeURIComponent(part); } catch (_) { return part; } });
 const eventSlug = eventPathParts[0] === 'event' ? (eventPathParts[1] || '') : eventPathParts.length === 2 ? eventPathParts[1] : '';
-const eventId = params.get('eventId');
+let eventId = params.get('eventId');
 const eventSource = params.get('source');
 const sourceBackUrl = (() => {
   if (eventSource && /^(category-(parties|brunch|culinary|workshops|experiences|music)\.html|index\.html)$/.test(eventSource)) return eventSource;
@@ -1007,7 +1007,7 @@ function register(){
     seatingPlanUrl: evData.seatingPlanUrl || '',
     seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
   });
-  location.href = `booking.html?${qs.toString()}`;
+  location.href = `/booking.html?${qs.toString()}`;
 }
 
 function updateRegistrationStatus(data){
@@ -1468,6 +1468,7 @@ async function init(){
   const snap = await db.collection('events').doc(resolvedEventId).get();
   if(!snap.exists){ document.getElementById('evTitle').textContent='Event not found'; return; }
 
+  eventId = resolvedEventId;
   const data = {id:snap.id,...snap.data()};
   if (!eventSlug || eventSlug !== slugifyEventName(data.name)) {
     history.replaceState(null, '', getEventPath(data.name));
