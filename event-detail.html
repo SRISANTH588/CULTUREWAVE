@@ -221,7 +221,8 @@
       .mob-info-row{padding:.05rem 0;}.mob-info-icon-box{width:45px;min-width:45px;height:45px;border-radius:12px;background:#171b23!important;}
       .mob-info-text-title{color:#fff;font-size:.9rem;}.mob-info-text-sub{color:#aeb4c0;}
       .mob-detail-tabs{position:fixed;top:var(--mob-detail-tabs-top,70px);left:1.2rem;right:1.2rem;width:auto;z-index:45;display:grid;grid-template-columns:repeat(4,1fr);gap:.18rem;margin:0!important;padding:.25rem;background:#292d36;border:1px solid #4a4e58;border-radius:999px;}
-      .mob-detail-tabs-spacer{display:block;height:78px;}
+      .mob-detail-tabs-spacer{position:relative;display:block;height:78px;}
+      .mob-detail-tabs-spacer::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:#252a34;}
       .mob-detail-tabs button{height:39px;border:0;border-radius:999px;background:transparent;color:#e5e7eb;font-size:.84rem;font-weight:800;}.mob-detail-tabs button.active{background:#fff;color:#10131a;}
       .shell{padding:0 1.4rem;background:#05070c;}.section,.mob-section-card{background:#0f1219!important;border-color:#292e38!important;color:#fff;box-shadow:none!important;}
       .section-title,.mob-section-label{color:#fff!important;}.section-title::before{background:#ff5a19;}.description{color:#d2d6de!important;}
@@ -955,6 +956,18 @@ window.addEventListener('resize',()=>{
   if(tabs){delete tabs.dataset.fixedTop;tabs.style.removeProperty('--mob-detail-tabs-top');}
   requestAnimationFrame(syncMobileTabs);
 },{passive:true});
+if('ResizeObserver' in window){
+  const tabsAnchorObserver=new ResizeObserver(()=>{
+    const tabs=document.querySelector('.mob-detail-tabs');
+    if(tabs&&window.matchMedia('(max-width: 768px)').matches){
+      delete tabs.dataset.fixedTop;
+      tabs.style.removeProperty('--mob-detail-tabs-top');
+      requestAnimationFrame(syncMobileTabs);
+    }
+  });
+  const mobileHeader=document.getElementById('mobEventHeader');
+  if(mobileHeader)tabsAnchorObserver.observe(mobileHeader);
+}
 
 function renderSeatingLayout(layout, target){
   if(!target) return;
