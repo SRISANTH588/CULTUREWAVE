@@ -282,8 +282,6 @@
     .checkout-payment-summary .bk-bill-row{min-height:48px;align-items:center;padding:.5rem 0;color:#dedee1!important;border:0!important;font-size:.82rem;}
     .checkout-payment-summary .bk-bill-row span,.checkout-payment-summary .bk-bill-row strong{color:#dedee1!important;}
     .checkout-payment-summary .checkout-order-row{min-height:58px;font-size:.9rem;font-weight:700;}
-    .checkout-payment-summary .checkout-order-row>span>span:first-child{margin-left:.25rem;color:#9fa0a6;font-size:1rem;}
-    .checkout-payment-summary .checkout-order-row>span>span:first-child[aria-hidden="true"]{display:none;}
     .checkout-payment-summary .bk-bill-row.total{margin-top:.2rem;padding-top:.55rem;border-top:1px solid #38393d!important;font-size:.9rem;font-weight:800;}
     .checkout-payment-summary .bk-bill-row.total strong{color:#fff!important;font-size:.95rem;}
     .checkout-invoice{margin:0 1.2rem 1.7rem;padding:1rem;border:1px solid #37383c;border-radius:22px;background:#1d1e21;}
@@ -499,11 +497,10 @@
         </section>
       </div>
         <div class="checkout-divider"><span></span><b>PAYMENT SUMMARY</b><span></span></div>
-        <section class="checkout-section checkout-payment-summary"><div class="bk-bill checkout-bill"><div class="bk-bill-row checkout-order-row"><span>Order amount <span aria-hidden="true">⌄</span><span id="b_price" hidden>Ticket</span></span><strong id="checkoutTicketTotal">₹0</strong></div><div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div><div class="bk-bill-row"><span>Platform fee</span><span id="b_fee">₹0</span></div><div class="bk-bill-row total"><span>Grand Total</span><strong id="b_total">₹0</strong></div></div></section>
+        <section class="checkout-section checkout-payment-summary"><div class="bk-bill checkout-bill"><div class="bk-bill-row checkout-order-row"><span>Order amount <small id="checkoutOrderBreakdown" style="display:block;margin-top:.3rem;color:#aeb0b7;font-size:.68rem;font-weight:500;"></small><span id="b_price" hidden>Ticket</span></span><strong id="checkoutTicketTotal">₹0</strong></div><div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div><div class="bk-bill-row"><span>Platform fee</span><span id="b_fee">₹0</span></div><div class="bk-bill-row total"><span>Grand Total</span><strong id="b_total">₹0</strong></div></div></section>
         <div class="checkout-divider"><span></span><b>INVOICE DETAILS</b><span></span></div>
         <section class="checkout-invoice"><div class="checkout-invoice-head"><span aria-hidden="true">♙</span><strong id="checkoutInvoiceName">Guest</strong><button type="button" onclick="editCheckoutDetails()">Edit&nbsp; ›</button></div><p id="checkoutInvoicePhone"></p><p id="checkoutInvoiceEmail"></p><small>Information above will be used for generating the invoice and sending out the tickets.</small></section>
         <details class="checkout-remember"><summary>Things to remember</summary><p>Your ticket will be confirmed after successful payment. Please carry a valid ID to the venue.</p></details>
-        <div class="bk-tc"><input type="checkbox" id="tcCheck"/><label for="tcCheck">I agree to the <a href="terms-and-conditions.html" target="_blank">Terms &amp; Conditions</a> and <a href="refund-policy.html" target="_blank">Refund Policy</a>.</label></div>
         <div class="bk-nav">
           <button class="bk-btn-back" onclick="returnToTicketPicker()">← Back</button>
           <div class="checkout-pay-method"><small>SECURE ONLINE PAYMENT</small><strong>Choose payment method</strong></div>
@@ -695,7 +692,8 @@ function formatTimeText(value){
 }
 function eventStartTime(){
   const firstDate=(evData.eventDates||[])[0]||{};
-  return formatTimeText(evData.startTime || evData.time || firstDate.startTime || firstDate.time || (firstDate.slots||[])[0]?.start || '');
+  const firstSlot=(firstDate.slots||[])[0]||{};
+  return formatTimeText(evData.startTime || evData.time || firstDate.startTime || firstDate.time || firstDate.start || firstSlot.startTime || firstSlot.start || firstSlot.time || '');
 }
 function ticketMax(ticket){
   const remainingValue = ticket.available ?? ticket.remaining;
@@ -780,15 +778,16 @@ function reconcileSelectedTickets(nextTickets){
   tickets=nextTickets;
   pickerQuantities=tickets.map(()=>0);
   const used=new Set();
+  let resolvedSelectedIndex=-1;
   selected.forEach(item=>{
     let index=item.id?tickets.findIndex((ticket,i)=>!used.has(i)&&String(ticket.id||ticket.ticketId||'')===item.id):-1;
+    if(index<0&&tickets[item.index]&&!used.has(item.index)&&String(tickets[item.index].name||'')===item.name&&Number(tickets[item.index].price||0)===item.price)index=item.index;
     if(index<0)index=tickets.findIndex((ticket,i)=>!used.has(i)&&String(ticket.name||'')===item.name&&Number(ticket.price||0)===item.price);
-    if(index<0&&tickets[item.index]&&String(tickets[item.index].name||'')===item.name)index=item.index;
-    if(index>=0){pickerQuantities[index]=item.quantity;used.add(index);}
+    if(index>=0){pickerQuantities[index]=item.quantity;used.add(index);if(item.index===selectedTicketIdx)resolvedSelectedIndex=index;}
   });
   let nextIndex=selectedId?tickets.findIndex(ticket=>String(ticket.id||ticket.ticketId||'')===selectedId):-1;
+  if(nextIndex<0&&resolvedSelectedIndex>=0)nextIndex=resolvedSelectedIndex;
   if(nextIndex<0)nextIndex=tickets.findIndex(ticket=>String(ticket.name||'')===selectedName&&Number(ticket.price||0)===selectedPrice);
-  if(nextIndex<0&&tickets[selectedTicketIdx]&&String(tickets[selectedTicketIdx].name||'')===selectedName)nextIndex=selectedTicketIdx;
   if(nextIndex>=0)selectedTicketIdx=nextIndex;
 }
 function groupTicketPrice(ticket, quantity){
@@ -805,7 +804,7 @@ function groupTicketHint(ticket){
 function selectedTicketCount(){ return selectedTicketItems().reduce((sum,item)=>sum+item.quantity,0); }
 function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+groupTicketPrice(item.ticket,item.quantity)*item.quantity,0); }
 function selectedTicketLabel(){ return selectedTicketItems().map(item=>{ const isGroup=ticketMinRequired(item.ticket)>1&&item.quantity>=ticketMinRequired(item.ticket); return isGroup?`${item.ticket.name||'Ticket'} (group of ${item.quantity})`:`${item.ticket.name||'Ticket'} × ${item.quantity}`; }).join(', '); }
-function platformFee(amount){const cart=Math.max(0,Number(amount)||0);return cart===0?0:cart>999?6:Math.round(cart*.10);}
+function platformFee(amount){const cart=Math.max(0,Number(amount)||0);return cart===0?0:Math.round(cart*(cart>700?.059:.10));}
 function startCheckoutCountdown(){
   if(!checkoutCountdownEndsAt) checkoutCountdownEndsAt=Date.now()+10*60*1000;
   const update=()=>{
@@ -832,12 +831,12 @@ function expireCheckout(){
 }
 function closePaymentOffersSheet(){document.getElementById('paymentOffersSheet').style.display='none';}
 function showPaymentOfferInfo(){
-  const offers=evData.razorpayPaymentOffers||[];
+  const offers=evData.razorpayPaymentOffers||evData.paymentOffers||[];
   const content=document.getElementById('paymentOffersContent');
   if(Array.isArray(offers)&&offers.length){
     content.innerHTML=offers.map(offer=>`<article style="padding:.85rem 0;border-bottom:1px solid #383a40"><strong style="display:block;color:#f5f5f6">${escapeHtml(offer.title||offer.name||offer.display_text||'Payment offer')}</strong><span>${escapeHtml(offer.description||offer.desc||offer.terms||'')}</span></article>`).join('');
   }else{
-    content.textContent='Razorpay shows the active offers that match your payment method and ticket amount inside its secure payment window. Choose Pay now, then select UPI, card, or net banking to see the offers available for your payment.';
+    content.textContent='Razorpay applies payment offers based on your payment method, card or bank, and order amount. Choose “See eligible offers” to open Razorpay Checkout and view every offer currently available for this payment.';
   }
   document.getElementById('paymentOffersSheet').style.display='flex';
 }
@@ -1123,7 +1122,7 @@ function goStep3(){
   if(poster){poster.src=evData.cardImgUrl||evData.coverUrl||'';poster.alt=`${evData.name||'Event'} poster`;}
   document.getElementById("s3Ticket").textContent = selectedTicketLabel();
   document.getElementById("s3Qty").textContent = selectedTicketCount();
-  const eventDate = eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date);
+  const eventDate = eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || passedEventDate);
   const dateLabel = !Number.isNaN(eventDate.getTime()) ? eventDate.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}) : '';
   const locationLabel = [evData.venueName||evData.venue, evData.city].filter(Boolean).join(' · ');
   document.getElementById('reviewEventMeta').textContent = [dateLabel, locationLabel].filter(Boolean).join('  ·  ') || 'Review your booking';
@@ -1143,6 +1142,8 @@ function updateBill(){
   const fee = platformFee(afterDiscount);
   const total = afterDiscount + fee;
   document.getElementById("b_price").textContent = selectedTicketLabel();
+  const orderBreakdown=selectedTicketItems().map(item=>`${item.ticket.name||'Ticket'} · ${fmt(groupTicketPrice(item.ticket,item.quantity))} × ${item.quantity}`).join('  |  ');
+  document.getElementById('checkoutOrderBreakdown').textContent=orderBreakdown;
   document.getElementById("b_subtotal").textContent = fmt(subtotal);
   document.getElementById("checkoutTicketTotal").textContent = fmt(subtotal);
   document.getElementById("checkoutQty").textContent = selectedTicketCount();
@@ -1296,9 +1297,6 @@ async function applyCoupon(selectedCode){
 
 // ── STEP 3 → 4 ──
 function goStep4(){
-  if(!document.getElementById("tcCheck").checked){
-    showToast("Please agree to Terms & Conditions"); return;
-  }
   const subtotal = selectedTicketSubtotal();
   const afterDiscount = Math.max(0, subtotal - discountAmt);
   const fee = platformFee(afterDiscount);
@@ -1448,7 +1446,6 @@ async function submitBooking(){
     pickerQuantities=tickets.map(()=>0);selectedSeats=[];document.getElementById('panel1').classList.add('ticket-picker');goStep(1);renderTicketPicker();updatePickerBar();showToast(evData.soldOutMsg||'This event is sold out.');return;
   }
   if(selectedTicketCount()<=0){showToast('Select at least one ticket before paying');return;}
-  if(!document.getElementById('tcCheck').checked){ showToast('Please agree to Terms & Conditions'); return; }
   const ticketName = selectedTicketLabel();
   const ticketCount = selectedTicketCount();
   // Recheck immediately before payment in case another guest took a seat while
@@ -1770,13 +1767,18 @@ async function init(){
         db.collection('events').doc(eventId).onSnapshot(liveSnap=>{
           if(!liveSnap.exists) return;
           const amountBeforeRefresh=selectedTicketSubtotal();
+          const ticketBeforeRefresh=selectedTicketLabel();
           evData={id:liveSnap.id,...liveSnap.data()};
           reconcileSelectedTickets(Array.isArray(evData.tickets)?evData.tickets:[]);
           const amountAfterRefresh=selectedTicketSubtotal();
-          if(amountAfterRefresh!==amountBeforeRefresh&&document.getElementById('panel3').classList.contains('active')){
+          if(document.getElementById('panel3').classList.contains('active')){
             document.getElementById('s3Ticket').textContent=selectedTicketLabel();
+            const liveDate=eventDateValue(evData.startDate||evData.date||(evData.eventDates||[])[0]?.date||passedEventDate);
+            const liveDateLabel=!Number.isNaN(liveDate.getTime())?liveDate.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}):'';
+            const liveTime=(eventStartTime()||formatTimeText(passedEventTime)).replace(/:00(?=\s)/,'');
+            document.getElementById('checkoutDate').textContent=[liveDateLabel,liveTime].filter(Boolean).join(' | ')||'Date & time TBA';
             updateBill();
-            showToast('Ticket pricing changed. Review the updated total.');
+            if(amountAfterRefresh!==amountBeforeRefresh||selectedTicketLabel()!==ticketBeforeRefresh)showToast('Checkout updated to match your selected ticket.');
           }
           if(eventSoldOut()){
             pickerQuantities=tickets.map(()=>0);

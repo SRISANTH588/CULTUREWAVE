@@ -1026,7 +1026,7 @@ function register(){
     ticketPrice: String(price),
     eventPrice: String(Number(evData.price || 0)),
     eventDate: String(eventDate),
-    eventTime: evData.startTime || evData.time || '',
+    eventTime: evData.startTime || evData.time || evData.eventDates?.[0]?.startTime || evData.eventDates?.[0]?.time || evData.eventDates?.[0]?.slots?.[0]?.startTime || evData.eventDates?.[0]?.slots?.[0]?.start || evData.eventDates?.[0]?.slots?.[0]?.time || '',
     posterUrl: evData.cardImgUrl || evData.coverUrl || '',
     seatingPlanUrl: evData.seatingPlanUrl || '',
     seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
