@@ -1620,12 +1620,16 @@ async function init(){
           document.getElementById("receiptBanner").appendChild(img);
         }
         renderTicketPicker();
-        if(resumeCheckout){
+        // Standalone booking links should open on checkout. The embedded version
+        // stays in the ticket/details flow so the event page can collect a booking.
+        if(resumeCheckout || !embeddedBooking){
           let draft=null;
           const draftKey=`culturewave:checkout-draft:${eventId}`;
-          try{
-            draft=JSON.parse(localStorage.getItem(draftKey)||'null');
-          }catch(resumeError){console.error('Could not resume checkout:',resumeError);}
+          if(resumeCheckout){
+            try{
+              draft=JSON.parse(localStorage.getItem(draftKey)||'null');
+            }catch(resumeError){console.error('Could not resume checkout:',resumeError);}
+          }
           if(draft&&Date.now()-Number(draft.savedAt||0)<30*60*1000){
             document.getElementById('bookName').value=draft.name||'';
             document.getElementById('bookPhone').value=draft.phone||'';
