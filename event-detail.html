@@ -220,10 +220,8 @@
       .mob-info-list{border-top:1px solid #252a34;padding-top:1rem;gap:.85rem;}
       .mob-info-row{padding:.05rem 0;}.mob-info-icon-box{width:45px;min-width:45px;height:45px;border-radius:12px;background:#171b23!important;}
       .mob-info-text-title{color:#fff;font-size:.9rem;}.mob-info-text-sub{color:#aeb4c0;}
-      .mob-detail-tabs{position:sticky;top:70px;z-index:25;display:grid;grid-template-columns:repeat(4,1fr);gap:.18rem;margin:1rem 1.2rem 1.4rem;padding:.25rem;background:#292d36;border:1px solid #4a4e58;border-radius:999px;}
-      .mob-detail-tabs.is-fixed{position:fixed;top:calc(70px + env(safe-area-inset-top));left:1.2rem;right:1.2rem;width:auto;margin:0;z-index:45;}
-      .mob-detail-tabs-spacer{display:none;height:0;}
-      .mob-detail-tabs-spacer.is-active{display:block;}
+      .mob-detail-tabs{position:fixed;top:calc(70px + env(safe-area-inset-top));left:1.2rem;right:1.2rem;width:auto;z-index:45;display:grid;grid-template-columns:repeat(4,1fr);gap:.18rem;margin:0;padding:.25rem;background:#292d36;border:1px solid #4a4e58;border-radius:999px;}
+      .mob-detail-tabs-spacer{display:block;height:88px;}
       .mob-detail-tabs button{height:39px;border:0;border-radius:999px;background:transparent;color:#e5e7eb;font-size:.84rem;font-weight:800;}.mob-detail-tabs button.active{background:#fff;color:#10131a;}
       .shell{padding:0 1.4rem;background:#05070c;}.section,.mob-section-card{background:#0f1219!important;border-color:#292e38!important;color:#fff;box-shadow:none!important;}
       .section-title,.mob-section-label{color:#fff!important;}.section-title::before{background:#ff5a19;}.description{color:#d2d6de!important;}
@@ -933,22 +931,7 @@ function syncMobileTabs(){
   const tabs=document.querySelector('.mob-detail-tabs');
   const spacer=document.getElementById('mobDetailTabsSpacer');
   if(tabs&&spacer&&window.matchMedia('(max-width: 768px)').matches){
-    const shouldFix=spacer.getBoundingClientRect().top<=70;
-    if(shouldFix!==tabs.classList.contains('is-fixed')){
-      if(shouldFix){
-        const style=getComputedStyle(tabs);
-        spacer.style.height=`${tabs.offsetHeight+parseFloat(style.marginTop)+parseFloat(style.marginBottom)}px`;
-        spacer.classList.add('is-active');
-      }else{
-        spacer.classList.remove('is-active');
-        spacer.style.height='0';
-      }
-      tabs.classList.toggle('is-fixed',shouldFix);
-    }
-  }else if(tabs&&spacer){
-    tabs.classList.remove('is-fixed');
-    spacer.classList.remove('is-active');
-    spacer.style.height='0';
+    spacer.style.height=`${tabs.offsetHeight+parseFloat(getComputedStyle(tabs).marginTop||0)+parseFloat(getComputedStyle(tabs).marginBottom||0)+38}px`;
   }
   const helpTarget = document.getElementById('mobileFaqsSection')?.hidden ? 'nightHelp' : 'mobileFaqsSection';
   const sections = [['about','nightAbout'],['photos','nightPhotos'],['venue','nightVenue'],['help',helpTarget]];
