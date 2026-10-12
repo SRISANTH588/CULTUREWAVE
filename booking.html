@@ -240,6 +240,9 @@
     .bk-panel#panel3 .bk-review-head p{display:none;}
     .checkout-expiry{height:38px;display:flex;align-items:center;justify-content:center;gap:.25rem;background:#242528;color:#d5d5d8;font-size:.78rem;}
     .checkout-expiry strong{color:#54d898;font-variant-numeric:tabular-nums;}
+    .checkout-expiry.expiring{color:#ffb4b4;background:#321d20;}
+    .checkout-expiry.expiring strong{color:#ff4d5a;}
+    .checkout-expiry.expired{height:auto;min-height:42px;padding:.55rem 1rem;color:#ffb4b4;background:#321d20;text-align:center;}
     .checkout-event{padding:1.1rem 1.2rem 1.2rem;}
     .checkout-event-head{display:flex;align-items:center;gap:1rem;margin:0 0 1.1rem;min-width:0;}
     .checkout-event-head img{width:90px;height:120px;flex:none;object-fit:cover;border-radius:12px;background:#25262a;}
@@ -584,6 +587,7 @@ let bookedSeats = [];
 let pickerQuantities = [];
 let checkoutCountdownEndsAt = 0;
 let checkoutCountdownTimer = null;
+let checkoutExpired = false;
 const razorpayFunctionsUrl='https://culturewave-razorpay.culturewaveindia.workers.dev';
 try{localStorage.removeItem('culturewave:preferred-payment-method');}catch(_){ }
 const inviteTokenParam = urlP.get('inviteToken') || '';
@@ -761,13 +765,26 @@ function selectedTicketLabel(){ return selectedTicketItems().map(item=>{ const i
 function startCheckoutCountdown(){
   if(!checkoutCountdownEndsAt) checkoutCountdownEndsAt=Date.now()+10*60*1000;
   const update=()=>{
+    if(checkoutExpired)return;
     const seconds=Math.max(0,Math.ceil((checkoutCountdownEndsAt-Date.now())/1000));
     const timer=document.getElementById('checkoutCountdown');
+    const bar=timer?.closest('.checkout-expiry');
+    if(bar)bar.classList.toggle('expiring',seconds<=180&&seconds>0);
     if(timer)timer.textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
-    if(seconds===0&&checkoutCountdownTimer){clearInterval(checkoutCountdownTimer);checkoutCountdownTimer=null;}
+    if(seconds===0){
+      if(checkoutCountdownTimer){clearInterval(checkoutCountdownTimer);checkoutCountdownTimer=null;}
+      expireCheckout();
+    }
   };
   update();
   if(!checkoutCountdownTimer)checkoutCountdownTimer=setInterval(update,1000);
+}
+function expireCheckout(){
+  if(checkoutExpired)return;
+  checkoutExpired=true;
+  const bar=document.querySelector('.checkout-expiry');
+  if(bar){bar.classList.remove('expiring');bar.classList.add('expired');bar.setAttribute('role','alert');bar.setAttribute('aria-live','assertive');bar.textContent='Booking time expired. Your ticket was not completed. Returning to event details…';}
+  setTimeout(removeCheckoutSelection,2500);
 }
 function showPaymentOfferInfo(){showToast('Tap Pay now to open Razorpay and view offers eligible for your payment method and ticket total.');}
 function removeCheckoutSelection(){
@@ -1342,6 +1359,10 @@ async function sendEmail(data){
 
 // ── SUBMIT ──
 async function submitBooking(){
+  if(checkoutExpired || (checkoutCountdownEndsAt && Date.now()>=checkoutCountdownEndsAt)){
+    expireCheckout();
+    return;
+  }
   const amountShownToCustomer=selectedTicketSubtotal();
   try{
     const fresh=await db.collection('events').doc(eventId).get({source:'server'});
