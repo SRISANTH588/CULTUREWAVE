@@ -946,7 +946,7 @@ function pinMobileDetailTabs(){
   }
   if(tabs.dataset.pinned==='true')return;
   const tabsStyle=getComputedStyle(tabs);
-  const originalTop=tabs.getBoundingClientRect().top+window.scrollY;
+  const originalTop=tabs.getBoundingClientRect().top;
   const flowSpace=tabs.offsetHeight+parseFloat(tabsStyle.marginTop||0)+parseFloat(tabsStyle.marginBottom||0);
   tabs.style.setProperty('--mob-detail-tabs-top',`${Math.max(0,originalTop)}px`);
   spacer.style.height=`${flowSpace}px`;
@@ -1227,6 +1227,7 @@ async function renderEvent(data){
   else { document.getElementById('mobDurationRow').style.display='none'; }
   document.getElementById('mobInfoVenue').textContent = data.venueName || 'Raasta';
   document.getElementById('mobInfoVenueCity').textContent = data.city || 'Madhapur, Hyderabad';
+  requestAnimationFrame(pinMobileDetailTabs);
   // mobile bottom bar
   document.getElementById('mobRegPrice').innerHTML = price0 ? `${isGroupTicket?'Group from':'From'} ₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
 
@@ -1450,7 +1451,6 @@ async function renderEvent(data){
       }
     }catch(e){ console.error('org load error',e); }
   }
-  requestAnimationFrame(pinMobileDetailTabs);
 }
 
 async function showFoodOrderingForEvent(data) {
