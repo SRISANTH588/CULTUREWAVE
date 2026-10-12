@@ -304,10 +304,7 @@
     .checkout-sheet-actions button:last-child{border:0;background:#1dae79;color:#fff;}
     .bk-panel#panel3 .checkout-remember{margin:0 1.2rem 1rem;padding:1rem 0;border-color:#393a3e;}
     .bk-panel#panel3 .bk-tc{margin:0 1.2rem 1rem;}
-    .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);align-items:center;gap:.7rem;margin:0;padding:.65rem 1.2rem calc(env(safe-area-inset-bottom) + .65rem);border-top:1px solid #38393d;background:#18191c;}
-    .checkout-pay-method{min-width:0;display:flex;flex-direction:column;gap:.2rem;}
-    .checkout-pay-method small{color:#a5a6ac;font-size:.52rem;font-weight:900;letter-spacing:.06em;}
-    .checkout-pay-method strong{color:#f0f0f1;font-size:.77rem;}
+    .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr;align-items:center;gap:.7rem;margin:0;padding:.65rem 1.2rem calc(env(safe-area-inset-bottom) + .65rem);border-top:1px solid #38393d;background:#18191c;}
     .checkout-pay-action{min-width:0;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.45rem .6rem .45rem .8rem;border-radius:15px;background:#f7f7f8;color:#161719;}
     .checkout-pay-action>div{display:flex;flex-direction:column;gap:.05rem;}
     .checkout-pay-action>div strong{font-size:.9rem;white-space:nowrap;}
@@ -503,7 +500,6 @@
         <details class="checkout-remember"><summary>Things to remember</summary><p>Your ticket will be confirmed after successful payment. Please carry a valid ID to the venue.</p></details>
         <div class="bk-nav">
           <button class="bk-btn-back" onclick="returnToTicketPicker()">← Back</button>
-          <div class="checkout-pay-method"><small>SECURE ONLINE PAYMENT</small><strong>Choose payment method</strong></div>
           <div class="checkout-pay-action"><div><strong id="checkoutGrandTotal">₹0</strong><small>Total</small></div><button class="bk-btn-next" id="submitBtn" onclick="submitBooking()">Pay now&nbsp; ›</button></div>
         </div>
       </div>
