@@ -61,13 +61,18 @@
       const p=new URLSearchParams(location.search);
       const get=(key,fallback='')=>p.get(key)||fallback;
       const bookingId=get('bookingId');
+      const formatTimeText=value=>String(value||'').replace(/(^|[^\d])(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/gi,(match,prefix,hourText,minute,meridiem)=>{
+        let hour=Number(hourText);if(meridiem)hour=(hour%12)+(meridiem.toUpperCase()==='PM'?12:0);
+        if(hour>23)return match;
+        return `${prefix}${hour%12||12}:${minute} ${hour>=12?'PM':'AM'}`;
+      });
 
       // Fields that can come from URL params OR Firestore booking doc
       let eventId=get('eventId');
       let guest=get('guest','Guest');
       let event=get('event','Event invitation');
       let date=get('date','To be announced');
-      let time=get('time','To be announced');
+      let time=formatTimeText(get('time','To be announced'));
       let venue=get('venue','Venue to be announced');
       let ticket=get('ticket','Invitation Ticket');
       let organiserMessage=get('message');
@@ -165,7 +170,7 @@
                 const session=(ev.sessions||[]).find(i=>!dateItem.date||i.date===dateItem.date)||{};
                 const start=ev.startTime||ev.time||ev.eventTime||ev.timing||dateItem.startTime||dateItem.time||slot.start||slot.startTime||session.start||session.startTime||'';
                 const end=ev.endTime||ev.finishTime||dateItem.endTime||dateItem.finishTime||slot.end||slot.endTime||session.end||session.endTime||'';
-                if(start)time=end?`${start} – ${end}`:start;
+                if(start)time=end?`${formatTimeText(start)} – ${formatTimeText(end)}`:formatTimeText(start);
                 const loc=[ev.venueName||ev.venue||ev.location||ev.address,ev.city].filter(Boolean).join(', ');
                 if(loc)venue=loc;
               }

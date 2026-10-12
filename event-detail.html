@@ -711,16 +711,24 @@ function toEventDate(value){
   return Number.isNaN(d.getTime()) ? null : d;
 }
 function getEventStart(data){ return toEventDate(data.startDate) || toEventDate(Array.isArray(data.eventDates) ? data.eventDates[0]?.date : null); }
+function formatTimeText(value){
+  return String(value||'').replace(/(^|[^\d])(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/gi,(match,prefix,hourText,minute,meridiem)=>{
+    let hour=Number(hourText);
+    if(meridiem) hour=(hour%12)+(meridiem.toUpperCase()==='PM'?12:0);
+    if(hour>23) return match;
+    return `${prefix}${hour%12||12}:${minute} ${hour>=12?'PM':'AM'}`;
+  });
+}
 function getEventTime(data){
   const firstDate = Array.isArray(data.eventDates) ? data.eventDates[0] : null;
-  return data.startTime || data.time || firstDate?.startTime || firstDate?.time || firstDate?.slots?.[0]?.start || '';
+  return formatTimeText(data.startTime || data.time || firstDate?.startTime || firstDate?.time || firstDate?.slots?.[0]?.start || '');
 }
 function fmtDate(ts){
   const d = toEventDate(ts);
   if(!d) return 'Date TBA';
   return d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
-function fmtTime(t){ return t ? t : ''; }
+function fmtTime(t){ return formatTimeText(t); }
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -754,7 +762,7 @@ function shareWA(){
   const venue=[evData.venueName||evData.venue||evData.location,evData.city].filter(Boolean).join(', ');
   const eventStart=getEventStart(evData);
   const date=evData.dateLabel||(eventStart?fmtDate(eventStart):'');
-  const time=evData.startTime||evData.time||'';
+  const time=formatTimeText(evData.startTime||evData.time||'');
   const price=Number(evData.price||0);
   const priceStr=price>0?`\n🎟️ Tickets from ₹${price}`:'\n🎟️ Free entry';
   const lines=[

@@ -584,6 +584,13 @@
 
   <script>
     /* ── READ URL PARAMS ── */
+    function formatTimeText(value){
+      return String(value||'').replace(/(^|[^\d])(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/gi,(match,prefix,hourText,minute,meridiem)=>{
+        let hour=Number(hourText);if(meridiem)hour=(hour%12)+(meridiem.toUpperCase()==='PM'?12:0);
+        if(hour>23)return match;
+        return `${prefix}${hour%12||12}:${minute} ${hour>=12?'PM':'AM'}`;
+      });
+    }
     const params    = new URLSearchParams(window.location.search);
     const bookingId  = params.get("bookingId") || "";
     const eventName  = params.get("event")     || "Your Booking";
@@ -594,7 +601,7 @@
     const bkType     = params.get("type")      || "event";
     const eventId    = params.get("eventId")  || "";
     const bkDate     = params.get("date")      || "";
-    const bkTime     = params.get("time")      || "";
+    const bkTime     = formatTimeText(params.get("time") || "");
     const ticketName = params.get("ticket")    || "Entry Pass";
     const seatCount  = params.get("seats")     || "1";
     const isRestaurant = bkType === "restaurant";
