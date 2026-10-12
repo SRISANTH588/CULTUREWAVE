@@ -940,6 +940,8 @@ function removeTicketFromCheckout(index,removeAll){
     if(nextIndex>=0)selectedTicketIdx=nextIndex;
   }
   if(selectedSeats.length>selectedTicketCount())selectedSeats=selectedSeats.slice(0,selectedTicketCount());
+  qty=selectedTicketCount()||1;
+  saveCheckoutDraft();
   renderTicketPicker();
   updatePickerBar();
   document.getElementById('s3Ticket').textContent=selectedTicketLabel();
@@ -959,6 +961,26 @@ function returnToEventDetails(){
 function clearCheckoutDraft(){
   if(!eventId)return;
   try{localStorage.removeItem(`culturewave:checkout-draft:${eventId}`);}catch(_){ }
+}
+function saveCheckoutDraft(){
+  if(!eventId)return;
+  try{
+    const selected=tickets[selectedTicketIdx]||{};
+    const draft={
+      eventId,bookingSession,
+      name:document.getElementById('bookName')?.value.trim()||'',
+      phone:document.getElementById('bookPhone')?.value.trim()||'',
+      email:document.getElementById('bookEmail')?.value.trim()||'',
+      quantities:pickerQuantities,
+      selections:draftTicketSelections(),
+      ticketName:String(selected.name||''),
+      ticketPrice:Number(selected.price||0),
+      seats:selectedSeats,
+      ticketIndex:selectedTicketIdx,
+      savedAt:Date.now()
+    };
+    localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify(draft));
+  }catch(error){console.warn('Could not save checkout ticket selection:',error);}
 }
 function editCheckoutDetails(){
   document.getElementById('checkoutEditName').value=document.getElementById('bookName').value.trim();
@@ -1854,7 +1876,9 @@ async function init(){
         if(resumeCheckout || !embeddedBooking){
           let draft=null;
           const draftKey=`culturewave:checkout-draft:${eventId}`;
-          if(resumeCheckout){
+          const navigationEntry=performance.getEntriesByType?.('navigation')?.[0];
+          const isPageReload=navigationEntry?.type==='reload'||(!navigationEntry&&performance.navigation?.type===1);
+          if(resumeCheckout||isPageReload){
             try{
               draft=JSON.parse(localStorage.getItem(draftKey)||'null');
             }catch(resumeError){console.error('Could not resume checkout:',resumeError);}
