@@ -494,6 +494,14 @@
           <div class="checkout-sheet-actions"><button type="button" onclick="closePaymentOffersSheet()">Close</button><button type="button" onclick="closePaymentOffersSheet();submitBooking()">See eligible offers</button></div>
         </section>
       </div>
+      <div id="removeTicketSheet" class="checkout-sheet-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="removeTicketTitle" onclick="if(event.target===this)closeRemoveTicketSheet()">
+        <section class="checkout-sheet">
+          <div class="checkout-sheet-head"><h2 id="removeTicketTitle">Want to remove a ticket?</h2><button class="checkout-sheet-close" type="button" onclick="closeRemoveTicketSheet()" aria-label="Close">×</button></div>
+          <p style="margin:-.45rem 0 1rem;color:#b8bac1;font-size:.84rem;">Select the ticket you want to remove.</p>
+          <div id="removeTicketChoices"></div>
+          <div class="checkout-sheet-actions"><button type="button" onclick="closeRemoveTicketSheet()">Keep tickets</button></div>
+        </section>
+      </div>
         <div class="checkout-divider"><span></span><b>PAYMENT SUMMARY</b><span></span></div>
         <section class="checkout-section checkout-payment-summary"><div class="bk-bill checkout-bill"><div class="bk-bill-row checkout-order-row"><span>Order amount <small id="checkoutOrderBreakdown" style="display:block;margin-top:.3rem;color:#aeb0b7;font-size:.68rem;font-weight:500;"></small><span id="b_price" hidden>Ticket</span></span><strong id="checkoutTicketTotal">₹0</strong></div><div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div><div class="bk-bill-row"><span>Platform fee</span><span id="b_fee">₹0</span></div><div class="bk-bill-row total"><span>Grand Total</span><strong id="b_total">₹0</strong></div></div></section>
         <div class="checkout-divider"><span></span><b>INVOICE DETAILS</b><span></span></div>
@@ -885,7 +893,7 @@ function expireCheckout(){
   clearCheckoutDraft();
   const bar=document.querySelector('.checkout-expiry');
   if(bar){bar.classList.remove('expiring');bar.classList.add('expired');bar.setAttribute('role','alert');bar.setAttribute('aria-live','assertive');bar.textContent='Booking time expired. Your ticket was not completed. Returning to event details…';}
-  setTimeout(removeCheckoutSelection,2500);
+  setTimeout(returnToEventDetails,2500);
 }
 function closePaymentOffersSheet(){document.getElementById('paymentOffersSheet').style.display='none';}
 function showPaymentOfferInfo(){
@@ -900,6 +908,42 @@ function showPaymentOfferInfo(){
 }
 function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
 function removeCheckoutSelection(){
+  if(selectedTicketCount()<=1){returnToEventDetails();return;}
+  openRemoveTicketSheet();
+}
+function openRemoveTicketSheet(){
+  const choices=document.getElementById('removeTicketChoices');
+  const items=selectedTicketItems();
+  choices.innerHTML=items.map(item=>{
+    const name=escapeHtml(item.ticket.name||'Ticket');
+    const lineTotal=groupTicketPrice(item.ticket,item.quantity)*item.quantity;
+    const actions=item.quantity>1&&ticketMinRequired(item.ticket)===1
+      ? `<button type="button" onclick="removeTicketFromCheckout(${item.index},false)" style="padding:.5rem .7rem;border:1px solid #4a4c53;border-radius:10px;background:#22242a;color:#f4f4f5;font-weight:800;">Remove 1</button><button type="button" onclick="removeTicketFromCheckout(${item.index},true)" style="padding:.5rem .7rem;border:0;border-radius:10px;background:#e34b3b;color:#fff;font-weight:800;">Remove all</button>`
+      : `<button type="button" onclick="removeTicketFromCheckout(${item.index},true)" style="padding:.5rem .8rem;border:0;border-radius:10px;background:#e34b3b;color:#fff;font-weight:800;">Remove ticket</button>`;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.8rem 0;border-bottom:1px solid #383a40;"><div style="min-width:0;"><strong style="display:block;color:#f4f4f5;font-size:.87rem;">${name}</strong><small style="display:block;margin-top:.25rem;color:#aeb0b8;">${item.quantity} selected · ${fmt(lineTotal)}</small></div><div style="display:flex;gap:.45rem;flex:none;">${actions}</div></div>`;
+  }).join('');
+  document.getElementById('removeTicketSheet').style.display='flex';
+}
+function closeRemoveTicketSheet(){document.getElementById('removeTicketSheet').style.display='none';}
+function removeTicketFromCheckout(index,removeAll){
+  const current=Number(pickerQuantities[index]||0);
+  const ticket=tickets[index];
+  if(!current||!ticket)return;
+  pickerQuantities[index]=removeAll?0:Math.max(0,current-1);
+  if(selectedTicketCount()<=0){closeRemoveTicketSheet();returnToEventDetails();return;}
+  if(selectedTicketIdx===index&&pickerQuantities[index]===0){
+    const nextIndex=pickerQuantities.findIndex(Boolean);
+    if(nextIndex>=0)selectedTicketIdx=nextIndex;
+  }
+  if(selectedSeats.length>selectedTicketCount())selectedSeats=selectedSeats.slice(0,selectedTicketCount());
+  closeRemoveTicketSheet();
+  renderTicketPicker();
+  updatePickerBar();
+  document.getElementById('s3Ticket').textContent=selectedTicketLabel();
+  updateBill();
+}
+function returnToEventDetails(){
+  closeRemoveTicketSheet();
   clearCheckoutDraft();
   if(eventId){
     const slug=String(evData.name||passedName||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';
