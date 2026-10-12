@@ -792,19 +792,6 @@ function goToProfile(){
   if(ownerUid) location.href = `client-profile.html?uid=${ownerUid}`;
 }
 
-function pinMobileDetailTabsAfterVenue(){
-  if(!window.matchMedia('(max-width:768px)').matches) return;
-  const header=document.getElementById('mobEventHeader');
-  const tabs=document.querySelector('.mob-detail-tabs');
-  const spacer=document.getElementById('mobDetailTabsSpacer');
-  if(!header||!tabs||!spacer) return;
-  const topGap=14;
-  const bottomGap=28;
-  const top=Math.max(0,Math.round(header.getBoundingClientRect().bottom+topGap));
-  tabs.style.setProperty('top',`${top}px`,'important');
-  spacer.style.height=`${tabs.offsetHeight+topGap+bottomGap}px`;
-}
-
 function showMobileDetailTab(tab){
   const helpTarget = document.getElementById('mobileFaqsSection')?.hidden ? 'nightHelp' : 'mobileFaqsSection';
   const targets = {
@@ -1268,7 +1255,6 @@ async function renderEvent(data){
   else { document.getElementById('mobDurationRow').style.display='none'; }
   document.getElementById('mobInfoVenue').textContent = data.venueName || 'Raasta';
   document.getElementById('mobInfoVenueCity').textContent = data.city || 'Madhapur, Hyderabad';
-  requestAnimationFrame(pinMobileDetailTabsAfterVenue);
   // mobile bottom bar
   document.getElementById('mobRegPrice').innerHTML = price0 ? `${isGroupTicket?'Group from':'From'} ₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
 
