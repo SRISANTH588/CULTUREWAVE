@@ -870,6 +870,7 @@ function startCheckoutCountdown(){
 function expireCheckout(){
   if(checkoutExpired)return;
   checkoutExpired=true;
+  clearCheckoutDraft();
   const bar=document.querySelector('.checkout-expiry');
   if(bar){bar.classList.remove('expiring');bar.classList.add('expired');bar.setAttribute('role','alert');bar.setAttribute('aria-live','assertive');bar.textContent='Booking time expired. Your ticket was not completed. Returning to event details…';}
   setTimeout(removeCheckoutSelection,2500);
@@ -887,12 +888,17 @@ function showPaymentOfferInfo(){
 }
 function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
 function removeCheckoutSelection(){
+  clearCheckoutDraft();
   if(eventId){
     const slug=String(evData.name||passedName||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';
     location.href=`/event/${encodeURIComponent(slug)}?eventId=${encodeURIComponent(eventId)}`;
     return;
   }
   history.back();
+}
+function clearCheckoutDraft(){
+  if(!eventId)return;
+  try{localStorage.removeItem(`culturewave:checkout-draft:${eventId}`);}catch(_){ }
 }
 function editCheckoutDetails(){
   document.getElementById('checkoutEditName').value=document.getElementById('bookName').value.trim();
@@ -1518,6 +1524,7 @@ async function submitBooking(){
     if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
     const emailSent = await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
     if(!emailSent) showToast("Booking confirmed, but we could not send the confirmation email.");
+    clearCheckoutDraft();
     location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     return;
   }
@@ -1573,6 +1580,7 @@ async function submitBooking(){
       if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
       const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
+      clearCheckoutDraft();
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     },
     modal:{
@@ -1785,7 +1793,6 @@ async function init(){
             restoreDraftTicketSelections(draft);
             selectedSeats=Array.isArray(draft.seats)?draft.seats.map(String):[];
             syncCheckoutInvoice();
-            localStorage.removeItem(draftKey);
           }else{
             const requestedByIndex=Number.isInteger(passedTicketIndex)&&passedTicketIndex>=0&&passedTicketIndex<tickets.length?passedTicketIndex:-1;
             const requestedTicket=requestedByIndex>=0?requestedByIndex:tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase()&&Number(ticket.price||0)===passedTicketPrice);
