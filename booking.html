@@ -283,6 +283,7 @@
     .checkout-payment-summary .bk-bill-row span,.checkout-payment-summary .bk-bill-row strong{color:#dedee1!important;}
     .checkout-payment-summary .checkout-order-row{min-height:58px;font-size:.9rem;font-weight:700;}
     .checkout-payment-summary .checkout-order-row>span>span:first-child{margin-left:.25rem;color:#9fa0a6;font-size:1rem;}
+    .checkout-payment-summary .checkout-order-row>span>span:first-child[aria-hidden="true"]{display:none;}
     .checkout-payment-summary .bk-bill-row.total{margin-top:.2rem;padding-top:.55rem;border-top:1px solid #38393d!important;font-size:.9rem;font-weight:800;}
     .checkout-payment-summary .bk-bill-row.total strong{color:#fff!important;font-size:.95rem;}
     .checkout-invoice{margin:0 1.2rem 1.7rem;padding:1rem;border:1px solid #37383c;border-radius:22px;background:#1d1e21;}
@@ -292,6 +293,17 @@
     .checkout-invoice-head button{border:0;background:none;color:#c3c4c8;font-size:.75rem;}
     .checkout-invoice p{margin:.35rem 0 0 1.95rem;color:#a4a5ab;font-size:.78rem;overflow-wrap:anywhere;}
     .checkout-invoice>small{display:block;margin-top:1rem;padding-top:.8rem;border-top:1px solid #37383c;color:#a4a5ab;font-size:.72rem;line-height:1.5;}
+    .checkout-sheet-backdrop{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center;}
+    .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:1.15rem 1.2rem calc(env(safe-area-inset-bottom) + 1.1rem);border:1px solid #393a3f;border-bottom:0;border-radius:24px 24px 0 0;background:#18191c;color:#f5f5f6;box-shadow:0 -15px 50px rgba(0,0,0,.4);}
+    .checkout-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .checkout-sheet-head h2{font-size:1rem;}
+    .checkout-sheet-close{border:0;background:transparent;color:#ddd;font-size:1.6rem;}
+    .checkout-sheet .bk-label{color:#babdc5;}
+    .checkout-sheet .bk-input{background:#101114;border-color:#383a40;}
+    .checkout-sheet .bk-input input{color:#f5f5f6;}
+    .checkout-sheet-actions{display:flex;gap:.65rem;margin-top:1rem;}
+    .checkout-sheet-actions button{flex:1;min-height:46px;border:1px solid #44464d;border-radius:12px;background:#24262b;color:#f4f4f5;font-weight:800;}
+    .checkout-sheet-actions button:last-child{border:0;background:#1dae79;color:#fff;}
     .bk-panel#panel3 .checkout-remember{margin:0 1.2rem 1rem;padding:1rem 0;border-color:#393a3e;}
     .bk-panel#panel3 .bk-tc{margin:0 1.2rem 1rem;}
     .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);align-items:center;gap:.7rem;margin:0;padding:.65rem 1.2rem calc(env(safe-area-inset-bottom) + .65rem);border-top:1px solid #38393d;background:#18191c;}
@@ -470,6 +482,22 @@
         <div style="padding:.5rem 1.2rem .3rem;font-size:.78rem;font-weight:900;color:#e5e7eb;">More offers</div>
         <div id="couponSheetList" style="padding:0 1.2rem;"></div>
       </div>
+      <div id="checkoutContactSheet" class="checkout-sheet-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="checkoutContactTitle" onclick="if(event.target===this)closeCheckoutContactSheet()">
+        <section class="checkout-sheet">
+          <div class="checkout-sheet-head"><h2 id="checkoutContactTitle">Edit guest details</h2><button class="checkout-sheet-close" type="button" onclick="closeCheckoutContactSheet()" aria-label="Close">×</button></div>
+          <div class="bk-field"><label class="bk-label" for="checkoutEditName">Full name</label><div class="bk-input"><input id="checkoutEditName" autocomplete="name" placeholder="Enter your full name"/></div></div>
+          <div class="bk-field"><label class="bk-label" for="checkoutEditPhone">Phone number</label><div class="bk-input"><input id="checkoutEditPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="10-digit number"/></div></div>
+          <div class="bk-field"><label class="bk-label" for="checkoutEditEmail">Email address</label><div class="bk-input"><input id="checkoutEditEmail" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com"/></div></div>
+          <div class="checkout-sheet-actions"><button type="button" onclick="closeCheckoutContactSheet()">Cancel</button><button type="button" onclick="saveCheckoutContactDetails()">Save details</button></div>
+        </section>
+      </div>
+      <div id="paymentOffersSheet" class="checkout-sheet-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="paymentOffersTitle" onclick="if(event.target===this)closePaymentOffersSheet()">
+        <section class="checkout-sheet">
+          <div class="checkout-sheet-head"><h2 id="paymentOffersTitle">Razorpay payment offers</h2><button class="checkout-sheet-close" type="button" onclick="closePaymentOffersSheet()" aria-label="Close">×</button></div>
+          <div id="paymentOffersContent" style="color:#c4c6cc;font-size:.86rem;line-height:1.6;"></div>
+          <div class="checkout-sheet-actions"><button type="button" onclick="closePaymentOffersSheet()">Close</button><button type="button" onclick="closePaymentOffersSheet();submitBooking()">See eligible offers</button></div>
+        </section>
+      </div>
         <div class="checkout-divider"><span></span><b>PAYMENT SUMMARY</b><span></span></div>
         <section class="checkout-section checkout-payment-summary"><div class="bk-bill checkout-bill"><div class="bk-bill-row checkout-order-row"><span>Order amount <span aria-hidden="true">⌄</span><span id="b_price" hidden>Ticket</span></span><strong id="checkoutTicketTotal">₹0</strong></div><div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div><div class="bk-bill-row"><span>Platform fee</span><span id="b_fee">₹0</span></div><div class="bk-bill-row total"><span>Grand Total</span><strong id="b_total">₹0</strong></div></div></section>
         <div class="checkout-divider"><span></span><b>INVOICE DETAILS</b><span></span></div>
@@ -565,6 +593,8 @@ const eventId = urlP.get("eventId") || "";
 const passedName = urlP.get("eventName") || "";
 const passedVenue = urlP.get("venueName") || "";
 const passedTicketName = urlP.get("ticketName") || "";
+const passedTicketIndexParam = urlP.get("ticketIndex");
+const passedTicketIndex = passedTicketIndexParam == null || passedTicketIndexParam === "" ? NaN : Number(passedTicketIndexParam);
 const passedTicketPrice = Number(urlP.get("ticketPrice") || 0);
 const passedEventDate = urlP.get("eventDate") || "";
 const passedEventTime = urlP.get("eventTime") || "";
@@ -741,11 +771,24 @@ function selectedTicketItems(){
   return pickerQuantities.length ? [] : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},index:selectedTicketIdx,quantity:qty}];
 }
 function reconcileSelectedTickets(nextTickets){
-  const selected=selectedTicketItems().map(item=>({name:String(item.ticket.name||''),quantity:item.quantity}));
-  const selectedName=String(tickets[selectedTicketIdx]?.name||'');
+  const previous=tickets;
+  const selected=selectedTicketItems().map(item=>({index:item.index,id:String(item.ticket.id||item.ticket.ticketId||''),name:String(item.ticket.name||''),price:Number(item.ticket.price||0),quantity:item.quantity}));
+  const selectedItem=previous[selectedTicketIdx];
+  const selectedId=String(selectedItem?.id||selectedItem?.ticketId||'');
+  const selectedName=String(selectedItem?.name||'');
+  const selectedPrice=Number(selectedItem?.price||0);
   tickets=nextTickets;
-  pickerQuantities=tickets.map(ticket=>selected.filter(item=>item.name===String(ticket.name||'')).reduce((sum,item)=>sum+item.quantity,0));
-  const nextIndex=tickets.findIndex(ticket=>String(ticket.name||'')===selectedName);
+  pickerQuantities=tickets.map(()=>0);
+  const used=new Set();
+  selected.forEach(item=>{
+    let index=item.id?tickets.findIndex((ticket,i)=>!used.has(i)&&String(ticket.id||ticket.ticketId||'')===item.id):-1;
+    if(index<0)index=tickets.findIndex((ticket,i)=>!used.has(i)&&String(ticket.name||'')===item.name&&Number(ticket.price||0)===item.price);
+    if(index<0&&tickets[item.index]&&String(tickets[item.index].name||'')===item.name)index=item.index;
+    if(index>=0){pickerQuantities[index]=item.quantity;used.add(index);}
+  });
+  let nextIndex=selectedId?tickets.findIndex(ticket=>String(ticket.id||ticket.ticketId||'')===selectedId):-1;
+  if(nextIndex<0)nextIndex=tickets.findIndex(ticket=>String(ticket.name||'')===selectedName&&Number(ticket.price||0)===selectedPrice);
+  if(nextIndex<0&&tickets[selectedTicketIdx]&&String(tickets[selectedTicketIdx].name||'')===selectedName)nextIndex=selectedTicketIdx;
   if(nextIndex>=0)selectedTicketIdx=nextIndex;
 }
 function groupTicketPrice(ticket, quantity){
@@ -762,6 +805,7 @@ function groupTicketHint(ticket){
 function selectedTicketCount(){ return selectedTicketItems().reduce((sum,item)=>sum+item.quantity,0); }
 function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+groupTicketPrice(item.ticket,item.quantity)*item.quantity,0); }
 function selectedTicketLabel(){ return selectedTicketItems().map(item=>{ const isGroup=ticketMinRequired(item.ticket)>1&&item.quantity>=ticketMinRequired(item.ticket); return isGroup?`${item.ticket.name||'Ticket'} (group of ${item.quantity})`:`${item.ticket.name||'Ticket'} × ${item.quantity}`; }).join(', '); }
+function platformFee(amount){const cart=Math.max(0,Number(amount)||0);return cart===0?0:cart>999?6:Math.round(cart*.10);}
 function startCheckoutCountdown(){
   if(!checkoutCountdownEndsAt) checkoutCountdownEndsAt=Date.now()+10*60*1000;
   const update=()=>{
@@ -786,7 +830,18 @@ function expireCheckout(){
   if(bar){bar.classList.remove('expiring');bar.classList.add('expired');bar.setAttribute('role','alert');bar.setAttribute('aria-live','assertive');bar.textContent='Booking time expired. Your ticket was not completed. Returning to event details…';}
   setTimeout(removeCheckoutSelection,2500);
 }
-function showPaymentOfferInfo(){showToast('Tap Pay now to open Razorpay and view offers eligible for your payment method and ticket total.');}
+function closePaymentOffersSheet(){document.getElementById('paymentOffersSheet').style.display='none';}
+function showPaymentOfferInfo(){
+  const offers=evData.razorpayPaymentOffers||[];
+  const content=document.getElementById('paymentOffersContent');
+  if(Array.isArray(offers)&&offers.length){
+    content.innerHTML=offers.map(offer=>`<article style="padding:.85rem 0;border-bottom:1px solid #383a40"><strong style="display:block;color:#f5f5f6">${escapeHtml(offer.title||offer.name||offer.display_text||'Payment offer')}</strong><span>${escapeHtml(offer.description||offer.desc||offer.terms||'')}</span></article>`).join('');
+  }else{
+    content.textContent='Razorpay shows the active offers that match your payment method and ticket amount inside its secure payment window. Choose Pay now, then select UPI, card, or net banking to see the offers available for your payment.';
+  }
+  document.getElementById('paymentOffersSheet').style.display='flex';
+}
+function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
 function removeCheckoutSelection(){
   if(eventId){
     const slug=String(evData.name||passedName||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';
@@ -796,15 +851,29 @@ function removeCheckoutSelection(){
   history.back();
 }
 function editCheckoutDetails(){
-  document.getElementById('panel1').classList.add('ticket-picker','details-step');
-  goStep(1);
-  document.getElementById('guestContactCard').style.display='';
-  document.getElementById('ticketSelectionSheet').style.display='none';
-  const bar=document.getElementById('pickerBar');
-  bar.classList.add('show');
-  const button=bar.querySelector('.bk-picker-proceed');
-  if(button){button.textContent='Continue  →';button.onclick=continueToTicketSelection;}
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('checkoutEditName').value=document.getElementById('bookName').value.trim();
+  document.getElementById('checkoutEditPhone').value=document.getElementById('bookPhone').value.trim();
+  document.getElementById('checkoutEditEmail').value=document.getElementById('bookEmail').value.trim();
+  document.getElementById('checkoutContactSheet').style.display='flex';
+}
+function closeCheckoutContactSheet(){document.getElementById('checkoutContactSheet').style.display='none';}
+function syncCheckoutInvoice(){
+  document.getElementById('checkoutInvoiceName').textContent=document.getElementById('bookName').value.trim()||'Guest';
+  document.getElementById('checkoutInvoicePhone').textContent=document.getElementById('bookPhone').value.trim();
+  document.getElementById('checkoutInvoiceEmail').textContent=document.getElementById('bookEmail').value.trim();
+}
+function saveCheckoutContactDetails(){
+  const name=document.getElementById('checkoutEditName').value.trim();
+  const phone=document.getElementById('checkoutEditPhone').value.trim();
+  const email=document.getElementById('checkoutEditEmail').value.trim();
+  if(!name){showToast('Enter your full name');return;}
+  if(phone.replace(/\D/g,'').length<10){showToast('Enter a valid phone number');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Enter a valid email address');return;}
+  document.getElementById('bookName').value=name;
+  document.getElementById('bookPhone').value=phone;
+  document.getElementById('bookEmail').value=email;
+  syncCheckoutInvoice();
+  closeCheckoutContactSheet();
 }
 function eventCoupons(){
   const source=evData.coupons || evData.discountCoupons || evData.offers || evData.couponCodes || evData.promos || [];
@@ -1059,11 +1128,9 @@ function goStep3(){
   const locationLabel = [evData.venueName||evData.venue, evData.city].filter(Boolean).join(' · ');
   document.getElementById('reviewEventMeta').textContent = [dateLabel, locationLabel].filter(Boolean).join('  ·  ') || 'Review your booking';
   document.getElementById('checkoutLocation').textContent = locationLabel || 'Event booking';
-  const checkoutTime=eventStartTime().replace(/:00(?=\s)/,'');
+  const checkoutTime=(eventStartTime()||formatTimeText(passedEventTime)).replace(/:00(?=\s)/,'');
   document.getElementById('checkoutDate').textContent = [dateLabel,checkoutTime].filter(Boolean).join(' | ') || 'Date & time TBA';
-  document.getElementById('checkoutInvoiceName').textContent=document.getElementById('bookName').value.trim()||'Guest';
-  document.getElementById('checkoutInvoicePhone').textContent=document.getElementById('bookPhone').value.trim();
-  document.getElementById('checkoutInvoiceEmail').textContent=document.getElementById('bookEmail').value.trim();
+  syncCheckoutInvoice();
   startCheckoutCountdown();
   updateBill();
   goStep(3);
@@ -1073,7 +1140,7 @@ function goStep3(){
 function updateBill(){
   const subtotal = selectedTicketSubtotal();
   const afterDiscount = Math.max(0, subtotal - discountAmt);
-  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
+  const fee = platformFee(afterDiscount);
   const total = afterDiscount + fee;
   document.getElementById("b_price").textContent = selectedTicketLabel();
   document.getElementById("b_subtotal").textContent = fmt(subtotal);
@@ -1234,7 +1301,7 @@ function goStep4(){
   }
   const subtotal = selectedTicketSubtotal();
   const afterDiscount = Math.max(0, subtotal - discountAmt);
-  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
+  const fee = platformFee(afterDiscount);
   const total = afterDiscount + fee;
   document.getElementById("c_event").textContent = evData.name||passedName||"—";
   document.getElementById("c_name").textContent = document.getElementById("bookName").value;
@@ -1397,7 +1464,7 @@ async function submitBooking(){
   }
   const subtotal = selectedTicketSubtotal();
   const afterDiscount = Math.max(0, subtotal - discountAmt);
-  const fee = afterDiscount > 0 ? Math.round(afterDiscount * 0.10) : 0;
+  const fee = platformFee(afterDiscount);
   const total = afterDiscount + fee;
   const name = document.getElementById("bookName").value.trim();
   // Use the email the customer provided for this booking.
@@ -1405,7 +1472,7 @@ async function submitBooking(){
   const phone = document.getElementById("bookPhone").value.trim();
   const eventName = evData.name||passedName||"Event";
   const eventDate = evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || '';
-  const eventTime = eventStartTime();
+  const eventTime = eventStartTime()||formatTimeText(passedEventTime);
   const bid = "CV"+Date.now();
 
   const submitBtn = document.getElementById("submitBtn");
@@ -1686,7 +1753,8 @@ async function init(){
             selectedTicketIdx=Math.max(0,Number(draft.ticketIndex)||0);
             localStorage.removeItem(draftKey);
           }else{
-            const requestedTicket=tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase());
+            const requestedByIndex=Number.isInteger(passedTicketIndex)&&passedTicketIndex>=0&&passedTicketIndex<tickets.length?passedTicketIndex:-1;
+            const requestedTicket=requestedByIndex>=0?requestedByIndex:tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase()&&Number(ticket.price||0)===passedTicketPrice);
             selectedTicketIdx=requestedTicket>=0?requestedTicket:0;
             const defaultQuantity=tickets.length?Math.max(1,ticketMinRequired(tickets[selectedTicketIdx])):1;
             pickerQuantities=tickets.map((_,index)=>index===selectedTicketIdx?defaultQuantity:0);
@@ -1734,7 +1802,8 @@ async function init(){
       tickets=(Array.isArray(evData.tickets)?evData.tickets:[]).filter(ticket=>ticket&&typeof ticket==='object');
       if(!tickets.length) tickets=[{name:passedTicketName||'General Admission',price:passedTicketPrice}];
       pickerQuantities=tickets.map(()=>0);
-      const requestedTicket=tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase());
+      const requestedByIndex=Number.isInteger(passedTicketIndex)&&passedTicketIndex>=0&&passedTicketIndex<tickets.length?passedTicketIndex:-1;
+      const requestedTicket=requestedByIndex>=0?requestedByIndex:tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase()&&Number(ticket.price||0)===passedTicketPrice);
       selectedTicketIdx=requestedTicket>=0?requestedTicket:0;
       pickerQuantities[selectedTicketIdx]=Math.max(1,ticketMinRequired(tickets[selectedTicketIdx]));
       document.getElementById('bookName').value=bookingAuth.currentUser?.displayName||'';
