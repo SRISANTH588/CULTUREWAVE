@@ -252,6 +252,7 @@
     }
 
     @media (max-width:768px), (min-width:769px){
+      .night-details i svg{width:25px;height:25px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
       .night-seating-map{margin-top:1rem;padding:.65rem;border:1px solid #343945;border-radius:16px;background:#171b23;overflow-x:auto;}
       .night-seating-map img{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:10px;}
       .night-org-card{margin:1rem 0 0;padding:1rem 1.1rem;border:1px solid #2c323b;border-radius:20px;background:#11151d;}
@@ -905,19 +906,26 @@ function renderNightDetails(data){
   const details = document.getElementById('nightDetails');
   const minutes = Number(data.duration || 0);
   const duration = minutes ? (minutes >= 60 ? (minutes % 60 ? `${(minutes / 60).toFixed(1)} hours` : `${minutes / 60} hours`) : `${minutes} mins`) : '';
+  const icons={
+    language:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h11M8.5 3v2c0 4.1-2.2 7-5 9m2-6c1.1 1.6 2.7 2.8 4.5 3.5"/><path d="M14 20l3.5-9 3.5 9m-5.8-3h4.6M14 5h7m-3.5-2v2c0 3.2 1.2 5.3 3.5 7"/></svg>',
+    duration:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3c0 4.5 2.1 6.7 5 9-2.9 2.3-5 4.5-5 9m10-18c0 4.5-2.1 6.7-5 9 2.9 2.3 5 4.5 5 9"/><path d="M9 6h6m-6 12h6"/></svg>',
+    layout:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M3 21h18M8 21v-5h8v5"/></svg>',
+    kids:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.4 2 4 2 4-2 4-2"/><path d="M8.5 9h.01M15.5 9h.01"/></svg>',
+    pets:'<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="15.5" rx="5" ry="4"/><ellipse cx="5.5" cy="9" rx="1.7" ry="2.2"/><ellipse cx="10" cy="6.5" rx="1.7" ry="2.2"/><ellipse cx="14.5" cy="6.5" rx="1.7" ry="2.2"/><ellipse cx="18.5" cy="9" rx="1.7" ry="2.2"/></svg>'
+  };
   const items = [
-    ['文', 'Language', data.language],
-    ['⌛', 'Duration', duration],
-    ['⌂', 'Layout', data.layoutType],
-    ['☺', 'Kid Friendly?', data.kidsFriendly],
-    ['🐾', 'Pet Friendly?', data.petsFriendly],
+    ['language', 'Language', data.language],
+    ['duration', 'Duration', duration],
+    ['layout', 'Layout', data.layoutType],
+    ['kids', 'Kid Friendly?', data.kidsFriendly],
+    ['pets', 'Pet Friendly?', data.petsFriendly],
   ].filter(([, , value]) => String(value || '').trim());
   details.replaceChildren();
   details.hidden = items.length === 0;
   items.forEach(([icon, label, value]) => {
     const item = document.createElement('div');
     const symbol = document.createElement('i');
-    symbol.textContent = icon;
+    symbol.innerHTML = icons[icon] || '';
     const copy = document.createElement('span');
     copy.textContent = label;
     const strong = document.createElement('strong');
