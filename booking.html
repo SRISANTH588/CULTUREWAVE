@@ -303,6 +303,47 @@
     .bk-panel#panel3 .bk-btn-next{grid-column:1/-1!important;width:100%!important;justify-self:stretch!important;}
     .bk-panel#panel3 .checkout-pay-action .bk-btn-next{grid-column:auto!important;width:auto!important;justify-self:auto!important;}
     }
+    @media(max-width:768px){
+      .bk-panel#panel1.ticket-picker::before{content:"";position:fixed;z-index:40;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(2px);}
+      .bk-panel#panel1 .bk-ticket-picker{position:fixed;z-index:50;left:0;right:0;bottom:0;height:min(84dvh,780px);min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 1.2rem calc(env(safe-area-inset-bottom) + 6.8rem);border:1px solid #e6e7eb;border-bottom:0;border-radius:28px 28px 0 0;background:#fff;color:#171a22;box-shadow:0 -12px 40px rgba(0,0,0,.18);}
+      .bk-panel#panel1 .bk-picker-head{position:sticky;z-index:2;top:0;display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:.3rem;margin:0 -1.2rem 0;padding:.75rem 1.2rem;border-bottom:1px solid #e6e7eb;background:#fff;}
+      .bk-panel#panel1 .bk-picker-head .bk-picker-back{width:40px;height:40px;border:0;background:transparent;color:#17202d;font-size:1.8rem;line-height:1;}
+      .bk-panel#panel1 .bk-picker-head h1{margin:0;color:#17202d;text-align:center;font-size:1.02rem;font-weight:650;}
+      .bk-panel#panel1 .bk-picker-info{gap:.6rem;margin:1.2rem 0 1.3rem;}
+      .bk-panel#panel1 .bk-picker-date,.bk-panel#panel1 .bk-picker-time{padding:.55rem .7rem;border:1px solid #e6e7eb;border-radius:13px;background:#f9fafb;color:#343947;box-shadow:none;}
+      .bk-panel#panel1 .bk-picker-date b{color:#5a45df;}
+      .bk-panel#panel1 .bk-picker-date strong,.bk-panel#panel1 .bk-picker-time strong{color:#293044;}
+      .bk-panel#panel1 .bk-picker-sheet{margin:0;padding:.75rem 0 1.2rem;border:0;border-radius:0;background:#fff;box-shadow:none;}
+      .bk-panel#panel1 .bk-picker-label{margin-bottom:.35rem;color:#252b38;font-size:.9rem;letter-spacing:0;text-transform:none;}
+      .bk-panel#panel1 .bk-picker-intro{margin:.25rem 0 .8rem;color:#6b7280;}
+      .bk-panel#panel1 .bk-picker-ticket{margin:.65rem 0;padding:1rem;border:1px solid #e5e7eb!important;border-radius:17px!important;background:#fff!important;box-shadow:0 2px 8px rgba(16,24,40,.04)!important;}
+      .bk-panel#panel1 .bk-picker-ticket-name,.bk-panel#panel1 .bk-picker-ticket-price{color:#171a22;}
+      .bk-panel#panel1 .bk-picker-availability{color:#6b7280;}
+      .bk-panel#panel1 .bk-picker-add,.bk-panel#panel1 .bk-picker-qty{min-width:94px;height:44px;border:0;border-radius:12px;background:linear-gradient(135deg,#5946e8,#3f42cc);color:#fff;box-shadow:0 6px 14px rgba(75,67,218,.2);text-transform:none;}
+      .bk-panel#panel1 .bk-picker-qty{min-width:100px;}
+      .bk-panel#panel1 .guest-contact-card{min-height:calc(100% - 60px);margin:0!important;padding:0!important;overflow:visible;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;color:#202633;}
+      .bk-panel#panel1 .guest-contact-card::before{display:none;}
+      .guest-contact-sheet-head{position:sticky;z-index:2;top:0;display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:.3rem;margin:0 -1.2rem 1.35rem;padding:.75rem 1.2rem;border-bottom:1px solid #e6e7eb;background:#fff;}
+      .guest-contact-sheet-head button{width:40px;height:40px;border:0;background:transparent;color:#17202d;font-size:1.8rem;line-height:1;}
+      .guest-contact-sheet-head h2{margin:0!important;color:#17202d!important;text-align:center;font-size:1.02rem!important;font-weight:650!important;}
+      .bk-panel#panel1 .guest-contact-head{display:none;}
+      .bk-panel#panel1 .guest-contact-card .bk-field{gap:.45rem;margin:0 0 1.15rem;}
+      .bk-panel#panel1 .guest-contact-card .bk-label{color:#626b7a;font-size:.78rem;letter-spacing:0;text-transform:none;}
+      .bk-panel#panel1 .guest-contact-card .bk-input{height:56px;padding:0 .85rem;border:1px solid #dfe2e8;border-radius:14px;background:#f8f9fb;box-shadow:none;}
+      .bk-panel#panel1 .guest-contact-card .bk-input:focus-within{border-color:#5946e8;box-shadow:0 0 0 3px rgba(89,70,232,.1);}
+      .bk-panel#panel1 .guest-contact-card .bk-input>span{color:#737b89;}
+      .bk-panel#panel1 .guest-contact-card .bk-input input{color:#202633;font-size:1rem;}
+      .bk-panel#panel1 .guest-contact-card .bk-input input::placeholder{color:#9ba2ad;}
+      .bk-panel#panel1 .guest-contact-continue,.bk-panel#panel1 .guest-contact-note{display:none;}
+      .bk-panel#panel1 .bk-picker-bar{z-index:60;left:0;right:0;bottom:0;gap:.7rem;padding:.8rem 1.2rem calc(env(safe-area-inset-bottom) + .8rem);border:0;border-top:1px solid #eceef2;border-radius:0;background:rgba(255,255,255,.98);box-shadow:0 -6px 24px rgba(25,30,40,.07);backdrop-filter:blur(14px);color:#202633;}
+      .bk-panel#panel1 .bk-picker-total small{color:#697180;font-size:.8rem;}
+      .bk-panel#panel1 .bk-picker-total strong{color:#202633;font-size:1.05rem;}
+      .bk-panel#panel1 .bk-picker-proceed{height:52px;min-width:132px;border-radius:13px;background:linear-gradient(135deg,#5946e8,#3f42cc);box-shadow:0 6px 14px rgba(75,67,218,.2);color:#fff;font-size:.92rem;}
+      .bk-panel#panel1 .bk-picker-proceed:disabled{background:#c8c9ce;box-shadow:none;color:#fff;}
+      .bk-panel#panel1.details-step .bk-picker-head,.bk-panel#panel1.details-step .bk-picker-info,.bk-panel#panel1.details-step .bk-picker-sheet{display:none!important;}
+      .bk-panel#panel1.details-step .bk-ticket-picker{padding-top:0;}
+      .bk-panel#panel1.details-step .guest-contact-card{display:block!important;}
+    }
   </style>
 </head>
 <body>
@@ -357,9 +398,11 @@
       <!-- STEP 1: YOUR DETAILS -->
       <div class="bk-panel active" id="panel1">
         <section class="bk-ticket-picker" id="ticketPicker">
-          <div class="bk-picker-head"><button class="bk-picker-back" type="button" onclick="history.back()" aria-label="Back">‹</button><div><div class="bk-picker-title" id="pickerEventTitle">Loading event…</div><div class="bk-picker-location" id="pickerEventLocation"></div></div></div>
+          <div class="bk-picker-head"><button class="bk-picker-back" type="button" onclick="closeBookingSheet()" aria-label="Close booking">×</button><h1>Book your seat</h1><span aria-hidden="true"></span></div>
+          <div hidden><span id="pickerEventTitle">Loading event…</span><span id="pickerEventLocation"></span></div>
           <div class="bk-picker-info"><div class="bk-picker-date"><b id="pickerDay">—</b><strong id="pickerDate">—</strong></div><div class="bk-picker-time"><strong id="pickerTime">—</strong></div></div>
-          <div id="guestContactCard" class="bk-card guest-contact-card">
+          <div id="guestContactCard" class="bk-card guest-contact-card" style="display:none;">
+            <div class="guest-contact-sheet-head"><button type="button" onclick="backToTicketSelection()" aria-label="Back to tickets">‹</button><h2>Your Details</h2><button type="button" onclick="closeBookingSheet()" aria-label="Close booking">×</button></div>
             <div class="guest-contact-head"><div class="guest-contact-icon" aria-hidden="true">✦</div><div><span class="guest-contact-kicker">Guest checkout</span><h2>Your Details</h2><p class="sub">Where should we send your ticket confirmation?</p></div></div>
             <div class="bk-field"><label class="bk-label" for="bookName">Full name</label><div class="bk-input"><span aria-hidden="true">👤</span><input type="text" id="bookName" placeholder="Enter your full name" autocomplete="name"/></div></div>
             <div class="bk-field"><label class="bk-label" for="bookPhone">Phone number</label><div class="bk-input"><span aria-hidden="true">📱</span><input type="tel" id="bookPhone" placeholder="10-digit number" autocomplete="tel" inputmode="tel"/></div></div>
@@ -367,7 +410,7 @@
             <button type="button" class="guest-contact-continue" onclick="continueToTicketSelection()">Continue to tickets <span aria-hidden="true">→</span></button>
             <div class="guest-contact-note"><span aria-hidden="true">🔒</span> Your details are used for this booking</div>
           </div>
-          <div class="bk-picker-sheet" id="ticketSelectionSheet" style="display:none;"><div class="bk-picker-label">CHOOSE TICKETS</div><p class="bk-picker-intro">Choose a pass to reserve your place at this event.</p><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div><div id="pickerSeatMount"></div></div>
+          <div class="bk-picker-sheet" id="ticketSelectionSheet"><div class="bk-picker-label">SELECT TICKETS</div><p class="bk-picker-intro">Choose a pass to reserve your place at this event.</p><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div><div id="pickerSeatMount"></div></div>
         </section>
         <div class="bk-picker-bar" id="pickerBar"><div class="bk-picker-total"><small id="pickerCount">0 tickets</small><strong id="pickerTotal">₹0</strong></div><button class="bk-picker-proceed" type="button" onclick="showBookingDetails()">Next</button></div>
       </div>
@@ -717,10 +760,14 @@ function removeCheckoutSelection(){
   returnToTicketPicker();
 }
 function editCheckoutDetails(){
-  document.getElementById('panel1').classList.remove('ticket-picker');
+  document.getElementById('panel1').classList.add('ticket-picker','details-step');
   goStep(1);
   document.getElementById('guestContactCard').style.display='';
   document.getElementById('ticketSelectionSheet').style.display='none';
+  const bar=document.getElementById('pickerBar');
+  bar.classList.add('show');
+  const button=bar.querySelector('.bk-picker-proceed');
+  if(button){button.textContent='Continue  →';button.onclick=continueToTicketSelection;}
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function eventCoupons(){
@@ -741,7 +788,7 @@ function renderTicketPicker(){
     return;
   }
   if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
-  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-copy"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span>${groupHint?`<div style="margin-top:.4rem;color:#45d49c;font-size:.72rem;font-weight:700;">${groupHint}</div>`:''}</div>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" aria-label="Remove one ticket" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" aria-label="Add one ticket" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">ADD</button>`}${description?`<button type="button" class="bk-picker-details" aria-expanded="true" onclick="togglePickerDetails(${index},this)">Details ⌃</button><p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}${sold?'<span class="bk-picker-availability">Sold out</span>':''}</article>`; }).join('');
+  list.innerHTML=tickets.map((ticket,index)=>{ const quantity=pickerQuantities[index]||0, selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0), max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere), min=ticketMinRequired(ticket), sold=max<min; const description=ticket.description||ticket.details||ticket.desc||''; const groupHint=groupTicketHint(ticket); const groupRate=Number(ticket.bulk?.pricePerPerson||0); const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0); return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-copy"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span>${groupHint?`<div style="margin-top:.4rem;color:#45d49c;font-size:.72rem;font-weight:700;">${groupHint}</div>`:''}</div>${sold?'<button class="bk-picker-add" disabled>SOLD OUT</button>':quantity?`<div class="bk-picker-qty"><button type="button" aria-label="Remove one ticket" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" aria-label="Add one ticket" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">＋ Add</button>`}${description?`<button type="button" class="bk-picker-details" aria-expanded="true" onclick="togglePickerDetails(${index},this)">Details ⌃</button><p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}${sold?'<span class="bk-picker-availability">Sold out</span>':''}</article>`; }).join('');
   updatePickerBar();
 }
 function togglePickerDetails(index,button){ const el=document.getElementById('pickerDesc'+index); if(el){const open=el.classList.toggle('open');button?.setAttribute('aria-expanded',String(open));if(button)button.innerHTML=open?'Details ⌃':'Details ⌄';} }
@@ -771,20 +818,33 @@ function updatePickerBar(){
   const total=pickerQuantities.reduce((sum,value,index)=>sum+groupTicketPrice(tickets[index],value)*value,0);
   document.getElementById('pickerCount').textContent=`${count} ticket${count===1?'':'s'}`;
   document.getElementById('pickerTotal').textContent=fmt(total);
-  document.getElementById('pickerBar').classList.toggle('show',count>0);
+  const isMobileSheet=window.matchMedia('(max-width: 768px)').matches&&document.getElementById('panel1').classList.contains('active');
+  document.getElementById('pickerBar').classList.toggle('show',count>0||isMobileSheet);
   const seatSection=document.querySelector('.picker-seat-section');
   if(seatSection) seatSection.style.display=count ? '' : 'none';
   const seatStatus=document.getElementById('pickerSeatStatus');
   const hasMap=document.getElementById('seatingWrap').style.display !== 'none' && !document.querySelector('#seatingContainer img');
   if(seatStatus) seatStatus.textContent=hasMap ? `${selectedSeats.length} of ${count} seat${count===1?'':'s'} selected` : 'Choose the number of seats for your tickets';
   const button=document.querySelector('.bk-picker-proceed');
-  if(button) button.textContent=hasMap && selectedSeats.length!==count ? 'Select seats' : 'Checkout';
+  if(button){
+    if(isMobileSheet&&document.getElementById('panel1').classList.contains('details-step')){button.textContent='Continue  →';button.onclick=continueToTicketSelection;button.disabled=false;}
+    else {button.textContent=hasMap&&selectedSeats.length!==count?'Select seats':'Proceed  →';button.onclick=showBookingDetails;button.disabled=count===0;}
+  }
 }
 function showBookingDetails(){
   if(!pickerQuantities.some(Boolean)){ showToast('Add at least one ticket'); return; }
   const hasSeating = document.getElementById('seatingWrap').style.display !== 'none';
   const isImagePlan = hasSeating && document.querySelector('#seatingContainer img');
   const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
+  if(window.matchMedia('(max-width: 768px)').matches){
+    const panel=document.getElementById('panel1');
+    panel.classList.add('details-step');
+    document.getElementById('guestContactCard').style.display='';
+    document.getElementById('ticketSelectionSheet').style.display='none';
+    updatePickerBar();
+    document.getElementById('ticketPicker').scrollTop=0;
+    return;
+  }
   if(hasSeating && !isImagePlan && selectedSeats.length !== ticketCount){ showToast(`Please select ${ticketCount} seat${ticketCount===1?'':'s'}`); return; }
   const phone = document.getElementById('bookPhone').value.trim();
   if(!phone || phone.replace(/\D/g,'').length < 10){ showToast('Enter a valid WhatsApp number'); return; }
@@ -806,6 +866,19 @@ function continueToTicketSelection(){
   if(!name){showToast('Enter your full name');return;}
   if(phone.replace(/\D/g,'').length<10){showToast('Enter a valid phone number');return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Enter a valid email address');return;}
+  if(window.matchMedia('(max-width: 768px)').matches&&document.getElementById('panel1').classList.contains('details-step')){
+    const hasSelectableSeatMap=evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections));
+    if(hasSelectableSeatMap&&selectedSeats.length!==selectedTicketCount()){
+      backToTicketSelection();
+      showToast(`Please select ${selectedTicketCount()} seat${selectedTicketCount()===1?'':'s'} before continuing`);
+      return;
+    }
+    if(!emailVerified&&bookingAuth.currentUser?.email!==email)emailVerified=true;
+    document.getElementById('panel1').classList.remove('ticket-picker','details-step');
+    document.getElementById('pickerBar').classList.remove('show');
+    goStep3();
+    return;
+  }
   document.getElementById('guestContactCard').style.display='none';
   document.getElementById('ticketSelectionSheet').style.display='block';
   const button=document.querySelector('.bk-picker-proceed');
@@ -814,9 +887,20 @@ function continueToTicketSelection(){
 }
 function returnToTicketPicker(){
   document.getElementById('panel1').classList.add('ticket-picker');
+  document.getElementById('panel1').classList.remove('details-step');
+  document.getElementById('guestContactCard').style.display='none';
+  document.getElementById('ticketSelectionSheet').style.display='block';
   goStep(1);
   updatePickerBar();
 }
+function backToTicketSelection(){
+  document.getElementById('panel1').classList.remove('details-step');
+  document.getElementById('guestContactCard').style.display='none';
+  document.getElementById('ticketSelectionSheet').style.display='block';
+  updatePickerBar();
+  document.getElementById('ticketPicker').scrollTop=0;
+}
+function closeBookingSheet(){history.back();}
 
 // ── STEPPER ──
 function goStep(n){
@@ -1468,7 +1552,11 @@ function toggleSeat(seatId, sofa){
 
 // ── INIT ──
 async function init(){
+  const mobileBookingSheet=window.matchMedia('(max-width: 768px)').matches;
   document.getElementById('panel1').classList.add('ticket-picker');
+  document.getElementById('guestContactCard').style.display=mobileBookingSheet?'none':'';
+  document.getElementById('ticketSelectionSheet').style.display=mobileBookingSheet?'block':'none';
+  updatePickerBar();
   if(eventId){
     try{
       const snap = await db.collection("events").doc(eventId).get();
