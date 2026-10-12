@@ -220,9 +220,8 @@
       .mob-info-list{border-top:1px solid #252a34;padding-top:1rem;gap:.85rem;}
       .mob-info-row{padding:.05rem 0;}.mob-info-icon-box{width:45px;min-width:45px;height:45px;border-radius:12px;background:#171b23!important;}
       .mob-info-text-title{color:#fff;font-size:.9rem;}.mob-info-text-sub{color:#aeb4c0;}
-      .mob-detail-tabs{position:sticky;top:70px;z-index:25;display:grid!important;grid-template-columns:repeat(4,1fr);gap:.18rem;margin:1rem 1.2rem 1.4rem;padding:.25rem;background:#292d36;border:1px solid #4a4e58;border-radius:999px;visibility:visible!important;opacity:1!important;}
-      .mob-detail-tabs-spacer{height:0;}
-      .mob-detail-tabs.is-fixed{position:fixed;top:var(--mob-detail-tabs-top,70px);left:1.2rem;right:1.2rem;width:auto;z-index:45;margin:0!important;}
+      .mob-detail-tabs{position:fixed;top:clamp(70px,34vh,300px);left:1.2rem;right:1.2rem;width:auto;z-index:45;display:grid!important;grid-template-columns:repeat(4,1fr);gap:.18rem;margin:0!important;padding:.25rem;background:#292d36;border:1px solid #4a4e58;border-radius:999px;visibility:visible!important;opacity:1!important;}
+      .mob-detail-tabs-spacer{height:78px;}
       .mob-detail-tabs button{height:39px;border:0;border-radius:999px;background:transparent;color:#e5e7eb;font-size:.84rem;font-weight:800;}.mob-detail-tabs button.active{background:#fff;color:#10131a;}
       .shell{padding:0 1.4rem;background:#05070c;}.section,.mob-section-card{background:#0f1219!important;border-color:#292e38!important;color:#fff;box-shadow:none!important;}
       .section-title,.mob-section-label{color:#fff!important;}.section-title::before{background:#ff5a19;}.description{color:#d2d6de!important;}
@@ -310,6 +309,7 @@
       .nightlife-mobile{padding-left:0;padding-right:0;}
       .mob-event-header{padding-left:0;padding-right:0;}
       .mob-detail-tabs{position:static;top:auto;}
+      .mob-detail-tabs-spacer{display:none;}
       .mob-event-header{padding-bottom:1rem;}
       .mob-event-title{font-size:2.5rem;line-height:1.08;letter-spacing:.015em;}
       .mob-event-summary{max-width:95ch;font-size:1.2rem;line-height:1.8;letter-spacing:.005em;}
@@ -934,45 +934,9 @@ function syncMobileTabs(){
   sections.forEach(([tab,id]) => { const el=document.getElementById(id); if(el && el.offsetTop <= marker) active=tab; });
   document.querySelectorAll('[data-mob-tab]').forEach(button => button.classList.toggle('active',button.dataset.mobTab===active));
 }
-function pinMobileDetailTabs(){
-  const tabs=document.querySelector('.mob-detail-tabs');
-  const spacer=document.getElementById('mobDetailTabsSpacer');
-  if(!tabs||!spacer)return;
-  if(!window.matchMedia('(max-width: 768px)').matches){
-    tabs.classList.remove('is-fixed');
-    tabs.style.removeProperty('--mob-detail-tabs-top');
-    spacer.style.height='0';
-    return;
-  }
-  if(tabs.dataset.pinned==='true')return;
-  const tabsStyle=getComputedStyle(tabs);
-  const originalTop=tabs.getBoundingClientRect().top;
-  const flowSpace=tabs.offsetHeight+parseFloat(tabsStyle.marginTop||0)+parseFloat(tabsStyle.marginBottom||0);
-  const maxTop=Math.max(70,window.innerHeight-tabs.offsetHeight-120);
-  tabs.style.setProperty('--mob-detail-tabs-top',`${Math.min(Math.max(70,originalTop),maxTop)}px`);
-  spacer.style.height=`${flowSpace}px`;
-  tabs.classList.add('is-fixed');
-  tabs.dataset.pinned='true';
-}
 window.addEventListener('scroll', syncMobileTabs, {passive:true});
 requestAnimationFrame(syncMobileTabs);
-window.addEventListener('resize',()=>{
-  const tabs=document.querySelector('.mob-detail-tabs');
-  if(tabs){tabs.dataset.pinned='';tabs.classList.remove('is-fixed');tabs.style.removeProperty('--mob-detail-tabs-top');}
-  requestAnimationFrame(()=>{pinMobileDetailTabs();syncMobileTabs();});
-},{passive:true});
-if('ResizeObserver' in window){
-  const tabsAnchorObserver=new ResizeObserver(()=>{
-    const tabs=document.querySelector('.mob-detail-tabs');
-    if(tabs&&window.matchMedia('(max-width: 768px)').matches){
-      delete tabs.dataset.fixedTop;
-      tabs.style.removeProperty('--mob-detail-tabs-top');
-      requestAnimationFrame(syncMobileTabs);
-    }
-  });
-  const mobileHeader=document.getElementById('mobEventHeader');
-  if(mobileHeader)tabsAnchorObserver.observe(mobileHeader);
-}
+window.addEventListener('resize', syncMobileTabs, {passive:true});
 
 function renderSeatingLayout(layout, target){
   if(!target) return;
@@ -1228,7 +1192,6 @@ async function renderEvent(data){
   else { document.getElementById('mobDurationRow').style.display='none'; }
   document.getElementById('mobInfoVenue').textContent = data.venueName || 'Raasta';
   document.getElementById('mobInfoVenueCity').textContent = data.city || 'Madhapur, Hyderabad';
-  requestAnimationFrame(pinMobileDetailTabs);
   // mobile bottom bar
   document.getElementById('mobRegPrice').innerHTML = price0 ? `${isGroupTicket?'Group from':'From'} ₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
 
