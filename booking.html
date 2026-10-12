@@ -582,6 +582,7 @@ emailjs.init({ publicKey: EJ_KEY });
 const urlP = new URLSearchParams(location.search);
 const embeddedBooking = urlP.get('embed') === '1';
 const resumeCheckout = urlP.get('resume') === '1';
+const bookingSession = urlP.get('bookingSession') || '';
 if(embeddedBooking){
   document.documentElement.style.setProperty('background','transparent','important');
   document.body.style.setProperty('background','transparent','important');
@@ -790,6 +791,55 @@ function reconcileSelectedTickets(nextTickets){
   if(nextIndex<0)nextIndex=tickets.findIndex(ticket=>String(ticket.name||'')===selectedName&&Number(ticket.price||0)===selectedPrice);
   if(nextIndex>=0)selectedTicketIdx=nextIndex;
 }
+function draftTicketSelections(){
+  return tickets.map((ticket,index)=>({
+    id:String(ticket.id||ticket.ticketId||''),
+    name:String(ticket.name||''),
+    price:Number(ticket.price||0),
+    quantity:Math.max(0,Number(pickerQuantities[index]||0)),
+    index
+  })).filter(item=>item.quantity>0);
+}
+function restoreDraftTicketSelections(draft){
+  pickerQuantities=tickets.map(()=>0);
+  let firstSelected=-1;
+  const selections=Array.isArray(draft.selections)?draft.selections:[];
+  if(selections.length){
+    selections.forEach(item=>{
+      const id=String(item.id||'');
+      const name=String(item.name||'');
+      const price=Number(item.price||0);
+      let index=id?tickets.findIndex(ticket=>String(ticket.id||ticket.ticketId||'')===id):-1;
+      if(index<0)index=tickets.findIndex(ticket=>String(ticket.name||'')===name&&Number(ticket.price||0)===price);
+      if(index<0){
+        const nameMatches=tickets.map((ticket,i)=>String(ticket.name||'')===name?i:-1).filter(i=>i>=0);
+        if(nameMatches.length===1)index=nameMatches[0];
+      }
+      if(index>=0){
+        pickerQuantities[index]+=Math.max(0,Number(item.quantity||0));
+        if(firstSelected<0)firstSelected=index;
+      }
+    });
+  }else{
+    // Older drafts only held indices. Prefer the ticket identity in the URL
+    // because fallback popup data may have contained only one ticket.
+    const oldQuantities=Array.isArray(draft.quantities)?draft.quantities:[];
+    const requestedName=String(passedTicketName||'').toLowerCase();
+    const requestedIndex=tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===requestedName&&Number(ticket.price||0)===passedTicketPrice);
+    if(requestedIndex>=0){
+      const count=oldQuantities.reduce((sum,value)=>sum+Math.max(0,Number(value)||0),0);
+      pickerQuantities[requestedIndex]=count;
+      firstSelected=requestedIndex;
+    }
+  }
+  if(firstSelected<0){
+    const name=String(draft.ticketName||'');
+    const price=Number(draft.ticketPrice||0);
+    firstSelected=tickets.findIndex(ticket=>String(ticket.name||'')===name&&Number(ticket.price||0)===price);
+  }
+  if(firstSelected>=0)selectedTicketIdx=firstSelected;
+  else if(pickerQuantities.length)selectedTicketIdx=Math.max(0,Math.min(pickerQuantities.length-1,Number(draft.ticketIndex)||0));
+}
 function groupTicketPrice(ticket, quantity){
   const bulk=ticket?.bulk||{};
   const min=Number(bulk.minPersons||0), max=Number(bulk.maxPersons||0), groupPrice=Number(bulk.pricePerPerson||0);
@@ -980,7 +1030,8 @@ function continueToTicketSelection(){
     if(!emailVerified&&bookingAuth.currentUser?.email!==email)emailVerified=true;
     if(embeddedBooking){
       try{
-        localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify({name,phone,email,quantities:pickerQuantities,seats:selectedSeats,ticketIndex:selectedTicketIdx,savedAt:Date.now()}));
+        const selected=tickets[selectedTicketIdx]||{};
+        localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify({eventId,bookingSession,name,phone,email,quantities:pickerQuantities,selections:draftTicketSelections(),ticketName:String(selected.name||''),ticketPrice:Number(selected.price||0),seats:selectedSeats,ticketIndex:selectedTicketIdx,savedAt:Date.now()}));
       }catch(_){showToast('Could not save your booking details. Please try again.');return;}
       const checkoutUrl=new URL(location.href);
       checkoutUrl.searchParams.delete('embed');
@@ -1741,13 +1792,14 @@ async function init(){
               draft=JSON.parse(localStorage.getItem(draftKey)||'null');
             }catch(resumeError){console.error('Could not resume checkout:',resumeError);}
           }
-          if(draft&&Date.now()-Number(draft.savedAt||0)<30*60*1000){
+          const draftMatchesSession=draft&&String(draft.eventId||eventId)===String(eventId)&&
+            (bookingSession?String(draft.bookingSession||'')===bookingSession:!draft.bookingSession);
+          if(draftMatchesSession&&Date.now()-Number(draft.savedAt||0)<30*60*1000){
             document.getElementById('bookName').value=draft.name||'';
             document.getElementById('bookPhone').value=draft.phone||'';
             document.getElementById('bookEmail').value=draft.email||'';
-            pickerQuantities=tickets.map((_,index)=>Math.max(0,Number(draft.quantities?.[index]||0)));
+            restoreDraftTicketSelections(draft);
             selectedSeats=Array.isArray(draft.seats)?draft.seats.map(String):[];
-            selectedTicketIdx=Math.max(0,Number(draft.ticketIndex)||0);
             localStorage.removeItem(draftKey);
           }else{
             const requestedByIndex=Number.isInteger(passedTicketIndex)&&passedTicketIndex>=0&&passedTicketIndex<tickets.length?passedTicketIndex:-1;

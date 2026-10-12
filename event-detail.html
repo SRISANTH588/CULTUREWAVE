@@ -1018,6 +1018,7 @@ function register(){
   const eventDate=rawEventDate?.toDate?rawEventDate.toDate().toISOString():rawEventDate;
   const qs = new URLSearchParams({
     eventId,
+    bookingSession: (globalThis.crypto?.randomUUID?.() || `booking-${Date.now()}-${Math.random().toString(36).slice(2)}`),
     eventName: evData.name || '',
     venueName: evData.venueName || evData.city || '',
     category: evData.category || '',
