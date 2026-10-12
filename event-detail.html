@@ -451,7 +451,6 @@
   </div>
 </div>
 
-<div class="mob-detail-tabs-spacer" id="mobDetailTabsSpacer" aria-hidden="true"></div>
 <!-- Phone-only quick navigation, inspired by the event discovery flow. -->
 <nav class="mob-detail-tabs" aria-label="Event details sections">
   <button class="active" type="button" data-mob-tab="about" onclick="showMobileDetailTab('about')">About</button>
@@ -928,17 +927,15 @@ function renderNightDetails(data){
 
 function syncMobileTabs(){
   const tabs=document.querySelector('.mob-detail-tabs');
-  const spacer=document.getElementById('mobDetailTabsSpacer');
-  if(tabs&&spacer&&window.matchMedia('(max-width: 768px)').matches){
-    if(!tabs.dataset.fixedTop){
-      tabs.style.setProperty('--mob-detail-tabs-top',`${Math.max(0,spacer.getBoundingClientRect().top+13)}px`);
+  const addressRow=document.querySelector('#mobEventHeader .mob-info-row:nth-child(3)');
+  if(tabs&&window.matchMedia('(max-width: 768px)').matches){
+    if(!tabs.dataset.fixedTop&&addressRow){
+      tabs.style.setProperty('--mob-detail-tabs-top',`${Math.max(0,addressRow.getBoundingClientRect().bottom+18)}px`);
       tabs.dataset.fixedTop='true';
     }
-    spacer.style.height=`${tabs.offsetHeight+29}px`;
-  }else if(tabs&&spacer){
+  }else if(tabs){
     tabs.style.removeProperty('--mob-detail-tabs-top');
     delete tabs.dataset.fixedTop;
-    spacer.style.height='0';
   }
   const helpTarget = document.getElementById('mobileFaqsSection')?.hidden ? 'nightHelp' : 'mobileFaqsSection';
   const sections = [['about','nightAbout'],['photos','nightPhotos'],['venue','nightVenue'],['help',helpTarget]];
@@ -954,18 +951,6 @@ window.addEventListener('resize',()=>{
   if(tabs){delete tabs.dataset.fixedTop;tabs.style.removeProperty('--mob-detail-tabs-top');}
   requestAnimationFrame(syncMobileTabs);
 },{passive:true});
-if('ResizeObserver' in window){
-  const tabsAnchorObserver=new ResizeObserver(()=>{
-    const tabs=document.querySelector('.mob-detail-tabs');
-    if(tabs&&window.matchMedia('(max-width: 768px)').matches){
-      delete tabs.dataset.fixedTop;
-      tabs.style.removeProperty('--mob-detail-tabs-top');
-      requestAnimationFrame(syncMobileTabs);
-    }
-  });
-  const mobileHeader=document.getElementById('mobEventHeader');
-  if(mobileHeader)tabsAnchorObserver.observe(mobileHeader);
-}
 
 function renderSeatingLayout(layout, target){
   if(!target) return;
