@@ -1623,8 +1623,9 @@ async function init(){
           document.getElementById("receiptBanner").appendChild(img);
         }
         renderTicketPicker();
-        // Always open the booking page on checkout, including legacy embedded links.
-        {
+        // Embedded event popups collect tickets and attendee details first.
+        // Standalone links and resumed bookings open directly on checkout.
+        if(resumeCheckout || !embeddedBooking){
           let draft=null;
           const draftKey=`culturewave:checkout-draft:${eventId}`;
           if(resumeCheckout){
@@ -1690,14 +1691,22 @@ async function init(){
       document.getElementById('bookPhone').value=bookingAuth.currentUser?.phoneNumber||'';
       document.getElementById('bookEmail').value=bookingAuth.currentUser?.email||'';
       try{renderTicketPicker();}catch(renderError){console.error('Could not render fallback ticket:',renderError);}
-      try{goStep3();}catch(checkoutError){
-        console.error('Could not fully render fallback checkout:',checkoutError);
-        document.getElementById('s3Event').textContent=evData.name||'Event booking';
-        document.getElementById('s3Ticket').textContent=selectedTicketLabel();
-        document.getElementById('checkoutDate').textContent=[passedEventDate,passedEventTime].filter(Boolean).join(' • ')||'Date & time TBA';
-        document.getElementById('checkoutLocation').textContent=passedVenue||'Event booking';
-        document.getElementById('submitBtn').textContent=passedTicketPrice?'Pay now ›':'Confirm booking ›';
-        goStep(3);
+      if(embeddedBooking&&!resumeCheckout){
+        document.getElementById('panel1').classList.add('ticket-picker');
+        document.getElementById('guestContactCard').style.display='none';
+        document.getElementById('ticketSelectionSheet').style.display='block';
+        goStep(1);
+        updatePickerBar();
+      }else{
+        try{goStep3();}catch(checkoutError){
+          console.error('Could not fully render fallback checkout:',checkoutError);
+          document.getElementById('s3Event').textContent=evData.name||'Event booking';
+          document.getElementById('s3Ticket').textContent=selectedTicketLabel();
+          document.getElementById('checkoutDate').textContent=[passedEventDate,passedEventTime].filter(Boolean).join(' • ')||'Date & time TBA';
+          document.getElementById('checkoutLocation').textContent=passedVenue||'Event booking';
+          document.getElementById('submitBtn').textContent=passedTicketPrice?'Pay now ›':'Confirm booking ›';
+          goStep(3);
+        }
       }
     }
   } else {
