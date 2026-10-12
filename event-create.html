@@ -1387,8 +1387,14 @@
           <label for="videoUrl">YouTube or Vimeo URL</label>
           <input id="videoUrl" type="url" placeholder="https://youtube.com/watch?v=..." oninput="syncVideoEmbed()" />
         </div>
+        <div class="field" style="margin-top:.75rem;">
+          <label for="videoFile">Or upload a video (MP4, MOV, or WebM; up to 50 MB)</label>
+          <input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/webm" onchange="uploadPromoVideo(this)" />
+          <div id="videoUploadStatus" role="status" style="margin-top:.35rem;font-size:.8rem;color:var(--muted);"></div>
+        </div>
         <div id="videoEmbedWrap" style="display:none;margin-top:.75rem;border-radius:14px;overflow:hidden;">
           <iframe id="videoEmbedFrame" style="width:100%;height:210px;border:none;display:block;"></iframe>
+          <video id="videoPreviewPlayer" controls playsinline style="display:none;width:100%;max-height:360px;background:#000;"></video>
         </div>
       </div>
 
@@ -2153,6 +2159,7 @@ async function persistUploadedImage(urlId, url) {
     cardImgUrl: 'cardImgUrl',
     logoUrl: 'ticketDesign.logoUrl',
     seatingPlanUrl: 'seatingPlanUrl',
+    videoUrl: 'videoUrl',
   }[urlId];
   if (!fieldPath) return;
   await db.collection('events').doc(editId).update({
@@ -2300,6 +2307,7 @@ loadUser();
     if (g('inviteCode')) set('inviteCode', d.inviteCode || '');
     if (g('soldOutMsg')) set('soldOutMsg', d.soldOutMsg || '');
     if (g('videoUrl')) set('videoUrl', d.videoUrl || '');
+    if (g('videoUrl')) syncVideoEmbed();
     if (g('eventLanguage')) set('eventLanguage', d.language || '');
     if (g('layoutType')) set('layoutType', d.layoutType || '');
     if (g('kidsFriendly')) set('kidsFriendly', d.kidsFriendly || '');
@@ -2643,11 +2651,30 @@ window.syncVideoEmbed = function() {
   const url = document.getElementById('videoUrl').value;
   const wrap = document.getElementById('videoEmbedWrap');
   const frame = document.getElementById('videoEmbedFrame');
+  const player = document.getElementById('videoPreviewPlayer');
   const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
   const vi = url.match(/vimeo\.com\/(\d+)/);
-  if (yt) { frame.src = 'https://www.youtube.com/embed/' + yt[1]; wrap.style.display = ''; }
-  else if (vi) { frame.src = 'https://player.vimeo.com/video/' + vi[1]; wrap.style.display = ''; }
-  else { frame.src = ''; wrap.style.display = 'none'; }
+  const directVideo = /^https?:\/\/.+\.(?:mp4|webm|mov)(?:[?#].*)?$/i.test(url);
+  if (yt) { player.pause(); player.removeAttribute('src'); player.load(); player.style.display='none'; frame.style.display='block'; frame.src = 'https://www.youtube.com/embed/' + yt[1]; wrap.style.display = ''; }
+  else if (vi) { player.pause(); player.removeAttribute('src'); player.load(); player.style.display='none'; frame.style.display='block'; frame.src = 'https://player.vimeo.com/video/' + vi[1]; wrap.style.display = ''; }
+  else if (directVideo) { frame.src=''; frame.style.display='none'; player.src=url; player.style.display='block'; wrap.style.display=''; }
+  else { frame.src = ''; frame.style.display='block'; player.pause(); player.removeAttribute('src'); player.load(); player.style.display='none'; wrap.style.display = 'none'; }
+};
+window.uploadPromoVideo = async function(input) {
+  const file=input.files && input.files[0];
+  if(!file) return;
+  const status=document.getElementById('videoUploadStatus');
+  status.textContent='Uploading video…';
+  try {
+    const url=await uploadVideoToImageKit(file,'/event-videos');
+    document.getElementById('videoUrl').value=url;
+    syncVideoEmbed();
+    updateProgress();
+    await persistUploadedImage('videoUrl',url);
+    status.textContent='Video uploaded and saved.';
+  } catch(error) {
+    status.textContent=error.message || 'Video upload failed.';
+  } finally { input.value=''; }
 };
 
 // ── TICKET MODE ──

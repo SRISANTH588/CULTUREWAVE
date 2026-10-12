@@ -472,7 +472,7 @@
   <section class="night-share-card" id="nightShareCard" aria-label="Share this event"><h3>Share this event</h3><div class="night-share-actions"><button type="button" onclick="shareWA()">WhatsApp</button><button type="button" onclick="copyLink()">Copy link</button></div></section>
   <section class="night-org-card" aria-label="Organised by"><div class="night-org-label">Organised by</div><button type="button" class="night-org-row" onclick="goToProfile()"><span class="night-org-avatar" id="nightOrgAvatar">JN</span><span><strong id="nightOrgName">Organiser</strong><small>View profile →</small></span></button></section>
   <div class="night-divider"><span></span><b>CHECK OUT THE VIBE</b><span></span></div>
-  <section class="night-photos" id="nightPhotos"><h2>Photos &amp; Videos</h2><div id="nightGallery" class="night-gallery"></div><button class="night-open-gallery" id="nightOpenGallery" type="button" onclick="openNightGallery()" hidden>Open gallery</button></section>
+  <section class="night-photos" id="nightPhotos"><h2>Photos &amp; Videos</h2><div id="nightGallery" class="night-gallery"></div><div id="nightPromoVideo" style="display:none;margin-top:1rem;"></div><button class="night-open-gallery" id="nightOpenGallery" type="button" onclick="openNightGallery()" hidden>Open gallery</button></section>
   <section class="night-artists" id="nightArtists" hidden><h2>Featured Artists</h2><div class="night-artists-track" id="nightArtistsTrack"></div></section>
   <section class="night-venue" id="nightVenue"><h2>Venue &amp; seating</h2><p id="nightVenueCopy">2.1km • Raasta • Madhapur, Hyderabad</p><div class="night-seating-map" id="nightSeatingPlan" hidden></div><button type="button" onclick="openDirections()" aria-label="Get directions">↗</button></section>
   <a class="night-help" id="nightHelpLink" href="https://wa.me/919848047428?text=Hi%20CultureWave%2C%20I%20need%20help%20with%20this%20event." target="_blank" rel="noopener noreferrer" aria-label="Contact CultureWave support on WhatsApp"><i aria-hidden="true">◖</i><span>Have queries or need help with<br>something? Hit us up</span><b aria-hidden="true">›</b></a>
@@ -521,6 +521,7 @@
     <div class="mob-gallery-section" id="mobGallerySection" style="display:none;">
       <div class="mob-detail-heading">Photos &amp; videos</div>
       <div class="mob-gallery-grid" id="mobGalleryGrid"></div>
+      <div id="mobPromoVideo" style="display:none;margin-top:.75rem;"></div>
     </div>
 
     <!-- TICKETS -->
@@ -690,6 +691,16 @@ let ownerUid = null;
 let nightGalleryImages = [];
 
 function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function promoVideoMarkup(url){
+  const value=String(url||'').trim();
+  if(!value) return '';
+  const yt=value.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  const vi=value.match(/vimeo\.com\/(\d+)/);
+  if(yt) return `<iframe src="https://www.youtube.com/embed/${encodeURIComponent(yt[1])}" title="Event promo video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px;"></iframe>`;
+  if(vi) return `<iframe src="https://player.vimeo.com/video/${encodeURIComponent(vi[1])}" title="Event promo video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px;"></iframe>`;
+  if(/^https?:\/\//i.test(value)) return `<video src="${esc(value)}" controls playsinline preload="metadata" style="width:100%;max-height:520px;background:#000;border-radius:12px;"></video>`;
+  return '';
+}
 
 function toEventDate(value){
   if(!value) return null;
@@ -1126,6 +1137,12 @@ async function renderEvent(data){
   const gallery = Array.isArray(gallerySource) ? gallerySource.filter(Boolean) : [];
   const galleryImages = [...new Set([posterSrc, ...gallery].filter(Boolean))].slice(0, 8);
   nightGalleryImages = galleryImages;
+  const promoVideo = promoVideoMarkup(data.videoUrl);
+  for (const id of ['nightPromoVideo','mobPromoVideo']) {
+    const container=document.getElementById(id);
+    if(container){container.innerHTML=promoVideo;container.style.display=promoVideo?'':'none';}
+  }
+  if(promoVideo) document.getElementById('mobGallerySection').style.display='block';
   if(galleryImages.length){
     document.getElementById('mobGalleryGrid').innerHTML = galleryImages.map((src,index) =>
       `<img src="${esc(src)}" alt="${esc(data.name||'Event')} photo ${index+1}" loading="lazy"/>`

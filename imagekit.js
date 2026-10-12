@@ -43,6 +43,43 @@ async function uploadImageToImageKit(file, folder = '/event-covers') {
   return await uploadToCloudinary(file, folder);
 }
 
+async function uploadVideoToImageKit(file, folder = '/event-videos') {
+  if (!file || !file.type.startsWith('video/')) throw new Error('Choose a valid video file.');
+  if (file.size > 50 * 1024 * 1024) throw new Error('Video must be 50 MB or smaller.');
+
+  const isGitHubPages = window.location.hostname.endsWith('.github.io');
+  if (!isGitHubPages) {
+    try {
+      const authResponse = await fetch('/api/imagekit/auth');
+      if (authResponse.ok) {
+        const auth = await authResponse.json();
+        if (auth.token && auth.expire && auth.signature) {
+          const form = new FormData();
+          form.append('file', file);
+          form.append('fileName', `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '-')}`);
+          form.append('folder', folder);
+          form.append('publicKey', auth.publicKey);
+          form.append('token', auth.token);
+          form.append('expire', String(auth.expire));
+          form.append('signature', auth.signature);
+          const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', { method: 'POST', body: form });
+          const data = await response.json().catch(() => ({}));
+          if (response.ok && data.url) return data.url;
+        }
+      }
+    } catch (_) {}
+  }
+
+  const form = new FormData();
+  form.append('file', file);
+  form.append('upload_preset', 'culturewave_upload');
+  form.append('folder', 'event-videos');
+  const response = await fetch('https://api.cloudinary.com/v1_1/antkxxvq/video/upload', { method: 'POST', body: form });
+  const data = await response.json().catch(() => ({}));
+  if (response.ok && data.secure_url) return data.secure_url;
+  throw new Error(data.error?.message || `Video upload failed (${response.status}).`);
+}
+
 async function uploadToCloudinary(file, folder) {
   const CLOUD_NAME = 'antkxxvq';
   const UPLOAD_PRESET = 'culturewave_upload';
