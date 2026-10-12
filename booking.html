@@ -1621,23 +1621,32 @@ async function init(){
         }
         renderTicketPicker();
         if(resumeCheckout){
+          let draft=null;
+          const draftKey=`culturewave:checkout-draft:${eventId}`;
           try{
-            const draftKey=`culturewave:checkout-draft:${eventId}`;
-            const draft=JSON.parse(localStorage.getItem(draftKey)||'null');
-            if(draft&&Date.now()-Number(draft.savedAt||0)<30*60*1000){
-              document.getElementById('bookName').value=draft.name||'';
-              document.getElementById('bookPhone').value=draft.phone||'';
-              document.getElementById('bookEmail').value=draft.email||'';
-              pickerQuantities=tickets.map((_,index)=>Math.max(0,Number(draft.quantities?.[index]||0)));
-              selectedSeats=Array.isArray(draft.seats)?draft.seats.map(String):[];
-              selectedTicketIdx=Math.max(0,Number(draft.ticketIndex)||0);
-              localStorage.removeItem(draftKey);
-              renderTicketPicker();
-              document.getElementById('panel1').classList.remove('details-step');
-              document.getElementById('pickerBar').classList.remove('show');
-              goStep3();
-            }
+            draft=JSON.parse(localStorage.getItem(draftKey)||'null');
           }catch(resumeError){console.error('Could not resume checkout:',resumeError);}
+          if(draft&&Date.now()-Number(draft.savedAt||0)<30*60*1000){
+            document.getElementById('bookName').value=draft.name||'';
+            document.getElementById('bookPhone').value=draft.phone||'';
+            document.getElementById('bookEmail').value=draft.email||'';
+            pickerQuantities=tickets.map((_,index)=>Math.max(0,Number(draft.quantities?.[index]||0)));
+            selectedSeats=Array.isArray(draft.seats)?draft.seats.map(String):[];
+            selectedTicketIdx=Math.max(0,Number(draft.ticketIndex)||0);
+            localStorage.removeItem(draftKey);
+          }else{
+            const requestedTicket=tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase());
+            selectedTicketIdx=requestedTicket>=0?requestedTicket:0;
+            const defaultQuantity=tickets.length?Math.max(1,ticketMinRequired(tickets[selectedTicketIdx])):1;
+            pickerQuantities=tickets.map((_,index)=>index===selectedTicketIdx?defaultQuantity:0);
+            document.getElementById('bookName').value=bookingAuth.currentUser?.displayName||'';
+            document.getElementById('bookPhone').value=bookingAuth.currentUser?.phoneNumber||'';
+            document.getElementById('bookEmail').value=bookingAuth.currentUser?.email||'';
+          }
+          renderTicketPicker();
+          document.getElementById('panel1').classList.remove('details-step');
+          document.getElementById('pickerBar').classList.remove('show');
+          goStep3();
         }
         db.collection('events').doc(eventId).onSnapshot(liveSnap=>{
           if(!liveSnap.exists) return;
