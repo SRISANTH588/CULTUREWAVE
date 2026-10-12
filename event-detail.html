@@ -1065,6 +1065,11 @@ window.addEventListener('message',event=>{
   if(event.data?.type==='culturewave:close-booking-sheet')closeEventBookingSheet();
   if(event.data?.type==='culturewave:go-to-checkout'){
     const bookingUrl=new URL(document.getElementById('eventBookingFrame').src,location.href);
+    const draft=event.data.draft;
+    if(draft&&String(draft.eventId||'')===String(bookingUrl.searchParams.get('eventId')||'')){
+      try{localStorage.setItem(`culturewave:checkout-draft:${draft.eventId}`,JSON.stringify(draft));}
+      catch(error){console.error('Could not preserve checkout details:',error);return;}
+    }
     bookingUrl.searchParams.delete('embed');
     bookingUrl.searchParams.set('resume','1');
     location.href=`${bookingUrl.pathname}${bookingUrl.search}${bookingUrl.hash}`;

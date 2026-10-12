@@ -1031,13 +1031,10 @@ function continueToTicketSelection(){
     if(embeddedBooking){
       try{
         const selected=tickets[selectedTicketIdx]||{};
-        localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify({eventId,bookingSession,name,phone,email,quantities:pickerQuantities,selections:draftTicketSelections(),ticketName:String(selected.name||''),ticketPrice:Number(selected.price||0),seats:selectedSeats,ticketIndex:selectedTicketIdx,savedAt:Date.now()}));
+        const draft={eventId,bookingSession,name,phone,email,quantities:pickerQuantities,selections:draftTicketSelections(),ticketName:String(selected.name||''),ticketPrice:Number(selected.price||0),seats:selectedSeats,ticketIndex:selectedTicketIdx,savedAt:Date.now()};
+        localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify(draft));
+        window.parent.postMessage({type:'culturewave:go-to-checkout',draft},location.origin);
       }catch(_){showToast('Could not save your booking details. Please try again.');return;}
-      const checkoutUrl=new URL(location.href);
-      checkoutUrl.searchParams.delete('embed');
-      checkoutUrl.searchParams.set('resume','1');
-      try{window.parent.location.assign(`${checkoutUrl.pathname}${checkoutUrl.search}${checkoutUrl.hash}`);}
-      catch(_){window.parent.postMessage({type:'culturewave:go-to-checkout'},location.origin);}
       return;
     }
     document.getElementById('panel1').classList.remove('ticket-picker','details-step');
@@ -1203,7 +1200,8 @@ function updateBill(){
   const firstCoupon=eventCoupons()[0];
   const firstCouponValue=firstCoupon ? Number(firstCoupon.value??firstCoupon.discount??0) : 0;
   const firstCouponLabel=firstCoupon ? ((firstCoupon.type==='percent'||firstCoupon.type==='percentage') ? `Save ${firstCouponValue}% with ${firstCoupon.code||firstCoupon.couponCode}` : `Save ₹${firstCouponValue} with ${firstCoupon.code||firstCoupon.couponCode}`) : 'Add a coupon to save more';
-  document.getElementById("offerSaving").textContent = couponApplied ? `${couponApplied} applied` : firstCouponLabel;
+  const offerSaving=document.getElementById('offerSaving');
+  if(offerSaving)offerSaving.textContent=couponApplied?`${couponApplied} applied`:firstCouponLabel;
   const voucher=document.getElementById('checkoutVoucher');
   if(voucher){
     voucher.hidden=!firstCoupon;
