@@ -1009,6 +1009,8 @@ function register(){
   const tickets = Array.isArray(evData.tickets) && evData.tickets.length ? evData.tickets : [];
   const t = tickets[selectedTicketIndex] || tickets[0] || {};
   const price = Number(t.price || evData.price || 0);
+  const rawEventDate=evData.startDate||evData.date||(evData.eventDates||[])[0]?.date||'';
+  const eventDate=rawEventDate?.toDate?rawEventDate.toDate().toISOString():rawEventDate;
   const qs = new URLSearchParams({
     eventId,
     eventName: evData.name || '',
@@ -1017,6 +1019,9 @@ function register(){
     ticketName: t.name || 'General Admission',
     ticketPrice: String(price),
     eventPrice: String(Number(evData.price || 0)),
+    eventDate: String(eventDate),
+    eventTime: evData.startTime || evData.time || '',
+    posterUrl: evData.cardImgUrl || evData.coverUrl || '',
     seatingPlanUrl: evData.seatingPlanUrl || '',
     seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
   });

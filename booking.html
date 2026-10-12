@@ -563,6 +563,9 @@ const passedName = urlP.get("eventName") || "";
 const passedVenue = urlP.get("venueName") || "";
 const passedTicketName = urlP.get("ticketName") || "";
 const passedTicketPrice = Number(urlP.get("ticketPrice") || 0);
+const passedEventDate = urlP.get("eventDate") || "";
+const passedEventTime = urlP.get("eventTime") || "";
+const passedPosterUrl = urlP.get("posterUrl") || "";
 let passedSeatingPlanUrl = urlP.get("seatingPlanUrl") || "";
 let passedSeatingPlan = null;
 try { passedSeatingPlan = JSON.parse(urlP.get("seatingPlan") || "null"); } catch(_){}
@@ -1669,7 +1672,34 @@ async function init(){
       } else {
         document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">This event could not be found.</div>';
       }
-    }catch(e){ console.error(e); document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">Unable to load this event. Please try again.</div>'; }
+    }catch(e){
+      console.error('Event data or checkout setup failed:',e);
+      // The event page already has this public event and selected ticket. Use
+      // those URL details to render checkout if the iframe read/setup fails;
+      // submitBooking still rechecks the event with Firestore before payment.
+      evData={...evData,id:eventId,name:evData.name||passedName,venueName:evData.venueName||passedVenue,
+        date:evData.date||passedEventDate,startTime:evData.startTime||passedEventTime,
+        coverUrl:evData.coverUrl||passedPosterUrl,price:Number(evData.price||urlP.get('eventPrice')||passedTicketPrice)};
+      tickets=(Array.isArray(evData.tickets)?evData.tickets:[]).filter(ticket=>ticket&&typeof ticket==='object');
+      if(!tickets.length) tickets=[{name:passedTicketName||'General Admission',price:passedTicketPrice}];
+      pickerQuantities=tickets.map(()=>0);
+      const requestedTicket=tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase());
+      selectedTicketIdx=requestedTicket>=0?requestedTicket:0;
+      pickerQuantities[selectedTicketIdx]=Math.max(1,ticketMinRequired(tickets[selectedTicketIdx]));
+      document.getElementById('bookName').value=bookingAuth.currentUser?.displayName||'';
+      document.getElementById('bookPhone').value=bookingAuth.currentUser?.phoneNumber||'';
+      document.getElementById('bookEmail').value=bookingAuth.currentUser?.email||'';
+      try{renderTicketPicker();}catch(renderError){console.error('Could not render fallback ticket:',renderError);}
+      try{goStep3();}catch(checkoutError){
+        console.error('Could not fully render fallback checkout:',checkoutError);
+        document.getElementById('s3Event').textContent=evData.name||'Event booking';
+        document.getElementById('s3Ticket').textContent=selectedTicketLabel();
+        document.getElementById('checkoutDate').textContent=[passedEventDate,passedEventTime].filter(Boolean).join(' • ')||'Date & time TBA';
+        document.getElementById('checkoutLocation').textContent=passedVenue||'Event booking';
+        document.getElementById('submitBtn').textContent=passedTicketPrice?'Pay now ›':'Confirm booking ›';
+        goStep(3);
+      }
+    }
   } else {
     document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">Missing event link. Please open booking from an event page.</div>';
     return;
