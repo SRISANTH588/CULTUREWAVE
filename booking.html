@@ -911,17 +911,21 @@ function removeCheckoutSelection(){
   if(selectedTicketCount()<=1){returnToEventDetails();return;}
   openRemoveTicketSheet();
 }
-function openRemoveTicketSheet(){
+function renderRemoveTicketChoices(){
   const choices=document.getElementById('removeTicketChoices');
   const items=selectedTicketItems();
   choices.innerHTML=items.map(item=>{
     const name=escapeHtml(item.ticket.name||'Ticket');
     const lineTotal=groupTicketPrice(item.ticket,item.quantity)*item.quantity;
-    const actions=item.quantity>1&&ticketMinRequired(item.ticket)===1
-      ? `<button type="button" onclick="removeTicketFromCheckout(${item.index},false)" style="padding:.5rem .7rem;border:1px solid #4a4c53;border-radius:10px;background:#22242a;color:#f4f4f5;font-weight:800;">Remove 1</button><button type="button" onclick="removeTicketFromCheckout(${item.index},true)" style="padding:.5rem .7rem;border:0;border-radius:10px;background:#e34b3b;color:#fff;font-weight:800;">Remove all</button>`
+    const canRemoveOne=item.quantity>1&&ticketMinRequired(item.ticket)===1;
+    const actions=canRemoveOne
+      ? `<div style="display:flex;align-items:center;gap:.45rem;"><button type="button" aria-label="Remove one ${name}" onclick="removeTicketFromCheckout(${item.index},false)" style="width:36px;height:36px;border:1px solid #53555c;border-radius:10px;background:#24262b;color:#fff;font-size:1.2rem;font-weight:800;">−</button><strong aria-label="Quantity ${item.quantity}" style="min-width:1.4rem;text-align:center;color:#fff;">${item.quantity}</strong><button type="button" onclick="removeTicketFromCheckout(${item.index},true)" style="padding:.5rem .65rem;border:0;border-radius:10px;background:#e34b3b;color:#fff;font-weight:800;">Remove all</button></div>`
       : `<button type="button" onclick="removeTicketFromCheckout(${item.index},true)" style="padding:.5rem .8rem;border:0;border-radius:10px;background:#e34b3b;color:#fff;font-weight:800;">Remove ticket</button>`;
     return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.8rem 0;border-bottom:1px solid #383a40;"><div style="min-width:0;"><strong style="display:block;color:#f4f4f5;font-size:.87rem;">${name}</strong><small style="display:block;margin-top:.25rem;color:#aeb0b8;">${item.quantity} selected · ${fmt(lineTotal)}</small></div><div style="display:flex;gap:.45rem;flex:none;">${actions}</div></div>`;
   }).join('');
+}
+function openRemoveTicketSheet(){
+  renderRemoveTicketChoices();
   document.getElementById('removeTicketSheet').style.display='flex';
 }
 function closeRemoveTicketSheet(){document.getElementById('removeTicketSheet').style.display='none';}
@@ -936,11 +940,11 @@ function removeTicketFromCheckout(index,removeAll){
     if(nextIndex>=0)selectedTicketIdx=nextIndex;
   }
   if(selectedSeats.length>selectedTicketCount())selectedSeats=selectedSeats.slice(0,selectedTicketCount());
-  closeRemoveTicketSheet();
   renderTicketPicker();
   updatePickerBar();
   document.getElementById('s3Ticket').textContent=selectedTicketLabel();
   updateBill();
+  renderRemoveTicketChoices();
 }
 function returnToEventDetails(){
   closeRemoveTicketSheet();
