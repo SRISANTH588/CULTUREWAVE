@@ -232,7 +232,77 @@
     @media(max-width:380px){#pickerTicketList .bk-picker-ticket{grid-template-columns:minmax(0,1fr) 96px;gap:.65rem;}#pickerTicketList .bk-picker-add,#pickerTicketList .bk-picker-qty{height:44px;}}
     /* Keep iOS Safari from zooming the page when a small form field receives focus. */
     @media(max-width:768px){.bk-input input,.bk-input select,.bk-otp-wrap input,.bk-coupon-row input,#couponSheetInput{font-size:16px!important;}}
+    /* Checkout review layout based on the supplied mobile reference. */
+    @media(max-width:768px){
+    .bk-panel#panel3{background:#121315;min-height:100vh;padding-bottom:8.4rem;gap:0;color:#f5f5f6;}
+    .bk-panel#panel3 .bk-review-head{min-height:68px;padding:.8rem 1.2rem;background:#121315;border:0;}
+    .bk-panel#panel3 .bk-review-head h1{font-size:1rem;letter-spacing:-.02em;}
+    .bk-panel#panel3 .bk-review-head p{display:none;}
+    .checkout-expiry{height:38px;display:flex;align-items:center;justify-content:center;gap:.25rem;background:#242528;color:#d5d5d8;font-size:.78rem;}
+    .checkout-expiry strong{color:#54d898;font-variant-numeric:tabular-nums;}
+    .checkout-event{padding:1.1rem 1.2rem 1.2rem;}
+    .checkout-event-head{display:flex;align-items:center;gap:1rem;margin:0 0 1.1rem;min-width:0;}
+    .checkout-event-head img{width:90px;height:120px;flex:none;object-fit:cover;border-radius:12px;background:#25262a;}
+    .checkout-event-head img[src=""]{visibility:hidden;}
+    .checkout-event-head>div{min-width:0;}
+    .checkout-event h2{margin:0;color:#f5f5f6;font-size:1.08rem;font-weight:800;line-height:1.45;letter-spacing:-.03em;}
+    .checkout-event>div>p{margin:.35rem 0 0;color:#999ba2;font-size:.82rem;line-height:1.45;}
+    .checkout-ticket{padding:1rem;border:1px solid #36373b!important;border-radius:22px!important;background:#1d1e21!important;box-shadow:none!important;}
+    .checkout-ticket-top,.checkout-ticket-bottom{display:flex;align-items:center;justify-content:space-between;gap:.6rem;}
+    .checkout-ticket-top{padding-bottom:.9rem;border-bottom:1px solid #36373b;color:#f1f1f2;font-size:.83rem;}
+    .checkout-ticket-top span{color:#b2b3b8;white-space:nowrap;}
+    .checkout-ticket-bottom{margin-top:.85rem;color:#f0f0f1;font-size:.84rem;}
+    .checkout-ticket-bottom>span{flex:1;font-weight:800;line-height:1.45;}
+    .checkout-ticket-bottom>strong{font-size:.9rem;white-space:nowrap;}
+    .checkout-ticket-remove-row{display:flex;justify-content:flex-end;margin:.3rem 0 .8rem;}
+    .checkout-ticket-remove{padding:.2rem 0;border:0;border-bottom:1px dashed #85868c;background:none;color:#a9aab0;font-size:.72rem;}
+    .checkout-ticket-note{display:flex;align-items:center;gap:.7rem;padding-top:.8rem;border-top:1px solid #36373b;color:#d7d7da;font-size:.78rem;}
+    .checkout-ticket-note>span:first-child{color:#92949a;font-size:1.2rem;}
+    .checkout-voucher{display:flex;align-items:center;justify-content:space-between;margin:0 1.2rem 1.8rem;padding:1rem 1.1rem;border:1px solid #37383c;border-radius:22px;background:#1d1e21;}
+    .checkout-voucher[hidden]{display:none;}
+    .checkout-voucher>div{display:flex;flex-direction:column;align-items:flex-start;gap:.42rem;}
+    .checkout-voucher small{color:#c8b2ff;font-size:.68rem;}
+    .checkout-voucher strong{color:#f2f2f4;font-size:.9rem;}
+    .checkout-voucher button{padding:0;border:0;border-bottom:1px dashed #8b8c91;background:none;color:#a7a8ad;font-size:.74rem;}
+    .checkout-voucher-art{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f879b4,#8a1ab4 54%,#31214c);color:#fff;font-size:1.75rem;font-weight:900;transform:rotate(-12deg);}
+    .checkout-divider{display:flex;align-items:center;gap:.8rem;margin:0 1.2rem 1rem;color:#ededee;}
+    .checkout-divider span{height:1px;flex:1;background:#393a3e;}
+    .checkout-divider b{font-size:.69rem;font-weight:700;letter-spacing:.16em;white-space:nowrap;}
+    .checkout-offers-list{margin:0 1.2rem 2rem;padding:0 .9rem;border:1px solid #37383c;border-radius:22px;background:#1d1e21;}
+    .checkout-offer-row{width:100%;min-height:76px;display:grid;grid-template-columns:32px minmax(0,1fr) 18px;align-items:center;gap:.65rem;border:0;background:transparent;color:#f1f1f2;text-align:left;}
+    .checkout-offer-row+.checkout-offer-row{border-top:1px solid #38393d;}
+    .checkout-offer-row strong{font-size:.82rem;font-weight:800;}
+    .checkout-offer-row>span:last-child{font-size:1.4rem;font-weight:300;}
+    .checkout-offer-icon{width:28px;height:28px;display:grid;place-items:center;border:1.5px solid #e4e5e8;border-radius:9px;font-size:1rem;}
+    .checkout-payment-summary{padding:0 1.2rem 2rem;}
+    .checkout-payment-summary .checkout-bill{padding:.45rem 1rem;border-color:#37383c!important;border-radius:22px!important;background:#1d1e21!important;}
+    .checkout-payment-summary .bk-bill-row{min-height:48px;align-items:center;padding:.5rem 0;color:#dedee1!important;border:0!important;font-size:.82rem;}
+    .checkout-payment-summary .bk-bill-row span,.checkout-payment-summary .bk-bill-row strong{color:#dedee1!important;}
+    .checkout-payment-summary .checkout-order-row{min-height:58px;font-size:.9rem;font-weight:700;}
+    .checkout-payment-summary .checkout-order-row>span>span:first-child{margin-left:.25rem;color:#9fa0a6;font-size:1rem;}
+    .checkout-payment-summary .bk-bill-row.total{margin-top:.2rem;padding-top:.55rem;border-top:1px solid #38393d!important;font-size:.9rem;font-weight:800;}
+    .checkout-payment-summary .bk-bill-row.total strong{color:#fff!important;font-size:.95rem;}
+    .checkout-invoice{margin:0 1.2rem 1.7rem;padding:1rem;border:1px solid #37383c;border-radius:22px;background:#1d1e21;}
+    .checkout-invoice-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.55rem;color:#b4b5bb;}
+    .checkout-invoice-head>span{font-size:1.35rem;}
+    .checkout-invoice-head strong{flex:1;color:#f3f3f4;font-size:.86rem;}
+    .checkout-invoice-head button{border:0;background:none;color:#c3c4c8;font-size:.75rem;}
+    .checkout-invoice p{margin:.35rem 0 0 1.95rem;color:#a4a5ab;font-size:.78rem;overflow-wrap:anywhere;}
+    .checkout-invoice>small{display:block;margin-top:1rem;padding-top:.8rem;border-top:1px solid #37383c;color:#a4a5ab;font-size:.72rem;line-height:1.5;}
+    .bk-panel#panel3 .checkout-remember{margin:0 1.2rem 1rem;padding:1rem 0;border-color:#393a3e;}
+    .bk-panel#panel3 .bk-tc{margin:0 1.2rem 1rem;}
+    .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);align-items:center;gap:.7rem;margin:0;padding:.65rem 1.2rem calc(env(safe-area-inset-bottom) + .65rem);border-top:1px solid #38393d;background:#18191c;}
+    .checkout-pay-method{min-width:0;display:flex;flex-direction:column;gap:.2rem;}
+    .checkout-pay-method small{color:#a5a6ac;font-size:.52rem;font-weight:900;letter-spacing:.06em;}
+    .checkout-pay-method strong{color:#f0f0f1;font-size:.77rem;}
+    .checkout-pay-action{min-width:0;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.45rem .6rem .45rem .8rem;border-radius:15px;background:#f7f7f8;color:#161719;}
+    .checkout-pay-action>div{display:flex;flex-direction:column;gap:.05rem;}
+    .checkout-pay-action>div strong{font-size:.9rem;white-space:nowrap;}
+    .checkout-pay-action>div small{font-size:.65rem;}
+    .checkout-pay-action .bk-btn-next{width:auto!important;height:46px!important;min-height:46px!important;padding:0 .75rem;border-radius:12px;background:transparent!important;box-shadow:none!important;color:#161719;font-size:.87rem;font-weight:900;white-space:nowrap;}
     .bk-panel#panel3 .bk-btn-next{grid-column:1/-1!important;width:100%!important;justify-self:stretch!important;}
+    .bk-panel#panel3 .checkout-pay-action .bk-btn-next{grid-column:auto!important;width:auto!important;justify-self:auto!important;}
+    }
   </style>
 </head>
 <body>
@@ -320,9 +390,23 @@
 
       <!-- STEP 3: SUMMARY + COUPON + BILL -->
       <div class="bk-panel" id="panel3">
-        <header class="bk-review-head"><button class="bk-picker-back" type="button" onclick="returnToTicketPicker()" aria-label="Back">‹</button><div><h1>Checkout</h1><p id="reviewEventMeta">Review your booking</p></div></header>
-        <div class="checkout-event"><h2 id="s3Event">—</h2><p id="checkoutLocation">Review your booking</p><div class="checkout-ticket"><div class="checkout-ticket-top"><strong id="checkoutDate">—</strong><span id="s3Qty">1 ticket</span></div><div class="checkout-ticket-bottom"><span id="s3Ticket">—</span><div class="checkout-quantity"><button type="button" onclick="changePickerQty(selectedTicketIdx,-1)">−</button><b id="checkoutQty">1</b><button type="button" onclick="changePickerQty(selectedTicketIdx,1)">+</button></div><strong id="b_subtotal">₹0</strong></div></div></div>
-        <section class="checkout-section"><h3>Additional Offers</h3><button class="checkout-offer" type="button" onclick="openCouponSheet()"><div><strong>Apply coupon &amp; Bank Offers</strong><span id="offerSaving">Tap to view available offers</span></div><span class="checkout-chevron" style="font-size:1.4rem;color:#aeb0b7;">›</span></button></section>
+        <header class="bk-review-head"><button class="bk-picker-back" type="button" onclick="returnToTicketPicker()" aria-label="Back">‹</button><div><h1>Review your booking</h1><p id="reviewEventMeta">Review your booking</p></div></header>
+        <div class="checkout-expiry" aria-live="off">Complete your booking in <strong id="checkoutCountdown">10:00</strong> mins</div>
+        <div class="checkout-event">
+          <div class="checkout-event-head"><img id="checkoutPoster" alt="Event poster"/><div><h2 id="s3Event">—</h2><p id="checkoutLocation">Review your booking</p></div></div>
+          <div class="checkout-ticket">
+            <div class="checkout-ticket-top"><strong id="checkoutDate">—</strong><span id="s3Qty">1 ticket</span></div>
+            <div class="checkout-ticket-bottom"><span id="s3Ticket">—</span><strong id="b_subtotal">₹0</strong><span id="checkoutQty" hidden>1</span></div>
+            <div class="checkout-ticket-remove-row"><button class="checkout-ticket-remove" type="button" onclick="removeCheckoutSelection()">Remove</button></div>
+            <div class="checkout-ticket-note"><span aria-hidden="true">▣</span><span>M-Ticket: Entry using the QR code on your ticket</span></div>
+          </div>
+        </div>
+        <section class="checkout-voucher" id="checkoutVoucher" hidden><div><small id="checkoutVoucherStatus">Offer available</small><strong id="checkoutVoucherTitle">Event offer</strong><button type="button" onclick="openCouponSheet()">Know more</button></div><span aria-hidden="true" class="checkout-voucher-art">₹</span></section>
+        <div class="checkout-divider"><span></span><b>OFFERS</b><span></span></div>
+        <section class="checkout-offers-list">
+          <button type="button" class="checkout-offer-row" onclick="openCouponSheet()"><span class="checkout-offer-icon" aria-hidden="true">%</span><strong>View all event offers</strong><span aria-hidden="true">›</span></button>
+          <button type="button" class="checkout-offer-row" onclick="showPaymentOfferInfo()"><span class="checkout-offer-icon" aria-hidden="true">▱</span><strong>View all payment offers</strong><span aria-hidden="true">›</span></button>
+        </section>
 
       <!-- COUPON FULL-SCREEN SHEET -->
       <div id="couponSheet" style="display:none;position:fixed;inset:0;z-index:100;background:#0a0c12;overflow-y:auto;padding:0 0 3rem;">
@@ -340,12 +424,16 @@
         <div style="padding:.5rem 1.2rem .3rem;font-size:.78rem;font-weight:900;color:#e5e7eb;">More offers</div>
         <div id="couponSheetList" style="padding:0 1.2rem;"></div>
       </div>
-        <section class="checkout-section"><h3>Bill Details</h3><div class="bk-bill checkout-bill"><div class="bk-bill-row"><span id="b_price">Ticket</span><span id="checkoutTicketTotal">₹0</span></div><div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div><div class="bk-bill-row"><span>Booking fee</span><span id="b_fee">₹0</span></div><div class="bk-bill-row total"><span>To Pay</span><strong id="b_total">₹0</strong></div></div></section>
+        <div class="checkout-divider"><span></span><b>PAYMENT SUMMARY</b><span></span></div>
+        <section class="checkout-section checkout-payment-summary"><div class="bk-bill checkout-bill"><div class="bk-bill-row checkout-order-row"><span>Order amount <span aria-hidden="true">⌄</span><span id="b_price" hidden>Ticket</span></span><strong id="checkoutTicketTotal">₹0</strong></div><div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div><div class="bk-bill-row"><span>Fees and charges</span><span id="b_fee">₹0</span></div><div class="bk-bill-row total"><span>Grand Total</span><strong id="b_total">₹0</strong></div></div></section>
+        <div class="checkout-divider"><span></span><b>INVOICE DETAILS</b><span></span></div>
+        <section class="checkout-invoice"><div class="checkout-invoice-head"><span aria-hidden="true">♙</span><strong id="checkoutInvoiceName">Guest</strong><button type="button" onclick="editCheckoutDetails()">Edit&nbsp; ›</button></div><p id="checkoutInvoicePhone"></p><p id="checkoutInvoiceEmail"></p><small>Information above will be used for generating the invoice and sending out the tickets.</small></section>
         <details class="checkout-remember"><summary>Things to remember</summary><p>Your ticket will be confirmed after successful payment. Please carry a valid ID to the venue.</p></details>
         <div class="bk-tc"><input type="checkbox" id="tcCheck"/><label for="tcCheck">I agree to the <a href="terms-and-conditions.html" target="_blank">Terms &amp; Conditions</a> and <a href="refund-policy.html" target="_blank">Refund Policy</a>.</label></div>
         <div class="bk-nav">
           <button class="bk-btn-back" onclick="returnToTicketPicker()">← Back</button>
-          <button class="bk-btn-next" id="submitBtn" onclick="submitBooking()">Pay ₹0</button>
+          <div class="checkout-pay-method"><small>SECURE ONLINE PAYMENT</small><strong>Choose payment method</strong></div>
+          <div class="checkout-pay-action"><div><strong id="checkoutGrandTotal">₹0</strong><small>Total</small></div><button class="bk-btn-next" id="submitBtn" onclick="submitBooking()">Pay now&nbsp; ›</button></div>
         </div>
       </div>
 
@@ -442,6 +530,8 @@ let generatedOtp = "";
 let selectedSeats = [];
 let bookedSeats = [];
 let pickerQuantities = [];
+let checkoutCountdownEndsAt = 0;
+let checkoutCountdownTimer = null;
 const razorpayFunctionsUrl='https://culturewave-razorpay.culturewaveindia.workers.dev';
 try{localStorage.removeItem('culturewave:preferred-payment-method');}catch(_){ }
 const inviteTokenParam = urlP.get('inviteToken') || '';
@@ -607,6 +697,32 @@ function groupTicketHint(ticket){
 function selectedTicketCount(){ return selectedTicketItems().reduce((sum,item)=>sum+item.quantity,0); }
 function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+groupTicketPrice(item.ticket,item.quantity)*item.quantity,0); }
 function selectedTicketLabel(){ return selectedTicketItems().map(item=>{ const isGroup=ticketMinRequired(item.ticket)>1&&item.quantity>=ticketMinRequired(item.ticket); return isGroup?`${item.ticket.name||'Ticket'} (group of ${item.quantity})`:`${item.ticket.name||'Ticket'} × ${item.quantity}`; }).join(', '); }
+function startCheckoutCountdown(){
+  if(!checkoutCountdownEndsAt) checkoutCountdownEndsAt=Date.now()+10*60*1000;
+  const update=()=>{
+    const seconds=Math.max(0,Math.ceil((checkoutCountdownEndsAt-Date.now())/1000));
+    const timer=document.getElementById('checkoutCountdown');
+    if(timer)timer.textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+    if(seconds===0&&checkoutCountdownTimer){clearInterval(checkoutCountdownTimer);checkoutCountdownTimer=null;}
+  };
+  update();
+  if(!checkoutCountdownTimer)checkoutCountdownTimer=setInterval(update,1000);
+}
+function showPaymentOfferInfo(){showToast('Available payment offers appear in the secure payment window.');}
+function removeCheckoutSelection(){
+  const index=selectedTicketIdx;
+  const quantity=pickerQuantities[index]||0;
+  if(quantity)changePickerQty(index,-quantity);
+  selectedSeats=[];
+  returnToTicketPicker();
+}
+function editCheckoutDetails(){
+  document.getElementById('panel1').classList.remove('ticket-picker');
+  goStep(1);
+  document.getElementById('guestContactCard').style.display='';
+  document.getElementById('ticketSelectionSheet').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 function eventCoupons(){
   const source=evData.coupons || evData.discountCoupons || evData.offers || evData.couponCodes || evData.promos || [];
   return Array.isArray(source) ? source.filter(c=>c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0) : [];
@@ -800,6 +916,8 @@ function goStep3(){
     showToast("Please select at least one seat"); return;
   }
   document.getElementById("s3Event").textContent = evData.name||passedName||"—";
+  const poster=document.getElementById('checkoutPoster');
+  if(poster){poster.src=evData.cardImgUrl||evData.coverUrl||'';poster.alt=`${evData.name||'Event'} poster`;}
   document.getElementById("s3Ticket").textContent = selectedTicketLabel();
   document.getElementById("s3Qty").textContent = selectedTicketCount();
   const eventDate = eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date);
@@ -808,6 +926,10 @@ function goStep3(){
   document.getElementById('reviewEventMeta').textContent = [dateLabel, locationLabel].filter(Boolean).join('  ·  ') || 'Review your booking';
   document.getElementById('checkoutLocation').textContent = locationLabel || 'Event booking';
   document.getElementById('checkoutDate').textContent = [dateLabel, eventStartTime()].filter(Boolean).join(' • ') || 'Date & time TBA';
+  document.getElementById('checkoutInvoiceName').textContent=document.getElementById('bookName').value.trim()||'Guest';
+  document.getElementById('checkoutInvoicePhone').textContent=document.getElementById('bookPhone').value.trim();
+  document.getElementById('checkoutInvoiceEmail').textContent=document.getElementById('bookEmail').value.trim();
+  startCheckoutCountdown();
   updateBill();
   goStep(3);
 }
@@ -823,17 +945,29 @@ function updateBill(){
   document.getElementById("checkoutTicketTotal").textContent = fmt(subtotal);
   document.getElementById("checkoutQty").textContent = selectedTicketCount();
   document.getElementById("s3Qty").textContent = `${selectedTicketCount()} ticket${selectedTicketCount()===1?'':'s'}`;
-  document.getElementById("submitBtn").textContent = total ? `Pay ${fmt(total)}` : "Confirm booking";
+  document.getElementById("submitBtn").textContent = total ? "Pay now ›" : "Confirm booking ›";
   const firstCoupon=eventCoupons()[0];
   const firstCouponValue=firstCoupon ? Number(firstCoupon.value??firstCoupon.discount??0) : 0;
   const firstCouponLabel=firstCoupon ? ((firstCoupon.type==='percent'||firstCoupon.type==='percentage') ? `Save ${firstCouponValue}% with ${firstCoupon.code||firstCoupon.couponCode}` : `Save ₹${firstCouponValue} with ${firstCoupon.code||firstCoupon.couponCode}`) : 'Add a coupon to save more';
   document.getElementById("offerSaving").textContent = couponApplied ? `${couponApplied} applied` : firstCouponLabel;
+  const voucher=document.getElementById('checkoutVoucher');
+  if(voucher){
+    voucher.hidden=!firstCoupon;
+    if(firstCoupon){
+      const value=Number(firstCoupon.value??firstCoupon.discount??firstCoupon.amount??firstCoupon.off??0);
+      const code=firstCoupon.code||firstCoupon.couponCode||firstCoupon.promoCode||'';
+      const isPercent=firstCoupon.type==='percent'||firstCoupon.type==='percentage';
+      document.getElementById('checkoutVoucherStatus').textContent=couponApplied?'Voucher added!':'Voucher available';
+      document.getElementById('checkoutVoucherTitle').textContent=firstCoupon.title||firstCoupon.name||`${isPercent?`${value}% off`:`Flat ${fmt(value)} off`}${code?` with ${code}`:''}`;
+    }
+  }
   if(discountAmt > 0){
     document.getElementById("b_discountRow").style.display = "";
     document.getElementById("b_discount").textContent = "-"+fmt(discountAmt);
   }
   document.getElementById("b_fee").textContent = fee ? fmt(fee) : "₹0";
   document.getElementById("b_total").textContent = total ? fmt(total) : "Free";
+  document.getElementById("checkoutGrandTotal").textContent = total ? fmt(total) : "Free";
   document.getElementById("rTotal").textContent = total ? fmt(total) : "Free";
 }
 
