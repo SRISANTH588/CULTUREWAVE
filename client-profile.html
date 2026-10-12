@@ -256,6 +256,11 @@ let myUid = null;
 let targetProfileUid = null;
 
 function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function slugifyEventName(name){ return String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event'; }
+function getProfileEventUrl(ev){
+  const handle=String(profileData.handle||targetHandle||'').trim().toLowerCase();
+  return handle ? `/${encodeURIComponent(handle)}/${encodeURIComponent(slugifyEventName(ev.name))}` : `event-detail.html?eventId=${encodeURIComponent(ev.id)}`;
+}
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -342,7 +347,7 @@ function renderEvents(events){
     const norm = (ev.status||'draft').toLowerCase();
     const badge = norm==='published' ? `<span class="ev-status live">LIVE</span>` : '';
     return `
-    <div class="ev-card" onclick="location.href='event-detail.html?eventId=${ev.id}'">
+    <div class="ev-card" onclick="location.href='${getProfileEventUrl(ev)}'">
       <div class="ev-cover" style="background:${grad};">
         ${cover ? `<img src="${cover}" alt="${esc(ev.name)}" loading="lazy"/>` : `<div class="ev-cover-placeholder">🎉</div>`}
         ${badge}
@@ -353,7 +358,7 @@ function renderEvents(events){
         <div class="ev-loc">📍 ${esc(ev.venueName||ev.city||'Venue TBA')}</div>
         <div class="ev-footer">
           <div class="ev-price">${priceStr}</div>
-          <button class="ev-cta" onclick="event.stopPropagation();location.href='event-detail.html?eventId=${ev.id}'">View →</button>
+          <button class="ev-cta" onclick="event.stopPropagation();location.href='${getProfileEventUrl(ev)}'">View →</button>
         </div>
       </div>
     </div>`;

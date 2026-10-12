@@ -665,6 +665,8 @@ async function getCurrentUser() {
 }
 
 const params = new URLSearchParams(location.search);
+const eventPathParts = location.pathname.split('/').filter(Boolean).map(part => { try { return decodeURIComponent(part); } catch (_) { return part; } });
+const eventSlug = eventPathParts[0] === 'event' ? (eventPathParts[1] || '') : eventPathParts.length === 2 ? eventPathParts[1] : '';
 const eventId = params.get('eventId');
 const eventSource = params.get('source');
 const sourceBackUrl = (() => {
@@ -716,7 +718,17 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'), 2500);
 }
 
-function getShareUrl(){ return `${location.origin}/event-detail.html?eventId=${eventId}`; }
+function slugifyEventName(name){
+  return String(name || 'event').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'event';
+}
+function getEventPath(name){
+  const slug = encodeURIComponent(slugifyEventName(name));
+  return eventPathParts.length === 2
+    ? `/${encodeURIComponent(eventPathParts[0])}/${slug}`
+    : `/event/${slug}`;
+}
+function getPublicEventUrl(data=evData){ return `${location.origin}/event/${encodeURIComponent(slugifyEventName(data.name))}`; }
+function getShareUrl(){ return getPublicEventUrl(); }
 
 function openShare(){
   if(evData.allowSharing===false) return;
@@ -1011,8 +1023,7 @@ async function renderEvent(data){
     }
     element.setAttribute(attribute, value);
   };
-  const eventCanonical = new URL(location.pathname, location.origin);
-  if (eventId) eventCanonical.searchParams.set('eventId', eventId);
+  const eventCanonical = new URL(`/event/${encodeURIComponent(slugifyEventName(data.name))}`, location.origin);
   let canonicalLink = document.head.querySelector('link[rel="canonical"]');
   if (!canonicalLink) {
     canonicalLink = document.createElement('link');
@@ -1400,7 +1411,24 @@ async function showFoodOrderingForEvent(data) {
 }
 
 async function init(){
-  if(!eventId){
+  let resolvedEventId = eventId;
+  if (resolvedEventId && eventSlug) {
+    const byId = await db.collection('events').doc(resolvedEventId).get();
+    if (byId.exists && slugifyEventName(byId.data().name) !== eventSlug) {
+      history.replaceState(null, '', getEventPath(byId.data().name));
+    }
+  }
+  if (!resolvedEventId && eventSlug) {
+    const matches = await db.collection('events').where('slug', '==', eventSlug).limit(1).get();
+    if (!matches.empty) resolvedEventId = matches.docs[0].id;
+    if (!resolvedEventId) {
+      const allEvents = await db.collection('events').get();
+      const matchingEvent = allEvents.docs.find(doc => slugifyEventName(doc.data().name) === eventSlug);
+      if (matchingEvent) resolvedEventId = matchingEvent.id;
+    }
+  }
+  if(!resolvedEventId){
+    if (eventSlug) { document.getElementById('evTitle').textContent='Event not found'; return; }
     await renderEvent({name:'THURSDAY AFRO HOUSE AT RAASTA',summary:'Afro House Takeover · DJ RAM DASARP',description:"Turn your night into a full blown vibe as DJ Ram Dasarp takes over with an electrifying Afro House set designed to keep you moving. This is more than a party - it's an immersive escape where rhythm, mood and atmosphere fuse to create something unforgettable. Step into a darker, edgier space where deep beats and hypnotic grooves drive the floor into a trance. From Afro House grooves to late-night energy, every moment is made for the dancefloor.",venueName:'Raasta',city:'Madhapur, Hyderabad',startDate:new Date('2026-09-17'),dateLabel:'17th Sep - 24th Sep',dateMore:'+1 more',duration:180,price:1000,cardImgUrl:'party.jpg',galleryImages:['party.jpg','y.jpg','banner.jpeg','herosection.jpeg'],tickets:[{name:'General Admission',price:1000}]});
     return;
   }
@@ -1412,13 +1440,16 @@ async function init(){
     if(user){ myUid = user.uid; }
   }catch(e){}
 
-  const snap = await db.collection('events').doc(eventId).get();
+  const snap = await db.collection('events').doc(resolvedEventId).get();
   if(!snap.exists){ document.getElementById('evTitle').textContent='Event not found'; return; }
 
   const data = {id:snap.id,...snap.data()};
+  if (!eventSlug || eventSlug !== slugifyEventName(data.name)) {
+    history.replaceState(null, '', getEventPath(data.name));
+  }
   await renderEvent(data);
 
-  db.collection('events').doc(eventId).onSnapshot(liveSnap=>{
+  db.collection('events').doc(resolvedEventId).onSnapshot(liveSnap=>{
     if(!liveSnap.exists) return;
     const liveData = liveSnap.data();
     evData={...evData,...liveData};

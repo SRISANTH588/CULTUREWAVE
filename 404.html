@@ -9,9 +9,21 @@
   <p id="message">Opening profile…</p>
   <script>
     const parts = location.pathname.split('/').filter(Boolean);
-    const slug = decodeURIComponent(parts.pop() || '').trim().toLowerCase();
-    const basePath = parts.length ? `/${parts.join('/')}/` : '/';
-    if (/^[a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?$/.test(slug)) {
+    const decodePart = value => { try { return decodeURIComponent(value || '').trim().toLowerCase(); } catch (_) { return ''; } };
+    const slug = decodePart(parts[parts.length - 1]);
+    const basePath = parts.length > 1 ? `/${parts.slice(0, -1).join('/')}/` : '/';
+    if (parts.length === 2 && /^[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?$/.test(slug)) {
+      fetch('/event-detail.html')
+        .then(response => {
+          if (!response.ok) throw new Error('Event page could not be loaded.');
+          return response.text();
+        })
+        .then(html => { document.open(); document.write(html); document.close(); })
+        .catch(() => {
+          document.title = 'Page not found | CultureWave';
+          document.getElementById('message').textContent = 'Event page could not be loaded.';
+        });
+    } else if (parts.length === 1 && /^[a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?$/.test(slug)) {
       fetch(`${basePath}client-profile.html`)
         .then(response => {
           if (!response.ok) throw new Error('Profile page could not be loaded.');

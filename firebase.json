@@ -10,5 +10,12 @@
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { "source": "/event/**", "destination": "/event-detail.html" }
+    ]
   }
 }
