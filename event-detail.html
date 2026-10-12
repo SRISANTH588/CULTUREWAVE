@@ -103,6 +103,10 @@
     /* SHARE MODAL */
     .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;place-items:center;z-index:50;padding:1rem;backdrop-filter:blur(4px);}
     .modal-bg.open{display:grid;}
+    .event-booking-modal{position:fixed;z-index:120;inset:0;display:none;background:transparent;}
+    .event-booking-modal.open{display:block;}
+    .event-booking-modal iframe{display:block;width:100%;height:100%;height:100dvh;border:0;background:transparent;}
+    body.event-booking-open{overflow:hidden;}
     #galleryLightbox{position:fixed;place-items:center;background:rgba(0,0,0,.9);padding:1rem;}
     #galleryLightbox img{max-width:94vw;max-height:88vh;border-radius:18px;object-fit:contain;}
     #galleryLightbox button{position:absolute;top:18px;right:18px;z-index:2;width:42px;height:42px;border:0;border-radius:50%;background:#17191f;color:#fff;font-size:26px;}
@@ -611,6 +615,8 @@
   <button class="mob-reg-btn" onclick="register()">Book tickets</button>
 </div>
 
+<div class="event-booking-modal" id="eventBookingModal" aria-hidden="true"><iframe id="eventBookingFrame" title="Book event tickets" allowtransparency="true"></iframe></div>
+
 <!-- SHARE MODAL -->
 <div class="modal-bg" id="galleryLightbox" onclick="if(event.target===this)closeNightLightbox()"><button aria-label="Close gallery" onclick="closeNightLightbox()">×</button><img id="galleryLightboxImage" alt="Event gallery image"/></div>
 <div class="modal-bg" id="shareModal">
@@ -1014,8 +1020,44 @@ function register(){
     seatingPlanUrl: evData.seatingPlanUrl || '',
     seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
   });
-  location.href = `/booking.html?${qs.toString()}`;
+  const bookingUrl = `/booking.html?${qs.toString()}`;
+  if(window.matchMedia('(max-width: 768px)').matches){
+    openEventBookingSheet(bookingUrl);
+    return;
+  }
+  location.href = bookingUrl;
 }
+
+function openEventBookingSheet(url){
+  const modal=document.getElementById('eventBookingModal');
+  const frame=document.getElementById('eventBookingFrame');
+  if(!modal||!frame){location.href=url;return;}
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  document.body.classList.add('event-booking-open');
+  frame.src=`${url}${url.includes('?')?'&':'?'}embed=1`;
+}
+
+function closeEventBookingSheet(){
+  const modal=document.getElementById('eventBookingModal');
+  const frame=document.getElementById('eventBookingFrame');
+  if(!modal)return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('event-booking-open');
+  if(frame)frame.src='about:blank';
+}
+
+window.addEventListener('message',event=>{
+  if(event.origin!==location.origin||event.source!==document.getElementById('eventBookingFrame')?.contentWindow)return;
+  if(event.data?.type==='culturewave:close-booking-sheet')closeEventBookingSheet();
+  if(event.data?.type==='culturewave:go-to-checkout'){
+    const bookingUrl=new URL(document.getElementById('eventBookingFrame').src,location.href);
+    bookingUrl.searchParams.delete('embed');
+    bookingUrl.searchParams.set('resume','1');
+    location.href=`${bookingUrl.pathname}${bookingUrl.search}${bookingUrl.hash}`;
+  }
+});
 
 function updateRegistrationStatus(data){
   const soldOut=eventIsSoldOut(data);
