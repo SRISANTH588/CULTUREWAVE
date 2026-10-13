@@ -1064,7 +1064,7 @@ function updatePickerBar(){
   const total=pickerQuantities.reduce((sum,value,index)=>sum+groupTicketPrice(tickets[index],value)*value,0);
   document.getElementById('pickerCount').textContent=`${count} ticket${count===1?'':'s'}`;
   document.getElementById('pickerTotal').textContent=fmt(total);
-  const isMobileSheet=window.matchMedia('(max-width: 768px)').matches&&document.getElementById('panel1').classList.contains('active');
+  const isMobileSheet=(embeddedBooking||window.matchMedia('(max-width: 768px)').matches)&&document.getElementById('panel1').classList.contains('active');
   document.getElementById('pickerBar').classList.toggle('show',count>0||isMobileSheet);
   const seatSection=document.querySelector('.picker-seat-section');
   if(seatSection) seatSection.style.display=count ? '' : 'none';
@@ -1082,7 +1082,7 @@ function showBookingDetails(){
   const hasSeating = document.getElementById('seatingWrap').style.display !== 'none';
   const isImagePlan = hasSeating && document.querySelector('#seatingContainer img');
   const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
-  if(window.matchMedia('(max-width: 768px)').matches){
+  if(embeddedBooking||window.matchMedia('(max-width: 768px)').matches){
     const panel=document.getElementById('panel1');
     panel.classList.add('details-step');
     document.getElementById('guestContactCard').style.display='';
@@ -1112,7 +1112,7 @@ function continueToTicketSelection(){
   if(!name){showToast('Enter your full name');return;}
   if(phone.replace(/\D/g,'').length<10){showToast('Enter a valid phone number');return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Enter a valid email address');return;}
-  if(window.matchMedia('(max-width: 768px)').matches&&document.getElementById('panel1').classList.contains('details-step')){
+  if((embeddedBooking||window.matchMedia('(max-width: 768px)').matches)&&document.getElementById('panel1').classList.contains('details-step')){
     const hasSelectableSeatMap=evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections));
     if(hasSelectableSeatMap&&selectedSeats.length!==selectedTicketCount()){
       backToTicketSelection();
@@ -1823,7 +1823,7 @@ function toggleSeat(seatId, sofa){
 
 // ── INIT ──
 async function init(){
-  const mobileBookingSheet=window.matchMedia('(max-width: 768px)').matches;
+  const mobileBookingSheet=embeddedBooking||window.matchMedia('(max-width: 768px)').matches;
   document.getElementById('panel1').classList.add('ticket-picker');
   document.getElementById('guestContactCard').style.display=mobileBookingSheet?'none':'';
   document.getElementById('ticketSelectionSheet').style.display=mobileBookingSheet?'block':'none';

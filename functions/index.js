@@ -22,6 +22,10 @@ function sendEmail(templateId, templateParams) {
     }),
   });
 }
+function slugifyEventName(name) {
+  return String(name || 'event').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'event';
+}
 
 exports.updateOrganiserFollowerCount = onDocumentCreated({
   document: 'users/{userId}/following/{organiserId}',
@@ -59,7 +63,7 @@ exports.emailFollowersAboutNewEvent = onDocumentCreated({
   const userIds = [...new Set(followers.docs.map((doc) => doc.ref.parent.parent.id))];
   const users = await Promise.all(userIds.map((uid) => db.collection('users').doc(uid).get()));
   const eventName = data.name || data.title || 'New event';
-  const eventUrl = `https://culturewave.in/event-detail.html?eventId=${encodeURIComponent(event.params.eventId)}`;
+  const eventUrl = `https://culturewave.in/event/${encodeURIComponent(slugifyEventName(eventName))}`;
   for (const user of users) {
     const email = user.data()?.email;
     if (!email) continue;
@@ -126,7 +130,7 @@ exports.notifyWaitlistWhenSpotsOpen = onDocumentUpdated({
 
   const templateId = waitlistTemplateId.value();
   const eventName = after.name || 'Event';
-  const bookingUrl = `https://srisanth588.github.io/CULTUREWAVE/event-detail.html?eventId=${encodeURIComponent(change.params.eventId)}`;
+  const bookingUrl = `https://culturewave.in/event/${encodeURIComponent(slugifyEventName(eventName))}`;
   for (const [index, entry] of waiting.docs.entries()) {
     const attendee = entry.data();
     if (!attendee.email) {

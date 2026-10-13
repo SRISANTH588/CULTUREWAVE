@@ -259,9 +259,8 @@ function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function slugifyEventName(name){ return String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event'; }
 function getProfileEventUrl(ev){
   const handle=String(profileData.handle||targetHandle||'').trim().toLowerCase();
-  const eventId=String(ev.id||'').trim();
-  const eventUrl=handle ? `/${encodeURIComponent(handle)}/${encodeURIComponent(slugifyEventName(ev.name))}` : 'event-detail.html';
-  return `${eventUrl}${eventId?`?eventId=${encodeURIComponent(eventId)}`:''}`;
+  const eventSlug=encodeURIComponent(slugifyEventName(ev.name));
+  return handle ? `/${encodeURIComponent(handle)}/${eventSlug}` : `/event/${eventSlug}`;
 }
 
 function showToast(msg){

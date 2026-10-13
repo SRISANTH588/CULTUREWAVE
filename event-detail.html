@@ -316,7 +316,7 @@
       .mob-event-header,.mob-detail-tabs,.nightlife-mobile{width:min(1120px,calc(100% - 2rem));margin-left:auto;margin-right:auto;}
       .nightlife-mobile{padding-left:0;padding-right:0;}
       .mob-event-header{padding-left:0;padding-right:0;}
-      .mob-detail-tabs{position:static!important;top:auto!important;}
+      .mob-detail-tabs{position:static!important;top:auto!important;margin:0 auto 1.2rem!important;}
       .mob-detail-tabs-spacer{display:none;}
       .mob-event-header{padding-bottom:1rem;}
       .mob-event-title{font-size:2.5rem;line-height:1.08;letter-spacing:.015em;}
@@ -744,17 +744,16 @@ function showToast(msg){
 function slugifyEventName(name){
   return String(name || 'event').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'event';
 }
-function getEventPath(name,id=eventId){
+function getEventPath(name){
   const slug = encodeURIComponent(slugifyEventName(name));
   const path = eventPathParts.length === 2
     ? `/${encodeURIComponent(eventPathParts[0])}/${slug}`
     : `/event/${slug}`;
-  return id ? `${path}?eventId=${encodeURIComponent(id)}` : path;
+  return path;
 }
 function getPublicEventUrl(data=evData){
   const path=`/event/${encodeURIComponent(slugifyEventName(data.name))}`;
-  const id=data.id||eventId;
-  return `${location.origin}${id?`${path}?eventId=${encodeURIComponent(id)}`:path}`;
+  return `${location.origin}${path}`;
 }
 function getShareUrl(){ return getPublicEventUrl(); }
 
@@ -1045,11 +1044,7 @@ function register(){
     seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
   });
   const bookingUrl = `/booking.html?${qs.toString()}`;
-  if(window.matchMedia('(max-width: 768px)').matches){
-    openEventBookingSheet(bookingUrl);
-    return;
-  }
-  location.href = bookingUrl;
+  openEventBookingSheet(bookingUrl);
 }
 
 function openEventBookingSheet(url){
@@ -1517,7 +1512,7 @@ async function init(){
   if (resolvedEventId && eventSlug) {
     const byId = await db.collection('events').doc(resolvedEventId).get();
     if (byId.exists && slugifyEventName(byId.data().name) !== eventSlug) {
-      history.replaceState(null, '', getEventPath(byId.data().name,resolvedEventId));
+      history.replaceState(null, '', getEventPath(byId.data().name));
     }
   }
   if (!resolvedEventId && eventSlug) {
@@ -1548,7 +1543,7 @@ async function init(){
   eventId = resolvedEventId;
   const data = {id:snap.id,...snap.data()};
   if (!eventSlug || eventSlug !== slugifyEventName(data.name)) {
-    history.replaceState(null, '', getEventPath(data.name,resolvedEventId));
+    history.replaceState(null, '', getEventPath(data.name));
   }
   await renderEvent(data);
 
