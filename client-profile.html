@@ -259,7 +259,7 @@ function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function slugifyEventName(name){ return String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event'; }
 function getProfileEventUrl(ev){
   const handle=String(profileData.handle||targetHandle||'').trim().toLowerCase();
-  const eventSlug=encodeURIComponent(slugifyEventName(ev.name));
+  const eventSlug=encodeURIComponent(slugifyEventName(ev.urlKey||ev.name));
   return handle ? `/${encodeURIComponent(handle)}/${eventSlug}` : `/event/${eventSlug}`;
 }
 

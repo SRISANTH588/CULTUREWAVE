@@ -63,7 +63,7 @@ exports.emailFollowersAboutNewEvent = onDocumentCreated({
   const userIds = [...new Set(followers.docs.map((doc) => doc.ref.parent.parent.id))];
   const users = await Promise.all(userIds.map((uid) => db.collection('users').doc(uid).get()));
   const eventName = data.name || data.title || 'New event';
-  const eventUrl = `https://culturewave.in/event/${encodeURIComponent(slugifyEventName(eventName))}`;
+  const eventUrl = `https://culturewave.in/event/${encodeURIComponent(slugifyEventName(data.urlKey||eventName))}`;
   for (const user of users) {
     const email = user.data()?.email;
     if (!email) continue;
@@ -130,7 +130,7 @@ exports.notifyWaitlistWhenSpotsOpen = onDocumentUpdated({
 
   const templateId = waitlistTemplateId.value();
   const eventName = after.name || 'Event';
-  const bookingUrl = `https://culturewave.in/event/${encodeURIComponent(slugifyEventName(eventName))}`;
+  const bookingUrl = `https://culturewave.in/event/${encodeURIComponent(slugifyEventName(after.urlKey||eventName))}`;
   for (const [index, entry] of waiting.docs.entries()) {
     const attendee = entry.data();
     if (!attendee.email) {

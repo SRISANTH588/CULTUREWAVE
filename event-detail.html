@@ -744,15 +744,15 @@ function showToast(msg){
 function slugifyEventName(name){
   return String(name || 'event').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'event';
 }
-function getEventPath(name){
-  const slug = encodeURIComponent(slugifyEventName(name));
+function getEventPath(name,urlKey=''){
+  const slug = encodeURIComponent(slugifyEventName(urlKey||name));
   const path = eventPathParts.length === 2
     ? `/${encodeURIComponent(eventPathParts[0])}/${slug}`
     : `/event/${slug}`;
   return path;
 }
 function getPublicEventUrl(data=evData){
-  const path=`/event/${encodeURIComponent(slugifyEventName(data.name))}`;
+  const path=`/event/${encodeURIComponent(slugifyEventName(data.urlKey||data.name))}`;
   return `${location.origin}${path}`;
 }
 function getShareUrl(){ return getPublicEventUrl(); }
@@ -1515,8 +1515,8 @@ async function init(){
   let resolvedEventId = eventId;
   if (resolvedEventId && eventSlug) {
     const byId = await db.collection('events').doc(resolvedEventId).get();
-    if (byId.exists && slugifyEventName(byId.data().name) !== eventSlug) {
-      history.replaceState(null, '', getEventPath(byId.data().name));
+    if (byId.exists && slugifyEventName(byId.data().urlKey||byId.data().name) !== eventSlug) {
+      history.replaceState(null, '', getEventPath(byId.data().name,byId.data().urlKey));
     }
   }
   if (!resolvedEventId && eventSlug) {
@@ -1547,8 +1547,8 @@ async function init(){
 
   eventId = resolvedEventId;
   const data = {id:snap.id,...snap.data()};
-  if (!eventSlug || eventSlug !== slugifyEventName(data.name)) {
-    history.replaceState(null, '', getEventPath(data.name));
+  if (!eventSlug || eventSlug !== slugifyEventName(data.urlKey||data.name)) {
+    history.replaceState(null, '', getEventPath(data.name,data.urlKey));
   }
   await renderEvent(data);
 

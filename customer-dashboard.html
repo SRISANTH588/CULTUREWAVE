@@ -741,6 +741,7 @@ async function markAllRead() {
 }
 
 // ── UPCOMING ──
+function eventPublicPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
 async function loadUpcoming() {
   try {
     const now = new Date();
@@ -758,7 +759,7 @@ async function loadUpcoming() {
       const price = d.tickets?.[0]?.price || d.price || 0;
       let dateStr = '';
       try { const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00'); dateStr = dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}); } catch(e){}
-      return `<a href="event-detail.html?eventId=${doc.id}" class="ev-card" style="margin-bottom:.75rem;text-decoration:none;">
+      return `<a href="${eventPublicPath(d.urlKey||d.name)}" class="ev-card" style="margin-bottom:.75rem;text-decoration:none;">
         <div class="ev-card-img" style="${d.cardImgUrl||d.coverUrl?`background:url('${d.cardImgUrl||d.coverUrl}') center/cover no-repeat`:grads[i%grads.length]};">${!(d.cardImgUrl||d.coverUrl)?'🎉':''}</div>
         <div class="ev-card-body">
           <div class="ev-card-name">${d.name||'Event'}</div>

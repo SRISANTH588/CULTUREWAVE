@@ -159,6 +159,7 @@
   const CATEGORY_LABEL='Experiences';
   const grid=document.getElementById('catGrid');
   const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const eventPublicPath=name=>`/event/${encodeURIComponent(String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event')}`;
   function eventDate(value){
     if(!value)return {day:'TBA',month:''};
     const date=value.toDate?value.toDate():new Date(String(value).slice(0,10)+'T00:00:00');
@@ -182,10 +183,10 @@
         const venue=[data.venueName||data.venue||data.city||'Location TBA',data.city&&data.venueName?data.city:''].filter(Boolean).join(' · ');
         const priceLabel=price?`Starts at ₹${price.toLocaleString('en-IN')}`:'Free';
         return `<article class="cat-card" data-price="${price?'paid':'free'}">
-          <a class="cat-card-banner" href="event-detail.html?eventId=${id}&amp;source=category-experiences.html" aria-label="View ${escapeHtml(data.name||CATEGORY_LABEL+' event')}"><div class="cat-card-banner-bg" style="${image?`background-image:url(&quot;${escapeHtml(image)}&quot;)`:''}"></div></a>
+          <a class="cat-card-banner" href="${eventPublicPath(data.urlKey||data.name)}" aria-label="View ${escapeHtml(data.name||CATEGORY_LABEL+' event')}"><div class="cat-card-banner-bg" style="${image?`background-image:url(&quot;${escapeHtml(image)}&quot;)`:''}"></div></a>
           <div class="cat-card-price"><strong>${priceLabel}</strong></div>
-          <a class="cat-card-btn" href="event-detail.html?eventId=${id}&amp;source=category-experiences.html"><span>${date.day}<br/>${date.month}</span></a>
-          <div class="cat-card-body"><h3>${escapeHtml(data.name||'Untitled event')}</h3><div class="cat-card-venue">${escapeHtml(venue)}</div><p class="cat-card-desc">${escapeHtml(data.summary||data.description||'')}</p><div class="cat-card-footer"><div class="cat-card-price">${priceLabel}</div><a class="cat-card-btn" href="event-detail.html?eventId=${id}&amp;source=category-experiences.html">Book Now →</a></div></div>
+          <a class="cat-card-btn" href="${eventPublicPath(data.urlKey||data.name)}"><span>${date.day}<br/>${date.month}</span></a>
+          <div class="cat-card-body"><h3>${escapeHtml(data.name||'Untitled event')}</h3><div class="cat-card-venue">${escapeHtml(venue)}</div><p class="cat-card-desc">${escapeHtml(data.summary||data.description||'')}</p><div class="cat-card-footer"><div class="cat-card-price">${priceLabel}</div><a class="cat-card-btn" href="${eventPublicPath(data.urlKey||data.name)}">Book Now →</a></div></div>
         </article>`;
       }).join('');
     }catch(error){grid.innerHTML='<div class="cat-empty"><span>⚠️</span>Events could not be loaded. Please try again.</div>';}

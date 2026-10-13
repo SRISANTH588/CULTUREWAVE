@@ -6,7 +6,7 @@
   <title>CultureWave</title>
 </head>
 <body>
-  <p id="message">Opening page…</p>
+  <p id="message" hidden></p>
   <script>
     const parts = location.pathname.split('/').filter(Boolean);
     const decodePart = value => { try { return decodeURIComponent(value || '').trim().toLowerCase(); } catch (_) { return ''; } };
@@ -14,7 +14,6 @@
     const basePath = parts.length > 1 ? `/${parts.slice(0, -1).join('/')}/` : '/';
     const legacyEventDetailLink = parts.length === 1 && slug === 'event-detail' && new URLSearchParams(location.search).has('eventId');
     if (legacyEventDetailLink || (parts.length === 2 && /^[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?$/.test(slug))) {
-      document.getElementById('message').textContent = 'Opening event…';
       fetch('/event-detail.html')
         .then(response => {
           if (!response.ok) throw new Error('Event page could not be loaded.');
@@ -23,10 +22,14 @@
         .then(html => { document.open(); document.write(html); document.close(); })
         .catch(() => {
           document.title = 'Page not found | CultureWave';
-          document.getElementById('message').textContent = 'Event page could not be loaded.';
+          const message=document.getElementById('message');
+          message.hidden=false;
+          message.textContent = 'Event page could not be loaded.';
         });
     } else if (parts.length === 1 && /^[a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?$/.test(slug)) {
-      document.getElementById('message').textContent = 'Opening profile…';
+      const message=document.getElementById('message');
+      message.hidden=false;
+      message.textContent='Opening profile…';
       fetch(`${basePath}client-profile.html`)
         .then(response => {
           if (!response.ok) throw new Error('Profile page could not be loaded.');
@@ -39,7 +42,8 @@
         })
         .catch(() => {
           document.title = 'Page not found | CultureWave';
-          document.getElementById('message').textContent = 'Profile page could not be loaded.';
+          message.hidden=false;
+          message.textContent = 'Profile page could not be loaded.';
         });
     } else {
       document.title = 'Page not found | CultureWave';

@@ -2215,6 +2215,11 @@
     return true;
   }
 
+  function eventPublicPath(name){
+    const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';
+    return `/event/${encodeURIComponent(slug)}`;
+  }
+
   async function loadIndexEvents() {
     try {
       const grid = document.getElementById('indexEventsGrid');
@@ -2237,7 +2242,7 @@
     if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
     const a = document.createElement('a');
     a.className = 'ev-card';
-    a.href = `event-detail.html?eventId=${id}`;
+    a.href = eventPublicPath(d.urlKey||d.name);
     a.innerHTML = `
       <div class="ev-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
         <span class="ev-price-pill ${price?'ev-price-paid':'ev-price-free'}">${price?`Starts at \u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
@@ -2348,7 +2353,7 @@
         if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
         const a=document.createElement('a');
         a.className='tr-card';
-        a.href=`event-detail.html?eventId=${id}`;
+        a.href=eventPublicPath(d.urlKey||d.name);
         a.innerHTML=`
           <div class="tr-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
             ${day?`<div class="tr-date-badge"><div class="tr-date-day">${day}</div><div class="tr-date-mon">${mon}</div></div>`:''}
@@ -2395,7 +2400,7 @@
         if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');dateStr=dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})+' onwards';}catch(e){}}
         const a=document.createElement('a');
         a.className='cup-card';
-        a.href=`event-detail.html?eventId=${id}`;
+        a.href=eventPublicPath(d.urlKey||d.name);
         a.innerHTML=`
           <div class="cup-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}"></div>
           <div class="cup-info">
@@ -2425,7 +2430,7 @@
         if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
         const a=document.createElement('a');
         a.className='ev-card';
-        a.href=`event-detail.html?eventId=${id}`;
+        a.href=eventPublicPath(d.urlKey||d.name);
         a.innerHTML=`
           <div class="ev-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
             <span class="ev-price-pill ${price?'ev-price-paid':'ev-price-free'}">Starts at ${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
@@ -2470,7 +2475,7 @@
         const price=d.tickets?.[0]?.price||d.price||0;
         let day='',mon='';
         if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
-        return `<a class="ogp-card" href="event-detail.html?eventId=${id}">
+        return `<a class="ogp-card" href="${eventPublicPath(d.urlKey||d.name)}">
           <div class="ogp-poster" style="${img?`background-image:url('${img}')`:grads[i%3]}">
             ${day?`<div class="ogp-date-badge"><div class="ogp-date-badge-day">${day}</div><div class="ogp-date-badge-mon">${mon}</div></div>`:''}
             <span class="ogp-price-badge ${price?'ogp-price-paid':'ogp-price-free'}">${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
@@ -2593,7 +2598,7 @@
         if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
         const a=document.createElement('a');
         a.className='ft-card';
-        a.href=`event-detail.html?eventId=${id}`;
+        a.href=eventPublicPath(d.urlKey||d.name);
         a.innerHTML=`
           <div class="ft-poster" style="${img?`background-image:url('${img}')`:"background:linear-gradient(135deg,#1a3a1a,#2e7d32)"}">
             <span class="ft-price-badge ${price?'ft-price-paid':'ft-price-free'}">${price?`Starts at \u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
@@ -2624,7 +2629,7 @@
         if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
         const a = document.createElement('a');
         a.className = 'hpe-card';
-        a.href = `event-detail.html?eventId=${id}`;
+        a.href = eventPublicPath(d.urlKey||d.name);
         a.innerHTML = `
           <div class="hpe-poster" style="${img?`background-image:url('${img}')`:'background:linear-gradient(135deg,#1a1a1a,#333)'}">
             <span class="hpe-price-badge ${price?'hpe-price-paid':'hpe-price-free'}">${price?`Starts at \u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
@@ -2816,7 +2821,7 @@
           }).join('');
         const a = document.createElement('a');
         a.className = 'ss-card';
-        a.href = `event-detail.html?eventId=${doc.id}`;
+        a.href = eventPublicPath(d.urlKey||d.name);
         a.innerHTML = `
           <div style="position:relative;">
             ${img
@@ -2998,7 +3003,7 @@
           }
           const slide = document.createElement('div');
           slide.className = 'hs-slide';
-          slide.innerHTML = `<div class="hs-card" onclick="location.href='event-detail.html?eventId=${id}'" style="cursor:pointer">
+          slide.innerHTML = `<div class="hs-card" onclick="location.href='${eventPublicPath(d.urlKey||d.name)}'" style="cursor:pointer">
             <div class="hs-poster">
               <div class="hs-poster-inner"></div>
             </div>

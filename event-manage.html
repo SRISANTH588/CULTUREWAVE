@@ -932,6 +932,7 @@ const eventId = params.get('eventId');
 if(!eventId){document.body.innerHTML='<div style="padding:3rem;text-align:center;">No event ID. <a href="premium-client-dashboard.html">Go back</a></div>';}
 
 let eventData=null, allBookings=[], allBookingDocs=[], allPaymentBookingDocs=[], anPeriod=30, hasPremiumPages=false;
+function publicEventPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
 
 function switchPanel(btn,panelId){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
@@ -1087,9 +1088,9 @@ window.togglePublish=async function(){
   showToast(next==='published'?'Event published!':'Event unpublished');
 };
 
-window.viewPublicPage=function(){window.open('event-detail.html?eventId='+eventId,'_blank');};
+window.viewPublicPage=function(){window.open(publicEventPath(eventData?.urlKey||eventData?.name),'_blank');};
 window.shareEvent=function(){
-  const url=location.origin+'/event-detail.html?eventId='+eventId;
+  const url=location.origin+publicEventPath(eventData?.urlKey||eventData?.name);
   navigator.clipboard.writeText(url).then(()=>showToast('Link copied!')).catch(()=>prompt('Copy link:',url));
 };
 
@@ -1758,7 +1759,7 @@ window.sendGuestInvitations=async function(){
   const alreadySent=new Set(Array.isArray(inviteAccess.sentInviteEmails)?inviteAccess.sentInviteEmails:[]);
   const bookingUrl=inviteAccess.inviteLinkEnabled&&inviteAccess.inviteToken
     ?`${location.origin}${location.pathname.replace(/event-manage\.html.*/, '')}booking.html?eventId=${encodeURIComponent(eventId)}&inviteToken=${encodeURIComponent(inviteAccess.inviteToken)}`
-    :`${location.origin}${location.pathname.replace(/event-manage\.html.*/, '')}event-detail.html?eventId=${encodeURIComponent(eventId)}`;
+    :`${location.origin}${publicEventPath(eventData.urlKey||eventData.name)}`;
   for(const email of guests){
     if(alreadySent.has(email))continue;
     try{
