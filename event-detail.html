@@ -788,7 +788,7 @@ function shareTwitter(){ if(evData.allowSharing===false) return; window.open(`ht
 function shareEmail(){ if(evData.allowSharing===false) return; window.open(`mailto:?subject=${encodeURIComponent(evData.name||'Event')}&body=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
 
 function goToProfile(){
-  if(ownerUid) location.href = `client-profile.html?uid=${ownerUid}`;
+  if(ownerUid) location.href = `/client-profile.html?uid=${encodeURIComponent(ownerUid)}`;
 }
 
 function showMobileDetailTab(tab){
@@ -1048,7 +1048,9 @@ function register(){
     openEventBookingSheet(bookingUrl);
     return;
   }
-  location.href = bookingUrl;
+  const desktopBookingUrl = new URL(bookingUrl, location.origin);
+  desktopBookingUrl.searchParams.set('picker', '1');
+  location.href = `${desktopBookingUrl.pathname}${desktopBookingUrl.search}`;
 }
 
 function openEventBookingSheet(url){

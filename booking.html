@@ -587,6 +587,7 @@ emailjs.init({ publicKey: EJ_KEY });
 const urlP = new URLSearchParams(location.search);
 const embeddedBooking = urlP.get('embed') === '1';
 const resumeCheckout = urlP.get('resume') === '1';
+const startWithTicketPicker = urlP.get('picker') === '1' && !embeddedBooking;
 const bookingSession = urlP.get('bookingSession') || '';
 if(embeddedBooking){
   document.documentElement.style.setProperty('background','transparent','important');
@@ -1091,6 +1092,15 @@ function showBookingDetails(){
     document.getElementById('ticketPicker').scrollTop=0;
     return;
   }
+  if(startWithTicketPicker){
+    if(hasSeating && !isImagePlan && selectedSeats.length !== ticketCount){ showToast(`Please select ${ticketCount} seat${ticketCount===1?'':'s'}`); return; }
+    document.getElementById('ticketSelectionSheet').style.display='none';
+    document.getElementById('guestContactCard').style.display='';
+    document.getElementById('pickerBar').classList.remove('show');
+    const continueButton=document.querySelector('.guest-contact-continue');
+    if(continueButton) continueButton.innerHTML='Continue to checkout <span aria-hidden="true">→</span>';
+    return;
+  }
   if(hasSeating && !isImagePlan && selectedSeats.length !== ticketCount){ showToast(`Please select ${ticketCount} seat${ticketCount===1?'':'s'}`); return; }
   const phone = document.getElementById('bookPhone').value.trim();
   if(!phone || phone.replace(/\D/g,'').length < 10){ showToast('Enter a valid WhatsApp number'); return; }
@@ -1112,6 +1122,22 @@ function continueToTicketSelection(){
   if(!name){showToast('Enter your full name');return;}
   if(phone.replace(/\D/g,'').length<10){showToast('Enter a valid phone number');return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Enter a valid email address');return;}
+  if(startWithTicketPicker && !window.matchMedia('(max-width: 768px)').matches){
+    const hasSelectableSeatMap=evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections));
+    if(hasSelectableSeatMap&&selectedSeats.length!==selectedTicketCount()){showToast(`Please select ${selectedTicketCount()} seat${selectedTicketCount()===1?'':'s'}`);return;}
+    if(!emailVerified&&bookingAuth.currentUser?.email!==email)emailVerified=true;
+    const selected=tickets[selectedTicketIdx]||{};
+    const draft={eventId,bookingSession,name,phone,email,quantities:pickerQuantities,selections:draftTicketSelections(),ticketName:String(selected.name||''),ticketPrice:Number(selected.price||0),seats:selectedSeats,ticketIndex:selectedTicketIdx,savedAt:Date.now()};
+    try{localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify(draft));}
+    catch(error){console.error('Could not preserve checkout details:',error);showToast('Could not save your booking details. Please try again.');return;}
+    urlP.delete('picker');
+    urlP.set('resume','1');
+    history.replaceState(null,'',`${location.pathname}?${urlP.toString()}`);
+    document.getElementById('panel1').classList.remove('ticket-picker');
+    document.getElementById('pickerBar').classList.remove('show');
+    goStep3();
+    return;
+  }
   if(window.matchMedia('(max-width: 768px)').matches&&document.getElementById('panel1').classList.contains('details-step')){
     const hasSelectableSeatMap=evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections));
     if(hasSelectableSeatMap&&selectedSeats.length!==selectedTicketCount()){
@@ -1825,8 +1851,8 @@ function toggleSeat(seatId, sofa){
 async function init(){
   const mobileBookingSheet=window.matchMedia('(max-width: 768px)').matches;
   document.getElementById('panel1').classList.add('ticket-picker');
-  document.getElementById('guestContactCard').style.display=mobileBookingSheet?'none':'';
-  document.getElementById('ticketSelectionSheet').style.display=mobileBookingSheet?'block':'none';
+  document.getElementById('guestContactCard').style.display=(mobileBookingSheet||startWithTicketPicker)?'none':'';
+  document.getElementById('ticketSelectionSheet').style.display=(mobileBookingSheet||startWithTicketPicker)?'block':'none';
   updatePickerBar();
   if(eventId){
     try{
@@ -1873,7 +1899,7 @@ async function init(){
         renderTicketPicker();
         // Embedded event popups collect tickets and attendee details first.
         // Standalone links and resumed bookings open directly on checkout.
-        if(resumeCheckout || !embeddedBooking){
+        if(resumeCheckout || (!embeddedBooking && !startWithTicketPicker)){
           let draft=null;
           const draftKey=`culturewave:checkout-draft:${eventId}`;
           const navigationEntry=performance.getEntriesByType?.('navigation')?.[0];
@@ -1958,7 +1984,7 @@ async function init(){
       document.getElementById('bookEmail').value=bookingAuth.currentUser?.email||'';
       document.getElementById('bookState').value='';
       try{renderTicketPicker();}catch(renderError){console.error('Could not render fallback ticket:',renderError);}
-      if(embeddedBooking&&!resumeCheckout){
+      if((embeddedBooking&&!resumeCheckout)||startWithTicketPicker){
         document.getElementById('panel1').classList.add('ticket-picker');
         document.getElementById('guestContactCard').style.display='none';
         document.getElementById('ticketSelectionSheet').style.display='block';
