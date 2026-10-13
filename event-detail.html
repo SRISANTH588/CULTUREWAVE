@@ -1520,11 +1520,12 @@ async function init(){
     }
   }
   if (!resolvedEventId && eventSlug) {
-    const matches = await db.collection('events').where('slug', '==', eventSlug).limit(1).get();
+    let matches = await db.collection('events').where('urlKey', '==', eventSlug).limit(1).get();
+    if (matches.empty) matches = await db.collection('events').where('slug', '==', eventSlug).limit(1).get();
     if (!matches.empty) resolvedEventId = matches.docs[0].id;
     if (!resolvedEventId) {
       const allEvents = await db.collection('events').get();
-      const matchingEvent = allEvents.docs.find(doc => slugifyEventName(doc.data().name) === eventSlug);
+      const matchingEvent = allEvents.docs.find(doc => slugifyEventName(doc.data().name) === eventSlug || slugifyEventName(doc.data().urlKey) === eventSlug);
       if (matchingEvent) resolvedEventId = matchingEvent.id;
     }
   }
