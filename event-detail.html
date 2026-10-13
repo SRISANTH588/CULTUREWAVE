@@ -1044,7 +1044,11 @@ function register(){
     seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
   });
   const bookingUrl = `/booking.html?${qs.toString()}`;
-  openEventBookingSheet(bookingUrl);
+  if(window.matchMedia('(max-width: 768px)').matches){
+    openEventBookingSheet(bookingUrl);
+    return;
+  }
+  location.href = bookingUrl;
 }
 
 function openEventBookingSheet(url){

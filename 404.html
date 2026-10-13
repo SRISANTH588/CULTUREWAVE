@@ -12,7 +12,8 @@
     const decodePart = value => { try { return decodeURIComponent(value || '').trim().toLowerCase(); } catch (_) { return ''; } };
     const slug = decodePart(parts[parts.length - 1]);
     const basePath = parts.length > 1 ? `/${parts.slice(0, -1).join('/')}/` : '/';
-    if (parts.length === 2 && /^[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?$/.test(slug)) {
+    const legacyEventDetailLink = parts.length === 1 && slug === 'event-detail' && new URLSearchParams(location.search).has('eventId');
+    if (legacyEventDetailLink || (parts.length === 2 && /^[a-z0-9](?:[a-z0-9-]{0,118}[a-z0-9])?$/.test(slug))) {
       fetch('/event-detail.html')
         .then(response => {
           if (!response.ok) throw new Error('Event page could not be loaded.');
