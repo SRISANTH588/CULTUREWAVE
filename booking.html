@@ -1120,9 +1120,7 @@ function renderTicketPicker(){
     const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0);
     const quantityControl=sold
       ? '<button class="bk-picker-add" disabled>SOLD OUT</button>'
-      : quantity
-        ? `<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">＋ Add another</button><span class="bk-picker-selected-count">${quantity} selected</span>`
-        : `<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">＋ Add</button>`;
+      : quantity?`<div class="bk-picker-qty"><button type="button" aria-label="Remove one ticket" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" aria-label="Add one ticket" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">＋ Add</button>`;
     return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-copy"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span>${groupHint?`<div style="margin-top:.4rem;color:#45d49c;font-size:.72rem;font-weight:700;">${groupHint}</div>`:''}</div>${quantityControl}${description?`<button type="button" class="bk-picker-details" aria-expanded="true" onclick="togglePickerDetails(${index},this)">Details ⌃</button><p class="bk-picker-desc open" id="pickerDesc${index}">${String(description)}</p>`:''}${sold?'<span class="bk-picker-availability">Sold out</span>':''}</article>`;
   }).join('');
   updatePickerBar();
