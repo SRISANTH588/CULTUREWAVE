@@ -741,7 +741,7 @@ async function markAllRead() {
 }
 
 // ── UPCOMING ──
-function eventPublicPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
+function eventPublicPath(name,id=''){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;}
 async function loadUpcoming() {
   try {
     const now = new Date();
@@ -755,11 +755,11 @@ async function loadUpcoming() {
     if (!docs.length) { el.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:#9ca3af;">No upcoming events found</div>'; return; }
     const grads = ['linear-gradient(135deg,#1242c5,#2f6bff)','linear-gradient(135deg,#7c3aed,#a855f7)','linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#065f46,#34d399)'];
     el.innerHTML = docs.map((doc,i) => {
-      const d = doc.data();
+      const d = doc.data(), id = doc.id;
       const price = d.tickets?.[0]?.price || d.price || 0;
       let dateStr = '';
       try { const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00'); dateStr = dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}); } catch(e){}
-      return `<a href="${eventPublicPath(d.urlKey||d.name)}" class="ev-card" style="margin-bottom:.75rem;text-decoration:none;">
+      return `<a href="${eventPublicPath(d.urlKey||d.name,id)}" class="ev-card" style="margin-bottom:.75rem;text-decoration:none;">
         <div class="ev-card-img" style="${d.cardImgUrl||d.coverUrl?`background:url('${d.cardImgUrl||d.coverUrl}') center/cover no-repeat`:grads[i%grads.length]};">${!(d.cardImgUrl||d.coverUrl)?'🎉':''}</div>
         <div class="ev-card-body">
           <div class="ev-card-name">${d.name||'Event'}</div>

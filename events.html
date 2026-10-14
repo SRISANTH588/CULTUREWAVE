@@ -526,7 +526,7 @@
         return publicListing !== false && ['published', 'live', 'active'].includes(status);
       }
 
-      function eventPublicPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
+      function eventPublicPath(name,id=''){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;}
       async function loadFirestoreEvents() {
         try {
           let snap;
@@ -561,7 +561,7 @@
             const [dayStr, monStr] = date ? [new Date(date+'T00:00:00').getDate(), new Date(date+'T00:00:00').toLocaleDateString('en-IN',{month:'short'})] : ['?','TBA'];
             const priceLabel = price ? `Starts at ₹${Number(price).toLocaleString('en-IN')}` : 'Free Entry';
             article.innerHTML = `
-              <a href="${eventPublicPath(d.urlKey||d.name)}" style="display:contents;text-decoration:none;color:inherit;">
+              <a href="${eventPublicPath(d.urlKey||d.name,id)}" style="display:contents;text-decoration:none;color:inherit;">
               <div class="ev-poster-wrap">
                 <div class="ev-banner ${bannerClass}" ${cardImage?`style="background:url('${cardImage}') center/cover no-repeat;"`:''} >
                   <span class="ev-tag">${d.category||'Event'}</span>

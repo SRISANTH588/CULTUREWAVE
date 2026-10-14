@@ -341,7 +341,7 @@
   };
   const LABELS = {all:'All Events', nightlife:'Nightlife', dining:'Fine Dining', workshops:'Workshops', music:'Live Music'};
   const BANNERS = ['linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#6b1a3a,#b71c1c)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
-  function eventPublicPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
+  function eventPublicPath(name,id=''){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;}
 
   let allEvents = [], activeFilter = 'all';
 
@@ -368,7 +368,7 @@
       if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');dateLabel=dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});}catch(e){}}
       const a = document.createElement('a');
       a.className='cp-card';
-      a.href=eventPublicPath(d.urlKey||d.name);
+      a.href=eventPublicPath(d.urlKey||d.name,id);
       a.innerHTML=`
         <div class="cp-banner" style="${img?`background-image:url('${img}')`:BANNERS[i%BANNERS.length]}">
           <span class="cp-promoted">♦ Promoted</span>

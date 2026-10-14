@@ -2311,7 +2311,7 @@ document.addEventListener('change', function(e){
 
 // ── EVENTS VIEW ──
 let allEvents = [], activeTab = 'published', myUid = null;
-function eventPublicPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
+function eventPublicPath(name,id=''){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;}
 
 // show empty state immediately
 (function(){
@@ -2372,7 +2372,7 @@ function renderEvents() {
         <div style="font-size:.84rem;font-weight:600;">${price?money(price):'Free'}</div>
         <div class="ev-actions" style="flex-wrap:wrap;gap:.3rem;">
           <button class="ev-act-btn ${isPublished?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${isPublished?'Unpublish':'Publish'}</button>
-          <a class="ev-act-btn" href="${eventPublicPath(ev.urlKey||ev.name)}" target="_blank">View</a>
+          <a class="ev-act-btn" href="${eventPublicPath(ev.urlKey||ev.name,ev.id)}" target="_blank">View</a>
           <a class="ev-act-btn" href="event-create.html?eventId=${ev.id}">Edit</a>
           <button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button>
           ${st!=='archived'?`<button class="ev-act-btn" onclick="archiveEvent('${ev.id}')" title="Keep as archived">Keep</button>`:''}
@@ -2387,7 +2387,7 @@ window.copyEvLink = function(id){
     ? location.origin
     : 'https://srisanth588.github.io/CULTUREWAVE';
   const event=allEvents.find(item=>item.id===id);
-  const url=`${publicBase}${eventPublicPath(event?.urlKey||event?.name)}`;
+  const url=`${publicBase}${eventPublicPath(event?.urlKey||event?.name,event?.id)}`;
   navigator.clipboard.writeText(url)
     .then(()=>showToast('Link copied!'))
     .catch(()=>prompt('Copy this link:', url));
@@ -2982,7 +2982,7 @@ window.addIgAutoReplyRule = async function() {
   if(!msg){ showToast('Enter a reply message'); return; }
   const eventName = document.getElementById('igReplyEvent').selectedOptions[0]?.text || '';
   const selectedEvent=allEvents.find(event=>event.id===eventId);
-  const bookingLink = eventId ? `${location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE'}${eventPublicPath(selectedEvent?.urlKey||selectedEvent?.name||eventName)}` : '';
+  const bookingLink = eventId ? `${location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE'}${eventPublicPath(selectedEvent?.urlKey||selectedEvent?.name||eventName,eventId)}` : '';
   const rule = { keywords:kw, message:msg, eventId, eventName: eventName==='\u2014 Select an event \u2014'?'':eventName, bookingLink, publicReply, enabled:true, createdAt: new Date().toISOString() };
   igRules.push(rule);
   await setDoc(doc(db,'organisers',myUid),{ igAutoReplyRules: igRules, updatedAt: new Date().toISOString() },{merge:true});
@@ -3417,7 +3417,7 @@ function dmGoLive() {
   var eventName = (eventSel && eventSel.selectedOptions[0]) ? eventSel.selectedOptions[0].text : '';
   if(eventName.includes('Select an event')) eventName='';
   var selectedEvent = (window.allEvents||[]).find(function(event){return event.id===eventId;});
-  var bookingLink = eventId ? ((location.hostname==='localhost'||location.hostname==='127.0.0.1'?location.origin:'https://srisanth588.github.io/CULTUREWAVE')+eventPublicPath(selectedEvent?.urlKey||selectedEvent?.name||eventName)) : '';
+  var bookingLink = eventId ? ((location.hostname==='localhost'||location.hostname==='127.0.0.1'?location.origin:'https://srisanth588.github.io/CULTUREWAVE')+eventPublicPath(selectedEvent?.urlKey||selectedEvent?.name||eventName,eventId)) : '';
   var publicReply = document.getElementById('dmExtraPublicReply')?.checked||false;
   var collectEmail = document.getElementById('dmExtraEmail')?.checked||false;
   var collectPhone = document.getElementById('dmExtraPhone')?.checked||false;
