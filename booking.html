@@ -690,6 +690,7 @@ let pickerQuantities = [];
 let checkoutCountdownEndsAt = 0;
 let checkoutCountdownTimer = null;
 let checkoutExpired = false;
+let bookingSubmissionInProgress = false;
 const razorpayFunctionsUrl='https://culturewave-razorpay.culturewaveindia.workers.dev';
 try{localStorage.removeItem('culturewave:preferred-payment-method');}catch(_){ }
 const inviteTokenParam = urlP.get('inviteToken') || '';
@@ -724,6 +725,20 @@ window.redeemInviteCode=async function(){
 
 function fmt(n){ return n===0?"Free":"₹"+Number(n).toLocaleString("en-IN"); }
 function showToast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2500); }
+
+function setBookingSubmissionBusy(busy, total){
+  bookingSubmissionInProgress = busy;
+  const submitBtn = document.getElementById('submitBtn');
+  const confirmBtn = document.getElementById('confirmSubmitBtn');
+  [submitBtn, confirmBtn].filter(Boolean).forEach(button => {
+    button.disabled = busy;
+    if(busy) button.textContent = 'Processing...';
+  });
+  if(!busy){
+    if(submitBtn) submitBtn.textContent = total ? `Pay ${fmt(total)}` : 'Confirm booking ›';
+    if(confirmBtn) confirmBtn.textContent = total ? '🔒 Pay Now' : '✅ Book Now (Free)';
+  }
+}
 
 function showPaymentError(reason){
   let el = document.getElementById('paymentErrorBanner');
@@ -1655,6 +1670,8 @@ async function submitBooking(){
     expireCheckout();
     return;
   }
+  if(bookingSubmissionInProgress) return;
+  setBookingSubmissionBusy(true);
   const amountShownToCustomer=selectedTicketSubtotal();
   try{
     const fresh=await db.collection('events').doc(eventId).get({source:'server'});
@@ -1664,15 +1681,16 @@ async function submitBooking(){
       if(selectedTicketSubtotal()!==amountShownToCustomer){
         document.getElementById('s3Ticket').textContent=selectedTicketLabel();
         updateBill();
+        setBookingSubmissionBusy(false, selectedTicketSubtotal());
         showToast('The ticket price changed. Please review the updated total before paying.');
         return;
       }
     }
-  }catch(error){console.error('Could not recheck event capacity:',error);showToast('Could not verify availability. Please try again.');return;}
+  }catch(error){console.error('Could not recheck event capacity:',error);setBookingSubmissionBusy(false, selectedTicketSubtotal());showToast('Could not verify availability. Please try again.');return;}
   if(eventSoldOut() || (eventCapacity()>0 && Number(evData.totalBooked||0)+selectedTicketCount()>eventCapacity())){
-    pickerQuantities=tickets.map(()=>0);selectedSeats=[];document.getElementById('panel1').classList.add('ticket-picker');goStep(1);renderTicketPicker();updatePickerBar();showToast(evData.soldOutMsg||'This event is sold out.');return;
+    setBookingSubmissionBusy(false, selectedTicketSubtotal());pickerQuantities=tickets.map(()=>0);selectedSeats=[];document.getElementById('panel1').classList.add('ticket-picker');goStep(1);renderTicketPicker();updatePickerBar();showToast(evData.soldOutMsg||'This event is sold out.');return;
   }
-  if(selectedTicketCount()<=0){showToast('Select at least one ticket before paying');return;}
+  if(selectedTicketCount()<=0){setBookingSubmissionBusy(false, selectedTicketSubtotal());showToast('Select at least one ticket before paying');return;}
   const ticketName = selectedTicketLabel();
   const ticketCount = selectedTicketCount();
   // Recheck immediately before payment in case another guest took a seat while
@@ -1682,6 +1700,7 @@ async function submitBooking(){
     if(selectedSeats.length !== ticketCount){
       renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
       updatePickerBar();
+      setBookingSubmissionBusy(false, selectedTicketSubtotal());
       showToast('One or more selected seats were just booked. Please choose another seat.');
       return;
     }
@@ -1700,10 +1719,6 @@ async function submitBooking(){
   const eventDate = evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || '';
   const eventTime = eventStartTime()||formatTimeText(passedEventTime);
   const bid = "CV"+Date.now();
-
-  const submitBtn = document.getElementById("submitBtn");
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Processing...";
 
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
@@ -1727,7 +1742,7 @@ async function submitBooking(){
     if(Number(orderData.amount)!==amountInPaise) throw new Error('Payment amount does not match your checkout total. Please refresh and try again.');
   }catch(orderError){
     console.error('Razorpay order creation failed:',orderError);
-    submitBtn.disabled=false;submitBtn.textContent=`Pay ${fmt(total)}`;
+    setBookingSubmissionBusy(false, total);
     showPaymentError(orderError.message||'Could not start payment. Please try again.');
     return;
   }
@@ -1742,7 +1757,7 @@ async function submitBooking(){
     theme: { color: "#1dae79", backdrop_color: "#090b10" },
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
-      submitBtn.textContent = "Verifying payment...";
+      [document.getElementById('submitBtn'), document.getElementById('confirmSubmitBtn')].filter(Boolean).forEach(button => { button.disabled=true; button.textContent = 'Verifying payment...'; });
       let verified = false;
       let paymentMethod='Razorpay';
       let verificationMessage='Payment signature verification failed.';
@@ -1757,8 +1772,7 @@ async function submitBooking(){
         verificationMessage='Could not verify this payment with the booking server. Contact support before retrying.';
       }
       if(!verified){
-        submitBtn.disabled = false;
-        submitBtn.textContent = `Pay ${fmt(total)}`;
+        setBookingSubmissionBusy(false, total);
         showPaymentError(verificationMessage);
         return;
       }
@@ -1773,8 +1787,7 @@ async function submitBooking(){
     },
     modal:{
       ondismiss: ()=>{
-        submitBtn.disabled = false;
-        submitBtn.textContent = `Pay ${fmt(total)}`;
+        setBookingSubmissionBusy(false, total);
         showPaymentError('Payment was cancelled. Your booking has not been confirmed.');
       }
     }
@@ -1782,7 +1795,7 @@ async function submitBooking(){
   try{new Razorpay(options).open();}
   catch(checkoutError){
     console.error('Could not open Razorpay Checkout:',checkoutError);
-    submitBtn.disabled=false;submitBtn.textContent=`Pay ${fmt(total)}`;
+    setBookingSubmissionBusy(false, total);
     showPaymentError('Could not open Razorpay Checkout. Please try again.');
   }
 }
