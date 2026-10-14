@@ -2039,19 +2039,6 @@
     </div>
   </section>
 
-  <!-- TRENDING RIGHT NOW -->
-  <section class="trn-section" id="latestBuzzSection" hidden>
-    <div class="trn-inner">
-    <div class="trn-head">THE LATEST BUZZ 🔥</div>
-    <div class="ev-grid" id="trnGrid"></div>
-    </div>
-  </section>
-  <style>
-    @media (min-width: 768px) {
-      #latestBuzzSection { display: none !important; }
-    }
-  </style>
-
   <!-- FEATURED EVENTS -->
   <section class="trn-section" id="events" data-site-section="home-events">
     <div class="trn-inner">
@@ -2177,26 +2164,6 @@
     });
   }
   const _idb = firebase.firestore();
-  const _paidListerPlans = new Set(['pro','premium','business','growth']);
-
-  // The Latest Buzz is a paid-lister benefit. Keep it hidden unless the
-  // authenticated user's Firestore profile confirms the correct role and plan.
-  firebase.auth().onAuthStateChanged(async (user) => {
-    const section = document.getElementById('latestBuzzSection');
-    if (!section || !user) return;
-    try {
-      const profile = await _idb.collection('users').doc(user.uid).get();
-      const data = profile.exists ? profile.data() : {};
-      const plan = String(data.plan || data.subscriptionPlan || '').trim().toLowerCase();
-      const status = String(data.subscriptionStatus || data.planStatus || 'active').trim().toLowerCase();
-      const hasActivePaidPlan = _paidListerPlans.has(plan) && !['cancelled','expired','inactive'].includes(status);
-      if (String(data.role || '').toLowerCase() === 'lister' && hasActivePaidPlan) {
-        section.hidden = false;
-      }
-    } catch (error) {
-      console.warn('Latest Buzz eligibility check failed:', error.message);
-    }
-  });
   const _banners = ['banner-a','banner-b','banner-c'];
   const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
@@ -2411,40 +2378,6 @@
         scroll.appendChild(a);
       });
     }catch(e){console.warn('CUP:',e.message);}
-  })();
-
-  // TRENDING RIGHT NOW
-  (async function loadTrendingRightNow(){
-    try{
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc=>isPublishedEvent(doc.data())).slice(0,6);
-      const grid=document.getElementById('trnGrid');
-      if(!grid) return;
-      if(!docs.length){grid.closest('.trn-section').style.display='none';return;}
-      const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)','linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#1a3a1a,#2e7d32)','linear-gradient(135deg,#92400e,#fbbf24)'];
-      docs.forEach((doc,i)=>{
-        const d=doc.data(),id=doc.id;
-        const img=d.cardImgUrl||d.coverUrl||'';
-        const price=d.tickets?.[0]?.price||d.price||0;
-        let day='',mon='';
-        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
-        const a=document.createElement('a');
-        a.className='ev-card';
-        a.href=eventPublicPath(d.urlKey||d.name);
-        a.innerHTML=`
-          <div class="ev-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
-            <span class="ev-price-pill ${price?'ev-price-paid':'ev-price-free'}">Starts at ${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
-          </div>
-          <div class="ev-body">
-            ${day?`<div class="ev-date" style="display:flex;flex-direction:column;align-items:center;background:#1e1e1e;border-radius:8px;padding:.3rem .45rem;min-width:36px;"><div style="font-size:.95rem;font-weight:900;color:#fff;line-height:1;">${day}</div><div style="font-size:.5rem;font-weight:800;color:#888;text-transform:uppercase;">${mon}</div></div>`:''}
-            <div class="ev-info">
-              <div class="ev-title">${d.name||'Untitled'}</div>
-              <div class="ev-venue">${d.venue||d.venueName||d.city||'India'}</div>
-            </div>
-          </div>`;
-        grid.appendChild(a);
-      });
-    }catch(e){console.warn('TRN:',e.message);}
   })();
 
   // OG Picks — mobile: deck stack | desktop: 4-up sliding carousel
