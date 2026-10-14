@@ -489,7 +489,7 @@
             <button type="button" class="guest-contact-continue" onclick="continueToTicketSelection()">Continue to tickets <span aria-hidden="true">→</span></button>
             <div class="guest-contact-note"><span aria-hidden="true">🔒</span> Your details are used for this booking</div>
           </div>
-          <div class="bk-picker-sheet" id="ticketSelectionSheet"><div class="bk-picker-label">SELECT TICKETS</div><p class="bk-picker-intro">Choose a pass to reserve your place at this event.</p><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div><div id="pickerSeatMount"></div></div>
+          <div class="bk-picker-sheet" id="ticketSelectionSheet"><div id="pickerImageSeatMount"></div><div class="bk-picker-label">SELECT TICKETS</div><p class="bk-picker-intro">Choose a pass to reserve your place at this event.</p><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div><div id="pickerSeatMount"></div></div>
         </section>
         <div class="bk-picker-bar" id="pickerBar"><div class="bk-picker-total"><small id="pickerCount">0 tickets</small><strong id="pickerTotal">₹0</strong></div><button class="bk-picker-proceed" type="button" onclick="showBookingDetails()">Next</button></div>
       </div>
@@ -1156,8 +1156,10 @@ function updatePickerBar(){
   document.getElementById('pickerTotal').textContent=fmt(total);
   const isMobileSheet=window.matchMedia('(max-width: 768px)').matches&&document.getElementById('panel1').classList.contains('active');
   document.getElementById('pickerBar').classList.toggle('show',count>0||isMobileSheet);
-  const seatSection=document.querySelector('.picker-seat-section');
-  if(seatSection) seatSection.style.display=count ? '' : 'none';
+  document.querySelectorAll('.picker-seat-section').forEach(seatSection=>{
+    const isUploadedImage=Boolean(seatSection.querySelector('#seatingContainer img'));
+    seatSection.style.display=isUploadedImage||count ? '' : 'none';
+  });
   const seatStatus=document.getElementById('pickerSeatStatus');
   const hasMap=document.getElementById('seatingWrap').style.display !== 'none' && !document.querySelector('#seatingContainer img');
   if(seatStatus) seatStatus.textContent=hasMap ? `${selectedSeats.length} of ${count} seat${count===1?'':'s'} selected` : 'Choose the number of seats for your tickets';
@@ -1964,7 +1966,8 @@ async function init(){
         if(evData.seatingPlanUrl){
           const img = document.createElement("img");
           img.src = evData.seatingPlanUrl;
-          img.style = "width:100%;border-radius:10px;";
+          img.alt = `${evData.name||'Event'} seating plan`;
+          img.style = "display:block;width:100%;max-height:60vh;object-fit:contain;border-radius:14px;";
           document.getElementById("seatingContainer").appendChild(img);
           document.getElementById("seatingWrap").style.display = "";
         } else if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
@@ -1977,10 +1980,11 @@ async function init(){
           const seatWrap = document.getElementById('seatingWrap');
           if(seatWrap.style.display !== 'none'){
             const section = document.createElement('section');
-            section.className = 'picker-seat-section';
-            section.innerHTML = '<div class="bk-picker-label">SELECT SEATS</div><p class="picker-seat-status" id="pickerSeatStatus">Select your tickets first</p>';
+            const isUploadedImage=Boolean(seatWrap.querySelector('img'));
+            section.className = `picker-seat-section${isUploadedImage?' picker-image-seat-section':''}`;
+            section.innerHTML = isUploadedImage ? '<div class="bk-picker-label">SEATING PLAN</div>' : '<div class="bk-picker-label">SELECT SEATS</div><p class="picker-seat-status" id="pickerSeatStatus">Select your tickets first</p>';
             section.appendChild(seatWrap);
-            document.getElementById('pickerSeatMount').appendChild(section);
+            document.getElementById(isUploadedImage?'pickerImageSeatMount':'pickerSeatMount').appendChild(section);
           }
         }
         // receipt banner
