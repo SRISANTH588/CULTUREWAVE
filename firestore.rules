@@ -44,6 +44,29 @@ service cloud.firestore {
         resource.data.status in ['published', 'live', 'active'];
     }
 
+    // Seat selections are written atomically with the corresponding booking.
+    // Public booking pages may append only the seats listed on that booking.
+    function bookedSeatAppend(eventId) {
+      let bookingId = request.resource.data.get('lastSeatBookingId', '');
+      let bookingPath = /databases/$(database)/documents/bookings/$(bookingId);
+      let booking = getAfter(bookingPath).data;
+      let oldSeats = resource.data.get('bookedSeats', []);
+      let newSeats = request.resource.data.get('bookedSeats', []);
+      let bookingSeats = booking.get('seatIds', []);
+      return bookingId is string && bookingId.size() > 0 &&
+        existsAfter(bookingPath) &&
+        booking.get('bookingId', '') == bookingId &&
+        booking.get('eventId', '') == eventId &&
+        booking.get('status', '') in ['confirmed', 'paid', 'success', 'completed'] &&
+        bookingSeats is list && bookingSeats.size() > 0 && bookingSeats.size() <= 20 &&
+        oldSeats is list && newSeats is list &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bookedSeats', 'lastSeatBookingId']) &&
+        newSeats.hasAll(oldSeats) &&
+        newSeats.hasAll(bookingSeats) &&
+        newSeats.size() == oldSeats.size() + bookingSeats.size() &&
+        resource.data.status in ['published', 'live', 'active'];
+    }
+
     function waitlistEventAllows(eventId) {
       let eventData = get(/databases/$(database)/documents/events/$(eventId)).data;
       return eventData.allowWaitlist == true &&
@@ -126,7 +149,8 @@ service cloud.firestore {
       allow read: if true;
       allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
       allow update: if (request.auth != null &&
-        (resource.data.ownerId == request.auth.uid || isAdmin())) || attendeeCountIncrement();
+        (resource.data.ownerId == request.auth.uid || isAdmin())) ||
+        attendeeCountIncrement() || bookedSeatAppend(id);
       allow delete: if request.auth != null &&
         (resource.data.ownerId == request.auth.uid || isAdmin());
     }

@@ -1624,11 +1624,19 @@ async function saveBooking(data){
       eventEmoji: evData.emoji || null,
       createdAt: ts
     };
-    await db.collection("bookings").doc(data.bookingId).set(doc);
-    await db.collection("payments").doc(data.bookingId).set(doc);
-    // The trusted booking trigger updates event inventory and bookedSeats.
-    // Guest clients cannot write protected event fields under Firestore rules.
+    const batch = db.batch();
+    batch.set(db.collection('bookings').doc(data.bookingId), doc);
+    batch.set(db.collection('payments').doc(data.bookingId), doc);
+    if(eventId && seatIds.length){
+      batch.update(db.collection('events').doc(eventId), {
+        bookedSeats: firebase.firestore.FieldValue.arrayUnion(...seatIds),
+        lastSeatBookingId: data.bookingId
+      });
+    }
+    await batch.commit();
+    return true;
   }catch(e){ console.error("saveBooking:",e); }
+  return false;
 }
 
 // ── SEND EMAIL ──
@@ -1722,7 +1730,12 @@ async function submitBooking(){
 
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
-    await saveBooking({ bookingId:bid, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone, state });
+    const saved = await saveBooking({ bookingId:bid, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone, state });
+    if(!saved){
+      setBookingSubmissionBusy(false, 0);
+      showToast('Could not save your booking. Please try again.');
+      return;
+    }
     await fetchBookedSeats();
     if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
     const emailSent = await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
@@ -1777,7 +1790,11 @@ async function submitBooking(){
         return;
       }
       document.getElementById("rStatus").textContent = "✅ Confirmed";
-      await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone, state });
+      const saved = await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone, state });
+      if(!saved){
+        showPaymentError('Payment was verified, but the booking could not be saved. Do not pay again; contact support with booking reference '+pid+'.');
+        return;
+      }
       await fetchBookedSeats();
       if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
       const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
