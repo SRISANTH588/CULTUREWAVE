@@ -43,6 +43,71 @@ exports.decreaseOrganiserFollowerCount = onDocumentDeleted({
   await db.collection('organisers').doc(organiserId).update({followers: FieldValue.increment(-1)});
 });
 
+const confirmedBookingStatuses = new Set(['confirmed', 'paid', 'success', 'completed']);
+
+exports.blockBookedSeats = onDocumentCreated({
+  document: 'bookings/{bookingId}',
+  region: 'asia-south1',
+  retry: true,
+}, async (event) => {
+  const bookingRef = event.data.ref;
+  const initialBooking = event.data.data();
+  const eventId = String(initialBooking.eventId || '');
+  if (!eventId || !confirmedBookingStatuses.has(String(initialBooking.status || '').toLowerCase())) return;
+
+  const eventRef = db.collection('events').doc(eventId);
+  await db.runTransaction(async (transaction) => {
+    const [bookingSnap, eventSnap] = await Promise.all([
+      transaction.get(bookingRef), transaction.get(eventRef),
+    ]);
+    if (!bookingSnap.exists || bookingSnap.data().inventoryApplied === true) return;
+    if (!eventSnap.exists) throw new Error(`Event ${eventId} was not found while applying booking inventory.`);
+
+    const booking = bookingSnap.data();
+    if (!confirmedBookingStatuses.has(String(booking.status || '').toLowerCase())) return;
+    const eventData = eventSnap.data();
+    const tickets = Array.isArray(eventData.tickets) ? eventData.tickets.map(ticket => ({...ticket})) : [];
+    const ticketItems = Array.isArray(booking.ticketItems) && booking.ticketItems.length
+      ? booking.ticketItems
+      : [{ticketIndex: -1, ticketName: String(booking.ticketName || '').split(' × ')[0], quantity: booking.seats || 1}];
+
+    ticketItems.forEach((item) => {
+      const index = Number(item.ticketIndex);
+      const ticketIndex = Number.isInteger(index) && index >= 0 && tickets[index]?.name === item.ticketName
+        ? index
+        : tickets.findIndex(ticket => String(ticket.name || '') === String(item.ticketName || ''));
+      if (ticketIndex < 0 || !tickets[ticketIndex]) return;
+      const ticket = tickets[ticketIndex];
+      const quantity = Math.max(1, Number(item.quantity) || 1);
+      const booked = Math.max(0, Number(ticket.booked) || 0) + quantity;
+      ticket.booked = booked;
+      const configuredInventory = Number(ticket.qty || ticket.inventory || 0);
+      if (configuredInventory > 0) {
+        ticket.available = Math.max(0, configuredInventory - booked);
+      } else if (ticket.available != null || ticket.remaining != null) {
+        const currentAvailable = Number(ticket.available ?? ticket.remaining) || 0;
+        ticket.available = Math.max(0, currentAvailable - quantity);
+        delete ticket.remaining;
+      }
+    });
+
+    const seatIds = Array.isArray(booking.seatIds)
+      ? [...new Set(booking.seatIds.map(String).map(value => value.trim()).filter(Boolean))]
+      : [];
+    const attendeeCount = Math.max(1, Number(booking.seats) || ticketItems.reduce((sum, item) => sum + Math.max(0, Number(item.quantity) || 0), 0) || 1);
+    const updates = {
+      totalBooked: FieldValue.increment(attendeeCount),
+      ...(seatIds.length ? {bookedSeats: FieldValue.arrayUnion(...seatIds)} : {}),
+      ...(tickets.length ? {tickets} : {}),
+    };
+    transaction.update(eventRef, updates);
+    transaction.update(bookingRef, {
+      inventoryApplied: true,
+      inventoryAppliedAt: FieldValue.serverTimestamp(),
+    });
+  });
+});
+
 exports.emailFollowersAboutNewEvent = onDocumentCreated({
   document: 'events/{eventId}',
   region: 'asia-south1',

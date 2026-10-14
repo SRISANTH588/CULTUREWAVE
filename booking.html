@@ -1611,39 +1611,8 @@ async function saveBooking(data){
     };
     await db.collection("bookings").doc(data.bookingId).set(doc);
     await db.collection("payments").doc(data.bookingId).set(doc);
-    if(eventId){
-      try{
-        await db.collection('events').doc(eventId).update({
-          totalBooked: firebase.firestore.FieldValue.increment(Math.max(1, Number(data.seats) || 1))
-        });
-      }catch(e){ console.warn('Could not update public attendee count:', e.message); }
-    }
-    // Also update the event's bookedSeats array in Firestore so the seat map
-    // reflects the new booking immediately for all users.
-    if(eventId){
-      try{
-        const updateData = {};
-        if(seatIds.length) updateData.bookedSeats = firebase.firestore.FieldValue.arrayUnion(...seatIds);
-        // Keep inventory on the selected ticket types so their quantities sell out independently.
-        const evSnap = await db.collection('events').doc(eventId).get();
-        if(evSnap.exists){
-          const evTickets = evSnap.data().tickets || [];
-          const bookedItems = ticketItems.length ? ticketItems : [{ticketIndex:-1,ticketName:(data.ticketName||'').split(' × ')[0],quantity:data.seats||1}];
-          bookedItems.forEach(item=>{
-            const tIdx = Number.isInteger(Number(item.ticketIndex)) && Number(item.ticketIndex)>=0 && evTickets[Number(item.ticketIndex)]?.name===item.ticketName
-              ? Number(item.ticketIndex)
-              : evTickets.findIndex(t => (t.name||'') === item.ticketName);
-            if(tIdx<0 || !evTickets[tIdx]) return;
-            const booked = (Number(evTickets[tIdx].booked)||0) + Math.max(1,Number(item.quantity)||1);
-            evTickets[tIdx].booked = booked;
-            const inventory = Number(evTickets[tIdx].qty||evTickets[tIdx].inventory||0);
-            if(inventory>0 || evTickets[tIdx].available!=null) evTickets[tIdx].available = Math.max(0,(inventory||Number(evTickets[tIdx].available)||booked)-booked);
-          });
-          if(bookedItems.length) updateData.tickets = evTickets;
-        }
-        if(Object.keys(updateData).length) await db.collection('events').doc(eventId).update(updateData);
-      }catch(_){}
-    }
+    // The trusted booking trigger updates event inventory and bookedSeats.
+    // Guest clients cannot write protected event fields under Firestore rules.
   }catch(e){ console.error("saveBooking:",e); }
 }
 
