@@ -1775,7 +1775,7 @@ async function submitBooking(){
       let paymentMethod='Razorpay';
       let verificationMessage='Payment signature verification failed.';
       try{
-        const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)});
+        const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...r,booking:{bookingId:pid,eventId,amountPaise:Math.round(total*100),tickets:ticketCount,seatIds:selectedSeats}})});
         const verificationData=await verification.json();
         verified=verification.ok&&verificationData.verified===true;
         paymentMethod=verificationData.method||paymentMethod;

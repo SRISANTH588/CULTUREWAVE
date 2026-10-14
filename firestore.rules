@@ -44,6 +44,23 @@ service cloud.firestore {
         resource.data.status in ['published', 'live', 'active'];
     }
 
+    function validPaidProof(booking, eventId) {
+      let paymentId = booking.get('paymentId', '');
+      let proofPath = /databases/$(database)/documents/verifiedPayments/$(paymentId);
+      let proof = get(proofPath).data;
+      let bookingSeats = booking.get('seatIds', []);
+      let proofSeats = proof.get('seatIds', []);
+      return booking.get('status', '') == 'paid' &&
+        paymentId is string && paymentId.size() > 0 &&
+        proof.status == 'captured' && proof.paymentId == paymentId &&
+        proof.bookingId == booking.get('bookingId', '') &&
+        proof.eventId == eventId && proof.amount == booking.amount * 100 &&
+        proof.tickets == booking.get('seats', -1) &&
+        bookingSeats is list && proofSeats is list &&
+        bookingSeats.size() == proofSeats.size() &&
+        bookingSeats.hasAll(proofSeats) && proofSeats.hasAll(bookingSeats);
+    }
+
     // Seat selections are written atomically with the corresponding booking.
     // Public booking pages may append only the seats listed on that booking.
     function bookedSeatAppend(eventId) {
@@ -59,6 +76,8 @@ service cloud.firestore {
         booking.get('eventId', '') == eventId &&
         booking.get('status', '') in ['confirmed', 'paid', 'success', 'completed'] &&
         bookingSeats is list && bookingSeats.size() > 0 && bookingSeats.size() <= 20 &&
+        ((booking.get('status', '') == 'confirmed' && booking.get('amount', -1) == 0) ||
+          validPaidProof(booking, eventId)) &&
         oldSeats is list && newSeats is list &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bookedSeats', 'lastSeatBookingId']) &&
         newSeats.hasAll(oldSeats) &&
@@ -193,9 +212,18 @@ service cloud.firestore {
         (request.resource.data.get('userId', null) == null ||
           (request.auth != null && request.resource.data.userId == request.auth.uid)) &&
         (request.auth == null
-          ? get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.get('inviteOnly', false) != true
-          : (ownsEvent(request.resource.data.eventId) || inviteAllowsBooking(request.resource.data.eventId)));
-      allow update: if true;
+          ? get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.get('inviteOnly', false) != true &&
+            ((request.resource.data.get('amount', -1) == 0 && request.resource.data.get('status', '') == 'confirmed') || validPaidProof(request.resource.data, request.resource.data.eventId))
+          : (ownsEvent(request.resource.data.eventId) ||
+            (inviteAllowsBooking(request.resource.data.eventId) &&
+              ((request.resource.data.get('amount', -1) == 0 && request.resource.data.get('status', '') == 'confirmed') || validPaidProof(request.resource.data, request.resource.data.eventId)))));
+      allow update: if (request.auth != null && ownsEvent(resource.data.eventId)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'confirmationEmail', 'confirmationEmailStatus', 'confirmationEmailSentAt'
+        ]) && (resource.data.get('amount', -1) == 0 || validPaidProof(resource.data, resource.data.eventId))) ||
+        (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checkedIn', 'checkedInAt', 'checkedInDate'
+        ]));
       allow delete: if request.auth != null;
     }
 
@@ -227,9 +255,16 @@ service cloud.firestore {
       );
       allow create: if request.resource.data.eventId is string &&
         (request.auth == null
-          ? get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.get('inviteOnly', false) != true
-          : (ownsEvent(request.resource.data.eventId) || inviteAllowsBooking(request.resource.data.eventId)));  // event owners can issue invitation tickets
-      allow update, delete: if request.auth != null;
+          ? get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.get('inviteOnly', false) != true &&
+            ((request.resource.data.get('amount', -1) == 0 && request.resource.data.get('status', '') == 'confirmed') || validPaidProof(request.resource.data, request.resource.data.eventId))
+          : (ownsEvent(request.resource.data.eventId) ||
+            (inviteAllowsBooking(request.resource.data.eventId) &&
+              ((request.resource.data.get('amount', -1) == 0 && request.resource.data.get('status', '') == 'confirmed') || validPaidProof(request.resource.data, request.resource.data.eventId)))));  // event owners can issue invitation tickets
+      allow update, delete: if request.auth != null && ownsEvent(resource.data.eventId);
+    }
+
+    match /verifiedPayments/{paymentId} {
+      allow read, write: if false;
     }
 
     match /wallets/{uid} {

@@ -132,7 +132,92 @@ async function verifyPayment(request, env) {
   if (finalPayment.status !== "captured") {
     return json({ success: false, verified: false, error: "Razorpay has not confirmed a captured payment." }, 400);
   }
+  const booking = body.booking || {};
+  const bookingId = clean(booking.bookingId, 100);
+  const eventId = clean(booking.eventId, 120);
+  const amountPaise = Number(booking.amountPaise);
+  const tickets = Number(booking.tickets);
+  const seatIds = Array.isArray(booking.seatIds) ? [...new Set(booking.seatIds.map(value => clean(value, 80)).filter(Boolean))] : [];
+  if (bookingId !== paymentId || !eventId || amountPaise !== Number(finalPayment.amount) ||
+      !Number.isInteger(tickets) || tickets < 1 || tickets > 20 || Number(order.notes?.tickets) !== tickets ||
+      !Array.isArray(booking.seatIds) || seatIds.length !== booking.seatIds.length || seatIds.length > 20) {
+    return json({ success: false, verified: false, error: "Booking details do not match the captured payment." }, 400);
+  }
+  if (clean(order.notes?.eventId, 120) !== eventId) {
+    return json({ success: false, verified: false, error: "Payment order does not match this event." }, 400);
+  }
+  await persistPaymentProof(env, {
+    paymentId, orderId, eventId, bookingId, amount: Number(finalPayment.amount), tickets,
+    seatIds, status: "captured", method: finalPayment.method || "Razorpay",
+  });
   return json({ success: true, verified: true, method: finalPayment.method || "Razorpay" });
+}
+
+const base64url = value => btoa(String.fromCharCode(...new TextEncoder().encode(value)))
+  .replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+
+async function firestoreAccessToken(env) {
+  if (!env.FIREBASE_SERVICE_ACCOUNT_JSON) throw new Error("Payment verification storage is not configured.");
+  const account = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  const now = Math.floor(Date.now() / 1000);
+  const header = base64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const claims = base64url(JSON.stringify({
+    iss: account.client_email,
+    scope: "https://www.googleapis.com/auth/datastore",
+    aud: account.token_uri || "https://oauth2.googleapis.com/token",
+    iat: now,
+    exp: now + 3600,
+  }));
+  const unsigned = `${header}.${claims}`;
+  const pem = account.private_key.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, "");
+  const binary = Uint8Array.from(atob(pem), char => char.charCodeAt(0));
+  const key = await crypto.subtle.importKey("pkcs8", binary, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
+  const signature = new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(unsigned)));
+  const assertion = `${unsigned}.${btoa(String.fromCharCode(...signature)).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_")}`;
+  const response = await fetch(account.token_uri || "https://oauth2.googleapis.com/token", {
+    method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion }),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.access_token) throw new Error("Could not authorize the payment record write.");
+  return result.access_token;
+}
+
+function firestoreValue(value) {
+  if (value === null) return { nullValue: null };
+  if (typeof value === "boolean") return { booleanValue: value };
+  if (typeof value === "number") return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
+  if (Array.isArray(value)) return { arrayValue: { values: value.map(firestoreValue) } };
+  return { stringValue: String(value) };
+}
+
+async function persistPaymentProof(env, proof) {
+  const token = await firestoreAccessToken(env);
+  const projectId = env.FIREBASE_PROJECT_ID || "ogshootsluxe-36740";
+  const url = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents/verifiedPayments/${encodeURIComponent(proof.paymentId)}?currentDocument.exists=false`;
+  const fields = Object.fromEntries(Object.entries({ ...proof, verifiedAt: new Date().toISOString() }).map(([key, value]) => [key, firestoreValue(value)]));
+  const response = await fetch(url, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields }),
+  });
+  if (response.ok) return;
+  if (response.status === 409 || response.status === 400) {
+    const existingResponse = await fetch(`https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents/verifiedPayments/${encodeURIComponent(proof.paymentId)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (existingResponse.ok) {
+      const existing = await existingResponse.json();
+      const fields = existing.fields || {};
+      const existingSeats = (fields.seatIds?.arrayValue?.values || []).map(value => value.stringValue);
+      if (fields.status?.stringValue === "captured" && fields.orderId?.stringValue === proof.orderId &&
+          fields.eventId?.stringValue === proof.eventId && Number(fields.amount?.integerValue) === proof.amount &&
+          Number(fields.tickets?.integerValue) === proof.tickets &&
+          existingSeats.length === proof.seatIds.length && existingSeats.every(seat => proof.seatIds.includes(seat))) return;
+    }
+  }
+  console.error("Could not persist captured payment proof", response.status);
+  throw new Error("Payment was captured, but its verification record could not be saved. Contact support before retrying.");
 }
 
 export default {
