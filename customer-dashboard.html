@@ -519,7 +519,8 @@ auth.onAuthStateChanged(async user => {
     // fallback: get phone + member since from earliest booking
     if (!phone || !joined) {
       try {
-        const bSnap = await db.collection('bookings').where('customerEmail','==',user.email).orderBy('createdAt','asc').limit(1).get();
+        const customerEmail=String(user.email||'').trim().toLowerCase();
+        const bSnap = await db.collection('bookings').where('customerEmail','==',customerEmail).orderBy('createdAt','asc').limit(1).get();
         if (!bSnap.empty) {
           const bd = bSnap.docs[0].data();
           if (!phone) phone = bd.customerPhone || '';
@@ -566,14 +567,15 @@ switchView('bookings');
 // ── BOOKINGS ──
 async function loadBookings() {
   try {
+    const customerEmail=String(currentUser.email||'').trim().toLowerCase();
     // Query by userId first
     let snap = await db.collection('bookings').where('userId','==',currentUser.uid).orderBy('createdAt','desc').get();
     allBookings = snap.docs.map(d => ({id:d.id,...d.data()}));
 
     // Also query by customerEmail to catch bookings made before account creation
-    if (currentUser.email) {
+    if (customerEmail) {
       try {
-        const emailSnap = await db.collection('bookings').where('customerEmail','==',currentUser.email).orderBy('createdAt','desc').get();
+        const emailSnap = await db.collection('bookings').where('customerEmail','==',customerEmail).orderBy('createdAt','desc').get();
         const emailBookings = emailSnap.docs.map(d => ({id:d.id,...d.data()}));
         // Merge, avoiding duplicates by bookingId/doc id
         const existingIds = new Set(allBookings.map(b => b.id));
@@ -582,7 +584,7 @@ async function loadBookings() {
         allBookings.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
       } catch(e) {
         // fallback without orderBy
-        const emailSnap = await db.collection('bookings').where('customerEmail','==',currentUser.email).get();
+        const emailSnap = await db.collection('bookings').where('customerEmail','==',customerEmail).get();
         const emailBookings = emailSnap.docs.map(d => ({id:d.id,...d.data()}));
         const existingIds = new Set(allBookings.map(b => b.id));
         emailBookings.forEach(b => { if(!existingIds.has(b.id)) allBookings.push(b); });
@@ -597,7 +599,7 @@ async function loadBookings() {
   } catch(e) {
     // fallback: query only by email
     try {
-      const snap = await db.collection('bookings').where('customerEmail','==',currentUser.email).get();
+      const snap = await db.collection('bookings').where('customerEmail','==',String(currentUser.email||'').trim().toLowerCase()).get();
       allBookings = snap.docs.map(d => ({id:d.id,...d.data()}));
       await enrichBookingDates();
       renderBookings(allBookings);

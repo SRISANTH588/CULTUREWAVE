@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile, RecaptchaVerifier, signInWithPhoneNumber, EmailAuthProvider, linkWithCredential } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getBytes, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
@@ -76,7 +76,7 @@ export {
   toEmail, getCurrentUser, requireAuth, logout, getPublicBase,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification,
   GoogleAuthProvider, signInWithPopup, updateProfile,
-  RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged,
+  RecaptchaVerifier, signInWithPhoneNumber, EmailAuthProvider, linkWithCredential, onAuthStateChanged,
   ref, uploadBytes, getBytes, deleteObject,
   doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
   collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp
