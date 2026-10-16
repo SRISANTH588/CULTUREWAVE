@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#a91f2e">
+  <title>Membership — COMMUNITY.VJA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="communitie.css">
+  <link rel="stylesheet" href="pages.css">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="membership.css">
+</head>
+<body class="membership-page">
+  <header class="topbar">
+    <a class="brand" href="index.html"><span>COMMUNITY.VJA</span></a>
+    <button class="location-picker" type="button" aria-label="Choose your city" data-city-open><span class="location-pin">⌖</span><span data-active-city>Hyderabad</span><span class="location-chevron">⌄</span></button>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="explore.html" class="nav-link">Explore</a>
+      <a href="clubs.html" class="nav-link">Clubs</a>
+      <a href="membership.html" class="nav-link active" aria-current="page">Membership</a>
+    </nav>
+    <div class="top-actions"><a class="login-button" href="login.html">Log in</a><button class="menu-toggle" aria-label="Open menu">☰</button></div>
+  </header>
+
+  <main class="membership-main">
+    <section class="membership-hero">
+      <span class="membership-kicker">A LITTLE MORE COMMUNITY</span>
+      <h1>Make room for <em>more.</em></h1>
+      <p>More plans, more people, more reasons to show up. Pick the membership that fits your kind of city life.</p>
+      <div class="billing-toggle" role="group" aria-label="Billing frequency"><button class="selected" type="button" data-billing="monthly">Monthly</button><button type="button" data-billing="annual">Yearly <span>Save 20%</span></button></div>
+    </section>
+
+    <section class="membership-plans" aria-label="Membership plans">
+      <article class="membership-card">
+        <div class="plan-top"><span class="plan-icon">○</span><span class="plan-label">A GOOD START</span></div>
+        <h2>Community</h2><p class="plan-description">For meeting your people and finding your next thing.</p>
+        <div class="plan-price"><strong data-month="0" data-year="0">₹0</strong><span> forever</span></div>
+        <a class="plan-cta plan-cta-outline" href="explore.html">Explore for free <span>↗</span></a>
+        <div class="plan-divider"></div><span class="includes-label">THE GOOD STUFF</span>
+        <ul><li>Explore local experiences</li><li>Join up to 3 clubs</li><li>Save your favourite plans</li><li>Meet people in your city</li></ul>
+      </article>
+
+      <article class="membership-card plan-featured">
+        <div class="popular-ribbon">MOST LOVED</div>
+        <div class="plan-top"><span class="plan-icon">✳</span><span class="plan-label">FOR THE REGULARS</span></div>
+        <h2>Communitie Plus</h2><p class="plan-description">For saying yes more often and getting a little extra.</p>
+        <div class="plan-price"><strong data-month="299" data-year="239">₹299</strong><span data-period>/ month</span></div>
+        <a class="plan-cta plan-cta-primary" href="login.html?plan=plus">Choose Plus <span>↗</span></a>
+        <div class="plan-divider"></div><span class="includes-label">EVERYTHING IN COMMUNITY, PLUS</span>
+        <ul><li>Unlimited club memberships</li><li>Early access to popular events</li><li>Member-only experiences</li><li>Save on selected event tickets</li></ul>
+      </article>
+
+      <article class="membership-card">
+        <div class="plan-top"><span class="plan-icon">✺</span><span class="plan-label">YOUR CITY, YOUR CIRCLE</span></div>
+        <h2>All Access</h2><p class="plan-description">For the ones who want the whole city to feel like theirs.</p>
+        <div class="plan-price"><strong data-month="699" data-year="559">₹699</strong><span data-period>/ month</span></div>
+        <a class="plan-cta plan-cta-outline" href="login.html?plan=all-access">Choose All Access <span>↗</span></a>
+        <div class="plan-divider"></div><span class="includes-label">EVERYTHING IN PLUS, PLUS</span>
+        <ul><li>Two guest passes every month</li><li>Priority booking on every event</li><li>Exclusive All Access meetups</li><li>Personalised city picks</li></ul>
+      </article>
+    </section>
+
+    <section class="membership-note"><span>✳</span><p>Every membership helps us make more good things happen in your city.<br><a href="explore.html">See what’s happening near you <b>↗</b></a></p></section>
+    <section class="membership-faq"><div><span class="membership-kicker">GOOD TO KNOW</span><h2>Questions? <em>Of course.</em></h2></div><details><summary>Can I change my membership later?</summary><p>Yes. You can switch or cancel your plan from your account settings whenever you need to.</p></details><details><summary>Is my membership tied to one city?</summary><p>Your membership travels with you. Choose another supported city any time.</p></details><details><summary>When will I be charged?</summary><p>Your selected plan and billing period are shown before checkout. You can review everything before confirming.</p></details></section>
+  </main>
+  <footer class="listing-footer membership-footer"><a href="index.html" class="brand"><span>COMMUNITY.VJA</span></a><span>FIND YOUR PEOPLE. SHOW UP FOR YOUR CITY.</span><a href="clubs.html">Find your club ↗</a></footer>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="city.js"></script>
+  <script src="membership.js"></script>
+</body>
+</html>
