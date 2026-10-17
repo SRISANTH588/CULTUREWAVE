@@ -30,6 +30,48 @@ function basicAuth(env) {
   return `Basic ${btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`)}`;
 }
 
+function firestoreBase(env) {
+  const projectId = env.FIREBASE_PROJECT_ID || "ogshootsluxe-36740";
+  return `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents`;
+}
+
+function decodeFirestoreValue(value = {}) {
+  if ("stringValue" in value) return value.stringValue;
+  if ("integerValue" in value) return Number(value.integerValue);
+  if ("doubleValue" in value) return value.doubleValue;
+  if ("booleanValue" in value) return value.booleanValue;
+  if ("nullValue" in value) return null;
+  if ("timestampValue" in value) return value.timestampValue;
+  if ("arrayValue" in value) return (value.arrayValue.values || []).map(decodeFirestoreValue);
+  if ("mapValue" in value) return decodeFirestoreFields(value.mapValue.fields || {});
+  return null;
+}
+
+function decodeFirestoreFields(fields = {}) {
+  return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, decodeFirestoreValue(value)]));
+}
+
+async function getFirestoreDocument(env, collection, id, token) {
+  const response = await fetch(`${firestoreBase(env)}/${collection}/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error("Could not read the event payment record.");
+  const document = await response.json();
+  return { name: document.name, updateTime: document.updateTime, ...decodeFirestoreFields(document.fields || {}) };
+}
+
+async function patchFirestoreDocument(env, collection, id, values, token) {
+  const query = new URLSearchParams();
+  Object.keys(values).forEach(field => query.append("updateMask.fieldPaths", field));
+  const response = await fetch(`${firestoreBase(env)}/${collection}/${encodeURIComponent(id)}?${query}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields: Object.fromEntries(Object.entries(values).map(([key, value]) => [key, firestoreValue(value)])) }),
+  });
+  if (!response.ok) throw new Error("Could not save the payment transaction record.");
+}
+
 async function razorpayRequest(env, path, options = {}) {
   const response = await fetch(`https://api.razorpay.com/v1/${path}`, {
     ...options,
@@ -74,6 +116,18 @@ async function createOrder(request, env) {
   }
   const customer = body.customer || {};
   const event = body.event || {};
+  const stallSlotIndex = body.stallSlotIndex === undefined ? null : Number(body.stallSlotIndex);
+  if (stallSlotIndex !== null) {
+    if (!Number.isInteger(stallSlotIndex) || stallSlotIndex < 0 || stallSlotIndex > 4 || !event.id) {
+      return json({ success: false, error: "Stall slot details are invalid." }, 400);
+    }
+    const firestoreToken = await firestoreAccessToken(env);
+    const eventDoc = await getFirestoreDocument(env, "events", clean(event.id, 120), firestoreToken);
+    const slot = eventDoc?.stallSlots?.[stallSlotIndex];
+    if (!slot?.open || Math.round(Number(slot.fee) * 100) !== amount) {
+      return json({ success: false, error: "This stall is no longer available. Choose another open stall." }, 409);
+    }
+  }
   const receipt = clean(body.receipt, 40).replace(/[^a-zA-Z0-9_-]/g, "") || `cw_${Date.now()}`;
   const order = await razorpayRequest(env, "orders", {
     method: "POST",
@@ -88,6 +142,7 @@ async function createOrder(request, env) {
         customerEmail: clean(customer.email, 180).toLowerCase(),
         customerPhone: clean(customer.phone, 32),
         tickets: String(Math.max(1, Number(customer.tickets) || 1)),
+        ...(stallSlotIndex !== null ? { stallSlotIndex: String(stallSlotIndex) } : {}),
       },
     }),
   });
@@ -146,11 +201,71 @@ async function verifyPayment(request, env) {
   if (clean(order.notes?.eventId, 120) !== eventId) {
     return json({ success: false, verified: false, error: "Payment order does not match this event." }, 400);
   }
+  const stallSlotIndex = order.notes?.stallSlotIndex === undefined ? null : Number(order.notes.stallSlotIndex);
+  const firestoreToken = await firestoreAccessToken(env);
+  const paymentRecord = {
+    bookingId, receipt: order.receipt || paymentId, eventId,
+    eventName: clean(order.notes?.eventName, 200) || "CultureWave event",
+    amount: Number(finalPayment.amount) / 100, currency: order.currency,
+    status: "paid", paymentId, paymentMethod: finalPayment.method || "Razorpay",
+    customerName: clean(order.notes?.customerName),
+    customerEmail: clean(order.notes?.customerEmail, 180).toLowerCase(),
+    customerPhone: clean(order.notes?.customerPhone, 32),
+    createdAt: { __firestoreTimestamp: new Date().toISOString() },
+    paidAt: { __firestoreTimestamp: new Date().toISOString() },
+  };
+  await patchFirestoreDocument(env, "payments", paymentId, paymentRecord, firestoreToken);
+  if (stallSlotIndex !== null) {
+    try {
+      await claimStallSlot(env, firestoreToken, eventId, stallSlotIndex, paymentId, Number(finalPayment.amount));
+    } catch (error) {
+      await patchFirestoreDocument(env, "payments", paymentId, {
+        status: "review", stallSlotConflict: true, reviewNote: error.message,
+      }, firestoreToken);
+      throw error;
+    }
+  }
   await persistPaymentProof(env, {
     paymentId, orderId, eventId, bookingId, amount: Number(finalPayment.amount), tickets,
     seatIds, status: "captured", method: finalPayment.method || "Razorpay",
   });
   return json({ success: true, verified: true, method: finalPayment.method || "Razorpay" });
+}
+
+async function claimStallSlot(env, token, eventId, slotIndex, paymentId, amountPaise) {
+  const base = firestoreBase(env);
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const beginResponse = await fetch(`${base}:beginTransaction`, {
+      method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ options: { readWrite: {} } }),
+    });
+    if (!beginResponse.ok) throw new Error("Could not reserve this stall.");
+    const { transaction } = await beginResponse.json();
+    const eventUrl = `${base}/events/${encodeURIComponent(eventId)}?transaction=${encodeURIComponent(transaction)}`;
+    const eventResponse = await fetch(eventUrl, { headers: { Authorization: `Bearer ${token}` } });
+    if (!eventResponse.ok) throw new Error("Could not find the event stall.");
+    const rawEvent = await eventResponse.json();
+    const event = decodeFirestoreFields(rawEvent.fields || {}), slots = Array.isArray(event.stallSlots) ? [...event.stallSlots] : [];
+    const slot = slots[slotIndex];
+    if (!slot || Math.round(Number(slot.fee) * 100) !== amountPaise) throw new Error("The stall fee does not match this payment.");
+    if (!slot.open && slot.applicationPaymentId !== paymentId) throw new Error("This stall was just booked by someone else. Your captured payment has been flagged for review.");
+    if (slot.applicationPaymentId === paymentId) return;
+    slots[slotIndex] = {...slot, open: false, applicationPaymentId: paymentId, applicationStatus: "pending"};
+    const commitResponse = await fetch(`${base}:commit`, {
+      method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        transaction,
+        writes: [{
+          update: { name: rawEvent.name, fields: { stallSlots: firestoreValue(slots), updatedAt: { timestampValue: new Date().toISOString() } } },
+          updateMask: { fieldPaths: ["stallSlots", "updatedAt"] },
+          currentDocument: { updateTime: rawEvent.updateTime },
+        }],
+      }),
+    });
+    if (commitResponse.ok) return;
+    if (![409, 400, 412].includes(commitResponse.status)) throw new Error("Could not reserve this stall.");
+  }
+  throw new Error("This stall is being booked right now. Refresh and check its availability.");
 }
 
 const base64url = value => btoa(String.fromCharCode(...new TextEncoder().encode(value)))
@@ -184,10 +299,14 @@ async function firestoreAccessToken(env) {
 }
 
 function firestoreValue(value) {
+  if (value && typeof value === "object" && value.__firestoreTimestamp) {
+    return { timestampValue: value.__firestoreTimestamp };
+  }
   if (value === null) return { nullValue: null };
   if (typeof value === "boolean") return { booleanValue: value };
   if (typeof value === "number") return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
   if (Array.isArray(value)) return { arrayValue: { values: value.map(firestoreValue) } };
+  if (typeof value === "object") return { mapValue: { fields: Object.fromEntries(Object.entries(value).map(([key, item]) => [key, firestoreValue(item)])) } };
   return { stringValue: String(value) };
 }
 

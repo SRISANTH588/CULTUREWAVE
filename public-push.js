@@ -6,6 +6,15 @@
   const publicKey = window.CULTUREWAVE_PUSH_PUBLIC_KEY || '';
   if (!prompt || !status || !enable || !disable) return;
 
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isInstalled = navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+  const isIOSBrowserTab = isIOS && !isInstalled;
+  const hasPushSupport = 'Notification' in window &&
+    'serviceWorker' in navigator && 'PushManager' in window;
+  const missingVapidKey = !publicKey || publicKey.includes('REPLACE_WITH');
+
   const endpointId = endpoint => btoa(endpoint).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
   const fromBase64Url = value => {
     const padded = (value + '='.repeat((4 - value.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/');
@@ -21,13 +30,17 @@
 
   async function refresh() {
     prompt.style.display = 'flex';
-    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-      status.textContent = 'Push notifications are not supported in this browser.';
+    if (isIOSBrowserTab) {
+      status.textContent = 'On iPhone or iPad, first tap Share → Add to Home Screen, then open CultureWave from that icon. Phone notifications require iOS 16.4 or later.';
       enable.style.display = 'none'; disable.style.display = 'none'; return;
     }
-    if (!publicKey.startsWith('B')) {
+    if (!hasPushSupport) {
+      status.textContent = 'This browser cannot receive web push notifications. Update your browser or open CultureWave in Safari or Chrome.';
+      enable.style.display = 'none'; disable.style.display = 'none'; return;
+    }
+    if (missingVapidKey) {
       status.textContent = 'Phone alerts are being set up. Please check back soon.';
-      enable.disabled = true; return;
+      enable.disabled = true; enable.style.display = ''; disable.style.display = 'none'; return;
     }
     if (Notification.permission === 'denied') {
       status.textContent = 'Notifications are blocked in browser settings. Allow them there to subscribe.';
@@ -48,7 +61,7 @@
   enable.addEventListener('click', async () => {
     enable.disabled = true;
     try {
-      if (!publicKey.startsWith('B')) throw new Error('Phone alerts are not configured yet.');
+      if (missingVapidKey) throw new Error('CultureWave notifications are not configured yet. Please check back soon.');
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') throw new Error('Notification permission was not granted.');
       const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
