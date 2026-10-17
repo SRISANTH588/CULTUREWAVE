@@ -520,6 +520,10 @@
     <div class="section" id="descSection" style="display:none;">
       <div class="section-title">About this event</div>
       <div class="description" id="evDesc"></div>
+      <section id="acceptedStallsSection" style="display:none;margin-top:1.2rem;padding:1rem;border:1px solid #eadfc9;background:#fbf7ee;border-radius:16px;">
+        <div class="section-title">🏪 Meet the event stalls</div>
+        <div id="acceptedStallsList" style="display:grid;gap:.65rem;"></div>
+      </section>
       <!-- Mobile-only: keeps the host close to the event story. -->
       <button class="mob-about-host" id="mobAboutHost" type="button" onclick="goToProfile()">
         <span class="mob-about-host-avatar" id="mobAboutHostAvatar">CW</span>
@@ -1403,6 +1407,7 @@ async function renderEvent(data){
   document.getElementById('nightAbout').classList.remove('expanded');
   document.getElementById('evDesc').textContent = about;
   document.getElementById('descSection').style.display='block';
+  renderAcceptedStalls(data);
 
   // tickets
   const tickets = data.tickets||[];
@@ -1556,6 +1561,12 @@ async function renderEvent(data){
   }
 }
 
+function renderAcceptedStalls(data){
+  const approvedStalls=(data.acceptedStalls||[]).filter(stall=>stall.status==='accepted');
+  const section=document.getElementById('acceptedStallsSection'),list=document.getElementById('acceptedStallsList');
+  if(section&&list){section.style.display=approvedStalls.length?'':'none';list.innerHTML=approvedStalls.map(stall=>`<article style="padding:.8rem;border-radius:12px;background:#fff;border:1px solid #efe7d8"><strong style="display:block">${esc(stall.stallName||'Event stall')}</strong><span style="display:block;color:#716650;font-size:.82rem;margin-top:.25rem">${esc(stall.description||stall.products||'')}</span>${stall.location?`<small style="display:block;color:#8a7653;margin-top:.35rem">${esc(stall.location)}</small>`:''}</article>`).join('');}
+}
+
 async function showFoodOrderingForEvent(data) {
   const section = document.getElementById('foodAtEvent');
   const links = document.getElementById('foodAtEventLinks');
@@ -1621,6 +1632,7 @@ async function init(){
     if(!liveSnap.exists) return;
     const liveData = liveSnap.data();
     evData={...evData,...liveData};
+    renderAcceptedStalls(evData);
     updateRegistrationStatus(evData);
     evData.allowSharing = liveData.allowSharing;
     evData.showAttendeeCount = liveData.showAttendeeCount;

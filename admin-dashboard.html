@@ -366,6 +366,7 @@
     <button class="sb-item" data-view="users"><span class="si-icon">👥</span> Members <span class="si-badge" id="badgeUsers">0</span></button>
     <button class="sb-item" data-view="events"><span class="si-icon">🎪</span> Live Events <span class="si-badge green" id="badgeEvents">0</span></button>
     <button class="sb-item" data-view="new-listers"><span class="si-icon">🧾</span> New Lister <span class="si-badge orange" id="badgeNewListers">0</span></button>
+    <button class="sb-item" data-view="stalls"><span class="si-icon">🏪</span> Event Stalls</button>
     <button class="sb-item" data-view="campaigns"><span class="si-icon">🚀</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
     <button class="sb-item" data-view="payments"><span class="si-icon">💳</span> Transactions <span class="si-badge" id="badgePayments">0</span></button>
     <button class="sb-item" data-view="whatsapp"><span class="si-icon">💬</span> WA Dispatch <span class="si-badge green" id="badgeWA">0</span></button>
@@ -885,6 +886,13 @@
     </div>
   </div>
 
+  <div class="view" data-view="stalls">
+    <div style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8,#3b82f6);border-radius:20px;padding:1.3rem 1.75rem;margin-bottom:1rem;color:white"><div style="font-size:1.65rem;font-weight:800">Event Stalls</div><div style="opacity:.8;margin-top:.25rem">Open up to five paid stall slots per event and review applications.</div></div>
+    <div class="card" style="font-size:.82rem;color:var(--muted)">Refund policy: rejected applications should be refunded to the original payment method. Process the refund in Razorpay using the payment ID shown in the application row. Accepted stall fees are non-refundable if the keeper cancels; event cancellation requires a refund.</div>
+    <div class="card"><div class="field"><label for="stallAdminEvent">Choose event</label><select id="stallAdminEvent" onchange="selectStallAdminEvent(this.value)" style="width:100%;padding:.7rem;border:1px solid var(--border);border-radius:10px"><option value="">Select an event</option></select></div><div id="stallAdminSlots" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-top:1rem"></div></div>
+    <div class="card" style="margin-top:1rem"><div style="font-weight:800;margin-bottom:.8rem">Stall applications</div><div class="table-wrap"><table class="data-table"><thead><tr><th>Slot / Event</th><th>Stall & contact</th><th>Details</th><th>Payment</th><th>Status</th><th>Review</th></tr></thead><tbody id="stallApplicationsTable"><tr><td colspan="6">Choose an event to review its applications.</td></tr></tbody></table></div></div>
+  </div>
+
   <!-- ══════════════════════════════════════════
        VIEW: WEBINARS
   ══════════════════════════════════════════ -->
@@ -1402,7 +1410,7 @@ window.updateTicketRequestStatus = async function(id, status) {
 
 // ── NAVIGATION ──
 const viewTitles = {
-  overview:'Dashboard', analytics:'Analytics & Insights', users:'Member Management', events:'Live Events',
+  overview:'Dashboard', analytics:'Analytics & Insights', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
   campaigns:'Campaigns', payments:'Transactions', refunds:'Refunds',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
@@ -2125,12 +2133,27 @@ onSnapshot(query(collection(db,'vendorOnboarding'),orderBy('submittedAt','desc')
 onSnapshot(query(collection(db,'events'),orderBy('createdAt','desc'),limit(200)), snap => {
   allEvents = snap.docs.map(d=>({id:d.id,collection:'events',...d.data()})).filter(e=>!e.archived);
   renderEventsTable(allEvents);
+  const stallSelect=document.getElementById('stallAdminEvent');
+  if(stallSelect){const selected=stallSelect.value;stallSelect.innerHTML='<option value="">Select an event</option>'+allEvents.map(e=>`<option value="${esc(e.id)}">${esc(e.name||'Untitled event')}</option>`).join('');if(allEvents.some(e=>e.id===selected))stallSelect.value=selected;}
   renderOverviewEvents();
   // webinars are events with type='webinar'
   const webinarItems = allEvents.filter(e=>e.type==='webinar'||e.eventType==='webinar'||e.category==='webinar');
   renderContentTable('webinarsTable', webinarItems.length ? webinarItems : allWebinars);
   updateStats();
 });
+
+window.selectStallAdminEvent=async function(eventId){
+  const host=document.getElementById('stallAdminSlots'),tbody=document.getElementById('stallApplicationsTable');
+  if(!eventId){host.innerHTML='';tbody.innerHTML='<tr><td colspan="6">Choose an event to review its applications.</td></tr>';return;}
+  const event=allEvents.find(e=>e.id===eventId);if(!event)return;
+  const slots=Array.isArray(event.stallSlots)?event.stallSlots:[];
+  host.innerHTML=Array.from({length:5},(_,i)=>{const slot=slots[i]||{};return `<div style="border:1px solid var(--border);border-radius:14px;padding:1rem;background:#fff"><strong>Stall ${i+1}</strong><label style="display:block;font-size:.78rem;margin-top:.7rem">Stall label<input id="stallSlotName${i}" maxlength="80" value="${esc(slot.slotName||`Stall ${i+1}`)}" style="display:block;width:100%;margin-top:.3rem;padding:.55rem;border:1px solid var(--border);border-radius:8px"></label><label style="display:block;font-size:.78rem;margin-top:.55rem">Admin contact email<input type="email" id="stallSlotEmail${i}" value="${esc(slot.adminEmail||'')}" placeholder="Optional" style="display:block;width:100%;margin-top:.3rem;padding:.55rem;border:1px solid var(--border);border-radius:8px"></label><label style="display:flex;align-items:center;gap:.5rem;margin:.75rem 0"><input type="checkbox" id="stallSlotOpen${i}" ${slot.open?'checked':''}> Open for applications</label><label style="font-size:.78rem">Fee (₹)<input type="number" min="1" id="stallSlotFee${i}" value="${Number(slot.fee)||''}" style="display:block;width:100%;margin-top:.3rem;padding:.55rem;border:1px solid var(--border);border-radius:8px"></label><button class="btn sm primary" style="margin-top:.7rem" onclick="saveStallSlot('${eventId}',${i})">Save slot</button><div style="font-size:.72rem;color:var(--muted);margin-top:.5rem">${slot.open?'Open':'Closed'} · ${money(slot.fee||0)}</div>${slot.open?`<a style="display:block;font-size:.72rem;margin-top:.5rem;overflow-wrap:anywhere" href="stall-create.html?eventId=${encodeURIComponent(eventId)}&slot=${i}" target="_blank">Open keeper application page ↗</a>`:''}</div>`}).join('');
+  const snap=await getDocs(query(collection(db,'stallApplications'),where('eventId','==',eventId)));
+  const apps=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
+  tbody.innerHTML=apps.length?apps.map(a=>`<tr><td>${esc(a.slotName||'Stall '+(Number(a.slotIndex)+1))}<br><small>${esc(a.eventName)}</small></td><td><strong>${esc(a.stallName)}</strong><br>${esc(a.contactName)}<br><a href="mailto:${esc(a.email)}">${esc(a.email)}</a><br>${esc(a.phone)}</td><td>${esc(a.description)}<br><small>${esc(a.location||'')} · ${esc(a.products||'')}</small></td><td>${money(a.fee)}<br><small>${esc(a.paymentId||'')}</small></td><td>${esc(a.status)}</td><td>${a.status==='pending'?`<button class="btn sm primary" onclick="reviewStallApplication('${a.id}','accepted')">Accept</button> <button class="btn sm danger" onclick="reviewStallApplication('${a.id}','rejected')">Reject</button>`:esc(a.status)}</td></tr>`).join(''):'<tr><td colspan="6">No stall applications for this event yet.</td></tr>';
+};
+window.saveStallSlot=async function(eventId,index){const event=allEvents.find(e=>e.id===eventId);if(!event)return;const slots=Array.from({length:5},(_,i)=>{const old=(event.stallSlots||[])[i]||{};return {...old,slotIndex:i,slotName:i===index?(document.getElementById(`stallSlotName${i}`).value.trim()||`Stall ${i+1}`):(old.slotName||`Stall ${i+1}`),adminEmail:i===index?document.getElementById(`stallSlotEmail${i}`).value.trim():(old.adminEmail||''),open:i===index?document.getElementById(`stallSlotOpen${i}`).checked:Boolean(old.open),fee:i===index?Number(document.getElementById(`stallSlotFee${i}`).value):Number(old.fee||0)}});if(slots[index].open&&(!Number.isFinite(slots[index].fee)||slots[index].fee<1)){showToast('Enter a valid fee before opening this stall.');return}await updateDoc(doc(db,'events',eventId),{stallSlots:slots,updatedAt:serverTimestamp()});showToast(`Stall ${index+1} updated`,'success');};
+window.reviewStallApplication=async function(applicationId,status){const appRef=doc(db,'stallApplications',applicationId),snap=await getDoc(appRef);if(!snap.exists())return;const appData=snap.data(),eventRef=doc(db,'events',appData.eventId),eventSnap=await getDoc(eventRef);if(!eventSnap.exists())return;const eventData=eventSnap.data(),accepted=[...(eventData.acceptedStalls||[])].filter(s=>s.applicationId!==applicationId);if(status==='accepted')accepted.push({applicationId,slotIndex:appData.slotIndex,stallName:appData.stallName,description:appData.description,location:appData.location,products:appData.products,contactName:appData.contactName,email:appData.email,phone:appData.phone,status:'accepted'});await updateDoc(appRef,{status,reviewedAt:serverTimestamp(),reviewedBy:auth.currentUser?.uid||''});await updateDoc(eventRef,{acceptedStalls:accepted,updatedAt:serverTimestamp()});showToast(`Stall ${status}`,'success');selectStallAdminEvent(appData.eventId);};
 
 // also listen to dedicated webinars collection
 onSnapshot(query(collection(db,'webinars'),orderBy('createdAt','desc'),limit(100)), snap => {
