@@ -1,8 +1,12 @@
-const {onDocumentCreated, onDocumentDeleted, onDocumentUpdated} = require('firebase-functions/v2/firestore');
+const {onDocumentCreated, onDocumentDeleted, onDocumentUpdated, onDocumentWritten} = require('firebase-functions/v2/firestore');
 const {defineString, defineSecret} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 const {PDFDocument, StandardFonts, rgb} = require('pdf-lib');
+const webpush = require('web-push');
+const {PKPass} = require('passkit-generator');
+const {createSign} = require('node:crypto');
+const {deflateSync} = require('node:zlib');
 
 initializeApp();
 const db = getFirestore();
@@ -10,6 +14,18 @@ const emailServiceId = defineString('EMAILJS_SERVICE_ID', {default: 'service_esp
 const emailPublicKey = defineString('EMAILJS_PUBLIC_KEY', {default: 'PDb2vpOIeLkbZBBFP'});
 const waitlistTemplateId = defineString('EMAILJS_WAITLIST_TEMPLATE_ID');
 const followerTemplateId = defineString('EMAILJS_FOLLOWER_EVENT_TEMPLATE_ID', {default: ''});
+const webPushPublicKey = defineString('WEB_PUSH_PUBLIC_KEY', {default: ''});
+const webPushPrivateKey = defineSecret('WEB_PUSH_PRIVATE_KEY');
+const webPushContact = defineString('WEB_PUSH_CONTACT', {default: 'mailto:support.culturewave@gmail.com'});
+const applePassTypeId = defineString('APPLE_WALLET_PASS_TYPE_ID', {default: ''});
+const appleTeamId = defineString('APPLE_WALLET_TEAM_ID', {default: ''});
+const appleOrganizationName = defineString('APPLE_WALLET_ORGANIZATION', {default: 'CultureWave'});
+const appleSignerCert = defineSecret('APPLE_WALLET_SIGNER_CERT_B64');
+const appleSignerKey = defineSecret('APPLE_WALLET_SIGNER_KEY_B64');
+const appleWwdrCert = defineSecret('APPLE_WALLET_WWDR_CERT_B64');
+const googleWalletIssuerId = defineString('GOOGLE_WALLET_ISSUER_ID', {default: ''});
+const googleWalletClassSuffix = defineString('GOOGLE_WALLET_CLASS_SUFFIX', {default: 'culturewave_event_tickets_v1'});
+const googleWalletServiceAccount = defineSecret('GOOGLE_WALLET_SERVICE_ACCOUNT_JSON');
 function sendEmail(templateId, templateParams) {
   return fetch('https://api.emailjs.com/api/v1.0/email/send', {
     method: 'POST',
@@ -26,6 +42,83 @@ function slugifyEventName(name) {
   return String(name || 'event').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'event';
 }
+async function sendPushToSubscriptionDocs(subscriptionDocs, payload) {
+  if (!webPushPublicKey.value() || !webPushPrivateKey.value()) return;
+  webpush.setVapidDetails(webPushContact.value(), webPushPublicKey.value(), webPushPrivateKey.value());
+  await Promise.all(subscriptionDocs.map(async (subscriptionDoc) => {
+    try {
+      await webpush.sendNotification(subscriptionDoc.data(), JSON.stringify(payload), {TTL: 60 * 60 * 24});
+    } catch (error) {
+      if (error.statusCode === 404 || error.statusCode === 410) {
+        await subscriptionDoc.ref.delete();
+        return;
+      }
+      console.error(`Web Push delivery failed for ${subscriptionDoc.id}:`, error.message);
+      throw error;
+    }
+  }));
+}
+
+exports.sendWebPushForNotification = onDocumentCreated({
+  document: 'notifications/{notificationId}',
+  region: 'asia-south1',
+  retry: true,
+  secrets: [webPushPrivateKey],
+}, async (event) => {
+  const notification = event.data.data();
+  const userId = String(notification.userId || '');
+  if (!userId || notification.type === 'new_event') return;
+  const [userSubscriptions, publicSubscriptions] = await Promise.all([
+    db.collection('users').doc(userId).collection('pushSubscriptions').get(),
+    db.collection('publicPushSubscriptions').where('ownerUid', '==', userId).get(),
+  ]);
+  await sendPushToSubscriptionDocs([...userSubscriptions.docs, ...publicSubscriptions.docs], {
+    title: String(notification.title || 'CultureWave').slice(0, 120),
+    body: String(notification.message || notification.body || 'You have a new update.').slice(0, 240),
+    url: String(notification.url || '/customer-dashboard.html').startsWith('/')
+      ? String(notification.url || '/customer-dashboard.html')
+      : '/customer-dashboard.html',
+  });
+});
+
+exports.notifyFollowersOfPublishedEvent = onDocumentWritten({
+  document: 'events/{eventId}',
+  region: 'asia-south1',
+  retry: true,
+}, async (event) => {
+  const before = event.data.before.exists ? event.data.before.data() : {};
+  const after = event.data.after.exists ? event.data.after.data() : null;
+  if (!after || !['published', 'live', 'active'].includes(String(after.status || '').toLowerCase())) return;
+  if (['published', 'live', 'active'].includes(String(before.status || '').toLowerCase())) return;
+  const ownerId = after.ownerId || after.organiserId;
+  if (!ownerId) return;
+  const followers = await db.collectionGroup('following').where('organiserId', '==', ownerId).limit(500).get();
+  if (followers.empty) return;
+  const eventName = String(after.name || after.title || 'New event').slice(0, 180);
+  const eventUrl = `/event/${encodeURIComponent(slugifyEventName(after.urlKey || eventName))}?eventId=${encodeURIComponent(event.params.eventId)}`;
+  const batch = db.batch();
+  const userIds = [...new Set(followers.docs.map((follow) => follow.ref.parent.parent.id))];
+  for (const userId of userIds) {
+    const notificationId = `published_${event.params.eventId}_${userId}`;
+    batch.set(db.collection('notifications').doc(notificationId), {
+      userId,
+      title: 'New event from an organiser you follow',
+      message: `${eventName} is now live.`,
+      url: eventUrl,
+      type: 'new_event',
+      eventId: event.params.eventId,
+      read: false,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  }
+  await batch.commit();
+  const publicSubscriptions = await db.collection('publicPushSubscriptions').get();
+  await sendPushToSubscriptionDocs(publicSubscriptions.docs, {
+    title: 'New event on CultureWave',
+    body: `${eventName} is now live.`,
+    url: eventUrl,
+  });
+});
 
 exports.updateOrganiserFollowerCount = onDocumentCreated({
   document: 'users/{userId}/following/{organiserId}',
@@ -300,6 +393,166 @@ function endpoint(handler, {admin=false, session=false, secrets=[]}={}) {
     }
   });
 }
+
+function crc32(buffer) {
+  let crc = 0xffffffff;
+  for (const byte of buffer) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+function pngChunk(type, data=Buffer.alloc(0)) {
+  const typeBuffer = Buffer.from(type);
+  const length = Buffer.alloc(4); length.writeUInt32BE(data.length);
+  const checksum = Buffer.alloc(4); checksum.writeUInt32BE(crc32(Buffer.concat([typeBuffer, data])));
+  return Buffer.concat([length, typeBuffer, data, checksum]);
+}
+function walletIconPng(size) {
+  const rows = Buffer.alloc((size * 4 + 1) * size);
+  const center = (size - 1) / 2;
+  for (let y = 0; y < size; y++) {
+    const row = y * (size * 4 + 1);
+    rows[row] = 0;
+    for (let x = 0; x < size; x++) {
+      const distance = Math.hypot(x - center, y - center);
+      const isRing = distance > size * .28 && distance < size * .42 && !(x > center && Math.abs(y - center) < size * .14);
+      const offset = row + 1 + x * 4;
+      rows[offset] = isRing ? 244 : 10;
+      rows[offset + 1] = isRing ? 189 : 15;
+      rows[offset + 2] = isRing ? 80 : 30;
+      rows[offset + 3] = 255;
+    }
+  }
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(size, 0); header.writeUInt32BE(size, 4);
+  header[8] = 8; header[9] = 6;
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    pngChunk('IHDR', header), pngChunk('IDAT', deflateSync(rows)), pngChunk('IEND'),
+  ]);
+}
+const walletIcon = walletIconPng(128);
+const walletIcon2x = walletIconPng(256);
+
+function dateForWallet(value) {
+  if (!value) return null;
+  const date = value.toDate ? value.toDate() : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+async function verifiedWalletBooking(body) {
+  const bookingId = clean(body.bookingId, 160);
+  const token = clean(body.walletToken, 100);
+  if (!bookingId || !/^[a-f0-9]{64}$/i.test(token)) throw new Error('This ticket cannot be added to Wallet.');
+  const bookingSnap = await db.collection('bookings').doc(bookingId).get();
+  if (!bookingSnap.exists) throw new Error('This ticket cannot be added to Wallet.');
+  const booking = bookingSnap.data();
+  const supplied = createHash('sha256').update(token).digest();
+  const storedHex = String(booking.walletAccessTokenHash || '');
+  const stored = /^[a-f0-9]{64}$/i.test(storedHex) ? Buffer.from(storedHex, 'hex') : Buffer.alloc(0);
+  if (stored.length !== supplied.length || !timingSafeEqual(stored, supplied)) throw new Error('This ticket cannot be added to Wallet.');
+  if (!['confirmed', 'paid', 'success', 'completed'].includes(String(booking.status || '').toLowerCase()) || !booking.eventId) {
+    throw new Error('Only confirmed event tickets can be added to Wallet.');
+  }
+  const eventSnap = await db.collection('events').doc(booking.eventId).get();
+  const event = eventSnap.exists ? eventSnap.data() : {};
+  const startDate = dateForWallet(booking.eventDate || event.startDate || event.date);
+  const eventName = clean(booking.eventName || event.name || 'CultureWave Event', 120);
+  const venue = clean([booking.venueName || event.venueName || event.venue, booking.city || event.city].filter(Boolean).join(', ') || 'Venue details available on CultureWave', 160);
+  const ticketName = clean(booking.ticketName || 'Entry Pass', 100);
+  const customerName = clean(booking.customerName || 'Guest', 80);
+  const bookingCode = bookingId.slice(-10).toUpperCase();
+  const qrValue = bookingId;
+  return {booking, event, eventId: String(booking.eventId), bookingId, bookingCode, eventName, venue, ticketName, customerName, startDate, qrValue};
+}
+
+exports.createAppleWalletPass = endpoint(async (req, res) => {
+  const ticket = await verifiedWalletBooking(req.body || {});
+  if (!applePassTypeId.value() || !appleTeamId.value()) throw new Error('Apple Wallet is not configured yet.');
+  const passJson = {
+    formatVersion: 1,
+    passTypeIdentifier: applePassTypeId.value(),
+    serialNumber: ticket.bookingId,
+    teamIdentifier: appleTeamId.value(),
+    organizationName: appleOrganizationName.value(),
+    description: `${ticket.eventName} event ticket`,
+    logoText: 'CultureWave',
+    foregroundColor: 'rgb(255, 255, 255)',
+    backgroundColor: 'rgb(10, 15, 30)',
+    labelColor: 'rgb(244, 189, 80)',
+    generic: {
+      primaryFields: [{key: 'event', label: 'EVENT', value: ticket.eventName}],
+      secondaryFields: [{key: 'venue', label: 'VENUE', value: ticket.venue}],
+      auxiliaryFields: [
+        {key: 'ticket', label: 'TICKET', value: ticket.ticketName},
+        {key: 'holder', label: 'TICKET HOLDER', value: ticket.customerName},
+        {key: 'booking', label: 'BOOKING ID', value: ticket.bookingCode},
+        ...(ticket.startDate ? [{key: 'date', label: 'EVENT DATE', value: ticket.startDate.toLocaleString('en-IN', {dateStyle: 'medium', timeZone: 'Asia/Kolkata'})}] : []),
+      ],
+      backFields: [{key: 'entry', label: 'ENTRY', value: 'Present this pass at the event entrance.'}],
+    },
+    barcodes: [{format: 'PKBarcodeFormatQR', message: ticket.qrValue, messageEncoding: 'utf-8'}],
+    ...(ticket.startDate ? {relevantDate: ticket.startDate.toISOString()} : {}),
+  };
+  const pass = new PKPass({
+    'pass.json': Buffer.from(JSON.stringify(passJson)),
+    'icon.png': walletIcon,
+    'icon@2x.png': walletIcon2x,
+  }, {
+    wwdr: Buffer.from(appleWwdrCert.value(), 'base64'),
+    signerCert: Buffer.from(appleSignerCert.value(), 'base64'),
+    signerKey: Buffer.from(appleSignerKey.value(), 'base64'),
+  });
+  const passBuffer = await pass.getAsBuffer();
+  return {pkpass: passBuffer.toString('base64')};
+}, {secrets: [appleSignerCert, appleSignerKey, appleWwdrCert]});
+
+exports.createGoogleWalletSaveLink = endpoint(async (req) => {
+  const ticket = await verifiedWalletBooking(req.body || {});
+  const issuerId = googleWalletIssuerId.value();
+  if (!issuerId) throw new Error('Google Wallet is not configured yet.');
+  const serviceAccount = JSON.parse(googleWalletServiceAccount.value());
+  const classSuffix = `${googleWalletClassSuffix.value()}_${ticket.eventId}`.replace(/[^A-Za-z0-9._-]/g, '').slice(0, 64);
+  const classId = `${issuerId}.${classSuffix}`;
+  const objectSuffix = ticket.bookingId.replace(/[^A-Za-z0-9._-]/g, '').slice(-64);
+  const objectId = `${issuerId}.${objectSuffix}`;
+  const eventTicketClass = {
+    id: classId,
+    issuerName: 'CultureWave',
+    reviewStatus: 'UNDER_REVIEW',
+    eventId: classSuffix,
+    eventName: {defaultValue: {language: 'en', value: ticket.eventName}},
+    hexBackgroundColor: '#0A0F1E',
+  };
+  const eventTicketObject = {
+    id: objectId,
+    classId,
+    state: 'ACTIVE',
+    ticketHolderName: ticket.customerName,
+    ticketNumber: ticket.bookingCode,
+    barcode: {type: 'QR_CODE', value: ticket.qrValue},
+    textModulesData: [
+      {id: 'venue', header: 'VENUE', body: ticket.venue},
+      {id: 'ticket', header: 'TICKET', body: ticket.ticketName},
+      ...(ticket.startDate ? [{id: 'date', header: 'DATE', body: ticket.startDate.toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata'})}] : []),
+    ],
+  };
+  const base64url = value => Buffer.from(value).toString('base64url');
+  const unsigned = `${base64url(JSON.stringify({alg: 'RS256', typ: 'JWT'}))}.${base64url(JSON.stringify({
+    iss: serviceAccount.client_email,
+    aud: 'google',
+    typ: 'savetowallet',
+    iat: Math.floor(Date.now() / 1000),
+    origins: ['culturewave.in', 'www.culturewave.in'],
+    payload: {eventTicketClasses: [eventTicketClass], eventTicketObjects: [eventTicketObject]},
+  }))}`;
+  const signer = createSign('RSA-SHA256');
+  signer.update(unsigned);
+  signer.end();
+  const signedJwt = `${unsigned}.${signer.sign(serviceAccount.private_key, 'base64url')}`;
+  if (signedJwt.length > 1800) throw new Error('This event ticket is too large to add to Google Wallet.');
+  return {saveUrl: `https://pay.google.com/gp/v/save/${signedJwt}`};
+}, {secrets: [googleWalletServiceAccount]});
 
 const razorpayKeyId = defineSecret('RAZORPAY_KEY_ID');
 const razorpayKeySecret = defineSecret('RAZORPAY_KEY_SECRET');

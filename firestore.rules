@@ -163,6 +163,31 @@ service cloud.firestore {
       }
     }
 
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Notification creation is server-only so clients cannot trigger push delivery to others.
+      allow write: if false;
+    }
+
+    match /publicPushSubscriptions/{subscriptionId} {
+      allow read: if false;
+      allow create: if request.auth != null &&
+        request.resource.data.keys().hasOnly(['endpoint', 'keys', 'ownerUid', 'createdAt']) &&
+        request.resource.data.ownerUid == request.auth.uid &&
+        request.resource.data.endpoint is string && request.resource.data.endpoint.size() <= 3000 &&
+        request.resource.data.get('keys', {}).get('p256dh', '') is string &&
+        request.resource.data.get('keys', {}).get('auth', '') is string &&
+        request.resource.data.createdAt == request.time;
+      allow update: if request.auth != null && resource.data.ownerUid == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['endpoint', 'keys', 'createdAt']) &&
+        request.resource.data.ownerUid == resource.data.ownerUid &&
+        request.resource.data.endpoint is string && request.resource.data.endpoint.size() <= 3000 &&
+        request.resource.data.get('keys', {}).get('p256dh', '') is string &&
+        request.resource.data.get('keys', {}).get('auth', '') is string &&
+        request.resource.data.createdAt == request.time;
+      allow delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+    }
+
     // Authenticated users can read/write their own data
     match /events/{id} {
       allow read: if true;

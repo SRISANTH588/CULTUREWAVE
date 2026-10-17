@@ -246,6 +246,14 @@
       background: #fff; color: #6b7280;
       border: 1.5px solid #dce4f5;
     }
+    .sc-wallet-actions{width:100%;max-width:680px;margin:1rem 0 0;padding:1.1rem;border:1px solid #2d3038;border-radius:18px;background:#101116;color:#fff;}
+    .sc-wallet-actions h2{margin:0 0 .3rem;font-size:1rem;}
+    .sc-wallet-actions p{margin:0 0 .9rem;color:#aeb2bd;font-size:.78rem;}
+    .sc-wallet-buttons{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+    .sc-wallet-buttons .sc-btn{min-height:48px;font-size:.8rem;}
+    .sc-wallet-apple{background:#08090b;color:#fff;border:1px solid #51545a;}
+    .sc-wallet-google{background:#fff;color:#202124;border:1px solid #d8dce2;}
+    .sc-wallet-error{display:none;margin:.7rem 0 0;color:#ff9999;font-size:.76rem;}
 
     /* failed state actions */
     .sc-failed-actions {
@@ -467,6 +475,16 @@
         </div>
       </div>
 
+      <section class="sc-wallet-actions" id="scWalletActions" style="display:none;" aria-label="Add ticket to phone wallet">
+        <h2>Add this ticket to your wallet</h2>
+        <p>Keep your event pass with the other tickets on your phone.</p>
+        <div class="sc-wallet-buttons">
+          <button class="sc-btn sc-wallet-apple" id="btnAppleWallet" type="button">Add to Apple Wallet</button>
+          <button class="sc-btn sc-wallet-google" id="btnGoogleWallet" type="button">Save to Google Wallet</button>
+        </div>
+        <div class="sc-wallet-error" id="walletError" role="status"></div>
+      </section>
+
       <!-- NEXT STEPS AND ATTENDEE REMINDERS (success only) -->
       <section class="sc-next-steps" id="scNextSteps" aria-labelledby="scNextTitle">
         <h2 id="scNextTitle">What to do next?</h2>
@@ -593,6 +611,7 @@
     }
     const params    = new URLSearchParams(window.location.search);
     const bookingId  = params.get("bookingId") || "";
+    const walletToken = params.get("walletToken") || "";
     const eventName  = params.get("event")     || "Your Booking";
     const guestName  = params.get("guest")     || params.get("name") || "";
     const amount     = params.get("amount")    || "—";
@@ -789,6 +808,9 @@
         document.getElementById("qrScanNote").textContent = "Staff scans at reception";
       }
       applyEventTicketDesign();
+      if (!isRestaurant && bookingId && /^[a-f0-9]{64}$/i.test(walletToken)) {
+        document.getElementById('scWalletActions').style.display = '';
+      }
 
     } else {
       // FAILED state
@@ -807,6 +829,53 @@
       const retryLink = document.querySelector('#scFailedActions a:first-child');
       if(retryLink && eventId) retryLink.href = `booking.html?eventId=${eventId}`;
     }
+
+    const walletApiBase = 'https://asia-south1-ogshootsluxe-36740.cloudfunctions.net';
+    async function requestWallet(endpointName) {
+      const response = await fetch(`${walletApiBase}/${endpointName}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({bookingId, walletToken}),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Wallet pass could not be created.');
+      return data;
+    }
+    document.getElementById('btnAppleWallet')?.addEventListener('click', async event => {
+      const button = event.currentTarget;
+      const oldText = button.textContent;
+      const error = document.getElementById('walletError');
+      error.style.display = 'none'; button.disabled = true; button.textContent = 'Preparing pass…';
+      try {
+        const data = await requestWallet('createAppleWalletPass');
+        const binary = atob(data.pkpass || '');
+        if (!binary) throw new Error('Apple Wallet returned an empty pass.');
+        const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], {type: 'application/vnd.apple.pkpass'}));
+        const link = document.createElement('a');
+        link.href = url; link.download = `CultureWave-${shortId}.pkpass`;
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+      } catch (failure) {
+        error.textContent = failure.message || 'Could not add this ticket to Apple Wallet.';
+        error.style.display = 'block';
+      } finally { button.disabled = false; button.textContent = oldText; }
+    });
+    document.getElementById('btnGoogleWallet')?.addEventListener('click', async event => {
+      const button = event.currentTarget;
+      const oldText = button.textContent;
+      const error = document.getElementById('walletError');
+      error.style.display = 'none'; button.disabled = true; button.textContent = 'Preparing pass…';
+      try {
+        const data = await requestWallet('createGoogleWalletSaveLink');
+        if (!data.saveUrl) throw new Error('Google Wallet returned an invalid save link.');
+        window.location.assign(data.saveUrl);
+      } catch (failure) {
+        error.textContent = failure.message || 'Could not add this ticket to Google Wallet.';
+        error.style.display = 'block';
+        button.disabled = false; button.textContent = oldText;
+      }
+    });
 
     /* ── DOWNLOAD TICKET ── */
     document.getElementById("btnDownload")?.addEventListener("click", async () => {

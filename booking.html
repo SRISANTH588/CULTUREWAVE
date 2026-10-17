@@ -1607,9 +1607,15 @@ async function saveBooking(data){
     }
     // Ensure seatIds is always a proper array of strings
     const seatIds = Array.isArray(data.seatIds) ? data.seatIds.map(String).filter(Boolean) : [];
+    let walletAccessTokenHash = null;
+    if(data.walletAccessToken && crypto.subtle){
+      try{
+        walletAccessTokenHash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data.walletAccessToken))), byte => byte.toString(16).padStart(2,'0')).join('');
+      }catch(error){console.warn('Wallet pass token hashing unavailable:',error);}
+    }
     const ticketItems = selectedTicketItems().map(item=>({ticketIndex:item.index,ticketName:item.ticket.name||'Ticket',quantity:item.quantity}));
     const doc = {
-      bookingId: data.bookingId, eventId: eventId||null,
+      bookingId: data.bookingId, walletAccessTokenHash, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
       ticketItems,
       amount: data.amount, seats: data.seats, seatIds: seatIds,
@@ -1727,10 +1733,11 @@ async function submitBooking(){
   const eventDate = evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || '';
   const eventTime = eventStartTime()||formatTimeText(passedEventTime);
   const bid = "CV"+Date.now();
+  const walletAccessToken = Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2,'0')).join('');
 
   if(total === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
-    const saved = await saveBooking({ bookingId:bid, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone, state });
+    const saved = await saveBooking({ bookingId:bid, walletAccessToken, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone, state });
     if(!saved){
       setBookingSubmissionBusy(false, 0);
       showToast('Could not save your booking. Please try again.');
@@ -1741,7 +1748,7 @@ async function submitBooking(){
     const emailSent = await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
     if(!emailSent) showToast("Booking confirmed, but we could not send the confirmation email.");
     clearCheckoutDraft();
-    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
+    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     return;
   }
 
@@ -1790,7 +1797,7 @@ async function submitBooking(){
         return;
       }
       document.getElementById("rStatus").textContent = "✅ Confirmed";
-      const saved = await saveBooking({ bookingId:pid, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone, state });
+      const saved = await saveBooking({ bookingId:pid, walletAccessToken, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone, state });
       if(!saved){
         showPaymentError('Payment was verified, but the booking could not be saved. Do not pay again; contact support with booking reference '+pid+'.');
         return;
@@ -1800,7 +1807,7 @@ async function submitBooking(){
       const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
       clearCheckoutDraft();
-      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
+      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime);
     },
     modal:{
       ondismiss: ()=>{

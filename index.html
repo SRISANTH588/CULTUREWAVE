@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="theme-color" content="#000000"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
   <title>CultureWave | Events, Live Music &amp; Dining in Hyderabad</title>
   <meta name="description" content="Discover events, live music, dining, workshops and experiences in Hyderabad. Explore what is happening and book your next outing with CultureWave."/>
   <link rel="canonical" href="https://culturewave.in/"/>
@@ -1887,6 +1889,11 @@
   </div>
 </nav>
 
+<aside id="sitePushPrompt" style="display:none;margin:0 auto 1rem;max-width:1200px;padding:1rem 1.25rem;border:1px solid #333;border-radius:14px;background:#111;align-items:center;justify-content:space-between;gap:1rem;">
+  <div><strong style="display:block;color:#fff;">Get CultureWave updates on your phone</strong><span id="sitePushStatus" style="font-size:.85rem;color:#bbb;">Get alerts when new events go live.</span></div>
+  <div style="display:flex;gap:.5rem;flex-shrink:0;"><button id="sitePushEnable" type="button" style="padding:.65rem 1rem;border:0;border-radius:9px;background:#f4bd50;color:#111;font-weight:800;">Enable notifications</button><button id="sitePushDisable" type="button" style="display:none;padding:.65rem 1rem;border:1px solid #555;border-radius:9px;background:transparent;color:#fff;font-weight:700;">Turn off</button></div>
+</aside>
+
 <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
   <a href="index.html" aria-current="page"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 20v-6h6v6"/></svg><strong>Home</strong></a>
   <a href="events.html"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7 3v4M17 3v4M3.5 10h17"/></svg><strong>Events</strong></a>
@@ -2152,6 +2159,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="script.js"></script>
+<script src="push-config.js"></script>
 <script>
   if (!firebase.apps.length) {
     firebase.initializeApp({
@@ -2187,14 +2195,26 @@
     return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;
   }
 
+  let homepageEventsPromise;
+  function getHomepageEvents(){
+    if(!homepageEventsPromise){
+      homepageEventsPromise = _idb.collection('events').orderBy('createdAt','desc').limit(200).get()
+        .then(snap => snap.docs)
+        .catch(error => {
+          homepageEventsPromise = null;
+          throw error;
+        });
+    }
+    return homepageEventsPromise;
+  }
+
   async function loadIndexEvents() {
     try {
       const grid = document.getElementById('indexEventsGrid');
       const empty = document.getElementById('indexEventsEmpty');
       if(!grid) return;
-      const snap = await _idb.collection('events').orderBy('createdAt', 'desc').limit(200).get();
-      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data()));
-      if(snap.empty || !docs.length){ empty.style.display=''; return; }
+      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0,12);
+      if(!docs.length){ empty.style.display=''; return; }
       empty.style.display = 'none';
       docs.forEach((doc, i) => renderEventCard(doc, i, grid));
     } catch(e) { console.error('Events load error:', e.message); }
@@ -2307,8 +2327,7 @@
   // Trending Now ticker
   (async function loadTrending(){
     try{
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,12);
+      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0,12);
       const ticker = document.getElementById('trendingTicker');
       if(!ticker||!docs.length){ if(ticker) ticker.closest('.trending-section').style.display='none'; return; }
       const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)','linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
@@ -2344,8 +2363,7 @@
   (async function loadComingUp(){
     try{
       const now = new Date();
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc=>{
+      const docs = (await getHomepageEvents()).filter(doc=>{
         const d=doc.data();
         if(!isPublishedEvent(d)) return false;
         if(!d.startDate) return false;
@@ -2383,8 +2401,7 @@
   // OG Picks — mobile: deck stack | desktop: 4-up sliding carousel
   (async function loadOGPicks(){
     try{
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,12);
+      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0,12);
       const activeWrap = document.getElementById('ogpActiveWrap');
       const peekLeft   = document.getElementById('ogpPeekLeft');
       const behind1    = document.getElementById('ogpBehind1');
@@ -2503,8 +2520,7 @@
   // Finest Tables — load dining/restaurant events
   (async function loadFinestTables(){
     try{
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc => {
+      const docs = (await getHomepageEvents()).filter(doc => {
         const d = doc.data();
         const s = String(d.status||'').toLowerCase();
         if(!['published','live','active'].includes(s)) return false;
@@ -2549,8 +2565,7 @@
   // Handpicked Experiences
   (async function loadHPE(){
     try{
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0,10);
+      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0,10);
       const scroll = document.getElementById('hpeScroll');
       if(!scroll) return;
       if(!docs.length){ scroll.closest('.hpe-scroll-wrap').style.display='none'; return; }
@@ -2652,8 +2667,7 @@
     try{
       const scroll = document.getElementById('tvScroll');
       if(!scroll) return;
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs.filter(doc => isPublishedEvent(doc.data()));
+      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data()));
       if(!docs.length){ document.getElementById('tvSection').style.display='none'; return; }
       // aggregate venues
       const VENUE_OVERRIDES = {
@@ -2702,8 +2716,7 @@
       const section = document.querySelector('.ss-section');
       if(!scroll || !section) return;
       const now = new Date();
-      const snap = await _idb.collection('events').limit(200).get();
-      const docs = snap.docs
+      const docs = (await getHomepageEvents())
         .filter(doc => {
           const d = doc.data();
           if(!isPublishedEvent(d)) return false;
@@ -2917,8 +2930,7 @@
 
     async function loadHeroSlider() {
       try {
-        const snap = await _idb.collection('events').limit(200).get();
-        const docs = snap.docs.filter(doc => isPublishedEvent(doc.data())).slice(0, 7);
+        const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0, 7);
         if (!docs.length) { document.getElementById('heroSlider').style.display='none'; return; }
         docs.forEach(function(doc, i) {
           const d = doc.data(), id = doc.id;
@@ -3044,5 +3056,6 @@
   });
 </script>
 <script src="auth-nav.js"></script>
+<script src="public-push.js"></script>
 </body>
 </html>
