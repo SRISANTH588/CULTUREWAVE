@@ -85,6 +85,7 @@ exports.notifyFollowersOfPublishedEvent = onDocumentWritten({
   document: 'events/{eventId}',
   region: 'asia-south1',
   retry: true,
+  secrets: [webPushPrivateKey],
 }, async (event) => {
   const before = event.data.before.exists ? event.data.before.data() : {};
   const after = event.data.after.exists ? event.data.after.data() : null;
@@ -563,6 +564,13 @@ exports.createRazorpayOrder = endpoint(async req => {
   if (!Number.isSafeInteger(amount) || amount < 100) throw new Error('Payment amount is invalid.');
   const customer = req.body.customer || {};
   const event = req.body.event || {};
+  const stallSlotIndex = Number.isInteger(Number(req.body.stallSlotIndex)) ? Number(req.body.stallSlotIndex) : null;
+  if (stallSlotIndex !== null) {
+    if (stallSlotIndex < 0 || stallSlotIndex > 4 || !event.id) throw new Error('Stall slot details are invalid.');
+    const eventSnap = await db.collection('events').doc(clean(event.id, 120)).get();
+    const stallSlot = eventSnap.exists ? eventSnap.data().stallSlots?.[stallSlotIndex] : null;
+    if (!stallSlot?.open || Math.round(Number(stallSlot.fee) * 100) !== amount) throw new Error('This stall is no longer available. Choose another open stall.');
+  }
   const method = ['upi', 'card', 'netbanking', 'wallet'].includes(customer.method) ? customer.method : 'checkout';
   const receipt = razorpayReceipt(req.body.receipt);
   const auth = Buffer.from(`${razorpayKeyId.value()}:${razorpayKeySecret.value()}`).toString('base64');
@@ -597,6 +605,7 @@ exports.createRazorpayOrder = endpoint(async req => {
     status: 'created',
     method,
     event: {id: clean(event.id, 120), name: clean(event.name, 200)},
+    ...(stallSlotIndex !== null ? {stallSlotIndex} : {}),
     customer: {
       name: clean(customer.name, 160),
       email: clean(customer.email, 180).toLowerCase(),
@@ -620,6 +629,19 @@ exports.verifyRazorpayPayment = endpoint(async req => {
   const orderSnap = await orderRef.get();
   if (!orderSnap.exists) throw new Error('Razorpay order was not found. Contact support before retrying.');
   const savedOrder = orderSnap.data();
+  const claimStallSlot = async () => {
+    if (!Number.isInteger(savedOrder.stallSlotIndex)) return;
+    const eventRef = db.collection('events').doc(savedOrder.event.id);
+    await db.runTransaction(async transaction => {
+      const eventSnap = await transaction.get(eventRef);
+      if (!eventSnap.exists) throw new Error('Event not found for this stall booking.');
+      const eventData = eventSnap.data(), slots = Array.isArray(eventData.stallSlots) ? [...eventData.stallSlots] : [];
+      const slot = slots[savedOrder.stallSlotIndex];
+      if (!slot || (!slot.open && slot.applicationPaymentId !== paymentId)) throw new Error('This stall was just booked by someone else. Your payment was captured; contact the organiser for a refund.');
+      slots[savedOrder.stallSlotIndex] = {...slot, open: false, applicationPaymentId: paymentId, applicationStatus: 'pending'};
+      transaction.update(eventRef, {stallSlots: slots, updatedAt: FieldValue.serverTimestamp()});
+    });
+  };
   const saveTransaction = async (method) => {
     await db.collection('payments').doc(paymentId).set({
       bookingId: paymentId,
@@ -640,6 +662,12 @@ exports.verifyRazorpayPayment = endpoint(async req => {
   };
   if (savedOrder.status === 'captured' && savedOrder.paymentId === paymentId) {
     await saveTransaction(savedOrder.actualMethod);
+    try {
+      await claimStallSlot();
+    } catch (error) {
+      await db.collection('payments').doc(paymentId).set({status: 'review', stallSlotConflict: true, reviewNote: error.message}, {merge: true});
+      throw error;
+    }
     return {success: true, verified: true, method: savedOrder.actualMethod || savedOrder.method};
   }
 
@@ -667,6 +695,12 @@ exports.verifyRazorpayPayment = endpoint(async req => {
     orderRef.update({status: 'captured', paymentId, actualMethod, capturedAt: FieldValue.serverTimestamp()}),
     saveTransaction(actualMethod),
   ]);
+  try {
+    await claimStallSlot();
+  } catch (error) {
+    await db.collection('payments').doc(paymentId).set({status: 'review', stallSlotConflict: true, reviewNote: error.message}, {merge: true});
+    throw error;
+  }
   return {success: true, verified: true, method: actualMethod};
 }, {secrets: [razorpayKeyId, razorpayKeySecret]});
 

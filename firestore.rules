@@ -200,8 +200,9 @@ service cloud.firestore {
     }
 
     match /stallApplications/{applicationId} {
-      allow read: if isAdmin();
-      allow create: if applicationId == request.resource.data.paymentId &&
+      allow read: if isAdmin() || (request.auth != null && resource.data.ownerUid == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid &&
+        applicationId == request.resource.data.paymentId &&
         request.resource.data.slotIndex is int && request.resource.data.slotIndex >= 0 && request.resource.data.slotIndex < 5 &&
         request.resource.data.status == 'pending' &&
         request.resource.data.termsAccepted == true &&
@@ -215,7 +216,8 @@ service cloud.firestore {
         get(/databases/$(database)/documents/verifiedPayments/$(request.resource.data.paymentId)).data.bookingId == request.resource.data.paymentId &&
         get(/databases/$(database)/documents/verifiedPayments/$(request.resource.data.paymentId)).data.eventId == request.resource.data.eventId &&
         get(/databases/$(database)/documents/verifiedPayments/$(request.resource.data.paymentId)).data.amount == request.resource.data.fee * 100 &&
-        get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.stallSlots[request.resource.data.slotIndex].open == true &&
+        (get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.stallSlots[request.resource.data.slotIndex].open == true ||
+          get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.stallSlots[request.resource.data.slotIndex].applicationPaymentId == request.resource.data.paymentId) &&
         get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.stallSlots[request.resource.data.slotIndex].fee == request.resource.data.fee;
       allow update, delete: if isAdmin();
     }
