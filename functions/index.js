@@ -620,7 +620,28 @@ exports.verifyRazorpayPayment = endpoint(async req => {
   const orderSnap = await orderRef.get();
   if (!orderSnap.exists) throw new Error('Razorpay order was not found. Contact support before retrying.');
   const savedOrder = orderSnap.data();
-  if (savedOrder.status === 'captured' && savedOrder.paymentId === paymentId) return {success: true, verified: true, method: savedOrder.actualMethod || savedOrder.method};
+  const saveTransaction = async (method) => {
+    await db.collection('payments').doc(paymentId).set({
+      bookingId: paymentId,
+      receipt: savedOrder.receipt || paymentId,
+      eventId: savedOrder.event?.id || null,
+      eventName: savedOrder.event?.name || 'CultureWave event',
+      amount: Number(savedOrder.amount) / 100,
+      currency: savedOrder.currency || 'INR',
+      status: 'paid',
+      paymentId,
+      paymentMethod: method || savedOrder.method || 'checkout',
+      customerName: savedOrder.customer?.name || '',
+      customerEmail: savedOrder.customer?.email || '',
+      customerPhone: savedOrder.customer?.phone || '',
+      createdAt: savedOrder.createdAt || FieldValue.serverTimestamp(),
+      paidAt: FieldValue.serverTimestamp(),
+    }, {merge: true});
+  };
+  if (savedOrder.status === 'captured' && savedOrder.paymentId === paymentId) {
+    await saveTransaction(savedOrder.actualMethod);
+    return {success: true, verified: true, method: savedOrder.actualMethod || savedOrder.method};
+  }
 
   const auth = Buffer.from(`${razorpayKeyId.value()}:${razorpayKeySecret.value()}`).toString('base64');
   const response = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}`, {headers: {Authorization: `Basic ${auth}`}});
@@ -641,8 +662,12 @@ exports.verifyRazorpayPayment = endpoint(async req => {
     }
   }
   if (payment.status !== 'captured') throw new Error('Razorpay has not confirmed a captured payment for this order.');
-  await orderRef.update({status: 'captured', paymentId, actualMethod: payment.method || savedOrder.method, capturedAt: FieldValue.serverTimestamp()});
-  return {success: true, verified: true, method: payment.method || savedOrder.method};
+  const actualMethod = payment.method || savedOrder.method;
+  await Promise.all([
+    orderRef.update({status: 'captured', paymentId, actualMethod, capturedAt: FieldValue.serverTimestamp()}),
+    saveTransaction(actualMethod),
+  ]);
+  return {success: true, verified: true, method: actualMethod};
 }, {secrets: [razorpayKeyId, razorpayKeySecret]});
 
 exports.sendOnboardingOtp = endpoint(async req => {

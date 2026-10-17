@@ -471,12 +471,10 @@
     .view[data-view="stalls"] .stall-slot-number{background:linear-gradient(135deg,#ed1747,#ff5271);color:#fff;}
     .view[data-view="stalls"] .stall-slot-card input:focus{border-color:#f3264f;box-shadow:0 0 0 3px rgba(243,38,79,.12);}
     .view[data-view="stalls"] .stall-open-toggle input{accent-color:#ed1747;}
-    /* Give every tab's gradient hero a consistent, generous page-heading scale. */
-    .view>div:first-child[style*="linear-gradient"]{min-height:190px!important;padding:2rem 2.25rem!important;display:flex;align-items:center;}
-    .view>div:first-child[style*="linear-gradient"]>div:first-child>div:nth-child(2){font-size:2.25rem!important;line-height:1.12!important;}
-    .view>div:first-child[style*="linear-gradient"]>div:first-child>div:nth-child(3){font-size:1rem!important;line-height:1.55!important;}
+    /* Enlarge tab hero banners without changing their original content flow. */
+    .view>div:first-child[style*="linear-gradient"]{min-height:190px!important;padding:2rem 2.25rem!important;}
     .btn:not(.primary):not(.success):not(.danger):hover{background:#fff1f4;border-color:#ffb5c1;color:#e91e49;}
-    @media(max-width:768px){.sidebar{background:#fff;border-right:1px solid var(--cw-line);}.topbar{height:62px;padding:0 .9rem}.view{padding:1rem}.sb-brand-row:before{font-size:1.25rem}.view>div:first-child[style*="linear-gradient"]{min-height:160px!important;padding:1.55rem 1.4rem!important}.view>div:first-child[style*="linear-gradient"]>div:first-child>div:nth-child(2){font-size:1.8rem!important}.view>div:first-child[style*="linear-gradient"]>div:first-child>div:nth-child(3){font-size:.88rem!important}}
+    @media(max-width:768px){.sidebar{background:#fff;border-right:1px solid var(--cw-line);}.topbar{height:62px;padding:0 .9rem}.view{padding:1rem}.sb-brand-row:before{font-size:1.25rem}.view>div:first-child[style*="linear-gradient"]{min-height:160px!important;padding:1.55rem 1.4rem!important}}
   </style>
 </head>
 <body>
@@ -1983,15 +1981,15 @@ function renderPaymentsTable(payments) {
     <td><span class="badge ${p.status==='paid'?'green':p.status==='refunded'?'blue':p.status==='refund_pending'?'orange':'yellow'}">${esc(p.status||'created')}</span></td>
     <td style="font-size:.76rem;color:var(--muted);">${fmtDate(p.createdAt)}</td>
     <td><div class="btn-row">
-      <button class="btn sm" onclick="openRefundFor('${p.id}')">Refund</button>
-      <button class="btn sm danger" onclick="archivePayment('${p.id}')">Archive</button>
+      ${p.isStallApplication?'<span class="badge blue">Stall fee</span>':`<button class="btn sm" onclick="openRefundFor('${p.id}')">Refund</button><button class="btn sm danger" onclick="archivePayment('${p.id}')">Archive</button>`}
     </div></td>
   </tr>`).join('');
 }
+function stallApplicationTransactions(){return allStallApplications.filter(a=>a.paymentStatus==='captured'&&a.paymentId).map(a=>({id:a.paymentId,receipt:a.paymentId,eventId:a.eventId,eventName:a.eventName,amount:Number(a.fee)||0,status:'paid',createdAt:a.createdAt,customerName:a.contactName,customerEmail:a.email,customerPhone:a.phone,paymentId:a.paymentId,isStallApplication:true}));}
 window.filterPayments = function() {
   const q = document.getElementById('paymentSearch').value.toLowerCase();
   const st = document.getElementById('paymentStatusFilter').value;
-  renderPaymentsTable(allPayments.filter(p=>{
+  renderPaymentsTable([...allPayments,...stallApplicationTransactions()].filter(p=>{
     const matchQ = !q||(p.receipt||p.id||'').toLowerCase().includes(q)||(p.eventName||'').toLowerCase().includes(q);
     const matchSt = !st||p.status===st;
     return matchQ&&matchSt;
@@ -2271,6 +2269,7 @@ onSnapshot(query(collection(db,'vendorOnboarding'),orderBy('submittedAt','desc')
 onSnapshot(query(collection(db,'stallApplications'),limit(500)), snap => {
   allStallApplications=snap.docs.map(d=>({id:d.id,...d.data()}));
   if(activeStallAdminEventId)renderStallApplicationsForEvent(activeStallAdminEventId);
+  renderPaymentsTable([...allPayments,...stallApplicationTransactions()]);
 }, error => {
   const tbody=document.getElementById('stallApplicationsTable');
   if(tbody)tbody.innerHTML=`<tr><td colspan="6" style="color:var(--red);">Could not load stall applications: ${esc(error.message)}</td></tr>`;
@@ -2313,7 +2312,7 @@ onSnapshot(query(collection(db,'webinars'),orderBy('createdAt','desc'),limit(100
 onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200)), snap => {
   allPayments = snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>!p.archived);
   document.getElementById('refundPayment').innerHTML = allPayments.map(p=>`<option value="${p.id}">${esc(p.receipt||p.id)} — ${esc(p.status||'created')}</option>`).join('');
-  renderPaymentsTable(allPayments);
+  renderPaymentsTable([...allPayments,...stallApplicationTransactions()]);
   renderRefundsTable(allPayments);
   syncWABookings();
   updateStats();
