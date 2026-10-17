@@ -471,8 +471,12 @@
     .view[data-view="stalls"] .stall-slot-number{background:linear-gradient(135deg,#ed1747,#ff5271);color:#fff;}
     .view[data-view="stalls"] .stall-slot-card input:focus{border-color:#f3264f;box-shadow:0 0 0 3px rgba(243,38,79,.12);}
     .view[data-view="stalls"] .stall-open-toggle input{accent-color:#ed1747;}
+    /* Give every tab's gradient hero a consistent, generous page-heading scale. */
+    .view>div:first-child[style*="linear-gradient"]{min-height:190px!important;padding:2rem 2.25rem!important;display:flex;align-items:center;}
+    .view>div:first-child[style*="linear-gradient"]>div:first-child>div:nth-child(2){font-size:2.25rem!important;line-height:1.12!important;}
+    .view>div:first-child[style*="linear-gradient"]>div:first-child>div:nth-child(3){font-size:1rem!important;line-height:1.55!important;}
     .btn:not(.primary):not(.success):not(.danger):hover{background:#fff1f4;border-color:#ffb5c1;color:#e91e49;}
-    @media(max-width:768px){.sidebar{background:#fff;border-right:1px solid var(--cw-line);}.topbar{height:62px;padding:0 .9rem}.view{padding:1rem}.sb-brand-row:before{font-size:1.25rem}}
+    @media(max-width:768px){.sidebar{background:#fff;border-right:1px solid var(--cw-line);}.topbar{height:62px;padding:0 .9rem}.view{padding:1rem}.sb-brand-row:before{font-size:1.25rem}.view>div:first-child[style*="linear-gradient"]{min-height:160px!important;padding:1.55rem 1.4rem!important}.view>div:first-child[style*="linear-gradient"]>div:first-child>div:nth-child(2){font-size:1.8rem!important}.view>div:first-child[style*="linear-gradient"]>div:first-child>div:nth-child(3){font-size:.88rem!important}}
   </style>
 </head>
 <body>
