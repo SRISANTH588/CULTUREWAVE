@@ -779,9 +779,9 @@
           document.getElementById('ticketVenue').textContent = fullVenue;
           document.getElementById('ticketLocation').textContent = fullVenue;
           if (!mapLink && d.mapLink) mapLink = d.mapLink;
-          if (!mapLink) mapLink = fullVenue.toLowerCase().includes('bratt brewing')
-            ? 'https://maps.app.goo.gl/H4C1Puz9fhCJ3MxY9'
-            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([d.venueName || d.venue,d.address,d.city].filter(Boolean).join(', ') || fullVenue)}`;
+          if (!mapLink || /(?:maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(mapLink)) {
+            mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([d.venueName || d.venue,d.address,d.city].filter(Boolean).join(', ') || fullVenue)}`;
+          }
           document.getElementById('ticketMapLink').href = mapLink;
         }
         movieLanguage = movieLanguage || d.language || '';
@@ -877,9 +877,10 @@
       document.getElementById("ticketVenue").textContent = venue;
       document.getElementById("ticketLocation").textContent = venue;
       const venueQuery = [venueFromUrl, params.get("address") || "", cityFromUrl].filter(Boolean).join(", ") || venue;
-      document.getElementById("ticketMapLink").href = mapLink || (venue.toLowerCase().includes("bratt brewing")
-        ? "https://maps.app.goo.gl/H4C1Puz9fhCJ3MxY9"
-        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueQuery)}`);
+      const isShortMapUrl = /(?:maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(mapLink);
+      document.getElementById("ticketMapLink").href = mapLink && !isShortMapUrl
+        ? mapLink
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueQuery)}`;
       if (posterUrl) {
         const poster = document.getElementById("ticketPoster");
         poster.src = posterUrl;
