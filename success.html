@@ -386,7 +386,7 @@
       .sc-detail-value{overflow-wrap:anywhere;color:#f1f1f3;font-size:.78rem;line-height:1.4;}
       .sc-detail-value.blue{color:#48d998;}
       .sc-ticket-poster{display:none;width:76px;height:112px;object-fit:cover;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.32);}
-      .sc-detail.has-poster{display:flex;align-items:center;justify-content:space-between;gap:.8rem;min-height:128px;}
+      .sc-detail.has-poster{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;min-height:0;}
       .sc-detail.has-poster .sc-detail-copy{display:grid;gap:.2rem;}
       .sc-ticket-location{display:flex;align-items:center;gap:.6rem;padding:.85rem .55rem;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);color:#d8d8dc;font-size:.76rem;line-height:1.45;text-decoration:none;}
       .sc-ticket-location:hover{color:#fff;background:rgba(255,255,255,.025);}
@@ -443,7 +443,7 @@
       .sc-detail-value{overflow-wrap:anywhere;color:#f1f1f3;font-size:.78rem;line-height:1.4;}
       .sc-detail-value.blue{color:#48d998;}
       .sc-ticket-poster{display:none;width:76px;height:112px;object-fit:cover;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.32);}
-      .sc-detail.has-poster{display:flex;align-items:center;justify-content:space-between;gap:.8rem;min-height:128px;}
+      .sc-detail.has-poster{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;min-height:0;}
       .sc-detail.has-poster .sc-detail-copy{display:grid;gap:.2rem;}
       .sc-ticket-location{display:flex;align-items:center;gap:.6rem;padding:.85rem .55rem;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);color:#d8d8dc;font-size:.76rem;line-height:1.45;text-decoration:none;}
       .sc-ticket-location:hover{color:#fff;background:rgba(255,255,255,.025);}
@@ -454,13 +454,15 @@
       .sc-btn-download{background:#35c985;box-shadow:none;}
       .sc-ticket-top{padding-top:1.25rem;padding-bottom:.25rem;}
       .sc-details-grid{padding-top:.5rem;}
-      .sc-detail.has-poster{min-height:132px;padding-top:1rem;padding-bottom:1rem;}
+      .sc-detail.has-poster{min-height:0;padding-top:0;padding-bottom:0;}
       .sc-ticket-codes{margin-top:.25rem;padding-top:.85rem;border-top:1px solid rgba(255,255,255,.1);}
     }
     @media (min-width:601px){.sc-booking-id{display:none!important;}.sc-details-grid > .sc-detail:has(#dBookingId){display:none!important;}.sc-ticket-poster{display:none;width:76px;height:112px;object-fit:cover;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.32);}.sc-detail.has-poster{min-height:132px;}.sc-hero-qr{margin:.65rem 0 1rem;}.sc-ticket-codes{margin-top:.25rem;padding-top:.85rem;border-top:1px solid rgba(255,255,255,.1);}}
     .sc-details-grid > .sc-detail:has(#dDate),
     .sc-details-grid > .sc-detail:has(#dEvent),
-    .sc-details-grid > .sc-detail:has(#dIssuedBy){border-bottom:0!important;padding-top:.2rem!important;padding-bottom:.2rem!important;}
+    .sc-details-grid > .sc-detail:has(#dIssuedBy){border-bottom:0!important;padding-top:.12rem!important;padding-bottom:.12rem!important;}
+    .sc-details-grid > .sc-detail.has-poster{min-height:0!important;padding-top:0!important;padding-bottom:0!important;align-items:flex-start!important;}
+    .sc-ticket-poster{margin-top:0!important;}
   </style>
 </head>
 <body>
