@@ -537,9 +537,6 @@
               <div class="sc-detail-copy"><span class="sc-detail-label" id="dEventLabel">Tickets</span><span class="sc-detail-value" id="dEvent">—</span></div>
               <img class="sc-ticket-poster" id="ticketPoster" alt="Event poster" />
             </div>
-            <div class="sc-detail" id="movieMetaDetail" style="display:none;"><span class="sc-detail-label">Movie details</span><span class="sc-detail-value" id="dMovieMeta">—</span></div>
-            <div class="sc-detail"><span class="sc-detail-label">Booking status</span><span class="sc-detail-value blue" id="dStatus">Confirmed</span></div>
-            <div class="sc-detail"><span class="sc-detail-label">Amount paid</span><span class="sc-detail-value" id="dAmount">—</span></div>
             <div class="sc-detail">
               <span class="sc-detail-label">Issued by</span>
               <span class="sc-detail-value" id="dIssuedBy">CultureWave</span>
@@ -779,10 +776,6 @@
         movieLanguage = movieLanguage || d.language || '';
         movieRating = movieRating || d.rating || d.certificate || d.ageRating || '';
         bkEndTime = bkEndTime || formatTimeText(d.endTime || d.finishTime || '');
-        if (movieLanguage || movieRating || bkEndTime) {
-          document.getElementById('dMovieMeta').textContent = [movieLanguage, bkEndTime ? `${bkTime} – ${bkEndTime}` : '', movieRating].filter(Boolean).join(' | ');
-          document.getElementById('movieMetaDetail').style.display = 'grid';
-        }
         const g1 = design.gradientStart || '#1242c5';
         const g2 = design.gradientEnd   || '#2f6bff';
 
@@ -889,17 +882,10 @@
       document.getElementById("dBookingId").textContent = shortId;
       document.getElementById("dBookingCode").textContent = shortId;
       document.getElementById("dFullBookingId").textContent = bookingId || "—";
-      document.getElementById("dStatus").textContent    = isRestaurant ? "Reserved" : "Confirmed";
-      document.getElementById("dAmount").textContent    = amount;
       const parsedBookingDate=bkDate ? new Date(bkDate) : null;
       const eventDateLabel=parsedBookingDate && !Number.isNaN(parsedBookingDate.getTime()) ? parsedBookingDate.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : dateStr;
       const eventTimeLabel = bkTime && bkEndTime ? `${bkTime} – ${bkEndTime}` : (bkTime || bkEndTime);
       document.getElementById("dDate").textContent      = [eventDateLabel, eventTimeLabel].filter(Boolean).join(" · ");
-      if (movieLanguage || movieRating || bkEndTime) {
-        const movieMeta = [movieLanguage, bkEndTime ? `${bkTime} – ${bkEndTime}` : "", movieRating].filter(Boolean).join(" | ");
-        document.getElementById("dMovieMeta").textContent = movieMeta;
-        document.getElementById("movieMetaDetail").style.display = "grid";
-      }
       document.getElementById("dEventLabel").textContent = `${seatCount} ticket${seatCount === "1" ? "" : "s"}`;
       document.getElementById("dEvent").textContent     = [ticketName, seatIds].filter(Boolean).join(" · ");
       if (screenName) {
