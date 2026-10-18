@@ -382,7 +382,9 @@
       .sc-status-banner{max-width:none;margin:0 auto 1.35rem;padding:0 0 .15rem;background:transparent!important;box-shadow:none!important;}
       .sc-icon-ring{width:3.5rem;height:3.5rem;margin:0 auto 1rem;background:#35d990!important;border:0!important;box-shadow:0 0 0 6px rgba(53,218,143,.12)!important;font-size:1.65rem;color:#064b31;}
       .sc-status-banner h1{color:#f5f5f6;font-family:Manrope,sans-serif;font-size:1.55rem;letter-spacing:-.045em;margin:0;}
-      .sc-ticket{max-width:560px;background:#29292c;border:1px solid rgba(255,255,255,.05);border-radius:18px;box-shadow:0 12px 34px rgba(0,0,0,.24);overflow:hidden;}
+      .sc-ticket{position:relative;max-width:560px;background:#29292c;border:1px solid rgba(255,255,255,.05);border-radius:18px;box-shadow:0 12px 34px rgba(0,0,0,.24);overflow:hidden;}
+      .sc-ticket::before,.sc-ticket::after{content:"";position:absolute;z-index:2;top:59%;width:22px;height:22px;border-radius:50%;background:#151617;}
+      .sc-ticket::before{left:-12px;}.sc-ticket::after{right:-12px;}
       .sc-hero-qr{display:flex;flex-direction:column;align-items:center;gap:.65rem;margin:.25rem 0 1rem;}
       .sc-hero-qr .sc-qr-box{width:184px;height:184px;padding:.7rem;border:0;border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,.28);}
       .sc-hero-qr #qrCanvas{width:160px!important;height:160px!important;}
@@ -400,6 +402,12 @@
       .sc-detail-label{color:#a7a8ae;font-size:.57rem;letter-spacing:.1em;}
       .sc-detail-value{overflow-wrap:anywhere;color:#f1f1f3;font-size:.78rem;line-height:1.4;}
       .sc-detail-value.blue{color:#48d998;}
+      .sc-ticket-poster{display:none;width:64px;height:94px;object-fit:cover;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.32);}
+      .sc-detail.has-poster{display:flex;align-items:center;justify-content:space-between;gap:.8rem;}
+      .sc-detail.has-poster .sc-detail-copy{display:grid;gap:.2rem;}
+      .sc-ticket-location{display:flex;align-items:center;gap:.6rem;padding:.85rem .55rem;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);color:#d8d8dc;font-size:.76rem;line-height:1.45;}
+      .sc-ticket-location-icon{flex:none;color:#b8bbc2;font-size:1rem;}
+      .sc-ticket-codes{padding:.8rem .55rem .2rem;color:#999ba2;text-align:center;font-size:.68rem;line-height:1.55;}
       .sc-actions{padding:.75rem 1rem calc(env(safe-area-inset-bottom) + .75rem);background:linear-gradient(transparent,rgba(18,18,20,.98) 28%);}
       .sc-btn{min-height:49px;border-radius:13px;}
       .sc-btn-download{background:#35c985;box-shadow:none;}
@@ -454,7 +462,6 @@
           <div class="sc-qr-box"><canvas id="qrCanvas"></canvas></div>
           <span class="sc-qr-scan-note" id="qrScanNote">Scan this QR code or share your booking ID at entrance for event entry</span>
         </div>
-        <div class="sc-booking-id" id="scBookingId">Booking ID: —</div>
         <div class="sc-ticket-top"><div class="sc-ticket-cover" id="ticketCoverBg"></div>
           <div class="sc-ticket-emoji" id="ticketEmoji">🎟️</div>
           <div class="sc-ticket-event-info">
@@ -488,14 +495,18 @@
               <span class="sc-detail-value" id="dDate">—</span>
             </div>
             <div class="sc-detail">
-              <span class="sc-detail-label" id="dEventLabel">Event</span>
+              <span class="sc-detail-label" id="dEventLabel">Tickets</span>
               <span class="sc-detail-value" id="dEvent">—</span>
+              <img class="sc-ticket-poster" id="ticketPoster" alt="Event poster" />
             </div>
             <div class="sc-detail">
               <span class="sc-detail-label">Issued by</span>
               <span class="sc-detail-value" id="dIssuedBy">CultureWave</span>
             </div>
           </div>
+
+          <div class="sc-ticket-location"><span class="sc-ticket-location-icon" aria-hidden="true">⌖</span><span id="ticketLocation">Venue, Hyderabad</span></div>
+          <div class="sc-ticket-codes">Booking code: <span id="dBookingCode">—</span><br />Booking ID: <span id="dFullBookingId">—</span></div>
 
           <div id="ticketCustomMessage" style="display:none;grid-column:1/-1;padding:.75rem 1rem;background:#f8fafc;border-radius:12px;font-size:.78rem;color:#475569;font-style:italic;"></div>
 
@@ -650,6 +661,9 @@
     const bkTime     = formatTimeText(params.get("time") || "");
     const ticketName = params.get("ticket")    || "Entry Pass";
     const seatCount  = params.get("seats")     || "1";
+    const seatIds    = params.get("seatIds")   || "";
+    const posterUrl  = params.get("poster")    || "";
+    const screenName = params.get("screen")    || "";
     const isRestaurant = bkType === "restaurant";
     const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
 
@@ -676,7 +690,10 @@
     };
 
     const emoji = eventEmojis[eventName] || "🎟️";
-    const venue = eventVenues[eventName] || "Hyderabad";
+    let venue = eventVenues[eventName] || "Hyderabad";
+    const venueFromUrl = params.get("venue") || "";
+    const cityFromUrl = params.get("city") || "";
+    if (venueFromUrl) venue = [venueFromUrl, cityFromUrl].filter(Boolean).join(", ");
     const dateStr = new Date().toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
     const shortId = bookingId ? bookingId.slice(-10).toUpperCase() : "—";
     const whatsappText = `Hi CultureWave support, I need help with my booking. Booking ID: ${shortId}. Event: ${eventName}.${guestName ? ` Name: ${guestName}.` : ""}`;
@@ -788,6 +805,13 @@
       document.getElementById("ticketEmoji").textContent = emoji;
       document.getElementById("ticketEvent").textContent = eventName;
       document.getElementById("ticketVenue").textContent = venue;
+      document.getElementById("ticketLocation").textContent = venue;
+      if (posterUrl) {
+        const poster = document.getElementById("ticketPoster");
+        poster.src = posterUrl;
+        poster.style.display = "block";
+        document.getElementById("dEvent").closest(".sc-detail").classList.add("has-poster");
+      }
 
       // ticket details
       if (guestName) {
@@ -795,15 +819,22 @@
         document.getElementById("guestNameDetail").style.display = "grid";
       }
       document.getElementById("dBookingId").textContent = shortId;
+      document.getElementById("dBookingCode").textContent = shortId;
+      document.getElementById("dFullBookingId").textContent = bookingId || "—";
       document.getElementById("dStatus").textContent    = isRestaurant ? "✅ Reserved" : "✅ Confirmed";
       document.getElementById("dAmount").textContent    = amount;
       const parsedBookingDate=bkDate ? new Date(bkDate) : null;
       const eventDateLabel=parsedBookingDate && !Number.isNaN(parsedBookingDate.getTime()) ? parsedBookingDate.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : dateStr;
-      document.getElementById("dDate").textContent      = eventDateLabel + (bkTime ? " · " + bkTime : "");
+      document.getElementById("dDate").textContent      = [eventDateLabel, bkTime].filter(Boolean).join(" · ");
       document.getElementById("dEventLabel").textContent = `${seatCount} ticket${seatCount === "1" ? "" : "s"}`;
-      document.getElementById("dEvent").textContent     = ticketName;
+      document.getElementById("dEvent").textContent     = [ticketName, seatIds].filter(Boolean).join(" · ");
+      if (screenName) {
+        document.getElementById("dEvent").textContent += ` · ${screenName}`;
+      }
       if (isRestaurant) {
         document.getElementById("dEventLabel").textContent = "Restaurant";
+        document.getElementById("dEvent").closest(".sc-detail").classList.remove("has-poster");
+        document.getElementById("ticketPoster").style.display = "none";
       }
 
       // QR code — encode booking verification data
