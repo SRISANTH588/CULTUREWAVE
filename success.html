@@ -369,8 +369,8 @@
       .sc-ticket::before,.sc-ticket::after{content:"";position:absolute;z-index:2;top:59%;width:22px;height:22px;border-radius:50%;background:#151617;}
       .sc-ticket::before{left:-12px;}.sc-ticket::after{right:-12px;}
       .sc-hero-qr{display:flex;flex-direction:column;align-items:center;gap:.65rem;margin:.65rem 0 1rem;}
-      .sc-hero-qr .sc-qr-box{width:184px;height:184px;padding:.7rem;border:0;border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,.28);}
-      .sc-hero-qr #qrCanvas{width:160px!important;height:160px!important;}
+      .sc-hero-qr .sc-qr-box{width:220px;height:220px;padding:6px;border:0;border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,.28);}
+      .sc-hero-qr #qrCanvas,.sc-hero-qr img{width:208px!important;height:208px!important;}
       .sc-hero-qr .sc-qr-scan-note{max-width:310px;color:#aeb0b5;font-size:.72rem;line-height:1.4;}
       .sc-ticket-top{padding:1.1rem 1.1rem .35rem;background:transparent!important;display:block;text-align:center;}
       .sc-ticket-top::after,.sc-ticket-cover,.sc-ticket-emoji,.sc-tear{display:none!important;}
@@ -426,8 +426,8 @@
       .sc-ticket::before,.sc-ticket::after{content:"";position:absolute;z-index:2;top:59%;width:22px;height:22px;border-radius:50%;background:#151617;}
       .sc-ticket::before{left:-12px;}.sc-ticket::after{right:-12px;}
       .sc-hero-qr{display:flex;flex-direction:column;align-items:center;gap:.65rem;margin:.25rem 0 1rem;}
-      .sc-hero-qr .sc-qr-box{width:184px;height:184px;padding:.7rem;border:0;border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,.28);}
-      .sc-hero-qr #qrCanvas{width:160px!important;height:160px!important;}
+      .sc-hero-qr .sc-qr-box{width:220px;height:220px;padding:6px;border:0;border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,.28);}
+      .sc-hero-qr #qrCanvas,.sc-hero-qr img{width:208px!important;height:208px!important;}
       .sc-hero-qr .sc-qr-scan-note{max-width:310px;color:#aeb0b5;font-size:.72rem;line-height:1.4;}
       .sc-booking-id{display:none!important;}
       .sc-ticket-top{padding:1.1rem 1.1rem .35rem;background:transparent!important;display:block;text-align:center;}
@@ -915,24 +915,24 @@
       const qrData = JSON.stringify({ id: bookingId, event: eventName, amount, date: dateStr, issuer: "CultureWave", type: bkType });
       try {
         QRCode.toCanvas(document.getElementById("qrCanvas"), qrData, {
-          width: 120, margin: 1,
+          width: 208, margin: 1,
           color: { dark: "#0a0f1e", light: "#ffffff" }
         }, function(err) {
           if (err) {
             // fallback: use QRCode img tag
             const img = document.createElement("img");
-            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=" + encodeURIComponent(qrData);
+            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=208x208&data=" + encodeURIComponent(qrData);
             img.style.borderRadius = "8px";
-            img.width = 120; img.height = 120;
+            img.width = 208; img.height = 208;
             const canvas = document.getElementById("qrCanvas");
             canvas.parentNode.replaceChild(img, canvas);
           }
         });
       } catch(e) {
         const img = document.createElement("img");
-        img.src = "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=" + encodeURIComponent(qrData);
+        img.src = "https://api.qrserver.com/v1/create-qr-code/?size=208x208&data=" + encodeURIComponent(qrData);
         img.style.borderRadius = "8px";
-        img.width = 120; img.height = 120;
+        img.width = 208; img.height = 208;
         const canvas = document.getElementById("qrCanvas");
         canvas.parentNode.replaceChild(img, canvas);
       }
