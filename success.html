@@ -460,6 +460,7 @@
     @media (min-width:601px){.sc-booking-id{display:none!important;}.sc-details-grid > .sc-detail:has(#dBookingId){display:none!important;}.sc-ticket-poster{display:none;width:76px;height:112px;object-fit:cover;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.32);}.sc-detail.has-poster{min-height:132px;}.sc-hero-qr{margin:.65rem 0 1rem;}.sc-ticket-codes{margin-top:.25rem;padding-top:.85rem;border-top:1px solid rgba(255,255,255,.1);}}
     .sc-details-grid > .sc-detail:has(#dDate),
     .sc-details-grid > .sc-detail:has(#dEvent),
+    .sc-details-grid > .sc-detail:has(#dAmount),
     .sc-details-grid > .sc-detail:has(#dIssuedBy){border-bottom:0!important;padding-top:.12rem!important;padding-bottom:.12rem!important;}
     .sc-details-grid > .sc-detail.has-poster{min-height:0!important;padding-top:0!important;padding-bottom:0!important;align-items:flex-start!important;}
     .sc-ticket-poster{margin-top:0!important;}
@@ -541,6 +542,10 @@
             <div class="sc-detail">
               <div class="sc-detail-copy"><span class="sc-detail-label" id="dEventLabel">Tickets</span><span class="sc-detail-value" id="dEvent">—</span></div>
               <img class="sc-ticket-poster" id="ticketPoster" alt="Event poster" />
+            </div>
+            <div class="sc-detail">
+              <span class="sc-detail-label">Amount Paid</span>
+              <span class="sc-detail-value" id="dAmount">—</span>
             </div>
             <div class="sc-detail">
               <span class="sc-detail-label">Issued by</span>
@@ -893,6 +898,7 @@
       document.getElementById("dDate").textContent      = [eventDateLabel, eventTimeLabel].filter(Boolean).join(" · ");
       document.getElementById("dEventLabel").textContent = `${seatCount} ticket${seatCount === "1" ? "" : "s"}`;
       document.getElementById("dEvent").textContent     = [ticketName, seatIds].filter(Boolean).join(" · ");
+      document.getElementById("dAmount").textContent = amount === "—" || String(amount).trim().startsWith("₹") ? amount : `₹${amount}`;
       if (screenName) {
         document.getElementById("dEvent").textContent += ` · ${screenName}`;
       }
