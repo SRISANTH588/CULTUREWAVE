@@ -390,6 +390,7 @@
       .sc-ticket-location{display:flex;align-items:center;gap:.6rem;padding:.85rem .55rem;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);color:#d8d8dc;font-size:.76rem;line-height:1.45;text-decoration:none;}
       .sc-ticket-location:hover{color:#fff;background:rgba(255,255,255,.025);}
       .sc-ticket-location-icon{flex:none;color:#b8bbc2;font-size:1rem;}
+      .sc-ticket-map-icon{flex:none;width:20px;height:20px;color:#c6c9d0;}
       .sc-ticket-codes{padding:.8rem .55rem .2rem;color:#999ba2;text-align:center;font-size:.68rem;line-height:1.55;}
       .sc-actions{max-width:560px;}.sc-btn-download{background:#35c985;box-shadow:none;}
       .sc-icon-ring{width:4rem;height:4rem;margin-bottom:1.15rem;border:6px solid rgba(53,217,144,.14)!important;background:#35d990!important;box-shadow:none!important;color:#063f2a;font-size:1.7rem;}
@@ -550,7 +551,7 @@
             </div>
           </div>
 
-          <a class="sc-ticket-location" id="ticketMapLink" href="https://www.google.com/maps/search/?api=1&amp;query=Event%20venue" target="_blank" rel="noopener noreferrer"><span id="ticketLocation">Venue, Hyderabad</span><span aria-hidden="true" style="margin-left:auto;font-size:1rem;">↗</span></a>
+          <a class="sc-ticket-location" id="ticketMapLink" href="https://www.google.com/maps/search/?api=1&amp;query=Event%20venue" target="_blank" rel="noopener noreferrer"><span id="ticketLocation">Venue, Hyderabad</span><svg class="sc-ticket-map-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8 21.2 12 12 21.2 2.8 12 12 2.8Z"/><path d="M8 15.5 15.5 8M10 8h5.5v5.5"/></svg></a>
           <div class="sc-ticket-codes">Booking code: <span id="dBookingCode">—</span><br />Booking ID: <span id="dFullBookingId">—</span></div>
 
           <div id="ticketCustomMessage" style="display:none;grid-column:1/-1;padding:.75rem 1rem;background:#f8fafc;border-radius:12px;font-size:.78rem;color:#475569;font-style:italic;"></div>
@@ -777,7 +778,9 @@
           document.getElementById('ticketVenue').textContent = fullVenue;
           document.getElementById('ticketLocation').textContent = fullVenue;
           if (!mapLink && d.mapLink) mapLink = d.mapLink;
-          if (!mapLink) mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([d.venueName || d.venue,d.address,d.city].filter(Boolean).join(', ') || fullVenue)}`;
+          if (!mapLink) mapLink = fullVenue.toLowerCase().includes('bratt brewing')
+            ? 'https://maps.app.goo.gl/H4C1Puz9fhCJ3MxY9'
+            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([d.venueName || d.venue,d.address,d.city].filter(Boolean).join(', ') || fullVenue)}`;
           document.getElementById('ticketMapLink').href = mapLink;
         }
         movieLanguage = movieLanguage || d.language || '';
@@ -873,7 +876,9 @@
       document.getElementById("ticketVenue").textContent = venue;
       document.getElementById("ticketLocation").textContent = venue;
       const venueQuery = [venueFromUrl, params.get("address") || "", cityFromUrl].filter(Boolean).join(", ") || venue;
-      document.getElementById("ticketMapLink").href = mapLink || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueQuery)}`;
+      document.getElementById("ticketMapLink").href = mapLink || (venue.toLowerCase().includes("bratt brewing")
+        ? "https://maps.app.goo.gl/H4C1Puz9fhCJ3MxY9"
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueQuery)}`);
       if (posterUrl) {
         const poster = document.getElementById("ticketPoster");
         poster.src = posterUrl;
