@@ -119,11 +119,18 @@
     .bk-review-head{display:none;}
     .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-    .payment-error-popup{position:fixed;left:1rem;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:200;width:min(540px,calc(100% - 2rem));margin:0 auto;padding:1rem 3rem 1rem 1.1rem;display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:.6rem .85rem;background:#1a0a0a;border:1px solid rgba(239,68,68,.55);border-left:4px solid #ef4444;border-radius:18px;box-shadow:0 18px 48px rgba(0,0,0,.55);opacity:0;transform:translateY(calc(100% + 2rem));transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .25s ease;}
+    .payment-error-popup{--payment-error-accent:#ff5b68;position:fixed;left:1rem;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:200;width:min(440px,calc(100% - 2rem));margin:0 auto;padding:1.15rem 1.2rem 1rem;display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:.85rem 1rem;background:linear-gradient(145deg,#21191c,#171416 72%);border:1px solid rgba(255,255,255,.1);border-top:2px solid var(--payment-error-accent);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.58),0 3px 18px rgba(255,74,88,.1);color:#f7f3f4;opacity:0;transform:translateY(calc(100% + 2rem));transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .25s ease;}
     .payment-error-popup.show{opacity:1;transform:translateY(0);}
-    .payment-error-retry{grid-column:2;justify-self:start;padding:.55rem .9rem;border:0;border-radius:10px;background:#ef4444;color:#fff;font-size:.78rem;font-weight:900;}
-    .payment-error-help{grid-column:2;justify-self:start;color:#fecaca;font-size:.76rem;font-weight:800;text-decoration:underline;text-underline-offset:3px;}
-    .payment-error-close{position:absolute;top:.65rem;right:.8rem;border:0;background:transparent;color:#9ca3af;font-size:1.4rem;line-height:1;padding:0;}
+    .payment-error-icon{width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(255,91,104,.42);border-radius:14px;background:rgba(255,91,104,.12);color:var(--payment-error-accent);font-size:1.15rem;font-weight:800;}
+    .payment-error-copy{min-width:0;padding-right:1.2rem;}
+    .payment-error-title{margin-bottom:.22rem;color:#fff;font-size:.96rem;font-weight:900;letter-spacing:-.02em;}
+    .payment-error-msg{color:#c6b9bd;font-size:.78rem;line-height:1.5;}
+    .payment-error-actions{grid-column:2;display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;}
+    .payment-error-retry{min-height:44px;padding:.7rem 1.05rem;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:linear-gradient(135deg,#ff6874,#e93d50);color:#fff;font-size:.8rem;font-weight:900;box-shadow:0 5px 14px rgba(229,58,77,.23);transition:filter .15s,transform .15s;}
+    .payment-error-retry:hover{filter:brightness(1.06);transform:translateY(-1px);}
+    .payment-error-help{color:#e7dadd;font-size:.74rem;font-weight:700;text-decoration:none;border-bottom:1px solid rgba(231,218,221,.38);padding-bottom:2px;}
+    .payment-error-close{position:absolute;top:.72rem;right:.8rem;width:32px;height:32px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.04);color:#b8aaae;font-size:1.25rem;line-height:1;padding:0;}
+    @media(max-width:560px){.payment-error-popup{left:.85rem;right:.85rem;bottom:calc(.85rem + env(safe-area-inset-bottom));width:auto;padding:1rem 1rem .95rem;border-radius:20px;grid-template-columns:40px minmax(0,1fr);gap:.75rem .8rem;}.payment-error-icon{width:40px;height:40px;border-radius:13px}.payment-error-copy{padding-right:1.2rem}.payment-error-title{font-size:.92rem}.payment-error-msg{font-size:.76rem}.payment-error-actions{gap:.65rem}.payment-error-retry{min-height:42px}.payment-error-close{top:.62rem;right:.65rem;width:30px;height:30px}}
     @media(max-width:860px){.bk-grid{grid-template-columns:1fr;}.bk-receipt{position:static;}}
     @media(max-width:560px){
       .bk-step-lbl{display:none;}
@@ -747,13 +754,15 @@ function showPaymentError(reason){
     el.id = 'paymentErrorBanner';
     el.className = 'payment-error-popup';
     el.innerHTML = `
-      <div style="width:40px;height:40px;border-radius:50%;background:rgba(239,68,68,.15);border:1.5px solid #ef4444;display:grid;place-items:center;font-size:1.2rem;flex:none;">✗</div>
-      <div style="flex:1;">
-        <div style="font-size:.92rem;font-weight:900;color:#ef4444;margin-bottom:.2rem;">Payment Not Done</div>
-        <div style="font-size:.78rem;color:#fca5a5;line-height:1.5;" id="paymentErrorMsg"></div>
+      <div class="payment-error-icon" aria-hidden="true">!</div>
+      <div class="payment-error-copy">
+        <div class="payment-error-title">Payment not completed</div>
+        <div class="payment-error-msg" id="paymentErrorMsg"></div>
       </div>
-      <button class="payment-error-retry" type="button" onclick="retryPayment()">Retry payment</button>
-      <a class="payment-error-help" href="https://wa.me/919848047428?text=Hi%20CultureWave%2C%20my%20event%20payment%20did%20not%20go%20through.%20Please%20help." target="_blank" rel="noopener noreferrer">Need help? Contact support</a>
+      <div class="payment-error-actions">
+        <button class="payment-error-retry" type="button" onclick="retryPayment()">Try payment again</button>
+        <a class="payment-error-help" href="https://wa.me/919848047428?text=Hi%20CultureWave%2C%20my%20event%20payment%20did%20not%20go%20through.%20Please%20help." target="_blank" rel="noopener noreferrer">Contact support</a>
+      </div>
       <button class="payment-error-close" type="button" aria-label="Dismiss payment message" onclick="document.getElementById('paymentErrorBanner').remove()">×</button>
     `;
     document.body.appendChild(el);
