@@ -1757,7 +1757,7 @@ async function submitBooking(){
     const emailSent = await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
     if(!emailSent) showToast("Booking confirmed, but we could not send the confirmation email.");
     clearCheckoutDraft();
-    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
+    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
     return;
   }
 
@@ -1816,7 +1816,7 @@ async function submitBooking(){
       const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
       clearCheckoutDraft();
-      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
+      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
     },
     modal:{
       ondismiss: ()=>{

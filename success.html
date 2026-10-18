@@ -358,6 +358,40 @@
       .sc-remember-list{padding:0 1rem 1rem 2.5rem;}
     }
     /* Mobile ticket confirmation experience */
+    @media (min-width:601px){
+      body{background:#151617;color:#f5f5f6;}
+      .sc-page{min-height:100vh;align-items:center;padding:3.5rem 1.5rem 5rem;background:radial-gradient(ellipse 55% 35% at 50% 5%,rgba(20,144,96,.22),transparent 72%),#151617;}
+      .sc-status-banner{max-width:560px;margin:0 auto 1.5rem;padding:0 0 .15rem;background:transparent!important;box-shadow:none!important;}
+      .sc-status-banner::before{display:none;}
+      .sc-icon-ring{width:3.5rem;height:3.5rem;margin:0 auto 1rem;background:#35d990!important;border:0!important;box-shadow:0 0 0 6px rgba(53,218,143,.12)!important;color:#064b31;font-size:1.65rem;}
+      .sc-status-banner h1{color:#f5f5f6;font-size:1.8rem;letter-spacing:-.045em;margin:0;}
+      .sc-ticket{position:relative;max-width:560px;background:#29292c;border:1px solid rgba(255,255,255,.05);border-radius:18px;box-shadow:0 12px 34px rgba(0,0,0,.24);overflow:hidden;}
+      .sc-ticket::before,.sc-ticket::after{content:"";position:absolute;z-index:2;top:59%;width:22px;height:22px;border-radius:50%;background:#151617;}
+      .sc-ticket::before{left:-12px;}.sc-ticket::after{right:-12px;}
+      .sc-hero-qr{display:flex;flex-direction:column;align-items:center;gap:.65rem;margin:.25rem 0 1rem;}
+      .sc-hero-qr .sc-qr-box{width:184px;height:184px;padding:.7rem;border:0;border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,.28);}
+      .sc-hero-qr #qrCanvas{width:160px!important;height:160px!important;}
+      .sc-hero-qr .sc-qr-scan-note{max-width:310px;color:#aeb0b5;font-size:.72rem;line-height:1.4;}
+      .sc-ticket-top{padding:1.1rem 1.1rem .35rem;background:transparent!important;display:block;text-align:center;}
+      .sc-ticket-top::after,.sc-ticket-cover,.sc-ticket-emoji,.sc-tear{display:none!important;}
+      .sc-ticket-event-info h2{font-size:1.3rem;line-height:1.3;color:#f5f5f6;}
+      .sc-ticket-event-info span{justify-content:center;color:#b5b5ba;font-size:.8rem;}
+      .sc-ticket-event-info span::before{display:none;}
+      .sc-ticket-body{display:block;padding:.15rem 1.1rem 1rem;}
+      .sc-details-grid{display:grid;grid-template-columns:1fr;gap:0;padding:.55rem 0 0;background:transparent;border:0;border-top:1px solid rgba(255,255,255,.1);border-radius:0;}
+      .sc-detail,.sc-detail:nth-child(odd){min-width:0;padding:.72rem .55rem;border-bottom:1px solid rgba(255,255,255,.09);text-align:left;}
+      .sc-detail:last-child{border-bottom:0;}
+      .sc-detail-label{color:#a7a8ae;font-size:.57rem;letter-spacing:.1em;}
+      .sc-detail-value{overflow-wrap:anywhere;color:#f1f1f3;font-size:.78rem;line-height:1.4;}
+      .sc-detail-value.blue{color:#48d998;}
+      .sc-ticket-poster{display:none;width:76px;height:112px;object-fit:cover;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.32);}
+      .sc-detail.has-poster{display:flex;align-items:center;justify-content:space-between;gap:.8rem;}
+      .sc-detail.has-poster .sc-detail-copy{display:grid;gap:.2rem;}
+      .sc-ticket-location{display:flex;align-items:center;gap:.6rem;padding:.85rem .55rem;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);color:#d8d8dc;font-size:.76rem;line-height:1.45;}
+      .sc-ticket-location-icon{flex:none;color:#b8bbc2;font-size:1rem;}
+      .sc-ticket-codes{padding:.8rem .55rem .2rem;color:#999ba2;text-align:center;font-size:.68rem;line-height:1.55;}
+      .sc-actions{max-width:560px;}.sc-btn-download{background:#35c985;box-shadow:none;}
+    }
     @media (max-width:600px){
       body{background:#171719;color:#f5f5f6}.topbar,.mobile-nav,.site-footer{display:none!important}.sc-page{min-height:100vh;align-items:stretch;padding:3.1rem 1.75rem 8.5rem;background:radial-gradient(ellipse 75% 23% at 50% 10%,rgba(20,144,96,.24),transparent 62%),#171719}.sc-status-banner{max-width:none;margin:0;padding:0 0 2.2rem;border-radius:0;background:transparent!important;box-shadow:none!important;overflow:visible}.sc-status-banner::before{display:none}.sc-icon-ring{width:4.8rem;height:4.8rem;margin:0 auto 1.25rem;background:radial-gradient(circle at 32% 26%,#7df0bb,#28c982 32%,#067349 100%)!important;border:3px solid rgba(211,255,234,.64)!important;box-shadow:0 0 0 7px rgba(53,218,143,.13),0 14px 30px rgba(0,0,0,.32),inset 0 1px 2px rgba(255,255,255,.55),inset 0 -7px 12px rgba(0,59,35,.24)!important;font-size:2rem}.sc-status-banner h1{color:#26bf84;font-family:cursive;font-size:2.1rem;letter-spacing:-.07em}.sc-status-banner p{display:none}.sc-hero-qr{display:flex;flex-direction:column;align-items:center;gap:.9rem;margin:1.2rem 0 1.25rem}.sc-hero-qr .sc-qr-box{width:145px;height:145px;padding:.7rem;border:0;border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.3)}.sc-hero-qr .sc-qr-scan-note{max-width:310px;color:#f1d26d;font-size:.84rem;line-height:1.45}.sc-booking-id{margin:0;background:none;border:0;border-radius:0;padding:0;color:#a7a7ab;font-size:.76rem;letter-spacing:0}.sc-ticket{max-width:none;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}.sc-ticket-top{padding:0 0 1.05rem;background:transparent!important;display:block}.sc-ticket-top::after,.sc-ticket-cover,.sc-ticket-emoji{display:none!important}.sc-ticket-event-info h2{font-size:1.15rem;line-height:1.32;color:#f5f5f6}.sc-ticket-event-info span{color:#aaaab0;font-size:.78rem}.sc-ticket-event-info span::before{display:none}.sc-tear{display:none}.sc-ticket-body{display:block;padding:0}.sc-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:1.05rem 1.05rem;background:#05070d;border:1px solid rgba(255,255,255,.04);border-radius:20px}.sc-detail{padding:.65rem 0;border-bottom:1px dashed #35363c}.sc-detail:nth-child(odd){padding-right:.7rem}.sc-detail:nth-child(even){text-align:right}.sc-detail:nth-last-child(-n+2){border-bottom:0}.sc-detail-label{color:#a7a8ae;font-size:.61rem}.sc-detail-value{color:#f1f1f3;font-size:.8rem}.sc-detail-value.blue{color:#2dca8d}.sc-actions{position:fixed;z-index:9;left:0;right:0;bottom:0;max-width:none;display:grid;grid-template-columns:1fr 1fr;padding:.9rem 1.75rem calc(env(safe-area-inset-bottom) + .9rem);margin:0;background:linear-gradient(transparent,#121214 23%)}.sc-btn{min-height:55px;border-radius:16px}.sc-btn-download{background:#ff5a12;box-shadow:none;order:1}.sc-btn-share{display:flex;order:2;background:#27282c;color:#f5f5f6;border-color:#414248;box-shadow:none}.sc-btn-home{display:none}.sc-failed-actions{padding:1rem}.sc-help{margin-top:1.4rem;background:#202126;border-color:#34353b;box-shadow:none}.sc-help summary{color:#f1d26d}.sc-help[open] summary{border-bottom-color:#34353b}.sc-faq-list details{border-bottom-color:#34353b}.sc-faq-list summary{color:#f5f5f6}.sc-faq-list p{color:#b8b8bd}.sc-faq-list a{color:#f1d26d}.sc-ticket #ticketCustomMessage{background:#0b0d13!important;color:#bdbec4!important}.sc-qr-label{display:none}
     }
@@ -462,6 +496,7 @@
           <div class="sc-qr-box"><canvas id="qrCanvas"></canvas></div>
           <span class="sc-qr-scan-note" id="qrScanNote">Scan this QR code or share your booking ID at entrance for event entry</span>
         </div>
+        <div class="sc-booking-id" id="scBookingId">Booking ID: —</div>
         <div class="sc-ticket-top"><div class="sc-ticket-cover" id="ticketCoverBg"></div>
           <div class="sc-ticket-emoji" id="ticketEmoji">🎟️</div>
           <div class="sc-ticket-event-info">
@@ -475,7 +510,7 @@
         <div class="sc-ticket-body" id="ticketBody">
           <div class="sc-details-grid">
             <div class="sc-detail" id="guestNameDetail" style="display:none;">
-              <span class="sc-detail-label">Invited Guest</span>
+              <span class="sc-detail-label">Booked for</span>
               <span class="sc-detail-value" id="dGuestName">—</span>
             </div>
             <div class="sc-detail">
@@ -483,22 +518,16 @@
               <span class="sc-detail-value blue" id="dBookingId">—</span>
             </div>
             <div class="sc-detail">
-              <span class="sc-detail-label">Status</span>
-              <span class="sc-detail-value blue" id="dStatus">Confirmed</span>
-            </div>
-            <div class="sc-detail">
-              <span class="sc-detail-label">Amount Paid</span>
-              <span class="sc-detail-value" id="dAmount">—</span>
-            </div>
-            <div class="sc-detail">
               <span class="sc-detail-label">Date</span>
               <span class="sc-detail-value" id="dDate">—</span>
             </div>
             <div class="sc-detail">
-              <span class="sc-detail-label" id="dEventLabel">Tickets</span>
-              <span class="sc-detail-value" id="dEvent">—</span>
+              <div class="sc-detail-copy"><span class="sc-detail-label" id="dEventLabel">Tickets</span><span class="sc-detail-value" id="dEvent">—</span></div>
               <img class="sc-ticket-poster" id="ticketPoster" alt="Event poster" />
             </div>
+            <div class="sc-detail" id="movieMetaDetail" style="display:none;"><span class="sc-detail-label">Movie details</span><span class="sc-detail-value" id="dMovieMeta">—</span></div>
+            <div class="sc-detail"><span class="sc-detail-label">Booking status</span><span class="sc-detail-value blue" id="dStatus">Confirmed</span></div>
+            <div class="sc-detail"><span class="sc-detail-label">Amount paid</span><span class="sc-detail-value" id="dAmount">—</span></div>
             <div class="sc-detail">
               <span class="sc-detail-label">Issued by</span>
               <span class="sc-detail-value" id="dIssuedBy">CultureWave</span>
@@ -659,10 +688,13 @@
     const eventId    = params.get("eventId")  || "";
     const bkDate     = params.get("date")      || "";
     const bkTime     = formatTimeText(params.get("time") || "");
+    let bkEndTime  = formatTimeText(params.get("endTime") || "");
+    let movieLanguage = params.get("language") || "";
+    let movieRating = params.get("rating") || "";
     const ticketName = params.get("ticket")    || "Entry Pass";
     const seatCount  = params.get("seats")     || "1";
     const seatIds    = params.get("seatIds")   || "";
-    const posterUrl  = params.get("poster")    || "";
+    let posterUrl  = params.get("poster")    || "";
     const screenName = params.get("screen")    || "";
     const isRestaurant = bkType === "restaurant";
     const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
@@ -716,6 +748,25 @@
         if (!snap.exists) return;
         const d = snap.data();
         const design = d.ticketDesign || {};
+        if (!posterUrl) posterUrl = d.cardImgUrl || d.coverUrl || '';
+        if (posterUrl && !isRestaurant) {
+          const poster = document.getElementById('ticketPoster');
+          poster.src = posterUrl;
+          poster.style.display = 'block';
+          document.getElementById('dEvent').closest('.sc-detail').classList.add('has-poster');
+        }
+        if (d.venueName || d.venue || d.city) {
+          const fullVenue = [d.venueName || d.venue, d.city].filter(Boolean).join(', ');
+          document.getElementById('ticketVenue').textContent = fullVenue;
+          document.getElementById('ticketLocation').textContent = fullVenue;
+        }
+        movieLanguage = movieLanguage || d.language || '';
+        movieRating = movieRating || d.rating || d.certificate || d.ageRating || '';
+        bkEndTime = bkEndTime || formatTimeText(d.endTime || d.finishTime || '');
+        if (movieLanguage || movieRating || bkEndTime) {
+          document.getElementById('dMovieMeta').textContent = [movieLanguage, bkEndTime ? `${bkTime} – ${bkEndTime}` : '', movieRating].filter(Boolean).join(' | ');
+          document.getElementById('movieMetaDetail').style.display = 'grid';
+        }
         const g1 = design.gradientStart || '#1242c5';
         const g2 = design.gradientEnd   || '#2f6bff';
 
@@ -774,7 +825,7 @@
 
         // Update venue from event data
         const venueEl = document.getElementById('ticketVenue');
-        if (venueEl && d.venueName) venueEl.textContent = d.venueName + (d.city ? ', ' + d.city : '');
+        if (venueEl && (d.venueName || d.venue || d.city)) venueEl.textContent = [d.venueName || d.venue, d.city].filter(Boolean).join(', ');
 
       } catch (error) {
         console.warn('Could not load event ticket design:', error);
@@ -826,6 +877,11 @@
       const parsedBookingDate=bkDate ? new Date(bkDate) : null;
       const eventDateLabel=parsedBookingDate && !Number.isNaN(parsedBookingDate.getTime()) ? parsedBookingDate.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : dateStr;
       document.getElementById("dDate").textContent      = [eventDateLabel, bkTime].filter(Boolean).join(" · ");
+      if (movieLanguage || movieRating || bkEndTime) {
+        const movieMeta = [movieLanguage, bkEndTime ? `${bkTime} – ${bkEndTime}` : "", movieRating].filter(Boolean).join(" | ");
+        document.getElementById("dMovieMeta").textContent = movieMeta;
+        document.getElementById("movieMetaDetail").style.display = "grid";
+      }
       document.getElementById("dEventLabel").textContent = `${seatCount} ticket${seatCount === "1" ? "" : "s"}`;
       document.getElementById("dEvent").textContent     = [ticketName, seatIds].filter(Boolean).join(" · ");
       if (screenName) {
