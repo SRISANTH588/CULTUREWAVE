@@ -211,7 +211,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .hamburger span{display:block;width:22px;height:2px;background:#1a1a2e;border-radius:2px;}
 @media(max-width:900px){
   .layout{grid-template-columns:1fr;}
-  .sidebar{display:flex!important;position:fixed;left:-260px;top:0;width:260px;height:100vh;z-index:50;transition:left .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+  .sidebar{display:flex!important;position:fixed;left:-260px;top:0;width:260px;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);z-index:50;transition:left .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
   .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.15);}
   .hamburger{display:flex;}
   .an-metrics{grid-template-columns:1fr 1fr;}

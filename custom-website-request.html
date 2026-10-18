@@ -120,7 +120,7 @@
     .btn-primary { padding: 0.6rem 1.2rem; border-radius: 11px; border: 0; background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-weight: 800; font-size: 0.84rem; cursor: pointer; box-shadow: 0 3px 12px rgba(20,84,255,0.25); }
     .btn-success { padding: 0.6rem 1.2rem; border-radius: 11px; border: 0; background: linear-gradient(135deg, #10b981, #34d399); color: #fff; font-weight: 800; font-size: 0.84rem; cursor: pointer; box-shadow: 0 3px 12px rgba(16,185,129,0.25); }
 
-    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; max-height:calc(100vh - 2rem); max-height:calc(100dvh - 2rem); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
     @media (max-width: 600px) { .topbar-inner { padding: 0 0.8rem; } .layout { padding: 0.7rem; } .progress-wrap { display: none; } }
   </style>
 </head>
