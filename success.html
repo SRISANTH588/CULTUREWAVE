@@ -776,67 +776,6 @@
     const isRestaurant = bkType === "restaurant";
     const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
 
-    const feedbackSection = document.getElementById('scFeedback');
-    const feedbackStorageKey = bookingId ? `culturewave-feedback-submitted:${bookingId}` : '';
-    let feedbackAlreadySubmitted = false;
-    try { feedbackAlreadySubmitted = Boolean(feedbackStorageKey && localStorage.getItem(feedbackStorageKey)); } catch {}
-    if (isSuccess && !feedbackAlreadySubmitted) feedbackSection.hidden = false;
-    const feedbackForm = document.getElementById('scFeedbackForm');
-    const feedbackOpenButton = document.getElementById('scFeedbackOpen');
-    const setFeedbackFormOpen = open => {
-      feedbackForm.hidden = !open;
-      feedbackOpenButton.setAttribute('aria-expanded', String(open));
-      feedbackOpenButton.querySelector('.sc-feedback-trigger-action').textContent = open ? 'Close' : 'Give feedback';
-    };
-    feedbackOpenButton.addEventListener('click', () => setFeedbackFormOpen(feedbackForm.hidden));
-    document.getElementById('scFeedbackClose').addEventListener('click', () => setFeedbackFormOpen(false));
-    const overallFeedbackButtons = [...feedbackSection.querySelectorAll('.sc-feedback-overall button')];
-    const categoryFeedback = {};
-    let overallRating = '';
-    const feedbackReaction = document.getElementById('scFeedbackReaction');
-    const feedbackState = document.getElementById('scFeedbackState');
-    overallFeedbackButtons.forEach(button => button.addEventListener('click', () => {
-      overallRating = button.dataset.vote;
-      overallFeedbackButtons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-      feedbackReaction.textContent = overallRating === 'like' ? 'Glad you had a great time! 🎉' : 'Thanks for letting us know. We’ll work to improve.';
-    }));
-    feedbackSection.querySelectorAll('.sc-feedback-item').forEach(item => {
-      item.querySelectorAll('.sc-feedback-vote').forEach(button => button.addEventListener('click', () => {
-        categoryFeedback[item.dataset.category] = button.dataset.vote;
-        item.querySelectorAll('.sc-feedback-vote').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
-        item.classList.toggle('is-liked', button.dataset.vote === 'like');
-        item.classList.toggle('is-disliked', button.dataset.vote === 'dislike');
-      }));
-    });
-    document.getElementById('scFeedbackSubmit').addEventListener('click', async event => {
-      const button = event.currentTarget;
-      if (!overallRating) { feedbackState.textContent = 'Please choose an overall rating first.'; return; }
-      if (!window.firebase) { feedbackState.textContent = 'Feedback could not be saved. Please try again later.'; return; }
-      button.disabled = true;
-      button.textContent = 'Submitting…';
-      feedbackState.textContent = '';
-      try {
-        if (!firebase.apps.length) firebase.initializeApp({apiKey:'AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI',authDomain:'ogshootsluxe-36740.firebaseapp.com',projectId:'ogshootsluxe-36740',storageBucket:'ogshootsluxe-36740.firebasestorage.app',messagingSenderId:'5471814825',appId:'1:5471814825:web:07e84f2f88486da817d5b8'});
-        await firebase.firestore().collection('surveyResponses').add({type:'booking-experience',bookingId:bookingId||null,eventId:eventId||null,eventName,bookingType:bkType,overallRating,ratings:categoryFeedback,comment:document.getElementById('scFeedbackComment').value.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-        if (feedbackStorageKey) {
-          try { localStorage.setItem(feedbackStorageKey, 'submitted'); } catch {}
-        }
-        feedbackState.textContent = 'Thank you! Your feedback has been recorded.';
-        button.textContent = 'Submitted';
-        feedbackOpenButton.querySelector('strong').textContent = 'Thanks for your feedback!';
-        feedbackOpenButton.querySelector('small').textContent = 'Your response has been saved.';
-        feedbackOpenButton.querySelector('.sc-feedback-trigger-action').textContent = 'Submitted';
-        feedbackOpenButton.disabled = true;
-        feedbackForm.hidden = true;
-        feedbackSection.querySelectorAll('.sc-feedback-form button').forEach(control => { if (control !== button) control.disabled = true; });
-      } catch (error) {
-        console.error('Could not submit booking feedback:', error);
-        feedbackState.textContent = 'Could not submit your feedback. Please try again.';
-        button.disabled = false;
-        button.textContent = 'Submit';
-      }
-    });
-
     const eventEmojis = {
       "HIMTEX 2026":"🏛️", "Nullcon Hyderabad 2026":"🔐",
       "Sport Expo India":"🏅", "CREDAI Property Show":"🏠",
