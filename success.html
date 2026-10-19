@@ -222,6 +222,31 @@
       gap: .8rem;
       margin-top: 1.4rem;
     }
+    /* Booking feedback */
+    .sc-feedback{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,.72);backdrop-filter:blur(9px);color:#f5f5f6;}
+    .sc-feedback[hidden]{display:none!important;}
+    .sc-feedback-dialog{position:relative;width:min(600px,100%);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain;padding:1.25rem;border:1px solid #34353b;border-radius:26px;background:linear-gradient(160deg,#1b2020,#171719 42%);box-shadow:0 24px 90px rgba(0,0,0,.7);}
+    .sc-feedback-close{position:absolute;top:.75rem;right:.75rem;width:36px;height:36px;border:1px solid #48494f;border-radius:50%;background:#292a2d;color:#f5f5f6;font-size:1.35rem;line-height:1;}
+    .sc-feedback h2{margin:0 0 1rem;text-align:center;font-size:1.05rem;}
+    .sc-feedback-overall{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;padding:.65rem;border:1px solid #37383d;border-radius:20px;background:#202124;}
+    .sc-feedback-overall button,.sc-feedback-vote{min-height:54px;border:1.5px solid #515258;border-radius:999px;background:transparent;color:#f5f5f6;font:inherit;font-weight:800;}
+    .sc-feedback-overall button[aria-pressed="true"][data-vote="like"]{border-color:#55dc91;color:#55dc91;background:rgba(44,200,112,.08);}
+    .sc-feedback-overall button[aria-pressed="true"][data-vote="dislike"]{border-color:#ff8585;color:#ff8585;background:rgba(220,70,70,.08);}
+    .sc-feedback-reaction{min-height:1.5rem;margin:.95rem 0 1.1rem;color:#55dc91;text-align:center;font-weight:800;}
+    .sc-feedback h3{margin:0 0 .75rem;text-align:center;font-size:.95rem;}
+    .sc-feedback-items{display:grid;gap:.65rem;}
+    .sc-feedback-item{display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.85rem .8rem;border-radius:18px;background:#292a2d;}
+    .sc-feedback-item.is-liked{background:linear-gradient(100deg,#292a2d,#124326);}
+    .sc-feedback-item.is-disliked{background:linear-gradient(100deg,#292a2d,#462323);}
+    .sc-feedback-copy{min-width:0;}.sc-feedback-copy strong{display:block;font-size:.83rem;font-weight:650;}.sc-feedback-copy small{display:block;margin-top:.15rem;color:#999ba2;font-size:.7rem;line-height:1.4;}
+    .sc-feedback-votes{display:flex;gap:.45rem;flex:none;}
+    .sc-feedback-vote{width:44px;min-height:44px;border-radius:50%;font-size:1rem;}
+    .sc-feedback-vote[aria-pressed="true"]{border-color:#54dc91;background:#155534;color:#62e69b;}
+    .sc-feedback-comment{display:block;margin:.95rem 0 .6rem;text-align:center;font-size:.9rem;font-weight:800;}
+    .sc-feedback textarea{box-sizing:border-box;width:100%;min-height:76px;padding:.8rem;border:1px solid #393a40;border-radius:15px;background:#202124;color:#f5f5f6;font:inherit;font-size:.82rem;resize:vertical;}
+    .sc-feedback-submit{position:sticky;bottom:.25rem;z-index:2;width:100%;min-height:54px;margin:.75rem 0 0;border:0;border-radius:999px;background:#f5f5f6;color:#171719;font:inherit;font-weight:900;box-shadow:0 4px 18px rgba(0,0,0,.3);}
+    .sc-feedback-submit:disabled{opacity:.7;}
+    .sc-feedback-state{margin:.65rem 0 0;color:#55dc91;text-align:center;font-size:.8rem;}
     .sc-btn {
       min-height: 52px; border-radius: 16px;
       font-size: .88rem; font-weight: 800;
@@ -417,7 +442,13 @@
       .sc-page{padding-bottom:calc(10rem + env(safe-area-inset-bottom));}
     }
     @media (max-width:600px){
-      .sc-page{min-height:100vh;min-height:100dvh;padding:2.5rem 1rem calc(7rem + env(safe-area-inset-bottom));background:radial-gradient(ellipse 80% 32% at 50% 6%,rgba(20,144,96,.24),transparent 70%),#151617;}
+      .sc-page{min-height:100vh;min-height:100dvh;padding:2.5rem 1rem calc(10rem + env(safe-area-inset-bottom));background:radial-gradient(ellipse 80% 32% at 50% 6%,rgba(20,144,96,.24),transparent 70%),#151617;}
+      .sc-feedback{align-items:flex-end;padding:0;background:rgba(0,0,0,.76);}
+      .sc-feedback-dialog{width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - .5rem);padding:1.25rem 1rem calc(env(safe-area-inset-bottom) + 1rem);border-radius:26px 26px 0 0;border-bottom:0;}
+      .sc-feedback h2{font-size:1rem;}
+      .sc-feedback-item{min-height:82px;padding:.75rem .7rem;}
+      .sc-feedback-vote{width:42px;min-height:42px;}
+      .sc-feedback-submit{position:sticky;bottom:0;margin-top:.75rem;}
       .sc-status-banner{max-width:none;margin:0 auto 1.35rem;padding:0 0 .15rem;background:transparent!important;box-shadow:none!important;}
       .sc-icon-ring{width:4rem;height:4rem;margin:0 auto 1.15rem;border:6px solid rgba(53,217,144,.14)!important;background:#35d990!important;box-shadow:none!important;font-size:1.7rem;color:#063f2a;}
       .sc-status-banner h1{color:#f5f5f6;font-family:Manrope,sans-serif;font-size:1.85rem;letter-spacing:-.045em;margin:0;}
@@ -570,6 +601,29 @@
         <div class="sc-wallet-error" id="walletError" role="status"></div>
       </section>
 
+      <section class="sc-feedback" id="scFeedback" aria-labelledby="scFeedbackTitle" hidden>
+        <div class="sc-feedback-dialog" role="dialog" aria-modal="true" aria-labelledby="scFeedbackTitle" tabindex="-1">
+        <button class="sc-feedback-close" id="scFeedbackClose" type="button" aria-label="Close feedback">×</button>
+        <h2 id="scFeedbackTitle">How was your booking experience?</h2>
+        <div class="sc-feedback-overall" role="group" aria-label="Overall booking experience">
+          <button type="button" data-vote="dislike" aria-pressed="false">👎 Not good!</button>
+          <button type="button" data-vote="like" aria-pressed="false">👍 Liked it!</button>
+        </div>
+        <p class="sc-feedback-reaction" id="scFeedbackReaction" aria-live="polite"></p>
+        <h3>How would you rate the following?</h3>
+        <div class="sc-feedback-items">
+          <div class="sc-feedback-item" data-category="showtime"><div class="sc-feedback-copy"><strong>Finding the right showtime</strong><small>Was it easy to pick your preferred slot?</small></div><div class="sc-feedback-votes" role="group" aria-label="Showtime rating"><button class="sc-feedback-vote" type="button" data-vote="dislike" aria-label="Showtime not good" aria-pressed="false">👎</button><button class="sc-feedback-vote" type="button" data-vote="like" aria-label="Showtime liked" aria-pressed="false">👍</button></div></div>
+          <div class="sc-feedback-item" data-category="seats"><div class="sc-feedback-copy"><strong>Seat selection</strong><small>Could you easily find good seats?</small></div><div class="sc-feedback-votes" role="group" aria-label="Seat selection rating"><button class="sc-feedback-vote" type="button" data-vote="dislike" aria-label="Seat selection not good" aria-pressed="false">👎</button><button class="sc-feedback-vote" type="button" data-vote="like" aria-label="Seat selection liked" aria-pressed="false">👍</button></div></div>
+          <div class="sc-feedback-item" data-category="payment"><div class="sc-feedback-copy"><strong>Payment</strong><small>Did checkout go through without a hitch?</small></div><div class="sc-feedback-votes" role="group" aria-label="Payment rating"><button class="sc-feedback-vote" type="button" data-vote="dislike" aria-label="Payment not good" aria-pressed="false">👎</button><button class="sc-feedback-vote" type="button" data-vote="like" aria-label="Payment liked" aria-pressed="false">👍</button></div></div>
+          <div class="sc-feedback-item" data-category="offers"><div class="sc-feedback-copy"><strong>Offers &amp; pricing</strong><small>Did you find a deal that worked for you?</small></div><div class="sc-feedback-votes" role="group" aria-label="Offers and pricing rating"><button class="sc-feedback-vote" type="button" data-vote="dislike" aria-label="Offers not good" aria-pressed="false">👎</button><button class="sc-feedback-vote" type="button" data-vote="like" aria-label="Offers liked" aria-pressed="false">👍</button></div></div>
+        </div>
+        <label class="sc-feedback-comment" for="scFeedbackComment">Anything else on your mind?</label>
+        <textarea id="scFeedbackComment" maxlength="1000" placeholder="Share your feedback"></textarea>
+        <button class="sc-feedback-submit" id="scFeedbackSubmit" type="button">Submit</button>
+        <p class="sc-feedback-state" id="scFeedbackState" role="status"></p>
+        </div>
+      </section>
+
       <!-- NEXT STEPS AND ATTENDEE REMINDERS (success only) -->
       <section class="sc-next-steps" id="scNextSteps" aria-labelledby="scNextTitle">
         <h2 id="scNextTitle">What to do next?</h2>
@@ -717,6 +771,59 @@
     let mapLink = params.get("mapLink") || "";
     const isRestaurant = bkType === "restaurant";
     const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
+
+    const feedbackSection = document.getElementById('scFeedback');
+    if (isSuccess) {
+      feedbackSection.hidden = false;
+      document.body.style.overflow = 'hidden';
+      window.setTimeout(() => document.querySelector('.sc-feedback-dialog')?.focus(), 0);
+    }
+    const closeFeedback = () => {
+      feedbackSection.hidden = true;
+      document.body.style.overflow = '';
+    };
+    document.getElementById('scFeedbackClose').addEventListener('click', closeFeedback);
+    feedbackSection.addEventListener('click', event => { if (event.target === feedbackSection) closeFeedback(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !feedbackSection.hidden) closeFeedback(); });
+    const overallFeedbackButtons = [...feedbackSection.querySelectorAll('.sc-feedback-overall button')];
+    const categoryFeedback = {};
+    let overallRating = '';
+    const feedbackReaction = document.getElementById('scFeedbackReaction');
+    const feedbackState = document.getElementById('scFeedbackState');
+    overallFeedbackButtons.forEach(button => button.addEventListener('click', () => {
+      overallRating = button.dataset.vote;
+      overallFeedbackButtons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      feedbackReaction.textContent = overallRating === 'like' ? 'Glad you had a great time! 🎉' : 'Thanks for letting us know. We’ll work to improve.';
+    }));
+    feedbackSection.querySelectorAll('.sc-feedback-item').forEach(item => {
+      item.querySelectorAll('.sc-feedback-vote').forEach(button => button.addEventListener('click', () => {
+        categoryFeedback[item.dataset.category] = button.dataset.vote;
+        item.querySelectorAll('.sc-feedback-vote').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+        item.classList.toggle('is-liked', button.dataset.vote === 'like');
+        item.classList.toggle('is-disliked', button.dataset.vote === 'dislike');
+      }));
+    });
+    document.getElementById('scFeedbackSubmit').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      if (!overallRating) { feedbackState.textContent = 'Please choose an overall rating first.'; return; }
+      if (!window.firebase) { feedbackState.textContent = 'Feedback could not be saved. Please try again later.'; return; }
+      button.disabled = true;
+      button.textContent = 'Submitting…';
+      feedbackState.textContent = '';
+      try {
+        if (!firebase.apps.length) firebase.initializeApp({apiKey:'AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI',authDomain:'ogshootsluxe-36740.firebaseapp.com',projectId:'ogshootsluxe-36740',storageBucket:'ogshootsluxe-36740.firebasestorage.app',messagingSenderId:'5471814825',appId:'1:5471814825:web:07e84f2f88486da817d5b8'});
+        await firebase.firestore().collection('surveyResponses').add({type:'booking-experience',bookingId:bookingId||null,eventId:eventId||null,eventName,bookingType:bkType,overallRating,ratings:categoryFeedback,comment:document.getElementById('scFeedbackComment').value.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+        feedbackState.textContent = 'Thank you! Your feedback has been recorded.';
+        button.textContent = 'Submitted';
+        feedbackSection.querySelectorAll('button').forEach(control => { if (control !== button) control.disabled = true; });
+        window.setTimeout(closeFeedback, 1400);
+      } catch (error) {
+        console.error('Could not submit booking feedback:', error);
+        feedbackState.textContent = 'Could not submit your feedback. Please try again.';
+        button.disabled = false;
+        button.textContent = 'Submit';
+      }
+    });
 
     const eventEmojis = {
       "HIMTEX 2026":"🏛️", "Nullcon Hyderabad 2026":"🔐",
