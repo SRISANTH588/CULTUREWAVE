@@ -223,11 +223,7 @@
       margin-top: 1.4rem;
     }
     /* Booking feedback */
-    .sc-feedback{position:fixed;inset:0;z-index:1200;display:flex;align-items:flex-end;justify-content:center;padding:1rem;background:rgba(0,0,0,.72);backdrop-filter:blur(9px);color:#f5f5f6;}
-    .sc-feedback[hidden]{display:none!important;}
-    .sc-feedback-dialog{position:relative;width:min(600px,100%);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain;padding:1.25rem;border:1px solid #34353b;border-radius:26px 26px 0 0;background:linear-gradient(160deg,#1b2020,#171719 42%);box-shadow:0 24px 90px rgba(0,0,0,.7);transform:translateY(105%);transition:transform .38s cubic-bezier(.2,.8,.2,1);}
-    .sc-feedback.is-open .sc-feedback-dialog{transform:translateY(0);}
-    .sc-feedback-close{position:absolute;top:.75rem;right:.75rem;width:36px;height:36px;border:1px solid #48494f;border-radius:50%;background:#292a2d;color:#f5f5f6;font-size:1.35rem;line-height:1;}
+    .sc-feedback{width:100%;max-width:680px;margin:1.4rem 0 1rem;padding:1.25rem;border:1px solid #34353b;border-radius:26px;background:linear-gradient(160deg,#1b2020,#171719 42%);color:#f5f5f6;}
     .sc-feedback h2{margin:0 0 1rem;text-align:center;font-size:1.05rem;}
     .sc-feedback-overall{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;padding:.65rem;border:1px solid #37383d;border-radius:20px;background:#202124;}
     .sc-feedback-overall button,.sc-feedback-vote{min-height:54px;border:1.5px solid #515258;border-radius:999px;background:transparent;color:#f5f5f6;font:inherit;font-weight:800;}
@@ -444,8 +440,7 @@
     }
     @media (max-width:600px){
       .sc-page{min-height:100vh;min-height:100dvh;padding:2.5rem 1rem calc(10rem + env(safe-area-inset-bottom));background:radial-gradient(ellipse 80% 32% at 50% 6%,rgba(20,144,96,.24),transparent 70%),#151617;}
-      .sc-feedback{align-items:flex-end;padding:0;background:rgba(0,0,0,.76);}
-      .sc-feedback-dialog{width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - .5rem);padding:1.25rem 1rem calc(env(safe-area-inset-bottom) + 1rem);border-radius:26px 26px 0 0;border-bottom:0;}
+      .sc-feedback{margin:1rem 0;padding:1rem;border-radius:22px;}
       .sc-feedback h2{font-size:1rem;}
       .sc-feedback-item{min-height:82px;padding:.75rem .7rem;}
       .sc-feedback-vote{width:42px;min-height:42px;}
@@ -602,9 +597,22 @@
         <div class="sc-wallet-error" id="walletError" role="status"></div>
       </section>
 
+      <!-- NEXT STEPS AND ATTENDEE REMINDERS (success only) -->
+      <section class="sc-next-steps" id="scNextSteps" aria-labelledby="scNextTitle">
+        <h2 id="scNextTitle">What to do next?</h2>
+        <div class="sc-next-panel">
+          <div class="sc-next-row">
+            <svg class="sc-next-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><circle cx="17" cy="17" r="3.2" fill="#05070d"/><path d="M17 15.5v1.7l1.1.7"/></svg>
+            <p>Please arrive at the venue on time for a seamless experience.</p>
+          </div>
+          <div class="sc-next-row">
+            <svg class="sc-next-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="7" y="7" width="4" height="4"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/><path d="M14 14h2v2h2v2h-4z" fill="currentColor" stroke="none"/></svg>
+            <p id="scEntryTip">Show the QR code or share your booking ID at the venue.</p>
+          </div>
+        </div>
+      </section>
+
       <section class="sc-feedback" id="scFeedback" aria-labelledby="scFeedbackTitle" hidden>
-        <div class="sc-feedback-dialog" role="dialog" aria-modal="true" aria-labelledby="scFeedbackTitle" tabindex="-1">
-        <button class="sc-feedback-close" id="scFeedbackClose" type="button" aria-label="Close feedback">×</button>
         <h2 id="scFeedbackTitle">How was your booking experience?</h2>
         <div class="sc-feedback-overall" role="group" aria-label="Overall booking experience">
           <button type="button" data-vote="dislike" aria-pressed="false">👎 Not good!</button>
@@ -622,22 +630,6 @@
         <textarea id="scFeedbackComment" maxlength="1000" placeholder="Share your feedback"></textarea>
         <button class="sc-feedback-submit" id="scFeedbackSubmit" type="button">Submit</button>
         <p class="sc-feedback-state" id="scFeedbackState" role="status"></p>
-        </div>
-      </section>
-
-      <!-- NEXT STEPS AND ATTENDEE REMINDERS (success only) -->
-      <section class="sc-next-steps" id="scNextSteps" aria-labelledby="scNextTitle">
-        <h2 id="scNextTitle">What to do next?</h2>
-        <div class="sc-next-panel">
-          <div class="sc-next-row">
-            <svg class="sc-next-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><circle cx="17" cy="17" r="3.2" fill="#05070d"/><path d="M17 15.5v1.7l1.1.7"/></svg>
-            <p>Please arrive at the venue on time for a seamless experience.</p>
-          </div>
-          <div class="sc-next-row">
-            <svg class="sc-next-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="7" y="7" width="4" height="4"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/><path d="M14 14h2v2h2v2h-4z" fill="currentColor" stroke="none"/></svg>
-            <p id="scEntryTip">Show the QR code or share your booking ID at the venue.</p>
-          </div>
-        </div>
       </section>
 
       <details class="sc-remember" id="scRemember" open>
@@ -774,22 +766,7 @@
     const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
 
     const feedbackSection = document.getElementById('scFeedback');
-    if (isSuccess) {
-      feedbackSection.hidden = false;
-      document.body.style.overflow = 'hidden';
-      window.requestAnimationFrame(() => {
-        feedbackSection.classList.add('is-open');
-        document.querySelector('.sc-feedback-dialog')?.focus();
-      });
-    }
-    const closeFeedback = () => {
-      feedbackSection.classList.remove('is-open');
-      feedbackSection.hidden = true;
-      document.body.style.overflow = '';
-    };
-    document.getElementById('scFeedbackClose').addEventListener('click', closeFeedback);
-    feedbackSection.addEventListener('click', event => { if (event.target === feedbackSection) closeFeedback(); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !feedbackSection.hidden) closeFeedback(); });
+    if (isSuccess) feedbackSection.hidden = false;
     const overallFeedbackButtons = [...feedbackSection.querySelectorAll('.sc-feedback-overall button')];
     const categoryFeedback = {};
     let overallRating = '';
@@ -821,7 +798,6 @@
         feedbackState.textContent = 'Thank you! Your feedback has been recorded.';
         button.textContent = 'Submitted';
         feedbackSection.querySelectorAll('button').forEach(control => { if (control !== button) control.disabled = true; });
-        window.setTimeout(closeFeedback, 1400);
       } catch (error) {
         console.error('Could not submit booking feedback:', error);
         feedbackState.textContent = 'Could not submit your feedback. Please try again.';
