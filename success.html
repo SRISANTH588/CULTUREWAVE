@@ -223,9 +223,10 @@
       margin-top: 1.4rem;
     }
     /* Booking feedback */
-    .sc-feedback{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,.72);backdrop-filter:blur(9px);color:#f5f5f6;}
+    .sc-feedback{position:fixed;inset:0;z-index:1200;display:flex;align-items:flex-end;justify-content:center;padding:1rem;background:rgba(0,0,0,.72);backdrop-filter:blur(9px);color:#f5f5f6;}
     .sc-feedback[hidden]{display:none!important;}
-    .sc-feedback-dialog{position:relative;width:min(600px,100%);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain;padding:1.25rem;border:1px solid #34353b;border-radius:26px;background:linear-gradient(160deg,#1b2020,#171719 42%);box-shadow:0 24px 90px rgba(0,0,0,.7);}
+    .sc-feedback-dialog{position:relative;width:min(600px,100%);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain;padding:1.25rem;border:1px solid #34353b;border-radius:26px 26px 0 0;background:linear-gradient(160deg,#1b2020,#171719 42%);box-shadow:0 24px 90px rgba(0,0,0,.7);transform:translateY(105%);transition:transform .38s cubic-bezier(.2,.8,.2,1);}
+    .sc-feedback.is-open .sc-feedback-dialog{transform:translateY(0);}
     .sc-feedback-close{position:absolute;top:.75rem;right:.75rem;width:36px;height:36px;border:1px solid #48494f;border-radius:50%;background:#292a2d;color:#f5f5f6;font-size:1.35rem;line-height:1;}
     .sc-feedback h2{margin:0 0 1rem;text-align:center;font-size:1.05rem;}
     .sc-feedback-overall{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;padding:.65rem;border:1px solid #37383d;border-radius:20px;background:#202124;}
@@ -776,9 +777,13 @@
     if (isSuccess) {
       feedbackSection.hidden = false;
       document.body.style.overflow = 'hidden';
-      window.setTimeout(() => document.querySelector('.sc-feedback-dialog')?.focus(), 0);
+      window.requestAnimationFrame(() => {
+        feedbackSection.classList.add('is-open');
+        document.querySelector('.sc-feedback-dialog')?.focus();
+      });
     }
     const closeFeedback = () => {
+      feedbackSection.classList.remove('is-open');
       feedbackSection.hidden = true;
       document.body.style.overflow = '';
     };
