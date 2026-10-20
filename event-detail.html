@@ -700,6 +700,9 @@ const sourceBackUrl = (() => {
     const sameSite = source.protocol === location.protocol && source.port === location.port &&
       source.hostname.replace(/^www\./, '') === location.hostname.replace(/^www\./, '');
     if (sameSite) {
+      // Returning from the gallery should not make the event's own back
+      // control point back to the gallery again.
+      if (source.pathname.endsWith('/event-gallery.html')) return 'index.html';
       return source.pathname + source.search + source.hash;
     }
   } catch(e) {}
