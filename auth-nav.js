@@ -30,6 +30,11 @@
     menu.setAttribute('aria-label', 'Profile and site navigation');
     menu.innerHTML = `
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
+      <a class="mobile-profile-card" href="customer-dashboard.html" aria-label="View your profile">
+        <span class="mobile-profile-avatar" aria-hidden="true">♙</span>
+        <span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">View and complete your profile</span></span>
+        <span class="mobile-profile-arrow" aria-hidden="true">→</span>
+      </a>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
         <a href="events.html"><span class="mobile-nav-icon">◷</span><span>Explore events</span><span class="mobile-nav-arrow">›</span></a>
@@ -98,6 +103,10 @@
   }
 
   function setAccountNavigation(user) {
+    const profileName = document.querySelector('.mobile-profile-name');
+    const profileContact = document.querySelector('.mobile-profile-contact');
+    if (profileName) profileName.textContent = user?.displayName || 'CultureWave member';
+    if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
     const accountLinks = document.querySelectorAll('.auth-actions .nav-link, .auth-actions .nav-cta');
     accountLinks.forEach((link) => {
       if (!link.dataset.defaultAccountHref) link.dataset.defaultAccountHref = link.getAttribute('href') || '';
@@ -142,6 +151,13 @@
       .mobile-nav::before{display:none!important;}
       .mobile-nav-head{display:flex;align-items:center;justify-content:flex-start;gap:.8rem;min-height:54px;margin-bottom:1rem;color:#fff;font-size:1.05rem;font-weight:800;}
       .mobile-nav-close{display:grid;place-items:center;width:46px;height:46px;flex:none;border:1px solid #353535;border-radius:50%;background:#1b1b1d;color:#fff;font-size:2rem;line-height:1;cursor:pointer;}
+      .mobile-profile-card{display:grid;grid-template-columns:68px 1fr 25px;align-items:center;gap:14px;margin:0 0 1.5rem;padding:1rem;border:1px solid #39343f;border-radius:20px;background:linear-gradient(120deg,#291e3b,#1b1b20 78%);color:#fff!important;text-decoration:none!important;}
+      .mobile-profile-avatar{display:grid;place-items:center;width:64px;height:64px;border:4px solid #b99cff;border-radius:50%;background:#333;color:#bbb;font-size:2rem;}
+      .mobile-profile-info{display:grid;gap:4px;min-width:0;}
+      .mobile-profile-name{overflow:hidden;color:#fff;font-size:1rem;font-weight:800;text-overflow:ellipsis;white-space:nowrap;}
+      .mobile-profile-contact,.mobile-profile-progress{color:#aaa;font-size:.8rem;}
+      .mobile-profile-progress{color:#c7afff;}
+      .mobile-profile-arrow{color:#c7afff;font-size:1.4rem;}
       .mobile-organizer-prompt{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.5rem 1rem;margin:0 0 1.55rem;padding:1.1rem;border:1px solid #39343f;border-radius:20px;background:linear-gradient(120deg,#251b35,#1b1b20 75%);color:#fff;}
       .mobile-organizer-prompt span{grid-column:1/-1;color:#b8a5d2;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;}
       .mobile-organizer-prompt strong{font-size:1rem;line-height:1.35;}
