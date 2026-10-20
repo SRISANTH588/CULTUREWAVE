@@ -694,7 +694,7 @@ const eventSlug = eventPathParts[0] === 'event' ? (eventPathParts[1] || '') : ev
 let eventId = params.get('eventId');
 const eventSource = params.get('source');
 const sourceBackUrl = (() => {
-  if (eventSource && /^(category-(parties|brunch|culinary|workshops|experiences|music)\.html|index\.html)$/.test(eventSource)) return eventSource;
+  if (eventSource && /^(category-(parties|brunch|culinary|workshops|experiences|music)\.html|index\.html)$/.test(eventSource)) return `/${eventSource}`;
   try {
     const source = new URL(document.referrer);
     const sameSite = source.protocol === location.protocol && source.port === location.port &&
@@ -702,11 +702,11 @@ const sourceBackUrl = (() => {
     if (sameSite) {
       // Returning from the gallery should not make the event's own back
       // control point back to the gallery again.
-      if (source.pathname.endsWith('/event-gallery.html')) return 'index.html';
+      if (source.pathname.endsWith('/event-gallery.html')) return '/index.html';
       return source.pathname + source.search + source.hash;
     }
   } catch(e) {}
-  return 'index.html';
+  return '/index.html';
 })();
 document.querySelectorAll('.mob-detail-home, .mob-poster-action').forEach(link => {
   link.href = sourceBackUrl;
