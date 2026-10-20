@@ -1029,6 +1029,9 @@ async function sendInvitationTicketEmail(ticket,url){
     ...content,reply_to:'support@culturewave.in'
   });
 }
+function invitationEmailError(error){
+  return String(error?.text||error?.message||error||'Unknown EmailJS error').slice(0,240);
+}
 window.resendInvitationTicketEmail=async function(id,button){
   let ticket=allBookings.find(item=>item.id===id||item.bookingId===id);
   if(!ticket){try{const snapshot=await db.collection('bookings').doc(id).get();if(snapshot.exists)ticket={id:snapshot.id,...snapshot.data()};}catch(_){}}
@@ -1038,8 +1041,9 @@ window.resendInvitationTicketEmail=async function(id,button){
     const emailTicket={bookingId:ticket.bookingId||ticket.id,name:bookingName(ticket),email:bookingEmail(ticket),phone:bookingPhone(ticket),ticketCount:Number(ticket.seats||ticket.tickets||1)};
     await sendInvitationTicketEmail(emailTicket,invitationPageUrl(emailTicket));
     if(button){button.textContent='Email sent';button.disabled=true;}
+    const status=document.getElementById('invitationStatus');if(status)status.textContent=`Invitation email sent to ${emailTicket.email}.`;
     showToast('Invitation email sent');
-  }catch(error){console.error('Invitation email resend failed:',error);if(button){button.disabled=false;button.textContent='Retry email';}showToast('Email could not be sent. Please retry.');}
+  }catch(error){const reason=invitationEmailError(error);console.error('Invitation email resend failed:',error);if(button){button.disabled=false;button.textContent='Retry email';}const status=document.getElementById('invitationStatus');if(status)status.textContent=`Email to ${bookingEmail(ticket)} failed: ${reason}`;showToast('Email failed: '+reason);}
 };
 
 function bookingName(b){return b.customerName||b.customer?.name||b.customer?.fullName||b.buyerName||b.buyer?.name||b.attendeeName||b.fullName||b.name||'Guest';}
@@ -1899,15 +1903,15 @@ window.issueInvitations=async function(){
     for(const ticket of issued){
       status.textContent=`Sending invitation emails (${emailed+emailFailed+1}/${issued.length})…`;
       try{await sendInvitationTicketEmail(ticket,invitationPageUrl(ticket));ticket.emailSent=true;emailed++;}
-      catch(error){console.error('Invitation email failed:',ticket.email,error);ticket.emailSent=false;emailFailed++;}
+      catch(error){ticket.emailError=invitationEmailError(error);console.error('Invitation email failed:',ticket.email,error);ticket.emailSent=false;emailFailed++;}
     }
     const list=document.getElementById('issuedInvitationTickets');
     list.innerHTML=issued.map(ticket=>{
       const url=invitationPageUrl({...ticket,status:'confirmed'});
       const whatsappUrl=invitationWhatsAppUrl(ticket,url);
-      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.85rem 1rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:800;">${esc(ticket.name)}</div><div style="font-size:.76rem;color:var(--muted);">${ticket.ticketCount} ticket${ticket.ticketCount===1?'':'s'} · ${esc(ticket.email)} · ${ticket.emailSent?'Email sent':'Email failed'} · ${esc(ticket.bookingId)}</div></div><div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite page</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Send WhatsApp invite</a>${ticket.emailSent?'':`<button class="tb-btn" type="button" onclick="resendInvitationTicketEmail('${ticket.bookingId}',this)">Retry email</button>`}</div></div>`;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.85rem 1rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:800;">${esc(ticket.name)}</div><div style="font-size:.76rem;color:var(--muted);">${ticket.ticketCount} ticket${ticket.ticketCount===1?'':'s'} · ${esc(ticket.email)} · ${ticket.emailSent?'Email sent':'Email failed'} · ${esc(ticket.bookingId)}</div>${ticket.emailError?`<div style="font-size:.72rem;color:#b42318;margin-top:.25rem;">${esc(ticket.emailError)}</div>`:''}</div><div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite page</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Send WhatsApp invite</a>${ticket.emailSent?'':`<button class="tb-btn" type="button" onclick="resendInvitationTicketEmail('${ticket.bookingId}',this)">Retry email</button>`}</div></div>`;
     }).join('');
-    status.textContent=emailFailed?`${issued.length} invitation${issued.length===1?'':'s'} created; ${emailed} email${emailed===1?'':'s'} sent and ${emailFailed} failed. Use Retry email for failed messages.`:`${issued.length} invitation${issued.length===1?'':'s'} created; all ${emailed} email${emailed===1?'':'s'} sent with ${totalTickets} ticket${totalTickets===1?'':'s'} assigned.`;
+    status.textContent=emailFailed?`${issued.length} invitation${issued.length===1?'':'s'} created; ${emailed} email${emailed===1?'':'s'} sent and ${emailFailed} failed. ${issued.find(ticket=>ticket.emailError)?.emailError||'Use Retry email for failed messages.'}`:`${issued.length} invitation${issued.length===1?'':'s'} created; all ${emailed} email${emailed===1?'':'s'} sent with ${totalTickets} ticket${totalTickets===1?'':'s'} assigned.`;
     document.getElementById('invitationRows').innerHTML='';addInvitationRow();
   }catch(error){console.error('Could not issue invitation tickets:',error);status.textContent=error.code==='permission-denied'?'Could not create tickets. Confirm you are signed in as the event owner and retry.':'Ticket generation failed. Please retry.';}
   finally{button.disabled=false;button.textContent='Generate tickets';}
