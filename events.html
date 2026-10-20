@@ -596,12 +596,14 @@
       function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
       async function loadFirestoreEvents() {
         try {
+          const eventsRef=_db.collection('events');
           let snap;
           try {
-            snap = await _db.collection('events').orderBy('createdAt', 'desc').limit(200).get();
+            snap = await eventsRef.orderBy('createdAt', 'desc').limit(200).get();
+            if(snap.size<200) snap=await eventsRef.get();
           } catch (e) {
-            console.error('Events fetch error:', e);
-            return;
+            console.warn('Ordered event query failed; retrying without createdAt:',e.message);
+            snap = await eventsRef.get();
           }
           const empty = grid.querySelector('.ev-empty');
           const docs = snap.docs.filter(d => isPublishedEvent(d.data()));

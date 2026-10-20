@@ -44,6 +44,7 @@
 
     /* ── HAMBURGER ── */
     @media(max-width:960px){
+      .index-auth-actions{display:none!important;}
       .hamburger{display:flex!important;visibility:visible!important;opacity:1!important;flex:none;align-items:center;justify-content:center;width:42px;height:42px;margin-left:.35rem;border:1px solid #333;border-radius:13px;background:#111;}
       .hamburger span{display:block;background:#fff!important;}
     }
@@ -2200,11 +2201,19 @@
   let homepageEventsPromise;
   function getHomepageEvents(){
     if(!homepageEventsPromise){
-      homepageEventsPromise = _idb.collection('events').orderBy('createdAt','desc').limit(200).get()
-        .then(snap => snap.docs)
-        .catch(error => {
-          homepageEventsPromise = null;
-          throw error;
+      const eventsRef=_idb.collection('events');
+      homepageEventsPromise = eventsRef.orderBy('createdAt','desc').limit(200).get()
+        .then(async snap => {
+          if(snap.size>=200) return snap.docs;
+          // Older listings may not have createdAt, and Firestore orderBy omits
+          // documents that do not contain the ordered field.
+          const fallback=await eventsRef.get();
+          return fallback.docs;
+        })
+        .catch(async error => {
+          console.warn('Ordered event query failed; retrying without createdAt:',error.message);
+          try { return (await eventsRef.get()).docs; }
+          catch(fallbackError) { homepageEventsPromise=null; throw fallbackError; }
         });
     }
     return homepageEventsPromise;
