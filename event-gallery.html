@@ -64,9 +64,10 @@
     const backPath=params.get('back');
     let media=[];
     function goBack(){
-      if(backPath&&backPath.startsWith('/')&&!backPath.startsWith('//'))location.href=backPath;
-      else if(document.referrer&&new URL(document.referrer).origin===location.origin)history.back();
-      else location.href='index.html';
+      // Replace this gallery entry so browser Back cannot send the user back
+      // into the gallery after returning to the event page.
+      if(backPath&&backPath.startsWith('/')&&!backPath.startsWith('//'))location.replace(backPath);
+      else location.replace('/index.html');
     }
     function selectTab(tab){
       const all=tab==='all';

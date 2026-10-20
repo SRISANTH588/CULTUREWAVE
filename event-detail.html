@@ -692,22 +692,7 @@ const params = new URLSearchParams(location.search);
 const eventPathParts = location.pathname.split('/').filter(Boolean).map(part => { try { return decodeURIComponent(part); } catch (_) { return part; } });
 const eventSlug = eventPathParts[0] === 'event' ? (eventPathParts[1] || '') : eventPathParts.length === 2 ? eventPathParts[1] : '';
 let eventId = params.get('eventId');
-const eventSource = params.get('source');
-const sourceBackUrl = (() => {
-  if (eventSource && /^(category-(parties|brunch|culinary|workshops|experiences|music)\.html|index\.html)$/.test(eventSource)) return `/${eventSource}`;
-  try {
-    const source = new URL(document.referrer);
-    const sameSite = source.protocol === location.protocol && source.port === location.port &&
-      source.hostname.replace(/^www\./, '') === location.hostname.replace(/^www\./, '');
-    if (sameSite) {
-      // Returning from the gallery should not make the event's own back
-      // control point back to the gallery again.
-      if (source.pathname.endsWith('/event-gallery.html')) return '/index.html';
-      return source.pathname + source.search + source.hash;
-    }
-  } catch(e) {}
-  return '/index.html';
-})();
+const sourceBackUrl = '/index.html';
 document.querySelectorAll('.mob-detail-home, .mob-poster-action').forEach(link => {
   link.href = sourceBackUrl;
   link.setAttribute('aria-label', 'Back to previous page');
