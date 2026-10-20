@@ -554,9 +554,16 @@
       /* Black, white and blue organizer theme */
       body { background: #080a10 !important; color: #f7f8fc; }
       .topbar, .mobile-nav { background: #0b0d13 !important; border-color: #242a36 !important; }
-      .topnav a, .nav-link { color: #e8ebf3 !important; }
-      .topbar .nav-link, .mobile-nav .nav-link { color: #080a10 !important; background: #fff !important; border-radius: 6px; padding: .45rem .8rem; }
+      .topnav a { color: #e8ebf3 !important; }
       .brand-sub { color: #9ca8c0 !important; }
+      .index-auth-actions{display:flex;align-items:center;gap:.5rem;padding:.3rem;border:1px solid #333!important;border-radius:999px;background:#111!important;}
+      .index-auth-actions .nav-link{padding:.6rem .95rem;border:0!important;border-radius:999px;background:transparent!important;color:#aaa!important;font-size:.82rem;}
+      .index-auth-actions .nav-link:hover{background:#222!important;color:#fff!important;}
+      .index-auth-actions .nav-cta{margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff!important;color:#000!important;border:0!important;border-radius:999px;font-weight:800;}
+      .index-mobile-ctas{gap:.65rem;}
+      .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
+      .index-mobile-ctas .nav-link{background:transparent!important;color:#aaa!important;border:0!important;}
+      .index-mobile-ctas .nav-cta{margin-left:0;background:#fff!important;color:#000!important;border-radius:999px;}
       .ft-hero {
         background: radial-gradient(ellipse at 78% 18%, rgba(40,99,255,.24), transparent 38%),
           radial-gradient(ellipse at 10% 100%, rgba(18,66,197,.18), transparent 42%), #080a10 !important;
@@ -642,7 +649,7 @@
           <a href="pricing.html">Pricing</a>
           <a href="how-it-works.html">How it works</a>
         </nav>
-        <div class="auth-actions">
+        <div class="auth-actions index-auth-actions">
           <a class="nav-link" href="login.html">Login</a>
           <a class="nav-cta" href="login.html">Get Started</a>
         </div>
@@ -658,7 +665,7 @@
       <a href="pricing.html">Pricing</a>
       <a href="how-it-works.html">How it works</a>
       <a href="customer-service.html">Customer Service</a>
-      <div class="mobile-nav-ctas">
+      <div class="mobile-nav-ctas index-mobile-ctas">
         <a class="nav-link" href="login.html">Login</a>
         <a class="nav-cta" href="login.html">Get Started</a>
       </div>
