@@ -600,7 +600,7 @@
           let snap;
           try {
             snap = await eventsRef.orderBy('createdAt', 'desc').limit(200).get();
-            if(snap.size<200) snap=await eventsRef.get();
+            if(!snap.size) snap=await eventsRef.get();
           } catch (e) {
             console.warn('Ordered event query failed; retrying without createdAt:',e.message);
             snap = await eventsRef.get();

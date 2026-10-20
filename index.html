@@ -2204,7 +2204,7 @@
       const eventsRef=_idb.collection('events');
       homepageEventsPromise = eventsRef.orderBy('createdAt','desc').limit(200).get()
         .then(async snap => {
-          if(snap.size>=200) return snap.docs;
+          if(snap.size) return snap.docs;
           // Older listings may not have createdAt, and Firestore orderBy omits
           // documents that do not contain the ordered field.
           const fallback=await eventsRef.get();
