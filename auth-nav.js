@@ -50,10 +50,10 @@
       const existingCard = profileCard;
       profileCard = document.createElement('div');
       profileCard.className = 'mobile-profile-card';
-      profileCard.setAttribute('role', 'button');
-      profileCard.tabIndex = 0;
-      profileCard.setAttribute('aria-label', 'Edit your profile');
-      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><a class="mobile-profile-arrow" href="edit-profile.html" aria-label="Edit profile">→</a></span>';
+      profileCard.setAttribute('role', 'group');
+      profileCard.removeAttribute('tabindex');
+      profileCard.removeAttribute('aria-label');
+      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Login to your account</span><a class="mobile-profile-action mobile-profile-login" href="login.html" aria-label="Login">Login</a></span>';
       if (existingCard) existingCard.replaceWith(profileCard);
       else {
         const menuHead = menu.querySelector('.mobile-nav-head');
@@ -61,6 +61,20 @@
         else menu.insertBefore(profileCard, menu.firstChild);
       }
     }
+    profileCard.setAttribute('role', 'group');
+    profileCard.removeAttribute('tabindex');
+    profileCard.removeAttribute('aria-label');
+    const profileAction = profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow');
+    if (profileAction) {
+      profileAction.classList.remove('mobile-profile-arrow');
+      profileAction.classList.add('mobile-profile-action', 'mobile-profile-login');
+      profileAction.href = 'login.html';
+      profileAction.dataset.action = 'login';
+      profileAction.textContent = 'Login';
+      profileAction.setAttribute('aria-label', 'Login');
+    }
+    const promptText = profileCard.querySelector('.mobile-profile-prompt > span');
+    if (promptText) promptText.textContent = 'Login to your account';
 
     const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
     menu.setAttribute('aria-label', 'Profile and site navigation');
@@ -154,10 +168,16 @@
     };
 
     profileCard?.addEventListener('click', (event) => {
-      if (!event.target.closest('.mobile-profile-arrow')) return;
+      const action = event.target.closest('.mobile-profile-action');
+      if (!action) return;
       event.preventDefault();
       event.stopPropagation();
-      showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
+      if (action.dataset.action === 'login') {
+        closeMenu();
+        window.location.assign(action.href);
+      } else {
+        showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
+      }
     }, true);
 
     hamburger?.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
@@ -172,11 +192,16 @@
     }, true);
     menu.querySelector('.mobile-nav-close')?.addEventListener('click', closeMenu);
     menu.addEventListener('click', async (event) => {
-      const editProfileLink = event.target.closest('.mobile-profile-arrow');
-      if (editProfileLink) {
+      const profileAction = event.target.closest('.mobile-profile-action');
+      if (profileAction) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
+        if (profileAction.dataset.action === 'login') {
+          closeMenu();
+          window.location.assign(profileAction.href);
+        } else {
+          showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
+        }
         return;
       }
       const profileCard = event.target.closest('.mobile-profile-card');
@@ -217,10 +242,8 @@
       showMenuPage(target.href, isProfileLink ? 'Edit Profile' : textLabel);
     }, true);
     menu.addEventListener('keydown', (event) => {
-      if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-card')) return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      showMenuPage('edit-profile.html', 'Edit Profile');
+      if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-action')) return;
+      event.target.closest('.mobile-profile-action').click();
     }, true);
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape' || !menu.classList.contains('open')) return;
@@ -241,10 +264,19 @@
     const profileContact = document.querySelector('.mobile-profile-contact');
     const profileProgress = document.querySelector('.mobile-profile-progress');
     const profilePrompt = document.querySelector('.mobile-profile-prompt > span');
+    const profileAction = document.querySelector('.mobile-profile-action');
     if (profileName) profileName.textContent = user?.displayName || user?.email?.split('@')[0] || 'CultureWave member';
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
     if (profileProgress) profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile';
-    if (profilePrompt) profilePrompt.textContent = user ? 'Edit profile' : 'Complete your profile, so we can surprise you on your special days!';
+    if (profilePrompt) profilePrompt.textContent = user ? 'Edit profile' : 'Login to your account';
+    if (profileAction) {
+      profileAction.href = user ? 'edit-profile.html' : 'login.html';
+      profileAction.dataset.action = user ? 'edit-profile' : 'login';
+      profileAction.classList.toggle('mobile-profile-arrow', Boolean(user));
+      profileAction.classList.toggle('mobile-profile-login', !user);
+      profileAction.textContent = user ? '→' : 'Login';
+      profileAction.setAttribute('aria-label', user ? 'Edit profile' : 'Login');
+    }
     if (hamburger) {
       const initial = (user?.displayName || user?.email || 'U').trim().charAt(0).toUpperCase() || 'U';
       hamburger.dataset.initial = initial;
@@ -314,6 +346,7 @@
       #mobileNav .mobile-profile-divider{display:block!important;width:100%!important;height:1px!important;grid-column:1/-1!important;background:#403a48!important;}
       #mobileNav .mobile-profile-prompt{display:grid!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.9rem!important;line-height:1.4!important;}
       #mobileNav .mobile-profile-arrow{display:grid!important;place-items:center!important;width:26px!important;height:26px!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
+      #mobileNav .mobile-profile-login{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:76px!important;min-height:34px!important;padding:0 14px!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#111!important;font-size:.82rem!important;font-weight:800!important;line-height:1!important;}
       .mobile-organizer-prompt,.mobile-nav-group{width:100%!important;max-width:760px!important;margin-right:auto!important;margin-left:auto!important;}
       .mobile-organizer-prompt{display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:.5rem 1rem!important;margin-bottom:1.5rem!important;padding:1.1rem!important;border:1px solid #39343f!important;border-radius:20px!important;background:linear-gradient(120deg,#251b35,#1b1b20 75%)!important;color:#fff!important;}
       .mobile-organizer-prompt span,.mobile-organizer-prompt p,.mobile-organizer-prompt a{grid-column:1/-1!important;}
@@ -370,6 +403,7 @@
       #mobileNav .mobile-profile-divider{display:block!important;position:static!important;width:100%!important;height:1px!important;grid-column:1/-1!important;background:#403a48!important;}
       #mobileNav .mobile-profile-prompt{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.87rem!important;line-height:1.35!important;}
       #mobileNav .mobile-profile-arrow{display:grid!important;position:static!important;place-items:center!important;width:26px!important;height:26px!important;box-sizing:border-box!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
+      #mobileNav .mobile-profile-login{display:inline-flex!important;position:static!important;align-items:center!important;justify-content:center!important;min-width:76px!important;min-height:34px!important;padding:0 14px!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#111!important;font-size:.82rem!important;font-weight:800!important;line-height:1!important;}
       #mobileNav.showing-view{overflow:hidden!important;padding:0!important;}
       #mobileNav.showing-view>:not(.mobile-nav-view){display:none!important;}
       #mobileNav .mobile-nav-view{display:none;position:absolute;inset:0;z-index:1100;box-sizing:border-box;flex-direction:column;gap:0;padding:calc(env(safe-area-inset-top) + 1rem) 1rem calc(env(safe-area-inset-bottom) + 1rem);background:#111;}
