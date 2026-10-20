@@ -39,11 +39,11 @@
     let profileCard = menu.querySelector('.mobile-profile-card');
     if (!profileCard || !profileCard.querySelector('.mobile-profile-main')) {
       const existingCard = profileCard;
-      const profileCard = document.createElement('div');
+      profileCard = document.createElement('div');
       profileCard.className = 'mobile-profile-card';
-      profileCard.setAttribute('role', 'link');
+      profileCard.setAttribute('role', 'button');
       profileCard.tabIndex = 0;
-      profileCard.setAttribute('aria-label', 'View your profile');
+      profileCard.setAttribute('aria-label', 'Edit your profile');
       profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><span class="mobile-profile-arrow" aria-hidden="true">→</span></span>';
       if (existingCard) existingCard.replaceWith(profileCard);
       else {
@@ -132,6 +132,12 @@
       menu.classList.add('showing-view');
     };
 
+    profileCard?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
+    }, true);
+
     hamburger?.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
     hamburger?.addEventListener('click', (event) => {
       event.preventDefault();
@@ -146,10 +152,9 @@
     menu.addEventListener('click', (event) => {
       const profileCard = event.target.closest('.mobile-profile-card');
       const link = event.target.closest('a');
-      if (!profileCard && !link) return;
-      const editProfile = Boolean(profileCard);
+      if (profileCard || !link) return;
       const isProfileLink = Boolean(link && (link.dataset.view === 'profile' || /account profile|account settings/i.test(link.textContent)));
-      const href = profileCard || isProfileLink ? 'edit-profile.html' : link.getAttribute('href');
+      const href = isProfileLink ? 'edit-profile.html' : link.getAttribute('href');
       if (!href || /^(mailto:|tel:|javascript:)/i.test(href) || link?.target === '_blank') return;
       const target = new URL(href, document.baseURI);
       if (target.origin !== window.location.origin) return;
@@ -162,7 +167,7 @@
         target.searchParams.set('view', selectedView);
         target.searchParams.set('embedded', 'menu');
       }
-      showMenuPage(target.href, editProfile || isProfileLink ? 'Edit Profile' : textLabel);
+      showMenuPage(target.href, isProfileLink ? 'Edit Profile' : textLabel);
     }, true);
     menu.addEventListener('keydown', (event) => {
       if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-card')) return;
