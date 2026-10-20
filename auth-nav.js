@@ -63,9 +63,7 @@
         <a href="customer-dashboard.html"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
         <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
-      <div class="mobile-nav-group"><h2 class="mobile-nav-group-title">Account</h2><div class="mobile-nav-ctas">
-        <a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a>
-      </div></div>`;
+      `;
 
     hamburger?.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
     hamburger?.addEventListener('click', (event) => {
@@ -100,7 +98,7 @@
   }
 
   function setAccountNavigation(user) {
-    const accountLinks = document.querySelectorAll('.auth-actions .nav-link, .auth-actions .nav-cta, .mobile-nav-ctas .nav-link, .mobile-nav-ctas .nav-cta');
+    const accountLinks = document.querySelectorAll('.auth-actions .nav-link, .auth-actions .nav-cta');
     accountLinks.forEach((link) => {
       if (!link.dataset.defaultAccountHref) link.dataset.defaultAccountHref = link.getAttribute('href') || '';
       if (!link.dataset.defaultAccountText) link.dataset.defaultAccountText = link.textContent.trim();
@@ -113,7 +111,7 @@
       });
       return;
     }
-    document.querySelectorAll('.auth-actions .nav-link, .mobile-nav-ctas .nav-link').forEach((link) => {
+    document.querySelectorAll('.auth-actions .nav-link').forEach((link) => {
       link.href = 'customer-dashboard.html';
       link.textContent = 'My Account';
       link.setAttribute('aria-label', 'Open my account');
@@ -122,11 +120,6 @@
       link.href = link.dataset.defaultAccountHref || 'login.html';
       link.textContent = link.dataset.defaultAccountText || 'Get Started';
       link.setAttribute('aria-label', 'Get started');
-    });
-    document.querySelectorAll('.mobile-nav-ctas .nav-cta').forEach((link) => {
-      link.href = 'customer-dashboard.html';
-      link.textContent = 'My Bookings';
-      link.setAttribute('aria-label', 'View my bookings');
     });
   }
 
