@@ -561,8 +561,10 @@ document.querySelectorAll('.sb-item[data-view]').forEach(btn => {
   btn.addEventListener('click', () => switchView(btn.dataset.view));
 });
 
-// show default view on load
-switchView('bookings');
+// Allow the mobile menu to open a specific dashboard section in place.
+const requestedView = new URLSearchParams(window.location.search).get('view');
+const availableViews = ['bookings','upcoming','notifications','support','refunds','profile'];
+switchView(availableViews.includes(requestedView) ? requestedView : 'bookings');
 
 // ── BOOKINGS ──
 async function loadBookings() {

@@ -23,6 +23,12 @@
       menu.setAttribute('aria-label', 'Main menu');
       header.insertAdjacentElement('afterend', menu);
     }
+    if (!menu.querySelector('.mobile-nav-head')) {
+      const menuHead = document.createElement('div');
+      menuHead.className = 'mobile-nav-head';
+      menuHead.innerHTML = '<button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span>';
+      menu.insertBefore(menuHead, menu.firstChild);
+    }
 
     menu.querySelectorAll('.mobile-nav-group').forEach((group) => {
       const heading = group.querySelector('.mobile-nav-group-title');
@@ -39,13 +45,6 @@
       profileCard.tabIndex = 0;
       profileCard.setAttribute('aria-label', 'View your profile');
       profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><span class="mobile-profile-arrow" aria-hidden="true">→</span></span>';
-      profileCard.addEventListener('click', () => { window.location.href = 'customer-dashboard.html'; });
-      profileCard.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          window.location.href = 'customer-dashboard.html';
-        }
-      });
       if (existingCard) existingCard.replaceWith(profileCard);
       else {
         const menuHead = menu.querySelector('.mobile-nav-head');
@@ -54,11 +53,9 @@
       }
     }
 
-    // The homepage and some other pages have their own menu contents and behavior.
-    if (menu.querySelector('.mobile-nav-group')) return;
-
+    const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
     menu.setAttribute('aria-label', 'Profile and site navigation');
-    menu.innerHTML = `
+    if (!hasExistingMenuContent) menu.innerHTML = `
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
@@ -75,9 +72,9 @@
         <a href="events.html"><span class="mobile-nav-icon">＋</span><span>Browse experiences to gift</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Manage</h2><div class="mobile-nav-card">
-        <a href="customer-dashboard.html"><span class="mobile-nav-icon">▤</span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="customer-dashboard.html"><span class="mobile-nav-icon">☆</span><span>Upcoming events</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="customer-dashboard.html"><span class="mobile-nav-icon">♙</span><span>Account profile</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html" data-view="bookings"><span class="mobile-nav-icon">▤</span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html" data-view="upcoming"><span class="mobile-nav-icon">☆</span><span>Upcoming events</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">♙</span><span>Account profile</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">For organisers</h2><div class="mobile-nav-card">
         <a href="features.html"><span class="mobile-nav-icon">✦</span><span>Organizer tools</span><span class="mobile-nav-arrow">›</span></a>
@@ -90,10 +87,34 @@
         <a href="customer-service.html"><span class="mobile-nav-icon">✎</span><span>Share feedback</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
-        <a href="customer-dashboard.html"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
         <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       `;
+
+    const closeMenu = () => {
+      menu.classList.remove('open', 'showing-view');
+      hamburger?.classList.remove('open');
+      hamburger?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    };
+    const showMenuPage = (href, title) => {
+      let view = menu.querySelector('.mobile-nav-view');
+      if (!view) {
+        view = document.createElement('section');
+        view.className = 'mobile-nav-view';
+        view.innerHTML = '<div class="mobile-nav-view-head"><button class="mobile-nav-view-back" type="button" aria-label="Back to menu">&#8249;</button><strong class="mobile-nav-view-title"></strong><button class="mobile-nav-view-close" type="button" aria-label="Close menu">&#215;</button></div><iframe class="mobile-nav-view-frame" title="Menu content"></iframe>';
+        view.querySelector('.mobile-nav-view-back').addEventListener('click', () => {
+          menu.classList.remove('showing-view');
+          view.querySelector('iframe').src = 'about:blank';
+        });
+        view.querySelector('.mobile-nav-view-close').addEventListener('click', closeMenu);
+        menu.appendChild(view);
+      }
+      view.querySelector('.mobile-nav-view-title').textContent = title || 'CultureWave';
+      view.querySelector('iframe').src = href;
+      menu.classList.add('showing-view');
+    };
 
     hamburger?.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
     hamburger?.addEventListener('click', (event) => {
@@ -105,19 +126,31 @@
       hamburger.setAttribute('aria-expanded', String(open));
       document.body.style.overflow = open ? 'hidden' : '';
     }, true);
-    menu.querySelector('.mobile-nav-close')?.addEventListener('click', () => {
-      menu.classList.remove('open');
-      hamburger?.classList.remove('open');
-      hamburger?.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    });
+    menu.querySelector('.mobile-nav-close')?.addEventListener('click', closeMenu);
     menu.addEventListener('click', (event) => {
-      if (!event.target.closest('a')) return;
-      menu.classList.remove('open');
-      hamburger?.classList.remove('open');
-      hamburger?.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    });
+      const profileCard = event.target.closest('.mobile-profile-card');
+      const link = event.target.closest('a');
+      if (!profileCard && !link) return;
+      const href = profileCard ? 'customer-dashboard.html?view=profile' : link.getAttribute('href');
+      if (!href || /^(mailto:|tel:|javascript:)/i.test(href) || link?.target === '_blank') return;
+      const target = new URL(href, document.baseURI);
+      if (target.origin !== window.location.origin) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const textLabel = link?.querySelector(':scope > span:not(.mobile-nav-icon):not(.mobile-nav-arrow)')?.textContent.trim() || link?.textContent.trim();
+      if (target.pathname.endsWith('customer-dashboard.html')) {
+        const normalizedLabel = (textLabel || '').toLowerCase();
+        const selectedView = link?.dataset.view || (normalizedLabel.includes('upcoming') ? 'upcoming' : normalizedLabel.includes('profile') || normalizedLabel.includes('account') ? 'profile' : 'bookings');
+        target.searchParams.set('view', selectedView);
+      }
+      showMenuPage(target.href, profileCard ? 'My Profile' : textLabel);
+    }, true);
+    menu.addEventListener('keydown', (event) => {
+      if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-card')) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      showMenuPage('customer-dashboard.html?view=profile', 'My Profile');
+    }, true);
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape' || !menu.classList.contains('open')) return;
       menu.classList.remove('open');
@@ -202,6 +235,15 @@
       #mobileNav .mobile-profile-divider{display:block!important;position:static!important;width:100%!important;height:1px!important;grid-column:1/-1!important;background:#403a48!important;}
       #mobileNav .mobile-profile-prompt{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.87rem!important;line-height:1.35!important;}
       #mobileNav .mobile-profile-arrow{display:grid!important;position:static!important;place-items:center!important;width:26px!important;height:26px!important;box-sizing:border-box!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
+      #mobileNav.showing-view{overflow:hidden!important;padding:0!important;}
+      #mobileNav.showing-view>:not(.mobile-nav-view){display:none!important;}
+      #mobileNav .mobile-nav-view{display:none;position:absolute;inset:0;z-index:1100;box-sizing:border-box;flex-direction:column;gap:0;padding:calc(env(safe-area-inset-top) + 1rem) 1rem calc(env(safe-area-inset-bottom) + 1rem);background:#111;}
+      #mobileNav.showing-view .mobile-nav-view{display:flex!important;}
+      #mobileNav .mobile-nav-view-head{display:flex;align-items:center;gap:.75rem;min-height:48px;margin:0 0 .8rem;color:#fff;}
+      #mobileNav .mobile-nav-view-head strong{flex:1;overflow:hidden;font-size:1rem;text-overflow:ellipsis;white-space:nowrap;}
+      #mobileNav .mobile-nav-view-back,#mobileNav .mobile-nav-view-close{display:grid;place-items:center;width:42px;height:42px;flex:none;border:1px solid #39393d;border-radius:50%;background:#1e1e21;color:#fff;font-size:1.8rem;line-height:1;}
+      #mobileNav .mobile-nav-view-close{font-size:1.5rem;}
+      #mobileNav .mobile-nav-view-frame{display:block;width:100%;min-height:0;flex:1;border:1px solid #303033;border-radius:16px;background:#111;}
       .mobile-organizer-prompt{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.5rem 1rem;margin:0 0 1.55rem;padding:1.1rem;border:1px solid #39343f;border-radius:20px;background:linear-gradient(120deg,#251b35,#1b1b20 75%);color:#fff;}
       .mobile-organizer-prompt span{grid-column:1/-1;color:#b8a5d2;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;}
       .mobile-organizer-prompt strong{font-size:1rem;line-height:1.35;}
