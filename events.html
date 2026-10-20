@@ -342,6 +342,7 @@
       .mobile-nav{background:#080808!important;border-left:1px solid #242424!important}
       .mobile-nav>a{background:#111!important;border-color:#252525!important;color:#fff!important}
       .mobile-nav>a::before{background:#1a1a1a!important;color:#fff!important}
+      @media(max-width:960px){.topbar .nav-wrap>.auth-actions{display:none!important}}
       .ev-hero{background:radial-gradient(ellipse at 80% 0%,rgba(255,255,255,.07),transparent 38%),linear-gradient(180deg,#0b0b0b,#050505 88%);border-bottom:1px solid #242424;padding:4rem 0 3rem}
       .ev-location{background:#111;border-color:#333;color:#fff;font-family:'Barlow Condensed',sans-serif;letter-spacing:.16em}
       .ev-hero h1{color:#fff;font-family:'Playfair Display',Georgia,serif;letter-spacing:-.045em;line-height:1.05}
@@ -627,8 +628,11 @@
             }
             const price = d.tickets?.[0]?.price||d.price||0;
             const bannerClass = banners[i%banners.length];
-            const article = document.createElement('article');
+            const article = document.createElement('a');
             article.className = 'ev-card';
+            article.href = eventPublicPath(d.urlKey||eventName,id);
+            article.style.textDecoration = 'none';
+            article.style.color = 'inherit';
             article.dataset.name = eventName;
             article.dataset.category = String(d.category||'other').trim().toLowerCase();
             article.dataset.city = String(d.city||'').trim().toLowerCase();
@@ -637,7 +641,6 @@
             const [dayStr, monStr] = date ? [new Date(date+'T00:00:00').getDate(), new Date(date+'T00:00:00').toLocaleDateString('en-IN',{month:'short'})] : ['?','TBA'];
             const priceLabel = price ? `Starts at ₹${Number(price).toLocaleString('en-IN')}` : 'Free Entry';
             article.innerHTML = `
-              <a href="${eventPublicPath(d.urlKey||eventName,id)}" style="display:contents;text-decoration:none;color:inherit;">
               <div class="ev-poster-wrap">
                 <div class="ev-banner ${bannerClass}" ${safeCardImage?`style="background-image:url('${safeCardImage}');"`:''} >
                   <span class="ev-tag">${escapeHTML(category)}</span>
@@ -654,12 +657,21 @@
                   </div>
                 </div>
               </div>
-              </a>`;
+              `;
             grid.appendChild(article);
             cards.push(article);
           });
           filterAndRender();
-        } catch(e) { console.error('Firestore events error:', e.message, e); }
+        } catch(e) {
+          console.error('Firestore events error:', e.message, e);
+          const empty=grid.querySelector('.ev-empty');
+          if(empty){
+            empty.style.display='';
+            empty.replaceChildren();
+            const icon=document.createElement('span');icon.textContent='⚠️';empty.append(icon,document.createTextNode('Events could not load. Check your connection and try again. '));
+            const retry=document.createElement('button');retry.type='button';retry.textContent='Try again';retry.style.cssText='display:block;margin:14px auto 0;padding:10px 18px;border:1px solid #666;border-radius:999px;background:#161616;color:#fff;font:inherit;font-weight:800;cursor:pointer';retry.addEventListener('click',loadFirestoreEvents);empty.append(retry);
+          }
+        }
       }
       loadFirestoreEvents();
     </script>
