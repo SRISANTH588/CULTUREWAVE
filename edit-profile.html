@@ -27,7 +27,7 @@
     .field label{font-size:.95rem;font-weight:500}
     .field input,.field select{width:100%;height:58px;padding:0 1rem;border:1px solid #48484e;border-radius:16px;outline:0;background:#1d1d1f;color:#f5f5f7;font:inherit;font-size:1rem}
     .field input:focus,.field select:focus{border-color:#b99cff}
-    .field input:disabled{color:#999;opacity:1}
+    .field input:disabled,.field input[readonly]{color:#999;opacity:1}
     .field input::placeholder{color:#666}
     .note{display:flex;align-items:flex-start;gap:.7rem;margin:-.7rem 0 1.3rem;color:#85858d;font-size:.82rem;line-height:1.45}
     .info-icon{display:grid;place-items:center;width:22px;height:22px;flex:none;border:2px solid #85858d;border-radius:50%;font-size:.75rem;font-weight:700}
@@ -58,10 +58,10 @@
           <input id="photoInput" class="hidden" type="file" accept="image/*">
         </div>
         <div class="field"><label for="nameInput">Name</label><input id="nameInput" autocomplete="name" required></div>
-        <div class="field"><label for="phoneInput">Phone number</label><input id="phoneInput" disabled></div>
+        <div class="field"><label for="phoneInput">Phone number</label><input id="phoneInput" type="tel" autocomplete="tel" required></div>
         <p class="note"><span class="info-icon">i</span><span>The phone number associated with your account cannot be modified</span></p>
-        <div class="field"><label for="emailInput">Email</label><input id="emailInput" type="email" disabled></div>
-        <div class="field"><label for="birthdayInput">Birthday</label><input id="birthdayInput" type="date"></div>
+        <div class="field"><label for="emailInput">Email</label><input id="emailInput" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="birthdayInput">Birthday</label><input id="birthdayInput" type="date" required></div>
         <p id="birthdayNote" class="note"><span class="info-icon">i</span><span>You can edit this only once</span></p>
       </section>
       <section class="profile-section">
@@ -71,7 +71,7 @@
       </section>
       <section class="profile-section">
         <h2 class="section-title">Invoice details</h2><div class="section-rule"></div>
-        <div class="field"><label for="stateInput">State</label><select id="stateInput"><option value="">Select state</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option></select></div>
+        <div class="field"><label for="stateInput">State</label><select id="stateInput" required><option value="">Select state</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option></select></div>
         <p class="note"><span>This is required to generate invoice</span></p>
       </section>
       <div id="status" class="status" role="status"></div>
@@ -124,7 +124,9 @@
         const snap=await db.collection('users').doc(user.uid).get();profileData=snap.exists?snap.data():{};
         nameInput.value=valueOf(user.displayName,profileData.name,profileData.fullName,user.email?.split('@')[0]);
         phoneInput.value=valueOf(profileData.whatsapp,profileData.phone,user.phoneNumber);
+        phoneInput.readOnly=Boolean(phoneInput.value);
         emailInput.value=user.email||profileData.email||'';
+        emailInput.readOnly=Boolean(emailInput.value);
         const birthday=valueOf(profileData.birthday,profileData.dob);
         birthdayInput.value=dateValue(birthday);
         birthdayInput.disabled=Boolean(birthday);
@@ -138,11 +140,19 @@
       event.preventDefault();if(!currentUser)return;
       saveButton.disabled=true;statusEl.textContent='Saving your profile…';
       try{
-        let photoURL=currentUser.photoURL||profileData.photoURL||profileData.photoUrl||'';
-        if(selectedPhoto){const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);await ref.put(selectedPhoto);photoURL=await ref.getDownloadURL();}
         const name=nameInput.value.trim();
         const birthday=birthdayInput.value||profileData.birthday||profileData.dob||'';
-        const updates={name,email:currentUser.email||profileData.email||'',phone:phoneInput.value,whatsapp:profileData.whatsapp||phoneInput.value,birthday,dob:birthday,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photoURL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+        const phone=phoneInput.value.trim(),email=emailInput.value.trim();
+        if(!name||!phone||!email||!birthday||!stateInput.value){
+          statusEl.textContent='Please fill in your name, phone number, email, birthday, and invoice state.';
+          saveButton.disabled=false;
+          const missingField=!name?nameInput:!phone?phoneInput:!email?emailInput:!birthday?birthdayInput:stateInput;
+          missingField.focus();
+          return;
+        }
+        let photoURL=currentUser.photoURL||profileData.photoURL||profileData.photoUrl||'';
+        if(selectedPhoto){const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);await ref.put(selectedPhoto);photoURL=await ref.getDownloadURL();}
+        const updates={name,email,phone,whatsapp:profileData.whatsapp||phone,birthday,dob:birthday,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photoURL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
         await db.collection('users').doc(currentUser.uid).set(updates,{merge:true});
         await currentUser.updateProfile({displayName:name,photoURL:photoURL||null});
         profileData={...profileData,...updates};initialValues=currentValues();statusEl.textContent='Profile updated successfully';
