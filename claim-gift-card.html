@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Claim Gift Card | CultureWave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#111;color:#f4f2f7;font-family:Inter,system-ui,sans-serif}.claim-page{min-height:100dvh;padding-bottom:8.8rem}.gift-hero{height:330px;position:relative;overflow:hidden;display:grid;place-items:center;text-align:center;background:radial-gradient(ellipse at 50% 0,#6332be 0,#32186c 46%,#17151e 100%)}.gift-hero:before,.gift-hero:after{content:'✦';position:absolute;color:#e8d9ff;text-shadow:0 0 18px #fff;font-size:22px}.gift-hero:before{left:24%;top:35%}.gift-hero:after{right:18%;top:22%;font-size:13px}.gift-hero-content{position:relative;z-index:1}.district{font-size:2rem;font-weight:900;letter-spacing:-.1em;transform:scaleX(.9)}.gift-title{margin-top:.4rem;color:#d6bbff;font-family:'Playfair Display',serif;font-size:3.3rem;font-style:italic;letter-spacing:-.06em}.gift-decoration{position:absolute;font-size:5rem;opacity:.55;filter:drop-shadow(0 8px 16px #000);transform:rotate(-16deg)}.gift-decoration.left{left:-1.2rem;bottom:1.7rem}.gift-decoration.right{right:-1.5rem;bottom:1.4rem;transform:rotate(15deg)}.hero-nav{position:absolute;top:calc(env(safe-area-inset-top) + 1rem);left:1rem;right:1rem;display:flex;justify-content:space-between;z-index:2}.round-btn,.faq-link{display:grid;place-items:center;min-width:48px;height:48px;padding:0 1rem;border:1px solid #ffffff33;border-radius:999px;background:#160e2acc;color:white;font:inherit;font-size:1rem;text-decoration:none}.round-btn{width:48px;padding:0;font-size:1.8rem}.claim-content{max-width:700px;margin:auto;padding:2.2rem 1.25rem}.claim-content h1{margin:0 0 1.6rem;font-size:1.25rem;line-height:1.4}.claim-form{display:grid;gap:1rem}.claim-form input{width:100%;height:58px;padding:0 1rem;border:1px solid #5a5960;border-radius:14px;background:#1c1c1f;color:#fff;font:inherit;font-size:1rem;outline:none}.claim-form input:focus{border-color:#9a67ff}.claim-form input::placeholder{color:#88858f}.note-title{margin:2.4rem 0 .9rem;color:#aaa7b1;font-size:1rem}.notes{display:grid;gap:.9rem;margin:0;padding-left:1.25rem;color:#9996a0;line-height:1.45}.terms{position:fixed;z-index:4;right:0;bottom:0;left:0;padding:1rem 1.1rem calc(env(safe-area-inset-bottom) + 1rem);border-radius:20px 20px 0 0;background:#111;text-align:center;color:#aaa7b1}.terms p{margin:.15rem 0 1rem}.terms a{color:#ae84ff}.claim-submit{width:100%;height:60px;border:0;border-radius:999px;background:#c9a7ff;color:#16111e;font:inherit;font-size:1rem;font-weight:800}.claim-submit:disabled{background:#39383e;color:#77747c}.notice{min-height:1.2rem;margin:.6rem 0 0;color:#c9a7ff;font-size:.84rem}
+  </style>
+</head>
+<body>
+  <main class="claim-page">
+    <section class="gift-hero" aria-label="District gift card">
+      <nav class="hero-nav"><button class="round-btn" id="backButton" aria-label="Back">‹</button><a class="faq-link" href="customer-service.html">FAQs</a></nav>
+      <span class="gift-decoration left" aria-hidden="true">🎁</span><span class="gift-decoration right" aria-hidden="true">🎁</span>
+      <div class="gift-hero-content"><div class="district">district</div><div class="gift-title">Gift card</div></div>
+    </section>
+    <section class="claim-content">
+      <h1>Enter the 16 digit code and 6 digit PIN to redeem your gift card</h1>
+      <form class="claim-form" id="claimForm">
+        <input id="giftCode" inputmode="numeric" autocomplete="off" maxlength="16" placeholder="Enter gift card code" aria-label="Gift card code" required>
+        <input id="giftPin" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Enter PIN" aria-label="Gift card PIN" required>
+        <h2 class="note-title">NOTE</h2>
+        <ul class="notes"><li>Gift card amount will be added to District Money</li><li>Gift card amount added will be valid for 1 year from the date of redemption</li><li>Claimed gift card cannot be transferred to bank account or another District Money account</li><li>Claimed gift card amount can be used exclusively on the District app. This cannot be used on District Stores.</li></ul>
+        <p id="claimNotice" class="notice" role="status"></p>
+      </form>
+    </section>
+    <footer class="terms"><p>By continuing, you agree to our <a href="terms-and-conditions.html">terms &amp; conditions</a></p><button class="claim-submit" id="claimButton" form="claimForm" disabled>Claim Gift Card</button></footer>
+  </main>
+  <script>
+    const backButton=document.getElementById('backButton');
+    backButton.addEventListener('click',()=>{if(parent!==window)parent.postMessage({type:'culturewave-menu-back'},location.origin);else history.back()});
+    const code=document.getElementById('giftCode'),pin=document.getElementById('giftPin'),claimButton=document.getElementById('claimButton'),claimForm=document.getElementById('claimForm');
+    function updateButton(){code.value=code.value.replace(/\D/g,'').slice(0,16);pin.value=pin.value.replace(/\D/g,'').slice(0,6);claimButton.disabled=code.value.length!==16||pin.value.length!==6}
+    code.addEventListener('input',updateButton);pin.addEventListener('input',updateButton);
+    claimForm.addEventListener('submit',event=>{event.preventDefault();document.getElementById('claimNotice').textContent='Gift card redemption is not connected yet. Please contact CultureWave support for help.'});
+  </script>
+</body>
+</html>
