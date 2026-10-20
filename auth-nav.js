@@ -160,6 +160,7 @@
         const normalizedLabel = (textLabel || '').toLowerCase();
         const selectedView = link?.dataset.view || (normalizedLabel.includes('upcoming') ? 'upcoming' : normalizedLabel.includes('profile') || normalizedLabel.includes('account') ? 'profile' : 'bookings');
         target.searchParams.set('view', selectedView);
+        target.searchParams.set('embedded', 'menu');
       }
       showMenuPage(target.href, editProfile || isProfileLink ? 'Edit Profile' : textLabel);
     }, true);
