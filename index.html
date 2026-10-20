@@ -1963,6 +1963,7 @@
   <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
     <a href="customer-dashboard.html"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
     <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>
   </div></section>
   <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Support</h2><div class="mobile-nav-card">
     <a href="customer-service.html"><span class="mobile-nav-icon">ⓘ</span><span>Frequently asked questions</span><span class="mobile-nav-arrow">›</span></a>
@@ -3192,12 +3193,19 @@
     ham.setAttribute('aria-expanded', String(isOpen));
     document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
   });
-  mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', event => {
+    if(a.dataset.action === 'logout'){
+      event.preventDefault();
+      firebase.auth().signOut().then(() => window.location.assign('index.html')).catch(error => console.warn('Could not sign out:', error));
+      return;
+    }
+    closeMenu();
+  }));
   document.addEventListener('keydown', event => { if(event.key === 'Escape' && mNav.classList.contains('open')) closeMenu(); });
   document.addEventListener('click', event => {
     if(mNav.classList.contains('open') && !mNav.contains(event.target) && !ham.contains(event.target)) closeMenu();
   });
 </script>
-<script src="auth-nav.js?v=5c8a41a"></script>
+<script src="auth-nav.js?v=logout-menu-20261020"></script>
 </body>
 </html>

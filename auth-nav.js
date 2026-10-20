@@ -94,8 +94,17 @@
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
         <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
         <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       `;
+
+    const moreGroup = Array.from(menu.querySelectorAll('.mobile-nav-group')).find((group) => group.querySelector('.mobile-nav-group-title')?.textContent.trim().toLowerCase() === 'more');
+    const moreCard = moreGroup?.querySelector('.mobile-nav-card');
+    if (moreCard && !moreCard.querySelector('[data-action="logout"]')) {
+      moreCard.insertAdjacentHTML('beforeend', '<a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>');
+    } else if (!moreCard) {
+      menu.insertAdjacentHTML('beforeend', '<section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card"><a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a></div></section>');
+    }
 
     const closeMenu = () => {
       menu.classList.remove('open', 'showing-view');
@@ -154,7 +163,7 @@
       document.body.style.overflow = open ? 'hidden' : '';
     }, true);
     menu.querySelector('.mobile-nav-close')?.addEventListener('click', closeMenu);
-    menu.addEventListener('click', (event) => {
+    menu.addEventListener('click', async (event) => {
       const editProfileLink = event.target.closest('.mobile-profile-arrow');
       if (editProfileLink) {
         event.preventDefault();
@@ -165,6 +174,18 @@
       const profileCard = event.target.closest('.mobile-profile-card');
       const link = event.target.closest('a');
       if (profileCard || !link) return;
+      if (link.dataset.action === 'logout') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        try {
+          if (window.firebase && typeof firebase.auth === 'function') await firebase.auth().signOut();
+        } catch (error) {
+          console.warn('Could not sign out:', error);
+        }
+        closeMenu();
+        window.location.assign('index.html');
+        return;
+      }
       const isProfileLink = Boolean(link && (link.dataset.view === 'profile' || /account profile|account settings/i.test(link.textContent)));
       const href = isProfileLink ? 'edit-profile.html' : link.getAttribute('href');
       if (!href || /^(mailto:|tel:|javascript:)/i.test(href) || link?.target === '_blank') return;
