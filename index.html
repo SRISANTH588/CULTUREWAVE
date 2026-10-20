@@ -41,11 +41,19 @@
     .index-mobile-ctas{gap:.65rem;}
     .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
     .index-mobile-ctas .nav-cta{margin-left:0;}
+    .desktop-header-search{display:none;}
 
     @media(min-width:961px){
-      .topbar .nav-wrap>.hamburger{display:grid!important;place-items:center!important;flex:0 0 52px!important;width:52px!important;height:52px!important;margin-left:auto!important;padding:0!important;border:0!important;border-radius:50%!important;background:#141418!important;color:#fff!important;box-shadow:none!important;}
+      .topbar{background:#fff!important;border:0!important;box-shadow:none!important;}
+      .topbar .nav-wrap{width:100%!important;max-width:none!important;min-height:100px!important;padding:.5rem 20px!important;gap:40px!important;}
+      .topbar .brand-block,.topbar .topnav,.topbar .mobile-header-actions{display:none!important;}
+      .desktop-header-search{display:flex!important;align-items:center!important;gap:20px!important;flex:1!important;min-width:0!important;height:88px!important;padding:0 28px!important;border:2px solid #d9d9dc!important;border-radius:25px!important;background:#fff!important;}
+      .desktop-header-search svg{display:block!important;flex:none!important;width:34px!important;height:34px!important;stroke:#6747f5!important;}
+      .desktop-header-search input{width:100%!important;min-width:0!important;padding:0!important;border:0!important;outline:0!important;background:transparent!important;color:#25252b!important;font-size:clamp(18px,2vw,30px)!important;font-weight:600!important;}
+      .desktop-header-search input::placeholder{color:#8c8c94!important;opacity:1!important;}
+      .topbar .nav-wrap>.hamburger{display:grid!important;place-items:center!important;flex:0 0 84px!important;width:84px!important;height:84px!important;margin-left:0!important;padding:0!important;border:0!important;border-radius:50%!important;background:#141418!important;color:#fff!important;box-shadow:none!important;}
       .topbar .nav-wrap>.hamburger span{display:none!important;}
-      .topbar .nav-wrap>.hamburger::after{content:"U";color:#fff;font-size:1.3rem;font-weight:700;line-height:1;}
+      .topbar .nav-wrap>.hamburger::after{content:"U";color:#fff;font-size:2rem;font-weight:700;line-height:1;}
     }
 
     /* ── HAMBURGER ── */
@@ -1912,6 +1920,10 @@
       <button class="mobile-header-icon" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
       <button class="mobile-header-icon" id="searchToggle" type="button" aria-label="Search events">⌕</button>
     </div>
+    <form class="desktop-header-search" id="desktopHeaderSearch" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.3"/><path d="m16.2 16.2 5 5"/></svg>
+      <input id="desktopHeaderSearchInput" type="search" placeholder="Search for events, movies and restaurants" aria-label="Search for events, movies and restaurants" autocomplete="off"/>
+    </form>
     <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -3016,6 +3028,11 @@
 
   const searchPopup = document.getElementById('searchPopup');
   const searchInput = document.getElementById('searchInput');
+  document.getElementById('desktopHeaderSearch').addEventListener('submit', event => {
+    event.preventDefault();
+    const query = document.getElementById('desktopHeaderSearchInput').value.trim();
+    if(query) window.location.href = 'events.html?search=' + encodeURIComponent(query);
+  });
   const closeSearch = () => {
     searchPopup.classList.remove('open');
     document.body.style.overflow = '';
