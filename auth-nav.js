@@ -1,5 +1,104 @@
 // Keep public page account controls and header styling consistent with index.html.
 (function () {
+  function buildUnifiedMobileMenu() {
+    const header = document.querySelector('.topbar');
+    const navWrap = header?.querySelector('.nav-wrap');
+    let hamburger = header?.querySelector('.hamburger');
+    let menu = document.querySelector('.mobile-nav');
+    if (!menu && !navWrap) return;
+
+    if (!hamburger && navWrap) {
+      hamburger = document.createElement('button');
+      hamburger.className = 'hamburger';
+      hamburger.type = 'button';
+      hamburger.setAttribute('aria-label', 'Open menu');
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.innerHTML = '<span></span><span></span><span></span>';
+      navWrap.appendChild(hamburger);
+    }
+    if (!menu) {
+      menu = document.createElement('nav');
+      menu.className = 'mobile-nav';
+      menu.id = 'mobileNav';
+      menu.setAttribute('aria-label', 'Main menu');
+      header.insertAdjacentElement('afterend', menu);
+    }
+
+    // The homepage already contains this menu and its dedicated behavior.
+    if (menu.querySelector('.mobile-nav-group')) return;
+
+    menu.setAttribute('aria-label', 'Profile and site navigation');
+    menu.innerHTML = `
+      <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
+      <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
+        <a href="events.html"><span class="mobile-nav-icon">◷</span><span>Explore events</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="restaurants.html"><span class="mobile-nav-icon">♧</span><span>Restaurants</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="category-experiences.html"><span class="mobile-nav-icon">✧</span><span>Experiences</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Deals and vouchers</h2><div class="mobile-nav-card">
+        <a href="events.html"><span class="mobile-nav-icon">◇</span><span>Explore current events</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="restaurants.html"><span class="mobile-nav-icon">♧</span><span>Discover dining offers</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Gift Cards</h2><div class="mobile-nav-card">
+        <a href="customer-service.html"><span class="mobile-nav-icon">▱</span><span>Ask about CultureWave gift cards</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="events.html"><span class="mobile-nav-icon">＋</span><span>Browse experiences to gift</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Manage</h2><div class="mobile-nav-card">
+        <a href="customer-dashboard.html"><span class="mobile-nav-icon">▤</span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html"><span class="mobile-nav-icon">☆</span><span>Upcoming events</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html"><span class="mobile-nav-icon">♙</span><span>Account profile</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">For organisers</h2><div class="mobile-nav-card">
+        <a href="features.html"><span class="mobile-nav-icon">✦</span><span>Organizer tools</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="pricing.html"><span class="mobile-nav-icon">₹</span><span>Pricing</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="how-it-works.html"><span class="mobile-nav-icon">↗</span><span>How it works</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Support</h2><div class="mobile-nav-card">
+        <a href="customer-service.html"><span class="mobile-nav-icon">ⓘ</span><span>Frequently asked questions</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="mailto:support.culturewave@gmail.com"><span class="mobile-nav-icon">✉</span><span>Chat with us</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-service.html"><span class="mobile-nav-icon">✎</span><span>Share feedback</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
+        <a href="customer-dashboard.html"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
+      <div class="mobile-nav-group"><h2 class="mobile-nav-group-title">Account</h2><div class="mobile-nav-ctas">
+        <a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a>
+      </div></div>`;
+
+    hamburger?.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
+    hamburger?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const open = !menu.classList.contains('open');
+      menu.classList.toggle('open', open);
+      hamburger.classList.toggle('open', open);
+      hamburger.setAttribute('aria-expanded', String(open));
+      document.body.style.overflow = open ? 'hidden' : '';
+    }, true);
+    menu.querySelector('.mobile-nav-close')?.addEventListener('click', () => {
+      menu.classList.remove('open');
+      hamburger?.classList.remove('open');
+      hamburger?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    });
+    menu.addEventListener('click', (event) => {
+      if (!event.target.closest('a')) return;
+      menu.classList.remove('open');
+      hamburger?.classList.remove('open');
+      hamburger?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !menu.classList.contains('open')) return;
+      menu.classList.remove('open');
+      hamburger?.classList.remove('open');
+      hamburger?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    });
+  }
+
   function setAccountNavigation(user) {
     const accountLinks = document.querySelectorAll('.auth-actions .nav-link, .auth-actions .nav-cta, .mobile-nav-ctas .nav-link, .mobile-nav-ctas .nav-cta');
     accountLinks.forEach((link) => {
@@ -44,8 +143,33 @@
     .mobile-nav-ctas .nav-link:hover{background:#222!important;color:#fff!important;}
     .mobile-nav-ctas .nav-cta{margin:0!important;padding:.78rem 1.15rem!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#000!important;font-size:1rem!important;font-weight:800!important;box-shadow:none!important;}
     .mobile-nav-ctas .nav-cta:hover{background:#e8e8e8!important;color:#000!important;}
+    @media(max-width:960px){
+      .mobile-nav{position:fixed!important;inset:0!important;top:0!important;left:0!important;right:0!important;width:100vw!important;max-width:none!important;height:100vh!important;height:100dvh!important;max-height:none!important;overflow-y:auto!important;box-sizing:border-box!important;align-items:stretch!important;justify-content:flex-start!important;gap:0!important;padding:calc(env(safe-area-inset-top) + 1rem) 1.25rem calc(env(safe-area-inset-bottom) + 1.25rem)!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#111!important;transform:translateX(100%)!important;z-index:1000!important;}
+      .mobile-nav.open{transform:translateX(0)!important;}
+      .mobile-nav::before{display:none!important;}
+      .mobile-nav-head{display:flex;align-items:center;justify-content:flex-start;gap:.8rem;min-height:54px;margin-bottom:1rem;color:#fff;font-size:1.05rem;font-weight:800;}
+      .mobile-nav-close{display:grid;place-items:center;width:46px;height:46px;flex:none;border:1px solid #353535;border-radius:50%;background:#1b1b1d;color:#fff;font-size:2rem;line-height:1;cursor:pointer;}
+      .mobile-organizer-prompt{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.5rem 1rem;margin:0 0 1.55rem;padding:1.1rem;border:1px solid #39343f;border-radius:20px;background:linear-gradient(120deg,#251b35,#1b1b20 75%);color:#fff;}
+      .mobile-organizer-prompt span{grid-column:1/-1;color:#b8a5d2;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;}
+      .mobile-organizer-prompt strong{font-size:1rem;line-height:1.35;}
+      .mobile-organizer-prompt p{grid-column:1/-1;margin:0;color:#aaa;font-size:.78rem;line-height:1.45;}
+      .mobile-organizer-prompt a{grid-column:1/-1;display:inline-flex;justify-self:start;margin-top:.25rem;padding:.62rem .9rem;border-radius:999px;background:#fff;color:#111;font-size:.78rem;font-weight:800;}
+      .mobile-nav-group{margin-bottom:1.25rem;}
+      .mobile-nav-group-title{margin:0 0 .65rem;color:#f4f4f5;font-size:.95rem;font-weight:800;}
+      .mobile-nav-card{overflow:hidden;border:1px solid #303033;border-radius:20px;background:#1d1d1f;padding:0 .9rem;}
+      .mobile-nav-card>a{display:flex;align-items:center;gap:.85rem;min-height:58px;padding:.65rem .15rem;border:0!important;border-bottom:1px solid #343437!important;border-radius:0!important;background:transparent!important;color:#f4f4f5!important;font-size:.9rem!important;font-weight:700;box-shadow:none!important;}
+      .mobile-nav-card>a:last-child{border-bottom:0!important;}
+      .mobile-nav-card>a::before,.mobile-nav-card>a::after{display:none!important;}
+      .mobile-nav-icon{display:grid;place-items:center;width:25px;flex:none;color:#aaa;font-size:1.1rem;}
+      .mobile-nav-arrow{margin-left:auto;color:#777;font-size:1.4rem;font-weight:400;}
+      .mobile-nav-ctas{display:grid!important;grid-template-columns:1fr 1fr;gap:.55rem!important;margin:0!important;padding:0!important;border:0!important;}
+      .mobile-nav-ctas::before{display:none!important;}
+      .mobile-nav-ctas .nav-link,.mobile-nav-ctas .nav-cta{display:flex;align-items:center;justify-content:center;min-height:48px;padding:.6rem!important;border:1px solid #38383b!important;border-radius:14px!important;background:#222!important;color:#fff!important;font-size:.8rem!important;font-weight:800!important;}
+      body:has(.mobile-nav.open)>header,body:has(.mobile-nav.open)>main,body:has(.mobile-nav.open)>footer,body:has(.mobile-nav.open)>.mobile-bottom-nav{transform:none!important;}
+    }
   `;
   document.head.appendChild(style);
+  buildUnifiedMobileMenu();
 
   const firebaseConfig = {
     apiKey: 'AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI',
