@@ -428,6 +428,38 @@ async function getGiftCardHistory(request, env) {
   return json({ success: true, purchases, transactions });
 }
 
+async function listFirestoreCollection(env, collection, token) {
+  const response = await fetch(`${firestoreBase(env)}/${collection}?pageSize=1000`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!response.ok) throw new Error(`Could not load ${collection}.`);
+  const result = await response.json();
+  return (result.documents || []).map(document => ({ id: document.name.split("/").pop(), ...decodeFirestoreFields(document.fields || {}) }));
+}
+
+async function getAdminOneClub(request, env) {
+  const user = await authenticatedUser(request, env);
+  if (!user) return json({ success: false, error: "Admin sign-in is required." }, 401);
+  const token = await firestoreAccessToken(env);
+  const profile = await getFirestoreDocument(env, "users", user.uid, token);
+  if (profile?.role !== "admin") return json({ success: false, error: "Admin access is required." }, 403);
+  const [walletRecords, purchases, transactions] = await Promise.all([
+    listFirestoreCollection(env, "wallets", token),
+    listFirestoreCollection(env, "giftCardPurchases", token),
+    listFirestoreCollection(env, "oneClubTransactions", token),
+  ]);
+  const wallets = walletRecords.map(wallet => ({ uid: wallet.id, balance: Number(wallet.balance || 0), updatedAt: wallet.updatedAt || wallet.createdAt || null }));
+  const giftCards = purchases.map(card => ({ id: card.id, ownerUid: card.ownerUid || "", amount: Number(card.amount || 0),
+    status: card.status || "issued", paymentId: card.paymentId || "", occasion: card.occasion || "", createdAt: card.createdAt || null,
+    redeemedAt: card.redeemedAt || null }));
+  const safeTransactions = transactions.map(item => ({ id: item.id, uid: item.uid || "", amount: Number(item.amount || 0),
+    type: item.type || "", paymentId: item.paymentId || "", createdAt: item.createdAt || null }));
+  return json({ success: true, wallets, giftCards, transactions: safeTransactions,
+    summary: { walletCount: wallets.length, totalBalance: wallets.reduce((sum, item) => sum + item.balance, 0),
+      giftCardCount: giftCards.length, issuedCount: giftCards.filter(item => item.status === "issued").length,
+      redeemedCount: giftCards.filter(item => item.status === "redeemed").length,
+      issuedValue: giftCards.reduce((sum, item) => sum + item.amount, 0),
+      redeemedValue: giftCards.filter(item => item.status === "redeemed").reduce((sum, item) => sum + item.amount, 0) } });
+}
+
 async function claimStallSlot(env, token, eventId, slotIndex, paymentId, amountPaise) {
   const base = firestoreBase(env);
   for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -557,6 +589,7 @@ export default {
       if (path === "/redeemGiftCard") return await redeemGiftCard(request, env).then(response => withHeaders(response, headers));
       if (path === "/oneClubBalance") return await getOneClub(request, env).then(response => withHeaders(response, headers));
       if (path === "/giftCardHistory") return await getGiftCardHistory(request, env).then(response => withHeaders(response, headers));
+      if (path === "/adminOneClub") return await getAdminOneClub(request, env).then(response => withHeaders(response, headers));
       return json({ error: "Not found." }, 404, headers);
     } catch (error) {
       console.error("Razorpay Worker request failed:", error.message);

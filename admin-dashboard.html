@@ -505,6 +505,8 @@
     <button class="sb-item" data-view="stalls"><span class="si-icon">🏪</span> Event Stalls</button>
     <button class="sb-item" data-view="campaigns"><span class="si-icon">🚀</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
     <button class="sb-item" data-view="payments"><span class="si-icon">💳</span> Transactions <span class="si-badge" id="badgePayments">0</span></button>
+    <button class="sb-item" data-view="one-club"><span class="si-icon">◉</span> One Club</button>
+    <button class="sb-item" data-view="gift-cards"><span class="si-icon">🎁</span> Gift Cards</button>
     <button class="sb-item" data-view="whatsapp"><span class="si-icon">💬</span> WA Dispatch <span class="si-badge green" id="badgeWA">0</span></button>
     <button class="sb-item" data-view="refunds"><span class="si-icon">🔄</span> Refunds <span class="si-badge" id="badgeRefunds">0</span></button>
     <button class="sb-item" data-view="website-requests"><span class="si-icon">🌐</span> Web Requests <span class="si-badge orange" id="badgeWebReqs">0</span></button>
@@ -970,6 +972,44 @@
         </table>
       </div>
     </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       VIEW: ONE CLUB
+  ══════════════════════════════════════════ -->
+  <div class="view" data-view="one-club">
+    <div style="background:linear-gradient(135deg,#25114f 0%,#5526a5 58%,#8d5ce0 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;color:white;">
+      <div style="font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8;">CultureWave Wallet</div>
+      <div style="font-size:1.75rem;font-weight:800;letter-spacing:-.04em;margin-top:.3rem;">One Club</div>
+      <div style="font-size:.88rem;opacity:.78;margin-top:.25rem;">Customer balances and One Club wallet activity.</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-icon">₹</div><div class="stat-label">Total Balance</div><div class="stat-value" id="oneClubTotalBalance">₹0</div></div>
+      <div class="stat-card blue"><div class="stat-icon">👥</div><div class="stat-label">Wallet Accounts</div><div class="stat-value" id="oneClubWalletCount">0</div></div>
+      <div class="stat-card green"><div class="stat-icon">🎟️</div><div class="stat-label">Ticket Uses</div><div class="stat-value" id="oneClubTicketUses">0</div></div>
+    </div>
+    <div class="filter-bar"><input id="oneClubSearch" type="search" placeholder="Search by customer UID" oninput="renderOneClubAdminTables()"><button class="btn" onclick="loadOneClubAdminData(true)">↻ Refresh</button><span id="oneClubLoadStatus" style="font-size:.76rem;color:var(--muted);margin-left:auto;"></span></div>
+    <div class="card"><div class="card-head"><h2>One Club Balances</h2></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Customer UID</th><th>Balance</th><th>Last Updated</th></tr></thead><tbody id="oneClubWalletTable"></tbody></table></div></div>
+    <div class="card"><div class="card-head"><h2>One Club Transactions</h2></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Customer UID</th><th>Activity</th><th>Amount</th><th>Payment</th><th>Date</th></tr></thead><tbody id="oneClubTransactionsTable"></tbody></table></div></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       VIEW: GIFT CARDS
+  ══════════════════════════════════════════ -->
+  <div class="view" data-view="gift-cards">
+    <div style="background:linear-gradient(135deg,#25114f 0%,#5526a5 58%,#8d5ce0 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;color:white;">
+      <div style="font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8;">CultureWave Payments</div>
+      <div style="font-size:1.75rem;font-weight:800;letter-spacing:-.04em;margin-top:.3rem;">Gift Cards</div>
+      <div style="font-size:.88rem;opacity:.78;margin-top:.25rem;">Purchase and redemption status. Card codes and PINs stay private.</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card blue"><div class="stat-icon">🎁</div><div class="stat-label">Gift Cards Sold</div><div class="stat-value" id="adminGiftCardCount">0</div></div>
+      <div class="stat-card orange"><div class="stat-icon">◷</div><div class="stat-label">Unredeemed</div><div class="stat-value" id="adminGiftCardIssued">0</div></div>
+      <div class="stat-card green"><div class="stat-icon">✓</div><div class="stat-label">Redeemed</div><div class="stat-value" id="adminGiftCardRedeemed">0</div></div>
+      <div class="stat-card purple"><div class="stat-icon">₹</div><div class="stat-label">Redeemed Value</div><div class="stat-value" id="adminGiftCardValue">₹0</div></div>
+    </div>
+    <div class="filter-bar"><input id="giftCardSearch" type="search" placeholder="Search customer UID or payment ID" oninput="renderOneClubAdminTables()"><select id="giftCardStatusFilter" onchange="renderOneClubAdminTables()"><option value="">All cards</option><option value="issued">Unredeemed</option><option value="redeemed">Redeemed</option></select><button class="btn" onclick="loadOneClubAdminData(true)">↻ Refresh</button><span id="giftCardLoadStatus" style="font-size:.76rem;color:var(--muted);margin-left:auto;"></span></div>
+    <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Customer UID</th><th>Amount</th><th>Occasion</th><th>Status</th><th>Payment ID</th><th>Purchased</th><th>Redeemed</th></tr></thead><tbody id="adminGiftCardTable"></tbody></table></div></div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -1525,6 +1565,7 @@ import { app, auth, db, getCurrentUser, logout,
 
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
+let oneClubAdminData=null,oneClubAdminLoading=false;
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allMarketingLeads=[];
 let allVendorApplications=[],activeVendorApplicationId=null;
 let allStallApplications=[],activeStallAdminEventId='';
@@ -1534,6 +1575,7 @@ const esc = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 const money = v => '₹'+Number(v||0).toLocaleString('en-IN');
 const fmtDate = ts => { if(!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); };
 const EMAILJS_SERVICE_ID='service_wvzjnnx', EMAILJS_PUBLIC_KEY='JXh4QRP2kafFxlPQo';
+const oneClubAdminApi='https://culturewave-razorpay.culturewaveindia.workers.dev/adminOneClub';
 emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
 
 window.showToast = function(msg, type='') {
@@ -1575,7 +1617,7 @@ window.updateTicketRequestStatus = async function(id, status) {
 const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', marketing:'Marketing', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
-  campaigns:'Campaigns', payments:'Transactions', refunds:'Refunds',
+  campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
   restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', 'site-visibility':'Content Visibility', settings:'Platform Settings'
 };
@@ -1587,10 +1629,47 @@ window.showView = function(name) {
   if(name==='marketing') renderMarketing();
   if(name==='new-listers') renderNewListers();
   if(name==='credits') renderCreditsView();
+  if(name==='one-club'||name==='gift-cards') loadOneClubAdminData();
   if(name==='activity') renderActivityLog();
   if(name==='whatsapp') { syncWABookings(); filterWA(); }
 };
 document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
+
+async function loadOneClubAdminData(force=false){
+  if(oneClubAdminLoading||(!force&&oneClubAdminData))return;
+  oneClubAdminLoading=true;
+  const statuses=['oneClubLoadStatus','giftCardLoadStatus'];statuses.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Loading…'});
+  try{
+    const user=auth.currentUser;
+    if(!user)throw new Error('Your admin session expired. Sign in again.');
+    const response=await fetch(oneClubAdminApi,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`,'Content-Type':'application/json'},body:'{}'});
+    const result=await response.json();
+    if(!response.ok||!result.success)throw new Error(result.error||'Could not load One Club records.');
+    oneClubAdminData=result;renderOneClubAdminTables();statuses.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Updated just now'});
+  }catch(error){statuses.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=error.message});showToast(error.message,'error')}
+  finally{oneClubAdminLoading=false}
+}
+window.loadOneClubAdminData=loadOneClubAdminData;
+function oneClubCustomer(uid){const user=allUsers.find(item=>item.id===uid);return user?`${esc(user.name||user.email||uid)}<div style="font-size:.7rem;color:var(--muted)">${esc(user.email||uid)}</div>`:esc(uid||'—')}
+window.renderOneClubAdminTables=function(){
+  if(!oneClubAdminData)return;
+  const {wallets=[],giftCards=[],transactions=[],summary={}}=oneClubAdminData;
+  const search=(document.getElementById('oneClubSearch')?.value||'').trim().toLowerCase();
+  const walletRows=wallets.filter(item=>!search||item.uid.toLowerCase().includes(search));
+  document.getElementById('oneClubTotalBalance').textContent=money(summary.totalBalance);
+  document.getElementById('oneClubWalletCount').textContent=Number(summary.walletCount||0).toLocaleString('en-IN');
+  document.getElementById('oneClubTicketUses').textContent=transactions.filter(item=>item.type==='ticket_booking').length.toLocaleString('en-IN');
+  document.getElementById('oneClubWalletTable').innerHTML=walletRows.length?walletRows.map(item=>`<tr><td><strong>${oneClubCustomer(item.uid)}</strong></td><td style="font-weight:800">${money(item.balance)}</td><td>${fmtDate(item.updatedAt)}</td></tr>`).join(''):'<tr><td colspan="3">No matching One Club wallets.</td></tr>';
+  const transactionRows=transactions.filter(item=>!search||item.uid.toLowerCase().includes(search)||item.paymentId.toLowerCase().includes(search)).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+  document.getElementById('oneClubTransactionsTable').innerHTML=transactionRows.length?transactionRows.map(item=>`<tr><td>${oneClubCustomer(item.uid)}</td><td>${item.type==='ticket_booking'?'Ticket booking':'Wallet activity'}</td><td style="font-weight:800;color:${Number(item.amount)<0?'#b42318':'#087443'}">${money(item.amount)}</td><td>${esc(item.paymentId||'—')}</td><td>${fmtDate(item.createdAt)}</td></tr>`).join(''):'<tr><td colspan="5">No One Club transactions.</td></tr>';
+  document.getElementById('adminGiftCardCount').textContent=Number(summary.giftCardCount||0).toLocaleString('en-IN');
+  document.getElementById('adminGiftCardIssued').textContent=Number(summary.issuedCount||0).toLocaleString('en-IN');
+  document.getElementById('adminGiftCardRedeemed').textContent=Number(summary.redeemedCount||0).toLocaleString('en-IN');
+  document.getElementById('adminGiftCardValue').textContent=money(summary.redeemedValue);
+  const giftSearch=(document.getElementById('giftCardSearch')?.value||'').trim().toLowerCase(),status=document.getElementById('giftCardStatusFilter')?.value||'';
+  const giftRows=giftCards.filter(item=>(!status||item.status===status)&&(!giftSearch||item.ownerUid.toLowerCase().includes(giftSearch)||item.paymentId.toLowerCase().includes(giftSearch))).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+  document.getElementById('adminGiftCardTable').innerHTML=giftRows.length?giftRows.map(item=>`<tr><td><strong>${oneClubCustomer(item.ownerUid)}</strong></td><td style="font-weight:800">${money(item.amount)}</td><td>${esc(item.occasion||'CultureWave')}</td><td><span class="badge ${item.status==='redeemed'?'green':'orange'}">${item.status==='redeemed'?'Redeemed':'Unredeemed'}</span></td><td>${esc(item.paymentId||'—')}</td><td>${fmtDate(item.createdAt)}</td><td>${fmtDate(item.redeemedAt)}</td></tr>`).join(''):'<tr><td colspan="7">No matching gift cards.</td></tr>';
+};
 
 function renderNewListers(){
   const tbody=document.getElementById('newListersTable');
