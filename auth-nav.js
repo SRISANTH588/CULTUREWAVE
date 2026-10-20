@@ -19,7 +19,12 @@
       link.textContent = 'My Account';
       link.setAttribute('aria-label', 'Open my account');
     });
-    document.querySelectorAll('.auth-actions .nav-cta, .mobile-nav-ctas .nav-cta').forEach((link) => {
+    document.querySelectorAll('.auth-actions .nav-cta').forEach((link) => {
+      link.href = link.dataset.defaultAccountHref || 'login.html';
+      link.textContent = link.dataset.defaultAccountText || 'Get Started';
+      link.setAttribute('aria-label', 'Get started');
+    });
+    document.querySelectorAll('.mobile-nav-ctas .nav-cta').forEach((link) => {
       link.href = 'customer-dashboard.html';
       link.textContent = 'My Bookings';
       link.setAttribute('aria-label', 'View my bookings');
