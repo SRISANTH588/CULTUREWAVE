@@ -24,17 +24,24 @@
       header.insertAdjacentElement('afterend', menu);
     }
 
-    // The homepage already contains this menu and its dedicated behavior.
+    // Add the shared profile card to existing page-specific menus as well.
+    if (!menu.querySelector('.mobile-profile-card')) {
+      const profileCard = document.createElement('a');
+      profileCard.className = 'mobile-profile-card';
+      profileCard.href = 'customer-dashboard.html';
+      profileCard.setAttribute('aria-label', 'View your profile');
+      profileCard.innerHTML = '<span class="mobile-profile-avatar" aria-hidden="true">♙</span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">View and complete your profile</span></span><span class="mobile-profile-arrow" aria-hidden="true">→</span>';
+      const menuHead = menu.querySelector('.mobile-nav-head');
+      if (menuHead) menuHead.insertAdjacentElement('afterend', profileCard);
+      else menu.insertBefore(profileCard, menu.firstChild);
+    }
+
+    // The homepage and some other pages have their own menu contents and behavior.
     if (menu.querySelector('.mobile-nav-group')) return;
 
     menu.setAttribute('aria-label', 'Profile and site navigation');
     menu.innerHTML = `
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
-      <a class="mobile-profile-card" href="customer-dashboard.html" aria-label="View your profile">
-        <span class="mobile-profile-avatar" aria-hidden="true">♙</span>
-        <span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">View and complete your profile</span></span>
-        <span class="mobile-profile-arrow" aria-hidden="true">→</span>
-      </a>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
         <a href="events.html"><span class="mobile-nav-icon">◷</span><span>Explore events</span><span class="mobile-nav-arrow">›</span></a>
