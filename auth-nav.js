@@ -149,11 +149,6 @@
     profileCard?.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
-      if (window.matchMedia('(min-width: 961px)').matches) {
-        closeMenu();
-        window.location.assign(new URL('edit-profile.html', window.location.href).href);
-        return;
-      }
       showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
     }, true);
 
@@ -173,11 +168,6 @@
       if (editProfileLink) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (window.matchMedia('(min-width: 961px)').matches) {
-          closeMenu();
-          window.location.assign(new URL('edit-profile.html', window.location.href).href);
-          return;
-        }
         showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
         return;
       }
@@ -222,11 +212,6 @@
       if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-card')) return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      if (window.matchMedia('(min-width: 961px)').matches) {
-        closeMenu();
-        window.location.assign('edit-profile.html');
-        return;
-      }
       showMenuPage('edit-profile.html', 'Edit Profile');
     }, true);
     document.addEventListener('keydown', (event) => {
