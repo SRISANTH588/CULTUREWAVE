@@ -42,6 +42,12 @@
     .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
     .index-mobile-ctas .nav-cta{margin-left:0;}
 
+    @media(min-width:961px){
+      .topbar .nav-wrap>.hamburger{display:grid!important;place-items:center!important;flex:0 0 52px!important;width:52px!important;height:52px!important;margin-left:auto!important;padding:0!important;border:0!important;border-radius:50%!important;background:#141418!important;color:#fff!important;box-shadow:none!important;}
+      .topbar .nav-wrap>.hamburger span{display:none!important;}
+      .topbar .nav-wrap>.hamburger::after{content:"U";color:#fff;font-size:1.3rem;font-weight:700;line-height:1;}
+    }
+
     /* ── HAMBURGER ── */
     @media(max-width:960px){
       .topbar .nav-wrap > .auth-actions.index-auth-actions{display:none!important;}
@@ -1906,10 +1912,6 @@
       <button class="mobile-header-icon" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
       <button class="mobile-header-icon" id="searchToggle" type="button" aria-label="Search events">⌕</button>
     </div>
-    <div class="auth-actions index-auth-actions">
-      <a class="nav-link" href="login.html">Login</a>
-      <a class="nav-cta" href="vendor-onboarding.html">List Your Event</a>
-    </div>
     <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -3179,6 +3181,6 @@
     if(mNav.classList.contains('open') && !mNav.contains(event.target) && !ham.contains(event.target)) closeMenu();
   });
 </script>
-<script src="auth-nav.js"></script>
+<script src="auth-nav.js?v=5c8a41a"></script>
 </body>
 </html>
