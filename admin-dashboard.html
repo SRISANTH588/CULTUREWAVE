@@ -1794,9 +1794,11 @@ function updateEventStats() {
   const published = allEvents.filter(e => String(e.status || '').toLowerCase() === 'published').length;
   const drafts = allEvents.filter(e => !e.status || String(e.status).toLowerCase() === 'draft').length;
   const totalPrice = allEvents.reduce((sum, event) => {
-    const rawPrice = event.price ?? event.ticketPrice ?? 0;
-    const price = Number(String(rawPrice).replace(/[^\d.-]/g, ''));
-    return sum + (Number.isFinite(price) ? price : 0);
+    // Most organizer-created events store their fare on the first ticket tier;
+    // admin-created listings can store it directly as event.price.
+    const candidates = [event.price, event.tickets?.[0]?.price, event.ticketPrice, event.eventPrice];
+    const prices = candidates.map(value => Number(String(value ?? '').replace(/[^\d.-]/g, ''))).filter(Number.isFinite);
+    return sum + (prices.find(price => price > 0) ?? prices[0] ?? 0);
   }, 0);
   document.getElementById('evTotal').textContent = allEvents.length;
   document.getElementById('evPublished').textContent = published;
