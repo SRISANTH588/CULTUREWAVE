@@ -1950,11 +1950,12 @@ auth.onAuthStateChanged(user=>{
 (function(){
   const sidebar = document.querySelector('.sidebar');
   const btn = document.getElementById('hamburgerBtn');
-  const overlay = document.getElementById('sbOverlay');
   if(!btn||!sidebar) return;
-  btn.addEventListener('click', ()=>{ sidebar.classList.add('open'); overlay.classList.add('open'); });
-  overlay.addEventListener('click', ()=>{ sidebar.classList.remove('open'); overlay.classList.remove('open'); });
-  document.querySelectorAll('.sb-item,.sb-back').forEach(s => s.addEventListener('click', ()=>{ sidebar.classList.remove('open'); overlay.classList.remove('open'); }));
+  const overlay=()=>document.getElementById('sbOverlay');
+  const closeSidebar=()=>{sidebar.classList.remove('open');overlay()?.classList.remove('open');};
+  btn.addEventListener('click', ()=>{sidebar.classList.add('open');overlay()?.classList.add('open');});
+  document.addEventListener('click',event=>{if(event.target?.id==='sbOverlay')closeSidebar();});
+  document.querySelectorAll('.sb-item,.sb-back').forEach(item=>item.addEventListener('click',closeSidebar));
 })();
 </script>
 <div class="sb-overlay" id="sbOverlay"></div>
