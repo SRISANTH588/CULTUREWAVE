@@ -32,8 +32,8 @@
   <script>
     if(!firebase.apps.length)firebase.initializeApp({apiKey:'AIzaSyBCgNQy8EJL7gE-SA1cMePGetWLOR7WWMI',authDomain:'ogshootsluxe-36740.firebaseapp.com',projectId:'ogshootsluxe-36740',storageBucket:'ogshootsluxe-36740.firebasestorage.app',messagingSenderId:'5471814825',appId:'1:5471814825:web:07e84f2f88486da817d5b8'});
     const giftAuth=firebase.auth(),giftApi='https://culturewave-razorpay.culturewaveindia.workers.dev';
-    const giftAuthReady=giftAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{}).then(()=>new Promise(resolve=>{let off=()=>{};off=giftAuth.onAuthStateChanged(user=>{off();resolve(user)})}));
-    const currentUser=async()=>{const user=await giftAuthReady;return user||giftAuth.currentUser};
+    const giftPersistenceReady=giftAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+    const currentUser=async()=>{await giftPersistenceReady;if(giftAuth.currentUser)return giftAuth.currentUser;return new Promise(resolve=>{let done=false,off=()=>{},timer;const finish=user=>{if(done||!user)return;done=true;clearTimeout(timer);off();resolve(user)};timer=setTimeout(()=>{if(done)return;done=true;off();resolve(giftAuth.currentUser||null)},4000);off=giftAuth.onAuthStateChanged(finish);if(done)off();if(giftAuth.currentUser)finish(giftAuth.currentUser)})};
     async function giftRequest(path,data){const user=await currentUser();if(!user)throw new Error('Please sign in to continue.');const token=await user.getIdToken();const response=await fetch(`${giftApi}/${path}`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(data||{})});const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||'Could not complete request.');return result}
     document.getElementById('backButton').addEventListener('click',()=>{if(parent!==window)parent.postMessage({type:'culturewave-menu-back'},location.origin);else history.back()});
     const historyOverlay=document.getElementById('historyOverlay');
