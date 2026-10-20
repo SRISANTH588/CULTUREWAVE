@@ -149,6 +149,11 @@
     profileCard?.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
+      if (window.matchMedia('(min-width: 961px)').matches) {
+        closeMenu();
+        window.location.assign(new URL('edit-profile.html', window.location.href).href);
+        return;
+      }
       showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
     }, true);
 
@@ -168,6 +173,11 @@
       if (editProfileLink) {
         event.preventDefault();
         event.stopImmediatePropagation();
+        if (window.matchMedia('(min-width: 961px)').matches) {
+          closeMenu();
+          window.location.assign(new URL('edit-profile.html', window.location.href).href);
+          return;
+        }
         showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
         return;
       }
@@ -198,7 +208,13 @@
         const normalizedLabel = (textLabel || '').toLowerCase();
         const selectedView = link?.dataset.view || (normalizedLabel.includes('upcoming') ? 'upcoming' : normalizedLabel.includes('profile') || normalizedLabel.includes('account') ? 'profile' : 'bookings');
         target.searchParams.set('view', selectedView);
-        target.searchParams.set('embedded', 'menu');
+        if (window.matchMedia('(min-width: 961px)').matches) target.searchParams.delete('embedded');
+        else target.searchParams.set('embedded', 'menu');
+      }
+      if (window.matchMedia('(min-width: 961px)').matches) {
+        closeMenu();
+        window.location.assign(target.href);
+        return;
       }
       showMenuPage(target.href, isProfileLink ? 'Edit Profile' : textLabel);
     }, true);
@@ -206,6 +222,11 @@
       if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-card')) return;
       event.preventDefault();
       event.stopImmediatePropagation();
+      if (window.matchMedia('(min-width: 961px)').matches) {
+        closeMenu();
+        window.location.assign('edit-profile.html');
+        return;
+      }
       showMenuPage('edit-profile.html', 'Edit Profile');
     }, true);
     document.addEventListener('keydown', (event) => {
