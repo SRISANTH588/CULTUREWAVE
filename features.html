@@ -887,20 +887,24 @@
             <div class="ft-stat"><strong id="liveEventCount">Loading…</strong><span>Live Events</span></div>
             <div class="ft-stat"><strong>100%</strong><span>Uptime</span></div>
             <div class="ft-stat"><strong>6</strong><span>Payment Methods</span></div>
-            <div class="ft-stat"><strong id="bookingCount">Loading…</strong><span>Bookings</span></div>
+            <div class="ft-stat"><strong id="bookingCount">Loading…</strong><span>Tickets Booked</span></div>
           </div>
         </div>
       </div>
 
       <script type="module">
-        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
-        import { app } from './firebase.js';
-        const stats = httpsCallable(getFunctions(app, 'asia-south1'), 'getPublicSiteStats');
-        stats().then(({data}) => {
-          document.getElementById('liveEventCount').textContent = Number(data.liveEvents || 0).toLocaleString('en-IN');
-          document.getElementById('bookingCount').textContent = Number(data.bookings || 0).toLocaleString('en-IN');
+        import { db, collection, getDocs } from './firebase.js';
+        getDocs(collection(db, 'events')).then(snapshot => {
+          const events = snapshot.docs.map(event => event.data());
+          const liveEvents = events.filter(event => event.status === 'published').length;
+          const bookedTickets = events.reduce((total, event) => {
+            const ticketBooked = (event.tickets || []).reduce((sum, ticket) => sum + (Number(ticket.booked) || 0), 0);
+            return total + Math.max(Number(event.totalBooked) || 0, ticketBooked);
+          }, 0);
+          document.getElementById('liveEventCount').textContent = liveEvents.toLocaleString('en-IN');
+          document.getElementById('bookingCount').textContent = bookedTickets.toLocaleString('en-IN');
         }).catch(error => {
-          console.warn('Could not load public site stats:', error);
+          console.warn('Could not load public event stats:', error);
           document.getElementById('liveEventCount').textContent = '—';
           document.getElementById('bookingCount').textContent = '—';
         });

@@ -835,14 +835,6 @@ exports.getSignedAgreement = endpoint(async req => {
   return {previewUrl,downloadUrl,signedAt:a.signedAgreement.signedAt?.toDate?.()?.toISOString()||null,signingReference:a.signedAgreement.signingReference};
 });
 
-exports.getPublicSiteStats = endpoint(async () => {
-  const [eventsSnapshot, bookingsSnapshot] = await Promise.all([
-    db.collection('events').where('status', '==', 'published').count().get(),
-    db.collection('bookings').count().get(),
-  ]);
-  return {liveEvents: eventsSnapshot.data().count, bookings: bookingsSnapshot.data().count};
-});
-
 exports.signAgreement = endpoint(async req => {
   const token=clean(req.body.token,200), signature=String(req.body.signature||''), signerName=clean(req.body.signerName,180), signerAddress=clean(req.body.signerAddress,600), signingDate=clean(req.body.signingDate,10);
   if(!/^data:image\/png;base64,/.test(signature))throw new Error('Capture your signature before submitting.');
