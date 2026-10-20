@@ -113,12 +113,10 @@
 
     menu.querySelectorAll('[data-action="logout"]').forEach((link) => link.remove());
     menu.querySelector('.mobile-nav-logout-card')?.remove();
-    const supportGroup = Array.from(menu.querySelectorAll('.mobile-nav-group')).find((group) => group.querySelector('.mobile-nav-group-title')?.textContent.trim().toLowerCase() === 'support');
     const logoutCard = document.createElement('div');
     logoutCard.className = 'mobile-nav-card mobile-nav-logout-card';
     logoutCard.innerHTML = '<a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>';
-    if (supportGroup) supportGroup.insertAdjacentElement('afterend', logoutCard);
-    else menu.appendChild(logoutCard);
+    menu.appendChild(logoutCard);
 
     const closeMenu = () => {
       menu.classList.remove('open', 'showing-view');
@@ -437,10 +435,8 @@
       .mobile-nav-ctas .nav-link,.mobile-nav-ctas .nav-cta{display:flex;align-items:center;justify-content:center;min-height:48px;padding:.6rem!important;border:1px solid #38383b!important;border-radius:14px!important;background:#222!important;color:#fff!important;font-size:.8rem!important;font-weight:800!important;}
       body:has(.mobile-nav.open)>header,body:has(.mobile-nav.open)>main,body:has(.mobile-nav.open)>footer,body:has(.mobile-nav.open)>.mobile-bottom-nav{transform:none!important;}
     }
-    .mobile-nav-logout-card{position:fixed!important;right:0!important;bottom:0!important;z-index:1002!important;width:min(400px,38vw)!important;min-width:340px!important;max-width:none!important;margin:0!important;padding:.75rem 1rem calc(.75rem + env(safe-area-inset-bottom))!important;border:0!important;border-top:1px solid #343437!important;border-radius:0!important;background:#111!important;box-shadow:0 -10px 28px rgba(0,0,0,.32)!important;}
-    #mobileNav .mobile-nav-logout-card>a{min-height:52px!important;border:1px solid #38383b!important;border-radius:14px!important;background:#222!important;color:#fff!important;}
-    @media(min-width:961px){.mobile-nav{padding-bottom:6rem!important;}}
-    @media(max-width:960px){.mobile-nav{padding-bottom:calc(env(safe-area-inset-bottom) + 6rem)!important;}.mobile-nav-logout-card{width:100vw!important;min-width:0!important;}}
+    .mobile-nav-logout-card{position:static!important;flex:none!important;width:100%!important;max-width:760px!important;margin:0 auto 1.25rem!important;}
+    #mobileNav .mobile-nav-logout-card>a{min-height:58px!important;}
   `;
   document.head.appendChild(style);
   buildUnifiedMobileMenu();
