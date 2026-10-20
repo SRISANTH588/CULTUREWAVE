@@ -523,7 +523,6 @@
     <button class="sb-item" data-view="activity"><span class="si-icon">📋</span> Activity Log</button>
     <button class="sb-item" data-view="site-visibility"><span class="si-icon">👁️</span> Content Visibility</button>
     <button class="sb-item" data-view="settings"><span class="si-icon">⚙️</span> Settings</button>
-    <a class="sb-item" href="checkin.html" target="_blank"><span class="si-icon">📷</span> Check-In Scanner</a>
   </nav>
 
   <div class="sb-divider"></div>
@@ -1261,7 +1260,8 @@
         <option value="created">Created</option>
         <option value="refunded">Refunded</option>
       </select>
-      <span style="font-size:.76rem;color:var(--muted);margin-left:auto;" id="waCount">0 bookings</span>
+        <span style="font-size:.76rem;color:var(--muted);margin-left:auto;" id="waCount">0 bookings</span>
+        <button class="btn sm danger" id="waDeleteAllBtn" onclick="deleteAllWABookings()">🗑 Delete all</button>
     </div>
 
     <div class="wa-grid" id="waGrid">
@@ -1508,7 +1508,7 @@
 <script type="module">
 import { EMAILJS_AGREEMENT_TEMPLATE_ID } from './emailjs-agreement-config.js?v=20261005';
 import { CULTUREWAVE_AGREEMENT } from './agreement-template.js?v=20261005-agreement-text';
-import { runTransaction } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { runTransaction, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { app, auth, db, getCurrentUser, logout,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
   query, orderBy, limit, onSnapshot, serverTimestamp, getDocs, getDoc,
@@ -2661,6 +2661,35 @@ window.adminCancelBooking = async function(id, customerName, customerEmail, cust
       window.open('https://wa.me/91' + customerPhone.replace(/[^0-9]/g,'') + '?text=' + msg, '_blank');
     }
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
+
+window.deleteAllWABookings = async function() {
+  const confirmed = confirm('Permanently delete every booking and payment record from the database? This cannot be undone.');
+  if (!confirmed) return;
+  const button = document.getElementById('waDeleteAllBtn');
+  if (button) { button.disabled = true; button.textContent = 'Deleting…'; }
+  try {
+    const [bookingSnapshot, paymentSnapshot] = await Promise.all([
+      getDocs(collection(db, 'bookings')),
+      getDocs(collection(db, 'payments'))
+    ]);
+    const documents = [
+      ...bookingSnapshot.docs.map(snapshot => snapshot.ref),
+      ...paymentSnapshot.docs.map(snapshot => snapshot.ref)
+    ];
+    for (let start = 0; start < documents.length; start += 450) {
+      const batch = writeBatch(db);
+      documents.slice(start, start + 450).forEach(ref => batch.delete(ref));
+      await batch.commit();
+    }
+    waSentLog = {};
+    if (button) button.textContent = '🗑 Delete all';
+    showToast(`Deleted ${documents.length} booking and payment records`, 'success');
+  } catch (e) {
+    showToast('Could not delete all bookings: ' + e.message, 'error');
+  } finally {
+    if (button) button.disabled = false;
+  }
 };
 
 window.markWASent = function(id, who) {
