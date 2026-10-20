@@ -1010,7 +1010,7 @@ async function sendInvitationTicketEmail(ticket,url){
   const content=invitationEmailContent(ticket,url);
   return emailjs.send(INVITE_EMAIL_SERVICE,INVITE_EMAIL_TEMPLATE,{
     to_email:ticket.email,to_name:ticket.name,name:ticket.name,event_name:eventData?.name||'CultureWave event',
-    booking_url:url,guest_name:ticket.name,guest_email:ticket.email,
+    booking_url:url,invite_code:ticket.bookingId,guest_name:ticket.name,guest_email:ticket.email,
     guest_phone:ticket.phone||'Not provided',ticket_count:ticket.ticketCount,event_date:invitationEventDetails().date,
     event_time:invitationEventDetails().time,event_venue:invitationEventDetails().venue,
     time:new Date().toLocaleString('en-IN'),email:'support@culturewave.in',
