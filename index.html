@@ -2175,6 +2175,12 @@
     });
   }
   const _idb = firebase.firestore();
+  // Mobile Safari and some mobile networks can stall Firestore's streaming
+  // transport. Use short polling responses there so public homepage reads
+  // complete reliably on phones.
+  if(window.matchMedia('(max-width: 699px)').matches){
+    _idb.settings({experimentalForceLongPolling:true});
+  }
   const _banners = ['banner-a','banner-b','banner-c'];
   const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
 
