@@ -2207,9 +2207,10 @@
   function getHomepageEvents(){
     if(!homepageEventsPromise){
       const eventsRef=_idb.collection('events');
-      // Read the collection directly: Firestore orderBy('createdAt') silently
-      // omits older event documents that do not have a createdAt field.
-      homepageEventsPromise = eventsRef.get()
+      // Fetch only public listings so mobile does not download drafts and
+      // unrelated event records before it can render the homepage cards.
+      const limit=window.matchMedia('(max-width: 699px)').matches?50:200;
+      homepageEventsPromise = eventsRef.where('status','in',['published','live','active']).limit(limit).get()
         .then(snap => snap.docs)
         .catch(error => { homepageEventsPromise=null; throw error; });
     }
@@ -2220,13 +2221,23 @@
     const grid = document.getElementById('indexEventsGrid');
     const empty = document.getElementById('indexEventsEmpty');
     if(!grid) return;
+    if(empty){
+      empty.style.display='block';
+      empty.replaceChildren(document.createTextNode('Loading events…'));
+    }
     try {
       const allDocs=await getHomepageEvents();
       const upcoming=allDocs.filter(doc=>isPublishedEvent(doc.data()));
       // Keep the homepage event cards useful if all published dates are past
       // or have stale date metadata; the Events page still lists these items.
       const docs=(upcoming.length?upcoming:allDocs.filter(doc=>isPublicEventListing(doc.data()))).slice(0,12);
-      if(!docs.length){ empty.style.display=''; return; }
+      if(!docs.length){
+        if(empty){
+          empty.style.display='block';
+          empty.replaceChildren(document.createTextNode('No published events yet. Check back soon.'));
+        }
+        return;
+      }
       empty.style.display = 'none';
       grid.querySelectorAll('.ev-card').forEach(card=>card.remove());
       docs.forEach((doc, i) => renderEventCard(doc, i, grid));
