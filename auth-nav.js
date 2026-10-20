@@ -23,6 +23,15 @@
       menu.setAttribute('aria-label', 'Main menu');
       header.insertAdjacentElement('afterend', menu);
     }
+    const syncDesktopHeader = () => {
+      const desktop = window.matchMedia('(min-width: 961px)').matches;
+      header?.querySelectorAll('.auth-actions').forEach((actions) => {
+        if (desktop) actions.style.setProperty('display', 'none', 'important');
+        else actions.style.removeProperty('display');
+      });
+    };
+    syncDesktopHeader();
+    window.addEventListener('resize', syncDesktopHeader);
     if (!menu.querySelector('.mobile-nav-head')) {
       const menuHead = document.createElement('div');
       menuHead.className = 'mobile-nav-head';
