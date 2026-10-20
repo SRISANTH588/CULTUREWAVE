@@ -997,6 +997,49 @@ function invitationWhatsAppUrl(ticket,url){
   const recipient=phone.length===10?'91'+phone:phone;
   return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}${recipient?`&phone=${encodeURIComponent(recipient)}`:''}`;
 }
+function invitationEmailContent(ticket,url){
+  const details=invitationEventDetails();
+  const eventName=eventData?.name||'our event';
+  const subject=`Your invitation to ${eventName}`;
+  const message=[
+    `Hi ${ticket.name},`,
+    `You are invited to ${eventName}.`,
+    details.message,
+    `Date: ${details.date}`,
+    `Time: ${details.time}`,
+    `Venue: ${details.venue}`,
+    `Guest: ${ticket.name}`,
+    `Email: ${ticket.email}`,
+    `Phone: ${ticket.phone||'Not provided'}`,
+    `Tickets: ${ticket.ticketCount}`,
+    `Invitation ID: ${ticket.bookingId}`,
+    `Open your invitation and QR guest pass: ${url}`
+  ].join('\n\n');
+  const html=`<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#211d1a;line-height:1.65"><h1 style="color:#351923">You’re invited</h1><p>Hi ${esc(ticket.name)},</p><p>You are invited to <strong>${esc(eventName)}</strong>.</p><p>${esc(details.message).replace(/\n/g,'<br>')}</p><table style="border-collapse:collapse;width:100%;margin:22px 0"><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Date</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${esc(details.date)}</strong></td></tr><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Time</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${esc(details.time)}</strong></td></tr><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Venue</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${esc(details.venue)}</strong></td></tr><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Guest</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${esc(ticket.name)}</strong></td></tr><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Tickets</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${ticket.ticketCount}</strong></td></tr><tr><td style="padding:8px">Invitation ID</td><td style="padding:8px"><strong>${esc(ticket.bookingId)}</strong></td></tr></table><p><a href="${url.replace(/&/g,'&amp;')}" style="display:inline-block;padding:12px 20px;background:#64283b;color:#fff;text-decoration:none;font-weight:bold">Open your invitation &amp; QR pass</a></p><p style="font-size:12px;color:#777068">Guest email: ${esc(ticket.email)} · Phone: ${esc(ticket.phone||'Not provided')}</p></div>`;
+  return {subject,message,message_html:html};
+}
+async function sendInvitationTicketEmail(ticket,url){
+  const content=invitationEmailContent(ticket,url);
+  return emailjs.send(INVITE_EMAIL_SERVICE,INVITE_EMAIL_TEMPLATE,{
+    to_email:ticket.email,to_name:ticket.name,name:ticket.name,event_name:eventData?.name||'CultureWave event',
+    booking_url:url,invite_code:ticket.bookingId,guest_name:ticket.name,guest_email:ticket.email,
+    guest_phone:ticket.phone||'Not provided',ticket_count:ticket.ticketCount,event_date:invitationEventDetails().date,
+    event_time:invitationEventDetails().time,event_venue:invitationEventDetails().venue,
+    ...content,reply_to:'support@culturewave.in'
+  });
+}
+window.resendInvitationTicketEmail=async function(id,button){
+  let ticket=allBookings.find(item=>item.id===id||item.bookingId===id);
+  if(!ticket){try{const snapshot=await db.collection('bookings').doc(id).get();if(snapshot.exists)ticket={id:snapshot.id,...snapshot.data()};}catch(_){}}
+  if(!ticket?.customerEmail){showToast('This invitation has no guest email address');return;}
+  if(button){button.disabled=true;button.textContent='Sending…';}
+  try{
+    const emailTicket={bookingId:ticket.bookingId||ticket.id,name:bookingName(ticket),email:bookingEmail(ticket),phone:bookingPhone(ticket),ticketCount:Number(ticket.seats||ticket.tickets||1)};
+    await sendInvitationTicketEmail(emailTicket,invitationPageUrl(emailTicket));
+    if(button){button.textContent='Email sent';button.disabled=true;}
+    showToast('Invitation email sent');
+  }catch(error){console.error('Invitation email resend failed:',error);if(button){button.disabled=false;button.textContent='Retry email';}showToast('Email could not be sent. Please retry.');}
+};
 
 function bookingName(b){return b.customerName||b.customer?.name||b.customer?.fullName||b.buyerName||b.buyer?.name||b.attendeeName||b.fullName||b.name||'Guest';}
 function bookingPhone(b){return b.customerPhone||b.customer?.phone||b.buyerPhone||b.buyer?.phone||b.phone||'';}
@@ -1808,7 +1851,7 @@ window.addInvitationRow=function(){
   const id=++invitationRowCount;
   const row=document.createElement('div');row.className='invitation-row';row.dataset.invitationRow=String(id);
   row.style.cssText='display:grid;grid-template-columns:1.2fr 1.3fr 1fr 1.2fr auto;gap:.55rem;align-items:end;padding:.8rem;background:#f8f9fa;border:1px solid var(--border);border-radius:10px;';
-  row.innerHTML=`<label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">GUEST NAME<input data-field="name" autocomplete="name" placeholder="Guest name" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">EMAIL<input data-field="email" type="email" autocomplete="email" placeholder="guest@example.com" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">PHONE<input data-field="phone" type="tel" autocomplete="tel" placeholder="Phone (optional)" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">NUMBER OF TICKETS<input data-field="ticketCount" type="number" min="1" max="249" step="1" value="1" inputmode="numeric" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><button type="button" aria-label="Remove guest" title="Remove guest" onclick="this.closest('.invitation-row').remove()" style="padding:.55rem;color:#c92a2a;font-size:1.1rem;">×</button>`;
+  row.innerHTML=`<label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">GUEST NAME *<input data-field="name" autocomplete="name" required placeholder="Guest name" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">EMAIL *<input data-field="email" type="email" autocomplete="email" required placeholder="guest@example.com" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">PHONE<input data-field="phone" type="tel" autocomplete="tel" placeholder="Phone (optional)" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">NUMBER OF TICKETS *<input data-field="ticketCount" type="number" min="1" max="249" step="1" value="1" inputmode="numeric" required style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><button type="button" aria-label="Remove guest" title="Remove guest" onclick="this.closest('.invitation-row').remove()" style="padding:.55rem;color:#c92a2a;font-size:1.1rem;">×</button>`;
   host.appendChild(row);
 };
 
@@ -1825,11 +1868,12 @@ window.issueInvitations=async function(){
     ticketCount:Number(row.querySelector('[data-field="ticketCount"]').value||0)
   }));
   if(!guests.length||guests.some(guest=>!guest.name)){status.textContent='Enter a name for every guest before generating tickets.';return;}
+  if(guests.some(guest=>!guest.email)){status.textContent='Enter an email address for every guest so we can send their invitation.';return;}
   if(guests.some(guest=>!Number.isInteger(guest.ticketCount)||guest.ticketCount<1)){status.textContent='Enter at least one ticket for every guest.';return;}
   const totalTickets=guests.reduce((total,guest)=>total+guest.ticketCount,0);
   if(totalTickets>249){status.textContent='Generate invitations for up to 249 tickets at a time.';return;}
-  if(guests.some(guest=>guest.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email))){status.textContent='Check the email address format and try again.';return;}
-  button.disabled=true;button.textContent='Generating…';status.textContent='Creating one attendee invitation per guest…';
+  if(guests.some(guest=>!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email))){status.textContent='Check the email address format and try again.';return;}
+  button.disabled=true;button.textContent='Generating…';status.textContent='Creating tickets…';
   try{
     const batch=db.batch();const issued=[];
     guests.forEach(guest=>{
@@ -1850,13 +1894,19 @@ window.issueInvitations=async function(){
     });
     batch.update(db.collection('events').doc(eventId),{totalBooked:firebase.firestore.FieldValue.increment(totalTickets)});
     await batch.commit();
+    let emailed=0, emailFailed=0;
+    for(const ticket of issued){
+      status.textContent=`Sending invitation emails (${emailed+emailFailed+1}/${issued.length})…`;
+      try{await sendInvitationTicketEmail(ticket,invitationPageUrl(ticket));ticket.emailSent=true;emailed++;}
+      catch(error){console.error('Invitation email failed:',ticket.email,error);ticket.emailSent=false;emailFailed++;}
+    }
     const list=document.getElementById('issuedInvitationTickets');
     list.innerHTML=issued.map(ticket=>{
       const url=invitationPageUrl({...ticket,status:'confirmed'});
       const whatsappUrl=invitationWhatsAppUrl(ticket,url);
-      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.85rem 1rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:800;">${esc(ticket.name)}</div><div style="font-size:.76rem;color:var(--muted);">${ticket.ticketCount} ticket${ticket.ticketCount===1?'':'s'} assigned to this guest · ${esc(ticket.bookingId)}</div></div><div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite page</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Send WhatsApp invite</a></div></div>`;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.85rem 1rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:800;">${esc(ticket.name)}</div><div style="font-size:.76rem;color:var(--muted);">${ticket.ticketCount} ticket${ticket.ticketCount===1?'':'s'} · ${esc(ticket.email)} · ${ticket.emailSent?'Email sent':'Email failed'} · ${esc(ticket.bookingId)}</div></div><div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite page</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Send WhatsApp invite</a>${ticket.emailSent?'':`<button class="tb-btn" type="button" onclick="resendInvitationTicketEmail('${ticket.bookingId}',this)">Retry email</button>`}</div></div>`;
     }).join('');
-    status.textContent=`${issued.length} guest invitation${issued.length===1?'':'s'} created with ${totalTickets} ticket${totalTickets===1?'':'s'} assigned across those guests.`;
+    status.textContent=emailFailed?`${issued.length} invitation${issued.length===1?'':'s'} created; ${emailed} email${emailed===1?'':'s'} sent and ${emailFailed} failed. Use Retry email for failed messages.`:`${issued.length} invitation${issued.length===1?'':'s'} created; all ${emailed} email${emailed===1?'':'s'} sent with ${totalTickets} ticket${totalTickets===1?'':'s'} assigned.`;
     document.getElementById('invitationRows').innerHTML='';addInvitationRow();
   }catch(error){console.error('Could not issue invitation tickets:',error);status.textContent=error.code==='permission-denied'?'Could not create tickets. Confirm you are signed in as the event owner and retry.':'Ticket generation failed. Please retry.';}
   finally{button.disabled=false;button.textContent='Generate tickets';}
