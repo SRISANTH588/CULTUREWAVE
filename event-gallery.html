@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#05070c">
+  <title>Gallery | CultureWave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;font-family:Manrope,Arial,sans-serif;background:#05070c;color:#f7f8fb;font-synthesis:none}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:#05070c;color:#f7f8fb;font-family:Manrope,Arial,sans-serif}
+    button{font:inherit}
+    .page{width:min(100%,760px);min-height:100vh;margin:auto;padding:calc(env(safe-area-inset-top) + 24px) 28px calc(env(safe-area-inset-bottom) + 32px)}
+    .heading{display:flex;align-items:center;gap:20px;min-height:58px}
+    .back{display:grid;place-items:center;width:36px;height:42px;margin-left:-8px;padding:0;border:0;background:transparent;color:#b9bdc8;cursor:pointer}
+    .back svg{width:30px;height:30px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    h1{margin:0;font-size:1.32rem;line-height:1.25;font-weight:800;letter-spacing:-.045em}
+    .count{margin:5px 0 0;color:#858b98;font-size:.9rem;font-weight:500}
+    .tabs{display:flex;gap:76px;margin:56px -28px 32px;padding:0 34px;border-bottom:1px solid #292d36}
+    .tab{position:relative;min-width:82px;padding:10px 0 18px;border:0;background:none;color:#858a95;text-align:center;font-size:1.08rem;font-weight:700;cursor:pointer}
+    .tab[aria-selected="true"]{color:#f5f6f8}
+    .tab[aria-selected="true"]::after{position:absolute;right:0;bottom:-1px;left:0;height:6px;border-radius:7px 7px 0 0;background:#ff5a19;content:""}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+    .tile{position:relative;display:block;overflow:hidden;aspect-ratio:1;border:0;border-radius:30px;background:#11141b;color:#f7f8fb;cursor:pointer}
+    .tile img,.tile video,.tile iframe{display:block;width:100%;height:100%;border:0;object-fit:cover}
+    .tile iframe{pointer-events:none}
+    .tile .play{position:absolute;top:50%;left:50%;display:grid;width:54px;height:54px;place-items:center;transform:translate(-50%,-50%);border:1px solid #ffffff55;border-radius:50%;background:#05070c9c;font-size:1.3rem}
+    .layout-panel{min-height:240px;overflow:auto;border-radius:26px;background:#101319;padding:20px}
+    .layout-panel img{display:block;width:100%;max-height:72vh;object-fit:contain;border-radius:16px}
+    .layout-empty,.empty{grid-column:1/-1;padding:54px 18px;color:#858b98;text-align:center;font-size:.92rem}
+    .empty{padding-top:100px}
+    .lightbox{position:fixed;inset:0;z-index:5;display:none;place-items:center;padding:20px;background:#000e}
+    .lightbox.open{display:grid}
+    .lightbox img,.lightbox video{max-width:100%;max-height:88vh;border-radius:16px;object-fit:contain}
+    .close{position:absolute;top:max(18px,env(safe-area-inset-top));right:18px;width:44px;height:44px;border:0;border-radius:50%;background:#242832;color:white;font-size:1.7rem;cursor:pointer}
+    @media(max-width:480px){.page{padding-right:28px;padding-left:28px}.tabs{margin-top:50px}.grid{gap:28px}.tile{border-radius:28px}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="heading">
+      <button class="back" type="button" onclick="goBack()" aria-label="Back to event"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6M9 12h12"/></svg></button>
+      <div><h1>Gallery</h1><p class="count" id="mediaCount">Loading photos &amp; videos…</p></div>
+    </header>
+    <nav class="tabs" aria-label="Gallery categories">
+      <button class="tab" type="button" id="allTab" aria-selected="true" onclick="selectTab('all')">All</button>
+      <button class="tab" type="button" id="layoutTab" aria-selected="false" onclick="selectTab('layout')">Layout</button>
+    </nav>
+    <section class="grid" id="mediaGrid" aria-label="Event photos and videos"></section>
+    <section class="layout-panel" id="layoutPanel" hidden></section>
+  </main>
+  <div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()"><button class="close" type="button" aria-label="Close" onclick="closeLightbox()">×</button><div id="lightboxContent"></div></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",authDomain:"ogshootsluxe-36740.firebaseapp.com",projectId:"ogshootsluxe-36740",storageBucket:"ogshootsluxe-36740.firebasestorage.app",messagingSenderId:"5471814825",appId:"1:5471814825:web:07e84f2f88486da817d5b8"});
+    const db=firebase.firestore();
+    const params=new URLSearchParams(location.search);
+    const eventId=params.get('eventId');
+    const backPath=params.get('back');
+    let media=[];
+    function goBack(){
+      if(backPath&&backPath.startsWith('/')&&!backPath.startsWith('//'))location.href=backPath;
+      else if(document.referrer&&new URL(document.referrer).origin===location.origin)history.back();
+      else location.href='index.html';
+    }
+    function selectTab(tab){
+      const all=tab==='all';
+      document.getElementById('allTab').setAttribute('aria-selected',String(all));
+      document.getElementById('layoutTab').setAttribute('aria-selected',String(!all));
+      document.getElementById('mediaGrid').hidden=!all;
+      document.getElementById('layoutPanel').hidden=all;
+    }
+    function safeUrl(value){
+      const raw=String(value||'').trim();
+      if(!raw)return '';
+      try{const url=new URL(raw,location.href);return ['http:','https:','blob:'].includes(url.protocol)?url.href:'';}catch{return '';}
+    }
+    function openMedia(item){
+      const box=document.getElementById('lightboxContent');
+      box.replaceChildren();
+      const node=document.createElement(item.type==='video'?'video':'img');
+      node.src=item.src;node.alt=item.alt||'Event gallery media';
+      if(item.type==='video'){node.controls=true;node.autoplay=true;node.playsInline=true;}
+      box.append(node);document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lightboxContent').replaceChildren();}
+    function mediaFrom(data){
+      const poster=data.cardImgUrl||data.coverUrl||'';
+      const raw=data.galleryImages||data.gallery||data.photos||[];
+      const values=Array.isArray(raw)?raw:[];
+      const list=[];
+      [poster,...values].forEach(entry=>{
+        const item=typeof entry==='string'?{src:entry,type:'image'}:entry&&typeof entry==='object'?{src:entry.src||entry.url||entry.image||entry.videoUrl,type:entry.type||((entry.video||entry.videoUrl)?'video':'image')}:null;
+        const src=safeUrl(item?.src);if(src&&!list.some(existing=>existing.src===src))list.push({...item,src});
+      });
+      const video=safeUrl(data.videoUrl);
+      if(video&&!list.some(item=>item.src===video)){
+        if(/\.(mp4|webm|mov)(\?|$)/i.test(video))list.push({src:video,type:'video'});
+        else if(/youtube\.com|youtu\.be|vimeo\.com/i.test(video))list.push({src:video,type:'embed'});
+      }
+      return list;
+    }
+    function renderMedia(){
+      const grid=document.getElementById('mediaGrid');grid.replaceChildren();
+      document.getElementById('mediaCount').textContent=`${media.length} ${media.length===1?'image or video':'images & videos'}`;
+      if(!media.length){grid.innerHTML='<p class="empty">No photos or videos have been added to this event yet.</p>';return;}
+      media.forEach((item,index)=>{
+        const tile=document.createElement('button');tile.type='button';tile.className='tile';tile.setAttribute('aria-label',`${item.type==='video'?'Play':'View'} gallery item ${index+1}`);
+        if(item.type==='embed'){
+          const thumb=document.createElement('img');thumb.src=media.find(m=>m.type==='image')?.src||'';thumb.alt=`${eventName} video`;tile.append(thumb);
+          const play=document.createElement('span');play.className='play';play.textContent='▶';tile.append(play);
+        }else{
+          const visual=document.createElement(item.type==='video'?'video':'img');visual.src=item.src;visual.alt=`${eventName} ${item.type==='video'?'video':'photo'} ${index+1}`;
+          if(item.type==='video'){visual.muted=true;visual.playsInline=true;visual.preload='metadata';}
+          tile.append(visual);if(item.type==='video'){const play=document.createElement('span');play.className='play';play.textContent='▶';tile.append(play);}
+        }
+        tile.addEventListener('click',()=>{
+          if(item.type==='embed')window.open(item.src,'_blank','noopener');
+          else openMedia(item);
+        });grid.append(tile);
+      });
+    }
+    function renderLayout(data){
+      const panel=document.getElementById('layoutPanel');
+      if(data.seatingPlanUrl){const img=document.createElement('img');img.src=data.seatingPlanUrl;img.alt='Event seating layout';panel.append(img);return;}
+      const plan=data.seatingPlan||{};
+      if(Array.isArray(plan.sections)&&plan.sections.length){
+        const canvas=document.createElement('div');canvas.style.cssText='position:relative;min-width:420px;height:420px;border-radius:16px;background:#080b11;overflow:hidden';
+        plan.sections.forEach(section=>{const box=document.createElement('div');box.textContent=section.name||'Section';box.style.cssText=`position:absolute;left:${Number(section.x)||0}%;top:${Number(section.y)||0}%;width:${Number(section.width)||20}%;height:${Number(section.height)||14}%;display:grid;place-items:center;padding:8px;border:1px solid #ffffff66;border-radius:${section.shape==='rounded'?'18px':'5px'};background:${/^#[\da-f]{3,8}$/i.test(section.color||'')?section.color:'#3155a3'};color:white;font-weight:800;text-align:center`;canvas.append(box);});panel.append(canvas);return;
+      }
+      if(Array.isArray(plan.rows)&&plan.rows.length){
+        const stage=document.createElement('div');stage.className='layout-stage';stage.textContent=plan.stage||'STAGE';stage.style.cssText='padding:12px;margin-bottom:18px;border-radius:9px;background:#202b48;text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.12em';panel.append(stage);
+        plan.rows.forEach(row=>{const rowEl=document.createElement('div');rowEl.style.cssText='display:flex;align-items:center;gap:10px;margin:14px 0;min-width:420px';const label=document.createElement('b');label.textContent=row.label||'';label.style.color='#abb2c2';rowEl.append(label);const seats=document.createElement('div');seats.style.cssText='display:flex;flex-wrap:wrap;gap:6px';const count=Math.max(1,Math.min(100,Number(row.seats)||1));for(let i=0;i<count;i++){const seat=document.createElement('span');seat.textContent=`${row.label||''}${i+1}`;seat.style.cssText='display:grid;place-items:center;min-width:30px;height:30px;padding:0 5px;border-radius:7px;background:#dce6ff;color:#1242c5;font-size:.6rem;font-weight:800';seats.append(seat);}rowEl.append(seats);panel.append(rowEl);});return;
+      }
+      panel.innerHTML='<p class="layout-empty">No seating layout has been added to this event.</p>';
+    }
+    let eventName='Event';
+    async function init(){
+      if(!eventId){document.getElementById('mediaCount').textContent='Event not found';return;}
+      try{
+        const snap=await db.collection('events').doc(eventId).get();
+        if(!snap.exists){document.getElementById('mediaCount').textContent='Event not found';return;}
+        const data=snap.data();eventName=data.name||'Event';document.title=`Gallery | ${eventName} | CultureWave`;
+        media=mediaFrom(data);renderMedia();renderLayout(data);
+      }catch(error){console.error('Unable to load event gallery:',error);document.getElementById('mediaCount').textContent='Unable to load gallery';document.getElementById('mediaGrid').innerHTML='<p class="empty">Please go back to the event page and try again.</p>';}
+    }
+    init();
+  </script>
+</body>
+</html>
