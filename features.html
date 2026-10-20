@@ -849,13 +849,27 @@
             <p>From small workshops to large exhibitions — CultureWave handles the booking and payment flow so you can focus on the event itself.</p>
           </div>
           <div class="ft-highlight-stats">
-            <div class="ft-stat"><strong>5+</strong><span>Live Events</span></div>
+            <div class="ft-stat"><strong id="liveEventCount">Loading…</strong><span>Live Events</span></div>
             <div class="ft-stat"><strong>100%</strong><span>Uptime</span></div>
             <div class="ft-stat"><strong>6</strong><span>Payment Methods</span></div>
-            <div class="ft-stat"><strong>∞</strong><span>Bookings</span></div>
+            <div class="ft-stat"><strong id="bookingCount">Loading…</strong><span>Bookings</span></div>
           </div>
         </div>
       </div>
+
+      <script type="module">
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
+        import { app } from './firebase.js';
+        const stats = httpsCallable(getFunctions(app, 'asia-south1'), 'getPublicSiteStats');
+        stats().then(({data}) => {
+          document.getElementById('liveEventCount').textContent = Number(data.liveEvents || 0).toLocaleString('en-IN');
+          document.getElementById('bookingCount').textContent = Number(data.bookings || 0).toLocaleString('en-IN');
+        }).catch(error => {
+          console.warn('Could not load public site stats:', error);
+          document.getElementById('liveEventCount').textContent = '—';
+          document.getElementById('bookingCount').textContent = '—';
+        });
+      </script>
 
       <!-- HOW IT WORKS -->
       <section class="ft-section" style="padding-top: 0;">
