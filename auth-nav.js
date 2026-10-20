@@ -154,6 +154,7 @@
     };
 
     profileCard?.addEventListener('click', (event) => {
+      if (!event.target.closest('.mobile-profile-arrow')) return;
       event.preventDefault();
       event.stopPropagation();
       showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
@@ -239,9 +240,11 @@
     const profileName = document.querySelector('.mobile-profile-name');
     const profileContact = document.querySelector('.mobile-profile-contact');
     const profileProgress = document.querySelector('.mobile-profile-progress');
+    const profilePrompt = document.querySelector('.mobile-profile-prompt > span');
     if (profileName) profileName.textContent = user?.displayName || user?.email?.split('@')[0] || 'CultureWave member';
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
     if (profileProgress) profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile';
+    if (profilePrompt) profilePrompt.textContent = user ? 'Edit profile' : 'Complete your profile, so we can surprise you on your special days!';
     if (hamburger) {
       const initial = (user?.displayName || user?.email || 'U').trim().charAt(0).toUpperCase() || 'U';
       hamburger.dataset.initial = initial;
