@@ -14,6 +14,20 @@
   "hosting": {
     "public": ".",
     "ignore": ["firebase.json", "**/.*", ".git/**", "**/.git/**", "**/node_modules/**"],
+    "headers": [
+      {
+        "source": "/",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, no-store, max-age=0, must-revalidate"}
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, no-store, max-age=0, must-revalidate"}
+        ]
+      }
+    ],
     "rewrites": [
       { "source": "/event/**", "destination": "/event-detail.html" },
       { "source": "/stall-create", "destination": "/stall-create.html" }
