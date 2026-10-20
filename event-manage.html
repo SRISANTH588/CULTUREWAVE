@@ -997,32 +997,22 @@ function invitationWhatsAppUrl(ticket,url){
   const recipient=phone.length===10?'91'+phone:phone;
   return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}${recipient?`&phone=${encodeURIComponent(recipient)}`:''}`;
 }
-function invitationEmailContent(ticket,url){
+function invitationEmailContent(){
   const details=invitationEventDetails();
   const eventName=eventData?.name||'our event';
   const subject=`Your invitation to ${eventName}`;
-  const message=[
-    `Hi ${ticket.name},`,
-    `You are invited to ${eventName}.`,
-    details.message,
-    `Date: ${details.date}`,
-    `Time: ${details.time}`,
-    `Venue: ${details.venue}`,
-    `Guest: ${ticket.name}`,
-    `Email: ${ticket.email}`,
-    `Phone: ${ticket.phone||'Not provided'}`,
-    `Tickets: ${ticket.ticketCount}`,
-    `Invitation ID: ${ticket.bookingId}`,
-    `Open your invitation and QR guest pass: ${url}`
-  ].join('\n\n');
-  const html=`<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#211d1a;line-height:1.65"><h1 style="color:#351923">You’re invited</h1><p>Hi ${esc(ticket.name)},</p><p>You are invited to <strong>${esc(eventName)}</strong>.</p><p>${esc(details.message).replace(/\n/g,'<br>')}</p><table style="border-collapse:collapse;width:100%;margin:22px 0"><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Date</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${esc(details.date)}</strong></td></tr><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Time</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${esc(details.time)}</strong></td></tr><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Venue</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${esc(details.venue)}</strong></td></tr><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Guest</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${esc(ticket.name)}</strong></td></tr><tr><td style="padding:8px;border-bottom:1px solid #e7dccb">Tickets</td><td style="padding:8px;border-bottom:1px solid #e7dccb"><strong>${ticket.ticketCount}</strong></td></tr><tr><td style="padding:8px">Invitation ID</td><td style="padding:8px"><strong>${esc(ticket.bookingId)}</strong></td></tr></table><p><a href="${url.replace(/&/g,'&amp;')}" style="display:inline-block;padding:12px 20px;background:#64283b;color:#fff;text-decoration:none;font-weight:bold">Open your invitation &amp; QR pass</a></p><p style="font-size:12px;color:#777068">Guest email: ${esc(ticket.email)} · Phone: ${esc(ticket.phone||'Not provided')}</p></div>`;
+  // The EmailJS template already renders the guest greeting, event facts,
+  // ticket count and invitation button. Keep this field to the invitation note
+  // so those details and the link are not repeated in the message body.
+  const message=details.message;
+  const html=`<div style="font-family:Arial,sans-serif;color:#59524b;line-height:1.7">${esc(details.message).replace(/\n/g,'<br>')}</div>`;
   return {subject,message,message_html:html};
 }
 async function sendInvitationTicketEmail(ticket,url){
-  const content=invitationEmailContent(ticket,url);
+  const content=invitationEmailContent();
   return emailjs.send(INVITE_EMAIL_SERVICE,INVITE_EMAIL_TEMPLATE,{
     to_email:ticket.email,to_name:ticket.name,name:ticket.name,event_name:eventData?.name||'CultureWave event',
-    booking_url:url,invite_code:ticket.bookingId,guest_name:ticket.name,guest_email:ticket.email,
+    booking_url:url,guest_name:ticket.name,guest_email:ticket.email,
     guest_phone:ticket.phone||'Not provided',ticket_count:ticket.ticketCount,event_date:invitationEventDetails().date,
     event_time:invitationEventDetails().time,event_venue:invitationEventDetails().venue,
     time:new Date().toLocaleString('en-IN'),email:'support@culturewave.in',
