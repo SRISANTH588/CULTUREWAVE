@@ -226,7 +226,9 @@
     });
     document.querySelectorAll('.auth-actions .nav-cta').forEach((link) => {
       link.href = link.dataset.defaultAccountHref || 'login.html';
-      link.textContent = link.dataset.defaultAccountText || 'Get Started';
+      // Keep the desktop actions distinct after login: the first opens the
+      // account, while the second remains the site's Get Started action.
+      link.textContent = 'Get Started';
       link.setAttribute('aria-label', 'Get started');
     });
   }
