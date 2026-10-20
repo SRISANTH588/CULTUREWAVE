@@ -1396,6 +1396,15 @@
 
 <!-- ══ MODALS ══ -->
 
+<!-- Transaction Person Details Modal -->
+<div class="modal-overlay" id="transactionPersonModal">
+  <div class="modal">
+    <h3>👤 Person Details</h3>
+    <div id="transactionPersonDetail"></div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('transactionPersonModal')">Close</button></div>
+  </div>
+</div>
+
 <!-- User Modal -->
 <div class="modal-overlay" id="userModal">
   <div class="modal">
@@ -2015,10 +2024,28 @@ function renderPaymentsTable(payments) {
     <td><span class="badge ${p.status==='paid'?'green':p.status==='refunded'?'blue':p.status==='refund_pending'?'orange':'yellow'}">${esc(p.status||'created')}</span></td>
     <td style="font-size:.76rem;color:var(--muted);">${fmtDate(p.createdAt)}</td>
     <td><div class="btn-row">
+      <button class="btn sm" title="View person details" aria-label="View person details" onclick="viewTransactionPerson('${p.id}')">⋮</button>
       ${p.isStallApplication?'<span class="badge blue">Stall fee</span>':`<button class="btn sm" onclick="openRefundFor('${p.id}')">Refund</button><button class="btn sm danger" onclick="archivePayment('${p.id}')">Archive</button>`}
     </div></td>
   </tr>`).join('');
 }
+window.viewTransactionPerson = function(id) {
+  const payment = allPayments.find(item => item.id === id) || {};
+  const booking = allBookingsCol.find(item => item.id === id || item.paymentId === id || item.bookingId === id) || {};
+  const stall = allStallApplications.find(item => item.paymentId === id) || {};
+  const person = {...booking, ...stall, ...payment};
+  const rows = [
+    ['Name', person.customerName || person.customer?.name || person.contactName || person.name || person.userName],
+    ['Email', person.customerEmail || person.customer?.email || person.contactEmail || person.email],
+    ['Phone', person.customerPhone || person.customer?.phone || person.contactPhone || person.phone || person.mobile],
+    ['User ID', person.customerId || person.userId || person.uid || person.customer?.uid],
+    ['Event / booking', person.eventName || person.event?.name || person.event || person.restaurantName || person.serviceName],
+    ['Booking ID', person.bookingId || person.id],
+    ['Payment ID', person.paymentId || person.id]
+  ];
+  document.getElementById('transactionPersonDetail').innerHTML = `<div style="display:grid;gap:.7rem;">${rows.map(([label,value])=>`<div style="padding:.65rem .75rem;border:1px solid var(--border);border-radius:10px;"><small style="display:block;color:var(--muted);margin-bottom:.2rem;">${label}</small><strong style="font-size:.84rem;overflow-wrap:anywhere;">${esc(typeof value==='string'?value:value?.name||'—')}</strong></div>`).join('')}</div>`;
+  openModal('transactionPersonModal');
+};
 function stallApplicationTransactions(){return allStallApplications.filter(a=>a.paymentStatus==='captured'&&a.paymentId).map(a=>({id:a.paymentId,receipt:a.paymentId,eventId:a.eventId,eventName:a.eventName,amount:Number(a.fee)||0,status:'paid',createdAt:a.createdAt,customerName:a.contactName,customerEmail:a.email,customerPhone:a.phone,paymentId:a.paymentId,isStallApplication:true}));}
 window.filterPayments = function() {
   const q = document.getElementById('paymentSearch').value.toLowerCase();
