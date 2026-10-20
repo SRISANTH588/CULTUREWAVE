@@ -494,6 +494,20 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Phone</div>
         <div style="font-size:.88rem;font-weight:600;color:var(--text);" id="ciConfirmPhone">—</div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+        <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Seats</div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--text);" id="ciConfirmSeats">—</div>
+        </div>
+        <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Amount Paid</div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--text);" id="ciConfirmAmount">—</div>
+        </div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Payment</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--text);" id="ciConfirmPayment">—</div>
+      </div>
       <div id="ciModalReason" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:.75rem 1rem;color:#9a3412;font-size:.8rem;line-height:1.45;"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.25rem;" id="ciModalBtns">
         <button onclick="cancelCiConfirm()" style="padding:.75rem;border-radius:10px;background:#f1f3f5;border:0;font-weight:700;font-size:.88rem;cursor:pointer;color:#495057;">Cancel</button>
@@ -1593,6 +1607,12 @@ function showCiModal(b,type){
   document.getElementById('ciConfirmName').textContent=name;
   document.getElementById('ciConfirmEmail').textContent=email;
   document.getElementById('ciConfirmPhone').textContent=phone;
+  const rawSeats=b?(b.seats??b.ticketCount??b.tickets??1):null;
+  const seatText=Array.isArray(rawSeats)?`${rawSeats.length} (${rawSeats.join(', ')})`:typeof rawSeats==='string'&&!/^\d+$/.test(rawSeats.trim())?`${rawSeats.split(',').filter(Boolean).length} (${rawSeats})`:`${Number(rawSeats)||1}`;
+  document.getElementById('ciConfirmSeats').textContent=b?seatText+(Number(Array.isArray(rawSeats)?rawSeats.length:rawSeats)===1?' seat':' seats'):'—';
+  const amount=Number(b?.amount||0);
+  document.getElementById('ciConfirmAmount').textContent=b?(amount>0?money(amount):'Free'):'—';
+  document.getElementById('ciConfirmPayment').textContent=b?(b.method||b.paymentMethod||b.payment?.method||'—'):'—';
   const hdr=document.getElementById('ciModalHeader');
   const title=document.getElementById('ciModalTitle');
   const sub=document.getElementById('ciModalSub');
