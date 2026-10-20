@@ -1790,6 +1790,20 @@ function updateBadges() {
 }
 
 // ── STATS ──
+function updateEventStats() {
+  const published = allEvents.filter(e => String(e.status || '').toLowerCase() === 'published').length;
+  const drafts = allEvents.filter(e => !e.status || String(e.status).toLowerCase() === 'draft').length;
+  const totalPrice = allEvents.reduce((sum, event) => {
+    const rawPrice = event.price ?? event.ticketPrice ?? 0;
+    const price = Number(String(rawPrice).replace(/[^\d.-]/g, ''));
+    return sum + (Number.isFinite(price) ? price : 0);
+  }, 0);
+  document.getElementById('evTotal').textContent = allEvents.length;
+  document.getElementById('evPublished').textContent = published;
+  document.getElementById('evDrafts').textContent = drafts;
+  document.getElementById('evAvgPrice').textContent = money(allEvents.length ? totalPrice / allEvents.length : 0);
+}
+
 function updateStats() {
   const revenue = allPayments.filter(p=>p.status==='paid').reduce((s,p)=>s+Number(p.amount||0),0);
   const pendingRefunds = allPayments.filter(p=>p.status==='refund_pending'||p.status==='review').length;
@@ -1808,6 +1822,7 @@ function updateStats() {
   document.getElementById('statCampaigns').textContent = allCampaigns.length;
   document.getElementById('statWebReqs').textContent = pendingReqs;
   document.getElementById('statCredits').textContent = totalCredits.toLocaleString('en-IN');
+  updateEventStats();
   updateBadges();
 }
 
@@ -2658,6 +2673,7 @@ function renderWAGrid(bookings) {
             ✔️ Sent
           </button>
           ${p.status !== 'cancelled' ? `<button class="wa-btn" style="background:#fff5f5;color:#c92a2a;border:1.5px solid #ffc9c9;" onclick="adminCancelBooking('${p.id}','${name}','${email}','${phone}','${event}')">❌ Cancel Booking</button>` : `<span style="display:inline-flex;align-items:center;padding:.4rem .8rem;border-radius:8px;background:#fff5f5;color:#c92a2a;font-size:.78rem;font-weight:700;">Cancelled</span>`}
+          <button class="wa-btn" style="background:#fff;color:#667085;border:1px solid #d0d5dd;" onclick="removeWABooking('${p.id}')">Remove from WA Dispatch</button>
         </div>
         <div class="wa-sent-log ${orgSent || custSent ? 'show' : ''}" id="walog-${p.id}">
           ${orgSent  ? '💬 Organizer: ' + orgSent + '<br>' : ''}
@@ -2691,8 +2707,9 @@ window.adminCancelBooking = async function(id, customerName, customerEmail, cust
 };
 
 window.deleteAllWABookings = async function() {
-  const confirmed = confirm('Permanently delete every booking and payment record from the database? This cannot be undone.');
+  const confirmed = confirm('Remove all entries from WhatsApp Dispatch? Booking and transaction records will remain available in the other admin sections.');
   if (!confirmed) return;
+  const visibleCount = allBookings.length;
   const button = document.getElementById('waDeleteAllBtn');
   if (button) { button.disabled = true; button.textContent = 'Deleting…'; }
   try {
@@ -2700,22 +2717,49 @@ window.deleteAllWABookings = async function() {
       getDocs(collection(db, 'bookings')),
       getDocs(collection(db, 'payments'))
     ]);
-    const documents = [
-      ...bookingSnapshot.docs.map(snapshot => snapshot.ref),
-      ...paymentSnapshot.docs.map(snapshot => snapshot.ref)
-    ];
+    const documents = [...bookingSnapshot.docs, ...paymentSnapshot.docs];
     for (let start = 0; start < documents.length; start += 450) {
       const batch = writeBatch(db);
-      documents.slice(start, start + 450).forEach(ref => batch.delete(ref));
+      documents.slice(start, start + 450).forEach(snapshot => batch.update(snapshot.ref, {
+        waDispatchHidden: true,
+        waDispatchHiddenAt: serverTimestamp(),
+        waDispatchHiddenBy: auth.currentUser?.uid || ''
+      }));
       await batch.commit();
     }
     waSentLog = {};
+    allPayments = allPayments.map(payment => ({...payment, waDispatchHidden: true}));
+    allBookingsCol = allBookingsCol.map(booking => ({...booking, waDispatchHidden: true}));
+    syncWABookings();
     if (button) button.textContent = '🗑 Delete all';
-    showToast(`Deleted ${documents.length} booking and payment records`, 'success');
+    showToast(`Removed ${visibleCount} entries from WhatsApp Dispatch`, 'success');
   } catch (e) {
-    showToast('Could not delete all bookings: ' + e.message, 'error');
+    showToast('Could not clear WhatsApp Dispatch: ' + e.message, 'error');
   } finally {
     if (button) button.disabled = false;
+  }
+};
+
+window.removeWABooking = async function(id) {
+  const matchingBookings = allBookingsCol.filter(booking => booking.id === id || booking.paymentId === id || booking.bookingId === id);
+  const matchingPayments = allPayments.filter(payment => payment.id === id || payment.bookingId === id);
+  const refs = [
+    ...matchingBookings.map(booking => doc(db, 'bookings', booking.id)),
+    ...matchingPayments.map(payment => doc(db, 'payments', payment.id))
+  ];
+  if (!refs.length) { showToast('Could not find this dispatch entry', 'error'); return; }
+  try {
+    await Promise.all(refs.map(ref => updateDoc(ref, {
+      waDispatchHidden: true,
+      waDispatchHiddenAt: serverTimestamp(),
+      waDispatchHiddenBy: auth.currentUser?.uid || ''
+    })));
+    allBookingsCol = allBookingsCol.map(booking => refs.some(ref => ref.path === `bookings/${booking.id}`) ? {...booking, waDispatchHidden: true} : booking);
+    allPayments = allPayments.map(payment => refs.some(ref => ref.path === `payments/${payment.id}`) ? {...payment, waDispatchHidden: true} : payment);
+    syncWABookings();
+    showToast('Removed from WhatsApp Dispatch; transaction records are unchanged', 'success');
+  } catch (e) {
+    showToast('Could not remove dispatch entry: ' + e.message, 'error');
   }
 };
 
@@ -2758,10 +2802,11 @@ window.filterWA = function() {
 
 // rebuild allBookings whenever payments update
 function syncWABookings() {
+  const hiddenIds = new Set([...allPayments, ...allBookingsCol].filter(item => item.waDispatchHidden).flatMap(item => [item.id, item.bookingId, item.paymentId].filter(Boolean)));
   allBookings = [
     ...allPayments,
     ...allBookingsCol.filter(b => !allPayments.find(p => p.id === b.id))
-  ].map(p => ({
+  ].filter(p => ![p.id, p.bookingId, p.paymentId].some(id => hiddenIds.has(id))).map(p => ({
     ...p,
     customerName:  p.customerName  || p.customer?.name  || '',
     customerEmail: p.customerEmail || p.customer?.email || '',
