@@ -494,6 +494,7 @@
   <nav class="sb-nav">
     <button class="sb-item active" data-view="overview"><span class="si-icon">🏠</span> Dashboard</button>
     <button class="sb-item" data-view="analytics"><span class="si-icon">📊</span> Analytics & Insights</button>
+    <button class="sb-item" data-view="marketing"><span class="si-icon">📣</span> Marketing</button>
   </nav>
 
   <div class="sb-section-label">✦ Manage</div>
@@ -703,6 +704,23 @@
       </div>
     </div>
 
+  </div>
+
+  <div class="view" data-view="marketing">
+    <div style="background:linear-gradient(135deg,#1a3f9f 0%,#2454d6 58%,#5a82ed 100%);border-radius:22px;padding:1.7rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8;">Growth overview</div>
+      <h1 style="font-size:1.8rem;margin:.35rem 0;">Marketing</h1>
+      <div style="opacity:.8">Bookings and revenue alongside campaign and lead performance.</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card blue"><div class="stat-icon">🎟️</div><div class="stat-label">Bookings</div><div class="stat-value" id="mktBookings">0</div><div class="stat-sub">All booking records</div></div>
+      <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-label">Paid Revenue</div><div class="stat-value" id="mktRevenue">₹0</div><div class="stat-sub">Successful payments</div></div>
+      <div class="stat-card orange"><div class="stat-icon">📣</div><div class="stat-label">Ad Campaigns</div><div class="stat-value" id="mktCampaigns">0</div><div class="stat-sub">Campaign records</div></div>
+      <div class="stat-card purple"><div class="stat-icon">🧲</div><div class="stat-label">Leads</div><div class="stat-value" id="mktLeads">0</div><div class="stat-sub">Lead records received</div></div>
+    </div>
+    <div class="card"><div class="card-head"><h2>Ad performance details</h2><p>Campaigns currently stored in CultureWave. Meta spend, impressions, clicks and attributed leads require ad integration or manual campaign data.</p></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Campaign</th><th>Platform</th><th>Goal</th><th>Status</th><th>Budget</th><th>Leads</th></tr></thead><tbody id="marketingCampaignsTable"></tbody></table></div></div>
+    <div class="card"><div class="card-head"><h2>Recent bookings</h2><p>Booking and payment records joined by booking ID where available.</p></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Date</th><th>Customer</th><th>Event / service</th><th>Source</th><th>Status</th><th>Amount</th></tr></thead><tbody id="marketingBookingsTable"></tbody></table></div></div>
+    <div class="card"><div class="card-head"><h2>Generated leads</h2><p>Lead details appear here when lead capture is connected and records are written to Firestore.</p></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Date</th><th>Name</th><th>Email</th><th>Phone</th><th>Source / campaign</th><th>Status</th></tr></thead><tbody id="marketingLeadsTable"><tr><td colspan="6">No lead records found. Lead capture is not currently connected.</td></tr></tbody></table></div></div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -1498,7 +1516,7 @@ import { app, auth, db, getCurrentUser, logout,
 
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
-let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[];
+let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allMarketingLeads=[];
 let allVendorApplications=[],activeVendorApplicationId=null;
 let allStallApplications=[],activeStallAdminEventId='';
 
@@ -1546,7 +1564,7 @@ window.updateTicketRequestStatus = async function(id, status) {
 
 // ── NAVIGATION ──
 const viewTitles = {
-  overview:'Dashboard', analytics:'Analytics & Insights', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
+  overview:'Dashboard', analytics:'Analytics & Insights', marketing:'Marketing', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
   campaigns:'Campaigns', payments:'Transactions', refunds:'Refunds',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
@@ -1557,6 +1575,7 @@ window.showView = function(name) {
   document.querySelectorAll('.sb-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view===name));
   document.getElementById('pageTitle').textContent = viewTitles[name] || name;
   if(name==='analytics') renderAnalytics();
+  if(name==='marketing') renderMarketing();
   if(name==='new-listers') renderNewListers();
   if(name==='credits') renderCreditsView();
   if(name==='activity') renderActivityLog();
@@ -1954,6 +1973,21 @@ function renderCampaignsTable(campaigns) {
     </div></td>
   </tr>`).join('');
 }
+
+function renderMarketing(){
+  const paymentsById=new Map(allPayments.map(p=>[p.id,p]));
+  const bookings=[...new Map([...allBookingsCol,...allPayments].map(b=>[b.id,b])).values()]
+    .sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+  const paid=allPayments.filter(p=>p.status==='paid');
+  document.getElementById('mktBookings').textContent=bookings.length;
+  document.getElementById('mktRevenue').textContent=money(paid.reduce((sum,p)=>sum+Number(p.amount||0),0));
+  document.getElementById('mktCampaigns').textContent=allCampaigns.length;
+  document.getElementById('mktLeads').textContent=allMarketingLeads.length;
+  const campaignsBody=document.getElementById('marketingCampaignsTable');
+  campaignsBody.innerHTML=allCampaigns.length?allCampaigns.map(c=>`<tr><td><strong>${esc(c.name||'Untitled')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(c.category||'')}</div></td><td>${esc((c.platforms||[]).join(', ')||c.platform||c.channel||'Not recorded')}</td><td>${esc(c.goal||'—')}</td><td>${esc(c.status||'—')}</td><td>${c.totalBudget!=null?money(c.totalBudget):c.budget!=null?money(c.budget):'—'}</td><td>${Number(c.leads||c.leadCount||0)}</td></tr>`).join(''):'<tr><td colspan="6">No campaign records found.</td></tr>';
+  document.getElementById('marketingBookingsTable').innerHTML=bookings.slice(0,100).map(b=>{const p=paymentsById.get(b.id)||b;const customer=b.customerName||b.customer?.name||b.name||b.userName||b.email||p.customerName||p.email||'Guest';const event=b.eventName||b.event?.name||b.event||b.restaurantName||b.serviceName||p.eventName||p.event?.name||p.event||'Booking';const source=b.utmSource||b.utm_source||b.source||b.referrer||b.utmCampaign||b.utm_campaign||'Not tracked';const amount=p.amount??b.amount??0;return `<tr><td>${fmtDate(b.createdAt||p.createdAt)}</td><td>${esc(customer)}</td><td>${esc(typeof event==='string'?event:event?.name||'Booking')}</td><td>${esc(source)}</td><td>${esc(p.status||b.status||'—')}</td><td>${money(amount)}</td></tr>`}).join('')||'<tr><td colspan="6">No bookings found.</td></tr>';
+  document.getElementById('marketingLeadsTable').innerHTML=allMarketingLeads.length?allMarketingLeads.slice(0,100).map(l=>`<tr><td>${fmtDate(l.createdAt||l.timestamp)}</td><td>${esc(l.name||l.fullName||'—')}</td><td>${esc(l.email||'—')}</td><td>${esc(l.phone||l.mobile||'—')}</td><td>${esc(l.utmCampaign||l.campaign||l.source||l.utmSource||'—')}</td><td>${esc(l.status||'New')}</td></tr>`).join(''):'<tr><td colspan="6">No lead records found. Lead capture is not currently connected.</td></tr>';
+}
 window.filterCampaigns = function() {
   const q = document.getElementById('campaignSearch').value.toLowerCase();
   const st = document.getElementById('campaignStatusFilter').value;
@@ -2333,17 +2367,28 @@ onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200
   renderRefundsTable(allPayments);
   syncWABookings();
   updateStats();
+  renderMarketing();
 });
 
 onSnapshot(query(collection(db,'bookings'),orderBy('createdAt','desc'),limit(500)), snap => {
   allBookingsCol = snap.docs.map(d=>({id:d.id,...d.data()}));
   syncWABookings();
+  renderMarketing();
 });
 
 onSnapshot(query(collection(db,'campaigns'),orderBy('createdAt','desc'),limit(100)), snap => {
   allCampaigns = snap.docs.map(d=>({id:d.id,...d.data()}));
   renderCampaignsTable(allCampaigns);
   updateStats();
+  renderMarketing();
+});
+
+onSnapshot(query(collection(db,'leads'),orderBy('createdAt','desc'),limit(200)), snap => {
+  allMarketingLeads=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderMarketing();
+}, error => {
+  allMarketingLeads=[];
+  renderMarketing();
 });
 
 onSnapshot(query(collection(db,'websiteRequests'),orderBy('createdAt','desc'),limit(100)), snap => {
