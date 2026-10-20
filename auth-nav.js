@@ -24,6 +24,11 @@
       header.insertAdjacentElement('afterend', menu);
     }
 
+    menu.querySelectorAll('.mobile-nav-group').forEach((group) => {
+      const heading = group.querySelector('.mobile-nav-group-title');
+      if (heading?.textContent.trim().toLowerCase() === 'account') group.remove();
+    });
+
     // Add the shared profile card to existing page-specific menus as well.
     if (!menu.querySelector('.mobile-profile-card')) {
       const profileCard = document.createElement('a');
