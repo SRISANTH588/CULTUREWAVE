@@ -44,7 +44,7 @@
       profileCard.setAttribute('role', 'button');
       profileCard.tabIndex = 0;
       profileCard.setAttribute('aria-label', 'Edit your profile');
-      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><span class="mobile-profile-arrow" aria-hidden="true">→</span></span>';
+      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><a class="mobile-profile-arrow" href="edit-profile.html" aria-label="Edit profile">→</a></span>';
       if (existingCard) existingCard.replaceWith(profileCard);
       else {
         const menuHead = menu.querySelector('.mobile-nav-head');
@@ -150,6 +150,13 @@
     }, true);
     menu.querySelector('.mobile-nav-close')?.addEventListener('click', closeMenu);
     menu.addEventListener('click', (event) => {
+      const editProfileLink = event.target.closest('.mobile-profile-arrow');
+      if (editProfileLink) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
+        return;
+      }
       const profileCard = event.target.closest('.mobile-profile-card');
       const link = event.target.closest('a');
       if (profileCard || !link) return;
