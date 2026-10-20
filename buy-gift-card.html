@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Buy Gift Card | CultureWave</title>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
   <style>
@@ -29,11 +27,13 @@
   </main>
   <footer class="proceed-dock"><button class="proceed" id="proceedButton">Proceed &nbsp;›</button></footer>
   <div class="history-overlay" id="historyOverlay" hidden><section class="history-panel" role="dialog" aria-modal="true" aria-labelledby="historyTitle"><header class="history-head"><h2 id="historyTitle">Gift Card History</h2><button class="history-close" id="historyClose" aria-label="Close history">×</button></header><div id="historyContent" class="history-empty"><span class="history-icon">◷</span><h3>Sign in to view purchases</h3><p>Your CultureWave gift card orders will appear here.</p><a href="gift-card-faq.html">Gift Card FAQs</a></div></section></div>
-  <script>
-    if(!firebase.apps.length)firebase.initializeApp({apiKey:'AIzaSyBCgNQy8EJL7gE-SA1cMePGetWLOR7WWMI',authDomain:'ogshootsluxe-36740.firebaseapp.com',projectId:'ogshootsluxe-36740',storageBucket:'ogshootsluxe-36740.firebasestorage.app',messagingSenderId:'5471814825',appId:'1:5471814825:web:07e84f2f88486da817d5b8'});
-    const giftAuth=firebase.auth(),giftApi='https://culturewave-razorpay.culturewaveindia.workers.dev';
-    const giftPersistenceReady=giftAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
-    const currentUser=async()=>{await giftPersistenceReady;if(typeof giftAuth.authStateReady==='function')await giftAuth.authStateReady();else await new Promise(resolve=>{let off=()=>{};off=giftAuth.onAuthStateChanged(()=>{off();resolve()})});return giftAuth.currentUser};
+  <script type="module">
+    import {auth as giftAuth} from "./firebase.js";
+    import {setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    /* Firebase initialization is shared with the login page. */
+    const giftApi="https://culturewave-razorpay.culturewaveindia.workers.dev";
+    const giftPersistenceReady=setPersistence(giftAuth,browserLocalPersistence).catch(()=>{});
+    const currentUser=async()=>{await giftPersistenceReady;await giftAuth.authStateReady();return giftAuth.currentUser};
     async function giftRequest(path,data){const user=await currentUser();if(!user)throw new Error('Please sign in to continue.');const token=await user.getIdToken();const response=await fetch(`${giftApi}/${path}`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(data||{})});const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||'Could not complete request.');return result}
     document.getElementById('backButton').addEventListener('click',()=>{if(parent!==window)parent.postMessage({type:'culturewave-menu-back'},location.origin);else history.back()});
     const historyOverlay=document.getElementById('historyOverlay');
