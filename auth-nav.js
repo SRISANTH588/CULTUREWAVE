@@ -109,6 +109,22 @@
           view.querySelector('iframe').src = 'about:blank';
         });
         view.querySelector('.mobile-nav-view-close').addEventListener('click', closeMenu);
+        window.addEventListener('message', (event) => {
+          if (event.origin !== window.location.origin) return;
+          if (event.data?.type === 'culturewave-menu-back') {
+            menu.classList.remove('showing-view');
+            view.querySelector('iframe').src = 'about:blank';
+          }
+          if (event.data?.type === 'culturewave-profile-updated') {
+            const profile = event.data.profile || {};
+            const name = menu.querySelector('.mobile-profile-name');
+            const contact = menu.querySelector('.mobile-profile-contact');
+            const progress = menu.querySelector('.mobile-profile-progress');
+            if (name && profile.name) name.textContent = profile.name;
+            if (contact && profile.phone) contact.textContent = profile.phone;
+            if (progress && profile.steps) progress.textContent = profile.steps;
+          }
+        });
         menu.appendChild(view);
       }
       view.querySelector('.mobile-nav-view-title').textContent = title || 'CultureWave';
@@ -131,7 +147,8 @@
       const profileCard = event.target.closest('.mobile-profile-card');
       const link = event.target.closest('a');
       if (!profileCard && !link) return;
-      const href = profileCard ? 'customer-dashboard.html?view=profile' : link.getAttribute('href');
+      const editProfile = Boolean(profileCard && event.target.closest('.mobile-profile-prompt'));
+      const href = profileCard ? (editProfile ? 'edit-profile.html' : 'customer-dashboard.html?view=profile') : link.getAttribute('href');
       if (!href || /^(mailto:|tel:|javascript:)/i.test(href) || link?.target === '_blank') return;
       const target = new URL(href, document.baseURI);
       if (target.origin !== window.location.origin) return;
@@ -143,7 +160,7 @@
         const selectedView = link?.dataset.view || (normalizedLabel.includes('upcoming') ? 'upcoming' : normalizedLabel.includes('profile') || normalizedLabel.includes('account') ? 'profile' : 'bookings');
         target.searchParams.set('view', selectedView);
       }
-      showMenuPage(target.href, profileCard ? 'My Profile' : textLabel);
+      showMenuPage(target.href, editProfile ? 'Edit Profile' : profileCard ? 'My Profile' : textLabel);
     }, true);
     menu.addEventListener('keydown', (event) => {
       if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-card')) return;
@@ -173,7 +190,7 @@
         const profileDoc = await firebase.firestore().collection('users').doc(user.uid).get();
         const profileData = profileDoc.exists ? profileDoc.data() : {};
         profileContact.textContent = profileData.whatsapp || profileData.phone || user.phoneNumber || user.email || '';
-        const filledSteps = [Boolean(user.displayName || profileData.name), Boolean(profileData.whatsapp || profileData.phone || user.phoneNumber), Boolean(user.email), Boolean(user.photoURL || profileData.photoURL || profileData.photoUrl)].filter(Boolean).length;
+        const filledSteps = [Boolean(user.displayName || profileData.name || profileData.fullName), Boolean(profileData.whatsapp || profileData.phone || user.phoneNumber), Boolean(user.email), Boolean(profileData.birthday || profileData.dob)].filter(Boolean).length;
         if (profileProgress) profileProgress.textContent = `${filledSteps} / 4 steps done`;
       } catch (error) {
         console.warn('Could not load profile details for mobile menu:', error);

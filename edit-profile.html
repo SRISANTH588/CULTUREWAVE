@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Edit Profile | CultureWave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#111;color:#f5f5f7;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0;background:#111;color:#f5f5f7;font-family:Inter,system-ui,sans-serif}
+    .edit-page{min-height:100dvh;padding:calc(env(safe-area-inset-top) + 1rem) 1rem calc(env(safe-area-inset-bottom) + 6.5rem);}
+    .edit-head{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:.85rem;height:58px;margin:0 -1rem 1.1rem;padding:0 1rem;background:rgba(17,17,17,.96);backdrop-filter:blur(10px)}
+    .back-button{display:grid;place-items:center;width:48px;height:48px;flex:none;border:1px solid #39393d;border-radius:50%;background:#1c1c20;color:#fff;font-size:2rem;line-height:1}
+    .edit-head h1{margin:0;font-size:1.25rem;font-weight:800}
+    .profile-section{margin:0 0 1rem;padding:1.1rem;border:1px solid #303034;border-radius:22px;background:#1d1d1f}
+    .section-title{margin:0 0 1.35rem;font-size:1.1rem;font-weight:500}
+    .progress{margin:0 0 1.2rem;color:#c6a9ff;font-size:.92rem;font-weight:600}
+    .profile-photo-wrap{display:grid;justify-items:center;gap:.8rem;margin:0 0 1.5rem}
+    .profile-photo{position:relative;display:grid;place-items:center;width:138px;height:138px;overflow:hidden;border:0;border-radius:50%;background:#38383d;color:#85858c}
+    .profile-photo svg{width:112px;height:112px;fill:none;stroke:#85858c;stroke-width:2.2}
+    .profile-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .photo-edit{position:absolute;right:0;bottom:0;display:grid;place-items:center;width:48px;height:48px;border:4px solid #1d1d1f;border-radius:50%;background:#29292e;color:#fff;font-size:1.25rem}
+    .photo-label{font-size:.95rem;font-weight:600}
+    .field{display:grid;gap:.6rem;margin:0 0 1.15rem}
+    .field:last-child{margin-bottom:0}
+    .field label{font-size:.95rem;font-weight:500}
+    .field input,.field select{width:100%;height:58px;padding:0 1rem;border:1px solid #48484e;border-radius:16px;outline:0;background:#1d1d1f;color:#f5f5f7;font:inherit;font-size:1rem}
+    .field input:focus,.field select:focus{border-color:#b99cff}
+    .field input:disabled{color:#999;opacity:1}
+    .field input::placeholder{color:#666}
+    .note{display:flex;align-items:flex-start;gap:.7rem;margin:-.7rem 0 1.3rem;color:#85858d;font-size:.82rem;line-height:1.45}
+    .info-icon{display:grid;place-items:center;width:22px;height:22px;flex:none;border:2px solid #85858d;border-radius:50%;font-size:.75rem;font-weight:700}
+    .section-rule{height:1px;margin:-.4rem 0 1.15rem;background:#343438}
+    .save-dock{position:fixed;z-index:4;right:0;bottom:0;left:0;padding:.75rem 1rem calc(env(safe-area-inset-bottom) + .75rem);background:linear-gradient(transparent,#111 18%)}
+    .save-button{width:100%;height:62px;border:0;border-radius:999px;background:#c7a8ff;color:#17131e;font:inherit;font-size:1rem;font-weight:800}
+    .save-button:disabled{background:#38383d;color:#77777f}
+    .status{min-height:1.2rem;margin:.6rem 0 0;color:#c6a9ff;text-align:center;font-size:.82rem}
+    .hidden{display:none!important}
+    @media(min-width:700px){.edit-page{max-width:680px;margin:auto}.save-dock{left:50%;width:min(680px,100%);transform:translateX(-50%);background:linear-gradient(transparent,#111 18%)}}
+  </style>
+</head>
+<body>
+  <main class="edit-page">
+    <header class="edit-head"><button id="backButton" class="back-button" type="button" aria-label="Back">&#8249;</button><h1>Edit Profile</h1></header>
+    <div id="signInMessage" class="profile-section hidden">Sign in to edit your CultureWave profile.</div>
+    <form id="profileForm" class="hidden">
+      <section class="profile-section">
+        <h2 class="section-title">Basic information</h2>
+        <p id="stepCount" class="progress">0 / 4 steps done</p>
+        <div class="profile-photo-wrap">
+          <button class="profile-photo" id="photoButton" type="button" aria-label="Add a profile photo">
+            <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg>
+            <img id="photoPreview" class="hidden" alt="Profile photo preview">
+            <span class="photo-edit" aria-hidden="true">✎</span>
+          </button>
+          <span class="photo-label">Add a profile photo</span>
+          <input id="photoInput" class="hidden" type="file" accept="image/*">
+        </div>
+        <div class="field"><label for="nameInput">Name</label><input id="nameInput" autocomplete="name" required></div>
+        <div class="field"><label for="phoneInput">Phone number</label><input id="phoneInput" disabled></div>
+        <p class="note"><span class="info-icon">i</span><span>The phone number associated with your account cannot be modified</span></p>
+        <div class="field"><label for="emailInput">Email</label><input id="emailInput" type="email" disabled></div>
+        <div class="field"><label for="birthdayInput">Birthday</label><input id="birthdayInput" type="date"></div>
+        <p id="birthdayNote" class="note"><span class="info-icon">i</span><span>You can edit this only once</span></p>
+      </section>
+      <section class="profile-section">
+        <h2 class="section-title">Additional details (optional)</h2><div class="section-rule"></div>
+        <div class="field"><label for="genderInput">Gender</label><select id="genderInput"><option value="">Select</option><option>Female</option><option>Male</option><option>Non-binary</option><option>Prefer not to say</option></select></div>
+        <div class="field"><label for="anniversaryInput">Anniversary</label><input id="anniversaryInput" type="date"></div>
+      </section>
+      <section class="profile-section">
+        <h2 class="section-title">Invoice details</h2><div class="section-rule"></div>
+        <div class="field"><label for="stateInput">State</label><select id="stateInput"><option value="">Select state</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option></select></div>
+        <p class="note"><span>This is required to generate invoice</span></p>
+      </section>
+      <div id="status" class="status" role="status"></div>
+      <div class="save-dock"><button id="saveButton" class="save-button" type="submit" disabled>Update profile</button></div>
+    </form>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script>
+    const firebaseConfig={apiKey:'AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI',authDomain:'ogshootsluxe-36740.firebaseapp.com',projectId:'ogshootsluxe-36740',storageBucket:'ogshootsluxe-36740.firebasestorage.app',messagingSenderId:'5471814825',appId:'1:5471814825:web:07e84f2f88486da817d5b8'};
+    if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+    const auth=firebase.auth(),db=firebase.firestore();
+    const form=document.getElementById('profileForm'),saveButton=document.getElementById('saveButton');
+    const nameInput=document.getElementById('nameInput'),phoneInput=document.getElementById('phoneInput'),emailInput=document.getElementById('emailInput');
+    const birthdayInput=document.getElementById('birthdayInput'),birthdayNote=document.getElementById('birthdayNote'),genderInput=document.getElementById('genderInput');
+    const anniversaryInput=document.getElementById('anniversaryInput'),stateInput=document.getElementById('stateInput'),photoInput=document.getElementById('photoInput');
+    const photoPreview=document.getElementById('photoPreview'),stepCount=document.getElementById('stepCount'),statusEl=document.getElementById('status');
+    let currentUser=null,profileData={},selectedPhoto=null,initialValues='';
+    const valueOf=(...values)=>values.find(value=>value!==undefined&&value!==null&&String(value).trim()!=='')||'';
+    const dateValue=value=>{
+      if(!value)return '';
+      if(value.toDate)value=value.toDate();
+      const date=value instanceof Date?value:new Date(value);
+      return Number.isNaN(date.getTime())?'':date.toISOString().slice(0,10);
+    };
+    const currentValues=()=>JSON.stringify({name:nameInput.value.trim(),birthday:birthdayInput.value,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photo:selectedPhoto?.name||''});
+    function updateProgress(){
+      const steps=[nameInput.value.trim(),phoneInput.value,emailInput.value,birthdayInput.value].filter(Boolean).length;
+      stepCount.textContent=`${steps} / 4 steps done`;
+    }
+    function markChanged(){updateProgress();saveButton.disabled=currentValues()===initialValues;}
+    document.getElementById('backButton').addEventListener('click',()=>{
+      if(window.parent!==window)window.parent.postMessage({type:'culturewave-menu-back'},location.origin);
+      else if(history.length>1)history.back();
+      else location.href='customer-dashboard.html';
+    });
+    document.getElementById('photoButton').addEventListener('click',()=>photoInput.click());
+    photoInput.addEventListener('change',()=>{
+      selectedPhoto=photoInput.files?.[0]||null;
+      if(selectedPhoto){photoPreview.src=URL.createObjectURL(selectedPhoto);photoPreview.classList.remove('hidden');}
+      markChanged();
+    });
+    form.addEventListener('input',markChanged);form.addEventListener('change',markChanged);
+    auth.onAuthStateChanged(async user=>{
+      currentUser=user;
+      if(!user){document.getElementById('signInMessage').classList.remove('hidden');return;}
+      try{
+        const snap=await db.collection('users').doc(user.uid).get();profileData=snap.exists?snap.data():{};
+        nameInput.value=valueOf(user.displayName,profileData.name,profileData.fullName,user.email?.split('@')[0]);
+        phoneInput.value=valueOf(profileData.whatsapp,profileData.phone,user.phoneNumber);
+        emailInput.value=user.email||profileData.email||'';
+        const birthday=valueOf(profileData.birthday,profileData.dob);
+        birthdayInput.value=dateValue(birthday);
+        birthdayInput.disabled=Boolean(birthday);
+        if(birthday)birthdayNote.classList.add('hidden');
+        genderInput.value=profileData.gender||'';anniversaryInput.value=dateValue(profileData.anniversary);stateInput.value=profileData.state||'';
+        if(user.photoURL||profileData.photoURL||profileData.photoUrl){photoPreview.src=user.photoURL||profileData.photoURL||profileData.photoUrl;photoPreview.classList.remove('hidden');}
+        updateProgress();initialValues=currentValues();saveButton.disabled=true;form.classList.remove('hidden');
+      }catch(error){statusEl.textContent='Could not load your profile. Please try again.';form.classList.remove('hidden');}
+    });
+    form.addEventListener('submit',async event=>{
+      event.preventDefault();if(!currentUser)return;
+      saveButton.disabled=true;statusEl.textContent='Saving your profile…';
+      try{
+        let photoURL=currentUser.photoURL||profileData.photoURL||profileData.photoUrl||'';
+        if(selectedPhoto){const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);await ref.put(selectedPhoto);photoURL=await ref.getDownloadURL();}
+        const name=nameInput.value.trim();
+        const birthday=birthdayInput.value||profileData.birthday||profileData.dob||'';
+        const updates={name,email:currentUser.email||profileData.email||'',phone:phoneInput.value,whatsapp:profileData.whatsapp||phoneInput.value,birthday,dob:birthday,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photoURL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+        await db.collection('users').doc(currentUser.uid).set(updates,{merge:true});
+        await currentUser.updateProfile({displayName:name,photoURL:photoURL||null});
+        profileData={...profileData,...updates};initialValues=currentValues();statusEl.textContent='Profile updated successfully';
+        updateProgress();
+        if(window.parent!==window)window.parent.postMessage({type:'culturewave-profile-updated',profile:{name,phone:phoneInput.value,birthday,steps:stepCount.textContent,photoURL}},location.origin);
+        window.setTimeout(()=>{statusEl.textContent='';},2500);
+      }catch(error){statusEl.textContent=error.message||'Could not update your profile. Please try again.';saveButton.disabled=false;}
+    });
+  </script>
+</body>
+</html>
