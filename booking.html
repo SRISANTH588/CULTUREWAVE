@@ -601,6 +601,8 @@
             <div class="bk-bill-row"><span>Seats</span><strong id="c_qty">—</strong></div>
             <div class="bk-bill-row discount" id="c_discountRow" style="display:none;"><span>Discount</span><strong id="c_discount">—</strong></div>
             <div class="bk-bill-row"><span>Platform fee</span><strong id="c_fee">—</strong></div>
+            <div class="bk-bill-row"><label for="oneClubUse">Use One Club balance <input id="oneClubUse" type="checkbox"></label><strong id="oneClubAvailable">₹0.00</strong></div>
+            <div class="bk-bill-row discount" id="oneClubAppliedRow" style="display:none"><span>One Club applied</span><strong id="oneClubApplied">−₹0.00</strong></div>
             <div class="bk-bill-row total"><span>Total</span><strong id="c_total">—</strong></div>
           </div>
         </div>
@@ -649,6 +651,7 @@ firebase.initializeApp({
 });
 const db = firebase.firestore();
 const bookingAuth = firebase.auth();
+let oneClubBalance=0,oneClubApplied=0;
 
 // ── EMAILJS ──
 const EJ_KEY = "PDb2vpOIeLkbZBBFP";
@@ -1587,14 +1590,20 @@ function goStep4(){
   document.getElementById("c_ticket").textContent = selectedTicketLabel();
   document.getElementById("c_qty").textContent = selectedTicketCount();
   document.getElementById("c_fee").textContent = fee ? fmt(fee) : "₹0";
-  document.getElementById("c_total").textContent = total ? fmt(total) : "Free";
+  oneClubApplied=document.getElementById('oneClubUse').checked?Math.min(oneClubBalance,Math.max(0,total-1)):0;
+  const payable=Math.max(0,total-oneClubApplied);
+  document.getElementById("c_total").textContent = payable ? fmt(payable) : "Free";
+  document.getElementById('oneClubAvailable').textContent=fmt(oneClubBalance);
+  document.getElementById('oneClubApplied').textContent='−'+fmt(oneClubApplied);
+  document.getElementById('oneClubAppliedRow').style.display=oneClubApplied>0?'':'none';
   document.getElementById("c_discountRow").style.display = discountAmt>0 ? "" : "none";
   document.querySelector("#c_discountRow > span").textContent=discountAmt>0?`Coupon${couponApplied?` (${couponApplied})`:''}`:"Discount";
   document.getElementById("c_discount").textContent = "-"+fmt(discountAmt);
-  const isFree = total === 0;
-  document.getElementById("confirmSubmitBtn").textContent = isFree ? "✅ Book Now (Free)" : "🔒 Pay Now";
+  document.getElementById("confirmSubmitBtn").textContent = payable===0 ? "✅ Book Now" : "🔒 Pay Now";
   goStep(4);
 }
+document.getElementById('oneClubUse')?.addEventListener('change',goStep4);
+bookingAuth.onAuthStateChanged(async user=>{if(!user)return;try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(response.ok&&result.success){oneClubBalance=Math.max(0,Number(result.balance)||0);if(document.getElementById('panel4').classList.contains('active'))goStep4()}}catch(error){console.warn('Could not load One Club balance:',error)}});
 
 async function saveBooking(data){
   try{
@@ -1744,7 +1753,10 @@ async function submitBooking(){
   const bid = "CV"+Date.now();
   const walletAccessToken = Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2,'0')).join('');
 
-  if(total === 0){
+  const walletUse=document.getElementById('oneClubUse')?.checked===true;
+  const walletAmount=walletUse?Math.min(oneClubBalance,Math.max(0,total-1)):0;
+  const customerPayable=Math.max(0,total-walletAmount);
+  if(customerPayable === 0){
     document.getElementById("rStatus").textContent = "✅ Confirmed";
     const saved = await saveBooking({ bookingId:bid, walletAccessToken, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone, state });
     if(!saved){
@@ -1761,10 +1773,12 @@ async function submitBooking(){
     return;
   }
 
-  const amountInPaise=Math.round(total*100);
+  const amountInPaise=Math.round(customerPayable*100);
   let orderData;
   try{
-    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:amountInPaise,receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
+    const user=walletAmount>0?bookingAuth.currentUser:null;
+    const authToken=user?await user.getIdToken():'';
+    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json',...(authToken?{Authorization:`Bearer ${authToken}`}:{})},body:JSON.stringify({amount:amountInPaise,walletAmount,receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
     const orderResponseText=await orderResponse.text();
     try{orderData=JSON.parse(orderResponseText);}catch(_){throw new Error(orderResponse.status===404?'Razorpay payment service is not deployed yet. Please contact support.':'Could not reach the payment service. Please try again.');}
     if(!orderResponse.ok||!orderData.success||orderData.provider!=='razorpay'||!orderData.razorpayOrderId||!orderData.keyId) throw new Error(orderData.error||'Live Razorpay order service is unavailable.');
@@ -1791,7 +1805,9 @@ async function submitBooking(){
       let paymentMethod='Razorpay';
       let verificationMessage='Payment signature verification failed.';
       try{
-        const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...r,booking:{bookingId:pid,eventId,amountPaise:Math.round(total*100),tickets:ticketCount,seatIds:selectedSeats}})});
+        const verifyUser=walletAmount>0?bookingAuth.currentUser:null;
+        const verifyToken=verifyUser?await verifyUser.getIdToken():'';
+        const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json',...(verifyToken?{Authorization:`Bearer ${verifyToken}`}:{})},body:JSON.stringify({...r,booking:{bookingId:pid,eventId,amountPaise:Math.round(total*100),tickets:ticketCount,seatIds:selectedSeats}})});
         const verificationData=await verification.json();
         verified=verification.ok&&verificationData.verified===true;
         paymentMethod=verificationData.method||paymentMethod;

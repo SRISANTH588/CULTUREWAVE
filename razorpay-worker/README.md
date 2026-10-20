@@ -1,8 +1,10 @@
 # Razorpay backend without Firebase Blaze
 
-This Worker provides the order creation and captured-payment verification endpoints used by `booking.html` and `stall-create.html`. Cloudflare Workers can store the Razorpay credentials as encrypted Worker secrets, so the Key Secret does not go into the website or repository.
+This Worker provides the order creation and captured-payment verification endpoints used by event booking, plus authenticated CultureWave gift card purchase/redemption and One Club wallet endpoints. Cloudflare Workers can store the Razorpay credentials as encrypted Worker secrets, so the Key Secret does not go into the website or repository.
 
-After Razorpay confirms capture, the Worker writes a `verifiedPayments/{paymentId}` proof and a transaction record directly to Firestore. For stall payments, it also atomically closes the selected slot before allowing the application to be saved; only one captured payment can claim a stall. These writes use the existing Spark Firestore database; this flow does not deploy Firebase Cloud Functions.
+After Razorpay confirms capture, the Worker writes a `verifiedPayments/{paymentId}` proof and a transaction record directly to Firestore. Gift card codes and PINs are issued only after capture; redemptions atomically mark the card claimed and credit the signed-in user's `wallets/{uid}.balance`. Event checkout may apply One Club balance, with the deduction and transaction record committed after captured payment. For stall payments, it also atomically closes the selected slot before allowing the application to be saved; only one captured payment can claim a stall. These writes use the existing Spark Firestore database; this flow does not deploy Firebase Cloud Functions.
+
+Gift card Firestore collections and wallet balance fields are server-only. Deploy the updated `firestore.rules` with the website so a customer's browser cannot mint a card or change their One Club balance. The Worker endpoints are `/createGiftCardOrder`, `/verifyGiftCardPayment`, `/redeemGiftCard`, `/oneClubBalance`, and `/giftCardHistory`.
 
 ## Deploy
 

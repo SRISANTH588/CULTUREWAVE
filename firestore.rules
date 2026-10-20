@@ -331,7 +331,21 @@ service cloud.firestore {
     }
 
     match /wallets/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      // Wallet balance is changed only by trusted payment/redemption services.
+      // Other existing wallet fields (such as organiser credits) remain owner editable.
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid &&
+        !('balance' in request.resource.data);
+      allow update: if request.auth != null && request.auth.uid == uid &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['balance', 'lastGiftCardId', 'lastBookingPaymentId']);
+      allow delete: if false;
+    }
+
+    match /giftCards/{giftCardId} {
+      allow read, write: if false;
+    }
+    match /giftCardPurchases/{purchaseId} {
+      allow read, write: if false;
     }
 
     match /kyc/{uid} {

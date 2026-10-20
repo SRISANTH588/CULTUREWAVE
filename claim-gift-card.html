@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Claim Gift Card | CultureWave</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
   <style>
@@ -30,12 +32,14 @@
     <footer class="terms"><p>By continuing, you agree to our <a href="terms-and-conditions.html">terms &amp; conditions</a></p><button class="claim-submit" id="claimButton" form="claimForm" disabled>Claim Gift Card</button></footer>
   </main>
   <script>
+    if(!firebase.apps.length)firebase.initializeApp({apiKey:'AIzaSyBCgNQy8EJL7gE-SA1cMePGetWLOR7WWMI',authDomain:'ogshootsluxe-36740.firebaseapp.com',projectId:'ogshootsluxe-36740',storageBucket:'ogshootsluxe-36740.firebasestorage.app',messagingSenderId:'5471814825',appId:'1:5471814825:web:07e84f2f88486da817d5b8'});
+    const giftAuth=firebase.auth(),giftApi='https://culturewave-razorpay.culturewaveindia.workers.dev';
     const backButton=document.getElementById('backButton');
     backButton.addEventListener('click',()=>{if(parent!==window)parent.postMessage({type:'culturewave-menu-back'},location.origin);else history.back()});
     const code=document.getElementById('giftCode'),pin=document.getElementById('giftPin'),claimButton=document.getElementById('claimButton'),claimForm=document.getElementById('claimForm');
     function updateButton(){code.value=code.value.replace(/\D/g,'').slice(0,16);pin.value=pin.value.replace(/\D/g,'').slice(0,6);claimButton.disabled=code.value.length!==16||pin.value.length!==6}
     code.addEventListener('input',updateButton);pin.addEventListener('input',updateButton);
-    claimForm.addEventListener('submit',event=>{event.preventDefault();document.getElementById('claimNotice').textContent='Gift card redemption is not connected yet. Please contact CultureWave support for help.'});
+    claimForm.addEventListener('submit',async event=>{event.preventDefault();claimButton.disabled=true;claimButton.textContent='Claiming…';const notice=document.getElementById('claimNotice');try{let user=giftAuth.currentUser;if(!user)user=await new Promise(resolve=>{const off=giftAuth.onAuthStateChanged(value=>{off();resolve(value)})});if(!user){location.href='login.html?next=claim-gift-card.html';return}const token=await user.getIdToken(),response=await fetch(`${giftApi}/redeemGiftCard`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({code:code.value,pin:pin.value})}),result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||'Could not claim this gift card.');notice.innerHTML=`Gift card claimed! ₹${Number(result.amount).toLocaleString('en-IN')} added to One Club. <a href="one-club.html">View your balance</a>`;claimForm.reset();updateButton()}catch(error){notice.textContent=error.message;claimButton.disabled=code.value.length!==16||pin.value.length!==6}finally{claimButton.textContent='Claim Gift Card'}});
   </script>
 </body>
 </html>
