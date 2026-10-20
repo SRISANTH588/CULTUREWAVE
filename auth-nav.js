@@ -14,12 +14,12 @@
       });
       return;
     }
-    document.querySelectorAll('.auth-actions .nav-link, .mobile-nav-ctas .nav-link, .auth-actions .nav-cta').forEach((link) => {
+    document.querySelectorAll('.auth-actions .nav-link, .mobile-nav-ctas .nav-link').forEach((link) => {
       link.href = 'customer-dashboard.html';
       link.textContent = 'My Account';
       link.setAttribute('aria-label', 'Open my account');
     });
-    document.querySelectorAll('.mobile-nav-ctas .nav-cta').forEach((link) => {
+    document.querySelectorAll('.auth-actions .nav-cta, .mobile-nav-ctas .nav-cta').forEach((link) => {
       link.href = 'customer-dashboard.html';
       link.textContent = 'My Bookings';
       link.setAttribute('aria-label', 'View my bookings');
