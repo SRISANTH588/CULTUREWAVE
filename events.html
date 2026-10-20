@@ -598,14 +598,9 @@
       async function loadFirestoreEvents() {
         try {
           const eventsRef=_db.collection('events');
-          let snap;
-          try {
-            snap = await eventsRef.orderBy('createdAt', 'desc').limit(200).get();
-            if(!snap.size) snap=await eventsRef.get();
-          } catch (e) {
-            console.warn('Ordered event query failed; retrying without createdAt:',e.message);
-            snap = await eventsRef.get();
-          }
+          // Avoid orderBy here: it excludes any published event without
+          // createdAt, which made the public list appear empty or incomplete.
+          const snap = await eventsRef.get();
           const empty = grid.querySelector('.ev-empty');
           const docs = snap.docs.filter(d => isPublishedEvent(d.data()));
           buildEventFilters(docs);

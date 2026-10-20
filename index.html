@@ -2207,19 +2207,11 @@
   function getHomepageEvents(){
     if(!homepageEventsPromise){
       const eventsRef=_idb.collection('events');
-      homepageEventsPromise = eventsRef.orderBy('createdAt','desc').limit(200).get()
-        .then(async snap => {
-          if(snap.size) return snap.docs;
-          // Older listings may not have createdAt, and Firestore orderBy omits
-          // documents that do not contain the ordered field.
-          const fallback=await eventsRef.get();
-          return fallback.docs;
-        })
-        .catch(async error => {
-          console.warn('Ordered event query failed; retrying without createdAt:',error.message);
-          try { return (await eventsRef.get()).docs; }
-          catch(fallbackError) { homepageEventsPromise=null; throw fallbackError; }
-        });
+      // Read the collection directly: Firestore orderBy('createdAt') silently
+      // omits older event documents that do not have a createdAt field.
+      homepageEventsPromise = eventsRef.get()
+        .then(snap => snap.docs)
+        .catch(error => { homepageEventsPromise=null; throw error; });
     }
     return homepageEventsPromise;
   }
