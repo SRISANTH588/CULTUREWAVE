@@ -29,16 +29,29 @@
       if (heading?.textContent.trim().toLowerCase() === 'account') group.remove();
     });
 
-    // Add the shared profile card to existing page-specific menus as well.
-    if (!menu.querySelector('.mobile-profile-card')) {
-      const profileCard = document.createElement('a');
+    // Normalize cards already injected by an older cached menu script.
+    let profileCard = menu.querySelector('.mobile-profile-card');
+    if (!profileCard || !profileCard.querySelector('.mobile-profile-main')) {
+      const existingCard = profileCard;
+      const profileCard = document.createElement('div');
       profileCard.className = 'mobile-profile-card';
-      profileCard.href = 'customer-dashboard.html';
+      profileCard.setAttribute('role', 'link');
+      profileCard.tabIndex = 0;
       profileCard.setAttribute('aria-label', 'View your profile');
-      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><span class="mobile-profile-arrow" aria-hidden="true">↗</span></span>';
-      const menuHead = menu.querySelector('.mobile-nav-head');
-      if (menuHead) menuHead.insertAdjacentElement('afterend', profileCard);
-      else menu.insertBefore(profileCard, menu.firstChild);
+      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><span class="mobile-profile-arrow" aria-hidden="true">→</span></span>';
+      profileCard.addEventListener('click', () => { window.location.href = 'customer-dashboard.html'; });
+      profileCard.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          window.location.href = 'customer-dashboard.html';
+        }
+      });
+      if (existingCard) existingCard.replaceWith(profileCard);
+      else {
+        const menuHead = menu.querySelector('.mobile-nav-head');
+        if (menuHead) menuHead.insertAdjacentElement('afterend', profileCard);
+        else menu.insertBefore(profileCard, menu.firstChild);
+      }
     }
 
     // The homepage and some other pages have their own menu contents and behavior.
@@ -177,17 +190,18 @@
       .mobile-nav::before{display:none!important;}
       .mobile-nav-head{display:flex;align-items:center;justify-content:flex-start;gap:.8rem;min-height:54px;margin-bottom:1rem;color:#fff;font-size:1.05rem;font-weight:800;}
       .mobile-nav-close{display:grid;place-items:center;width:46px;height:46px;flex:none;border:1px solid #353535;border-radius:50%;background:#1b1b1d;color:#fff;font-size:2rem;line-height:1;cursor:pointer;}
-      .mobile-profile-card{display:grid;grid-template-columns:1fr;gap:14px;margin:0 0 1.5rem;padding:1rem;border:1px solid #39343f;border-radius:20px;background:linear-gradient(120deg,#291e3b,#1b1b20 78%);color:#fff!important;text-decoration:none!important;}
-      .mobile-profile-main{display:grid;grid-template-columns:102px 1fr;align-items:center;gap:14px;}
-      .mobile-profile-avatar{display:grid;place-items:center;width:100px;height:100px;border:5px solid #b99cff;border-radius:50%;background:#333;box-shadow:inset 0 0 0 3px #25252a;}
-      .mobile-profile-avatar svg{width:72px;height:72px;fill:none;stroke:#777;stroke-width:2;}
-      .mobile-profile-info{display:grid;gap:4px;min-width:0;}
-      .mobile-profile-name{overflow:hidden;color:#fff;font-size:1rem;font-weight:800;text-overflow:ellipsis;white-space:nowrap;}
-      .mobile-profile-contact,.mobile-profile-progress{color:#aaa;font-size:.8rem;}
-      .mobile-profile-progress{color:#c7afff;}
-      .mobile-profile-divider{display:block;width:100%;height:1px;background:#403a48;}
-      .mobile-profile-prompt{display:grid;grid-template-columns:1fr 28px;align-items:center;gap:12px;color:#f1edf7;font-size:.87rem;line-height:1.35;}
-      .mobile-profile-arrow{display:grid;place-items:center;width:26px;height:26px;border:2px solid #c7afff;border-radius:50%;color:#c7afff;font-size:1rem;line-height:1;}
+      #mobileNav .mobile-profile-card{display:grid!important;position:relative!important;inset:auto!important;width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;box-sizing:border-box!important;grid-template-columns:minmax(0,1fr)!important;align-items:stretch!important;justify-content:stretch!important;gap:14px!important;margin:0 0 1.5rem!important;padding:16px!important;overflow:hidden!important;border:1px solid #39343f!important;border-radius:20px!important;background:linear-gradient(120deg,#291e3b,#1b1b20 78%)!important;color:#fff!important;text-decoration:none!important;cursor:pointer;}
+      #mobileNav .mobile-profile-card::before,#mobileNav .mobile-profile-card::after{display:none!important;content:none!important;}
+      #mobileNav .mobile-profile-main{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:100px minmax(0,1fr)!important;align-items:center!important;gap:14px!important;}
+      #mobileNav .mobile-profile-avatar{display:grid!important;place-items:center!important;width:100px!important;height:100px!important;min-width:100px!important;max-width:100px!important;box-sizing:border-box!important;border:5px solid #b99cff!important;border-radius:50%!important;background:#333!important;box-shadow:inset 0 0 0 3px #25252a!important;}
+      #mobileNav .mobile-profile-avatar svg{display:block!important;width:72px!important;height:72px!important;fill:none!important;stroke:#777!important;stroke-width:2!important;}
+      #mobileNav .mobile-profile-info{display:grid!important;position:static!important;grid-template-columns:minmax(0,1fr)!important;gap:4px!important;min-width:0!important;}
+      #mobileNav .mobile-profile-name{display:block!important;overflow:hidden!important;color:#fff!important;font-size:1rem!important;font-weight:800!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+      #mobileNav .mobile-profile-contact,#mobileNav .mobile-profile-progress{display:block!important;color:#aaa!important;font-size:.8rem!important;}
+      #mobileNav .mobile-profile-progress{color:#c7afff!important;}
+      #mobileNav .mobile-profile-divider{display:block!important;position:static!important;width:100%!important;height:1px!important;grid-column:1/-1!important;background:#403a48!important;}
+      #mobileNav .mobile-profile-prompt{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.87rem!important;line-height:1.35!important;}
+      #mobileNav .mobile-profile-arrow{display:grid!important;position:static!important;place-items:center!important;width:26px!important;height:26px!important;box-sizing:border-box!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
       .mobile-organizer-prompt{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.5rem 1rem;margin:0 0 1.55rem;padding:1.1rem;border:1px solid #39343f;border-radius:20px;background:linear-gradient(120deg,#251b35,#1b1b20 75%);color:#fff;}
       .mobile-organizer-prompt span{grid-column:1/-1;color:#b8a5d2;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;}
       .mobile-organizer-prompt strong{font-size:1rem;line-height:1.35;}
