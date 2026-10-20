@@ -1668,7 +1668,7 @@ async function sendEmail(data){
       seats_label: selectedSeats.length ? "Seat Numbers" : "Seats", booking_type: "Event Booking",
       date_time: [eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}), eventStartTime()].filter(Boolean).join(" • "),
       payment_method: data.method||"Online",
-      ticket_url: "https://srisanth588.github.io/CULTUREWAVE/success.html?bookingId="+encodeURIComponent(data.bookingId)+"&event="+encodeURIComponent(data.eventName)+"&amount="+encodeURIComponent(data.amount)+"&status=Confirmed&eventId="+encodeURIComponent(eventId),
+      ticket_url: "https://culturewave.in/success.html?bookingId="+encodeURIComponent(data.bookingId)+"&event="+encodeURIComponent(data.eventName)+"&amount="+encodeURIComponent(data.amount)+"&status=Confirmed&eventId="+encodeURIComponent(eventId),
       reply_to: "support.culturewave@gmail.com"
     });
     // Delivery has succeeded even if the optional audit write is blocked by a
