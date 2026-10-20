@@ -914,8 +914,8 @@ firebase.initializeApp({
   appId: "1:5471814825:web:07e84f2f88486da817d5b8"
 });
 const db = firebase.firestore();
-const INVITE_EMAIL_TEMPLATE='template_667qxrq';
-const INVITE_EMAIL_SERVICE='service_esppdwf';
+const INVITE_EMAIL_TEMPLATE='template_v9pjkqj';
+const INVITE_EMAIL_SERVICE='service_772zlfa';
 const INVITE_EMAIL_PUBLIC_KEY='PDb2vpOIeLkbZBBFP';
 emailjs.init({publicKey:INVITE_EMAIL_PUBLIC_KEY});
 const auth = firebase.auth();
@@ -1025,6 +1025,7 @@ async function sendInvitationTicketEmail(ticket,url){
     booking_url:url,invite_code:ticket.bookingId,guest_name:ticket.name,guest_email:ticket.email,
     guest_phone:ticket.phone||'Not provided',ticket_count:ticket.ticketCount,event_date:invitationEventDetails().date,
     event_time:invitationEventDetails().time,event_venue:invitationEventDetails().venue,
+    time:new Date().toLocaleString('en-IN'),email:'support@culturewave.in',
     ...content,reply_to:'support@culturewave.in'
   });
 }
