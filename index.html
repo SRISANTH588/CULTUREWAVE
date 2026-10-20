@@ -2193,6 +2193,11 @@
     return true;
   }
 
+  function isPublicEventListing(data) {
+    const status=String(data?.status||'').toLowerCase();
+    return data?.publicListing!==false && ['published','live','active'].includes(status);
+  }
+
   function eventPublicPath(name,id=''){
     const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';
     return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;
@@ -2220,15 +2225,29 @@
   }
 
   async function loadIndexEvents() {
+    const grid = document.getElementById('indexEventsGrid');
+    const empty = document.getElementById('indexEventsEmpty');
+    if(!grid) return;
     try {
-      const grid = document.getElementById('indexEventsGrid');
-      const empty = document.getElementById('indexEventsEmpty');
-      if(!grid) return;
-      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0,12);
+      const allDocs=await getHomepageEvents();
+      const upcoming=allDocs.filter(doc=>isPublishedEvent(doc.data()));
+      // Keep the homepage event cards useful if all published dates are past
+      // or have stale date metadata; the Events page still lists these items.
+      const docs=(upcoming.length?upcoming:allDocs.filter(doc=>isPublicEventListing(doc.data()))).slice(0,12);
       if(!docs.length){ empty.style.display=''; return; }
       empty.style.display = 'none';
+      grid.querySelectorAll('.ev-card').forEach(card=>card.remove());
       docs.forEach((doc, i) => renderEventCard(doc, i, grid));
-    } catch(e) { console.error('Events load error:', e.message); }
+    } catch(e) {
+      console.error('Events load error:', e.message);
+      if(empty){
+        empty.style.display='block';
+        empty.replaceChildren(document.createTextNode('Events could not load. Check your connection and try again. '));
+        const retry=document.createElement('button');retry.type='button';retry.textContent='Try again';
+        retry.style.cssText='display:block;margin:14px auto 0;padding:10px 18px;border:1px solid #555;border-radius:999px;background:#161616;color:#fff;font:inherit;font-weight:800;cursor:pointer';
+        retry.addEventListener('click',loadIndexEvents);empty.append(retry);
+      }
+    }
   }
 
   function renderEventCard(doc, i, grid){
@@ -2678,7 +2697,9 @@
     try{
       const scroll = document.getElementById('tvScroll');
       if(!scroll) return;
-      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data()));
+      const allDocs=await getHomepageEvents();
+      const upcoming=allDocs.filter(doc=>isPublishedEvent(doc.data()));
+      const docs=upcoming.length?upcoming:allDocs.filter(doc=>isPublicEventListing(doc.data()));
       if(!docs.length){ document.getElementById('tvSection').style.display='none'; return; }
       // aggregate venues
       const VENUE_OVERRIDES = {
@@ -2717,7 +2738,24 @@
           ${v.city?`<div class="tv-city">${v.city}</div>`:''}`;
         scroll.appendChild(a);
       });
-    }catch(e){ console.warn('TopVenues:', e.message); }
+    }catch(e){
+      console.warn('TopVenues:', e.message);
+      const section=document.getElementById('tvSection');
+      const scroll=document.getElementById('tvScroll');
+      if(section&&scroll){
+        section.style.display='';
+        let message=document.getElementById('tvLoadError');
+        if(!message){
+          message=document.createElement('div');message.id='tvLoadError';
+          message.style.cssText='padding:.75rem 0;color:rgba(255,255,255,.65);font-size:.9rem';
+          scroll.parentElement.appendChild(message);
+        }
+        message.textContent='Venues could not load. ';
+        const retry=document.createElement('button');retry.type='button';retry.textContent='Try again';
+        retry.style.cssText='margin-left:.5rem;padding:.4rem .8rem;border:1px solid #555;border-radius:999px;background:#161616;color:#fff;font:inherit;font-weight:700;cursor:pointer';
+        retry.addEventListener('click',()=>{message.remove();loadTopVenues();});message.appendChild(retry);
+      }
+    }
   })();
 
   // SCENE STEALERS
