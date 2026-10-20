@@ -108,17 +108,17 @@
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
         <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
         <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       `;
 
-    const moreGroup = Array.from(menu.querySelectorAll('.mobile-nav-group')).find((group) => group.querySelector('.mobile-nav-group-title')?.textContent.trim().toLowerCase() === 'more');
-    const moreCard = moreGroup?.querySelector('.mobile-nav-card');
-    if (moreCard && !moreCard.querySelector('[data-action="logout"]')) {
-      moreCard.insertAdjacentHTML('beforeend', '<a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>');
-    } else if (!moreCard) {
-      menu.insertAdjacentHTML('beforeend', '<section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card"><a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a></div></section>');
-    }
+    menu.querySelectorAll('[data-action="logout"]').forEach((link) => link.remove());
+    menu.querySelector('.mobile-nav-logout-card')?.remove();
+    const supportGroup = Array.from(menu.querySelectorAll('.mobile-nav-group')).find((group) => group.querySelector('.mobile-nav-group-title')?.textContent.trim().toLowerCase() === 'support');
+    const logoutCard = document.createElement('div');
+    logoutCard.className = 'mobile-nav-card mobile-nav-logout-card';
+    logoutCard.innerHTML = '<a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>';
+    if (supportGroup) supportGroup.insertAdjacentElement('afterend', logoutCard);
+    else menu.appendChild(logoutCard);
 
     const closeMenu = () => {
       menu.classList.remove('open', 'showing-view');
@@ -351,6 +351,7 @@
       #mobileNav .mobile-profile-arrow{display:grid!important;place-items:center!important;width:26px!important;height:26px!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
       #mobileNav .mobile-profile-login{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:76px!important;min-height:34px!important;padding:0 14px!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#111!important;font-size:.82rem!important;font-weight:800!important;line-height:1!important;}
       .mobile-organizer-prompt,.mobile-nav-group{width:100%!important;max-width:760px!important;margin-right:auto!important;margin-left:auto!important;}
+      .mobile-nav-logout-card{width:100%!important;max-width:760px!important;margin:0 auto 1.25rem!important;}
       .mobile-organizer-prompt{display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:.5rem 1rem!important;margin-bottom:1.5rem!important;padding:1.1rem!important;border:1px solid #39343f!important;border-radius:20px!important;background:linear-gradient(120deg,#251b35,#1b1b20 75%)!important;color:#fff!important;}
       .mobile-organizer-prompt span,.mobile-organizer-prompt p,.mobile-organizer-prompt a{grid-column:1/-1!important;}
       .mobile-organizer-prompt span{color:#b8a5d2!important;font-size:.72rem!important;font-weight:800!important;letter-spacing:.12em!important;text-transform:uppercase!important;}
@@ -418,6 +419,7 @@
       #mobileNav .mobile-nav-view-close{font-size:1.5rem;}
       #mobileNav .mobile-nav-view-frame{display:block;width:100%;min-height:0;flex:1;border:1px solid #303033;border-radius:16px;background:#111;}
       .mobile-organizer-prompt{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.5rem 1rem;margin:0 0 1.55rem;padding:1.1rem;border:1px solid #39343f;border-radius:20px;background:linear-gradient(120deg,#251b35,#1b1b20 75%);color:#fff;}
+      .mobile-nav-logout-card{width:100%;margin:0 0 1.25rem;}
       .mobile-organizer-prompt span{grid-column:1/-1;color:#b8a5d2;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;}
       .mobile-organizer-prompt strong{font-size:1rem;line-height:1.35;}
       .mobile-organizer-prompt p{grid-column:1/-1;margin:0;color:#aaa;font-size:.78rem;line-height:1.45;}
