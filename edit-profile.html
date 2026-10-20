@@ -99,7 +99,7 @@
       const date=value instanceof Date?value:new Date(value);
       return Number.isNaN(date.getTime())?'':date.toISOString().slice(0,10);
     };
-    const currentValues=()=>JSON.stringify({name:nameInput.value.trim(),birthday:birthdayInput.value,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photo:selectedPhoto?.name||''});
+    const currentValues=()=>JSON.stringify({name:nameInput.value.trim(),phone:phoneInput.value.trim(),email:emailInput.value.trim(),birthday:birthdayInput.value,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photo:selectedPhoto?.name||''});
     function updateProgress(){
       const steps=[nameInput.value.trim(),phoneInput.value,emailInput.value,birthdayInput.value].filter(Boolean).length;
       stepCount.textContent=`${steps} / 4 steps done`;
