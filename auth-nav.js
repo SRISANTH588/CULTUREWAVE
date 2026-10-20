@@ -141,8 +141,15 @@
         });
         menu.appendChild(view);
       }
+      view.classList.toggle('profile-edit-view', title === 'Edit Profile');
       view.querySelector('.mobile-nav-view-title').textContent = title || 'CultureWave';
-      view.querySelector('iframe').src = href;
+      const frame = view.querySelector('iframe');
+      frame.onload = () => {
+        if (view.classList.contains('profile-edit-view') && window.matchMedia('(min-width: 961px)').matches) {
+          frame.contentDocument?.querySelector('.edit-head')?.style.setProperty('display', 'none', 'important');
+        }
+      };
+      frame.src = href;
       menu.classList.add('showing-view');
     };
 
@@ -327,6 +334,9 @@
       #mobileNav .mobile-nav-view-head strong{flex:1;overflow:hidden;font-size:1rem;text-overflow:ellipsis;white-space:nowrap;}
       #mobileNav .mobile-nav-view-back,#mobileNav .mobile-nav-view-close{display:grid;place-items:center;width:42px;height:42px;flex:none;border:1px solid #39393d;border-radius:50%;background:#1e1e21;color:#fff;font-size:1.8rem;line-height:1;}
       #mobileNav .mobile-nav-view-close{font-size:1.5rem;}
+      #mobileNav .mobile-nav-view.profile-edit-view .mobile-nav-view-back,
+      #mobileNav .mobile-nav-view.profile-edit-view .mobile-nav-view-title{display:none!important;}
+      #mobileNav .mobile-nav-view.profile-edit-view .mobile-nav-view-head{justify-content:flex-end;min-height:0;margin:0 0 .5rem;}
       #mobileNav .mobile-nav-view-frame{display:block;width:100%;min-height:0;flex:1;border:1px solid #303033;border-radius:16px;background:#111;}
     }
     .auth-actions{display:flex!important;align-items:center!important;gap:.5rem!important;padding:.3rem!important;border:1px solid #333!important;border-radius:999px!important;background:#111!important;}
