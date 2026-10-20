@@ -147,8 +147,9 @@
       const profileCard = event.target.closest('.mobile-profile-card');
       const link = event.target.closest('a');
       if (!profileCard && !link) return;
-      const editProfile = Boolean(profileCard && event.target.closest('.mobile-profile-prompt'));
-      const href = profileCard ? (editProfile ? 'edit-profile.html' : 'customer-dashboard.html?view=profile') : link.getAttribute('href');
+      const editProfile = Boolean(profileCard);
+      const isProfileLink = Boolean(link && (link.dataset.view === 'profile' || /account profile|account settings/i.test(link.textContent)));
+      const href = profileCard || isProfileLink ? 'edit-profile.html' : link.getAttribute('href');
       if (!href || /^(mailto:|tel:|javascript:)/i.test(href) || link?.target === '_blank') return;
       const target = new URL(href, document.baseURI);
       if (target.origin !== window.location.origin) return;
@@ -160,13 +161,13 @@
         const selectedView = link?.dataset.view || (normalizedLabel.includes('upcoming') ? 'upcoming' : normalizedLabel.includes('profile') || normalizedLabel.includes('account') ? 'profile' : 'bookings');
         target.searchParams.set('view', selectedView);
       }
-      showMenuPage(target.href, editProfile ? 'Edit Profile' : profileCard ? 'My Profile' : textLabel);
+      showMenuPage(target.href, editProfile || isProfileLink ? 'Edit Profile' : textLabel);
     }, true);
     menu.addEventListener('keydown', (event) => {
       if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-card')) return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      showMenuPage('customer-dashboard.html?view=profile', 'My Profile');
+      showMenuPage('edit-profile.html', 'Edit Profile');
     }, true);
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape' || !menu.classList.contains('open')) return;
