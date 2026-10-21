@@ -217,8 +217,7 @@
         window.location.assign('index.html');
         return;
       }
-      const isProfileLink = Boolean(link && (link.dataset.view === 'profile' || /account profile|account settings/i.test(link.textContent)));
-      const href = isProfileLink ? 'edit-profile.html' : link.getAttribute('href');
+      const href = link.getAttribute('href');
       if (!href || /^(mailto:|tel:|javascript:)/i.test(href) || link?.target === '_blank') return;
       const target = new URL(href, document.baseURI);
       if (target.origin !== window.location.origin) return;
@@ -229,15 +228,10 @@
         const normalizedLabel = (textLabel || '').toLowerCase();
         const selectedView = link?.dataset.view || (normalizedLabel.includes('upcoming') ? 'upcoming' : normalizedLabel.includes('profile') || normalizedLabel.includes('account') ? 'profile' : 'bookings');
         target.searchParams.set('view', selectedView);
-        if (window.matchMedia('(min-width: 961px)').matches) target.searchParams.delete('embedded');
-        else target.searchParams.set('embedded', 'menu');
+        target.searchParams.delete('embedded');
       }
-      if (window.matchMedia('(min-width: 961px)').matches) {
-        closeMenu();
-        window.location.assign(target.href);
-        return;
-      }
-      showMenuPage(target.href, isProfileLink ? 'Edit Profile' : textLabel);
+      closeMenu();
+      window.location.assign(target.href);
     }, true);
     menu.addEventListener('keydown', (event) => {
       if ((event.key !== 'Enter' && event.key !== ' ') || !event.target.closest('.mobile-profile-action')) return;
