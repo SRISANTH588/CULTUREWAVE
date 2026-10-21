@@ -5014,3 +5014,12 @@ body:has(> .site-footer) > .site-footer { margin-top: 0 !important; flex-shrink:
 html:has(body .site-footer),
 body:has(.site-footer) { background: #111 !important; }
 
+/* Keep shared site headers to the brand and menu button on mobile. */
+@media (max-width: 960px) {
+  .topbar .nav-wrap > .topnav,
+  .topbar .nav-wrap > .auth-actions,
+  .topbar .nav-wrap > .mobile-header-actions,
+  .topbar .nav-wrap > .desktop-header-search { display: none !important; }
+  .topbar .nav-wrap > .brand-block .brand-sub { display: none !important; }
+}
+
