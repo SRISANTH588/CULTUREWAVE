@@ -177,10 +177,22 @@ body:has(.support-page) .footer-wrap {
   max-width: none !important;
   margin-right: 0 !important;
   margin-left: 0 !important;
-  padding-right: 0 !important;
-  padding-left: 0 !important;
+  padding-right: clamp(14px, 2.4vw, 32px) !important;
+  padding-left: clamp(14px, 2.4vw, 32px) !important;
 }
-body:has(.support-page) .support-page { padding-right: 0 !important; padding-left: 0 !important; }
+body:has(.support-page) .support-page { padding-right: clamp(14px, 2.4vw, 32px) !important; padding-left: clamp(14px, 2.4vw, 32px) !important; }
+body:has(.hw-hero) .hw-timeline,
+body:has(.hw-hero) .hw-organizer-hero,
+body:has(.support-page) .support-hero,
+body:has(.support-page) .support-form {
+  width: 100% !important;
+  max-width: none !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+body:has(.pr-hero) .pr-hero-inner > p,
+body:has(.ft-hero) .ft-hero-inner > p,
+body:has(.hw-hero) .hw-hero-inner > p { max-width: 720px; margin-right: auto !important; margin-left: auto !important; }
 body:has(.ft-hero) main > *, body:has(.pr-hero) main > *,
 body:has(.hw-hero) main > *, body:has(.legal-hero) main > *,
 body:has(.support-page) main > * { min-width: 0; max-width: none; }
@@ -210,7 +222,7 @@ body:has(.legal-hero) table, body:has(.support-page) table {
 @media (max-width: 760px) {
   .ft-hero, .pr-hero, .hw-hero { padding: 3.3rem 0 2.8rem !important; }
   .ft-hero-inner, .pr-hero-inner, .hw-hero-inner,
-  .ft-wrap, .pr-wrap, .hw-wrap, .legal-wrap, .support-wrap { padding-right: 0 !important; padding-left: 0 !important; }
+  .ft-wrap, .pr-wrap, .hw-wrap, .legal-wrap, .support-wrap { padding-right: 14px !important; padding-left: 14px !important; }
   .ft-hero h1, .pr-hero h1, .hw-hero h1, .legal-hero h1, .support-hero h1 { font-size: clamp(2.35rem, 11vw, 3.65rem) !important; }
   .ft-section, .pr-section { padding-top: 2.8rem !important; padding-bottom: 2.8rem !important; }
   .ft-card, .pr-card, .legal-card, .support-card, .guide-card { border-radius: 18px !important; }
