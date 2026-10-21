@@ -53,7 +53,7 @@
       profileCard.setAttribute('role', 'group');
       profileCard.removeAttribute('tabindex');
       profileCard.removeAttribute('aria-label');
-      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Login to your account</span><a class="mobile-profile-action mobile-profile-login" href="login.html" aria-label="Login">Login</a></span>';
+      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile</span></span>';
       if (existingCard) existingCard.replaceWith(profileCard);
       else {
         const menuHead = menu.querySelector('.mobile-nav-head');
@@ -64,17 +64,9 @@
     profileCard.setAttribute('role', 'group');
     profileCard.removeAttribute('tabindex');
     profileCard.removeAttribute('aria-label');
-    const profileAction = profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow');
-    if (profileAction) {
-      profileAction.classList.remove('mobile-profile-arrow');
-      profileAction.classList.add('mobile-profile-action', 'mobile-profile-login');
-      profileAction.href = 'login.html';
-      profileAction.dataset.action = 'login';
-      profileAction.textContent = 'Login';
-      profileAction.setAttribute('aria-label', 'Login');
-    }
+    profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow, [data-action="login"]')?.remove();
     const promptText = profileCard.querySelector('.mobile-profile-prompt > span');
-    if (promptText) promptText.textContent = 'Login to your account';
+    if (promptText) promptText.textContent = 'Complete your profile';
 
     const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
     const isIndexPage = window.location.pathname === '/' || /\/index\.html$/.test(window.location.pathname);
@@ -83,7 +75,7 @@
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
       <div class="mobile-profile-card" role="group">
         <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span>
-        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Login to your account</span><a class="mobile-profile-action mobile-profile-login" href="login.html" aria-label="Login">Login</a></span>
+        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile</span></span>
       </div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
@@ -117,9 +109,6 @@
         <a href="mailto:support.culturewave@gmail.com"><span class="mobile-nav-icon">✉</span><span>Chat with us</span><span class="mobile-nav-arrow">›</span></a>
         <a href="customer-service.html"><span class="mobile-nav-icon">✎</span><span>Share feedback</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
-      <div class="mobile-nav-group"><h2 class="mobile-nav-group-title">Account</h2><div class="mobile-nav-ctas index-mobile-ctas">
-        <a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a>
-      </div></div>
       `;
 
     menu.querySelectorAll('[data-action="logout"]').forEach((link) => link.remove());
@@ -267,19 +256,10 @@
     const profileContact = document.querySelector('.mobile-profile-contact');
     const profileProgress = document.querySelector('.mobile-profile-progress');
     const profilePrompt = document.querySelector('.mobile-profile-prompt > span');
-    const profileAction = document.querySelector('.mobile-profile-action');
     if (profileName) profileName.textContent = user?.displayName || user?.email?.split('@')[0] || 'CultureWave member';
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
     if (profileProgress) profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile';
-    if (profilePrompt) profilePrompt.textContent = user ? 'Edit profile' : 'Login to your account';
-    if (profileAction) {
-      profileAction.href = user ? 'edit-profile.html' : 'login.html';
-      profileAction.dataset.action = user ? 'edit-profile' : 'login';
-      profileAction.classList.toggle('mobile-profile-arrow', Boolean(user));
-      profileAction.classList.toggle('mobile-profile-login', !user);
-      profileAction.textContent = user ? '→' : 'Login';
-      profileAction.setAttribute('aria-label', user ? 'Edit profile' : 'Login');
-    }
+    if (profilePrompt) profilePrompt.textContent = user ? 'Edit profile' : 'Complete your profile';
     if (hamburger) {
       const initial = (user?.displayName || user?.email || 'U').trim().charAt(0).toUpperCase() || 'U';
       hamburger.dataset.initial = initial;
@@ -329,7 +309,7 @@
   style.textContent = `
     @media(max-width:960px){
       .topbar .nav-wrap>.auth-actions,.topbar .nav-wrap>.topnav,.topbar .nav-wrap>.mobile-header-actions,.topbar .nav-wrap>.desktop-header-search{display:none!important;}
-      #mobileNav .mobile-nav-ctas{display:none!important;}
+      #mobileNav .mobile-nav-ctas,#mobileNav .mobile-profile-login,#mobileNav .mobile-profile-action{display:none!important;}
       .topbar .nav-wrap>.hamburger{position:relative!important;z-index:31!important;display:flex!important;flex:0 0 42px!important;align-items:center!important;justify-content:center!important;width:42px!important;height:42px!important;margin-left:.35rem!important;padding:.4rem!important;border:1px solid #57417f!important;border-radius:13px!important;background:#24212b!important;box-shadow:none!important;}
       .topbar .nav-wrap>.hamburger span{display:block!important;width:24px!important;height:2.5px!important;border-radius:2px!important;background:#c7a9ff!important;}
     }
@@ -443,6 +423,7 @@
       .mobile-nav-icon{display:grid;place-items:center;width:25px;flex:none;color:#aaa;font-size:1.1rem;}
       .mobile-nav-arrow{margin-left:auto;color:#777;font-size:1.4rem;font-weight:400;}
       .mobile-nav-ctas{display:grid!important;grid-template-columns:1fr 1fr;gap:.55rem!important;margin:0!important;padding:0!important;border:0!important;}
+      #mobileNav .mobile-nav-ctas,#mobileNav .mobile-profile-login,#mobileNav .mobile-profile-action{display:none!important;}
       .mobile-nav-ctas::before{display:none!important;}
       .mobile-nav-ctas .nav-link,.mobile-nav-ctas .nav-cta{display:flex;align-items:center;justify-content:center;min-height:48px;padding:.6rem!important;border:1px solid #38383b!important;border-radius:14px!important;background:#222!important;color:#fff!important;font-size:.8rem!important;font-weight:800!important;}
       body:has(.mobile-nav.open)>header,body:has(.mobile-nav.open)>main,body:has(.mobile-nav.open)>footer,body:has(.mobile-nav.open)>.mobile-bottom-nav{transform:none!important;}
