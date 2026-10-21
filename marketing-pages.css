@@ -14,6 +14,10 @@ body:has(.ft-hero), body:has(.pr-hero), body:has(.hw-hero),
 body:has(.legal-hero), body:has(.support-page) {
   background: var(--page-bg) !important;
   color: var(--page-white) !important;
+  width: 100%;
+  max-width: none !important;
+  margin: 0 !important;
+  overflow-x: clip;
 }
 
 body:has(.ft-hero) main, body:has(.pr-hero) main,
@@ -159,14 +163,66 @@ body:has(.hw-hero) footer, body:has(.legal-hero) footer,
 body:has(.support-page) footer { background: #17151b !important; border-top: 1px solid var(--page-border) !important; }
 .footer-heart, .footer-contact-icon, .footer-credit strong, .footer-owned { color: var(--page-lilac) !important; }
 
+/* Let redesigned page content use the full canvas without horizontal clipping. */
+body:has(.ft-hero) .ft-hero-inner,
+body:has(.pr-hero) .pr-hero-inner,
+body:has(.hw-hero) .hw-hero-inner,
+body:has(.ft-hero) .ft-wrap, body:has(.pr-hero) .pr-wrap,
+body:has(.hw-hero) .hw-wrap, body:has(.legal-hero) .legal-wrap,
+body:has(.support-page) .support-wrap,
+body:has(.ft-hero) .footer-wrap, body:has(.pr-hero) .footer-wrap,
+body:has(.hw-hero) .footer-wrap, body:has(.legal-hero) .footer-wrap,
+body:has(.support-page) .footer-wrap {
+  width: 100% !important;
+  max-width: none !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+body:has(.support-page) .support-page { padding-right: 0 !important; padding-left: 0 !important; }
+body:has(.ft-hero) main > *, body:has(.pr-hero) main > *,
+body:has(.hw-hero) main > *, body:has(.legal-hero) main > *,
+body:has(.support-page) main > * { min-width: 0; max-width: none; }
+body:has(.ft-hero) *, body:has(.pr-hero) *, body:has(.hw-hero) *,
+body:has(.legal-hero) *, body:has(.support-page) * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body:has(.ft-hero) img, body:has(.pr-hero) img, body:has(.hw-hero) img,
+body:has(.legal-hero) img, body:has(.support-page) img,
+body:has(.ft-hero) iframe, body:has(.pr-hero) iframe, body:has(.hw-hero) iframe,
+body:has(.legal-hero) iframe, body:has(.support-page) iframe {
+  max-width: 100%;
+}
+body:has(.ft-hero) pre, body:has(.pr-hero) pre, body:has(.hw-hero) pre,
+body:has(.legal-hero) pre, body:has(.support-page) pre,
+body:has(.ft-hero) table, body:has(.pr-hero) table, body:has(.hw-hero) table,
+body:has(.legal-hero) table, body:has(.support-page) table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.legal-card, .ft-card, .pr-card, .support-card, .guide-card,
+.pr-calc, .support-form, .ft-showcase-box { padding-right: clamp(1rem, 3vw, 2rem) !important; padding-left: clamp(1rem, 3vw, 2rem) !important; }
+
 @media (max-width: 760px) {
   .ft-hero, .pr-hero, .hw-hero { padding: 3.3rem 0 2.8rem !important; }
   .ft-hero-inner, .pr-hero-inner, .hw-hero-inner,
-  .ft-wrap, .pr-wrap, .hw-wrap, .legal-wrap, .support-wrap { padding-right: 1.15rem !important; padding-left: 1.15rem !important; }
+  .ft-wrap, .pr-wrap, .hw-wrap, .legal-wrap, .support-wrap { padding-right: 0 !important; padding-left: 0 !important; }
   .ft-hero h1, .pr-hero h1, .hw-hero h1, .legal-hero h1, .support-hero h1 { font-size: clamp(2.35rem, 11vw, 3.65rem) !important; }
   .ft-section, .pr-section { padding-top: 2.8rem !important; padding-bottom: 2.8rem !important; }
   .ft-card, .pr-card, .legal-card, .support-card, .guide-card { border-radius: 18px !important; }
   .legal-hero { padding-top: 3.5rem !important; text-align: left !important; }
   .legal-card { margin: 1.5rem 0 3rem !important; }
   .support-hero { border-radius: 22px !important; }
+  .hw-steps { display: grid !important; grid-template-columns: minmax(0,1fr) !important; gap: .8rem !important; overflow: visible !important; padding: 0 !important; }
+  .hw-step { flex: initial !important; width: 100% !important; max-width: none !important; }
+  .hw-steps-panel, .hw-detail-grid, .hw-timeline, .ft-grid, .pr-grid,
+  .support-grid, .guides-grid, .ft-steps, .ft-showcase-list { min-width: 0 !important; max-width: 100% !important; }
+  .pr-grid, .ft-grid, .support-grid, .guides-grid { grid-template-columns: minmax(0,1fr) !important; }
+  .ft-hero-actions, .legal-actions, .hw-tabs { max-width: 100%; flex-wrap: wrap; }
+  .pr-luxe, .pr-calc-grid, .support-fields { grid-template-columns: minmax(0,1fr) !important; }
+  .pr-luxe > *, .pr-grid > *, .ft-grid > *, .hw-steps > *, .support-grid > *, .guides-grid > * { min-width: 0 !important; max-width: 100% !important; }
 }
