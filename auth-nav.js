@@ -77,9 +77,14 @@
     if (promptText) promptText.textContent = 'Login to your account';
 
     const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
+    const isIndexPage = window.location.pathname === '/' || /\/index\.html$/.test(window.location.pathname);
     menu.setAttribute('aria-label', 'Profile and site navigation');
-    if (!hasExistingMenuContent) menu.innerHTML = `
+    if (!hasExistingMenuContent || !isIndexPage) menu.innerHTML = `
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
+      <div class="mobile-profile-card" role="group">
+        <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span>
+        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Login to your account</span><a class="mobile-profile-action mobile-profile-login" href="login.html" aria-label="Login">Login</a></span>
+      </div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
         <a href="events.html"><span class="mobile-nav-icon">◷</span><span>Explore events</span><span class="mobile-nav-arrow">›</span></a>
@@ -89,6 +94,9 @@
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Gift Cards</h2><div class="mobile-nav-card">
         <a href="claim-gift-card.html"><span class="mobile-nav-icon">▱</span><span>Claim Gift Card</span><span class="mobile-nav-arrow">›</span></a>
         <a href="buy-gift-card.html"><span class="mobile-nav-icon">＋</span><span>Buy Gift Card</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">One Club</h2><div class="mobile-nav-card">
+        <a href="one-club.html"><span class="mobile-nav-icon">◉</span><span>Balance &amp; activity</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Manage</h2><div class="mobile-nav-card">
         <a href="customer-dashboard.html" data-view="bookings"><span class="mobile-nav-icon">▤</span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
@@ -100,15 +108,18 @@
         <a href="pricing.html"><span class="mobile-nav-icon">₹</span><span>Pricing</span><span class="mobile-nav-arrow">›</span></a>
         <a href="how-it-works.html"><span class="mobile-nav-icon">↗</span><span>How it works</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
+      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
+        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
+      </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Support</h2><div class="mobile-nav-card">
         <a href="customer-service.html"><span class="mobile-nav-icon">ⓘ</span><span>Frequently asked questions</span><span class="mobile-nav-arrow">›</span></a>
         <a href="mailto:support.culturewave@gmail.com"><span class="mobile-nav-icon">✉</span><span>Chat with us</span><span class="mobile-nav-arrow">›</span></a>
         <a href="customer-service.html"><span class="mobile-nav-icon">✎</span><span>Share feedback</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
-      <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
-        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
-      </div></section>
+      <div class="mobile-nav-group"><h2 class="mobile-nav-group-title">Account</h2><div class="mobile-nav-ctas index-mobile-ctas">
+        <a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="login.html">Get Started</a>
+      </div></div>
       `;
 
     menu.querySelectorAll('[data-action="logout"]').forEach((link) => link.remove());
@@ -316,6 +327,11 @@
   const style = document.createElement('style');
   style.id = 'culturewave-shared-account-navigation';
   style.textContent = `
+    @media(max-width:960px){
+      .topbar .nav-wrap>.hamburger{position:relative!important;z-index:31!important;display:flex!important;flex:0 0 42px!important;align-items:center!important;justify-content:center!important;width:42px!important;height:42px!important;margin-left:.35rem!important;padding:.4rem!important;border:1px solid #333!important;border-radius:13px!important;background:#111!important;box-shadow:none!important;}
+      .topbar .nav-wrap>.hamburger span{display:block!important;width:24px!important;height:2.5px!important;border-radius:2px!important;background:#fff!important;}
+    }
+    @media(max-width:700px){.topbar .nav-wrap>.hamburger{margin-left:.2rem!important;}}
     @media(min-width:961px){
       .topbar .nav-wrap>.auth-actions{display:none!important;}
       .topbar .nav-wrap>.hamburger{display:grid!important;place-items:center!important;flex:0 0 52px!important;width:52px!important;height:52px!important;margin-left:auto!important;padding:0!important;border:0!important;border-radius:50%!important;background:#141418!important;color:#fff!important;box-shadow:none!important;}
