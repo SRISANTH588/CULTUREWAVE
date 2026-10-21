@@ -330,7 +330,7 @@
         .ev-stats-inner { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
       }
 
-      /* CultureWave charcoal and violet event discovery redesign. */
+      /* Monochrome CultureWave theme with standard event cards. */
       html,body{background:#000!important;color:#fff!important;}
       .ev-location::before{content:"";}
       .topbar{background:#000!important;border-bottom:1px solid #242424!important;box-shadow:0 12px 30px rgba(0,0,0,.5)!important;}
@@ -370,54 +370,6 @@
       .ev-empty{color:#aaa}.ev-empty span{filter:grayscale(1)}
       .site-footer{background:#050505}
       @media(max-width:600px){.ev-hero{padding:2.7rem 0 2.2rem}.ev-hero h1{font-size:clamp(2.2rem,11vw,3.2rem)}.ev-grid{gap:1rem}.ev-banner{aspect-ratio:16/10}.ev-city-select{width:100%}}
-
-      .ev-hero{position:relative;isolation:isolate;overflow:hidden;padding:clamp(3.5rem,7vw,6rem) 0 3rem;border:0;background:radial-gradient(ellipse at 78% 34%,rgba(124,58,237,.17),transparent 34%),linear-gradient(130deg,#18171c 0%,#111014 52%,#0c0b0f 100%)}
-      .ev-hero::after{content:"";position:absolute;z-index:-1;width:460px;height:460px;right:-150px;top:-240px;border:1px solid rgba(196,167,255,.13);border-radius:50%;box-shadow:0 0 0 44px rgba(196,167,255,.025),0 0 0 92px rgba(196,167,255,.02)}
-      .ev-hero-inner{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);align-items:center;gap:clamp(2rem,6vw,6rem);max-width:1320px;padding:0 2rem}
-      .ev-hero-copy{max-width:650px}
-      .ev-kicker{display:flex;align-items:center;gap:.65rem;margin:0 0 1.15rem;color:#c4a7ff;font-size:.72rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
-      .ev-kicker::before{content:"";width:25px;height:1px;background:#a78bfa}
-      .ev-hero h1{max-width:680px;margin:0 0 1rem;font-family:Manrope,sans-serif;font-size:clamp(3rem,6.2vw,5.6rem);font-weight:800;line-height:.98;letter-spacing:-.075em}
-      .ev-hero h1 span{display:block;text-decoration:none;color:#b99aff}
-      .ev-hero p{max-width:520px;margin:0;color:#aaa5b3;font-size:1rem;line-height:1.75}
-      .ev-hero-art{position:relative;min-height:350px;display:grid;place-items:center}
-      .ev-art-orbit{position:absolute;width:min(30vw,330px);aspect-ratio:1;border:1px solid rgba(196,167,255,.22);border-radius:50%;box-shadow:0 0 0 32px rgba(139,92,246,.045),0 0 70px rgba(139,92,246,.12)}
-      .ev-art-disc{position:absolute;width:min(23vw,245px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 34% 28%,#d7c5ff 0,#a78bfa 12%,#7043bb 43%,#27202f 72%);box-shadow:0 28px 90px rgba(124,58,237,.34)}
-      .ev-art-disc::after{content:"CW";position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.88);font-size:clamp(3rem,6vw,5.5rem);font-weight:800;letter-spacing:-.1em}
-      .ev-art-card{position:absolute;right:2%;bottom:6%;width:min(220px,55%);padding:1rem 1.1rem;border:1px solid rgba(210,194,240,.22);border-radius:18px;background:rgba(30,27,35,.83);box-shadow:0 18px 55px rgba(0,0,0,.4);backdrop-filter:blur(16px)}
-      .ev-art-card span{display:block;color:#b99aff;font-size:.65rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
-      .ev-art-card strong{display:block;margin-top:.4rem;color:#fff;font-size:1.1rem;line-height:1.2}
-      .ev-discovery{position:relative;z-index:2;max-width:1240px;margin:-1.2rem auto 0;padding:0 1.4rem}
-      .ev-discovery-inner{padding:1.2rem;border:1px solid #302c37;border-radius:22px;background:#19181d;box-shadow:0 20px 60px rgba(0,0,0,.28)}
-      .ev-search-row{max-width:none;margin:0 0 1rem;gap:.6rem}
-      .ev-search-row input{min-height:52px;border-radius:14px;padding-inline:1rem}
-      .ev-search-btn{min-width:112px;border-radius:14px}
-      .ev-chips{gap:.55rem}
-      .ev-chip,.ev-city-select{min-height:40px;padding:.5rem .9rem;font-size:.78rem}
-      .ev-stats{margin-top:2rem;background:transparent;border:0}
-      .ev-stats-inner{max-width:1240px;padding:.5rem 1.4rem;align-items:end}
-      .ev-results-title{margin:0;color:#fff;font-size:1.6rem;font-weight:800;letter-spacing:-.05em}
-      .ev-results-kicker{margin:0 0 .3rem;color:#a78bfa;font-size:.67rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-      .ev-count{margin:.4rem 0 0;color:#9994a2}
-      .ev-sort{color:#9994a2}
-      .ev-sort select{min-height:40px;border-radius:12px;padding:.45rem 2rem .45rem .8rem}
-      .ev-section{max-width:1240px;padding:1.2rem 1.4rem 5rem}
-      .ev-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:1.15rem}
-      .ev-card{border-radius:20px;background:#19181d;border-color:#2c2932;transition:transform .25s,border-color .25s,box-shadow .25s}
-      .ev-card:hover{transform:translateY(-5px);border-color:#7252a6;box-shadow:0 22px 48px rgba(0,0,0,.4),0 0 24px rgba(139,92,246,.1)}
-      .ev-banner{aspect-ratio:1.35/1;background-position:center 40%;transition:transform .45s}
-      .ev-card:hover .ev-banner{transform:scale(1.025)}
-      .ev-poster-wrap{background:#211d28}
-      .ev-tag{top:.9rem;left:.9rem;padding:.38rem .72rem;border-radius:999px;background:rgba(18,15,24,.78);border-color:rgba(196,167,255,.4);font-size:.65rem;letter-spacing:.1em}
-      .ev-body{padding:1.05rem 1.15rem 1.15rem}
-      .ev-info h3{font-size:1.04rem;line-height:1.4;margin:.45rem 0 .55rem}
-      .ev-date-meta{display:inline-flex;padding:.3rem .55rem;border:1px solid #3b304a;border-radius:7px;background:#211a2b;color:#c4a7ff;font-size:.67rem;letter-spacing:.06em;text-transform:uppercase}
-      .ev-card-bottom{margin-top:.8rem;padding-top:.75rem}
-      .ev-venue{font-size:.76rem}
-      .ev-price-bar{white-space:nowrap;font-size:.76rem}
-      .ev-empty{padding:5rem 1rem;border:1px dashed #38323f;border-radius:20px;background:#151417}
-      @media(max-width:900px){.ev-hero-inner{grid-template-columns:1fr minmax(240px,.7fr);gap:1rem}.ev-hero-art{min-height:290px}.ev-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-      @media(max-width:640px){.ev-hero{padding:3.2rem 0 2.3rem}.ev-hero-inner{grid-template-columns:1fr;padding:0 1.2rem}.ev-hero-copy{position:relative;z-index:1}.ev-hero h1{font-size:clamp(2.8rem,13vw,4.2rem)}.ev-hero p{font-size:.92rem}.ev-hero-art{position:absolute;right:-65px;top:45px;width:220px;min-height:220px;opacity:.42;pointer-events:none}.ev-art-orbit{width:190px}.ev-art-disc{width:145px}.ev-art-card{display:none}.ev-discovery{margin:-.85rem auto 0;padding:0 .8rem}.ev-discovery-inner{padding:.85rem;border-radius:18px}.ev-search-row{flex-direction:row}.ev-search-row input{min-width:0;min-height:48px;padding:.7rem .8rem;font-size:.82rem}.ev-search-btn{min-width:auto;padding:.7rem .9rem;font-size:.8rem}.ev-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:.2rem;scrollbar-width:none}.ev-chips::-webkit-scrollbar{display:none}.ev-chip,.ev-city-select{flex:none;white-space:nowrap}.ev-city-select{width:auto}.ev-stats{margin-top:1.7rem}.ev-stats-inner{flex-direction:row;align-items:center;padding:0 1rem}.ev-results-title{font-size:1.3rem}.ev-count{font-size:.75rem}.ev-sort{font-size:.75rem}.ev-sort select{max-width:100px}.ev-section{padding:1rem .8rem 4rem}.ev-grid{grid-template-columns:1fr;gap:.85rem}.ev-card{display:grid;grid-template-columns:38% minmax(0,1fr);align-items:stretch;min-height:145px}.ev-poster-wrap{min-height:100%;}.ev-banner{height:100%;min-height:145px;aspect-ratio:auto}.ev-body{align-self:center;padding:.8rem}.ev-info h3{font-size:.9rem;margin:.4rem 0}.ev-card-bottom{display:block;margin-top:.55rem;padding-top:.5rem}.ev-price-bar{display:block;margin-top:.35rem}.ev-venue{font-size:.69rem}.ev-empty{grid-column:1}}
     </style>
   </head>
   <body>
@@ -459,27 +411,18 @@
       <!-- HERO -->
       <section class="ev-hero">
         <div class="ev-hero-inner">
-          <div class="ev-hero-copy">
-            <div class="ev-kicker">CultureWave presents</div>
-            <h1>Make room for <span>what moves you.</span></h1>
-            <p>From late night sets to new city discoveries, find the experiences worth stepping out for.</p>
-          </div>
-          <div class="ev-hero-art" aria-hidden="true">
-            <div class="ev-art-orbit"></div><div class="ev-art-disc"></div>
-            <div class="ev-art-card"><span>Your next story starts here</span><strong>Find your people.<br>Feel the moment.</strong></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="ev-discovery" aria-label="Find events">
-        <div class="ev-discovery-inner">
+          <div class="ev-location">Events across India</div>
+          <h1>Find your next <span>experience</span></h1>
+          <p>Explore live music, food, workshops, nightlife and unique experiences across cities in India. Find something happening near you.</p>
           <div class="ev-search-row">
-            <input id="eventSearch" type="search" placeholder="Search events, cities, venues…" aria-label="Search events, cities, venues, and categories" />
+            <input id="eventSearch" type="search" placeholder="Search events, cities, venues, categories…" />
             <button class="ev-search-btn" type="button">Search</button>
           </div>
           <div class="ev-chips" id="eventCategoryChips" aria-label="Filter by event category">
             <button class="ev-chip active" type="button" data-filter="all">All Events</button>
-            <select class="ev-city-select" id="eventCityFilter" aria-label="Filter by city"><option value="">All cities</option></select>
+            <select class="ev-city-select" id="eventCityFilter" aria-label="Filter by city">
+              <option value="">All cities</option>
+            </select>
           </div>
         </div>
       </section>
@@ -487,7 +430,7 @@
       <!-- STATS BAR -->
       <div class="ev-stats">
         <div class="ev-stats-inner">
-          <div><p class="ev-results-kicker">The good stuff</p><h2 class="ev-results-title">Upcoming events</h2><p class="ev-count">Showing <strong id="evCount">0</strong> events across India</p></div>
+          <p class="ev-count">Showing <strong id="evCount">0</strong> events across India</p>
           <div class="ev-sort">
             Sort by
             <select id="evSort">
