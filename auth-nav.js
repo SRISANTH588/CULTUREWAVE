@@ -26,8 +26,8 @@
     const syncDesktopHeader = () => {
       const desktop = window.matchMedia('(min-width: 961px)').matches;
       header?.querySelectorAll('.auth-actions').forEach((actions) => {
-        if (desktop) actions.style.setProperty('display', 'none', 'important');
-        else actions.style.removeProperty('display');
+        if (desktop) actions.style.removeProperty('display');
+        else actions.style.setProperty('display', 'none', 'important');
       });
     };
     syncDesktopHeader();
