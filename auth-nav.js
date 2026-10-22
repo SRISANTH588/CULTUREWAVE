@@ -20,6 +20,14 @@
     image.src = photoURL;
   }
 
+  function setProfileEditAction(action, complete) {
+    if (!action) return;
+    action.classList.toggle('mobile-profile-edit-button', complete);
+    action.classList.toggle('mobile-profile-arrow', !complete);
+    action.textContent = complete ? 'Edit profile' : '→';
+    action.setAttribute('aria-label', 'Edit profile');
+  }
+
   function buildUnifiedMobileMenu() {
     const header = document.querySelector('.topbar');
     const navWrap = header?.querySelector('.nav-wrap');
@@ -191,7 +199,10 @@
             const progress = menu.querySelector('.mobile-profile-progress');
             if (name && profile.name) name.textContent = profile.name;
             if (contact && profile.phone) contact.textContent = profile.phone;
-            if (progress && profile.steps) progress.textContent = profile.steps;
+            if (progress && profile.steps) {
+              progress.textContent = profile.steps;
+              setProfileEditAction(menu.querySelector('.mobile-profile-action'), /^\s*4\s*\/\s*4/.test(profile.steps));
+            }
             if (profile.photoURL) setProfileAvatar(profile.photoURL);
           }
         });
@@ -313,7 +324,7 @@
     if (profileAction) {
       profileAction.href = user ? 'edit-profile.html' : loginHref;
       profileAction.dataset.action = user ? 'edit-profile' : 'login';
-      profileAction.classList.remove('mobile-profile-arrow', 'mobile-profile-login');
+      profileAction.classList.remove('mobile-profile-arrow', 'mobile-profile-edit-button', 'mobile-profile-login');
       profileAction.classList.add('mobile-profile-action', user ? 'mobile-profile-arrow' : 'mobile-profile-login');
       profileAction.textContent = user ? '→' : 'Login';
       profileAction.setAttribute('aria-label', user ? 'Edit profile' : 'Login');
@@ -337,6 +348,7 @@
         renderProfileAvatar(profileAvatar, photoURL);
         const filledSteps = [Boolean(user.displayName || profileData.name || profileData.fullName), Boolean(profileData.whatsapp || profileData.phone || profileData.phoneNumber || profileData.mobile || user.phoneNumber), Boolean(user.email || profileData.email), Boolean(profileData.birthday || profileData.dob || profileData.dateOfBirth || profileData.birthDate)].filter(Boolean).length;
         if (profileProgress) profileProgress.textContent = `${filledSteps} / 4 steps done`;
+        setProfileEditAction(profileAction, filledSteps === 4);
       } catch (error) {
         console.warn('Could not load profile details for mobile menu:', error);
       }
@@ -411,6 +423,7 @@
       #mobileNav .mobile-profile-prompt{display:grid!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.9rem!important;line-height:1.4!important;}
       #mobileNav .mobile-profile-prompt:has(.mobile-profile-login){grid-template-columns:minmax(0,1fr) auto!important;}
       #mobileNav .mobile-profile-arrow{display:grid!important;place-items:center!important;width:26px!important;height:26px!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
+      #mobileNav .mobile-profile-edit-button{display:inline-flex!important;grid-column:1/-1!important;justify-self:end!important;align-items:center!important;justify-content:center!important;min-height:38px!important;padding:0 16px!important;border:1px solid #c7afff!important;border-radius:999px!important;background:#c7afff!important;color:#17131e!important;font-size:.84rem!important;font-weight:800!important;line-height:1!important;}
       #mobileNav .mobile-profile-login{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:76px!important;min-height:34px!important;padding:0 14px!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#111!important;font-size:.82rem!important;font-weight:800!important;line-height:1!important;}
       .mobile-organizer-prompt,.mobile-nav-group{width:100%!important;max-width:760px!important;margin-right:auto!important;margin-left:auto!important;}
       .mobile-nav-logout-card{width:100%!important;max-width:760px!important;margin:0 auto 1.25rem!important;}
@@ -471,6 +484,7 @@
       #mobileNav .mobile-profile-prompt{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.87rem!important;line-height:1.35!important;}
       #mobileNav .mobile-profile-prompt:has(.mobile-profile-login){grid-template-columns:minmax(0,1fr) auto!important;}
       #mobileNav .mobile-profile-arrow{display:grid!important;position:static!important;place-items:center!important;width:26px!important;height:26px!important;box-sizing:border-box!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
+      #mobileNav .mobile-profile-edit-button{display:inline-flex!important;position:static!important;grid-column:1/-1!important;justify-self:end!important;align-items:center!important;justify-content:center!important;min-height:38px!important;padding:0 16px!important;border:1px solid #c7afff!important;border-radius:999px!important;background:#c7afff!important;color:#17131e!important;font-size:.84rem!important;font-weight:800!important;line-height:1!important;}
       #mobileNav .mobile-profile-login{display:inline-flex!important;position:static!important;align-items:center!important;justify-content:center!important;min-width:76px!important;min-height:34px!important;padding:0 14px!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#111!important;font-size:.82rem!important;font-weight:800!important;line-height:1!important;}
       #mobileNav.showing-view{overflow:hidden!important;padding:0!important;}
       #mobileNav.showing-view>:not(.mobile-nav-view){display:none!important;}
