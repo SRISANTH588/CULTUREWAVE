@@ -53,7 +53,7 @@
       profileCard.setAttribute('role', 'group');
       profileCard.removeAttribute('tabindex');
       profileCard.removeAttribute('aria-label');
-      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile</span></span>';
+      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress" style="display:none"></span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span style="display:none"></span></span>';
       if (existingCard) existingCard.replaceWith(profileCard);
       else {
         const menuHead = menu.querySelector('.mobile-nav-head');
@@ -66,7 +66,7 @@
     profileCard.removeAttribute('aria-label');
     profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow, [data-action="login"]')?.remove();
     const promptText = profileCard.querySelector('.mobile-profile-prompt > span');
-    if (promptText) promptText.textContent = 'Complete your profile';
+    if (promptText) { promptText.textContent = ''; promptText.style.display = 'none'; }
     profileCard.querySelector('.mobile-profile-login-row')?.remove();
 
     const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
@@ -77,8 +77,8 @@
     if (!hasExistingMenuContent || !isIndexPage) menu.innerHTML = `
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
       <div class="mobile-profile-card" role="group">
-        <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span>
-        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile</span></span>
+        <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress" style="display:none"></span></span></span>
+        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span style="display:none"></span></span>
       </div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
