@@ -11,7 +11,7 @@
   <main class="card"><div class="brand">CultureWave</div><h1>Activate your lister account</h1><p>Use the email address that received this approval link. Create a password to set up your lister account.</p><label class="field">Email address<input id="email" type="email" autocomplete="email" required></label><label class="field">Create a password<input id="password" type="password" autocomplete="new-password" minlength="8" required></label><label class="field">Confirm password<input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></label><button id="activate" class="button" type="button">Create account and activate</button><div id="status" class="status" role="status" aria-live="polite"></div></main>
   <script type="module">
     import { auth, db } from './firebase.js';
-    import { createUserWithEmailAndPassword, signInWithEmailAndPassword, reload } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { createUserWithEmailAndPassword, signInAnonymously, signInWithEmailAndPassword, reload } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
     import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     const paramsFromLink=(()=>{const queue=[location.href],seen=new Set(),state={};while(queue.length&&seen.size<12){const raw=queue.shift();if(!raw||seen.has(raw))continue;seen.add(raw);try{const url=new URL(raw,location.origin);for(const key of ['activation','applicationId'])if(!state[key]&&url.searchParams.has(key))state[key]=url.searchParams.get(key);for(const key of ['continueUrl','continueURL','link','deep_link_id']){const nested=url.searchParams.get(key);if(nested)queue.push(nested)}}catch{}}return state})();
     const emailInput=document.getElementById('email'),button=document.getElementById('activate'),status=document.getElementById('status');
@@ -28,7 +28,7 @@
       try{
         const tokenSnapshot=await getDoc(tokenRef);if(!tokenSnapshot.exists())throw new Error('This activation link is invalid or expired. Ask CultureWave to send a new one.');
         const token=tokenSnapshot.data(),expiresAt=token.expiresAt?.toDate?.()||new Date(token.expiresAt);
-        if(String(token.email||'').trim().toLowerCase()!==email.trim().toLowerCase()||token.applicationId!==paramsFromLink.applicationId)throw new Error('This activation link does not match the approved email address.');
+        if(String(token.email||'').trim().toLowerCase()!==email.trim().toLowerCase())throw new Error('This activation link belongs to a different email address. Use the approved email shown in the link.');
         if(token.used){if(token.activatedBy===uid)return;throw new Error('This activation link has already been used. Contact CultureWave if you need help.')}
         if(expiresAt.getTime()<Date.now())throw new Error('This activation link has expired. Ask CultureWave to send a new one.');
         const userRef=doc(db,'users',uid),organiserRef=doc(db,'organisers',uid),applicationRef=doc(db,'vendorOnboarding',token.applicationId),userSnapshot=await getDoc(userRef);
@@ -57,9 +57,17 @@
     }
     auth.authStateReady().then(()=>{const user=auth.currentUser;if(user?.email)emailInput.value=user.email}).catch(error=>console.error('Could not restore the sign-in session:',error));
     button.addEventListener('click',async()=>{
-      const email=emailInput.value.trim().toLowerCase(),password=document.getElementById('password').value,confirmPassword=document.getElementById('confirmPassword').value;if(!email){say('Enter the email address that received this link.');return}if(password.length<8){say('Choose a password with at least 8 characters.');return}if(password!==confirmPassword){say('The passwords do not match.');return}
+      let email=emailInput.value.trim().toLowerCase();const password=document.getElementById('password').value,confirmPassword=document.getElementById('confirmPassword').value;if(!email){say('Enter the email address that received this link.');return}if(password.length<8){say('Choose a password with at least 8 characters.');return}if(password!==confirmPassword){say('The passwords do not match.');return}
       button.disabled=true;button.textContent='Creating account…';
-      try{let user=auth.currentUser?.email?.toLowerCase()===email.toLowerCase()?auth.currentUser:null;if(!user){try{user=(await signInWithEmailAndPassword(auth,email,password)).user}catch(error){if(error.code!=='auth/user-not-found'&&error.code!=='auth/invalid-credential')throw error;user=(await createUserWithEmailAndPassword(auth,email,password)).user}}await reload(user);await completeActivation(user,email)}catch(error){say(error.code==='auth/operation-not-allowed'?'Enable Email/Password in Firebase Authentication → Sign-in method, then try again.':error.code==='auth/email-already-in-use'?'This email already has an account. Enter its current password to continue.':error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Create account and activate'}
+      try{
+        let session=auth.currentUser;if(!session)session=(await signInAnonymously(auth)).user;
+        const rawToken=paramsFromLink.activation;if(!rawToken)throw new Error('This activation link is missing its approval token. Ask CultureWave to send a new activation email.');
+        const tokenSnapshot=await getDoc(doc(db,'onboardingActivationTokens',await hashToken(rawToken)));if(!tokenSnapshot.exists())throw new Error('This activation link is invalid or expired. Ask CultureWave to send a new one.');
+        const approvedEmail=String(tokenSnapshot.data().email||'').trim().toLowerCase();if(!approvedEmail)throw new Error('The approved email is missing from this activation link. Ask CultureWave to resend it.');
+        if(email!==approvedEmail){email=approvedEmail;emailInput.value=approvedEmail}
+        let user=auth.currentUser?.email?.toLowerCase()===email?auth.currentUser:null;if(!user){try{user=(await signInWithEmailAndPassword(auth,email,password)).user}catch(error){if(error.code!=='auth/user-not-found'&&error.code!=='auth/invalid-credential')throw error;user=(await createUserWithEmailAndPassword(auth,email,password)).user}}
+        await reload(user);await completeActivation(user,email)
+      }catch(error){say(error.code==='auth/operation-not-allowed'?'Enable Email/Password in Firebase Authentication → Sign-in method, then try again.':error.code==='auth/email-already-in-use'?'This email already has an account. Enter its current password to continue.':error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Create account and activate'}
     });
   </script>
 </body>
