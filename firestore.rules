@@ -552,7 +552,6 @@ service cloud.firestore {
 
     match /onboardingActivationTokens/{tokenHash} {
       allow get: if isAdmin() || (request.auth != null &&
-        resource.data.email.lower() == request.auth.token.email.lower() &&
         resource.data.expiresAt > request.time &&
         (resource.data.used == false || resource.data.activatedBy == request.auth.uid));
       allow list: if isAdmin();
