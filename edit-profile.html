@@ -34,8 +34,8 @@
     .info-icon{display:grid;place-items:center;width:22px;height:22px;flex:none;border:2px solid #85858d;border-radius:50%;font-size:.75rem;font-weight:700}
     .section-rule{height:1px;margin:-.4rem 0 1.15rem;background:#343438}
     .save-dock{position:sticky;z-index:4;bottom:0;margin:0 -1.1rem;padding:.75rem 1rem calc(env(safe-area-inset-bottom) + .75rem);background:linear-gradient(transparent,#111 18%)}
-    .save-button{width:100%;height:62px;border:0;border-radius:999px;background:#c7a8ff;color:#17131e;font:inherit;font-size:1rem;font-weight:800}
-    .save-button:disabled{background:#38383d;color:#77777f}
+    .save-button{width:100%;height:62px;border:0;border-radius:999px;background:#fff;color:#17131e;font:inherit;font-size:1rem;font-weight:800}
+    .save-button:disabled{background:#fff;color:#77777f;opacity:.55}
     .status{min-height:1.2rem;margin:.6rem 0 0;color:#c6a9ff;text-align:center;font-size:.82rem}
     .hidden{display:none!important}
     @media(min-width:700px){.edit-page{max-width:680px;margin:auto}.save-dock{margin:0 -1.1rem;background:linear-gradient(transparent,#111 18%)}}
@@ -92,7 +92,7 @@
     const birthdayInput=document.getElementById('birthdayInput'),birthdayNote=document.getElementById('birthdayNote'),genderInput=document.getElementById('genderInput');
     const anniversaryInput=document.getElementById('anniversaryInput'),stateInput=document.getElementById('stateInput'),photoInput=document.getElementById('photoInput');
     const photoPreview=document.getElementById('photoPreview'),stepCount=document.getElementById('stepCount'),statusEl=document.getElementById('status');
-    let currentUser=null,profileData={},selectedPhoto=null,initialValues='';
+    let currentUser=null,profileData={},profileExists=false,selectedPhoto=null,initialValues='';
     const valueOf=(...values)=>values.find(value=>value!==undefined&&value!==null&&String(value).trim()!=='')||'';
     const dateValue=value=>{
       if(!value)return '';
@@ -122,7 +122,7 @@
       currentUser=user;
       if(!user){document.getElementById('signInMessage').classList.remove('hidden');return;}
       try{
-        const snap=await db.collection('users').doc(user.uid).get();profileData=snap.exists?snap.data():{};
+        const snap=await db.collection('users').doc(user.uid).get();profileExists=snap.exists;profileData=snap.exists?snap.data():{};
         nameInput.value=valueOf(user.displayName,profileData.name,profileData.fullName,user.email?.split('@')[0]);
         phoneInput.value=valueOf(profileData.whatsapp,profileData.phone,user.phoneNumber);
         phoneInput.readOnly=Boolean(phoneInput.value);
@@ -154,9 +154,10 @@
         let photoURL=currentUser.photoURL||profileData.photoURL||profileData.photoUrl||'';
         if(selectedPhoto){const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);await ref.put(selectedPhoto);photoURL=await ref.getDownloadURL();}
         const updates={name,email,phone,whatsapp:profileData.whatsapp||phone,birthday,dob:birthday,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photoURL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+        if(!profileExists)updates.role='customer';
         await db.collection('users').doc(currentUser.uid).set(updates,{merge:true});
         await currentUser.updateProfile({displayName:name,photoURL:photoURL||null});
-        profileData={...profileData,...updates};initialValues=currentValues();statusEl.textContent='Profile updated successfully';
+        profileData={...profileData,...updates};profileExists=true;initialValues=currentValues();statusEl.textContent='Profile updated successfully';
         updateProgress();
         if(window.parent!==window)window.parent.postMessage({type:'culturewave-profile-updated',profile:{name,phone:phoneInput.value,birthday,steps:stepCount.textContent,photoURL}},location.origin);
         window.setTimeout(()=>{statusEl.textContent='';},2500);
