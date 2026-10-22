@@ -53,7 +53,7 @@
       profileCard.setAttribute('role', 'group');
       profileCard.removeAttribute('tabindex');
       profileCard.removeAttribute('aria-label');
-      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress" style="display:none"></span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span style="display:none"></span></span>';
+      profileCard.innerHTML = '<span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span><span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span style="display:none"></span></span>';
       if (existingCard) existingCard.replaceWith(profileCard);
       else {
         const menuHead = menu.querySelector('.mobile-nav-head');
@@ -67,6 +67,8 @@
     profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow, [data-action="login"]')?.remove();
     const promptText = profileCard.querySelector('.mobile-profile-prompt > span');
     if (promptText) { promptText.textContent = ''; promptText.style.display = 'none'; }
+    const progressText = profileCard.querySelector('.mobile-profile-progress');
+    if (progressText) { progressText.textContent = 'Complete your profile'; progressText.style.display = ''; }
     profileCard.querySelector('.mobile-profile-login-row')?.remove();
 
     const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
@@ -77,7 +79,7 @@
     if (!hasExistingMenuContent || !isIndexPage) menu.innerHTML = `
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
       <div class="mobile-profile-card" role="group">
-        <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress" style="display:none"></span></span></span>
+        <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span>
         <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span style="display:none"></span></span>
       </div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
@@ -262,7 +264,7 @@
     const profilePrompt = document.querySelector('.mobile-profile-prompt > span');
     if (profileName) profileName.textContent = user?.displayName || user?.email?.split('@')[0] || 'CultureWave member';
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
-    if (profileProgress) { profileProgress.textContent = user ? '3 / 4 steps done' : ''; profileProgress.style.display = user ? '' : 'none'; }
+    if (profileProgress) { profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile'; profileProgress.style.display = ''; }
     if (profilePrompt) { profilePrompt.textContent = user ? 'Edit profile' : ''; profilePrompt.style.display = user ? '' : 'none'; }
     if (hamburger) {
       const initial = (user?.displayName || user?.email || 'U').trim().charAt(0).toUpperCase() || 'U';
