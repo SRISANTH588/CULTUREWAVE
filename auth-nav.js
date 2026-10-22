@@ -71,6 +71,8 @@
 
     const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
     const isIndexPage = window.location.pathname === '/' || /\/index\.html$/.test(window.location.pathname);
+    const isDashboardPage = /\/customer-dashboard\.html$/.test(window.location.pathname);
+    const showHomeLink = !isIndexPage && !isDashboardPage;
     menu.setAttribute('aria-label', 'Profile and site navigation');
     if (!hasExistingMenuContent || !isIndexPage) menu.innerHTML = `
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
@@ -80,6 +82,7 @@
       </div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
+        ${showHomeLink ? '<a href="index.html"><span class="mobile-nav-icon">⌂</span><span>Home</span><span class="mobile-nav-arrow">›</span></a>' : ''}
         <a href="events.html"><span class="mobile-nav-icon">◷</span><span>Explore events</span><span class="mobile-nav-arrow">›</span></a>
         <a href="restaurants.html"><span class="mobile-nav-icon">♧</span><span>Restaurants</span><span class="mobile-nav-arrow">›</span></a>
         <a href="category-experiences.html"><span class="mobile-nav-icon">✧</span><span>Experiences</span><span class="mobile-nav-arrow">›</span></a>
