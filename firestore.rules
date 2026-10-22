@@ -19,11 +19,11 @@ service cloud.firestore {
       let userAfter = getAfter(/databases/$(database)/documents/users/$(uid)).data;
       return request.auth != null && request.auth.uid == uid &&
         token.applicationId == applicationId &&
-        token.email == request.auth.token.email &&
+        token.email.lower() == request.auth.token.email.lower() &&
         token.used == false && token.expiresAt > request.time &&
         tokenAfter.used == true && tokenAfter.activatedBy == uid &&
         applicationAfter.status == 'APPROVED' &&
-        applicationAfter.email == request.auth.token.email &&
+        applicationAfter.email.lower() == request.auth.token.email.lower() &&
         applicationAfter.activationTokenHash == tokenHash &&
         applicationAfter.accountSetupStatus == 'ACTIVE' &&
         applicationAfter.userId == uid &&
@@ -418,7 +418,7 @@ service cloud.firestore {
         getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.signedAgreementId == 'final'
       ) || (request.auth != null &&
         resource.data.status == 'APPROVED' &&
-        resource.data.email == request.auth.token.email &&
+        resource.data.email.lower() == request.auth.token.email.lower() &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['userId', 'accountSetupStatus', 'updatedAt']) &&
         request.resource.data.userId == request.auth.uid &&
         request.resource.data.accountSetupStatus == 'ACTIVE' &&
@@ -557,7 +557,7 @@ service cloud.firestore {
 
     match /onboardingActivationTokens/{tokenHash} {
       allow get: if isAdmin() || (request.auth != null &&
-        resource.data.email == request.auth.token.email &&
+        resource.data.email.lower() == request.auth.token.email.lower() &&
         resource.data.expiresAt > request.time &&
         (resource.data.used == false || resource.data.activatedBy == request.auth.uid));
       allow list: if isAdmin();
@@ -581,7 +581,7 @@ service cloud.firestore {
         request.resource.data.activatedBy == null;
       allow update: if request.auth != null &&
         resource.data.used == false &&
-        resource.data.email == request.auth.token.email &&
+        resource.data.email.lower() == request.auth.token.email.lower() &&
         resource.data.expiresAt > request.time &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'activatedBy', 'activatedAt']) &&
         request.resource.data.used == true &&

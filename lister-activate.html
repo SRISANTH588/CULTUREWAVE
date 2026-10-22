@@ -27,7 +27,7 @@
       await runTransaction(db,async transaction=>{
         const tokenSnapshot=await transaction.get(tokenRef);if(!tokenSnapshot.exists())throw new Error('This activation link is invalid or expired. Ask CultureWave to send a new one.');
         const token=tokenSnapshot.data(),expiresAt=token.expiresAt?.toDate?.()||new Date(token.expiresAt);
-        if(token.email.toLowerCase()!==email.toLowerCase()||token.applicationId!==paramsFromLink.applicationId)throw new Error('This activation link does not match the verified email.');
+        if(String(token.email||'').trim().toLowerCase()!==email.trim().toLowerCase()||token.applicationId!==paramsFromLink.applicationId)throw new Error('This activation link does not match the approved email address.');
         if(token.used){if(token.activatedBy===uid)return;throw new Error('This activation link has already been used. Contact CultureWave if you need help.')}
         if(expiresAt.getTime()<Date.now())throw new Error('This activation link has expired. Ask CultureWave to send a new one.');
         const userRef=doc(db,'users',uid),organiserRef=doc(db,'organisers',uid),applicationRef=doc(db,'vendorOnboarding',token.applicationId),userSnapshot=await transaction.get(userRef);
@@ -54,7 +54,7 @@
       catch(error){say(error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Activate lister account'}
     }).catch(error=>console.error('Could not resume lister activation:',error));
     button.addEventListener('click',async()=>{
-      const email=emailInput.value.trim(),password=document.getElementById('password').value,confirmPassword=document.getElementById('confirmPassword').value;if(!email){say('Enter the email address that received this link.');return}if(password.length<8){say('Choose a password with at least 8 characters.');return}if(password!==confirmPassword){say('The passwords do not match.');return}
+      const email=emailInput.value.trim().toLowerCase(),password=document.getElementById('password').value,confirmPassword=document.getElementById('confirmPassword').value;if(!email){say('Enter the email address that received this link.');return}if(password.length<8){say('Choose a password with at least 8 characters.');return}if(password!==confirmPassword){say('The passwords do not match.');return}
       button.disabled=true;button.textContent='Creating account…';
       try{let user=auth.currentUser?.email?.toLowerCase()===email.toLowerCase()?auth.currentUser:null;if(!user){try{user=(await signInWithEmailAndPassword(auth,email,password)).user}catch(error){if(error.code!=='auth/user-not-found'&&error.code!=='auth/invalid-credential')throw error;user=(await createUserWithEmailAndPassword(auth,email,password)).user}}await reload(user);await completeActivation(user,email)}catch(error){say(error.code==='auth/operation-not-allowed'?'Enable Email/Password in Firebase Authentication → Sign-in method, then try again.':error.code==='auth/email-already-in-use'?'This email already has an account. Enter its current password to continue.':error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Create account and activate'}
     });
