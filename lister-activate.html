@@ -47,12 +47,7 @@
       const userSnapshot=await getDoc(doc(db,'users',user.uid)),profile=userSnapshot.exists()?userSnapshot.data():{},destination=allowedDashboards.has(profile.dashboard)?profile.dashboard:dashboardByCategory[normalizeCategory(profile.preferredCategory)]||'premium-client-dashboard.html';
       say('Your lister account is active. Opening your dashboard…',true);button.textContent='Account activated';setTimeout(()=>location.assign(destination),900);
     }
-    auth.authStateReady().then(async()=>{
-      const user=auth.currentUser;if(!user)return;
-      if(user.email)emailInput.value=user.email;
-      try{await reload(user);button.disabled=true;button.textContent='Activating lister account…';say('Setting up your lister account…',true);await completeActivation(user,user.email||'')}
-      catch(error){say(error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Activate lister account'}
-    }).catch(error=>console.error('Could not resume lister activation:',error));
+    auth.authStateReady().then(()=>{const user=auth.currentUser;if(user?.email)emailInput.value=user.email}).catch(error=>console.error('Could not restore the sign-in session:',error));
     button.addEventListener('click',async()=>{
       const email=emailInput.value.trim().toLowerCase(),password=document.getElementById('password').value,confirmPassword=document.getElementById('confirmPassword').value;if(!email){say('Enter the email address that received this link.');return}if(password.length<8){say('Choose a password with at least 8 characters.');return}if(password!==confirmPassword){say('The passwords do not match.');return}
       button.disabled=true;button.textContent='Creating account…';
