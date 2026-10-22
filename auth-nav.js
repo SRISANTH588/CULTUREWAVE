@@ -173,13 +173,30 @@
 
     profileCard?.addEventListener('click', (event) => {
       const action = event.target.closest('.mobile-profile-action');
-      if (!action) return;
-      event.preventDefault();
-      event.stopPropagation();
-      if (action.dataset.action === 'login') {
+      if (action) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (action.dataset.action === 'login') {
+          closeMenu();
+          window.location.assign(action.href);
+        } else {
+          showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
+        }
+        return;
+      }
+      // If clicking a login link inside the card, navigate
+      const loginLink = event.target.closest('a.mobile-profile-login');
+      if (loginLink) {
+        event.preventDefault();
+        event.stopPropagation();
         closeMenu();
-        window.location.assign(action.href);
-      } else {
+        window.location.assign(loginLink.href);
+        return;
+      }
+      // If logged in, clicking anywhere on the card opens edit profile
+      if (profileCard.dataset.loggedIn === 'true') {
+        event.preventDefault();
+        event.stopPropagation();
         showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
       }
     }, true);
@@ -295,6 +312,8 @@
         link.removeAttribute('aria-label');
       });
       // Show login row in mobile menu profile card
+      const card = document.querySelector('#mobileNav .mobile-profile-card');
+      if (card) card.dataset.loggedIn = 'false';
       const profilePromptEl = document.querySelector('#mobileNav .mobile-profile-prompt');
       if (profilePromptEl && !profilePromptEl.querySelector('.mobile-profile-login-row')) {
         const loginRow = document.createElement('span');
@@ -307,6 +326,8 @@
     }
     // Remove login row if user is logged in
     document.querySelector('#mobileNav .mobile-profile-login-row')?.remove();
+    const card = document.querySelector('#mobileNav .mobile-profile-card');
+    if (card) card.dataset.loggedIn = 'true';
     document.querySelectorAll('.auth-actions .nav-link').forEach((link) => {
       link.href = 'customer-dashboard.html';
       link.textContent = 'My Account';
