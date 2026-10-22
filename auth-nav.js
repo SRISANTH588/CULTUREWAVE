@@ -64,6 +64,24 @@
     profileCard.setAttribute('role', 'group');
     profileCard.removeAttribute('tabindex');
     profileCard.removeAttribute('aria-label');
+    const setProfileAvatar = (photoURL) => {
+      const avatar = profileCard.querySelector('.mobile-profile-avatar');
+      if (!avatar) return;
+      let image = avatar.querySelector('img');
+      if (!photoURL) {
+        image?.remove();
+        return;
+      }
+      if (!image) {
+        image = document.createElement('img');
+        image.alt = 'Profile photo';
+        image.loading = 'lazy';
+        image.referrerPolicy = 'no-referrer';
+        avatar.appendChild(image);
+      }
+      image.src = photoURL;
+    };
+    setProfileAvatar('');
     let profileAction = profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow, [data-action="login"]');
     if (!profileAction) {
       profileAction = document.createElement('a');
@@ -170,6 +188,7 @@
             if (name && profile.name) name.textContent = profile.name;
             if (contact && profile.phone) contact.textContent = profile.phone;
             if (progress && profile.steps) progress.textContent = profile.steps;
+            if (profile.photoURL) setProfileAvatar(profile.photoURL);
           }
         });
         menu.appendChild(view);
@@ -297,6 +316,20 @@
     }
     const profileCard = document.querySelector('#mobileNav .mobile-profile-card');
     if (profileCard) profileCard.dataset.loggedIn = user ? 'true' : 'false';
+    const profileAvatar = profileCard?.querySelector('.mobile-profile-avatar');
+    if (profileAvatar) {
+      let image = profileAvatar.querySelector('img');
+      const photoURL = user?.photoURL || '';
+      if (photoURL && !image) {
+        image = document.createElement('img');
+        image.alt = 'Profile photo';
+        image.loading = 'lazy';
+        image.referrerPolicy = 'no-referrer';
+        profileAvatar.appendChild(image);
+      }
+      if (image && photoURL) image.src = photoURL;
+      if (image && !photoURL) image.remove();
+    }
     if (hamburger) {
       const initial = (user?.displayName || user?.email || 'U').trim().charAt(0).toUpperCase() || 'U';
       hamburger.dataset.initial = initial;
@@ -308,7 +341,20 @@
         const profileDoc = await firebase.firestore().collection('users').doc(user.uid).get();
         const profileData = profileDoc.exists ? profileDoc.data() : {};
         profileContact.textContent = profileData.whatsapp || profileData.phone || user.phoneNumber || user.email || '';
-        const filledSteps = [Boolean(user.displayName || profileData.name || profileData.fullName), Boolean(profileData.whatsapp || profileData.phone || user.phoneNumber), Boolean(user.email), Boolean(profileData.birthday || profileData.dob)].filter(Boolean).length;
+        const photoURL = profileData.photoURL || profileData.photoUrl || profileData.profilePhotoURL || profileData.avatarUrl || user.photoURL || '';
+        const avatar = profileCard?.querySelector('.mobile-profile-avatar');
+        if (avatar && photoURL) {
+          let image = avatar.querySelector('img');
+          if (!image) {
+            image = document.createElement('img');
+            image.alt = 'Profile photo';
+            image.loading = 'lazy';
+            image.referrerPolicy = 'no-referrer';
+            avatar.appendChild(image);
+          }
+          image.src = photoURL;
+        }
+        const filledSteps = [Boolean(user.displayName || profileData.name || profileData.fullName), Boolean(profileData.whatsapp || profileData.phone || profileData.phoneNumber || profileData.mobile || user.phoneNumber), Boolean(user.email || profileData.email), Boolean(profileData.birthday || profileData.dob || profileData.dateOfBirth || profileData.birthDate)].filter(Boolean).length;
         if (profileProgress) profileProgress.textContent = `${filledSteps} / 4 steps done`;
       } catch (error) {
         console.warn('Could not load profile details for mobile menu:', error);
@@ -374,6 +420,7 @@
       #mobileNav .mobile-profile-card::before,#mobileNav .mobile-profile-card::after{display:none!important;content:none!important;}
       #mobileNav .mobile-profile-main{display:grid!important;grid-column:1/-1!important;grid-template-columns:84px minmax(0,1fr)!important;align-items:center!important;gap:16px!important;min-width:0!important;}
       #mobileNav .mobile-profile-avatar{display:grid!important;place-items:center!important;width:84px!important;height:84px!important;box-sizing:border-box!important;border:4px solid #b99cff!important;border-radius:50%!important;background:#333!important;}
+      #mobileNav .mobile-profile-avatar img{display:block!important;width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;}
       #mobileNav .mobile-profile-avatar svg{display:block!important;width:62px!important;height:62px!important;fill:none!important;stroke:#777!important;stroke-width:2!important;}
       #mobileNav .mobile-profile-info{display:grid!important;gap:4px!important;min-width:0!important;}
       #mobileNav .mobile-profile-name{display:block!important;overflow:hidden!important;color:#fff!important;font-size:1rem!important;font-weight:800!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
@@ -433,6 +480,7 @@
       #mobileNav .mobile-profile-card::before,#mobileNav .mobile-profile-card::after{display:none!important;content:none!important;}
       #mobileNav .mobile-profile-main{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:100px minmax(0,1fr)!important;align-items:center!important;gap:14px!important;}
       #mobileNav .mobile-profile-avatar{display:grid!important;place-items:center!important;width:100px!important;height:100px!important;min-width:100px!important;max-width:100px!important;box-sizing:border-box!important;border:5px solid #b99cff!important;border-radius:50%!important;background:#333!important;box-shadow:inset 0 0 0 3px #25252a!important;}
+      #mobileNav .mobile-profile-avatar img{display:block!important;width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;}
       #mobileNav .mobile-profile-avatar svg{display:block!important;width:72px!important;height:72px!important;fill:none!important;stroke:#777!important;stroke-width:2!important;}
       #mobileNav .mobile-profile-info{display:grid!important;position:static!important;grid-template-columns:minmax(0,1fr)!important;gap:4px!important;min-width:0!important;}
       #mobileNav .mobile-profile-name{display:block!important;overflow:hidden!important;color:#fff!important;font-size:1rem!important;font-weight:800!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
