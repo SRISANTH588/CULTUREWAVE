@@ -67,6 +67,7 @@
     profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow, [data-action="login"]')?.remove();
     const promptText = profileCard.querySelector('.mobile-profile-prompt > span');
     if (promptText) promptText.textContent = 'Complete your profile';
+    profileCard.querySelector('.mobile-profile-login-row')?.remove();
 
     const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
     const isIndexPage = window.location.pathname === '/' || /\/index\.html$/.test(window.location.pathname);
@@ -288,8 +289,19 @@
         link.textContent = link.dataset.defaultAccountText;
         link.removeAttribute('aria-label');
       });
+      // Show login row in mobile menu profile card
+      const profilePromptEl = document.querySelector('#mobileNav .mobile-profile-prompt');
+      if (profilePromptEl && !profilePromptEl.querySelector('.mobile-profile-login-row')) {
+        const loginRow = document.createElement('span');
+        loginRow.className = 'mobile-profile-login-row';
+        loginRow.style.cssText = 'display:flex!important;align-items:center;justify-content:space-between;grid-column:1/-1;width:100%;';
+        loginRow.innerHTML = '<span style="color:#f1edf7;font-size:.9rem;">Login to your account</span><a href="login.html" class="mobile-profile-login" style="display:inline-flex!important;align-items:center;justify-content:center;min-width:76px;min-height:34px;padding:0 14px;border-radius:999px;background:#fff;color:#111;font-size:.82rem;font-weight:800;text-decoration:none;">Login</a>';
+        profilePromptEl.appendChild(loginRow);
+      }
       return;
     }
+    // Remove login row if user is logged in
+    document.querySelector('#mobileNav .mobile-profile-login-row')?.remove();
     document.querySelectorAll('.auth-actions .nav-link').forEach((link) => {
       link.href = 'customer-dashboard.html';
       link.textContent = 'My Account';
