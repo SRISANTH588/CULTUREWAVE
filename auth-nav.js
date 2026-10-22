@@ -64,12 +64,24 @@
     profileCard.setAttribute('role', 'group');
     profileCard.removeAttribute('tabindex');
     profileCard.removeAttribute('aria-label');
-    profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow, [data-action="login"]')?.remove();
+    let profileAction = profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow, [data-action="login"]');
+    if (!profileAction) {
+      profileAction = document.createElement('a');
+      profileCard.querySelector('.mobile-profile-prompt')?.appendChild(profileAction);
+    }
+    profileAction.classList.remove('mobile-profile-login');
+    profileAction.classList.add('mobile-profile-action', 'mobile-profile-arrow');
+    profileAction.href = 'edit-profile.html';
+    profileAction.dataset.action = 'edit-profile';
+    profileAction.textContent = '→';
+    profileAction.setAttribute('aria-label', 'Edit profile');
     const promptText = profileCard.querySelector('.mobile-profile-prompt > span');
-    if (promptText) { promptText.textContent = ''; promptText.style.display = 'none'; }
+    if (promptText) { promptText.textContent = 'Complete your profile'; promptText.style.display = ''; }
     const progressText = profileCard.querySelector('.mobile-profile-progress');
     if (progressText) { progressText.textContent = 'Complete your profile'; progressText.style.display = ''; }
     profileCard.querySelector('.mobile-profile-login-row')?.remove();
+    const logoutCardForInitialState = menu.querySelector('.mobile-nav-logout-card');
+    if (logoutCardForInitialState) logoutCardForInitialState.style.display = 'none';
 
     const hasExistingMenuContent = Boolean(menu.querySelector('.mobile-nav-group'));
     const isIndexPage = window.location.pathname === '/' || /\/index\.html$/.test(window.location.pathname);
@@ -80,7 +92,7 @@
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
       <div class="mobile-profile-card" role="group">
         <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span>
-        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span style="display:none"></span></span>
+        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile</span><a class="mobile-profile-action mobile-profile-arrow" href="edit-profile.html" data-action="edit-profile" aria-label="Edit profile">→</a></span>
       </div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
@@ -130,6 +142,7 @@
       hamburger?.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
     };
+
     const showMenuPage = (href, title) => {
       let view = menu.querySelector('.mobile-nav-view');
       if (!view) {
@@ -171,36 +184,6 @@
       menu.classList.add('showing-view');
     };
 
-    profileCard?.addEventListener('click', (event) => {
-      const action = event.target.closest('.mobile-profile-action');
-      if (action) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (action.dataset.action === 'login') {
-          closeMenu();
-          window.location.assign(action.href);
-        } else {
-          showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
-        }
-        return;
-      }
-      // If clicking a login link inside the card, navigate
-      const loginLink = event.target.closest('a.mobile-profile-login');
-      if (loginLink) {
-        event.preventDefault();
-        event.stopPropagation();
-        closeMenu();
-        window.location.assign(loginLink.href);
-        return;
-      }
-      // If logged in, clicking anywhere on the card opens edit profile
-      if (profileCard.dataset.loggedIn === 'true') {
-        event.preventDefault();
-        event.stopPropagation();
-        showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
-      }
-    }, true);
-
     hamburger?.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
     hamburger?.addEventListener('click', (event) => {
       event.preventDefault();
@@ -221,12 +204,28 @@
           closeMenu();
           window.location.assign(profileAction.href);
         } else {
-          showMenuPage(new URL('edit-profile.html', window.location.href).href, 'Edit Profile');
+          closeMenu();
+          window.location.assign(new URL('edit-profile.html', window.location.href).href);
         }
+        return;
+      }
+      const loginLink = event.target.closest('a.mobile-profile-login');
+      if (loginLink) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeMenu();
+        window.location.assign(loginLink.href);
         return;
       }
       const profileCard = event.target.closest('.mobile-profile-card');
       const link = event.target.closest('a');
+      if (profileCard && profileCard.dataset.loggedIn === 'true') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeMenu();
+        window.location.assign(new URL('edit-profile.html', window.location.href).href);
+        return;
+      }
       if (profileCard || !link) return;
       if (link.dataset.action === 'logout') {
         event.preventDefault();
@@ -279,10 +278,23 @@
     const profileContact = document.querySelector('.mobile-profile-contact');
     const profileProgress = document.querySelector('.mobile-profile-progress');
     const profilePrompt = document.querySelector('.mobile-profile-prompt > span');
+    const profileAction = document.querySelector('#mobileNav .mobile-profile-action');
+    const returnPage = `${window.location.pathname.split('/').pop() || 'index.html'}${window.location.search}${window.location.hash}`;
+    const loginHref = `login.html?next=${encodeURIComponent(returnPage)}`;
     if (profileName) profileName.textContent = user?.displayName || user?.email?.split('@')[0] || 'CultureWave member';
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
     if (profileProgress) { profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile'; profileProgress.style.display = ''; }
-    if (profilePrompt) { profilePrompt.textContent = user ? 'Edit profile' : ''; profilePrompt.style.display = user ? '' : 'none'; }
+    if (profilePrompt) { profilePrompt.textContent = 'Complete your profile'; profilePrompt.style.display = ''; }
+    if (profileAction) {
+      profileAction.href = user ? 'edit-profile.html' : loginHref;
+      profileAction.dataset.action = user ? 'edit-profile' : 'login';
+      profileAction.classList.remove('mobile-profile-arrow', 'mobile-profile-login');
+      profileAction.classList.add('mobile-profile-action', user ? 'mobile-profile-arrow' : 'mobile-profile-login');
+      profileAction.textContent = user ? '→' : 'Login';
+      profileAction.setAttribute('aria-label', user ? 'Edit profile' : 'Login');
+    }
+    const profileCard = document.querySelector('#mobileNav .mobile-profile-card');
+    if (profileCard) profileCard.dataset.loggedIn = user ? 'true' : 'false';
     if (hamburger) {
       const initial = (user?.displayName || user?.email || 'U').trim().charAt(0).toUpperCase() || 'U';
       hamburger.dataset.initial = initial;
@@ -319,7 +331,8 @@
         const loginRow = document.createElement('span');
         loginRow.className = 'mobile-profile-login-row';
         loginRow.style.cssText = 'display:flex!important;align-items:center;justify-content:space-between;grid-column:1/-1;width:100%;';
-        loginRow.innerHTML = '<span style="color:#f1edf7;font-size:.9rem;">Login to your account</span><a href="login.html" class="mobile-profile-login" style="display:inline-flex!important;align-items:center;justify-content:center;min-width:76px;min-height:34px;padding:0 14px;border-radius:999px;background:#fff;color:#111;font-size:.82rem;font-weight:800;text-decoration:none;">Login</a>';
+        loginRow.innerHTML = '<span style="color:#f1edf7;font-size:.9rem;">Login to your account</span><a class="mobile-profile-login" style="display:inline-flex!important;align-items:center;justify-content:center;min-width:76px;min-height:34px;padding:0 14px;border-radius:999px;background:#fff;color:#111;font-size:.82rem;font-weight:800;text-decoration:none;">Login</a>';
+        loginRow.querySelector('a').href = loginHref;
         profilePromptEl.appendChild(loginRow);
       }
       return;
@@ -347,7 +360,7 @@
   style.textContent = `
     @media(max-width:960px){
       .topbar .nav-wrap>.auth-actions,.topbar .nav-wrap>.topnav,.topbar .nav-wrap>.mobile-header-actions,.topbar .nav-wrap>.desktop-header-search{display:none!important;}
-      #mobileNav .mobile-nav-ctas,#mobileNav .mobile-profile-login,#mobileNav .mobile-profile-action{display:none!important;}
+      #mobileNav .mobile-nav-ctas{display:none!important;}
       .topbar .nav-wrap>.hamburger{position:relative!important;z-index:31!important;display:flex!important;flex:0 0 42px!important;align-items:center!important;justify-content:center!important;width:42px!important;height:42px!important;margin-left:.35rem!important;padding:.4rem!important;border:1px solid #57417f!important;border-radius:13px!important;background:#24212b!important;box-shadow:none!important;}
       .topbar .nav-wrap>.hamburger span{display:block!important;width:24px!important;height:2.5px!important;border-radius:2px!important;background:#fff!important;}
     }
@@ -461,7 +474,7 @@
       .mobile-nav-icon{display:grid;place-items:center;width:25px;flex:none;color:#aaa;font-size:1.1rem;}
       .mobile-nav-arrow{margin-left:auto;color:#777;font-size:1.4rem;font-weight:400;}
       .mobile-nav-ctas{display:grid!important;grid-template-columns:1fr 1fr;gap:.55rem!important;margin:0!important;padding:0!important;border:0!important;}
-      #mobileNav .mobile-nav-ctas,#mobileNav .mobile-profile-login,#mobileNav .mobile-profile-action{display:none!important;}
+      #mobileNav .mobile-nav-ctas{display:none!important;}
       .mobile-nav-ctas::before{display:none!important;}
       .mobile-nav-ctas .nav-link,.mobile-nav-ctas .nav-cta{display:flex;align-items:center;justify-content:center;min-height:48px;padding:.6rem!important;border:1px solid #38383b!important;border-radius:14px!important;background:#222!important;color:#fff!important;font-size:.8rem!important;font-weight:800!important;}
       body:has(.mobile-nav.open)>header,body:has(.mobile-nav.open)>main,body:has(.mobile-nav.open)>footer,body:has(.mobile-nav.open)>.mobile-bottom-nav{transform:none!important;}

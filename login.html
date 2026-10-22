@@ -838,17 +838,20 @@
 
       async function redirect(uid) {
         const data = await getUserData(uid);
-        // A booking link must take precedence over the normal dashboard redirect.
-        // Only accept a same-site relative path to avoid an open-redirect URL.
+        // Return customers to the page where they requested sign-in. The
+        // destination must be a same-site relative URL to prevent open redirects.
         const next = new URLSearchParams(location.search).get('next');
-        if (next && /^(?:booking\.html|client-profile\.html|[a-z0-9._-]+)(?:[?#]|$)/i.test(next) && !next.startsWith('//')) {
-          window.location.href = next;
-          return;
-        }
         const role = data.role || 'customer';
         if (role === 'admin') { window.location.href = 'admin-dashboard.html'; return; }
         if (role === 'lister') { window.location.href = data.dashboard || 'premium-client-dashboard.html'; return; }
         if (role === 'client') { window.location.href = 'premium-client-dashboard.html'; return; }
+        if (next && !next.startsWith('//') && !/^[a-z][a-z0-9+.-]*:/i.test(next)) {
+          const destination = new URL(next, window.location.origin);
+          if (destination.origin === window.location.origin) {
+            window.location.href = destination.href;
+            return;
+          }
+        }
         window.location.href = 'customer-dashboard.html';
       }
 
