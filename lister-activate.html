@@ -41,6 +41,9 @@
       });
     }
     async function completeActivation(user,email){
+      await reload(user);
+      if(!user.emailVerified)throw new Error('Verify your email first, then return to this page to activate your lister account.');
+      await user.getIdToken(true);
       await activate(user.uid,user.email||email);
       const userSnapshot=await getDoc(doc(db,'users',user.uid)),profile=userSnapshot.exists()?userSnapshot.data():{},destination=allowedDashboards.has(profile.dashboard)?profile.dashboard:dashboardByCategory[normalizeCategory(profile.preferredCategory)]||'premium-client-dashboard.html';
       say('Your lister account is active. Opening your dashboard…',true);button.textContent='Account activated';setTimeout(()=>location.assign(destination),900);
