@@ -320,7 +320,10 @@
     if (profileName) profileName.textContent = user?.displayName || user?.email?.split('@')[0] || 'CultureWave member';
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
     if (profileProgress) { profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile'; profileProgress.style.display = ''; }
-    if (profilePrompt) { profilePrompt.textContent = ''; profilePrompt.style.display = 'none'; }
+    if (profilePrompt) {
+      profilePrompt.textContent = user ? '' : 'Login to your account';
+      profilePrompt.style.display = user ? 'none' : '';
+    }
     if (profileAction) {
       profileAction.href = user ? 'edit-profile.html' : loginHref;
       profileAction.dataset.action = user ? 'edit-profile' : 'login';
