@@ -25,7 +25,7 @@
     /* Shared category page layout inspired by the mobile event feed */
     body{background:#201d23!important;color:#f7f5f8;}
     .cat-hero{min-height:300px;height:clamp(300px,52vw,520px);align-items:flex-end;background:#201d23;}
-    .cat-hero-bg{filter:brightness(.38);background-position:center 35%;}
+    .cat-hero-bg{background-image:url('community.jpg');background-size:cover;background-position:center 35%;filter:brightness(.38);}
     .cat-hero-overlay{background:linear-gradient(90deg,rgba(32,29,35,.86),rgba(32,29,35,.12)),linear-gradient(0deg,#201d23 0%,transparent 45%);}
     .cat-hero-inner{max-width:1240px;padding:0 1rem 1.5rem;}
     .cat-pill{display:none;}
@@ -78,13 +78,31 @@
   </div></header>
   <nav class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Restaurants</a><a href="how-it-works.html">How it works</a><a href="login.html">Get Started</a></nav>
 
-  <section class="community-hero"><div class="community-hero-bg"></div><div class="community-hero-overlay"></div><div class="community-hero-inner">
-    <div class="community-pill">✨ Experiences</div>
-    <h1>Find your next<br/><span>great experience.</span></h1>
-    <p class="community-desc">Discover memorable activities, immersive attractions, and things to do around you.</p>
-  </div></section>
+  <section class="cat-hero">
+    <div class="cat-hero-bg"></div>
+    <div class="cat-hero-overlay"></div>
+    <div class="cat-hero-inner">
+      <div class="cat-pill">✨ Experiences</div>
+      <h1>Find your next<br/><span>great experience.</span></h1>
+      <p class="cat-hero-desc">Discover memorable activities, immersive attractions, and things to do around you.</p>
+      <div class="cat-hero-meta">
+        <div class="cat-hero-stat"><strong id="statCount">—</strong>Experiences Listed</div>
+        <div class="cat-hero-stat"><strong>Hyderabad</strong>Top City</div>
+        <div class="cat-hero-stat"><strong>Free – ₹3000</strong>Price Range</div>
+      </div>
+    </div>
+  </section>
 
-  <main class="community-body"><div class="community-heading"><div><h2>Experiences &amp; things to do</h2><p>Pick something memorable near you.</p></div><a class="community-button" href="events.html">Browse all events</a></div><div class="community-grid" id="communityGrid"><div class="community-empty"><span>✨</span>Loading experiences...</div></div></main>
+  <main class="cat-body">
+    <div class="cat-filter-row">
+      <button class="cat-chip active" data-filter="all">All</button>
+      <button class="cat-chip" data-filter="free">Free</button>
+      <button class="cat-chip" data-filter="paid">Paid</button>
+    </div>
+    <div class="cat-grid" id="catGrid">
+      <div class="cat-empty"><span>✨</span>Loading experiences…</div>
+    </div>
+  </main>
 
   <footer class="site-footer">
   <div class="footer-glow-top"></div>
