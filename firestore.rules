@@ -18,7 +18,6 @@ service cloud.firestore {
       let applicationAfter = getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data;
       let userAfter = getAfter(/databases/$(database)/documents/users/$(uid)).data;
       return request.auth != null && request.auth.uid == uid &&
-        request.auth.token.email_verified == true &&
         token.applicationId == applicationId &&
         token.email == request.auth.token.email &&
         token.used == false && token.expiresAt > request.time &&
