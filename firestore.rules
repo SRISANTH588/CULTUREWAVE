@@ -14,22 +14,14 @@ service cloud.firestore {
 
     function validListerActivation(uid, applicationId, tokenHash) {
       let token = get(/databases/$(database)/documents/onboardingActivationTokens/$(tokenHash)).data;
-      let tokenAfter = getAfter(/databases/$(database)/documents/onboardingActivationTokens/$(tokenHash)).data;
-      let applicationAfter = getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data;
-      let userAfter = getAfter(/databases/$(database)/documents/users/$(uid)).data;
+      let application = get(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data;
       return request.auth != null && request.auth.uid == uid &&
         token.applicationId == applicationId &&
         token.email.lower() == request.auth.token.email.lower() &&
         token.used == false && token.expiresAt > request.time &&
-        tokenAfter.used == true && tokenAfter.activatedBy == uid &&
-        applicationAfter.status == 'APPROVED' &&
-        applicationAfter.email.lower() == request.auth.token.email.lower() &&
-        applicationAfter.activationTokenHash == tokenHash &&
-        applicationAfter.accountSetupStatus == 'ACTIVE' &&
-        applicationAfter.userId == uid &&
-        userAfter.role == 'lister' &&
-        userAfter.onboardingApplicationId == applicationId &&
-        userAfter.activationTokenHash == tokenHash;
+        application.status == 'APPROVED' &&
+        application.email.lower() == request.auth.token.email.lower() &&
+        application.activationTokenHash == tokenHash;
     }
 
     // Public booking pages may update only the aggregate attendee counter.
@@ -423,7 +415,10 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid &&
         request.resource.data.accountSetupStatus == 'ACTIVE' &&
         request.resource.data.updatedAt == request.time &&
-        validListerActivation(request.auth.uid, applicationId, resource.data.get('activationTokenHash', ''))
+        validListerActivation(request.auth.uid, applicationId, resource.data.get('activationTokenHash', '')) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'lister' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.onboardingApplicationId == applicationId &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.activationTokenHash == resource.data.get('activationTokenHash', '')
       );
 
       match /documents/{fileId} {
@@ -587,9 +582,11 @@ service cloud.firestore {
         request.resource.data.used == true &&
         request.resource.data.activatedBy == request.auth.uid &&
         request.resource.data.activatedAt == request.time &&
-        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.userId == request.auth.uid &&
-        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.accountSetupStatus == 'ACTIVE' &&
-        getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'lister';
+        get(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.userId == request.auth.uid &&
+        get(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.accountSetupStatus == 'ACTIVE' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'lister' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.onboardingApplicationId == resource.data.applicationId &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.activationTokenHash == tokenHash;
       allow delete: if isAdmin();
     }
 

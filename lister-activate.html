@@ -12,7 +12,7 @@
   <script type="module">
     import { auth, db } from './firebase.js';
     import { createUserWithEmailAndPassword, signInWithEmailAndPassword, reload } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    import { doc, getDoc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     const paramsFromLink=(()=>{const queue=[location.href],seen=new Set(),state={};while(queue.length&&seen.size<12){const raw=queue.shift();if(!raw||seen.has(raw))continue;seen.add(raw);try{const url=new URL(raw,location.origin);for(const key of ['activation','applicationId'])if(!state[key]&&url.searchParams.has(key))state[key]=url.searchParams.get(key);for(const key of ['continueUrl','continueURL','link','deep_link_id']){const nested=url.searchParams.get(key);if(nested)queue.push(nested)}}catch{}}return state})();
     const emailInput=document.getElementById('email'),button=document.getElementById('activate'),status=document.getElementById('status');
     const dashboardByCategory={nightlife:'dashboard-nightlife.html',brunch:'dashboard-brunch.html',dining:'dashboard-restaurant.html',workshops:'dashboard-workshops.html',experiences:'dashboard-experiences.html',music:'dashboard-livemusic.html'};
@@ -24,21 +24,29 @@
     async function activate(uid,email,emailVerified){
       const rawToken=paramsFromLink.activation;if(!rawToken)throw new Error('This activation link is missing its approval token. Ask CultureWave to send a new activation email.');
       const tokenHash=await hashToken(rawToken),tokenRef=doc(db,'onboardingActivationTokens',tokenHash);
-      await runTransaction(db,async transaction=>{
-        const tokenSnapshot=await transaction.get(tokenRef);if(!tokenSnapshot.exists())throw new Error('This activation link is invalid or expired. Ask CultureWave to send a new one.');
+      let step='reading the approval link';
+      try{
+        const tokenSnapshot=await getDoc(tokenRef);if(!tokenSnapshot.exists())throw new Error('This activation link is invalid or expired. Ask CultureWave to send a new one.');
         const token=tokenSnapshot.data(),expiresAt=token.expiresAt?.toDate?.()||new Date(token.expiresAt);
         if(String(token.email||'').trim().toLowerCase()!==email.trim().toLowerCase()||token.applicationId!==paramsFromLink.applicationId)throw new Error('This activation link does not match the approved email address.');
         if(token.used){if(token.activatedBy===uid)return;throw new Error('This activation link has already been used. Contact CultureWave if you need help.')}
         if(expiresAt.getTime()<Date.now())throw new Error('This activation link has expired. Ask CultureWave to send a new one.');
-        const userRef=doc(db,'users',uid),organiserRef=doc(db,'organisers',uid),applicationRef=doc(db,'vendorOnboarding',token.applicationId),userSnapshot=await transaction.get(userRef);
+        const userRef=doc(db,'users',uid),organiserRef=doc(db,'organisers',uid),applicationRef=doc(db,'vendorOnboarding',token.applicationId),userSnapshot=await getDoc(userRef);
         if(userSnapshot.exists()&&!['client','customer','lister'].includes(userSnapshot.data().role))throw new Error('This email already has a different account type. Contact CultureWave support.');
         const category=normalizeCategory(token.preferredCategory),dashboard=dashboardByCategory[category]||(allowedDashboards.has(token.preferredDashboard)?token.preferredDashboard:'premium-client-dashboard.html');
         const profile={uid,name:token.name||email,email,phone:token.phone||'',role:'lister',dashboard,preferredCategory:category||'',status:'active',emailVerified:emailVerified===true,onboardingApplicationId:token.applicationId,activationTokenHash:tokenHash};
-        if(userSnapshot.exists())transaction.set(userRef,{...userSnapshot.data(),...profile,updatedAt:serverTimestamp()});else transaction.set(userRef,{...profile,createdAt:serverTimestamp()});
-        transaction.set(organiserRef,{ownerId:uid,name:token.businessName||token.name||email,businessName:token.businessName||'',email,phone:token.phone||'',status:'active',createdAt:serverTimestamp()},{merge:true});
-        transaction.update(applicationRef,{userId:uid,accountSetupStatus:'ACTIVE',updatedAt:serverTimestamp()});
-        transaction.update(tokenRef,{used:true,activatedBy:uid,activatedAt:serverTimestamp()});
-      });
+        step='saving your lister profile';
+        await setDoc(userRef,{...(userSnapshot.exists()?userSnapshot.data():{}),...profile,...(userSnapshot.exists()?{updatedAt:serverTimestamp()}:{createdAt:serverTimestamp()})},{merge:true});
+        step='saving your organiser profile';
+        await setDoc(organiserRef,{ownerId:uid,name:token.businessName||token.name||email,businessName:token.businessName||'',email,phone:token.phone||'',status:'active',createdAt:serverTimestamp()},{merge:true});
+        step='activating your approved application';
+        await updateDoc(applicationRef,{userId:uid,accountSetupStatus:'ACTIVE',updatedAt:serverTimestamp()});
+        step='completing your approval link';
+        await updateDoc(tokenRef,{used:true,activatedBy:uid,activatedAt:serverTimestamp()});
+      }catch(error){
+        if(error.code==='permission-denied')throw new Error(`Permission was denied while ${step}. Reload this page and try again; if it repeats, ask CultureWave to resend the approval link.`);
+        throw error;
+      }
     }
     async function completeActivation(user,email){
       await reload(user);
