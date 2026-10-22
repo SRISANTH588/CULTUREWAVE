@@ -1,5 +1,25 @@
 // Keep public page account controls and header styling consistent with index.html.
 (function () {
+  function renderProfileAvatar(avatar, photoURL) {
+    if (!avatar) return;
+    const placeholder = avatar.querySelector('svg');
+    let image = avatar.querySelector('img');
+    if (!photoURL) {
+      image?.remove();
+      if (placeholder) placeholder.style.removeProperty('display');
+      return;
+    }
+    if (!image) {
+      image = document.createElement('img');
+      image.alt = 'Profile photo';
+      image.loading = 'lazy';
+      image.referrerPolicy = 'no-referrer';
+      avatar.appendChild(image);
+    }
+    if (placeholder) placeholder.style.setProperty('display', 'none', 'important');
+    image.src = photoURL;
+  }
+
   function buildUnifiedMobileMenu() {
     const header = document.querySelector('.topbar');
     const navWrap = header?.querySelector('.nav-wrap');
@@ -64,23 +84,7 @@
     profileCard.setAttribute('role', 'group');
     profileCard.removeAttribute('tabindex');
     profileCard.removeAttribute('aria-label');
-    const setProfileAvatar = (photoURL) => {
-      const avatar = profileCard.querySelector('.mobile-profile-avatar');
-      if (!avatar) return;
-      let image = avatar.querySelector('img');
-      if (!photoURL) {
-        image?.remove();
-        return;
-      }
-      if (!image) {
-        image = document.createElement('img');
-        image.alt = 'Profile photo';
-        image.loading = 'lazy';
-        image.referrerPolicy = 'no-referrer';
-        avatar.appendChild(image);
-      }
-      image.src = photoURL;
-    };
+    const setProfileAvatar = (photoURL) => renderProfileAvatar(profileCard.querySelector('.mobile-profile-avatar'), photoURL);
     setProfileAvatar('');
     let profileAction = profileCard.querySelector('.mobile-profile-action, .mobile-profile-arrow, [data-action="login"]');
     if (!profileAction) {
@@ -305,7 +309,7 @@
     if (profileName) profileName.textContent = user?.displayName || user?.email?.split('@')[0] || 'CultureWave member';
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
     if (profileProgress) { profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile'; profileProgress.style.display = ''; }
-    if (profilePrompt) { profilePrompt.textContent = 'Complete your profile'; profilePrompt.style.display = ''; }
+    if (profilePrompt) { profilePrompt.textContent = ''; profilePrompt.style.display = 'none'; }
     if (profileAction) {
       profileAction.href = user ? 'edit-profile.html' : loginHref;
       profileAction.dataset.action = user ? 'edit-profile' : 'login';
@@ -317,19 +321,7 @@
     const profileCard = document.querySelector('#mobileNav .mobile-profile-card');
     if (profileCard) profileCard.dataset.loggedIn = user ? 'true' : 'false';
     const profileAvatar = profileCard?.querySelector('.mobile-profile-avatar');
-    if (profileAvatar) {
-      let image = profileAvatar.querySelector('img');
-      const photoURL = user?.photoURL || '';
-      if (photoURL && !image) {
-        image = document.createElement('img');
-        image.alt = 'Profile photo';
-        image.loading = 'lazy';
-        image.referrerPolicy = 'no-referrer';
-        profileAvatar.appendChild(image);
-      }
-      if (image && photoURL) image.src = photoURL;
-      if (image && !photoURL) image.remove();
-    }
+    renderProfileAvatar(profileAvatar, user?.photoURL || '');
     if (hamburger) {
       const initial = (user?.displayName || user?.email || 'U').trim().charAt(0).toUpperCase() || 'U';
       hamburger.dataset.initial = initial;
@@ -342,18 +334,7 @@
         const profileData = profileDoc.exists ? profileDoc.data() : {};
         profileContact.textContent = profileData.whatsapp || profileData.phone || user.phoneNumber || user.email || '';
         const photoURL = profileData.photoURL || profileData.photoUrl || profileData.profilePhotoURL || profileData.avatarUrl || user.photoURL || '';
-        const avatar = profileCard?.querySelector('.mobile-profile-avatar');
-        if (avatar && photoURL) {
-          let image = avatar.querySelector('img');
-          if (!image) {
-            image = document.createElement('img');
-            image.alt = 'Profile photo';
-            image.loading = 'lazy';
-            image.referrerPolicy = 'no-referrer';
-            avatar.appendChild(image);
-          }
-          image.src = photoURL;
-        }
+        renderProfileAvatar(profileAvatar, photoURL);
         const filledSteps = [Boolean(user.displayName || profileData.name || profileData.fullName), Boolean(profileData.whatsapp || profileData.phone || profileData.phoneNumber || profileData.mobile || user.phoneNumber), Boolean(user.email || profileData.email), Boolean(profileData.birthday || profileData.dob || profileData.dateOfBirth || profileData.birthDate)].filter(Boolean).length;
         if (profileProgress) profileProgress.textContent = `${filledSteps} / 4 steps done`;
       } catch (error) {
