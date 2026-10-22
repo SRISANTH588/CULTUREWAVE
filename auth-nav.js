@@ -259,8 +259,8 @@
     const profilePrompt = document.querySelector('.mobile-profile-prompt > span');
     if (profileName) profileName.textContent = user?.displayName || user?.email?.split('@')[0] || 'CultureWave member';
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
-    if (profileProgress) profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile';
-    if (profilePrompt) profilePrompt.textContent = user ? 'Edit profile' : 'Complete your profile';
+    if (profileProgress) { profileProgress.textContent = user ? '3 / 4 steps done' : ''; profileProgress.style.display = user ? '' : 'none'; }
+    if (profilePrompt) { profilePrompt.textContent = user ? 'Edit profile' : ''; profilePrompt.style.display = user ? '' : 'none'; }
     if (hamburger) {
       const initial = (user?.displayName || user?.email || 'U').trim().charAt(0).toUpperCase() || 'U';
       hamburger.dataset.initial = initial;
