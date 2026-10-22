@@ -12,9 +12,12 @@
   <script type="module">
     import { auth, db } from './firebase.js';
     import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, reload } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    import { doc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { doc, getDoc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     const paramsFromLink=(()=>{const queue=[location.href],seen=new Set(),state={};while(queue.length&&seen.size<12){const raw=queue.shift();if(!raw||seen.has(raw))continue;seen.add(raw);try{const url=new URL(raw,location.origin);for(const key of ['activation','applicationId'])if(!state[key]&&url.searchParams.has(key))state[key]=url.searchParams.get(key);for(const key of ['continueUrl','continueURL','link','deep_link_id']){const nested=url.searchParams.get(key);if(nested)queue.push(nested)}}catch{}}return state})();
     const emailInput=document.getElementById('email'),button=document.getElementById('activate'),status=document.getElementById('status');
+    const dashboardByCategory={nightlife:'dashboard-nightlife.html',brunch:'dashboard-brunch.html',dining:'dashboard-restaurant.html',workshops:'dashboard-workshops.html',experiences:'dashboard-experiences.html',music:'dashboard-livemusic.html'};
+    const allowedDashboards=new Set([...Object.values(dashboardByCategory),'premium-client-dashboard.html']);
+    const normalizeCategory=value=>{const key=String(value||'').trim().toLowerCase();const aliases={'party':'nightlife','parties':'nightlife','fine dining':'dining','restaurant':'dining','live music':'music','experience':'experiences'};return aliases[key]||key};
     const say=(message,ok=false)=>{status.textContent=message;status.className='status show'+(ok?' ok':'')};
     emailInput.value='';
     async function hashToken(value){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));return Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,'0')).join('')}
@@ -29,17 +32,29 @@
         if(expiresAt.getTime()<Date.now())throw new Error('This activation link has expired. Ask CultureWave to send a new one.');
         const userRef=doc(db,'users',uid),organiserRef=doc(db,'organisers',uid),applicationRef=doc(db,'vendorOnboarding',token.applicationId),userSnapshot=await transaction.get(userRef);
         if(userSnapshot.exists()&&!['client','customer','lister'].includes(userSnapshot.data().role))throw new Error('This email already has a different account type. Contact CultureWave support.');
-        const profile={uid,name:token.name||email,email,phone:token.phone||'',role:'lister',status:'active',emailVerified:true,onboardingApplicationId:token.applicationId,activationTokenHash:tokenHash};
+        const category=normalizeCategory(token.preferredCategory),dashboard=dashboardByCategory[category]||(allowedDashboards.has(token.preferredDashboard)?token.preferredDashboard:'premium-client-dashboard.html');
+        const profile={uid,name:token.name||email,email,phone:token.phone||'',role:'lister',dashboard,preferredCategory:category||'',status:'active',emailVerified:true,onboardingApplicationId:token.applicationId,activationTokenHash:tokenHash};
         if(userSnapshot.exists())transaction.set(userRef,{...userSnapshot.data(),...profile,updatedAt:serverTimestamp()});else transaction.set(userRef,{...profile,createdAt:serverTimestamp()});
         transaction.set(organiserRef,{ownerId:uid,name:token.businessName||token.name||email,businessName:token.businessName||'',email,phone:token.phone||'',status:'active',createdAt:serverTimestamp()},{merge:true});
         transaction.update(applicationRef,{userId:uid,accountSetupStatus:'ACTIVE',updatedAt:serverTimestamp()});
         transaction.update(tokenRef,{used:true,activatedBy:uid,activatedAt:serverTimestamp()});
       });
     }
+    async function completeActivation(user,email){
+      await activate(user.uid,user.email||email);
+      const userSnapshot=await getDoc(doc(db,'users',user.uid)),profile=userSnapshot.exists()?userSnapshot.data():{},destination=allowedDashboards.has(profile.dashboard)?profile.dashboard:dashboardByCategory[normalizeCategory(profile.preferredCategory)]||'premium-client-dashboard.html';
+      say('Your lister account is active. Opening your dashboard…',true);button.textContent='Account activated';setTimeout(()=>location.assign(destination),900);
+    }
+    auth.authStateReady().then(async()=>{
+      const user=auth.currentUser;if(!user)return;
+      if(user.email)emailInput.value=user.email;
+      try{await reload(user);if(!user.emailVerified)return;button.disabled=true;button.textContent='Activating lister account…';say('Email verified. Activating your lister account…',true);await completeActivation(user,user.email||'')}
+      catch(error){say(error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Activate lister account'}
+    }).catch(error=>console.error('Could not resume lister activation:',error));
     button.addEventListener('click',async()=>{
       const email=emailInput.value.trim(),password=document.getElementById('password').value,confirmPassword=document.getElementById('confirmPassword').value;if(!email){say('Enter the email address that received this link.');return}if(password.length<8){say('Choose a password with at least 8 characters.');return}if(password!==confirmPassword){say('The passwords do not match.');return}
       button.disabled=true;button.textContent='Verifying…';
-      try{let user=auth.currentUser?.email?.toLowerCase()===email.toLowerCase()?auth.currentUser:null;if(!user){try{user=(await signInWithEmailAndPassword(auth,email,password)).user}catch(error){if(error.code!=='auth/user-not-found'&&error.code!=='auth/invalid-credential')throw error;user=(await createUserWithEmailAndPassword(auth,email,password)).user}}await reload(user);if(!user.emailVerified){await sendEmailVerification(user,{url:location.href,handleCodeInApp:false});say('A Firebase verification email was sent. Verify your email, return to this page, and press the button again.');button.disabled=false;button.textContent='I verified my email — activate account';return}await activate(user.uid,user.email||email);say('Your lister account is active. Opening your dashboard…',true);button.textContent='Account activated';setTimeout(()=>location.assign('premium-client-dashboard.html'),1100)}catch(error){say(error.code==='auth/operation-not-allowed'?'Enable Email/Password in Firebase Authentication → Sign-in method, then try again.':error.code==='auth/email-already-in-use'?'This email already has an account. Enter its current password to continue.':error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Create account and activate'}
+      try{let user=auth.currentUser?.email?.toLowerCase()===email.toLowerCase()?auth.currentUser:null;if(!user){try{user=(await signInWithEmailAndPassword(auth,email,password)).user}catch(error){if(error.code!=='auth/user-not-found'&&error.code!=='auth/invalid-credential')throw error;user=(await createUserWithEmailAndPassword(auth,email,password)).user}}await reload(user);if(!user.emailVerified){await sendEmailVerification(user,{url:location.href,handleCodeInApp:false});say('A verification email was sent. Verify it using this device; your lister account will activate automatically when you return.');button.disabled=false;button.textContent='Check verification status';return}await completeActivation(user,email)}catch(error){say(error.code==='auth/operation-not-allowed'?'Enable Email/Password in Firebase Authentication → Sign-in method, then try again.':error.code==='auth/email-already-in-use'?'This email already has an account. Enter its current password to continue.':error.message||'We could not activate this account. Ask CultureWave to resend the link.');button.disabled=false;button.textContent='Create account and activate'}
     });
   </script>
 </body>

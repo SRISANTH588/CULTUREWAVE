@@ -371,8 +371,13 @@ service cloud.firestore {
           'applicationId', 'email', 'emailVerified', 'applicantUid', 'name', 'contact',
           'vendor', 'business', 'address', 'listing', 'bank', 'identity', 'consent',
           'documents', 'documentIds', 'status', 'agreementStatus', 'userId',
+          'preferredCategory', 'preferredDashboard',
           'submittedAt', 'createdAt', 'updatedAt', 'consentAt'
         ]) &&
+        (!('preferredCategory' in request.resource.data.keys()) ||
+          (request.resource.data.preferredCategory is string && request.resource.data.preferredCategory.size() <= 40)) &&
+        (!('preferredDashboard' in request.resource.data.keys()) ||
+          request.resource.data.preferredDashboard in ['dashboard-nightlife.html', 'dashboard-brunch.html', 'dashboard-restaurant.html', 'dashboard-workshops.html', 'dashboard-experiences.html', 'dashboard-livemusic.html', 'premium-client-dashboard.html']) &&
         request.resource.data.applicationId == applicationId &&
         request.resource.data.applicantUid == request.auth.uid &&
         request.resource.data.emailVerified == true &&
@@ -560,8 +565,12 @@ service cloud.firestore {
       allow create: if isAdmin() &&
         request.resource.data.keys().hasOnly([
           'applicationId', 'email', 'name', 'businessName', 'phone',
-          'createdAt', 'expiresAt', 'used', 'activatedBy'
+          'preferredCategory', 'preferredDashboard', 'createdAt', 'expiresAt', 'used', 'activatedBy'
         ]) &&
+        (!('preferredCategory' in request.resource.data.keys()) ||
+          (request.resource.data.preferredCategory is string && request.resource.data.preferredCategory.size() <= 40)) &&
+        (!('preferredDashboard' in request.resource.data.keys()) ||
+          request.resource.data.preferredDashboard in ['dashboard-nightlife.html', 'dashboard-brunch.html', 'dashboard-restaurant.html', 'dashboard-workshops.html', 'dashboard-experiences.html', 'dashboard-livemusic.html', 'premium-client-dashboard.html']) &&
         request.resource.data.applicationId is string &&
         request.resource.data.email is string &&
         request.resource.data.name is string &&

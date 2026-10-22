@@ -344,6 +344,17 @@ const API_ORIGINS = new Set([
 const sha = value => createHash('sha256').update(String(value)).digest('hex');
 const randomToken = () => randomBytes(32).toString('base64url');
 const clean = (value, max=5000) => String(value ?? '').trim().slice(0, max);
+const listerDashboardByCategory = {nightlife:'dashboard-nightlife.html',brunch:'dashboard-brunch.html',dining:'dashboard-restaurant.html',workshops:'dashboard-workshops.html',experiences:'dashboard-experiences.html',music:'dashboard-livemusic.html'};
+function listerPreference(application) {
+  const aliases = {party:'nightlife',parties:'nightlife','fine dining':'dining',restaurant:'dining','live music':'music',experience:'experiences'};
+  const raw = clean(application.preferredCategory || application.vendor?.category, 80).toLowerCase();
+  const category = aliases[raw] || raw;
+  const selected = Object.prototype.hasOwnProperty.call(listerDashboardByCategory, category) ? category : '';
+  const validDashboards = Object.values(listerDashboardByCategory);
+  const dashboard = selected ? listerDashboardByCategory[selected]
+    : validDashboards.includes(application.preferredDashboard) ? application.preferredDashboard : 'premium-client-dashboard.html';
+  return {preferredCategory: selected || category, dashboard};
+}
 const sendOnboardingMail = async (to, subject, message, name='Lister', actionUrl='') => {
   const templateId = onboardingNoticeTemplate.value();
   if (!templateId) throw new Error('Configure EMAILJS_ONBOARDING_NOTICE_TEMPLATE_ID before sending onboarding emails.');
@@ -876,6 +887,7 @@ exports.adminOnboardingAction = endpoint(async (req,res,uid) => {
   }
   if(action==='resendApprovalEmail'){
     if(a.status!=='APPROVED'||!a.userId)throw new Error('This application has no approved lister account.');
+    await db.collection('users').doc(a.userId).set({role:'lister',...listerPreference(a),updatedAt:FieldValue.serverTimestamp()},{merge:true});
     const link=await getAuth().generatePasswordResetLink(a.email,{url:'https://culturewave.in/login.html'});
     await sendOnboardingMail(a.email,'Your Lister Account Has Been Approved',`Dear ${a.name},\n\nYour application ${id} is approved and your lister account is active. Set your password and sign in here: ${link}\n\nCultureWave Vendor Onboarding Team`,a.name,link);
     await writeActivity(id,'Approval Email Sent',uid,{resent:true});return {ok:true,emailSent:true};
@@ -885,7 +897,7 @@ exports.adminOnboardingAction = endpoint(async (req,res,uid) => {
     if(!onboardingNoticeTemplate.value())throw new Error('Configure the EmailJS onboarding notice template before approving listers.');
     const required=['pan','aadhaar'];for(const kind of required)if(!a.documents?.some(d=>d.type===kind))throw new Error(`The ${kind.toUpperCase()} document is missing.`);
     const auth=getAuth();let user;try{user=await auth.getUserByEmail(a.email);if(user.disabled)throw new Error('This email already belongs to a disabled account.');}catch(e){if(e.code!=='auth/user-not-found')throw e;user=await auth.createUser({email:a.email,emailVerified:true,displayName:a.name,disabled:false});}
-    const userRef=db.collection('users').doc(user.uid);await userRef.set({uid:user.uid,name:a.name,email:a.email,phone:a.contact?.phone||'',role:'lister',status:'active',emailVerified:true,createdAt:FieldValue.serverTimestamp(),onboardingApplicationId:id},{merge:true});
+    const userRef=db.collection('users').doc(user.uid);await userRef.set({uid:user.uid,name:a.name,email:a.email,phone:a.contact?.phone||'',role:'lister',...listerPreference(a),status:'active',emailVerified:true,createdAt:FieldValue.serverTimestamp(),onboardingApplicationId:id},{merge:true});
     await db.collection('organisers').doc(user.uid).set({ownerId:user.uid,name:a.listing?.name||a.vendor?.registeredName||a.name,businessName:a.vendor?.registeredName||'',email:a.email,phone:a.contact?.phone||'',status:'active',createdAt:FieldValue.serverTimestamp()},{merge:true});
     await ref.update({status:'APPROVED',approvedAt:FieldValue.serverTimestamp(),approvedBy:uid,userId:user.uid,updatedAt:FieldValue.serverTimestamp()});await writeActivity(id,'Admin Approved',uid);await writeActivity(id,'Account Created','system',{userId:user.uid});
     const link=await auth.generatePasswordResetLink(a.email,{url:'https://culturewave.in/login.html'});
