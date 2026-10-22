@@ -78,7 +78,9 @@
     const promptText = profileCard.querySelector('.mobile-profile-prompt > span');
     if (promptText) { promptText.textContent = 'Complete your profile'; promptText.style.display = ''; }
     const progressText = profileCard.querySelector('.mobile-profile-progress');
-    if (progressText) { progressText.textContent = 'Complete your profile'; progressText.style.display = ''; }
+    if (progressText) progressText.style.display = 'none';
+    const profilePromptEl = profileCard.querySelector('.mobile-profile-prompt');
+    if (profilePromptEl) profilePromptEl.style.display = 'none';
     profileCard.querySelector('.mobile-profile-login-row')?.remove();
     const logoutCardForInitialState = menu.querySelector('.mobile-nav-logout-card');
     if (logoutCardForInitialState) logoutCardForInitialState.style.display = 'none';
@@ -323,18 +325,9 @@
         link.textContent = link.dataset.defaultAccountText;
         link.removeAttribute('aria-label');
       });
-      // Show login row in mobile menu profile card
       const card = document.querySelector('#mobileNav .mobile-profile-card');
       if (card) card.dataset.loggedIn = 'false';
-      const profilePromptEl = document.querySelector('#mobileNav .mobile-profile-prompt');
-      if (profilePromptEl && !profilePromptEl.querySelector('.mobile-profile-login-row')) {
-        const loginRow = document.createElement('span');
-        loginRow.className = 'mobile-profile-login-row';
-        loginRow.style.cssText = 'display:flex!important;align-items:center;justify-content:space-between;grid-column:1/-1;width:100%;';
-        loginRow.innerHTML = '<span style="color:#f1edf7;font-size:.9rem;">Login to your account</span><a class="mobile-profile-login" style="display:inline-flex!important;align-items:center;justify-content:center;min-width:76px;min-height:34px;padding:0 14px;border-radius:999px;background:#fff;color:#111;font-size:.82rem;font-weight:800;text-decoration:none;">Login</a>';
-        loginRow.querySelector('a').href = loginHref;
-        profilePromptEl.appendChild(loginRow);
-      }
+      document.querySelector('#mobileNav .mobile-profile-login-row')?.remove();
       return;
     }
     // Remove login row if user is logged in
