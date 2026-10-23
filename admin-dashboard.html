@@ -2519,10 +2519,26 @@ onSnapshot(query(collection(db,'bookings'),orderBy('createdAt','desc'),limit(500
 });
 
 onSnapshot(query(collection(db,'campaigns'),orderBy('createdAt','desc'),limit(100)), snap => {
-  allCampaigns = snap.docs.map(d=>({id:d.id,...d.data()}));
+  allCampaigns = snap.docs.map(d => {
+    try {
+      const data = d.data();
+      // sanitize any string fields that may contain unterminated content
+      Object.keys(data).forEach(key => {
+        if (typeof data[key] === 'string') data[key] = data[key].replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+      });
+      return {id:d.id,...data};
+    } catch(e) {
+      console.warn('Corrupt campaign doc:', d.id, e);
+      return {id:d.id, name:'[corrupt record – id: '+d.id+']', status:'draft'};
+    }
+  });
   renderCampaignsTable(allCampaigns);
   updateStats();
   renderMarketing();
+}, error => {
+  console.warn('Campaigns snapshot error:', error);
+  allCampaigns = [];
+  renderCampaignsTable([]);
 });
 
 onSnapshot(query(collection(db,'leads'),orderBy('createdAt','desc'),limit(200)), snap => {
