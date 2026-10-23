@@ -51,8 +51,11 @@ function decodeFirestoreFields(fields = {}) {
   return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, decodeFirestoreValue(value)]));
 }
 
-async function getFirestoreDocument(env, collection, id, token) {
-  const response = await fetch(`${firestoreBase(env)}/${collection}/${encodeURIComponent(id)}`, {
+async function getFirestoreDocument(env, collection, id, token, fields = null) {
+  const query = new URLSearchParams();
+  (fields || []).forEach(field => query.append("mask.fieldPaths", field));
+  const suffix = query.size ? `?${query}` : "";
+  const response = await fetch(`${firestoreBase(env)}/${collection}/${encodeURIComponent(id)}${suffix}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (response.status === 404) return null;
@@ -454,23 +457,37 @@ async function getGiftCardHistory(request, env) {
   return json({ success: true, purchases });
 }
 
-async function listFirestoreCollection(env, collection, token) {
-  const response = await fetch(`${firestoreBase(env)}/${collection}?pageSize=1000`, { headers: { Authorization: `Bearer ${token}` } });
-  if (!response.ok) throw new Error(`Could not load ${collection}.`);
-  const result = await response.json();
-  return (result.documents || []).map(document => ({ id: document.name.split("/").pop(), ...decodeFirestoreFields(document.fields || {}) }));
+async function listFirestoreCollection(env, collection, token, fields) {
+  const documents = [];
+  let pageToken = "";
+  // Keep Firestore responses small: gift card purchase documents contain private credentials
+  // and optional custom messages that are not needed by the admin list.
+  for (let page = 0; page < 10; page += 1) {
+    const query = new URLSearchParams({ pageSize: "100" });
+    fields.forEach(field => query.append("mask.fieldPaths", field));
+    if (pageToken) query.set("pageToken", pageToken);
+    const response = await fetch(`${firestoreBase(env)}/${collection}?${query}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) throw new Error(`Could not load ${collection}.`);
+    let result;
+    try { result = await response.json(); }
+    catch (_) { throw new Error(`Could not read the ${collection} records. Refresh and try again.`); }
+    documents.push(...(result.documents || []));
+    pageToken = result.nextPageToken || "";
+    if (!pageToken) break;
+  }
+  return documents.map(document => ({ id: document.name.split("/").pop(), ...decodeFirestoreFields(document.fields || {}) }));
 }
 
 async function getAdminOneClub(request, env) {
   const user = await authenticatedUser(request, env);
   if (!user) return json({ success: false, error: "Admin sign-in is required." }, 401);
   const token = await firestoreAccessToken(env);
-  const profile = await getFirestoreDocument(env, "users", user.uid, token);
+  const profile = await getFirestoreDocument(env, "users", user.uid, token, ["role"]);
   if (profile?.role !== "admin") return json({ success: false, error: "Admin access is required." }, 403);
   const [walletRecords, purchases, transactions, giftCardSettings] = await Promise.all([
-    listFirestoreCollection(env, "wallets", token),
-    listFirestoreCollection(env, "giftCardPurchases", token),
-    listFirestoreCollection(env, "oneClubTransactions", token),
+    listFirestoreCollection(env, "wallets", token, ["balance", "updatedAt", "createdAt"]),
+    listFirestoreCollection(env, "giftCardPurchases", token, ["ownerUid", "customerEmail", "amount", "status", "paymentId", "giftCardId", "occasion", "message", "redeemedBy", "createdAt", "redeemedAt"]),
+    listFirestoreCollection(env, "oneClubTransactions", token, ["uid", "amount", "type", "paymentId", "createdAt"]),
     getGiftCardSettings(env, token),
   ]);
   const wallets = walletRecords.map(wallet => ({ uid: wallet.id, balance: Number(wallet.balance || 0), updatedAt: wallet.updatedAt || wallet.createdAt || null }));
@@ -491,7 +508,7 @@ async function getAdminOneClub(request, env) {
 const DEFAULT_GIFT_CARD_SETTINGS = Object.freeze({ minAmount: 250, maxAmount: 10000 });
 
 async function getGiftCardSettings(env, token) {
-  const saved = await getFirestoreDocument(env, "giftCardSettings", "config", token);
+  const saved = await getFirestoreDocument(env, "giftCardSettings", "config", token, ["minAmount", "maxAmount"]);
   const minAmount = Number(saved?.minAmount ?? DEFAULT_GIFT_CARD_SETTINGS.minAmount);
   const maxAmount = Number(saved?.maxAmount ?? DEFAULT_GIFT_CARD_SETTINGS.maxAmount);
   if (!Number.isSafeInteger(minAmount) || !Number.isSafeInteger(maxAmount) || minAmount < 1 || maxAmount <= minAmount || maxAmount > 500000) {
@@ -504,7 +521,7 @@ async function updateGiftCardSettings(request, env) {
   const user = await authenticatedUser(request, env);
   if (!user) return json({ success: false, error: "Admin sign-in is required." }, 401);
   const token = await firestoreAccessToken(env);
-  const profile = await getFirestoreDocument(env, "users", user.uid, token);
+  const profile = await getFirestoreDocument(env, "users", user.uid, token, ["role"]);
   if (profile?.role !== "admin") return json({ success: false, error: "Admin access is required." }, 403);
   const body = await request.json();
   const minAmount = Number(body.minAmount), maxAmount = Number(body.maxAmount);
