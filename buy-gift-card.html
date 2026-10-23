@@ -22,6 +22,26 @@
     .dots button{width:10px;height:10px;padding:0;border:0;border-radius:99px;background:#555;cursor:pointer;transition:width .2s,background .2s}
     .dots button.active{width:24px;background:#f0e9ff}.dots button:focus-visible,.carousel-control:focus-visible{outline:2px solid #c7a8ff;outline-offset:3px}
   </style>
+  <style>
+    /* Premium card treatment with a larger, responsive landscape preview. */
+    .carousel{height:370px;overflow:visible}
+    .gift-card{width:min(86vw,560px);height:auto;aspect-ratio:1.72;min-height:0;border:1px solid transparent;border-radius:30px;transform:rotate(-1deg);background:radial-gradient(ellipse at 78% 20%,#fff3 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#4921a0,#241052 72%) padding-box,linear-gradient(135deg,#fff0be,#a77d39 22%,#f3dc9b 48%,#5c438a 72%,#f3dca0) border-box;box-shadow:inset 0 1px 0 #fff5,inset 0 -18px 35px #08051066,0 28px 70px #000b,0 0 34px #8d5cff20;color:#f4e7ff}
+    .gift-card:before{inset:14px;border:1px solid #ead49a88;border-radius:21px;box-shadow:inset 0 0 28px #fff1}
+    .gift-card:after{left:17%;top:-20%;height:145%;width:2px;border:0;background:linear-gradient(180deg,transparent,#f5dfa088 18%,#fff3 50%,#b98d49aa 82%,transparent);transform:rotate(-5deg)}
+    .gift-card[data-design="night"]{background:radial-gradient(ellipse at 78% 20%,#b9d0ff44 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#294a88,#0a142f 72%) padding-box,linear-gradient(135deg,#fff0be,#8a6eaa 24%,#9db5e6 50%,#3c507e 74%,#f3dca0) border-box;border-color:transparent;color:#e4edff}
+    .gift-card[data-design="sunset"]{background:radial-gradient(ellipse at 78% 20%,#fff2d344 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#b76450,#55263d 72%) padding-box,linear-gradient(135deg,#fff0be,#bd8051 24%,#f3c090 50%,#75425b 74%,#f3dca0) border-box;border-color:transparent;color:#fff0df}
+    .gift-card[data-design="mint"]{background:radial-gradient(ellipse at 78% 20%,#c7fff344 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#277e75,#103d42 72%) padding-box,linear-gradient(135deg,#fff0be,#5d9f87 24%,#a5e4cb 50%,#315e60 74%,#f3dca0) border-box;border-color:transparent;color:#e0fff3}
+    .gift-card[data-design="confetti"]{background:radial-gradient(ellipse at 78% 20%,#ffd8f244 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#9a438e,#431d65 72%) padding-box,linear-gradient(135deg,#fff0be,#aa68a0 24%,#efb4d5 50%,#69417d 74%,#f3dca0) border-box;border-color:transparent;color:#ffe8f6}
+    .gift-card .card-face{position:relative;z-index:1;display:grid;justify-items:center;gap:.7rem;padding:1.5rem 1rem;text-align:center}
+    .gift-card .brand-mark{font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.9rem,4vw,2.65rem);font-weight:600;letter-spacing:-.035em;text-shadow:0 2px 20px #fff4}
+    .card-kicker{font-size:.58rem;font-weight:700;letter-spacing:.24em;opacity:.76}
+    .gift-card small{font-size:.62rem;letter-spacing:.23em;opacity:.9}
+    .card-serial{position:absolute;right:9%;bottom:9%;z-index:1;font-size:.5rem;font-weight:700;letter-spacing:.2em;opacity:.62}
+    .card-glow{width:170px;height:170px;right:-45px;top:-65px;background:#fff4;filter:blur(15px)}
+    .card-check{top:22px;right:23px;width:30px;height:30px;box-shadow:0 2px 12px #0005}
+    .carousel-control.prev{left:max(1rem,calc(50% - 345px))}.carousel-control.next{right:max(1rem,calc(50% - 345px))}
+    @media(max-width:640px){.carousel{height:285px}.gift-card{width:min(90vw,480px);border-radius:24px}.gift-card:before{inset:10px;border-radius:17px}.gift-card .card-face{gap:.55rem;padding:1rem .7rem}.gift-card .brand-mark{font-size:clamp(1.8rem,8vw,2.3rem)}.card-kicker{font-size:.48rem;letter-spacing:.18em}.gift-card small{font-size:.5rem;letter-spacing:.15em}.card-serial{font-size:.42rem;right:8%;bottom:8%}.card-check{top:17px;right:18px}.carousel-control{width:36px;height:36px;font-size:1.3rem}.carousel-control.prev{left:0}.carousel-control.next{right:0}}
+  </style>
 </head>
 <body>
   <main class="buy-page">
@@ -30,7 +50,7 @@
     <nav class="categories" aria-label="Gift card occasion"><button class="category active" data-category="all" aria-pressed="true">All</button><button class="category" data-category="culturewave" aria-pressed="false">CultureWave</button><button class="category" data-category="birthday" aria-pressed="false">Birthday</button><button class="category" data-category="anniversary" aria-pressed="false">Anniversary</button><button class="category" data-category="thank you" aria-pressed="false">Thank you</button></nav>
     <section class="carousel" id="giftCarousel" aria-label="Choose a gift card design">
       <button class="carousel-control prev" type="button" aria-label="Previous gift card design">‹</button>
-      <div class="gift-card" id="giftCard" data-occasion="all" data-design="classic" tabindex="0" role="img" aria-label="Classic CultureWave gift card"><span class="card-glow"></span><span class="card-check" aria-label="Selected">✓</span><div><div class="brand-mark" id="giftCardBrand">CultureWave</div><small id="giftCardCaption">CULTUREWAVE GIFT CARD · CLASSIC</small></div></div>
+      <div class="gift-card" id="giftCard" data-occasion="all" data-design="classic" tabindex="0" role="img" aria-label="Classic CultureWave gift card"><span class="card-glow"></span><span class="card-check" aria-label="Selected">✓</span><div class="card-face"><div class="brand-mark" id="giftCardBrand">CultureWave</div><span class="card-kicker">EXPERIENCES · DINING · CULTURE</span><small id="giftCardCaption">CULTUREWAVE GIFT CARD · CLASSIC</small></div><span class="card-serial">A GIFT, BEAUTIFULLY GIVEN</span></div>
       <button class="carousel-control next" type="button" aria-label="Next gift card design">›</button>
     </section>
     <div class="dots" id="giftDesignDots" role="group" aria-label="Gift card designs">
