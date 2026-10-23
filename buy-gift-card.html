@@ -16,6 +16,17 @@
     .categories{justify-content:center;margin-right:0;margin-left:0;flex-wrap:wrap}
     .carousel{height:270px}
     .gift-card{width:min(78vw,420px);height:auto;aspect-ratio:1.72;transform:none;border-radius:24px}
+    .gift-card{transition:background .25s ease,transform .25s ease,border-color .25s ease;cursor:grab;touch-action:pan-y}
+    .gift-card:active{cursor:grabbing}
+    .gift-card[data-design="night"]{background:radial-gradient(ellipse at 75% 30%,#3d5b9b,#101b3a 72%);border-color:#718ed0;color:#d6e2ff}
+    .gift-card[data-design="sunset"]{background:radial-gradient(ellipse at 70% 25%,#e88c55,#6a2c54 72%);border-color:#e6a276;color:#ffe4d6}
+    .gift-card[data-design="mint"]{background:radial-gradient(ellipse at 75% 25%,#43a99b,#124944 72%);border-color:#63c4b3;color:#d4fff3}
+    .gift-card[data-design="confetti"]{background:radial-gradient(ellipse at 70% 20%,#b34d9b,#53216f 72%);border-color:#d88bc8;color:#ffe1f6}
+    .carousel-control{position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:42px;height:42px;transform:translateY(-50%);border:1px solid #484450;border-radius:50%;background:#1d1b22;color:#fff;font:inherit;font-size:1.5rem;cursor:pointer}
+    .carousel-control:hover{border-color:#a982ff;background:#2b1a49}
+    .carousel-control.prev{left:max(1rem,calc(50% - 290px))}.carousel-control.next{right:max(1rem,calc(50% - 290px))}
+    .dots button{width:10px;height:10px;padding:0;border:0;border-radius:99px;background:#555;cursor:pointer;transition:width .2s,background .2s}
+    .dots button.active{width:24px;background:#f0e9ff}.dots button:focus-visible,.carousel-control:focus-visible{outline:2px solid #c7a8ff;outline-offset:3px}
     .amount-box{max-width:850px;margin:0 auto}
     .redeem-line,.message-label,.message,.more-title,.more-options,.notice{display:block;width:min(100%,850px);margin-right:auto;margin-left:auto}
     @media(max-width:640px){.buy-page{width:100%;padding-right:1rem;padding-left:1rem}.page-head{margin-right:-1rem;margin-left:-1rem;padding-right:1rem;padding-left:1rem}.buy-hero{margin-right:-1rem;margin-left:-1rem;border:0;border-radius:0}.categories{justify-content:flex-start;margin-right:-1rem;margin-left:-1rem;flex-wrap:nowrap}.carousel{height:235px}.gift-card{width:min(82vw,380px)}}
@@ -27,8 +38,18 @@
     <header class="page-head"><button id="backButton" class="back-btn" aria-label="Back">‹</button><h1>Buy Gift Card</h1><button class="history-btn" id="historyButton">◴ &nbsp;History</button></header>
     <section class="buy-hero"><div class="brand"><div class="brand-mark">CultureWave</div><div class="brand-name">GIFT CARD</div></div></section>
     <nav class="categories" aria-label="Gift card occasion"><button class="category active" data-category="all" aria-pressed="true">All</button><button class="category" data-category="culturewave" aria-pressed="false">CultureWave</button><button class="category" data-category="birthday" aria-pressed="false">Birthday</button><button class="category" data-category="anniversary" aria-pressed="false">Anniversary</button><button class="category" data-category="thank you" aria-pressed="false">Thank you</button></nav>
-    <section class="carousel" aria-label="Gift card design"><div class="gift-card" id="giftCard" data-occasion="all"><span class="card-glow"></span><span class="card-check" aria-label="Selected">✓</span><div><div class="brand-mark" id="giftCardBrand">CultureWave</div><small id="giftCardCaption">CULTUREWAVE GIFT CARD</small></div></div></section>
-    <div class="dots" aria-hidden="true"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+    <section class="carousel" id="giftCarousel" aria-label="Choose a gift card design">
+      <button class="carousel-control prev" type="button" aria-label="Previous gift card design">‹</button>
+      <div class="gift-card" id="giftCard" data-occasion="all" data-design="classic" tabindex="0" role="img" aria-label="Classic CultureWave gift card"><span class="card-glow"></span><span class="card-check" aria-label="Selected">✓</span><div><div class="brand-mark" id="giftCardBrand">CultureWave</div><small id="giftCardCaption">CULTUREWAVE GIFT CARD · CLASSIC</small></div></div>
+      <button class="carousel-control next" type="button" aria-label="Next gift card design">›</button>
+    </section>
+    <div class="dots" id="giftDesignDots" role="group" aria-label="Gift card designs">
+      <button class="active" type="button" data-design-index="0" aria-label="Classic design" aria-pressed="true"></button>
+      <button type="button" data-design-index="1" aria-label="Midnight design" aria-pressed="false"></button>
+      <button type="button" data-design-index="2" aria-label="Sunset design" aria-pressed="false"></button>
+      <button type="button" data-design-index="3" aria-label="Mint design" aria-pressed="false"></button>
+      <button type="button" data-design-index="4" aria-label="Confetti design" aria-pressed="false"></button>
+    </div>
     <section class="amount-box"><h2>Choose amount</h2><label class="amount-display"><span>₹</span><input id="amountInput" aria-label="Gift card amount" inputmode="numeric" value="2000"></label><div class="amounts"><button class="amount-option">₹1,000</button><button class="amount-option active"><small>Popular</small>₹2,000</button><button class="amount-option">₹5,000</button><button class="amount-option">₹10,000</button></div></section>
     <p class="redeem-line">Already have a gift card? <a href="claim-gift-card.html">Redeem now</a></p>
     <label class="message-label" for="customMessage">Add a custom message:</label><textarea class="message" id="customMessage" placeholder="Start typing here..."></textarea>
@@ -50,7 +71,36 @@
     historyOverlay.addEventListener('click',event=>{if(event.target===historyOverlay)historyOverlay.hidden=true});
     document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!historyOverlay.hidden)historyOverlay.hidden=true});
     const categoryCaptions={all:'CULTUREWAVE GIFT CARD',culturewave:'CULTUREWAVE GIFT CARD',birthday:'HAPPY BIRTHDAY',anniversary:'HAPPY ANNIVERSARY','thank you':'THANK YOU'};
-    document.querySelectorAll('.category').forEach(button=>button.addEventListener('click',()=>{document.querySelector('.category.active')?.classList.remove('active');button.classList.add('active');document.querySelectorAll('.category').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));const category=button.dataset.category;document.getElementById('giftCard').dataset.occasion=category;document.getElementById('giftCardBrand').textContent='CultureWave';document.getElementById('giftCardCaption').textContent=categoryCaptions[category]||'CULTUREWAVE GIFT CARD'}));
+    const giftDesigns=[{id:'classic',label:'Classic'},{id:'night',label:'Midnight'},{id:'sunset',label:'Sunset'},{id:'mint',label:'Mint'},{id:'confetti',label:'Confetti'}];
+    const giftCard=document.getElementById('giftCard');
+    const giftDesignDots=[...document.querySelectorAll('[data-design-index]')];
+    let activeGiftDesign=0;
+    let activeGiftOccasion='all';
+    function selectGiftDesign(index){
+      activeGiftDesign=(index+giftDesigns.length)%giftDesigns.length;
+      const design=giftDesigns[activeGiftDesign];
+      giftCard.dataset.design=design.id;
+      giftCard.setAttribute('aria-label',`${design.label} ${categoryCaptions[activeGiftOccasion]||categoryCaptions.all} gift card`);
+      document.getElementById('giftCardBrand').textContent='CultureWave';
+      document.getElementById('giftCardCaption').textContent=`${categoryCaptions[activeGiftOccasion]||categoryCaptions.all} · ${design.label.toUpperCase()}`;
+      giftDesignDots.forEach((dot,dotIndex)=>{const active=dotIndex===activeGiftDesign;dot.classList.toggle('active',active);dot.setAttribute('aria-pressed',String(active))});
+    }
+    document.querySelectorAll('.category').forEach(button=>button.addEventListener('click',()=>{
+      document.querySelector('.category.active')?.classList.remove('active');button.classList.add('active');
+      document.querySelectorAll('.category').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+      activeGiftOccasion=button.dataset.category;
+      giftCard.dataset.occasion=activeGiftOccasion;
+      const occasionDesign={all:0,culturewave:0,birthday:1,anniversary:2,'thank you':3};
+      selectGiftDesign(occasionDesign[activeGiftOccasion]??0);
+    }));
+    giftDesignDots.forEach(dot=>dot.addEventListener('click',()=>selectGiftDesign(Number(dot.dataset.designIndex))));
+    document.querySelector('.carousel-control.prev').addEventListener('click',()=>selectGiftDesign(activeGiftDesign-1));
+    document.querySelector('.carousel-control.next').addEventListener('click',()=>selectGiftDesign(activeGiftDesign+1));
+    giftCard.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'){event.preventDefault();selectGiftDesign(activeGiftDesign-1)}else if(event.key==='ArrowRight'){event.preventDefault();selectGiftDesign(activeGiftDesign+1)}});
+    const giftCarousel=document.getElementById('giftCarousel');
+    let swipeStartX=null;
+    giftCarousel.addEventListener('pointerdown',event=>{if(event.pointerType!=='mouse'&&!event.target.closest('button'))swipeStartX=event.clientX});
+    giftCarousel.addEventListener('pointerup',event=>{if(swipeStartX===null)return;const delta=event.clientX-swipeStartX;swipeStartX=null;if(Math.abs(delta)>40)selectGiftDesign(activeGiftDesign+(delta<0?1:-1))});
     document.querySelectorAll('.amount-option').forEach(button=>button.addEventListener('click',()=>{document.querySelector('.amount-option.active')?.classList.remove('active');button.classList.add('active');document.getElementById('amountInput').value=button.textContent.replace(/\D/g,'')}));
     document.getElementById('proceedButton').addEventListener('click',async()=>{const notice=document.getElementById('buyNotice'),button=document.getElementById('proceedButton');button.disabled=true;notice.textContent='Opening secure checkout…';try{let user=await currentUser();if(!user){location.href='login.html?next=buy-gift-card.html';return}const amount=Number(document.getElementById('amountInput').value);if(!Number.isSafeInteger(amount)||amount<250||amount>10000)throw new Error('Gift card amount must be between ₹250 and ₹10,000.');if(typeof Razorpay==='undefined')throw new Error('Secure checkout could not load. Refresh and try again.');const occasion=document.querySelector('.category.active')?.dataset.category||'culturewave';const {razorpayOrderId,keyId,amount:paise}=await giftRequest('createGiftCardOrder',{amount,occasion,message:document.getElementById('customMessage').value});const checkout=new Razorpay({key:keyId,order_id:razorpayOrderId,amount:paise,currency:'INR',name:'CultureWave',description:'CultureWave Gift Card',prefill:{email:user.email||''},theme:{color:'#7b48ce'},handler:async response=>{try{user=giftAuth.currentUser;const result=await giftRequest('verifyGiftCardPayment',response);notice.innerHTML=`Payment confirmed. Save your gift card code and PIN:<br><strong>Code: ${result.giftCard.code}</strong><br><strong>PIN: ${result.giftCard.pin}</strong><br>Amount: ₹${Number(result.giftCard.amount).toLocaleString('en-IN')}<br><a href="one-club.html">Go to One Club</a>`}catch(error){notice.textContent=`Payment may have completed, but gift card confirmation failed: ${error.message}. Do not pay again; contact CultureWave support.`}finally{button.disabled=false;button.textContent='Proceed ›'}}});checkout.on('payment.failed',response=>{notice.textContent=response.error?.description||'Payment was not completed.';button.disabled=false;button.textContent='Proceed ›'});checkout.open()}catch(error){notice.textContent=error.message;button.disabled=false;button.textContent='Proceed ›'}});
   </script>
