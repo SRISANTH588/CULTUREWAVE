@@ -369,6 +369,12 @@
       .ev-venue{color:#999;font-size:.74rem;flex:1;min-width:0}
       .ev-empty{color:#aaa}.ev-empty span{filter:grayscale(1)}
       .site-footer{background:#050505}
+      .ev-desktop-poster{display:none}
+      @media(min-width:961px){
+        .ev-section .ev-grid{grid-template-columns:repeat(2,minmax(0,520px));justify-content:center;align-items:start;gap:1.5rem;}
+        .ev-section .ev-banner{height:auto;aspect-ratio:auto;background-image:none!important;background-color:transparent;overflow:hidden;}
+        .ev-section .ev-desktop-poster{display:block;width:100%;height:auto;object-fit:contain;}
+      }
       @media(max-width:600px){.ev-hero{padding:2.7rem 0 2.2rem}.ev-hero h1{font-size:clamp(2.2rem,11vw,3.2rem)}.ev-grid{gap:1rem}.ev-banner{aspect-ratio:16/9}.ev-city-select{width:100%}}
       /* Preserve the full-width page gutters. */
       @media(max-width:960px){main{width:100%;max-width:none;margin:0;padding-left:0!important;padding-right:0!important;}}
@@ -700,6 +706,7 @@
             article.innerHTML = `
               <div class="ev-poster-wrap">
                 <div class="ev-banner ${bannerClass}" ${safeCardImage?`style="background-image:url('${safeCardImage}');"`:''} >
+                  ${safeCardImage ? `<img class="ev-desktop-poster" src="${safeCardImage}" alt="${escapeHTML(eventName)} poster" loading="lazy">` : ''}
                   <span class="ev-tag">${escapeHTML(category)}</span>
                 </div>
                 <span class="ev-rank">${i+1}</span>
