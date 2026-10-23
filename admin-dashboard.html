@@ -1000,7 +1000,7 @@
     <div style="background:linear-gradient(135deg,#25114f 0%,#5526a5 58%,#8d5ce0 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;color:white;">
       <div style="font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8;">CultureWave Payments</div>
       <div style="font-size:1.75rem;font-weight:800;letter-spacing:-.04em;margin-top:.3rem;">Gift Cards</div>
-      <div style="font-size:.88rem;opacity:.78;margin-top:.25rem;">Purchase and redemption status. Card codes and PINs stay private.</div>
+      <div style="font-size:.88rem;opacity:.78;margin-top:.25rem;">Purchase, customer and redemption details. Card codes and PINs stay private.</div>
     </div>
     <div class="stats-grid">
       <div class="stat-card blue"><div class="stat-icon">🎁</div><div class="stat-label">Gift Cards Sold</div><div class="stat-value" id="adminGiftCardCount">0</div></div>
@@ -1008,8 +1008,9 @@
       <div class="stat-card green"><div class="stat-icon">✓</div><div class="stat-label">Redeemed</div><div class="stat-value" id="adminGiftCardRedeemed">0</div></div>
       <div class="stat-card purple"><div class="stat-icon">₹</div><div class="stat-label">Redeemed Value</div><div class="stat-value" id="adminGiftCardValue">₹0</div></div>
     </div>
-    <div class="filter-bar"><input id="giftCardSearch" type="search" placeholder="Search customer UID or payment ID" oninput="renderOneClubAdminTables()"><select id="giftCardStatusFilter" onchange="renderOneClubAdminTables()"><option value="">All cards</option><option value="issued">Unredeemed</option><option value="redeemed">Redeemed</option></select><button class="btn" onclick="loadOneClubAdminData(true)">↻ Refresh</button><span id="giftCardLoadStatus" style="font-size:.76rem;color:var(--muted);margin-left:auto;"></span></div>
-    <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Customer UID</th><th>Amount</th><th>Occasion</th><th>Status</th><th>Payment ID</th><th>Purchased</th><th>Redeemed</th></tr></thead><tbody id="adminGiftCardTable"></tbody></table></div></div>
+    <div class="card" style="padding:1rem 1.25rem;margin-bottom:1rem;"><div class="card-head"><h2>Purchase limits</h2><span style="color:var(--muted);font-size:.76rem;">Applied during checkout</span></div><div style="display:flex;align-items:end;gap:.75rem;flex-wrap:wrap;"><label style="display:grid;gap:.35rem;font-size:.78rem;font-weight:700;">Minimum amount (₹)<input id="giftCardMinAmount" type="number" min="1" step="1" style="width:190px;padding:.65rem .75rem;border:1px solid var(--border);border-radius:9px;"></label><label style="display:grid;gap:.35rem;font-size:.78rem;font-weight:700;">Maximum amount (₹)<input id="giftCardMaxAmount" type="number" min="2" max="500000" step="1" style="width:190px;padding:.65rem .75rem;border:1px solid var(--border);border-radius:9px;"></label><button class="btn primary" id="saveGiftCardLimits" onclick="saveGiftCardLimits()">Save limits</button><span id="giftCardSettingsStatus" style="font-size:.76rem;color:var(--muted);"></span></div></div>
+    <div class="filter-bar"><input id="giftCardSearch" type="search" placeholder="Search customer, email, UID or payment ID" oninput="renderOneClubAdminTables()"><select id="giftCardStatusFilter" onchange="renderOneClubAdminTables()"><option value="">All cards</option><option value="issued">Unredeemed</option><option value="redeemed">Redeemed</option></select><button class="btn" onclick="loadOneClubAdminData(true)">↻ Refresh</button><span id="giftCardLoadStatus" style="font-size:.76rem;color:var(--muted);margin-left:auto;"></span></div>
+    <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Customer</th><th>Amount</th><th>Occasion / Message</th><th>Status</th><th>Payment ID</th><th>Gift Card ID</th><th>Purchased</th><th>Redeemed by / date</th></tr></thead><tbody id="adminGiftCardTable"></tbody></table></div></div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -1576,6 +1577,7 @@ const money = v => '₹'+Number(v||0).toLocaleString('en-IN');
 const fmtDate = ts => { if(!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); };
 const EMAILJS_SERVICE_ID='service_wvzjnnx', EMAILJS_PUBLIC_KEY='JXh4QRP2kafFxlPQo';
 const oneClubAdminApi='https://culturewave-razorpay.culturewaveindia.workers.dev/adminOneClub';
+const giftCardSettingsApi='https://culturewave-razorpay.culturewaveindia.workers.dev/updateGiftCardSettings';
 emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
 
 window.showToast = function(msg, type='') {
@@ -1645,11 +1647,26 @@ async function loadOneClubAdminData(force=false){
     const response=await fetch(oneClubAdminApi,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`,'Content-Type':'application/json'},body:'{}'});
     const result=await response.json();
     if(!response.ok||!result.success)throw new Error(result.error||'Could not load One Club records.');
-    oneClubAdminData=result;renderOneClubAdminTables();statuses.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Updated just now'});
+    oneClubAdminData=result;renderOneClubAdminTables();
+    const settings=result.giftCardSettings||{minAmount:250,maxAmount:10000};
+    document.getElementById('giftCardMinAmount').value=settings.minAmount;
+    document.getElementById('giftCardMaxAmount').value=settings.maxAmount;
+    document.getElementById('giftCardSettingsStatus').textContent='Current limits are active at checkout.';
+    statuses.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Updated just now'});
   }catch(error){statuses.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=error.message});showToast(error.message,'error')}
   finally{oneClubAdminLoading=false}
 }
 window.loadOneClubAdminData=loadOneClubAdminData;
+window.saveGiftCardLimits=async function(){
+  const minAmount=Number(document.getElementById('giftCardMinAmount').value),maxAmount=Number(document.getElementById('giftCardMaxAmount').value);
+  const status=document.getElementById('giftCardSettingsStatus'),button=document.getElementById('saveGiftCardLimits');
+  if(!Number.isSafeInteger(minAmount)||!Number.isSafeInteger(maxAmount)||minAmount<1||maxAmount<=minAmount||maxAmount>500000){status.textContent='Use whole rupee amounts; max must exceed min and be at most ₹5,00,000.';return}
+  try{const user=auth.currentUser;if(!user)throw new Error('Your admin session expired. Sign in again.');button.disabled=true;status.textContent='Saving…';
+    const response=await fetch(giftCardSettingsApi,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`,'Content-Type':'application/json'},body:JSON.stringify({minAmount,maxAmount})});
+    const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||'Could not save gift card limits.');
+    oneClubAdminData={...(oneClubAdminData||{}),giftCardSettings:result.giftCardSettings};status.textContent='Saved. These limits now apply to checkout.';showToast('Gift card limits updated','success');
+  }catch(error){status.textContent=error.message;showToast(error.message,'error')}finally{button.disabled=false}
+};
 function oneClubCustomer(uid){const user=allUsers.find(item=>item.id===uid);return user?`${esc(user.name||user.email||uid)}<div style="font-size:.7rem;color:var(--muted)">${esc(user.email||uid)}</div>`:esc(uid||'—')}
 window.renderOneClubAdminTables=function(){
   if(!oneClubAdminData)return;
@@ -1667,8 +1684,8 @@ window.renderOneClubAdminTables=function(){
   document.getElementById('adminGiftCardRedeemed').textContent=Number(summary.redeemedCount||0).toLocaleString('en-IN');
   document.getElementById('adminGiftCardValue').textContent=money(summary.redeemedValue);
   const giftSearch=(document.getElementById('giftCardSearch')?.value||'').trim().toLowerCase(),status=document.getElementById('giftCardStatusFilter')?.value||'';
-  const giftRows=giftCards.filter(item=>(!status||item.status===status)&&(!giftSearch||item.ownerUid.toLowerCase().includes(giftSearch)||item.paymentId.toLowerCase().includes(giftSearch))).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
-  document.getElementById('adminGiftCardTable').innerHTML=giftRows.length?giftRows.map(item=>`<tr><td><strong>${oneClubCustomer(item.ownerUid)}</strong></td><td style="font-weight:800">${money(item.amount)}</td><td>${esc(item.occasion||'CultureWave')}</td><td><span class="badge ${item.status==='redeemed'?'green':'orange'}">${item.status==='redeemed'?'Redeemed':'Unredeemed'}</span></td><td>${esc(item.paymentId||'—')}</td><td>${fmtDate(item.createdAt)}</td><td>${fmtDate(item.redeemedAt)}</td></tr>`).join(''):'<tr><td colspan="7">No matching gift cards.</td></tr>';
+  const giftRows=giftCards.filter(item=>(!status||item.status===status)&&(!giftSearch||[item.ownerUid,item.customerEmail,item.paymentId,item.giftCardId].some(value=>String(value||'').toLowerCase().includes(giftSearch)))).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+  document.getElementById('adminGiftCardTable').innerHTML=giftRows.length?giftRows.map(item=>`<tr><td><strong>${oneClubCustomer(item.ownerUid)}</strong><div style="font-size:.7rem;color:var(--muted);">${esc(item.customerEmail||'')}</div></td><td style="font-weight:800">${money(item.amount)}</td><td>${esc(item.occasion||'CultureWave')}${item.message?`<div style="font-size:.7rem;color:var(--muted);max-width:240px;white-space:normal;">${esc(item.message)}</div>`:''}</td><td><span class="badge ${item.status==='redeemed'?'green':'orange'}">${item.status==='redeemed'?'Redeemed':'Unredeemed'}</span></td><td>${esc(item.paymentId||'—')}</td><td>${esc(item.giftCardId||'—')}</td><td>${fmtDate(item.createdAt)}</td><td>${item.redeemedBy?`${oneClubCustomer(item.redeemedBy)}<div style="font-size:.7rem;color:var(--muted);">${fmtDate(item.redeemedAt)}</div>`:fmtDate(item.redeemedAt)}</td></tr>`).join(''):'<tr><td colspan="8">No matching gift cards.</td></tr>';
 };
 
 function renderNewListers(){

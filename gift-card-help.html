@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111">
+  <title>Gift Card Help | CultureWave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100dvh;background:#111;color:#f5f3f8;font-family:Inter,system-ui,sans-serif}.help-page{max-width:720px;margin:auto;padding:calc(env(safe-area-inset-top) + 1rem) 1rem calc(env(safe-area-inset-bottom) + 2rem)}.head{display:flex;align-items:center;gap:.8rem;margin-bottom:1.4rem}.back{display:grid;place-items:center;width:46px;height:46px;border:1px solid #393740;border-radius:50%;background:#1d1c22;color:#fff;font:inherit;font-size:1.8rem}.head h1{margin:0;font-size:1.2rem}.hero,.form-card{border:1px solid #302b3a;border-radius:22px;background:linear-gradient(145deg,#19151f,#121216);padding:1.25rem}.hero{margin-bottom:1rem}.eyebrow{color:#c7a8ff;font-size:.7rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.hero h2{margin:.55rem 0;font-size:1.75rem;letter-spacing:-.05em}.hero p,.hint{color:#aaa7b1;font-size:.88rem;line-height:1.6}.hero p{margin:0}.field{display:grid;gap:.45rem;margin-bottom:.9rem}.field label{font-size:.78rem;font-weight:700;color:#d8d5de}.field input,.field textarea{width:100%;border:1px solid #3b3942;border-radius:12px;background:#1b1a20;color:#f7f5fa;font:inherit;padding:.8rem .9rem;outline:none}.field input:focus,.field textarea:focus{border-color:#9b70f1;box-shadow:0 0 0 3px #8d5be322}.field textarea{min-height:190px;resize:vertical;line-height:1.55}.hint{margin:.25rem 0 1rem;font-size:.76rem}.actions{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.action{display:flex;justify-content:center;align-items:center;min-height:50px;border-radius:13px;text-decoration:none;font-size:.88rem;font-weight:800}.email{background:#8a5cf6;color:#fff}.whatsapp{border:1px solid #3a3942;background:#201f24;color:#f5f3f8}.safe-note{margin:1rem 0 0;padding:.8rem;border:1px solid #42382d;border-radius:12px;background:#211c17;color:#d7c5a5;font-size:.76rem;line-height:1.55}@media(max-width:480px){.actions{grid-template-columns:1fr}.hero h2{font-size:1.55rem}}
+  </style>
+</head>
+<body>
+  <main class="help-page">
+    <header class="head"><button class="back" id="backButton" type="button" aria-label="Back">‹</button><h1>Gift Card Help</h1></header>
+    <section class="hero"><div class="eyebrow">CultureWave Support</div><h2>We’ll help sort it out.</h2><p>Send us the details below and our team can look into your gift card purchase or history.</p></section>
+    <section class="form-card">
+      <div class="field"><label for="memberEmail">Email registered to your account</label><input id="memberEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
+      <div class="field"><label for="reference">Payment ID or order reference (optional)</label><input id="reference" type="text" autocomplete="off" placeholder="Add a payment reference if available"></div>
+      <div class="field"><label for="supportMessage">Message</label><textarea id="supportMessage"></textarea></div>
+      <p class="hint">The message is prefilled for the Gift Card History error. You can edit it before sending.</p>
+      <div class="actions"><a class="action email" id="emailSupport" href="mailto:support.culturewave@gmail.com">Email Support</a><a class="action whatsapp" id="whatsappSupport" href="https://wa.me/919848047428" target="_blank" rel="noopener noreferrer">Continue on WhatsApp</a></div>
+      <p class="safe-note">For your security, never include your gift card code or PIN in an email or message. Support will never ask you to share your PIN.</p>
+    </section>
+  </main>
+  <script type="module">
+    import {auth} from './firebase.js';
+    const message=document.getElementById('supportMessage');
+    const email=document.getElementById('memberEmail');
+    const reference=document.getElementById('reference');
+    message.value='Hi CultureWave Support,\n\nI need help with my CultureWave Gift Card. The Gift Card History showed this error: “Unterminated string in JSON at position 1018 (line 1 column 1019)”.\n\nPlease check my gift card purchase history and help me access my purchase details.\n\nThank you.';
+    auth.authStateReady().then(()=>{if(auth.currentUser?.email)email.value=auth.currentUser.email}).catch(()=>{});
+    function updateLinks(){
+      const details=`${message.value}\n\nRegistered account email: ${email.value||'[add your email]'}${reference.value?`\nPayment ID or order reference: ${reference.value}`:''}`;
+      document.getElementById('emailSupport').href=`mailto:support.culturewave@gmail.com?subject=${encodeURIComponent('CultureWave Gift Card support')}&body=${encodeURIComponent(details)}`;
+      document.getElementById('whatsappSupport').href=`https://wa.me/919848047428?text=${encodeURIComponent(details)}`;
+    }
+    [message,email,reference].forEach(field=>field.addEventListener('input',updateLinks));updateLinks();
+    document.getElementById('backButton').addEventListener('click',()=>{if(parent!==window)parent.postMessage({type:'culturewave-menu-back'},location.origin);else history.back()});
+  </script>
+</body>
+</html>

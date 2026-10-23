@@ -314,13 +314,16 @@ async function createGiftCardOrder(request, env) {
   if (!user) return json({ success: false, error: "Sign in to buy a CultureWave gift card." }, 401);
   const body = await request.json();
   const amount = Number(body.amount);
-  if (!Number.isSafeInteger(amount) || amount < 250 || amount > 10000) {
-    return json({ success: false, error: "Gift card amount must be between ₹250 and ₹10,000." }, 400);
+  const firestoreToken = await firestoreAccessToken(env);
+  const settings = await getGiftCardSettings(env, firestoreToken);
+  if (!Number.isSafeInteger(amount) || amount < settings.minAmount || amount > settings.maxAmount) {
+    return json({ success: false, error: `Gift card amount must be between ₹${settings.minAmount.toLocaleString("en-IN")} and ₹${settings.maxAmount.toLocaleString("en-IN")}.` }, 400);
   }
   const order = await razorpayRequest(env, "orders", {
     method: "POST",
     body: JSON.stringify({ amount: amount * 100, currency: "INR", receipt: `cwgc_${Date.now()}`.slice(0, 40),
       notes: { purchaseType: "culturewave_gift_card", ownerUid: user.uid, amount: String(amount),
+        minAmount: String(settings.minAmount), maxAmount: String(settings.maxAmount),
         occasion: clean(body.occasion, 32), message: clean(body.message, 240), customerEmail: user.email } }),
   });
   return json({ success: true, provider: "razorpay", keyId: env.RAZORPAY_KEY_ID,
@@ -354,8 +357,11 @@ async function createGiftCard(request, env) {
     razorpayRequest(env, `payments/${encodeURIComponent(paymentId)}`),
   ]);
   const amount = Number(order.notes?.amount);
+  const orderMinAmount = Number(order.notes?.minAmount ?? DEFAULT_GIFT_CARD_SETTINGS.minAmount);
+  const orderMaxAmount = Number(order.notes?.maxAmount ?? DEFAULT_GIFT_CARD_SETTINGS.maxAmount);
   if (order.notes?.purchaseType !== "culturewave_gift_card" || order.notes?.ownerUid !== user.uid ||
-      order.currency !== "INR" || !Number.isSafeInteger(amount) || amount < 250 || amount > 10000 ||
+      order.currency !== "INR" || !Number.isSafeInteger(orderMinAmount) || !Number.isSafeInteger(orderMaxAmount) ||
+      !Number.isSafeInteger(amount) || amount < orderMinAmount || amount > orderMaxAmount ||
       Number(order.amount) !== amount * 100 || payment.order_id !== orderId || Number(payment.amount) !== Number(order.amount)) {
     return json({ success: false, verified: false, error: "Payment does not match this CultureWave gift card." }, 400);
   }
@@ -380,7 +386,7 @@ async function createGiftCard(request, env) {
     createdAt: { __firestoreTimestamp: timestamp }, expiresAt: { __firestoreTimestamp: new Date(Date.now() + 365 * 86400000).toISOString() } };
   const cardSaved = await createFirestoreDocument(env, "giftCards", giftCardId, giftCard, firestoreToken);
   if (!cardSaved) throw new Error("The gift card was paid for, but issuance needs retry or support review. Keep your payment reference " + paymentId + ".");
-  const saved = await createFirestoreDocument(env, "giftCardPurchases", purchaseId, { ownerUid: user.uid, amount, paymentId,
+  const saved = await createFirestoreDocument(env, "giftCardPurchases", purchaseId, { ownerUid: user.uid, customerEmail: clean(user.email, 180).toLowerCase(), amount, paymentId,
     giftCardId, code, pin, occasion: giftCard.occasion, message: giftCard.message, status: "issued",
     createdAt: { __firestoreTimestamp: timestamp } }, firestoreToken);
   if (!saved) {
@@ -431,23 +437,21 @@ async function getGiftCardHistory(request, env) {
   const user = await authenticatedUser(request, env);
   if (!user) return json({ success: false, error: "Sign in to view gift card history." }, 401);
   const token = await firestoreAccessToken(env);
-  const listFor = async (collection, field) => {
-    const response = await fetch(`${firestoreBase(env)}:runQuery`, { method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ structuredQuery: { from: [{ collectionId: collection }],
-        where: { fieldFilter: { field: { fieldPath: field }, op: "EQUAL", value: { stringValue: user.uid } } }, limit: 50 } }) });
-    if (!response.ok) throw new Error("Could not load One Club history.");
-    return response.json();
-  };
-  let purchaseRows, transactionRows;
-  try { [purchaseRows, transactionRows] = await Promise.all([listFor("giftCardPurchases", "ownerUid"), listFor("oneClubTransactions", "uid")]); }
-  catch (_) { return json({ success: false, error: "Could not load One Club history." }, 502); }
-  const purchases = (purchaseRows || []).filter(row => row.document).map(row => {
-    const document = row.document;
-    return { id: document.name.split("/").pop(), ...decodeFirestoreFields(document.fields || {}) };
+  const response = await fetch(`${firestoreBase(env)}:runQuery`, { method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ structuredQuery: { from: [{ collectionId: "giftCardPurchases" }],
+      select: { fields: ["ownerUid", "amount", "status", "code", "pin", "createdAt"].map(fieldPath => ({ fieldPath })) },
+      where: { fieldFilter: { field: { fieldPath: "ownerUid" }, op: "EQUAL", value: { stringValue: user.uid } } }, limit: 50 } }) });
+  if (!response.ok) return json({ success: false, error: "Could not load One Club history." }, 502);
+  let rows;
+  try { rows = await response.json(); }
+  catch (_) { return json({ success: false, error: "Gift card history is temporarily unavailable. Please try again or contact support." }, 502); }
+  const purchases = (rows || []).filter(row => row.document).map(row => {
+    const document = row.document, fields = decodeFirestoreFields(document.fields || {});
+    return { id: document.name.split("/").pop(), amount: Number(fields.amount || 0), status: fields.status || "issued",
+      code: fields.code || "", pin: fields.pin || "", createdAt: fields.createdAt || null };
   });
-  const transactions = (transactionRows || []).filter(row => row.document).map(row => ({ id: row.document.name.split("/").pop(), ...decodeFirestoreFields(row.document.fields || {}) }));
-  return json({ success: true, purchases, transactions });
+  return json({ success: true, purchases });
 }
 
 async function listFirestoreCollection(env, collection, token) {
@@ -463,23 +467,52 @@ async function getAdminOneClub(request, env) {
   const token = await firestoreAccessToken(env);
   const profile = await getFirestoreDocument(env, "users", user.uid, token);
   if (profile?.role !== "admin") return json({ success: false, error: "Admin access is required." }, 403);
-  const [walletRecords, purchases, transactions] = await Promise.all([
+  const [walletRecords, purchases, transactions, giftCardSettings] = await Promise.all([
     listFirestoreCollection(env, "wallets", token),
     listFirestoreCollection(env, "giftCardPurchases", token),
     listFirestoreCollection(env, "oneClubTransactions", token),
+    getGiftCardSettings(env, token),
   ]);
   const wallets = walletRecords.map(wallet => ({ uid: wallet.id, balance: Number(wallet.balance || 0), updatedAt: wallet.updatedAt || wallet.createdAt || null }));
-  const giftCards = purchases.map(card => ({ id: card.id, ownerUid: card.ownerUid || "", amount: Number(card.amount || 0),
-    status: card.status || "issued", paymentId: card.paymentId || "", occasion: card.occasion || "", createdAt: card.createdAt || null,
+  const giftCards = purchases.map(card => ({ id: card.id, ownerUid: card.ownerUid || "", customerEmail: card.customerEmail || "", amount: Number(card.amount || 0),
+    status: card.status || "issued", paymentId: card.paymentId || "", giftCardId: card.giftCardId || "", occasion: card.occasion || "",
+    message: card.message || "", redeemedBy: card.redeemedBy || "", createdAt: card.createdAt || null,
     redeemedAt: card.redeemedAt || null }));
   const safeTransactions = transactions.map(item => ({ id: item.id, uid: item.uid || "", amount: Number(item.amount || 0),
     type: item.type || "", paymentId: item.paymentId || "", createdAt: item.createdAt || null }));
-  return json({ success: true, wallets, giftCards, transactions: safeTransactions,
+  return json({ success: true, wallets, giftCards, transactions: safeTransactions, giftCardSettings,
     summary: { walletCount: wallets.length, totalBalance: wallets.reduce((sum, item) => sum + item.balance, 0),
       giftCardCount: giftCards.length, issuedCount: giftCards.filter(item => item.status === "issued").length,
       redeemedCount: giftCards.filter(item => item.status === "redeemed").length,
       issuedValue: giftCards.reduce((sum, item) => sum + item.amount, 0),
       redeemedValue: giftCards.filter(item => item.status === "redeemed").reduce((sum, item) => sum + item.amount, 0) } });
+}
+
+const DEFAULT_GIFT_CARD_SETTINGS = Object.freeze({ minAmount: 250, maxAmount: 10000 });
+
+async function getGiftCardSettings(env, token) {
+  const saved = await getFirestoreDocument(env, "giftCardSettings", "config", token);
+  const minAmount = Number(saved?.minAmount ?? DEFAULT_GIFT_CARD_SETTINGS.minAmount);
+  const maxAmount = Number(saved?.maxAmount ?? DEFAULT_GIFT_CARD_SETTINGS.maxAmount);
+  if (!Number.isSafeInteger(minAmount) || !Number.isSafeInteger(maxAmount) || minAmount < 1 || maxAmount <= minAmount || maxAmount > 500000) {
+    return { ...DEFAULT_GIFT_CARD_SETTINGS };
+  }
+  return { minAmount, maxAmount };
+}
+
+async function updateGiftCardSettings(request, env) {
+  const user = await authenticatedUser(request, env);
+  if (!user) return json({ success: false, error: "Admin sign-in is required." }, 401);
+  const token = await firestoreAccessToken(env);
+  const profile = await getFirestoreDocument(env, "users", user.uid, token);
+  if (profile?.role !== "admin") return json({ success: false, error: "Admin access is required." }, 403);
+  const body = await request.json();
+  const minAmount = Number(body.minAmount), maxAmount = Number(body.maxAmount);
+  if (!Number.isSafeInteger(minAmount) || !Number.isSafeInteger(maxAmount) || minAmount < 1 || maxAmount <= minAmount || maxAmount > 500000) {
+    return json({ success: false, error: "Enter whole rupee amounts: minimum at least ₹1, maximum greater than minimum and no more than ₹5,00,000." }, 400);
+  }
+  await patchFirestoreDocument(env, "giftCardSettings", "config", { minAmount, maxAmount, updatedAt: { __firestoreTimestamp: new Date().toISOString() }, updatedBy: user.uid }, token);
+  return json({ success: true, giftCardSettings: { minAmount, maxAmount } });
 }
 
 async function claimStallSlot(env, token, eventId, slotIndex, paymentId, amountPaise) {
@@ -612,6 +645,7 @@ export default {
       if (path === "/oneClubBalance") return await getOneClub(request, env).then(response => withHeaders(response, headers));
       if (path === "/giftCardHistory") return await getGiftCardHistory(request, env).then(response => withHeaders(response, headers));
       if (path === "/adminOneClub") return await getAdminOneClub(request, env).then(response => withHeaders(response, headers));
+      if (path === "/updateGiftCardSettings") return await updateGiftCardSettings(request, env).then(response => withHeaders(response, headers));
       return json({ error: "Not found." }, 404, headers);
     } catch (error) {
       console.error("Razorpay Worker request failed:", error.message);
