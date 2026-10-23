@@ -573,7 +573,14 @@ const base64url = value => btoa(String.fromCharCode(...new TextEncoder().encode(
 
 async function firestoreAccessToken(env) {
   if (!env.FIREBASE_SERVICE_ACCOUNT_JSON) throw new Error("Payment verification storage is not configured.");
-  const account = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  let account;
+  try {
+    account = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  } catch (e) {
+    throw new Error("Service account JSON is invalid: " + e.message);
+  }
+  if (!account.private_key) throw new Error("Service account is missing private_key.");
+  if (!account.client_email) throw new Error("Service account is missing client_email.");
   const now = Math.floor(Date.now() / 1000);
   const header = base64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
   const claims = base64url(JSON.stringify({
