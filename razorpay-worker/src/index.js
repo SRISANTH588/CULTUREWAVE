@@ -277,14 +277,36 @@ async function verifyPayment(request, env) {
 
 async function authenticatedUser(request, env) {
   const token = String(request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-  const apiKey = env.FIREBASE_WEB_API_KEY || "AIzaSyBCgNQy8EJL7gE-SA1cMePGetWLOR7WWMI";
   if (!token) return null;
-  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idToken: token }),
-  });
-  const result = await response.json().catch(() => ({}));
-  const user = result.users?.[0];
-  return response.ok && user?.localId ? { uid: user.localId, email: clean(user.email, 180).toLowerCase() } : null;
+  // Retry with the app key if a stale Cloudflare override was configured.
+  const apiKeys = [...new Set([
+    String(env.FIREBASE_WEB_API_KEY || "").trim(),
+    "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  ].filter(Boolean))];
+  let authServiceUnavailable = false;
+  for (const apiKey of apiKeys) {
+    let response;
+    try {
+      response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idToken: token }),
+      });
+    } catch {
+      authServiceUnavailable = true;
+      continue;
+    }
+    const result = await response.json().catch(() => ({}));
+    const user = result.users?.[0];
+    if (response.ok && user?.localId) {
+      return { uid: user.localId, email: clean(user.email, 180).toLowerCase() };
+    }
+    const errorCode = String(result.error?.message || "").toUpperCase();
+    if (errorCode === "INVALID_ID_TOKEN" || errorCode === "USER_DISABLED") continue;
+    if (!response.ok && (response.status >= 500 || errorCode.includes("API_KEY") || errorCode === "PROJECT_NOT_FOUND")) {
+      authServiceUnavailable = true;
+    }
+  }
+  if (authServiceUnavailable) throw new Error("Firebase sign-in verification is temporarily unavailable. Please try again shortly.");
+  return null;
 }
 
 async function createGiftCardOrder(request, env) {
