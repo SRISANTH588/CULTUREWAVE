@@ -505,6 +505,14 @@ async function getAdminOneClub(request, env) {
       redeemedValue: giftCards.filter(item => item.status === "redeemed").reduce((sum, item) => sum + item.amount, 0) } });
 }
 
+async function getGiftCardCheckoutLimits(request, env) {
+  const user = await authenticatedUser(request, env);
+  if (!user) return json({ success: false, error: "Sign in to view gift card purchase limits." }, 401);
+  const token = await firestoreAccessToken(env);
+  const giftCardSettings = await getGiftCardSettings(env, token);
+  return json({ success: true, giftCardSettings });
+}
+
 const DEFAULT_GIFT_CARD_SETTINGS = Object.freeze({ minAmount: 250, maxAmount: 10000 });
 
 async function getGiftCardSettings(env, token) {
@@ -664,6 +672,7 @@ export default {
       if (path === "/createRazorpayOrder") return await createOrder(request, env).then(response => withHeaders(response, headers));
       if (path === "/verifyRazorpayPayment") return await verifyPayment(request, env).then(response => withHeaders(response, headers));
       if (path === "/createGiftCardOrder") return await createGiftCardOrder(request, env).then(response => withHeaders(response, headers));
+      if (path === "/giftCardLimits") return await getGiftCardCheckoutLimits(request, env).then(response => withHeaders(response, headers));
       if (path === "/verifyGiftCardPayment") return await createGiftCard(request, env).then(response => withHeaders(response, headers));
       if (path === "/redeemGiftCard") return await redeemGiftCard(request, env).then(response => withHeaders(response, headers));
       if (path === "/oneClubBalance") return await getOneClub(request, env).then(response => withHeaders(response, headers));
