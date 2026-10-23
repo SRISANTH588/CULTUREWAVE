@@ -136,7 +136,7 @@
       <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
       <div class="mobile-profile-card" role="group">
         <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span>
-        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><a class="mobile-profile-action mobile-profile-arrow" href="edit-profile.html" data-action="edit-profile" aria-label="Edit profile">→</a><span>Complete your profile</span></span>
+        <span class="mobile-profile-divider"></span><span class="mobile-profile-prompt"><span>Complete your profile</span><a class="mobile-profile-action mobile-profile-arrow" href="edit-profile.html" data-action="edit-profile" aria-label="Edit profile">→</a></span>
       </div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
@@ -439,7 +439,7 @@
       #mobileNav .mobile-profile-contact,#mobileNav .mobile-profile-progress{display:block!important;color:#aaa!important;font-size:.82rem!important;}
       #mobileNav .mobile-profile-progress{color:#c7afff!important;}
       #mobileNav .mobile-profile-divider{display:block!important;width:100%!important;height:1px!important;grid-column:1/-1!important;background:#403a48!important;}
-      #mobileNav .mobile-profile-prompt{display:grid!important;grid-column:1/-1!important;grid-template-columns:28px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.9rem!important;line-height:1.4!important;}
+      #mobileNav .mobile-profile-prompt{display:grid!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.9rem!important;line-height:1.4!important;}
       #mobileNav .mobile-profile-prompt:has(.mobile-profile-login){grid-template-columns:minmax(0,1fr) auto!important;}
       #mobileNav .mobile-profile-arrow{display:grid!important;place-items:center!important;width:26px!important;height:26px!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
       #mobileNav .mobile-profile-edit-button{display:inline-flex!important;grid-column:1/-1!important;justify-self:end!important;align-items:center!important;justify-content:center!important;min-height:38px!important;padding:0 16px!important;border:1px solid #c7afff!important;border-radius:999px!important;background:#c7afff!important;color:#17131e!important;font-size:.84rem!important;font-weight:800!important;line-height:1!important;}
@@ -500,7 +500,7 @@
       #mobileNav .mobile-profile-contact,#mobileNav .mobile-profile-progress{display:block!important;color:#aaa!important;font-size:.8rem!important;}
       #mobileNav .mobile-profile-progress{color:#c7afff!important;}
       #mobileNav .mobile-profile-divider{display:block!important;position:static!important;width:100%!important;height:1px!important;grid-column:1/-1!important;background:#403a48!important;}
-      #mobileNav .mobile-profile-prompt{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:28px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.87rem!important;line-height:1.35!important;}
+      #mobileNav .mobile-profile-prompt{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.87rem!important;line-height:1.35!important;}
       #mobileNav .mobile-profile-prompt:has(.mobile-profile-login){grid-template-columns:minmax(0,1fr) auto!important;}
       #mobileNav .mobile-profile-arrow{display:grid!important;position:static!important;place-items:center!important;width:26px!important;height:26px!important;box-sizing:border-box!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
       #mobileNav .mobile-profile-edit-button{display:inline-flex!important;position:static!important;grid-column:1/-1!important;justify-self:end!important;align-items:center!important;justify-content:center!important;min-height:38px!important;padding:0 16px!important;border:1px solid #c7afff!important;border-radius:999px!important;background:#c7afff!important;color:#17131e!important;font-size:.84rem!important;font-weight:800!important;line-height:1!important;}
