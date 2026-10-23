@@ -333,8 +333,8 @@
     if (profileContact) profileContact.textContent = user?.phoneNumber || user?.email || '';
     if (profileProgress) { profileProgress.textContent = user ? '3 / 4 steps done' : 'Complete your profile'; profileProgress.style.display = ''; }
     if (profilePrompt) {
-      profilePrompt.textContent = user ? '' : 'Login to your account';
-      profilePrompt.style.display = user ? 'none' : '';
+      profilePrompt.textContent = user ? 'Complete your profile, so we can surprise you on your special days!' : 'Login to your account';
+      profilePrompt.style.display = '';
     }
     if (profileAction) {
       profileAction.href = user ? 'edit-profile.html' : loginHref;
@@ -365,7 +365,9 @@
         renderHeaderAvatar(hamburger, photoURL);
         const filledSteps = [Boolean(user.displayName || profileData.name || profileData.fullName), Boolean(profileData.whatsapp || profileData.phone || profileData.phoneNumber || profileData.mobile || user.phoneNumber), Boolean(user.email || profileData.email), Boolean(profileData.birthday || profileData.dob || profileData.dateOfBirth || profileData.birthDate)].filter(Boolean).length;
         if (profileProgress) profileProgress.textContent = `${filledSteps} / 4 steps done`;
-        setProfileEditAction(profileAction, filledSteps === 4);
+        const profileComplete = filledSteps === 4;
+        setProfileEditAction(profileAction, profileComplete);
+        if (profilePrompt) profilePrompt.style.display = profileComplete ? 'none' : '';
       } catch (error) {
         console.warn('Could not load profile details for mobile menu:', error);
       }
