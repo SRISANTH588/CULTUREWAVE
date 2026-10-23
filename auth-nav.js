@@ -1,5 +1,29 @@
 // Keep public page account controls and header styling consistent with index.html.
 (function () {
+  function navIcon(name) {
+    const paths = {
+      home: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+      events: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"/>',
+      restaurants: '<path d="M3 3v7a4 4 0 0 0 8 0V3M7 3v18M19 3v18M19 3c-3 2-4 5-4 9h4"/>',
+      experiences: '<path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z"/><path d="m19 14 .9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14ZM5 3l.8 1.7L7.5 5.5l-1.7.8L5 8l-.8-1.7-1.7-.8 1.7-.8L5 3Z"/>',
+      gift: '<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8H7.5a2.5 2.5 0 1 1 2.4-3.2L12 8Zm0 0h4.5a2.5 2.5 0 1 0-2.4-3.2L12 8Z"/>',
+      card: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+      wallet: '<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v16H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3"/><path d="M3 8h17M16 13h4M16.5 13.5h.01"/>',
+      booking: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18l-7 4-3-2-5 3"/>',
+      upcoming: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M12 13v3l2 1"/>',
+      profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+      settings: '<circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.5.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.5-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.8l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.5-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.5.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 1.8Z" transform="translate(-2 -2) scale(1.16)"/>',
+      organizer: '<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/>',
+      pricing: '<path d="M6 4h12M6 9h12M8 4c5 0 7 2 7 5s-2 5-7 5l8 6"/>',
+      how: '<path d="M7 17 17 7M8 7h9v9"/><path d="M5 4h6M4 8v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/>',
+      info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+      support: '<path d="M4 5h16v12H8l-4 3V5Z"/><path d="M8 9h8M8 13h5"/>',
+      feedback: '<path d="m4 16-.8 4.8L8 20l11-11-4-4L4 16Z"/><path d="m13.5 6.5 4 4M4 21h16"/>',
+      logout: '<path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>'
+    };
+    return `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name] || paths.info}</svg>`;
+  }
+
   function renderProfileAvatar(avatar, photoURL) {
     if (!avatar) return;
     const placeholder = avatar.querySelector('svg');
@@ -140,36 +164,36 @@
       </div>
       <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
-        ${showHomeLink ? '<a href="index.html"><span class="mobile-nav-icon">⌂</span><span>Home</span><span class="mobile-nav-arrow">›</span></a>' : ''}
-        <a href="events.html"><span class="mobile-nav-icon">◷</span><span>Explore events</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="restaurants.html"><span class="mobile-nav-icon">♧</span><span>Restaurants</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="category-experiences.html"><span class="mobile-nav-icon">✧</span><span>Experiences</span><span class="mobile-nav-arrow">›</span></a>
+        ${showHomeLink ? `<a href="index.html"><span class="mobile-nav-icon">${navIcon('home')}</span><span>Home</span><span class="mobile-nav-arrow">›</span></a>` : ''}
+        <a href="events.html"><span class="mobile-nav-icon">${navIcon('events')}</span><span>Explore events</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="restaurants.html"><span class="mobile-nav-icon">${navIcon('restaurants')}</span><span>Restaurants</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="category-experiences.html"><span class="mobile-nav-icon">${navIcon('experiences')}</span><span>Experiences</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Gift Cards</h2><div class="mobile-nav-card">
-        <a href="claim-gift-card.html"><span class="mobile-nav-icon">▱</span><span>Claim Gift Card</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="buy-gift-card.html"><span class="mobile-nav-icon">＋</span><span>Buy Gift Card</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="claim-gift-card.html"><span class="mobile-nav-icon">${navIcon('gift')}</span><span>Claim Gift Card</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="buy-gift-card.html"><span class="mobile-nav-icon">${navIcon('card')}</span><span>Buy Gift Card</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">One Club</h2><div class="mobile-nav-card">
-        <a href="one-club.html"><span class="mobile-nav-icon">◉</span><span>Balance &amp; activity</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="one-club.html"><span class="mobile-nav-icon">${navIcon('wallet')}</span><span>Balance &amp; activity</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Manage</h2><div class="mobile-nav-card">
-        <a href="customer-dashboard.html" data-view="bookings"><span class="mobile-nav-icon">▤</span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="customer-dashboard.html" data-view="upcoming"><span class="mobile-nav-icon">☆</span><span>Upcoming events</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">♙</span><span>Account profile</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html" data-view="bookings"><span class="mobile-nav-icon">${navIcon('booking')}</span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html" data-view="upcoming"><span class="mobile-nav-icon">${navIcon('upcoming')}</span><span>Upcoming events</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">${navIcon('profile')}</span><span>Account profile</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">For organisers</h2><div class="mobile-nav-card">
-        <a href="features.html"><span class="mobile-nav-icon">✦</span><span>Organizer tools</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="pricing.html"><span class="mobile-nav-icon">₹</span><span>Pricing</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="how-it-works.html"><span class="mobile-nav-icon">↗</span><span>How it works</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="features.html"><span class="mobile-nav-icon">${navIcon('organizer')}</span><span>Organizer tools</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="pricing.html"><span class="mobile-nav-icon">${navIcon('pricing')}</span><span>Pricing</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="how-it-works.html"><span class="mobile-nav-icon">${navIcon('how')}</span><span>How it works</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
-        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">♙</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="how-it-works.html"><span class="mobile-nav-icon">ⓘ</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">${navIcon('settings')}</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="how-it-works.html"><span class="mobile-nav-icon">${navIcon('info')}</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Support</h2><div class="mobile-nav-card">
-        <a href="customer-service.html"><span class="mobile-nav-icon">ⓘ</span><span>Frequently asked questions</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="mailto:support.culturewave@gmail.com"><span class="mobile-nav-icon">✉</span><span>Chat with us</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="customer-service.html"><span class="mobile-nav-icon">✎</span><span>Share feedback</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-service.html"><span class="mobile-nav-icon">${navIcon('info')}</span><span>Frequently asked questions</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="mailto:support.culturewave@gmail.com"><span class="mobile-nav-icon">${navIcon('support')}</span><span>Chat with us</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="customer-service.html"><span class="mobile-nav-icon">${navIcon('feedback')}</span><span>Share feedback</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       `;
 
@@ -177,7 +201,7 @@
     menu.querySelector('.mobile-nav-logout-card')?.remove();
     const logoutCard = document.createElement('div');
     logoutCard.className = 'mobile-nav-card mobile-nav-logout-card';
-    logoutCard.innerHTML = '<a href="#logout" data-action="logout"><span class="mobile-nav-icon">⇥</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>';
+    logoutCard.innerHTML = `<a href="#logout" data-action="logout"><span class="mobile-nav-icon">${navIcon('logout')}</span><span>Logout</span><span class="mobile-nav-arrow">›</span></a>`;
     menu.appendChild(logoutCard);
 
     const closeMenu = () => {
@@ -460,7 +484,8 @@
       .mobile-nav-card>a{display:flex!important;align-items:center!important;gap:.85rem!important;min-height:58px!important;padding:.65rem .15rem!important;border:0!important;border-bottom:1px solid #343437!important;border-radius:0!important;background:transparent!important;color:#f4f4f5!important;font-size:.92rem!important;font-weight:700!important;box-shadow:none!important;}
       .mobile-nav-card>a:last-child{border-bottom:0!important;}
       .mobile-nav-card>a::before,.mobile-nav-card>a::after{display:none!important;}
-      .mobile-nav-icon{display:grid!important;place-items:center!important;width:25px!important;flex:none!important;color:#aaa!important;font-size:1.1rem!important;}
+      .mobile-nav-icon{display:grid!important;place-items:center!important;width:25px!important;height:25px!important;flex:none!important;color:#b99cff!important;}
+      .mobile-nav-icon svg{display:block!important;width:20px!important;height:20px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important;}
       .mobile-nav-arrow{margin-left:auto!important;color:#777!important;font-size:1.4rem!important;font-weight:400!important;}
       #mobileNav.showing-view{overflow:hidden!important;padding:1.5rem 1rem!important;}
       #mobileNav.showing-view>:not(.mobile-nav-view){display:none!important;}
@@ -528,7 +553,8 @@
       .mobile-nav-card>a{display:flex;align-items:center;gap:.85rem;min-height:58px;padding:.65rem .15rem;border:0!important;border-bottom:1px solid #343437!important;border-radius:0!important;background:transparent!important;color:#f4f4f5!important;font-size:.9rem!important;font-weight:700;box-shadow:none!important;}
       .mobile-nav-card>a:last-child{border-bottom:0!important;}
       .mobile-nav-card>a::before,.mobile-nav-card>a::after{display:none!important;}
-      .mobile-nav-icon{display:grid;place-items:center;width:25px;flex:none;color:#aaa;font-size:1.1rem;}
+      .mobile-nav-icon{display:grid;place-items:center;width:25px;height:25px;flex:none;color:#b99cff;}
+      .mobile-nav-icon svg{display:block;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
       .mobile-nav-arrow{margin-left:auto;color:#777;font-size:1.4rem;font-weight:400;}
       .mobile-nav-ctas{display:grid!important;grid-template-columns:1fr 1fr;gap:.55rem!important;margin:0!important;padding:0!important;border:0!important;}
       #mobileNav .mobile-nav-ctas{display:none!important;}
