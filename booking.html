@@ -83,7 +83,7 @@
     .avail-coupon-val{font-size:.7rem;font-weight:800;color:#166534;background:#dcfce7;padding:.15rem .45rem;border-radius:6px;}
     .avail-coupon-tap{font-size:.62rem;font-weight:700;color:#b45309;white-space:nowrap;}
     .bk-bill{background:#f7faff;border:1px solid var(--border);border-radius:16px;padding:1rem 1.2rem;}
-    .bk-bill-row{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.84rem;color:#374151;font-weight:600;padding:.38rem 0;border-bottom:1px solid rgba(18,66,197,.06);}
+    .bk-bill-row{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.84rem;color:#374151;font-weight:600;padding:.38rem 0;border-bottom:1px solid rgba(18,66,197,.06);}#oneClubRow[hidden]{display:none!important;}
     .bk-bill-row span:first-child{flex:1;min-width:0;}
     .bk-bill-row span:last-child,.bk-bill-row strong{flex:none;text-align:right;word-break:break-all;}
     .bk-bill-row:last-child{border-bottom:none;}
@@ -602,7 +602,7 @@
             <div class="bk-bill-row"><span>Seats</span><strong id="c_qty">—</strong></div>
             <div class="bk-bill-row discount" id="c_discountRow" style="display:none;"><span>Discount</span><strong id="c_discount">—</strong></div>
             <div class="bk-bill-row"><span>Platform fee</span><strong id="c_fee">—</strong></div>
-            <div class="bk-bill-row"><label for="oneClubUse">Use One Club balance <input id="oneClubUse" type="checkbox"></label><strong id="oneClubAvailable">₹0.00</strong></div>
+            <div class="bk-bill-row" id="oneClubRow" hidden><label for="oneClubUse">Use One Club balance <input id="oneClubUse" type="checkbox"></label><strong id="oneClubAvailable">₹0.00</strong></div>
             <div class="bk-bill-row discount" id="oneClubAppliedRow" style="display:none"><span>One Club applied</span><strong id="oneClubApplied">−₹0.00</strong></div>
             <div class="bk-bill-row total"><span>Total</span><strong id="c_total">—</strong></div>
           </div>
@@ -1591,7 +1591,7 @@ function goStep4(){
   document.getElementById("c_ticket").textContent = selectedTicketLabel();
   document.getElementById("c_qty").textContent = selectedTicketCount();
   document.getElementById("c_fee").textContent = fee ? fmt(fee) : "₹0";
-  oneClubApplied=document.getElementById('oneClubUse').checked?Math.min(oneClubBalance,Math.max(0,total-1)):0;
+  oneClubApplied=calculateOneClubApplied(total);
   const payable=Math.max(0,total-oneClubApplied);
   document.getElementById("c_total").textContent = payable ? fmt(payable) : "Free";
   document.getElementById('oneClubAvailable').textContent=fmt(oneClubBalance);
@@ -1603,8 +1603,12 @@ function goStep4(){
   document.getElementById("confirmSubmitBtn").textContent = payable===0 ? "✅ Book Now" : "🔒 Pay Now";
   goStep(4);
 }
+function calculateOneClubApplied(total){
+  if(!document.getElementById('oneClubUse')?.checked||oneClubBalance<=0||total<=0)return 0;
+  return oneClubBalance>=total?total:Math.min(oneClubBalance,Math.max(0,Math.floor(total-1)));
+}
 document.getElementById('oneClubUse')?.addEventListener('change',goStep4);
-bookingAuth.onAuthStateChanged(async user=>{if(!user)return;try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(response.ok&&result.success){oneClubBalance=Math.max(0,Number(result.balance)||0);if(document.getElementById('panel4').classList.contains('active'))goStep4()}}catch(error){console.warn('Could not load One Club balance:',error)}});
+async function loadOneClubBalance(user){const row=document.getElementById('oneClubRow');oneClubBalance=0;if(!user){row.hidden=true;document.getElementById('oneClubUse').checked=false;return}try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(response.ok&&result.success){oneClubBalance=Math.max(0,Number(result.balance)||0);row.hidden=oneClubBalance<=0;if(!oneClubBalance)document.getElementById('oneClubUse').checked=false;if(document.getElementById('panel4').classList.contains('active'))goStep4()}}catch(error){row.hidden=true;console.warn('Could not load One Club balance:',error)}}
 
 async function saveBooking(data){
   try{
@@ -1637,7 +1641,7 @@ async function saveBooking(data){
       bookingId: data.bookingId, walletAccessTokenHash, eventId: eventId||null,
       eventName: data.eventName, ticketName: data.ticketName,
       ticketItems,
-      amount: data.amount, seats: data.seats, seatIds: seatIds,
+      amount: data.amount, walletAmount:Number(data.walletAmount||0), seats: data.seats, seatIds: seatIds,
       status: data.status, paymentId: data.paymentId||null, paymentMethod:data.method||null,
       customerName: data.name, customerEmail: normalizedCustomerEmail,
       customerPhone: data.phone, customerState:data.state||'', userId: userId,
@@ -1755,11 +1759,18 @@ async function submitBooking(){
   const walletAccessToken = Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2,'0')).join('');
 
   const walletUse=document.getElementById('oneClubUse')?.checked===true;
-  const walletAmount=walletUse?Math.min(oneClubBalance,Math.max(0,total-1)):0;
+  const walletAmount=walletUse?calculateOneClubApplied(total):0;
   const customerPayable=Math.max(0,total-walletAmount);
-  if(customerPayable === 0){
+  if(customerPayable === 0 && walletAmount > 0){
+    const user=bookingAuth.currentUser;
+    if(!user){setBookingSubmissionBusy(false,total);showPaymentError('Sign in to use your One Club balance.');return}
+    try{
+      const response=await fetch(`${razorpayFunctionsUrl}/payWithOneClub`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${await user.getIdToken()}`},body:JSON.stringify({bookingId:bid,amountPaise:Math.round(total*100),event:{id:eventId,name:eventName},tickets:ticketCount,seatIds:selectedSeats,customer:{name,email,phone}})});
+      const result=await response.json();
+      if(!response.ok||!result.success)throw new Error(result.error||'Could not use your One Club balance. Please try again.');
+    }catch(error){setBookingSubmissionBusy(false,total);showPaymentError(error.message||'Could not use your One Club balance. Please try again.');return}
     document.getElementById("rStatus").textContent = "✅ Confirmed";
-    const saved = await saveBooking({ bookingId:bid, walletAccessToken, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone, state });
+    const saved = await saveBooking({ bookingId:bid, walletAccessToken, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:bid, method:"One Club", name, email, phone, state });
     if(!saved){
       setBookingSubmissionBusy(false, 0);
       showToast('Could not save your booking. Please try again.');
@@ -1767,10 +1778,23 @@ async function submitBooking(){
     }
     await fetchBookedSeats();
     if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
-    const emailSent = await sendEmail({ name, email, eventName, amount:"Free", seats:ticketCount, bookingId:bid, method:"Free" });
+    const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:bid, method:"One Club" });
     if(!emailSent) showToast("Booking confirmed, but we could not send the confirmation email.");
     clearCheckoutDraft();
-    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&address="+encodeURIComponent(evData.address||'')+"&mapLink="+encodeURIComponent(evData.mapLink||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
+    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&address="+encodeURIComponent(evData.address||'')+"&mapLink="+encodeURIComponent(evData.mapLink||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
+    return;
+  }
+
+  if(total===0){
+    document.getElementById("rStatus").textContent = "✅ Confirmed";
+    const saved = await saveBooking({ bookingId:bid, walletAccessToken, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone, state });
+    if(!saved){setBookingSubmissionBusy(false,0);showToast('Could not save your booking. Please try again.');return}
+    await fetchBookedSeats();
+    if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections)))renderSeating(evData.seatingPlan,document.getElementById('seatingContainer'));
+    const emailSent=await sendEmail({name,email,eventName,amount:"Free",seats:ticketCount,bookingId:bid,method:"Free"});
+    if(!emailSent)showToast("Booking confirmed, but we could not send the confirmation email.");
+    clearCheckoutDraft();
+    location.href="success.html?bookingId="+encodeURIComponent(bid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&address="+encodeURIComponent(evData.address||'')+"&mapLink="+encodeURIComponent(evData.mapLink||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
     return;
   }
 
@@ -1779,7 +1803,7 @@ async function submitBooking(){
   try{
     const user=walletAmount>0?bookingAuth.currentUser:null;
     const authToken=user?await user.getIdToken():'';
-    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json',...(authToken?{Authorization:`Bearer ${authToken}`}:{})},body:JSON.stringify({amount:amountInPaise,walletAmount,receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
+    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json',...(authToken?{Authorization:`Bearer ${authToken}`}:{})},body:JSON.stringify({amount:amountInPaise,walletAmount,grossAmountPaise:Math.round(total*100),receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
     const orderResponseText=await orderResponse.text();
     try{orderData=JSON.parse(orderResponseText);}catch(_){throw new Error(orderResponse.status===404?'Razorpay payment service is not deployed yet. Please contact support.':'Could not reach the payment service. Please try again.');}
     if(!orderResponse.ok||!orderData.success||orderData.provider!=='razorpay'||!orderData.razorpayOrderId||!orderData.keyId) throw new Error(orderData.error||'Live Razorpay order service is unavailable.');
@@ -1808,7 +1832,7 @@ async function submitBooking(){
       try{
         const verifyUser=walletAmount>0?bookingAuth.currentUser:null;
         const verifyToken=verifyUser?await verifyUser.getIdToken():'';
-        const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json',...(verifyToken?{Authorization:`Bearer ${verifyToken}`}:{})},body:JSON.stringify({...r,booking:{bookingId:pid,eventId,amountPaise:Math.round(total*100),tickets:ticketCount,seatIds:selectedSeats}})});
+        const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json',...(verifyToken?{Authorization:`Bearer ${verifyToken}`}:{})},body:JSON.stringify({...r,booking:{bookingId:pid,eventId,amountPaise:Math.round(customerPayable*100)+walletAmount*100,tickets:ticketCount,seatIds:selectedSeats}})});
         const verificationData=await verification.json();
         verified=verification.ok&&verificationData.verified===true;
         paymentMethod=verificationData.method||paymentMethod;
@@ -1823,7 +1847,7 @@ async function submitBooking(){
         return;
       }
       document.getElementById("rStatus").textContent = "✅ Confirmed";
-      const saved = await saveBooking({ bookingId:pid, walletAccessToken, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone, state });
+      const saved = await saveBooking({ bookingId:pid, walletAccessToken, eventName, ticketName, amount:total, walletAmount, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone, state });
       if(!saved){
         showPaymentError('Payment was verified, but the booking could not be saved. Do not pay again; contact support with booking reference '+pid+'.');
         return;
@@ -2143,6 +2167,7 @@ async function init(){
 }
 
 const bookingAuthReady=new Promise(resolve=>bookingAuth.onAuthStateChanged(resolve,()=>resolve(null)));
+bookingAuth.onAuthStateChanged(loadOneClubBalance);
 init();
 
 // hamburger

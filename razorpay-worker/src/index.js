@@ -133,7 +133,7 @@ async function createOrder(request, env) {
   const customer = body.customer || {};
   const event = body.event || {};
   const walletAmount = Number(body.walletAmount || 0);
-  if (!Number.isSafeInteger(walletAmount) || walletAmount < 0 || (walletAmount > 0 && walletAmount * 100 >= amount)) {
+  if (!Number.isSafeInteger(walletAmount) || walletAmount < 0) {
     return json({ success: false, error: "One Club balance amount is invalid." }, 400);
   }
   const walletUser = walletAmount ? await authenticatedUser(request, env) : null;
@@ -156,6 +156,9 @@ async function createOrder(request, env) {
     if (!wallet || Number(wallet.balance || 0) < walletAmount) return json({ success: false, error: "Your One Club balance is lower than the selected amount." }, 400);
   }
   const receipt = clean(body.receipt, 40).replace(/[^a-zA-Z0-9_-]/g, "") || `cw_${Date.now()}`;
+  if (walletAmount && walletAmount * 100 >= amount) return json({ success: false, error: "Use the One Club-only checkout for a fully covered order." }, 400);
+  const grossAmountPaise = Number.isSafeInteger(Number(body.grossAmountPaise)) ? Number(body.grossAmountPaise) : amount + walletAmount * 100;
+  if (grossAmountPaise !== amount + walletAmount * 100) return json({ success: false, error: "Booking total does not match the One Club contribution." }, 400);
   const order = await razorpayRequest(env, "orders", {
     method: "POST",
     body: JSON.stringify({
@@ -169,7 +172,8 @@ async function createOrder(request, env) {
         customerEmail: clean(customer.email, 180).toLowerCase(),
         customerPhone: clean(customer.phone, 32),
         tickets: String(Math.max(1, Number(customer.tickets) || 1)),
-        ...(walletAmount ? { walletAmount: String(walletAmount), walletUid: walletUser.uid, grossAmountPaise: String(amount + walletAmount * 100) } : {}),
+        grossAmountPaise: String(grossAmountPaise),
+        ...(walletAmount ? { walletAmount: String(walletAmount), walletUid: walletUser.uid, grossAmountPaise: String(grossAmountPaise) } : {}),
         ...(stallSlotIndex !== null ? { stallSlotIndex: String(stallSlotIndex) } : {}),
       },
     }),
@@ -222,7 +226,9 @@ async function verifyPayment(request, env) {
   const tickets = Number(booking.tickets);
   const seatIds = Array.isArray(booking.seatIds) ? [...new Set(booking.seatIds.map(value => clean(value, 80)).filter(Boolean))] : [];
   const walletAmount = Number(order.notes?.walletAmount || 0);
+  const grossAmountPaise = Number(order.notes?.grossAmountPaise || (Number(order.amount) + walletAmount * 100));
   if (bookingId !== paymentId || !eventId || amountPaise !== Number(finalPayment.amount) + walletAmount * 100 ||
+      amountPaise !== grossAmountPaise ||
       !Number.isInteger(tickets) || tickets < 1 || tickets > 20 || Number(order.notes?.tickets) !== tickets ||
       !Array.isArray(booking.seatIds) || seatIds.length !== booking.seatIds.length || seatIds.length > 20) {
     return json({ success: false, verified: false, error: "Booking details do not match the captured payment." }, 400);
@@ -281,6 +287,59 @@ async function verifyPayment(request, env) {
     seatIds, status: "captured", method: finalPayment.method || "Razorpay",
   });
   return json({ success: true, verified: true, method: finalPayment.method || "Razorpay" });
+}
+
+async function payWithOneClub(request, env) {
+  const user = await authenticatedUser(request, env);
+  if (!user) return json({ success: false, error: "Sign in to use your One Club balance." }, 401);
+  const body = await request.json();
+  const bookingId = clean(body.bookingId, 100), eventId = clean(body.event?.id, 120);
+  const amountPaise = Number(body.amountPaise), tickets = Number(body.tickets);
+  const seatIds = Array.isArray(body.seatIds) ? [...new Set(body.seatIds.map(value => clean(value, 80)).filter(Boolean))] : [];
+  if (!bookingId || !eventId || !Number.isSafeInteger(amountPaise) || amountPaise < 1 ||
+      !Number.isInteger(tickets) || tickets < 1 || tickets > 20 || !Array.isArray(body.seatIds) ||
+      seatIds.length !== body.seatIds.length || seatIds.length > 20) {
+    return json({ success: false, error: "Booking details are invalid." }, 400);
+  }
+  const token = await firestoreAccessToken(env), wallet = await getFirestoreDocument(env, "wallets", user.uid, token);
+  const amount = amountPaise / 100, balance = Number(wallet?.balance || 0);
+  if (balance < amount) return json({ success: false, error: "Your One Club balance changed and no longer covers this booking. Please try again." }, 409);
+  const paymentId = `wallet_${bookingId}`;
+  const existing = await getFirestoreDocument(env, "oneClubTransactions", paymentId, token);
+  if (existing) {
+    if (existing.uid !== user.uid || Number(existing.amount) !== -amount) return json({ success: false, error: "This booking reference was already used." }, 409);
+    return json({ success: true, balance: Number((await getFirestoreDocument(env, "wallets", user.uid, token))?.balance || 0), amount });
+  }
+  const timestamp = new Date().toISOString();
+  const writes = [
+    { update: { name: firestoreDocumentName(env, "wallets", user.uid), fields: {
+      balance: firestoreValue(balance - amount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }), lastBookingPaymentId: firestoreValue(paymentId),
+    } }, updateMask: { fieldPaths: ["balance", "updatedAt", "lastBookingPaymentId"] },
+      ...(wallet?.updateTime ? { currentDocument: { updateTime: wallet.updateTime } } : { currentDocument: { exists: false } }) },
+    { update: { name: firestoreDocumentName(env, "oneClubTransactions", paymentId), fields: {
+      uid: firestoreValue(user.uid), amount: firestoreValue(-amount), type: firestoreValue("ticket_booking"), paymentId: firestoreValue(paymentId),
+      eventId: firestoreValue(eventId), eventName: firestoreValue(clean(body.event?.name, 200)), createdAt: firestoreValue({ __firestoreTimestamp: timestamp }),
+    } }, currentDocument: { exists: false } },
+    { update: { name: firestoreDocumentName(env, "payments", paymentId), fields: {
+      bookingId: firestoreValue(bookingId), eventId: firestoreValue(eventId), eventName: firestoreValue(clean(body.event?.name, 200)),
+      amount: firestoreValue(amount), capturedAmount: firestoreValue(0), walletAmount: firestoreValue(amount), currency: firestoreValue("INR"),
+      status: firestoreValue("paid"), paymentId: firestoreValue(paymentId), paymentMethod: firestoreValue("One Club"),
+      customerName: firestoreValue(clean(body.customer?.name)), customerEmail: firestoreValue(clean(body.customer?.email, 180).toLowerCase()),
+      customerPhone: firestoreValue(clean(body.customer?.phone, 32)), tickets: firestoreValue(tickets), seatIds: firestoreValue(seatIds),
+      createdAt: firestoreValue({ __firestoreTimestamp: timestamp }), paidAt: firestoreValue({ __firestoreTimestamp: timestamp }),
+    } }, currentDocument: { exists: false } },
+  ];
+  const response = await fetch(`${firestoreBase(env)}:commit`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ writes }) });
+  if (!response.ok) {
+    const failure = await response.json().catch(() => ({}));
+    console.error("One Club-only booking commit failed", response.status, failure.error?.status || "", failure.error?.message || "");
+    const committed = await getFirestoreDocument(env, "oneClubTransactions", paymentId, token);
+    if (committed?.uid === user.uid && Number(committed.amount) === -amount) {
+      return json({ success: true, balance: Number((await getFirestoreDocument(env, "wallets", user.uid, token))?.balance || 0), amount });
+    }
+    return json({ success: false, error: "Could not charge your One Club balance. Please retry." }, 409);
+  }
+  return json({ success: true, balance: balance - amount, amount });
 }
 
 async function authenticatedUser(request, env) {
@@ -695,6 +754,7 @@ export default {
       const path = new URL(request.url).pathname.replace(/\/+$/, "");
       if (path === "/createRazorpayOrder") return await createOrder(request, env).then(response => withHeaders(response, headers));
       if (path === "/verifyRazorpayPayment") return await verifyPayment(request, env).then(response => withHeaders(response, headers));
+      if (path === "/payWithOneClub") return await payWithOneClub(request, env).then(response => withHeaders(response, headers));
       if (path === "/createGiftCardOrder") return await createGiftCardOrder(request, env).then(response => withHeaders(response, headers));
       if (path === "/giftCardLimits") return await getGiftCardCheckoutLimits(request, env).then(response => withHeaders(response, headers));
       if (path === "/verifyGiftCardPayment") return await createGiftCard(request, env).then(response => withHeaders(response, headers));
