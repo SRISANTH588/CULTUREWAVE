@@ -6,6 +6,11 @@
   const heading = document.getElementById('customerTitle');
   const loader = document.getElementById('customerLoading');
   if (!page || !view || !frame || !heading) return;
+  const hideLoader = () => {
+    if (!loader) return;
+    loader.hidden = true;
+    loader.style.display = 'none';
+  };
 
   document.title = `${title} | CultureWave`;
   heading.textContent = title;
@@ -17,10 +22,10 @@
         location.replace(`login.html?next=${encodeURIComponent(page)}`);
         return;
       }
-      if (loader) loader.hidden = true;
+      hideLoader();
     } catch (_) {
-      if (loader) loader.hidden = true;
+      hideLoader();
     }
   });
-  frame.src = `customer-dashboard.html?view=${encodeURIComponent(view)}&embedded=menu`;
+  frame.src = `customer-dashboard.html?view=${encodeURIComponent(view)}&embedded=menu&section=account-premium-2`;
 })();
