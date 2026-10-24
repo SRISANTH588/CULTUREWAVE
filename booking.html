@@ -603,6 +603,7 @@
             <div class="bk-bill-row discount" id="c_discountRow" style="display:none;"><span>Discount</span><strong id="c_discount">—</strong></div>
             <div class="bk-bill-row"><span>Platform fee</span><strong id="c_fee">—</strong></div>
             <div class="bk-bill-row" id="oneClubRow" hidden><label for="oneClubUse">Use One Club balance <input id="oneClubUse" type="checkbox"></label><strong id="oneClubAvailable">₹0.00</strong></div>
+            <div class="bk-bill-row" id="oneClubStatusRow" hidden><span id="oneClubStatus" role="status"></span></div>
             <div class="bk-bill-row discount" id="oneClubAppliedRow" style="display:none"><span>One Club applied</span><strong id="oneClubApplied">−₹0.00</strong></div>
             <div class="bk-bill-row total"><span>Total</span><strong id="c_total">—</strong></div>
           </div>
@@ -1579,6 +1580,7 @@ async function applyCoupon(selectedCode){
 
 // ── STEP 3 → 4 ──
 function goStep4(){
+  if(!bookingAuth.currentUser&&walletAuthReady){walletAuthReady.then(()=>walletBalanceLoad).then(()=>{if(document.getElementById('panel4').classList.contains('active'))goStep4()});}
   const subtotal = selectedTicketSubtotal();
   discountAmt = appliedCouponData ? calculateCouponDiscount(appliedCouponData,subtotal) : 0;
   const afterDiscount = Math.max(0, subtotal - discountAmt);
@@ -1608,8 +1610,10 @@ function calculateOneClubApplied(total){
   return oneClubBalance>=total?total:Math.min(oneClubBalance,Math.max(0,Math.floor(total-1)));
 }
 document.getElementById('oneClubUse')?.addEventListener('change',goStep4);
-async function loadOneClubBalance(user){const row=document.getElementById('oneClubRow');oneClubBalance=0;if(!user){row.hidden=true;document.getElementById('oneClubUse').checked=false;return}try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(response.ok&&result.success){oneClubBalance=Math.max(0,Number(result.balance)||0);row.hidden=oneClubBalance<=0;if(!oneClubBalance)document.getElementById('oneClubUse').checked=false;if(document.getElementById('panel4').classList.contains('active'))goStep4()}}catch(error){row.hidden=true;console.warn('Could not load One Club balance:',error)}}
-const walletAuthReady=import('./firebase.js').then(({auth})=>{auth.onAuthStateChanged(loadOneClubBalance);return auth.authStateReady().then(()=>auth)});
+async function loadOneClubBalance(user){const row=document.getElementById('oneClubRow'),statusRow=document.getElementById('oneClubStatusRow'),status=document.getElementById('oneClubStatus');oneClubBalance=0;row.hidden=true;statusRow.hidden=true;if(!user){document.getElementById('oneClubUse').checked=false;return}try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||`Balance request failed (${response.status})`);oneClubBalance=Math.max(0,Number(result.balance)||0);row.hidden=oneClubBalance<=0;if(!oneClubBalance)document.getElementById('oneClubUse').checked=false;if(document.getElementById('panel4').classList.contains('active'))goStep4()}catch(error){row.hidden=true;status.textContent='One Club balance could not load. Please try again.';statusRow.hidden=false;console.warn('Could not load One Club balance:',error)}}
+let walletBalanceLoad=Promise.resolve();
+bookingAuth.onAuthStateChanged(user=>{walletBalanceLoad=loadOneClubBalance(user)});
+const walletAuthReady=bookingAuthReady;
 
 async function saveBooking(data){
   try{
