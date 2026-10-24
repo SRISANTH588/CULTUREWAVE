@@ -1609,6 +1609,7 @@ function calculateOneClubApplied(total){
 }
 document.getElementById('oneClubUse')?.addEventListener('change',goStep4);
 async function loadOneClubBalance(user){const row=document.getElementById('oneClubRow');oneClubBalance=0;if(!user){row.hidden=true;document.getElementById('oneClubUse').checked=false;return}try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(response.ok&&result.success){oneClubBalance=Math.max(0,Number(result.balance)||0);row.hidden=oneClubBalance<=0;if(!oneClubBalance)document.getElementById('oneClubUse').checked=false;if(document.getElementById('panel4').classList.contains('active'))goStep4()}}catch(error){row.hidden=true;console.warn('Could not load One Club balance:',error)}}
+const walletAuthReady=import('./firebase.js').then(({auth})=>{auth.onAuthStateChanged(loadOneClubBalance);return auth.authStateReady().then(()=>auth)});
 
 async function saveBooking(data){
   try{
@@ -1762,7 +1763,7 @@ async function submitBooking(){
   const walletAmount=walletUse?calculateOneClubApplied(total):0;
   const customerPayable=Math.max(0,total-walletAmount);
   if(customerPayable === 0 && walletAmount > 0){
-    const user=bookingAuth.currentUser;
+    const user=(await walletAuthReady).currentUser;
     if(!user){setBookingSubmissionBusy(false,total);showPaymentError('Sign in to use your One Club balance.');return}
     try{
       const response=await fetch(`${razorpayFunctionsUrl}/payWithOneClub`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${await user.getIdToken()}`},body:JSON.stringify({bookingId:bid,amountPaise:Math.round(total*100),event:{id:eventId,name:eventName},tickets:ticketCount,seatIds:selectedSeats,customer:{name,email,phone}})});
@@ -1801,7 +1802,7 @@ async function submitBooking(){
   const amountInPaise=Math.round(customerPayable*100);
   let orderData;
   try{
-    const user=walletAmount>0?bookingAuth.currentUser:null;
+    const user=walletAmount>0?(await walletAuthReady).currentUser:null;
     const authToken=user?await user.getIdToken():'';
     const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json',...(authToken?{Authorization:`Bearer ${authToken}`}:{})},body:JSON.stringify({amount:amountInPaise,walletAmount,grossAmountPaise:Math.round(total*100),receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
     const orderResponseText=await orderResponse.text();
@@ -1830,7 +1831,7 @@ async function submitBooking(){
       let paymentMethod='Razorpay';
       let verificationMessage='Payment signature verification failed.';
       try{
-        const verifyUser=walletAmount>0?bookingAuth.currentUser:null;
+        const verifyUser=walletAmount>0?(await walletAuthReady).currentUser:null;
         const verifyToken=verifyUser?await verifyUser.getIdToken():'';
         const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json',...(verifyToken?{Authorization:`Bearer ${verifyToken}`}:{})},body:JSON.stringify({...r,booking:{bookingId:pid,eventId,amountPaise:Math.round(customerPayable*100)+walletAmount*100,tickets:ticketCount,seatIds:selectedSeats}})});
         const verificationData=await verification.json();
@@ -2167,7 +2168,6 @@ async function init(){
 }
 
 const bookingAuthReady=new Promise(resolve=>bookingAuth.onAuthStateChanged(resolve,()=>resolve(null)));
-bookingAuth.onAuthStateChanged(loadOneClubBalance);
 init();
 
 // hamburger
