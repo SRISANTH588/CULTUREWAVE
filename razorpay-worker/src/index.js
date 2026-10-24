@@ -408,24 +408,43 @@ async function redeemGiftCard(request, env) {
   const pin = String(body.pin || "").replace(/\D/g, "").slice(0, 6);
   if (code.length !== 16 || pin.length !== 6) return json({ success: false, error: "Enter a valid 16-digit code and 6-digit PIN." }, 400);
   const id = await digest(`${code}:${pin}`), token = await firestoreAccessToken(env);
-  const card = await getFirestoreDocument(env, "giftCards", id, token);
+  let card = await getFirestoreDocument(env, "giftCards", id, token);
   if (!card || card.code !== code || card.pin !== pin) return json({ success: false, error: "Gift card code or PIN is incorrect." }, 404);
   if (card.status !== "unredeemed") return json({ success: false, error: "This gift card has already been claimed." }, 409);
   if (Date.parse(card.expiresAt) < Date.now()) return json({ success: false, error: "This gift card has expired." }, 410);
   const walletId = user.uid;
-  const wallet = await getFirestoreDocument(env, "wallets", walletId, token);
-  const purchase = card.purchaseId ? await getFirestoreDocument(env, "giftCardPurchases", card.purchaseId, token) : null;
-  const balance = Number(wallet?.balance || 0), amount = Number(card.amount);
-  const writes = [
-    { update: { name: `${firestoreBase(env)}/giftCards/${encodeURIComponent(id)}`, fields: { status: firestoreValue("redeemed"), redeemedBy: firestoreValue(user.uid), redeemedAt: firestoreValue({ __firestoreTimestamp: new Date().toISOString() }) } },
-      updateMask: { fieldPaths: ["status", "redeemedBy", "redeemedAt"] }, currentDocument: { updateTime: card.updateTime } },
-    { update: { name: `${firestoreBase(env)}/wallets/${encodeURIComponent(walletId)}`, fields: { balance: firestoreValue(balance + amount), updatedAt: firestoreValue({ __firestoreTimestamp: new Date().toISOString() }), lastGiftCardId: firestoreValue(id) } },
-      updateMask: { fieldPaths: ["balance", "updatedAt", "lastGiftCardId"] }, ...(wallet?.updateTime ? { currentDocument: { updateTime: wallet.updateTime } } : { currentDocument: { exists: false } }) },
-    ...(purchase ? [{ update: { name: `${firestoreBase(env)}/giftCardPurchases/${encodeURIComponent(card.purchaseId)}`, fields: { status: firestoreValue("redeemed"), redeemedBy: firestoreValue(user.uid), redeemedAt: firestoreValue({ __firestoreTimestamp: new Date().toISOString() }) } }, updateMask: { fieldPaths: ["status", "redeemedBy", "redeemedAt"] }, currentDocument: { updateTime: purchase.updateTime } }] : []),
-  ];
-  const response = await fetch(`${firestoreBase(env)}:commit`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ writes }) });
-  if (!response.ok) return json({ success: false, error: "Could not claim the card just now. Please retry." }, 409);
-  return json({ success: true, balance: balance + amount, amount });
+  const amount = Number(card.amount);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const wallet = await getFirestoreDocument(env, "wallets", walletId, token);
+    const purchase = card.purchaseId ? await getFirestoreDocument(env, "giftCardPurchases", card.purchaseId, token) : null;
+    const balance = Number(wallet?.balance || 0), timestamp = new Date().toISOString();
+    const writes = [
+      { update: { name: `${firestoreBase(env)}/giftCards/${encodeURIComponent(id)}`, fields: { status: firestoreValue("redeemed"), redeemedBy: firestoreValue(user.uid), redeemedAt: firestoreValue({ __firestoreTimestamp: timestamp }) } },
+        updateMask: { fieldPaths: ["status", "redeemedBy", "redeemedAt"] }, currentDocument: { updateTime: card.updateTime } },
+      { update: { name: `${firestoreBase(env)}/wallets/${encodeURIComponent(walletId)}`, fields: { balance: firestoreValue(balance + amount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }), lastGiftCardId: firestoreValue(id) } },
+        updateMask: { fieldPaths: ["balance", "updatedAt", "lastGiftCardId"] }, ...(wallet?.updateTime ? { currentDocument: { updateTime: wallet.updateTime } } : { currentDocument: { exists: false } }) },
+      ...(purchase ? [{ update: { name: `${firestoreBase(env)}/giftCardPurchases/${encodeURIComponent(card.purchaseId)}`, fields: { status: firestoreValue("redeemed"), redeemedBy: firestoreValue(user.uid), redeemedAt: firestoreValue({ __firestoreTimestamp: timestamp }) } }, updateMask: { fieldPaths: ["status", "redeemedBy", "redeemedAt"] }, currentDocument: { updateTime: purchase.updateTime } }] : []),
+    ];
+    const response = await fetch(`${firestoreBase(env)}:commit`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ writes }) });
+    if (response.ok) return json({ success: true, balance: balance + amount, amount });
+    const failure = await response.json().catch(() => ({}));
+    const reason = failure.error?.status || "";
+    console.error("Gift card redemption commit failed", response.status, reason, failure.error?.message || "");
+    if (attempt < 2 && (response.status === 409 || reason === "ABORTED" || reason === "FAILED_PRECONDITION")) {
+      card = await getFirestoreDocument(env, "giftCards", id, token);
+      if (card?.status === "redeemed") {
+        if (card.redeemedBy === user.uid) {
+          const currentWallet = await getFirestoreDocument(env, "wallets", walletId, token);
+          return json({ success: true, balance: Number(currentWallet?.balance || 0), amount });
+        }
+        return json({ success: false, error: "This gift card has already been claimed." }, 409);
+      }
+      if (!card || card.code !== code || card.pin !== pin) return json({ success: false, error: "Gift card code or PIN is incorrect." }, 404);
+      continue;
+    }
+    break;
+  }
+  return json({ success: false, error: "Could not claim the card just now. Please retry." }, 409);
 }
 
 async function getOneClub(request, env) {
