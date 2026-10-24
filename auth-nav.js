@@ -188,7 +188,7 @@
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
         <a href="account-profile.html"><span class="mobile-nav-icon">${navIcon('settings')}</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="how-it-works.html"><span class="mobile-nav-icon">${navIcon('info')}</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="about-culturewave.html"><span class="mobile-nav-icon">${navIcon('info')}</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Support</h2><div class="mobile-nav-card">
         <a href="customer-service.html"><span class="mobile-nav-icon">${navIcon('info')}</span><span>Frequently asked questions</span><span class="mobile-nav-arrow">›</span></a>
