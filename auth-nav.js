@@ -177,9 +177,9 @@
         <a href="one-club.html"><span class="mobile-nav-icon">${navIcon('wallet')}</span><span>Balance &amp; activity</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Manage</h2><div class="mobile-nav-card">
-        <a href="customer-dashboard.html" data-view="bookings"><span class="mobile-nav-icon">${navIcon('booking')}</span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="customer-dashboard.html" data-view="upcoming"><span class="mobile-nav-icon">${navIcon('upcoming')}</span><span>Upcoming events</span><span class="mobile-nav-arrow">›</span></a>
-        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">${navIcon('profile')}</span><span>Account profile</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="your-bookings.html"><span class="mobile-nav-icon">${navIcon('booking')}</span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="upcoming-events.html"><span class="mobile-nav-icon">${navIcon('upcoming')}</span><span>Upcoming events</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="account-profile.html"><span class="mobile-nav-icon">${navIcon('profile')}</span><span>Account profile</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">For organisers</h2><div class="mobile-nav-card">
         <a href="features.html"><span class="mobile-nav-icon">${navIcon('organizer')}</span><span>Organizer tools</span><span class="mobile-nav-arrow">›</span></a>
@@ -187,7 +187,7 @@
         <a href="how-it-works.html"><span class="mobile-nav-icon">${navIcon('how')}</span><span>How it works</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">More</h2><div class="mobile-nav-card">
-        <a href="customer-dashboard.html" data-view="profile"><span class="mobile-nav-icon">${navIcon('settings')}</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="account-profile.html"><span class="mobile-nav-icon">${navIcon('settings')}</span><span>Account settings</span><span class="mobile-nav-arrow">›</span></a>
         <a href="how-it-works.html"><span class="mobile-nav-icon">${navIcon('info')}</span><span>About CultureWave</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Support</h2><div class="mobile-nav-card">
