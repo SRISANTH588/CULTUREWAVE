@@ -653,6 +653,7 @@ firebase.initializeApp({
 });
 const db = firebase.firestore();
 const bookingAuth = firebase.auth();
+const bookingAuthReady=new Promise(resolve=>bookingAuth.onAuthStateChanged(resolve,()=>resolve(null)));
 let oneClubBalance=0,oneClubApplied=0;
 
 // ── EMAILJS ──
@@ -1580,7 +1581,6 @@ async function applyCoupon(selectedCode){
 
 // ── STEP 3 → 4 ──
 function goStep4(){
-  if(!bookingAuth.currentUser){bookingAuthReady.then(()=>walletBalanceLoad).then(()=>{if(document.getElementById('panel4').classList.contains('active'))goStep4()});}
   const subtotal = selectedTicketSubtotal();
   discountAmt = appliedCouponData ? calculateCouponDiscount(appliedCouponData,subtotal) : 0;
   const afterDiscount = Math.max(0, subtotal - discountAmt);
@@ -2171,7 +2171,6 @@ async function init(){
   buildTickets();
 }
 
-const bookingAuthReady=new Promise(resolve=>bookingAuth.onAuthStateChanged(resolve,()=>resolve(null)));
 init();
 
 // hamburger
