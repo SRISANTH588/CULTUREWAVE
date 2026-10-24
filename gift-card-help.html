@@ -22,7 +22,6 @@
       <div class="field"><label for="memberEmail">Email registered to your account</label><input id="memberEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
       <div class="field"><label for="reference">Payment ID or order reference (optional)</label><input id="reference" type="text" autocomplete="off" placeholder="Add a payment reference if available"></div>
       <div class="field"><label for="supportMessage">Message</label><textarea id="supportMessage"></textarea></div>
-      <p class="hint">The message is prefilled for the Gift Card History error. You can edit it before sending.</p>
       <div class="actions"><a class="action email" id="emailSupport" href="mailto:support.culturewave@gmail.com">Email Support</a><a class="action whatsapp" id="whatsappSupport" href="https://wa.me/919848047428" target="_blank" rel="noopener noreferrer">Continue on WhatsApp</a></div>
       <p class="safe-note">For your security, never include your gift card code or PIN in an email or message. Support will never ask you to share your PIN.</p>
     </section>
@@ -32,7 +31,6 @@
     const message=document.getElementById('supportMessage');
     const email=document.getElementById('memberEmail');
     const reference=document.getElementById('reference');
-    message.value='Hi CultureWave Support,\n\nI need help with my CultureWave Gift Card. The Gift Card History showed this error: “Unterminated string in JSON at position 1018 (line 1 column 1019)”.\n\nPlease check my gift card purchase history and help me access my purchase details.\n\nThank you.';
     auth.authStateReady().then(()=>{if(auth.currentUser?.email)email.value=auth.currentUser.email}).catch(()=>{});
     function updateLinks(){
       const details=`${message.value}\n\nRegistered account email: ${email.value||'[add your email]'}${reference.value?`\nPayment ID or order reference: ${reference.value}`:''}`;
