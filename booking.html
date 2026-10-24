@@ -1580,7 +1580,7 @@ async function applyCoupon(selectedCode){
 
 // ── STEP 3 → 4 ──
 function goStep4(){
-  if(!bookingAuth.currentUser&&walletAuthReady){walletAuthReady.then(()=>walletBalanceLoad).then(()=>{if(document.getElementById('panel4').classList.contains('active'))goStep4()});}
+  if(!bookingAuth.currentUser){bookingAuthReady.then(()=>walletBalanceLoad).then(()=>{if(document.getElementById('panel4').classList.contains('active'))goStep4()});}
   const subtotal = selectedTicketSubtotal();
   discountAmt = appliedCouponData ? calculateCouponDiscount(appliedCouponData,subtotal) : 0;
   const afterDiscount = Math.max(0, subtotal - discountAmt);
@@ -1613,7 +1613,7 @@ document.getElementById('oneClubUse')?.addEventListener('change',goStep4);
 async function loadOneClubBalance(user){const row=document.getElementById('oneClubRow'),statusRow=document.getElementById('oneClubStatusRow'),status=document.getElementById('oneClubStatus');oneClubBalance=0;row.hidden=true;statusRow.hidden=true;if(!user){document.getElementById('oneClubUse').checked=false;return}try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||`Balance request failed (${response.status})`);oneClubBalance=Math.max(0,Number(result.balance)||0);row.hidden=oneClubBalance<=0;if(!oneClubBalance)document.getElementById('oneClubUse').checked=false;if(document.getElementById('panel4').classList.contains('active'))goStep4()}catch(error){row.hidden=true;status.textContent='One Club balance could not load. Please try again.';statusRow.hidden=false;console.warn('Could not load One Club balance:',error)}}
 let walletBalanceLoad=Promise.resolve();
 bookingAuth.onAuthStateChanged(user=>{walletBalanceLoad=loadOneClubBalance(user)});
-const walletAuthReady=bookingAuthReady;
+const walletAuthReady=bookingAuthReady.then(()=>bookingAuth);
 
 async function saveBooking(data){
   try{
