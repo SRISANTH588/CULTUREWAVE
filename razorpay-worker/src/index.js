@@ -35,6 +35,11 @@ function firestoreBase(env) {
   return `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents`;
 }
 
+function firestoreDocumentName(env, collection, id) {
+  const projectId = env.FIREBASE_PROJECT_ID || "ogshootsluxe-36740";
+  return `projects/${encodeURIComponent(projectId)}/databases/(default)/documents/${collection}/${encodeURIComponent(id)}`;
+}
+
 function decodeFirestoreValue(value = {}) {
   if ("stringValue" in value) return value.stringValue;
   if ("integerValue" in value) return Number(value.integerValue);
@@ -254,10 +259,10 @@ async function verifyPayment(request, env) {
     if (!walletTransaction) {
       const response = await fetch(`${firestoreBase(env)}:commit`, { method: "POST",
         headers: { Authorization: `Bearer ${firestoreToken}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ writes: [{ update: { name: `${firestoreBase(env)}/wallets/${encodeURIComponent(walletUid)}`,
+        body: JSON.stringify({ writes: [{ update: { name: firestoreDocumentName(env, "wallets", walletUid),
           fields: { balance: firestoreValue(Number(wallet.balance) - walletAmount), lastBookingPaymentId: firestoreValue(paymentId), updatedAt: firestoreValue({ __firestoreTimestamp: new Date().toISOString() }) } },
           updateMask: { fieldPaths: ["balance", "lastBookingPaymentId", "updatedAt"] }, ...(wallet.updateTime ? { currentDocument: { updateTime: wallet.updateTime } } : { currentDocument: { exists: false } }) },
-          { update: { name: `${firestoreBase(env)}/oneClubTransactions/${encodeURIComponent(paymentId)}`, fields: { uid: firestoreValue(walletUid), amount: firestoreValue(-walletAmount), type: firestoreValue("ticket_booking"), paymentId: firestoreValue(paymentId), createdAt: firestoreValue({ __firestoreTimestamp: new Date().toISOString() }) } }, currentDocument: { exists: false } }] }) });
+          { update: { name: firestoreDocumentName(env, "oneClubTransactions", paymentId), fields: { uid: firestoreValue(walletUid), amount: firestoreValue(-walletAmount), type: firestoreValue("ticket_booking"), paymentId: firestoreValue(paymentId), createdAt: firestoreValue({ __firestoreTimestamp: new Date().toISOString() }) } }, currentDocument: { exists: false } }] }) });
       if (!response.ok && !await getFirestoreDocument(env, "oneClubTransactions", paymentId, firestoreToken)) throw new Error("The ticket payment was captured but One Club could not be updated. Contact support with payment reference " + paymentId + ".");
     }
   }
@@ -419,11 +424,11 @@ async function redeemGiftCard(request, env) {
     const purchase = card.purchaseId ? await getFirestoreDocument(env, "giftCardPurchases", card.purchaseId, token) : null;
     const balance = Number(wallet?.balance || 0), timestamp = new Date().toISOString();
     const writes = [
-      { update: { name: `${firestoreBase(env)}/giftCards/${encodeURIComponent(id)}`, fields: { status: firestoreValue("redeemed"), redeemedBy: firestoreValue(user.uid), redeemedAt: firestoreValue({ __firestoreTimestamp: timestamp }) } },
+      { update: { name: firestoreDocumentName(env, "giftCards", id), fields: { status: firestoreValue("redeemed"), redeemedBy: firestoreValue(user.uid), redeemedAt: firestoreValue({ __firestoreTimestamp: timestamp }) } },
         updateMask: { fieldPaths: ["status", "redeemedBy", "redeemedAt"] }, currentDocument: { updateTime: card.updateTime } },
-      { update: { name: `${firestoreBase(env)}/wallets/${encodeURIComponent(walletId)}`, fields: { balance: firestoreValue(balance + amount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }), lastGiftCardId: firestoreValue(id) } },
+      { update: { name: firestoreDocumentName(env, "wallets", walletId), fields: { balance: firestoreValue(balance + amount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }), lastGiftCardId: firestoreValue(id) } },
         updateMask: { fieldPaths: ["balance", "updatedAt", "lastGiftCardId"] }, ...(wallet?.updateTime ? { currentDocument: { updateTime: wallet.updateTime } } : { currentDocument: { exists: false } }) },
-      ...(purchase ? [{ update: { name: `${firestoreBase(env)}/giftCardPurchases/${encodeURIComponent(card.purchaseId)}`, fields: { status: firestoreValue("redeemed"), redeemedBy: firestoreValue(user.uid), redeemedAt: firestoreValue({ __firestoreTimestamp: timestamp }) } }, updateMask: { fieldPaths: ["status", "redeemedBy", "redeemedAt"] }, currentDocument: { updateTime: purchase.updateTime } }] : []),
+      ...(purchase ? [{ update: { name: firestoreDocumentName(env, "giftCardPurchases", card.purchaseId), fields: { status: firestoreValue("redeemed"), redeemedBy: firestoreValue(user.uid), redeemedAt: firestoreValue({ __firestoreTimestamp: timestamp }) } }, updateMask: { fieldPaths: ["status", "redeemedBy", "redeemedAt"] }, currentDocument: { updateTime: purchase.updateTime } }] : []),
     ];
     const response = await fetch(`${firestoreBase(env)}:commit`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ writes }) });
     if (response.ok) return json({ success: true, balance: balance + amount, amount });
