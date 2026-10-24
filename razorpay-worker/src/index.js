@@ -523,21 +523,35 @@ async function getGiftCardHistory(request, env) {
   const user = await authenticatedUser(request, env);
   if (!user) return json({ success: false, error: "Sign in to view gift card history." }, 401);
   const token = await firestoreAccessToken(env);
-  const response = await fetch(`${firestoreBase(env)}:runQuery`, { method: "POST",
+  const query = (collectionId, fields, ownerField = "ownerUid") => fetch(`${firestoreBase(env)}:runQuery`, { method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ structuredQuery: { from: [{ collectionId: "giftCardPurchases" }],
-      select: { fields: ["ownerUid", "amount", "status", "code", "pin", "createdAt"].map(fieldPath => ({ fieldPath })) },
-      where: { fieldFilter: { field: { fieldPath: "ownerUid" }, op: "EQUAL", value: { stringValue: user.uid } } }, limit: 50 } }) });
-  if (!response.ok) return json({ success: false, error: "Could not load One Club history." }, 502);
-  let rows;
-  try { rows = await response.json(); }
+    body: JSON.stringify({ structuredQuery: { from: [{ collectionId }],
+      select: { fields: fields.map(fieldPath => ({ fieldPath })) },
+      where: { fieldFilter: { field: { fieldPath: ownerField }, op: "EQUAL", value: { stringValue: user.uid } } }, limit: 50 } }) });
+  const [purchaseResponse, transactionResponse] = await Promise.all([
+    query("giftCardPurchases", ["ownerUid", "amount", "status", "code", "pin", "createdAt"]),
+    query("oneClubTransactions", ["uid", "amount", "type", "paymentId", "eventId", "eventName", "createdAt"], "uid"),
+  ]);
+  if (!purchaseResponse.ok) return json({ success: false, error: "Could not load gift card history." }, 502);
+  let rows, transactionRows = [];
+  try { rows = await purchaseResponse.json(); }
   catch (_) { return json({ success: false, error: "Gift card history is temporarily unavailable. Please try again or contact support." }, 502); }
+  if (transactionResponse.ok) {
+    try { transactionRows = await transactionResponse.json(); }
+    catch (_) { transactionRows = []; }
+  }
   const purchases = (rows || []).filter(row => row.document).map(row => {
     const document = row.document, fields = decodeFirestoreFields(document.fields || {});
     return { id: document.name.split("/").pop(), amount: Number(fields.amount || 0), status: fields.status || "issued",
       code: fields.code || "", pin: fields.pin || "", createdAt: fields.createdAt || null };
   });
-  return json({ success: true, purchases });
+  const transactions = (transactionRows || []).filter(row => row.document).map(row => {
+    const document = row.document, fields = decodeFirestoreFields(document.fields || {});
+    return { id: document.name.split("/").pop(), amount: Number(fields.amount || 0), type: fields.type || "wallet_activity",
+      paymentId: fields.paymentId || "", eventId: fields.eventId || "", eventName: fields.eventName || "",
+      createdAt: fields.createdAt || null };
+  });
+  return json({ success: true, purchases, transactions });
 }
 
 async function listFirestoreCollection(env, collection, token, fields) {
