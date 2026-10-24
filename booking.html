@@ -462,6 +462,20 @@
       .bk-panel#panel3 .bk-btn-back{display:none;}
       .bk-panel#panel3 .checkout-pay-action{width:100%;max-width:560px;min-height:62px;gap:.35rem;padding:.4rem .45rem;}
       .bk-panel#panel3 .checkout-pay-action .bk-btn-next{min-width:104px;height:46px!important;padding:0 .6rem;font-size:.76rem;}
+      .bk-panel#panel3 .checkout-pay-action{width:100%;min-height:62px;gap:.35rem;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;}
+      .bk-panel#panel3 .checkout-payment-picker{flex:0 1 44%;}
+      .bk-panel#panel3 .checkout-payment-toggle{min-height:56px;gap:.45rem;padding:.25rem .1rem;color:#f4f4f5;}
+      .bk-panel#panel3 .checkout-payment-mark{width:29px;height:18px;border-radius:4px;background:#fff;color:#0876bd;font-size:.42rem;font-weight:900;letter-spacing:-.04em;}
+      .bk-panel#panel3 .checkout-payment-label small{color:#98999f;font-size:.58rem;font-weight:500;letter-spacing:0;}
+      .bk-panel#panel3 .checkout-payment-label strong{color:#f5f5f6;font-size:.77rem;}
+      .bk-panel#panel3 .checkout-payment-chevron{color:#a9aab0;}
+      .bk-panel#panel3 .checkout-pay-action .checkout-pay-submit{display:flex;flex:1 1 56%;align-items:center;justify-content:space-between;gap:.55rem;width:auto!important;min-width:0;height:54px!important;min-height:54px!important;padding:0 .8rem;border:0;border-radius:14px;background:#fff!important;box-shadow:none!important;color:#171719!important;font-size:.86rem;font-weight:800;white-space:nowrap;}
+      .checkout-submit-total{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:.05rem;}
+      .checkout-submit-total small{color:#4f5055;font-size:.63rem;font-weight:500;}
+      .checkout-submit-total strong{color:#171719;font-size:.9rem;font-weight:800;}
+      .checkout-submit-label{display:flex;align-items:center;gap:.35rem;color:#171719;font-size:.85rem;font-weight:800;}
+      .checkout-submit-label b{font-size:1.2rem;line-height:1;}
+      .bk-panel#panel3 .checkout-pay-action .checkout-pay-submit:disabled{opacity:.65;}
     }
   </style>
   <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
@@ -620,14 +634,13 @@
           <button class="bk-btn-back" onclick="returnToTicketPicker()">← Back</button>
           <div class="checkout-pay-action">
             <div class="checkout-payment-picker" id="checkoutPaymentPicker">
-              <button class="checkout-payment-toggle" id="checkoutPaymentToggle" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="toggleCheckoutPaymentMenu()"><span class="checkout-payment-mark" aria-hidden="true">◉</span><span class="checkout-payment-label"><small>Pay using</small><strong id="checkoutPaymentMethodLabel">Pay online</strong></span><span class="checkout-payment-chevron" aria-hidden="true">⌄</span></button>
+              <button class="checkout-payment-toggle" id="checkoutPaymentToggle" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="toggleCheckoutPaymentMenu()"><span class="checkout-payment-mark" aria-hidden="true">Paytm</span><span class="checkout-payment-label"><small>Pay using</small><strong id="checkoutPaymentMethodLabel">Paytm UPI</strong></span><span class="checkout-payment-chevron" aria-hidden="true">⌄</span></button>
               <div class="checkout-payment-menu" id="checkoutPaymentMenu" role="listbox" aria-label="Choose payment method" hidden>
                 <button class="checkout-payment-option" id="payOnlineOption" type="button" role="option" aria-selected="true" onclick="selectCheckoutPayment('online')"><strong>Pay online</strong><small>UPI, cards, net banking</small></button>
                 <button class="checkout-payment-option" id="oneClubOption" type="button" role="option" aria-selected="false" onclick="selectCheckoutPayment('oneclub')" disabled><strong>One Club</strong><small id="oneClubMethodBalance">Balance loading…</small></button>
               </div>
             </div>
-            <div class="checkout-pay-total"><strong id="checkoutGrandTotal">₹0</strong><small id="checkoutTotalLabel">Total</small></div>
-            <button class="bk-btn-next" id="submitBtn" onclick="submitBooking()">Pay now&nbsp; ›</button>
+            <button class="bk-btn-next checkout-pay-submit" id="submitBtn" onclick="submitBooking()"><span class="checkout-submit-total"><small id="checkoutTotalLabel">Total</small><strong id="checkoutGrandTotal">₹0</strong></span><span class="checkout-submit-label">Pay now <b aria-hidden="true">›</b></span></button>
           </div>
         </div>
       </div>
@@ -786,14 +799,18 @@ function setBookingSubmissionBusy(busy, total){
   const confirmBtn = document.getElementById('confirmSubmitBtn');
   [submitBtn, confirmBtn].filter(Boolean).forEach(button => {
     button.disabled = busy;
-    if(busy) button.textContent = 'Processing...';
+    if(busy) {
+      const label=button.querySelector('.checkout-submit-label');
+      if(label) label.textContent='Processing...';
+      else button.textContent='Processing...';
+    }
   });
   if(!busy){
     const subtotal=selectedTicketSubtotal();
     const afterDiscount=Math.max(0,subtotal-(appliedCouponData?calculateCouponDiscount(appliedCouponData,subtotal):0));
     const gross=afterDiscount+platformFee(afterDiscount);
     const payable=Math.max(0,gross-calculateOneClubApplied(gross));
-    if(submitBtn) submitBtn.textContent = payable ? 'Pay now ›' : 'Book now ›';
+    if(submitBtn){const label=submitBtn.querySelector('.checkout-submit-label');if(label)label.innerHTML=payable?'Pay now <b aria-hidden="true">›</b>':'Book now <b aria-hidden="true">›</b>';else submitBtn.textContent=payable?'Pay now ›':'Book now ›';}
     if(confirmBtn) confirmBtn.textContent = total ? '🔒 Pay Now' : '✅ Book Now (Free)';
   }
 }
@@ -1484,7 +1501,9 @@ function updateBill(){
   document.getElementById("s3Qty").textContent = `${selectedTicketCount()} ticket${selectedTicketCount()===1?'':'s'}`;
   oneClubApplied=calculateOneClubApplied(total);
   const payable=Math.max(0,total-oneClubApplied);
-  document.getElementById("submitBtn").textContent = payable ? 'Pay now ›' : "Book now ›";
+  const checkoutSubmitLabel=document.querySelector('#submitBtn .checkout-submit-label');
+  if(checkoutSubmitLabel)checkoutSubmitLabel.innerHTML=payable?'Pay now <b aria-hidden="true">›</b>':'Book now <b aria-hidden="true">›</b>';
+  else document.getElementById("submitBtn").textContent=payable?'Pay now ›':'Book now ›';
   const firstCoupon=eventCoupons()[0];
   const firstCouponValue=firstCoupon ? Number(firstCoupon.value??firstCoupon.discount??0) : 0;
   const firstCouponLabel=firstCoupon ? ((firstCoupon.type==='percent'||firstCoupon.type==='percentage') ? `Save ${firstCouponValue}% with ${firstCoupon.code||firstCoupon.couponCode}` : `Save ₹${firstCouponValue} with ${firstCoupon.code||firstCoupon.couponCode}`) : 'Add a coupon to save more';
@@ -1660,7 +1679,7 @@ function calculateOneClubApplied(total){
   return oneClubBalance>=total?total:Math.min(oneClubBalance,Math.max(0,Math.floor(total-1)));
 }
 function toggleCheckoutPaymentMenu(){const menu=document.getElementById('checkoutPaymentMenu'),toggle=document.getElementById('checkoutPaymentToggle');menu.hidden=!menu.hidden;toggle.setAttribute('aria-expanded',String(!menu.hidden))}
-function selectCheckoutPayment(method){if(method==='oneclub'&&oneClubBalance<=0)return;checkoutPaymentMethod=method==='oneclub'?'oneclub':'online';document.getElementById('checkoutPaymentMethodLabel').textContent=checkoutPaymentMethod==='oneclub'?'One Club':'Pay online';document.getElementById('payOnlineOption').setAttribute('aria-selected',String(checkoutPaymentMethod==='online'));document.getElementById('oneClubOption').setAttribute('aria-selected',String(checkoutPaymentMethod==='oneclub'));document.getElementById('checkoutPaymentMenu').hidden=true;document.getElementById('checkoutPaymentToggle').setAttribute('aria-expanded','false');updateBill()}
+function selectCheckoutPayment(method){if(method==='oneclub'&&oneClubBalance<=0)return;checkoutPaymentMethod=method==='oneclub'?'oneclub':'online';document.getElementById('checkoutPaymentMethodLabel').textContent=checkoutPaymentMethod==='oneclub'?'One Club':'Paytm UPI';document.querySelector('.checkout-payment-mark').textContent=checkoutPaymentMethod==='oneclub'?'OC':'Paytm';document.getElementById('payOnlineOption').setAttribute('aria-selected',String(checkoutPaymentMethod==='online'));document.getElementById('oneClubOption').setAttribute('aria-selected',String(checkoutPaymentMethod==='oneclub'));document.getElementById('checkoutPaymentMenu').hidden=true;document.getElementById('checkoutPaymentToggle').setAttribute('aria-expanded','false');updateBill()}
 document.addEventListener('click',event=>{if(!event.target.closest('#checkoutPaymentPicker')){const menu=document.getElementById('checkoutPaymentMenu');if(menu){menu.hidden=true;document.getElementById('checkoutPaymentToggle').setAttribute('aria-expanded','false')}}});
 async function loadOneClubBalance(user){const option=document.getElementById('oneClubOption'),label=document.getElementById('oneClubMethodBalance'),statusRow=document.getElementById('oneClubStatusRow'),status=document.getElementById('oneClubStatus');oneClubBalance=0;statusRow.hidden=true;if(!user){option.disabled=true;label.textContent='Sign in to use One Club';if(checkoutPaymentMethod==='oneclub')selectCheckoutPayment('online');updateBill();return}try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||`Balance request failed (${response.status})`);oneClubBalance=Math.max(0,Number(result.balance)||0);option.disabled=oneClubBalance<=0;label.textContent=oneClubBalance>0?`Available · ₹${oneClubBalance.toLocaleString('en-IN')}`:'No balance available';if(!oneClubBalance&&checkoutPaymentMethod==='oneclub')selectCheckoutPayment('online');updateBill()}catch(error){oneClubBalance=0;option.disabled=true;label.textContent='Balance unavailable';status.textContent='One Club balance could not load. Please try again.';statusRow.hidden=false;if(checkoutPaymentMethod==='oneclub')selectCheckoutPayment('online');else updateBill();console.warn('Could not load One Club balance:',error)}}
 bookingAuth.onAuthStateChanged(loadOneClubBalance);
@@ -2210,7 +2229,9 @@ async function init(){
           const fallbackTime=formatTimeText(passedEventTime).replace(/:00(?=\s)/,'');
           document.getElementById('checkoutDate').textContent=[fallbackDateLabel,fallbackTime].filter(Boolean).join(' | ')||'Date & time TBA';
           document.getElementById('checkoutLocation').textContent=passedVenue||'Event booking';
-          document.getElementById('submitBtn').textContent=passedTicketPrice?'Pay now ›':'Confirm booking ›';
+          const fallbackSubmitLabel=document.querySelector('#submitBtn .checkout-submit-label');
+          if(fallbackSubmitLabel)fallbackSubmitLabel.innerHTML=passedTicketPrice?'Pay now <b aria-hidden="true">›</b>':'Confirm booking <b aria-hidden="true">›</b>';
+          else document.getElementById('submitBtn').textContent=passedTicketPrice?'Pay now ›':'Confirm booking ›';
           goStep(3);
         }
       }
