@@ -786,7 +786,6 @@ async function markAllRead() {
 }
 
 // ── UPCOMING ──
-function eventPublicPath(name,id=''){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;}
 async function loadUpcoming() {
   try {
     const now = new Date();
@@ -807,11 +806,20 @@ async function loadUpcoming() {
         const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
         day = dt.toLocaleDateString('en-IN',{day:'numeric'});
         mon = dt.toLocaleDateString('en-IN',{month:'short'}).toUpperCase();
-        timeStr = dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});
+        // Only show time if it's not midnight (00:00)
+        const h = dt.getHours(), m = dt.getMinutes();
+        if (h !== 0 || m !== 0) {
+          timeStr = dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+        }
+        // Also check startTime field as fallback
+        if (!timeStr && d.startTime && String(d.startTime).trim() && String(d.startTime) !== '00:00') {
+          timeStr = d.startTime;
+        }
       } catch(e){}
       const img = d.cardImgUrl || d.coverUrl || '';
       const venue = d.venueName || d.venue || d.city || 'India';
-      return `<a href="${eventPublicPath(d.urlKey||d.name,id)}" style="text-decoration:none;border-radius:18px;overflow:hidden;background:#18151e;border:1px solid #2e2a38;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px #0006'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      const href = `event-detail.html?eventId=${encodeURIComponent(id)}`;
+      return `<a href="${href}" target="_top" style="text-decoration:none;border-radius:18px;overflow:hidden;background:#18151e;border:1px solid #2e2a38;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px #0006'" onmouseout="this.style.transform='';this.style.boxShadow=''">
         <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:${img?'#000':grads[i%grads.length]};">
           ${img?`<img src="${img}" alt="${d.name||''}" style="width:100%;height:100%;object-fit:cover;display:block;">`:''}
           <div style="position:absolute;inset:0;background:linear-gradient(to top,#18151eee 0%,transparent 55%);"></div>
