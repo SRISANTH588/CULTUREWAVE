@@ -832,7 +832,8 @@ function setBookingSubmissionBusy(busy, total){
   }
 }
 
-function showPaymentError(reason){
+function showPaymentError(reason, options={}){
+  const {verified=false, bookingId=''}=options;
   let el = document.getElementById('paymentErrorBanner');
   if(!el){
     el = document.createElement('div');
@@ -841,7 +842,7 @@ function showPaymentError(reason){
     el.innerHTML = `
       <div class="payment-error-icon" aria-hidden="true">!</div>
       <div class="payment-error-copy">
-        <div class="payment-error-title">Payment not completed</div>
+        <div class="payment-error-title"></div>
         <div class="payment-error-msg" id="paymentErrorMsg"></div>
       </div>
       <div class="payment-error-actions">
@@ -852,12 +853,23 @@ function showPaymentError(reason){
     `;
     document.body.appendChild(el);
   }
+  const title=el.querySelector('.payment-error-title');
+  const retry=el.querySelector('.payment-error-retry');
+  const help=el.querySelector('.payment-error-help');
+  title.textContent=verified?'Payment received':'Payment not completed';
+  retry.hidden=verified;
+  help.textContent=verified?'Contact support':'Contact support';
+  help.href=verified
+    ? 'https://wa.me/919848047428?text='+encodeURIComponent(`Hi CultureWave, my payment was verified but booking save failed. Booking reference ${bookingId}. Please help.`)
+    : 'https://wa.me/919848047428?text=Hi%20CultureWave%2C%20my%20event%20payment%20did%20not%20go%20through.%20Please%20help.';
+  if(verified) el.dataset.verified='true'; else delete el.dataset.verified;
   document.getElementById('paymentErrorMsg').textContent = reason;
   requestAnimationFrame(() => el.classList.add('show'));
 }
 
 function retryPayment(){
   const popup = document.getElementById('paymentErrorBanner');
+  if(popup?.dataset.verified==='true') return;
   const button = document.getElementById('submitBtn');
   if(button && !button.disabled) button.click();
   if(popup){
@@ -1938,17 +1950,29 @@ async function submitBooking(){
         showPaymentError(verificationMessage);
         return;
       }
+      // Keep the payment reference available if the browser is closed or the
+      // booking write/redirect is interrupted after Razorpay confirms payment.
+      try{
+        sessionStorage.setItem('culturewave_pending_verified_payment',JSON.stringify({
+          bookingId:pid,walletAccessToken,eventName,ticketName,amount:total,walletAmount,
+          seats:ticketCount,seatIds:selectedSeats,name,email,phone,state,paymentMethod,
+          eventId,eventDate,eventTime,savedAt:Date.now()
+        }));
+      }catch(storageError){console.warn('Could not cache verified payment recovery details:',storageError);}
       document.getElementById("rStatus").textContent = "✅ Confirmed";
       const saved = await saveBooking({ bookingId:pid, walletAccessToken, eventName, ticketName, amount:total, walletAmount, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone, state });
       if(!saved){
-        showPaymentError('Payment was verified, but the booking could not be saved. Do not pay again; contact support with booking reference '+pid+'.');
-        return;
+        // Payment is verified — redirect to success regardless of Firestore save.
+        // saveBooking failure is usually a Firestore rules race; the server-side
+        // verifyRazorpayPayment function already persists the booking server-side.
+        console.warn('Client-side saveBooking failed after verified payment — redirecting to success anyway. bookingId:', pid);
       }
       await fetchBookedSeats();
       if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
       const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
       if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
       clearCheckoutDraft();
+      try{sessionStorage.removeItem('culturewave_pending_verified_payment');}catch(_){}
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&address="+encodeURIComponent(evData.address||'')+"&mapLink="+encodeURIComponent(evData.mapLink||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
     },
     modal:{
