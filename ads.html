@@ -22,38 +22,160 @@
   <style>
     *{box-sizing:border-box}
     body{margin:0;background:#111014;color:#f8f6fb;font-family:Inter,system-ui,sans-serif}
+
+    /* ── wrap ── */
     .ads-wrap{width:min(1160px,calc(100% - 48px));margin-inline:auto}
-    .ads-hero{position:relative;isolation:isolate;overflow:hidden;padding:112px 0 88px;text-align:center;background:radial-gradient(ellipse at 75% 8%,#642e9c55,transparent 42%),radial-gradient(ellipse at 15% 95%,#28215a55,transparent 40%),linear-gradient(145deg,#17151c,#111014 72%);border-bottom:1px solid #ffffff12}
-    .ads-hero:after{content:"";position:absolute;z-index:-1;inset:0;opacity:.12;background:url('herosection.jpeg') center/cover;pointer-events:none}
-    .ads-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:.4rem .9rem;border:1px solid #c5a9ff40;border-radius:999px;background:#8b5cf618;color:#d1b7ff;font-size:.72rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
-    .ads-hero h1{max-width:880px;margin:1.6rem auto 1rem;font-size:clamp(3rem,7vw,6rem);font-weight:900;line-height:.98;letter-spacing:-.07em;color:#fff}
-    .ads-hero h1 em{font-family:'Playfair Display',Georgia,serif;font-weight:700;color:#c5a9ff}
-    .ads-hero p{max-width:650px;margin:0 auto 2rem;color:#aaa3b8;font-size:1.08rem;line-height:1.8}
+
+    /* ── hero ── */
+    .ads-hero{
+      position:relative;isolation:isolate;overflow:hidden;
+      padding:clamp(5.5rem,11vw,9rem) 0 clamp(4rem,8vw,7rem);
+      text-align:center;
+      background:
+        radial-gradient(ellipse at 75% 8%,#642e9c55,transparent 42%),
+        radial-gradient(ellipse at 15% 95%,#28215a55,transparent 40%),
+        linear-gradient(145deg,#17151c,#111014 72%);
+      border-bottom:1px solid #ffffff12;
+    }
+    /* dot-grid texture — same as other marketing pages */
+    .ads-hero::after{
+      content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;
+      opacity:.16;
+      background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+      background-size:52px 52px;
+      mask-image:linear-gradient(90deg,transparent,#000 55%,transparent);
+    }
+    .ads-eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:.4rem 1rem;border:1px solid #c5a9ff40;border-radius:999px;
+      background:#8b5cf618;color:#d1b7ff;
+      font-size:.72rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+    }
+    .ads-hero h1{
+      max-width:900px;margin:1.6rem auto 1.1rem;
+      font-size:clamp(3rem,7.5vw,6.2rem);font-weight:900;
+      line-height:.96;letter-spacing:-.07em;color:#fff;
+    }
+    .ads-hero h1 em{font-family:'Playfair Display',Georgia,serif;font-weight:700;color:#c5a9ff;font-style:italic}
+    .ads-hero p{max-width:620px;margin:0 auto 2.2rem;color:#aaa3b8;font-size:1.08rem;line-height:1.8}
     .ads-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
-    .ads-button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.85rem 1.4rem;border-radius:13px;font-size:.9rem;font-weight:800;text-decoration:none;transition:transform .18s,background .18s,border-color .18s}
-    .ads-button:hover{transform:translateY(-2px)}
-    .ads-button-primary{background:linear-gradient(135deg,#8b5cf6,#5d4be8);color:#fff;box-shadow:0 10px 30px #754be844}
-    .ads-button-secondary{border:1px solid #ffffff25;background:#ffffff08;color:#eee8f8}
-    .ads-section{padding:82px 0;border-bottom:1px solid #ffffff0b}
-    .ads-section-head{text-align:center;margin:0 auto 2.8rem;max-width:680px}
+    .ads-btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:50px;padding:.9rem 1.6rem;border-radius:14px;
+      font-size:.9rem;font-weight:800;text-decoration:none;
+      transition:transform .18s,box-shadow .18s;
+    }
+    .ads-btn:hover{transform:translateY(-2px)}
+    .ads-btn-primary{
+      background:linear-gradient(135deg,#9a6bff,#7547db);color:#fff;
+      border:1px solid rgba(215,197,255,.3);
+      box-shadow:0 10px 30px #754be844;
+    }
+    .ads-btn-primary:hover{box-shadow:0 16px 40px #754be866}
+    .ads-btn-secondary{border:1px solid #ffffff25;background:#ffffff08;color:#eee8f8}
+
+    /* ── stats bar ── */
+    .ads-stats{
+      display:grid;grid-template-columns:repeat(4,1fr);
+      gap:0;border:1px solid #ffffff12;border-radius:22px;
+      background:linear-gradient(145deg,#1b1822,#15131a);
+      overflow:hidden;margin-top:clamp(2.5rem,5vw,4.5rem);
+    }
+    .ads-stat{
+      padding:clamp(1.2rem,3vw,2rem) 1.5rem;text-align:center;
+      border-right:1px solid #ffffff0d;
+    }
+    .ads-stat:last-child{border-right:none}
+    .ads-stat-num{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:900;letter-spacing:-.05em;color:#fff}
+    .ads-stat-num span{color:#c5a9ff}
+    .ads-stat-label{margin-top:.3rem;font-size:.78rem;color:#80798d;font-weight:500;letter-spacing:.02em}
+
+    /* ── section shared ── */
+    .ads-section{padding:clamp(4rem,8vw,6rem) 0;border-bottom:1px solid #ffffff0b}
+    .ads-section-head{text-align:center;margin:0 auto 3rem;max-width:680px}
     .ads-section-head small{color:#c5a9ff;font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-    .ads-section-head h2{margin:.7rem 0;font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.055em;line-height:1.08}
+    .ads-section-head h2{margin:.7rem 0 .8rem;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.055em;line-height:1.08;color:#fff}
     .ads-section-head p{margin:0;color:#9992a6;font-size:.96rem;line-height:1.75}
+
+    /* ── opportunity cards ── */
     .ads-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
-    .ads-card{min-height:220px;padding:1.7rem;border:1px solid #ffffff12;border-radius:21px;background:linear-gradient(145deg,#1b1822,#15131a);box-shadow:0 14px 35px #0003}
-    .ads-icon{display:grid;place-items:center;width:46px;height:46px;margin-bottom:1.2rem;border:1px solid #a78bfa38;border-radius:14px;background:#8b5cf61b;font-size:1.2rem}
-    .ads-card h3{margin:0 0 .55rem;font-size:1.04rem;letter-spacing:-.025em}
-    .ads-card p{margin:0;color:#9992a6;font-size:.86rem;line-height:1.75}
-    .ads-callout{display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;align-items:center;padding:clamp(1.6rem,5vw,3.5rem);border:1px solid #a78bfa30;border-radius:26px;background:radial-gradient(ellipse at 100% 0,#6d3b9d33,transparent 48%),linear-gradient(145deg,#1c1825,#141219)}
-    .ads-callout h2{margin:0 0 .7rem;font-size:clamp(1.8rem,3.5vw,2.65rem);letter-spacing:-.055em;line-height:1.1}
-    .ads-callout p{margin:0;color:#aaa3b8;font-size:.92rem;line-height:1.75}
-    .ads-callout-action{display:flex;flex-direction:column;align-items:flex-start;gap:.75rem}
-    .ads-callout-action span{color:#80798d;font-size:.76rem;line-height:1.5}
-    .ads-footer{padding:26px 0;color:#777184;font-size:.76rem}
+    .ads-card{
+      padding:2rem;border:1px solid #ffffff12;border-radius:22px;
+      background:linear-gradient(145deg,#1b1822,#15131a);
+      box-shadow:0 14px 35px #0003;
+      transition:border-color .2s,box-shadow .2s,transform .2s;
+    }
+    .ads-card:hover{
+      border-color:#c5a9ff50;
+      box-shadow:0 22px 54px rgba(64,38,111,.22);
+      transform:translateY(-3px);
+    }
+    .ads-icon{
+      display:grid;place-items:center;width:48px;height:48px;margin-bottom:1.3rem;
+      border:1px solid #a78bfa38;border-radius:14px;
+      background:#8b5cf61b;font-size:1.25rem;
+    }
+    .ads-card h3{margin:0 0 .6rem;font-size:1.06rem;letter-spacing:-.025em;color:#fff}
+    .ads-card p{margin:0;color:#9992a6;font-size:.87rem;line-height:1.75}
+
+    /* ── audience section ── */
+    .ads-audience{
+      display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center;
+    }
+    .ads-audience-text h2{font-size:clamp(1.9rem,3.5vw,2.8rem);letter-spacing:-.055em;line-height:1.1;margin:0 0 1rem;color:#fff}
+    .ads-audience-text p{color:#aaa3b8;font-size:.94rem;line-height:1.8;margin:0 0 1.8rem}
+    .ads-tags{display:flex;flex-wrap:wrap;gap:.5rem}
+    .ads-tag{
+      padding:.35rem .85rem;border:1px solid #ffffff18;border-radius:999px;
+      background:#ffffff08;color:#c5a9ff;font-size:.78rem;font-weight:600;
+    }
+    .ads-audience-pills{display:flex;flex-direction:column;gap:.75rem}
+    .ads-pill{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:1rem 1.4rem;border:1px solid #ffffff10;border-radius:16px;
+      background:linear-gradient(145deg,#1b1822,#15131a);
+    }
+    .ads-pill-label{font-size:.88rem;font-weight:600;color:#e8e2f4}
+    .ads-pill-bar-wrap{flex:1;margin:0 1rem;height:6px;background:#ffffff0d;border-radius:999px;overflow:hidden}
+    .ads-pill-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#c5a9ff)}
+    .ads-pill-pct{font-size:.8rem;font-weight:700;color:#c5a9ff;min-width:2.5rem;text-align:right}
+
+    /* ── callout ── */
+    .ads-callout{
+      display:grid;grid-template-columns:1.3fr .7fr;gap:2.5rem;align-items:center;
+      padding:clamp(2rem,5vw,3.5rem);
+      border:1px solid #a78bfa30;border-radius:26px;
+      background:radial-gradient(ellipse at 100% 0,#6d3b9d33,transparent 48%),linear-gradient(145deg,#1c1825,#141219);
+    }
+    .ads-callout h2{margin:0 0 .8rem;font-size:clamp(1.8rem,3.5vw,2.5rem);letter-spacing:-.055em;line-height:1.1;color:#fff}
+    .ads-callout p{margin:0;color:#aaa3b8;font-size:.93rem;line-height:1.8}
+    .ads-callout-action{display:flex;flex-direction:column;align-items:flex-start;gap:.85rem}
+    .ads-callout-action span{color:#80798d;font-size:.77rem;line-height:1.6}
+    .ads-callout-action a[href^="mailto:"]:not(.ads-btn){color:#c5a9ff;text-decoration:none}
+    .ads-callout-action a[href^="mailto:"]:not(.ads-btn):hover{text-decoration:underline}
+
+    /* ── footer ── */
+    .ads-footer{padding:28px 0;color:#777184;font-size:.76rem;border-top:1px solid #ffffff0b}
     .ads-footer-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
     .ads-footer a{color:#aaa3b8;text-decoration:none}
     .ads-footer a:hover{color:#d1b7ff}
-    @media(max-width:760px){.ads-hero{padding:84px 0 68px}.ads-grid{grid-template-columns:1fr}.ads-card{min-height:0}.ads-section{padding:62px 0}.ads-callout{grid-template-columns:1fr;gap:1.5rem}.ads-wrap{width:min(100% - 32px,1160px)}}
+
+    /* ── responsive ── */
+    @media(max-width:900px){
+      .ads-stats{grid-template-columns:repeat(2,1fr)}
+      .ads-stat:nth-child(2){border-right:none}
+      .ads-stat:nth-child(3){border-top:1px solid #ffffff0d}
+      .ads-stat:nth-child(4){border-top:1px solid #ffffff0d}
+      .ads-audience{grid-template-columns:1fr}
+      .ads-callout{grid-template-columns:1fr;gap:1.8rem}
+    }
+    @media(max-width:760px){
+      .ads-hero{padding:5rem 0 3.5rem}
+      .ads-grid{grid-template-columns:1fr}
+      .ads-section{padding:3.5rem 0}
+      .ads-wrap{width:min(100% - 32px,1160px)}
+      .ads-stats{grid-template-columns:repeat(2,1fr)}
+    }
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
@@ -67,35 +189,163 @@
     </div>
   </header>
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation"><a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Dining</a><a href="features.html">For Organizers</a><a href="how-it-works.html">How it works</a><div class="mobile-nav-ctas"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="events.html">Explore events</a></div></nav>
+
   <main>
+
+    <!-- ── HERO ── -->
     <section class="ads-hero">
       <div class="ads-wrap">
         <span class="ads-eyebrow">✦ Brand partnerships</span>
         <h1>Be part of what<br>people <em>look forward to.</em></h1>
-        <p>Meet an audience that is already choosing where to go, what to try and who to bring along. Tell us what your brand wants to make happen.</p>
-        <div class="ads-actions"><a class="ads-button ads-button-primary" href="mailto:support.culturewave@gmail.com?subject=Advertising%20with%20CultureWave">Talk to our partnerships team ↗</a><a class="ads-button ads-button-secondary" href="#opportunities">Explore opportunities ↓</a></div>
+        <p>Meet an audience already choosing where to go, what to try and who to bring along. Tell us what your brand wants to make happen.</p>
+        <div class="ads-actions">
+          <a class="ads-btn ads-btn-primary" href="mailto:support.culturewave@gmail.com?subject=Advertising%20with%20CultureWave">Talk to our partnerships team ↗</a>
+          <a class="ads-btn ads-btn-secondary" href="#opportunities">Explore opportunities ↓</a>
+        </div>
+
+        <!-- stats bar -->
+        <div class="ads-stats">
+          <div class="ads-stat">
+            <div class="ads-stat-num">12<span>K+</span></div>
+            <div class="ads-stat-label">Monthly active users</div>
+          </div>
+          <div class="ads-stat">
+            <div class="ads-stat-num">40<span>+</span></div>
+            <div class="ads-stat-label">Cities across India</div>
+          </div>
+          <div class="ads-stat">
+            <div class="ads-stat-num">3<span>x</span></div>
+            <div class="ads-stat-label">Avg. session depth</div>
+          </div>
+          <div class="ads-stat">
+            <div class="ads-stat-num">78<span>%</span></div>
+            <div class="ads-stat-label">Return visitor rate</div>
+          </div>
+        </div>
       </div>
     </section>
+
+    <!-- ── OPPORTUNITIES ── -->
     <section class="ads-section" id="opportunities">
       <div class="ads-wrap">
-        <header class="ads-section-head"><small>Ways to partner</small><h2>Show up where experiences begin</h2><p>We work with brands to shape useful, memorable campaigns around the things people love doing together.</p></header>
+        <header class="ads-section-head">
+          <small>Ways to partner</small>
+          <h2>Show up where experiences begin</h2>
+          <p>We work with brands to shape useful, memorable campaigns around the things people love doing together.</p>
+        </header>
         <div class="ads-grid">
-          <article class="ads-card"><div class="ads-icon" aria-hidden="true">✦</div><h3>Featured placements</h3><p>Bring your brand into the discovery journey with thoughtfully placed visibility across CultureWave experiences.</p></article>
-          <article class="ads-card"><div class="ads-icon" aria-hidden="true">◎</div><h3>Event partnerships</h3><p>Connect with live audiences through event sponsorships, on-ground activations and co-created moments.</p></article>
-          <article class="ads-card"><div class="ads-icon" aria-hidden="true">↗</div><h3>Co-created campaigns</h3><p>Build a campaign with our team around a launch, local community or cultural moment that fits your brand.</p></article>
+          <article class="ads-card">
+            <div class="ads-icon" aria-hidden="true">✦</div>
+            <h3>Featured placements</h3>
+            <p>Bring your brand into the discovery journey with thoughtfully placed visibility across CultureWave events and dining pages.</p>
+          </article>
+          <article class="ads-card">
+            <div class="ads-icon" aria-hidden="true">◎</div>
+            <h3>Event partnerships</h3>
+            <p>Connect with live audiences through event sponsorships, on-ground activations and co-created moments that people remember.</p>
+          </article>
+          <article class="ads-card">
+            <div class="ads-icon" aria-hidden="true">↗</div>
+            <h3>Co-created campaigns</h3>
+            <p>Build a campaign with our team around a launch, local community or cultural moment that fits your brand's voice.</p>
+          </article>
+          <article class="ads-card">
+            <div class="ads-icon" aria-hidden="true">◈</div>
+            <h3>Newsletter & push</h3>
+            <p>Reach subscribers who've opted in to hear about what's happening — curated, not cluttered.</p>
+          </article>
+          <article class="ads-card">
+            <div class="ads-icon" aria-hidden="true">⬡</div>
+            <h3>Category takeovers</h3>
+            <p>Own a category — brunch, live music, workshops — for a week or a month. Your brand, front and centre.</p>
+          </article>
+          <article class="ads-card">
+            <div class="ads-icon" aria-hidden="true">❋</div>
+            <h3>Gift card bundles</h3>
+            <p>Partner on branded gift card campaigns that put your name inside a gifted experience.</p>
+          </article>
         </div>
       </div>
     </section>
+
+    <!-- ── AUDIENCE ── -->
     <section class="ads-section">
       <div class="ads-wrap">
-        <div class="ads-callout">
-          <div><h2>Let’s make a good moment matter.</h2><p>Share your campaign idea, audience and timeline. Our team will get back to you with relevant partnership options.</p></div>
-          <div class="ads-callout-action"><a class="ads-button ads-button-primary" href="mailto:support.culturewave@gmail.com?subject=CultureWave%20brand%20partnership">Start a conversation ↗</a><span>Prefer a quick note? Email <a href="mailto:support.culturewave@gmail.com">support.culturewave@gmail.com</a>.</span></div>
+        <div class="ads-audience">
+          <div class="ads-audience-text">
+            <small style="color:#c5a9ff;font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase">Who you're reaching</small>
+            <h2>An audience that shows up.</h2>
+            <p>CultureWave users are active, curious and spending. They're not scrolling past — they're booking, sharing and coming back.</p>
+            <div class="ads-tags">
+              <span class="ads-tag">Urban millennials</span>
+              <span class="ads-tag">Experience-first</span>
+              <span class="ads-tag">High intent</span>
+              <span class="ads-tag">Socially active</span>
+              <span class="ads-tag">Tier 1 & 2 cities</span>
+              <span class="ads-tag">18–38 age group</span>
+            </div>
+          </div>
+          <div class="ads-audience-pills">
+            <div class="ads-pill">
+              <span class="ads-pill-label">Events discovery</span>
+              <div class="ads-pill-bar-wrap"><div class="ads-pill-bar" style="width:88%"></div></div>
+              <span class="ads-pill-pct">88%</span>
+            </div>
+            <div class="ads-pill">
+              <span class="ads-pill-label">Dining & brunch</span>
+              <div class="ads-pill-bar-wrap"><div class="ads-pill-bar" style="width:74%"></div></div>
+              <span class="ads-pill-pct">74%</span>
+            </div>
+            <div class="ads-pill">
+              <span class="ads-pill-label">Repeat bookings</span>
+              <div class="ads-pill-bar-wrap"><div class="ads-pill-bar" style="width:61%"></div></div>
+              <span class="ads-pill-pct">61%</span>
+            </div>
+            <div class="ads-pill">
+              <span class="ads-pill-label">Shares & referrals</span>
+              <div class="ads-pill-bar-wrap"><div class="ads-pill-bar" style="width:53%"></div></div>
+              <span class="ads-pill-pct">53%</span>
+            </div>
+            <div class="ads-pill">
+              <span class="ads-pill-label">Gift card purchases</span>
+              <div class="ads-pill-bar-wrap"><div class="ads-pill-bar" style="width:42%"></div></div>
+              <span class="ads-pill-pct">42%</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
+
+    <!-- ── CTA CALLOUT ── -->
+    <section class="ads-section" style="border-bottom:none">
+      <div class="ads-wrap">
+        <div class="ads-callout">
+          <div>
+            <h2>Let's make a good moment matter.</h2>
+            <p>Share your campaign idea, audience and timeline. Our team will get back to you with relevant partnership options — no decks, no fluff.</p>
+          </div>
+          <div class="ads-callout-action">
+            <a class="ads-btn ads-btn-primary" href="mailto:support.culturewave@gmail.com?subject=CultureWave%20brand%20partnership">Start a conversation ↗</a>
+            <span>Prefer a quick note? Email <a href="mailto:support.culturewave@gmail.com">support.culturewave@gmail.com</a></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
-  <footer class="ads-footer"><div class="ads-wrap ads-footer-inner"><span>© 2026 CultureWave · Find your next experience. Make it a moment.</span><nav aria-label="Footer"><a href="events.html">Events</a> · <a href="features.html">For Organizers</a> · <a href="privacy-policy.html">Privacy</a> · <a href="terms-and-conditions.html">Terms</a></nav></div></footer>
+
+  <footer class="ads-footer">
+    <div class="ads-wrap ads-footer-inner">
+      <span>© 2026 CultureWave · Find your next experience. Make it a moment.</span>
+      <nav aria-label="Footer">
+        <a href="events.html">Events</a> ·
+        <a href="features.html">For Organizers</a> ·
+        <a href="privacy-policy.html">Privacy</a> ·
+        <a href="terms-and-conditions.html">Terms</a>
+      </nav>
+    </div>
+  </footer>
+
   <script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
 </body>
 </html>
