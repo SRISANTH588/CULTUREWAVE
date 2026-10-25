@@ -182,7 +182,8 @@ service cloud.firestore {
     // Authenticated users can read/write their own data
     match /events/{id} {
       allow read: if true;
-      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid &&
+        (request.resource.data.get('type', '') != 'ad_campaign' || request.resource.data.status == 'pending_review');
       allow update: if (request.auth != null &&
         (resource.data.ownerId == request.auth.uid || isAdmin())) ||
         attendeeCountIncrement() || bookedSeatAppend(id);
@@ -602,7 +603,29 @@ service cloud.firestore {
     }
 
     match /campaigns/{id} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null && (isAdmin() || resource.data.ownerId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow update: if request.auth != null && (isAdmin() ||
+        (resource.data.ownerId == request.auth.uid &&
+         request.resource.data.ownerId == resource.data.ownerId &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+           'name', 'urlKey', 'summary', 'description', 'goal', 'category', 'tags', 'platforms',
+           'influencerTier', 'targetAge', 'targetGender', 'targetLocation', 'startDate', 'endDate',
+           'applicationDeadline', 'contentDeadline', 'currency', 'totalBudget', 'perInfluencerBudget',
+           'paymentType', 'commissionRate', 'targetReach', 'targetImpressions', 'targetEngagement',
+           'openApplication', 'autoApprove', 'requireMediaKit', 'minFollowers', 'minEngagement',
+           'maxInfluencers', 'mandatoryMentions', 'dosList', 'dontsList', 'requireApproval',
+           'requireCaptionApproval', 'approvalDays', 'coverUrl', 'videoUrl', 'briefNotes',
+           'influencers', 'deliverables', 'coupons', 'faqs', 'publicListing', 'showStats',
+           'notifyApps', 'allowSharing', 'ndaRequired', 'termsText', 'updatedAt',
+           'creativeUrl', 'creativePath', 'creativeName', 'creativeType', 'packageId'
+         ])));
+      allow delete: if request.auth != null && (isAdmin() || resource.data.ownerId == request.auth.uid);
+    }
+
+    match /adPackageOrders/{id} {
+      allow read: if request.auth != null && (isAdmin() || resource.data.ownerId == request.auth.uid);
+      allow write: if false;
     }
 
     match /webinars/{id} {

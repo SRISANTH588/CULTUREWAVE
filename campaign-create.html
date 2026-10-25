@@ -906,11 +906,10 @@ let uid = null;
 // ── AUTH ──
 async function loadUser() {
   try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (!res.ok) { window.location.href = '/login.html'; return; }
-    
+    const user = auth.currentUser || await new Promise(resolve => auth.onAuthStateChanged(resolve));
+    if (!user) { window.location.href = '/login.html'; return; }
     uid = user.uid;
-    document.getElementById('topAvatar').textContent = (user.name || 'U').trim().charAt(0).toUpperCase();
+    document.getElementById('topAvatar').textContent = (user.displayName || user.email || 'U').trim().charAt(0).toUpperCase();
   } catch {}
 }
 loadUser();
@@ -1285,6 +1284,8 @@ async function saveCampaign(status) {
   try {
     const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
     btn.textContent = 'Saving...'; btn.disabled = true;
+    payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    payload.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
     await db.collection('campaigns').add(payload);
     window.location.href = 'premium-client-dashboard.html';
   } catch (err) {

@@ -504,6 +504,7 @@
     <button class="sb-item" data-view="new-listers"><span class="si-icon">🧾</span> New Lister <span class="si-badge orange" id="badgeNewListers">0</span></button>
     <button class="sb-item" data-view="stalls"><span class="si-icon">🏪</span> Event Stalls</button>
     <button class="sb-item" data-view="campaigns"><span class="si-icon">🚀</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
+    <button class="sb-item" data-view="ads-manager"><span class="si-icon">📢</span> Ads Manager <span class="si-badge orange" id="badgeAds">0</span></button>
     <button class="sb-item" data-view="payments"><span class="si-icon">💳</span> Transactions <span class="si-badge" id="badgePayments">0</span></button>
     <button class="sb-item" data-view="one-club"><span class="si-icon">◉</span> One Club</button>
     <button class="sb-item" data-view="gift-cards"><span class="si-icon">🎁</span> Gift Cards</button>
@@ -939,6 +940,22 @@
         </table>
       </div>
     </div>
+  </div>
+
+  <div class="view" data-view="ads-manager">
+    <div style="background:linear-gradient(135deg,#21144a 0%,#6437d9 65%,#9d67ef 100%);border-radius:22px;padding:1.7rem 2rem;color:#fff;margin-bottom:1rem;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8;">Advertiser operations</div>
+      <h1 style="font-size:1.8rem;margin:.35rem 0;">Ads Manager</h1>
+      <div style="opacity:.8">Review campaigns, preview uploaded creatives, check package payments, and update approval status.</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-icon">📣</div><div class="stat-label">Ad submissions</div><div class="stat-value" id="adminAdCount">0</div></div>
+      <div class="stat-card orange"><div class="stat-icon">⏳</div><div class="stat-label">Needs review</div><div class="stat-value" id="adminAdPending">0</div></div>
+      <div class="stat-card green"><div class="stat-icon">✓</div><div class="stat-label">Approved</div><div class="stat-value" id="adminAdApproved">0</div></div>
+      <div class="stat-card blue"><div class="stat-icon">💳</div><div class="stat-label">Package payments</div><div class="stat-value" id="adminAdRevenue">₹0</div></div>
+    </div>
+    <div class="card"><div class="card-head"><h2>Advertiser campaigns and creative review</h2><p>Preview the uploaded asset before approving or requesting changes.</p></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Advertiser</th><th>Campaign</th><th>Platform / goal</th><th>Creative preview</th><th>Package / payment</th><th>Status</th><th>Review</th></tr></thead><tbody id="adminAdsTable"><tr><td colspan="7">Loading campaigns…</td></tr></tbody></table></div></div>
+    <div class="card"><div class="card-head"><h2>Ad package purchases</h2><p>Successful payments are recorded after server-side Razorpay verification.</p></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Advertiser UID</th><th>Package</th><th>Payment ID</th><th>Amount</th><th>Date</th></tr></thead><tbody id="adminAdOrders"><tr><td colspan="5">Loading purchases…</td></tr></tbody></table></div></div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -1620,6 +1637,7 @@ const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', marketing:'Marketing', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
   campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
+  'ads-manager':'Ads Manager',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
   restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', 'site-visibility':'Content Visibility', settings:'Platform Settings'
 };
@@ -1629,6 +1647,7 @@ window.showView = function(name) {
   document.getElementById('pageTitle').textContent = viewTitles[name] || name;
   if(name==='analytics') renderAnalytics();
   if(name==='marketing') renderMarketing();
+  if(name==='ads-manager') renderAdsManager();
   if(name==='new-listers') renderNewListers();
   if(name==='credits') renderCreditsView();
   if(name==='one-club'||name==='gift-cards') loadOneClubAdminData();
@@ -2098,6 +2117,17 @@ function renderCampaignsTable(campaigns) {
   </tr>`).join('');
 }
 
+async function renderAdsManager(){
+  const campaigns=allCampaigns.filter(c=>c.type==='ad_campaign');
+  document.getElementById('adminAdCount').textContent=campaigns.length;
+  document.getElementById('adminAdPending').textContent=campaigns.filter(c=>['pending_review','submitted','review'].includes(c.status)).length;
+  document.getElementById('adminAdApproved').textContent=campaigns.filter(c=>['approved','active'].includes(c.status)).length;
+  const tbody=document.getElementById('adminAdsTable');
+  tbody.innerHTML=campaigns.length?campaigns.map(c=>`<tr><td>${esc(c.advertiserEmail||c.ownerId||'—')}<div style="font-size:.65rem;color:var(--muted)">${esc(c.ownerId||'')}</div></td><td><strong>${esc(c.name||'Untitled')}</strong><div style="font-size:.68rem;color:var(--muted);max-width:200px;white-space:normal">${esc(c.description||'')}</div></td><td>${esc(c.platform||'—')}<div style="font-size:.68rem;color:var(--muted)">${esc(c.goal||'—')} · ${esc(c.startDate||'')}</div></td><td>${c.creativeUrl?`<a href="${esc(c.creativeUrl)}" target="_blank" rel="noopener">${String(c.creativeType||'').startsWith('video/')?'<video controls style="max-width:120px;max-height:80px;border-radius:8px"><source src="'+esc(c.creativeUrl)+'" type="'+esc(c.creativeType)+'"></video>':'<img src="'+esc(c.creativeUrl)+'" alt="Creative preview" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:8px">'}</a>`:'No creative uploaded'}</td><td>${esc(c.packageName||c.packageId||'Not purchased')}${c.paymentId?`<div style="font-size:.65rem;color:var(--muted)">${esc(c.paymentId)}</div>`:''}</td><td><span class="badge ${c.status==='approved'||c.status==='active'?'green':c.status==='rejected'?'red':'orange'}">${esc((c.status||'draft').replaceAll('_',' '))}</span>${c.reviewNote?`<div style="font-size:.68rem;color:#b42318">${esc(c.reviewNote)}</div>`:''}</td><td><div style="display:grid;gap:5px;min-width:120px"><input id="adReviewNote-${esc(c.id)}" placeholder="Review note" style="width:130px;padding:.35rem;border:1px solid var(--border);border-radius:6px;font-size:.68rem"><button class="btn sm success" onclick="reviewAdCampaign('${esc(c.id)}','approved')">Approve</button><button class="btn sm danger" onclick="reviewAdCampaign('${esc(c.id)}','rejected')">Request changes</button></div></td></tr>`).join(''):'<tr><td colspan="7">No advertiser campaigns have been submitted.</td></tr>';
+  try{const snap=await getDocs(query(collection(db,'adPackageOrders'),orderBy('createdAt','desc'),limit(200)));const orders=snap.docs.map(d=>({id:d.id,...d.data()}));document.getElementById('adminAdRevenue').textContent=money(orders.reduce((sum,o)=>sum+Number(o.amount||0),0));document.getElementById('adminAdOrders').innerHTML=orders.length?orders.map(o=>`<tr><td>${esc(o.ownerId||'—')}</td><td>${esc(o.packageId||'—')}</td><td>${esc(o.paymentId||o.id)}</td><td>${money(o.amount)}</td><td>${fmtDate(o.createdAt)}</td></tr>`).join(''):'<tr><td colspan="5">No ad packages purchased.</td></tr>'}catch(error){document.getElementById('adminAdOrders').innerHTML=`<tr><td colspan="5">Could not load package orders: ${esc(error.message)}</td></tr>`}
+}
+window.reviewAdCampaign=async function(id,status){const note=(document.getElementById(`adReviewNote-${id}`)?.value||'').trim();try{await updateDoc(doc(db,'campaigns',id),{status,reviewNote:note,reviewedAt:serverTimestamp(),reviewedBy:auth.currentUser?.uid||''});showToast(status==='approved'?'Campaign approved.':'Changes requested.','success')}catch(error){showToast(error.message||'Could not update campaign review.','error')}};
+
 function renderMarketing(){
   const paymentsById=new Map(allPayments.map(p=>[p.id,p]));
   const bookings=[...new Map([...allBookingsCol,...allPayments].map(b=>[b.id,b])).values()]
@@ -2535,10 +2565,12 @@ onSnapshot(query(collection(db,'campaigns'),orderBy('createdAt','desc'),limit(10
   renderCampaignsTable(allCampaigns);
   updateStats();
   renderMarketing();
+  if(document.querySelector('.view[data-view="ads-manager"]')) renderAdsManager();
 }, error => {
   console.warn('Campaigns snapshot error:', error);
   allCampaigns = [];
   renderCampaignsTable([]);
+  if(document.querySelector('.view[data-view="ads-manager"]')) renderAdsManager();
 });
 
 onSnapshot(query(collection(db,'leads'),orderBy('createdAt','desc'),limit(200)), snap => {

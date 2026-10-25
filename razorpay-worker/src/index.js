@@ -127,6 +127,18 @@ async function hasValidSignature(orderId, paymentId, signature, secret) {
 async function createOrder(request, env) {
   const body = await request.json();
   const amount = Number(body.amount);
+  const adPackages = {starter: 49900, growth: 149900, spotlight: 299900};
+  const adPackage = clean(body.adPackage, 32);
+  let adBuyer = null;
+  if (adPackage) {
+    adBuyer = await authenticatedUser(request, env);
+    if (!adBuyer || adBuyer.uid !== clean(body.ownerId, 128)) {
+      return json({ success: false, error: "Sign in to purchase an advertising package." }, 401);
+    }
+    if (adPackages[adPackage] !== amount) {
+      return json({ success: false, error: "The selected advertising package or price is invalid." }, 400);
+    }
+  }
   if (!Number.isSafeInteger(amount) || amount < 100 || amount > 500000000) {
     return json({ success: false, error: "Payment amount is invalid." }, 400);
   }
@@ -166,6 +178,7 @@ async function createOrder(request, env) {
       currency: "INR",
       receipt,
       notes: {
+        ...(adPackage ? { adPackage, adOwnerId: adBuyer.uid } : {}),
         eventId: clean(event.id, 120),
         eventName: clean(event.name, 200),
         customerName: clean(customer.name),
@@ -218,6 +231,31 @@ async function verifyPayment(request, env) {
   }
   if (finalPayment.status !== "captured") {
     return json({ success: false, verified: false, error: "Razorpay has not confirmed a captured payment." }, 400);
+  }
+  if (order.notes?.adPackage) {
+    const adPackages = {starter: 49900, growth: 149900, spotlight: 299900};
+    const ownerId = clean(order.notes.adOwnerId, 128);
+    const user = await authenticatedUser(request, env);
+    if (!user || user.uid !== ownerId || adPackages[order.notes.adPackage] !== Number(finalPayment.amount)) {
+      return json({ success: false, verified: false, error: "Advertising package payment does not match this account or package." }, 403);
+    }
+    const firestoreToken = await firestoreAccessToken(env);
+    const purchase = {
+      ownerId, packageId: order.notes.adPackage, amount: Number(finalPayment.amount) / 100,
+      currency: order.currency, paymentId, status: "paid",
+      createdAt: { __firestoreTimestamp: new Date().toISOString() },
+    };
+    await patchFirestoreDocument(env, "adPackageOrders", paymentId, purchase, firestoreToken);
+    await patchFirestoreDocument(env, "payments", paymentId, {
+      bookingId: paymentId, receipt: order.receipt || paymentId,
+      eventName: `${order.notes.adPackage} advertising package`, amount: Number(finalPayment.amount) / 100,
+      currency: order.currency, status: "paid", paymentId,
+      paymentMethod: finalPayment.method || "Razorpay", customerName: clean(order.notes?.customerName),
+      customerEmail: clean(order.notes?.customerEmail, 180).toLowerCase(),
+      createdAt: { __firestoreTimestamp: new Date().toISOString() },
+      paidAt: { __firestoreTimestamp: new Date().toISOString() },
+    }, firestoreToken);
+    return json({ success: true, verified: true, method: finalPayment.method || "Razorpay", packageId: order.notes.adPackage });
   }
   const booking = body.booking || {};
   const bookingId = clean(booking.bookingId, 100);
