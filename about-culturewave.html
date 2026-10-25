@@ -12,65 +12,215 @@
   <meta property="og:description" content="A place to discover events, dining and cultural experiences—and bring people together."/>
   <meta property="og:url" content="https://culturewave.in/about-culturewave.html"/>
   <meta property="og:image" content="https://culturewave.in/herosection.jpeg"/>
-  <meta name="theme-color" content="#100d16"/>
+  <meta name="theme-color" content="#080a10"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,500;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="marketing-pages.css?v=full-width-neat-20261021">
   <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022">
   <style>
-    :root{color-scheme:dark;--about-bg:#100d16;--about-panel:#19151f;--about-border:#ffffff14;--about-muted:#b5adbf;--about-lilac:#d4b8ff;--about-violet:#8c57d1}
-    body{margin:0;background:var(--about-bg);color:#f7f3fb;font-family:Inter,system-ui,sans-serif}
-    .about-main{overflow:hidden;background:radial-gradient(ellipse at 82% 0,#4b287733,transparent 34%),radial-gradient(ellipse at 12% 33%,#2b1b3a33,transparent 28%),var(--about-bg)}
-    .about-wrap{width:min(1120px,calc(100% - 40px));margin-inline:auto}
-    .about-hero{position:relative;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(290px,.9fr);align-items:center;gap:clamp(2rem,7vw,6rem);min-height:530px;padding:78px 0 70px}
-    .about-hero-copy{position:relative;z-index:1;max-width:650px}
-    .about-eyebrow{display:inline-flex;align-items:center;gap:9px;color:#cfb2f8;font-size:.68rem;font-weight:800;letter-spacing:.19em;text-transform:uppercase}
-    .about-eyebrow:before{width:24px;height:1px;background:#b38ae8;content:""}
-    .about-hero h1{margin:20px 0 18px;font-size:clamp(2.9rem,6.5vw,5.4rem);font-weight:700;line-height:.99;letter-spacing:-.075em;color:#fbf8ff}
-    .about-hero h1 em{color:#c69df4;font-family:"Playfair Display",Georgia,serif;font-weight:500;letter-spacing:-.055em}
-    .about-lead{max-width:570px;margin:0;color:#c1b9ca;font-size:clamp(.98rem,1.5vw,1.12rem);line-height:1.8}
-    .about-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
-    .about-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 19px;border:1px solid #ffffff20;border-radius:13px;background:#ffffff08;color:#f5effb;font-size:.86rem;font-weight:750;text-decoration:none;transition:transform .18s,border-color .18s,background .18s}
-    .about-button:hover{transform:translateY(-2px);border-color:#c9a2f977;background:#ffffff10}
-    .about-button.primary{border-color:#a778e3;background:linear-gradient(135deg,#9a64dc,#6f42b0);box-shadow:0 10px 28px #713fae40;color:#fff}
-    .about-art{position:relative;display:grid;place-items:center;min-height:350px}
-    .about-orb{position:absolute;width:min(31vw,350px);aspect-ratio:1;border:1px solid #d5b3ff2a;border-radius:50%;background:radial-gradient(circle at 35% 30%,#cc9fff55,transparent 29%),radial-gradient(circle at 68% 70%,#653b9670,transparent 46%),linear-gradient(145deg,#392454,#17121e 70%);box-shadow:inset 0 1px #ffffff1a,0 35px 100px #0008,0 0 70px #8f58c622}
-    .about-orb:before,.about-orb:after{position:absolute;inset:13%;border:1px solid #eedaff2b;border-radius:50%;content:""}
-    .about-orb:after{inset:27%;border-color:#eedaff20}
-    .about-monogram{position:relative;display:grid;place-items:center;width:166px;aspect-ratio:1;border:1px solid #f0dcff53;border-radius:38% 62% 55% 45% / 48% 42% 58% 52%;background:linear-gradient(145deg,#ffffff17,#ffffff04);box-shadow:inset 0 1px #ffffff22,0 18px 55px #0006;color:#f4e8ff;font-family:"Playfair Display",Georgia,serif;font-size:3.7rem;font-style:italic;letter-spacing:-.1em;transform:rotate(-9deg)}
-    .about-monogram:after{position:absolute;right:17px;bottom:15px;color:#d7b6ff;font-family:Inter,system-ui,sans-serif;font-size:.5rem;font-style:normal;font-weight:800;letter-spacing:.15em;content:"CW"}
-    .about-float{position:absolute;display:flex;align-items:center;gap:10px;padding:12px 15px;border:1px solid #ffffff1c;border-radius:15px;background:#201b28dc;box-shadow:0 15px 36px #0006;backdrop-filter:blur(14px);color:#eee7f4;font-size:.75rem;font-weight:700}
-    .about-float span{display:grid;place-items:center;width:30px;height:30px;border:1px solid #bd96ed3b;border-radius:10px;background:#8c57d122;color:#dcbdff;font-size:1rem}
-    .about-float.one{top:17%;right:-1%}.about-float.two{bottom:16%;left:-4%}
-    .about-section{padding:76px 0;border-top:1px solid #ffffff0e}
-    .about-section-head{max-width:680px;margin:0 auto 34px;text-align:center}
-    .about-section-head .about-eyebrow{justify-content:center}
-    .about-section h2{margin:14px 0 10px;color:#faf7fd;font-size:clamp(1.8rem,4vw,2.65rem);font-weight:700;letter-spacing:-.055em}
-    .about-section-head p{margin:0;color:var(--about-muted);font-size:.95rem;line-height:1.75}
-    .about-pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-    .about-pillar{position:relative;min-height:220px;padding:24px;border:1px solid var(--about-border);border-radius:20px;background:linear-gradient(145deg,#ffffff09,#ffffff03);box-shadow:inset 0 1px #ffffff08;overflow:hidden}
-    .about-pillar:after{position:absolute;right:-70px;bottom:-95px;width:190px;height:190px;border-radius:50%;background:#995dd511;filter:blur(18px);content:""}
-    .about-icon{display:grid;place-items:center;width:43px;height:43px;margin-bottom:24px;border:1px solid #c39aef35;border-radius:14px;background:linear-gradient(145deg,#8955c62b,#3f2a522b);color:#dfc5ff;font-size:1.15rem}
-    .about-pillar h3{margin:0 0 9px;color:#f6f0fb;font-size:1.03rem;letter-spacing:-.025em}
-    .about-pillar p{max-width:330px;margin:0;color:#b7afc0;font-size:.84rem;line-height:1.75}
-    .about-journey{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(2rem,7vw,6rem);align-items:start;padding:30px;border:1px solid #ffffff14;border-radius:24px;background:linear-gradient(135deg,#241a30,#17131c 75%);box-shadow:0 22px 60px #0003}
-    .about-journey h2{margin:8px 0 0;font-size:clamp(1.8rem,4vw,2.5rem);letter-spacing:-.055em;line-height:1.1}
-    .about-journey-copy{color:#c0b8c9;font-size:.92rem;line-height:1.8}
-    .about-journey-copy p{margin:0 0 14px}
-    .about-journey-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-    .about-journey-links a{color:#dfc7ff;font-size:.82rem;font-weight:750;text-decoration:none}
-    .about-journey-links a:hover{text-decoration:underline;text-underline-offset:4px}
-    .about-footer{padding:26px 0 calc(26px + env(safe-area-inset-bottom));border-top:1px solid #ffffff12;background:#0c0a10;color:#a9a2b1}
-    .about-footer-inner{display:flex;justify-content:space-between;align-items:center;gap:20px}
-    .about-footer-brand{color:#f5effa;font-size:.95rem;font-weight:800;letter-spacing:-.03em}
-    .about-footer-note{margin-top:5px;font-size:.72rem}
-    .about-footer-links{display:flex;flex-wrap:wrap;gap:18px}
-    .about-footer-links a{color:#bdb5c7;font-size:.76rem;text-decoration:none}
-    .about-footer-links a:hover{color:#e2caff}
-    @media(max-width:760px){.about-wrap{width:min(100% - 32px,600px)}.about-hero{grid-template-columns:1fr;gap:5px;min-height:0;padding:64px 0 44px}.about-hero h1{font-size:clamp(3rem,13vw,4.3rem)}.about-art{min-height:255px;margin-top:6px}.about-orb{width:min(66vw,260px)}.about-monogram{width:125px;font-size:2.9rem}.about-float.one{top:11%;right:1%}.about-float.two{bottom:9%;left:0}.about-section{padding:54px 0}.about-pillars{grid-template-columns:1fr;gap:11px}.about-pillar{min-height:0;padding:19px}.about-icon{margin-bottom:15px}.about-journey{grid-template-columns:1fr;gap:18px;padding:22px;border-radius:20px}.about-footer-inner{align-items:flex-start;flex-direction:column}.about-footer-links{gap:14px}}
-    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+    :root{color-scheme:dark}
+    *{box-sizing:border-box}
+    body{margin:0;background:#080a10;color:#f0ecf8;font-family:Inter,system-ui,sans-serif}
+
+    /* ── NAV OVERRIDE ── */
+    .topbar,.mobile-nav{background:#0b0d14!important;border-color:#1e2330!important}
+    .topnav a{color:#d0d6e8!important}
+    .brand-sub{color:#8892aa!important}
+
+    /* ── HERO ── */
+    .ab-hero{
+      position:relative;overflow:hidden;
+      background:radial-gradient(ellipse at 75% -10%,#4a1f8a44,transparent 42%),
+        radial-gradient(ellipse at 8% 90%,#1a0f3344,transparent 38%),#080a10;
+      padding:120px 0 100px;text-align:center;
+    }
+    .ab-hero::before{
+      content:'';position:absolute;inset:0;
+      background:url('herosection.jpeg') center/cover no-repeat;
+      opacity:.07;pointer-events:none;
+    }
+    .ab-wrap{width:min(1160px,calc(100% - 48px));margin-inline:auto;position:relative;z-index:1}
+    .ab-eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(168,120,255,.12);border:1px solid rgba(168,120,255,.3);
+      border-radius:999px;padding:.32rem 1rem;
+      font-size:.72rem;font-weight:800;color:#c9a0ff;letter-spacing:.16em;text-transform:uppercase;
+      margin-bottom:1.6rem;
+    }
+    .ab-hero h1{
+      margin:0 auto 1.4rem;max-width:820px;
+      font-size:clamp(3rem,7vw,6rem);font-weight:900;line-height:.96;
+      letter-spacing:-.07em;color:#fff;
+    }
+    .ab-hero h1 em{
+      font-family:'Playfair Display',Georgia,serif;font-style:italic;font-weight:700;
+      background:linear-gradient(135deg,#c084fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .ab-hero-sub{
+      max-width:580px;margin:0 auto 2.4rem;
+      color:#a8b0c4;font-size:1.1rem;line-height:1.8;
+    }
+    .ab-hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .ab-btn-primary{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:.85rem 1.8rem;border-radius:14px;
+      background:linear-gradient(135deg,#7c3aed,#4f46e5);
+      color:#fff;font-size:.92rem;font-weight:800;text-decoration:none;
+      box-shadow:0 10px 32px rgba(124,58,237,.35);
+      transition:transform .18s,box-shadow .18s;
+    }
+    .ab-btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(124,58,237,.45)}
+    .ab-btn-ghost{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:.85rem 1.8rem;border-radius:14px;
+      border:1.5px solid #ffffff20;background:#ffffff08;
+      color:#e0d8f0;font-size:.92rem;font-weight:700;text-decoration:none;
+      transition:border-color .18s,background .18s,transform .18s;
+    }
+    .ab-btn-ghost:hover{border-color:#a78bfa55;background:#ffffff12;transform:translateY(-2px)}
+
+    /* ── STATS STRIP ── */
+    .ab-stats{
+      display:grid;grid-template-columns:repeat(4,1fr);
+      border:1px solid #ffffff10;border-radius:24px;
+      background:linear-gradient(135deg,#12101a,#0e0c16);
+      overflow:hidden;margin:5rem 0 0;
+    }
+    .ab-stat{
+      padding:2rem 1.5rem;text-align:center;
+      border-right:1px solid #ffffff0e;
+    }
+    .ab-stat:last-child{border-right:0}
+    .ab-stat-val{font-size:2.6rem;font-weight:900;letter-spacing:-.06em;color:#fff;line-height:1}
+    .ab-stat-val span{background:linear-gradient(135deg,#c084fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .ab-stat-lbl{margin-top:.5rem;font-size:.78rem;font-weight:700;color:#7a829a;letter-spacing:.06em;text-transform:uppercase}
+
+    /* ── SECTION ── */
+    .ab-section{padding:96px 0;border-top:1px solid #ffffff0a}
+    .ab-section-head{text-align:center;margin-bottom:3.5rem}
+    .ab-section-head h2{margin:.8rem 0 .8rem;font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.055em;color:#f5f0fc}
+    .ab-section-head p{margin:0 auto;max-width:520px;color:#8892aa;font-size:.98rem;line-height:1.75}
+
+    /* ── PILLARS ── */
+    .ab-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+    .ab-pillar{
+      padding:2rem;border:1px solid #ffffff0f;border-radius:22px;
+      background:linear-gradient(145deg,#13111a,#0f0d15);
+      box-shadow:0 12px 36px #0004;
+      transition:transform .2s,border-color .2s,box-shadow .2s;
+    }
+    .ab-pillar:hover{transform:translateY(-5px);border-color:#7c3aed44;box-shadow:0 20px 50px #0006}
+    .ab-pillar-icon{
+      width:50px;height:50px;border-radius:15px;margin-bottom:1.4rem;
+      display:grid;place-items:center;font-size:1.4rem;
+      background:linear-gradient(135deg,#7c3aed22,#4f46e522);
+      border:1px solid #7c3aed33;
+    }
+    .ab-pillar h3{margin:0 0 .6rem;font-size:1.05rem;font-weight:800;color:#f0ecf8;letter-spacing:-.02em}
+    .ab-pillar p{margin:0;color:#8892aa;font-size:.88rem;line-height:1.75}
+
+    /* ── STORY SPLIT ── */
+    .ab-story{
+      display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;
+      padding:3.5rem;border:1px solid #ffffff0f;border-radius:28px;
+      background:radial-gradient(ellipse at 90% 10%,#4a1f8a22,transparent 45%),linear-gradient(145deg,#13111a,#0d0b13);
+      box-shadow:0 24px 64px #0005;
+    }
+    .ab-story-label{font-size:.7rem;font-weight:800;color:#a78bfa;letter-spacing:.18em;text-transform:uppercase;margin-bottom:1rem}
+    .ab-story h2{margin:0 0 1.4rem;font-size:clamp(1.9rem,3.5vw,2.8rem);font-weight:800;letter-spacing:-.055em;line-height:1.1;color:#f5f0fc}
+    .ab-story h2 span{color:#c084fc}
+    .ab-story-body{color:#8892aa;font-size:.95rem;line-height:1.85}
+    .ab-story-body p{margin:0 0 1rem}
+    .ab-story-links{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.8rem}
+    .ab-story-link{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:.5rem 1.1rem;border-radius:10px;
+      border:1px solid #ffffff15;background:#ffffff08;
+      color:#c4b5fd;font-size:.82rem;font-weight:700;text-decoration:none;
+      transition:border-color .18s,background .18s;
+    }
+    .ab-story-link:hover{border-color:#a78bfa55;background:#ffffff12}
+    .ab-story-visual{
+      display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+    }
+    .ab-story-card{
+      padding:1.4rem;border:1px solid #ffffff0f;border-radius:18px;
+      background:linear-gradient(145deg,#1a1624,#110f18);
+      text-align:center;
+    }
+    .ab-story-card-icon{font-size:1.8rem;margin-bottom:.6rem}
+    .ab-story-card strong{display:block;font-size:.92rem;font-weight:800;color:#f0ecf8;margin-bottom:.25rem}
+    .ab-story-card span{font-size:.78rem;color:#7a829a}
+
+    /* ── VALUES ── */
+    .ab-values{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+    .ab-value{
+      padding:1.8rem 1.4rem;border:1px solid #ffffff0f;border-radius:20px;
+      background:linear-gradient(145deg,#13111a,#0f0d15);
+      text-align:center;
+    }
+    .ab-value-num{font-size:2.5rem;font-weight:900;letter-spacing:-.06em;margin-bottom:.5rem;background:linear-gradient(135deg,#c084fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .ab-value h4{margin:0 0 .4rem;font-size:.92rem;font-weight:800;color:#f0ecf8}
+    .ab-value p{margin:0;font-size:.8rem;color:#7a829a;line-height:1.65}
+
+    /* ── TEAM BANNER ── */
+    .ab-team{
+      padding:3.5rem;border-radius:28px;text-align:center;
+      background:linear-gradient(135deg,#7c3aed,#4f46e5);
+      box-shadow:0 24px 64px rgba(124,58,237,.3);
+      position:relative;overflow:hidden;
+    }
+    .ab-team::before{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.1),transparent 50%);
+      pointer-events:none;
+    }
+    .ab-team h2{margin:0 0 .8rem;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:900;letter-spacing:-.055em;color:#fff}
+    .ab-team p{margin:0 auto 2rem;max-width:520px;color:rgba(255,255,255,.75);font-size:1rem;line-height:1.75}
+    .ab-team-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .ab-team-btn{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:.85rem 1.8rem;border-radius:14px;
+      background:#fff;color:#4f46e5;
+      font-size:.92rem;font-weight:800;text-decoration:none;
+      transition:transform .18s,box-shadow .18s;
+    }
+    .ab-team-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.2)}
+    .ab-team-btn.ghost{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)}
+    .ab-team-btn.ghost:hover{background:rgba(255,255,255,.22)}
+
+    /* ── FOOTER ── */
+    .ab-footer{
+      padding:2rem 0 calc(2rem + env(safe-area-inset-bottom));
+      border-top:1px solid #ffffff0e;background:#060810;
+    }
+    .ab-footer-inner{display:flex;justify-content:space-between;align-items:center;gap:1.5rem;flex-wrap:wrap}
+    .ab-footer-brand{font-size:.95rem;font-weight:800;color:#f0ecf8;letter-spacing:-.02em}
+    .ab-footer-note{margin-top:4px;font-size:.72rem;color:#5a6278}
+    .ab-footer-links{display:flex;flex-wrap:wrap;gap:1.2rem}
+    .ab-footer-links a{color:#7a829a;font-size:.76rem;text-decoration:none;transition:color .15s}
+    .ab-footer-links a:hover{color:#c4b5fd}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:960px){
+      .ab-stats{grid-template-columns:repeat(2,1fr)}
+      .ab-stat:nth-child(2){border-right:0}
+      .ab-stat:nth-child(3){border-top:1px solid #ffffff0e}
+      .ab-pillars{grid-template-columns:1fr 1fr}
+      .ab-story{grid-template-columns:1fr;gap:2.5rem;padding:2rem}
+      .ab-values{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:600px){
+      .ab-hero{padding:90px 0 70px}
+      .ab-stats{grid-template-columns:1fr 1fr}
+      .ab-pillars{grid-template-columns:1fr}
+      .ab-story-visual{grid-template-columns:1fr 1fr}
+      .ab-values{grid-template-columns:1fr 1fr}
+      .ab-team{padding:2.2rem 1.4rem}
+      .ab-section{padding:64px 0}
+    }
   </style>
 </head>
 <body>
@@ -80,57 +230,239 @@
         <span class="logo">CultureWave</span><span class="brand-sub">by OGSHOOTS LUXE</span>
       </a>
       <nav class="topnav" aria-label="Main navigation">
-        <a href="events.html">Events</a><a href="restaurants.html">Dining</a><a href="category-experiences.html">Experiences</a><a href="how-it-works.html">How it works</a>
+        <a href="events.html">Events</a>
+        <a href="restaurants.html">Dining</a>
+        <a href="features.html">For Organizers</a>
+        <a href="how-it-works.html">How it works</a>
       </nav>
       <div class="auth-actions"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="events.html">Explore events</a></div>
       <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </header>
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
-    <a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Dining</a><a href="category-experiences.html">Experiences</a><a href="how-it-works.html">How it works</a>
+    <a href="index.html">Home</a><a href="events.html">Events</a><a href="restaurants.html">Dining</a><a href="features.html">For Organizers</a><a href="how-it-works.html">How it works</a>
     <div class="mobile-nav-ctas"><a class="nav-link" href="login.html">Login</a><a class="nav-cta" href="events.html">Explore events</a></div>
   </nav>
 
-  <main class="about-main">
-    <section class="about-wrap about-hero">
-      <div class="about-hero-copy">
-        <div class="about-eyebrow">About CultureWave</div>
-        <h1>Make room for<br><em>more moments.</em></h1>
-        <p class="about-lead">CultureWave brings events, dining and cultural experiences together in one place—making it easier to find something you love and share it with the people who matter.</p>
-        <div class="about-actions"><a class="about-button primary" href="events.html">Explore experiences <span aria-hidden="true">↗</span></a><a class="about-button" href="how-it-works.html">How CultureWave works <span aria-hidden="true">→</span></a></div>
-      </div>
-      <div class="about-art" aria-hidden="true">
-        <div class="about-orb"></div><div class="about-monogram">C</div>
-        <div class="about-float one"><span>✦</span>Find your next favourite</div>
-        <div class="about-float two"><span>◉</span>Make it a shared moment</div>
-      </div>
-    </section>
+  <main>
 
-    <section class="about-section">
-      <div class="about-wrap">
-        <header class="about-section-head"><div class="about-eyebrow">What brings us together</div><h2>Experiences, made easier to find.</h2><p>From the first idea to the day you go, CultureWave helps bring the pieces of a great outing together.</p></header>
-        <div class="about-pillars">
-          <article class="about-pillar"><div class="about-icon" aria-hidden="true">✦</div><h3>Discover something new</h3><p>Explore live events, music, workshops, dining and other experiences in one place.</p></article>
-          <article class="about-pillar"><div class="about-icon" aria-hidden="true">↗</div><h3>Plan with confidence</h3><p>Review event details, choose your tickets and keep your booking information close at hand.</p></article>
-          <article class="about-pillar"><div class="about-icon" aria-hidden="true">＋</div><h3>Bring people together</h3><p>Find moments to share, give a CultureWave gift card, or bring your own event to the community.</p></article>
+    <!-- HERO -->
+    <section class="ab-hero">
+      <div class="ab-wrap">
+        <div class="ab-eyebrow">✦ About CultureWave</div>
+        <h1>Where every experience<br>becomes <em>unforgettable.</em></h1>
+        <p class="ab-hero-sub">CultureWave is India's premium events and experiences platform — connecting people to live music, dining, workshops, and cultural moments that matter.</p>
+        <div class="ab-hero-actions">
+          <a class="ab-btn-primary" href="events.html">Explore Events ↗</a>
+          <a class="ab-btn-ghost" href="how-it-works.html">How it works →</a>
+        </div>
+        <div class="ab-stats">
+          <div class="ab-stat">
+            <div class="ab-stat-val"><span id="liveCount">—</span></div>
+            <div class="ab-stat-lbl">Live Events</div>
+          </div>
+          <div class="ab-stat">
+            <div class="ab-stat-val"><span id="ticketCount">—</span></div>
+            <div class="ab-stat-lbl">Tickets Booked</div>
+          </div>
+          <div class="ab-stat">
+            <div class="ab-stat-val"><span>6+</span></div>
+            <div class="ab-stat-lbl">Payment Methods</div>
+          </div>
+          <div class="ab-stat">
+            <div class="ab-stat-val"><span>100%</span></div>
+            <div class="ab-stat-lbl">Uptime</div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="about-section" style="padding-top:0">
-      <div class="about-wrap about-journey">
-        <div><div class="about-eyebrow">A little about us</div><h2>Made for the moments outside the routine.</h2></div>
-        <div class="about-journey-copy"><p>Some of the best memories start with a simple question: “What should we do?” CultureWave is here to make that answer easier—whether you’re looking for a night out, a new place to eat, a creative workshop or a reason to celebrate.</p><p>We also give event organisers tools to share their experiences and help guests find the details they need to take part.</p><div class="about-journey-links"><a href="vendor-onboarding.html">For event organisers&nbsp; →</a><a href="buy-gift-card.html">CultureWave Gift Cards&nbsp; →</a><a href="customer-service.html">Contact us&nbsp; →</a></div></div>
+    <!-- PILLARS -->
+    <section class="ab-section">
+      <div class="ab-wrap">
+        <header class="ab-section-head">
+          <div class="ab-eyebrow">What we do</div>
+          <h2>Built for experiences that bring people together</h2>
+          <p>From discovery to the door — CultureWave handles every step of the journey.</p>
+        </header>
+        <div class="ab-pillars">
+          <article class="ab-pillar">
+            <div class="ab-pillar-icon">🎟️</div>
+            <h3>Discover & Book</h3>
+            <p>Browse live events, music nights, workshops, dining and cultural experiences — all in one place. Book in seconds with instant confirmation.</p>
+          </article>
+          <article class="ab-pillar">
+            <div class="ab-pillar-icon">💳</div>
+            <h3>Seamless Payments</h3>
+            <p>UPI, cards, wallets, net banking, EMI and QR — powered by Razorpay for a fast, secure checkout every time.</p>
+          </article>
+          <article class="ab-pillar">
+            <div class="ab-pillar-icon">📊</div>
+            <h3>Organizer Tools</h3>
+            <p>Publish events, manage bookings, track attendance and grow your audience with powerful tools built for Indian event organizers.</p>
+          </article>
+          <article class="ab-pillar">
+            <div class="ab-pillar-icon">🎫</div>
+            <h3>Smart Ticketing</h3>
+            <p>QR-coded tickets delivered instantly. Multiple ticket types, group discounts, coupon codes and time slots — all configurable.</p>
+          </article>
+          <article class="ab-pillar">
+            <div class="ab-pillar-icon">🔔</div>
+            <h3>Stay Connected</h3>
+            <p>WhatsApp reminders, email confirmations and push notifications keep guests informed from booking to event day.</p>
+          </article>
+          <article class="ab-pillar">
+            <div class="ab-pillar-icon">🛡️</div>
+            <h3>Trusted & Secure</h3>
+            <p>Every transaction is protected. Clear refund policies, verified organizers and dedicated support you can count on.</p>
+          </article>
+        </div>
       </div>
     </section>
+
+    <!-- STORY -->
+    <section class="ab-section" style="padding-top:0">
+      <div class="ab-wrap">
+        <div class="ab-story">
+          <div>
+            <div class="ab-story-label">Our story</div>
+            <h2>Made for the moments <span>outside the routine.</span></h2>
+            <div class="ab-story-body">
+              <p>Some of the best memories start with a simple question: "What should we do?" CultureWave was built to make that answer easier — whether you're looking for a night out, a new place to eat, a creative workshop or a reason to celebrate.</p>
+              <p>We started in Vijayawada with a vision to make premium cultural experiences accessible to everyone. Today we power events across India, giving organizers the tools to share their passion and guests the confidence to show up.</p>
+              <p>We're part of OGSHOOTS LUXE — a creative studio that believes in building things that last.</p>
+            </div>
+            <div class="ab-story-links">
+              <a class="ab-story-link" href="vendor-onboarding.html">For Organizers →</a>
+              <a class="ab-story-link" href="buy-gift-card.html">Gift Cards →</a>
+              <a class="ab-story-link" href="customer-service.html">Contact us →</a>
+            </div>
+          </div>
+          <div class="ab-story-visual">
+            <div class="ab-story-card">
+              <div class="ab-story-card-icon">🎵</div>
+              <strong>Live Music</strong>
+              <span>Curated nights</span>
+            </div>
+            <div class="ab-story-card">
+              <div class="ab-story-card-icon">🍽️</div>
+              <strong>Dining</strong>
+              <span>Premium venues</span>
+            </div>
+            <div class="ab-story-card">
+              <div class="ab-story-card-icon">🎨</div>
+              <strong>Workshops</strong>
+              <span>Learn & create</span>
+            </div>
+            <div class="ab-story-card">
+              <div class="ab-story-card-icon">🎉</div>
+              <strong>Experiences</strong>
+              <span>Unforgettable</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VALUES -->
+    <section class="ab-section" style="padding-top:0">
+      <div class="ab-wrap">
+        <header class="ab-section-head">
+          <div class="ab-eyebrow">Why CultureWave</div>
+          <h2>Everything you need, nothing you don't</h2>
+          <p>Simple, powerful and built for India.</p>
+        </header>
+        <div class="ab-values">
+          <div class="ab-value">
+            <div class="ab-value-num">01</div>
+            <h4>India-First Payments</h4>
+            <p>UPI, QR, wallets and cards — every method your guests already use.</p>
+          </div>
+          <div class="ab-value">
+            <div class="ab-value-num">02</div>
+            <h4>Instant Confirmation</h4>
+            <p>Tickets delivered the moment payment clears. No waiting, no confusion.</p>
+          </div>
+          <div class="ab-value">
+            <div class="ab-value-num">03</div>
+            <h4>Zero Setup Hassle</h4>
+            <p>Publish your first event in minutes. No technical knowledge needed.</p>
+          </div>
+          <div class="ab-value">
+            <div class="ab-value-num">04</div>
+            <h4>Real Support</h4>
+            <p>WhatsApp support from a real team — not a bot, not a ticket queue.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section class="ab-section" style="padding-top:0;padding-bottom:96px">
+      <div class="ab-wrap">
+        <div class="ab-team">
+          <h2>Ready to be part of the wave?</h2>
+          <p>Join thousands of guests and organizers across India who trust CultureWave to make every experience count.</p>
+          <div class="ab-team-actions">
+            <a class="ab-team-btn" href="events.html">Browse Events ↗</a>
+            <a class="ab-team-btn ghost" href="vendor-onboarding.html">List Your Event →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="about-footer"><div class="about-wrap about-footer-inner"><div><div class="about-footer-brand">CultureWave</div><div class="about-footer-note">Find your next experience. Make it a moment.</div></div><nav class="about-footer-links" aria-label="Footer"><a href="events.html">Events</a><a href="how-it-works.html">How it works</a><a href="about-culturewave.html" aria-current="page">About CultureWave</a><a href="privacy-policy.html">Privacy</a><a href="terms-and-conditions.html">Terms</a><a href="mailto:support.culturewave@gmail.com">Contact</a></nav></div></footer>
+  <footer class="ab-footer">
+    <div class="ab-wrap ab-footer-inner">
+      <div>
+        <div class="ab-footer-brand">CultureWave</div>
+        <div class="ab-footer-note">Find your next experience. Make it a moment.</div>
+      </div>
+      <nav class="ab-footer-links" aria-label="Footer">
+        <a href="events.html">Events</a>
+        <a href="how-it-works.html">How it works</a>
+        <a href="features.html">For Organizers</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="privacy-policy.html">Privacy</a>
+        <a href="terms-and-conditions.html">Terms</a>
+        <a href="mailto:support.culturewave@gmail.com">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { db, collection, getDocs } from './firebase.js';
+    getDocs(collection(db,'events')).then(snap => {
+      const events = snap.docs.map(d => d.data());
+      const live = events.filter(e => e.status==='published').length;
+      const tickets = events.reduce((t,e) => {
+        const tb = (e.tickets||[]).reduce((s,tk) => s+(Number(tk.booked)||0),0);
+        return t + Math.max(Number(e.totalBooked)||0, tb);
+      },0);
+      document.getElementById('liveCount').textContent = live.toLocaleString('en-IN');
+      document.getElementById('ticketCount').textContent = tickets.toLocaleString('en-IN');
+    }).catch(()=>{
+      document.getElementById('liveCount').textContent='—';
+      document.getElementById('ticketCount').textContent='—';
+    });
+  </script>
   <script>
     const hamburger=document.getElementById('hamburger');
     const mobileNav=document.getElementById('mobileNav');
-    hamburger?.addEventListener('click',()=>{const open=hamburger.getAttribute('aria-expanded')!=='true';hamburger.setAttribute('aria-expanded',String(open));hamburger.classList.toggle('open',open);mobileNav?.classList.toggle('open',open);document.body.style.overflow=open?'hidden':'';});
-    mobileNav?.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{hamburger?.setAttribute('aria-expanded','false');hamburger?.classList.remove('open');mobileNav.classList.remove('open');document.body.style.overflow='';}));
+    hamburger?.addEventListener('click',()=>{
+      const open=hamburger.getAttribute('aria-expanded')!=='true';
+      hamburger.setAttribute('aria-expanded',String(open));
+      hamburger.classList.toggle('open',open);
+      mobileNav?.classList.toggle('open',open);
+      document.body.style.overflow=open?'hidden':'';
+    });
+    mobileNav?.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
+      hamburger?.setAttribute('aria-expanded','false');
+      hamburger?.classList.remove('open');
+      mobileNav.classList.remove('open');
+      document.body.style.overflow='';
+    }));
   </script>
   <script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
 </body>
