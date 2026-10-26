@@ -245,7 +245,14 @@ async function verifyPayment(request, env) {
       currency: order.currency, paymentId, status: "paid",
       createdAt: { __firestoreTimestamp: new Date().toISOString() },
     };
-    await patchFirestoreDocument(env, "adPackageOrders", paymentId, purchase, firestoreToken);
+    const purchaseSaved = await createFirestoreDocument(env, "adPackageOrders", paymentId, purchase, firestoreToken);
+    if (!purchaseSaved) {
+      const existingPurchase = await getFirestoreDocument(env, "adPackageOrders", paymentId, firestoreToken);
+      if (existingPurchase?.ownerId !== ownerId || existingPurchase?.packageId !== order.notes.adPackage ||
+          existingPurchase?.paymentId !== paymentId || Number(existingPurchase?.amount) !== purchase.amount) {
+        throw new Error("Could not safely save the advertising package purchase.");
+      }
+    }
     await patchFirestoreDocument(env, "payments", paymentId, {
       bookingId: paymentId, receipt: order.receipt || paymentId,
       eventName: `${order.notes.adPackage} advertising package`, amount: Number(finalPayment.amount) / 100,
