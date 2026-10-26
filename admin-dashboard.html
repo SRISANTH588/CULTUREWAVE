@@ -2596,8 +2596,13 @@ onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200
   renderMarketing();
 });
 
-onSnapshot(query(collection(db,'razorpayOrders'),orderBy('createdAt','desc'),limit(500)), snap => {
-  allCheckoutAttempts = snap.docs.map(d=>({id:d.id,...d.data()}));
+onSnapshot(query(collection(db,'razorpayOrders'),limit(500)), snap => {
+  allCheckoutAttempts = snap.docs.map(d=>({id:d.id,...d.data()}))
+    .sort((a,b)=>{
+      const ta=a.createdAt?.toMillis?a.createdAt.toMillis():(a.createdAt?new Date(a.createdAt).getTime():0);
+      const tb=b.createdAt?.toMillis?b.createdAt.toMillis():(b.createdAt?new Date(b.createdAt).getTime():0);
+      return tb-ta;
+    });
   renderCheckoutAttempts();
   const badge=document.getElementById('badgeCheckoutAttempts');
   if(badge) badge.textContent=String(allCheckoutAttempts.length);
