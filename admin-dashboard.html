@@ -506,6 +506,7 @@
     <button class="sb-item" data-view="campaigns"><span class="si-icon">🚀</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
     <button class="sb-item" data-view="ads-manager"><span class="si-icon">📢</span> Ads Manager <span class="si-badge orange" id="badgeAds">0</span></button>
     <button class="sb-item" data-view="payments"><span class="si-icon">💳</span> Transactions <span class="si-badge" id="badgePayments">0</span></button>
+    <button class="sb-item" data-view="checkout-attempts"><span class="si-icon">🧾</span> Pay Now Activity <span class="si-badge orange" id="badgeCheckoutAttempts">0</span></button>
     <button class="sb-item" data-view="one-club"><span class="si-icon">◉</span> One Club</button>
     <button class="sb-item" data-view="gift-cards"><span class="si-icon">🎁</span> Gift Cards</button>
     <button class="sb-item" data-view="whatsapp"><span class="si-icon">💬</span> WA Dispatch <span class="si-badge green" id="badgeWA">0</span></button>
@@ -989,6 +990,25 @@
         </table>
       </div>
     </div>
+  </div>
+
+  <div class="view" data-view="checkout-attempts">
+    <div style="background:linear-gradient(135deg,#590a25 0%,#ad103d 47%,#f3264f 100%);border-radius:22px;padding:1.5rem 1.8rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8;">Checkout activity</div>
+      <h1 style="font-size:1.8rem;margin:.3rem 0;">Pay Now Activity</h1>
+      <p style="opacity:.82;">Customer details and payment outcome for every Razorpay checkout order.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card blue"><div class="stat-label">Checkout attempts</div><div class="stat-value" id="checkoutAttemptCount">0</div></div>
+      <div class="stat-card green"><div class="stat-label">Payment done</div><div class="stat-value" id="checkoutPaidCount">0</div></div>
+      <div class="stat-card orange"><div class="stat-label">Not completed</div><div class="stat-value" id="checkoutUnpaidCount">0</div></div>
+    </div>
+    <div class="filter-bar">
+      <input id="checkoutAttemptSearch" placeholder="Search name, email, phone or event..." oninput="filterCheckoutAttempts()" />
+      <select id="checkoutAttemptStatus" onchange="filterCheckoutAttempts()"><option value="">All outcomes</option><option value="paid">Paid</option><option value="created">Pending</option><option value="failed">Failed</option><option value="cancelled">Cancelled</option></select>
+      <span style="font-size:.76rem;color:var(--muted);margin-left:auto" id="checkoutAttemptResults">0 attempts</span>
+    </div>
+    <div class="card" style="padding:0;"><div class="table-wrap" style="border:0;border-radius:16px;"><table class="data-table"><thead><tr><th>Clicked / started</th><th>Customer</th><th>Contact</th><th>Event</th><th>Tickets / seats</th><th>Amount</th><th>Payment status</th><th>Order / payment ID</th></tr></thead><tbody id="checkoutAttemptsTable"><tr><td colspan="8">Loading checkout activity…</td></tr></tbody></table></div></div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -1585,6 +1605,7 @@ import { app, auth, db, getCurrentUser, logout,
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
 let oneClubAdminData=null,oneClubAdminLoading=false;
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allMarketingLeads=[];
+let allCheckoutAttempts=[];
 let allVendorApplications=[],activeVendorApplicationId=null;
 let allStallApplications=[],activeStallAdminEventId='';
 
@@ -1639,13 +1660,14 @@ const viewTitles = {
   campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
   'ads-manager':'Ads Manager',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
-  restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', 'site-visibility':'Content Visibility', settings:'Platform Settings'
+  restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', 'site-visibility':'Content Visibility', settings:'Platform Settings', 'checkout-attempts':'Pay Now Activity'
 };
 window.showView = function(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===name));
   document.querySelectorAll('.sb-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view===name));
   document.getElementById('pageTitle').textContent = viewTitles[name] || name;
   if(name==='analytics') renderAnalytics();
+  if(name==='checkout-attempts') renderCheckoutAttempts();
   if(name==='marketing') renderMarketing();
   if(name==='ads-manager') renderAdsManager();
   if(name==='new-listers') renderNewListers();
@@ -2192,6 +2214,38 @@ window.viewTransactionPerson = function(id) {
   openModal('transactionPersonModal');
 };
 function stallApplicationTransactions(){return allStallApplications.filter(a=>a.paymentStatus==='captured'&&a.paymentId).map(a=>({id:a.paymentId,receipt:a.paymentId,eventId:a.eventId,eventName:a.eventName,amount:Number(a.fee)||0,status:'paid',createdAt:a.createdAt,customerName:a.contactName,customerEmail:a.email,customerPhone:a.phone,paymentId:a.paymentId,isStallApplication:true}));}
+function checkoutAttemptStatus(order){
+  const matchingPayment=allPayments.find(payment=>payment.receipt===order.receipt||payment.bookingId===order.receipt||payment.paymentId===order.paymentId);
+  const status=String(matchingPayment?.status||order.status||'created').toLowerCase();
+  return ['paid','captured','success','completed'].includes(status)?'paid':status;
+}
+function renderCheckoutAttempts(attempts=allCheckoutAttempts){
+  const tbody=document.getElementById('checkoutAttemptsTable');
+  if(!tbody)return;
+  const count=document.getElementById('checkoutAttemptCount'),paid=document.getElementById('checkoutPaidCount'),unpaid=document.getElementById('checkoutUnpaidCount');
+  if(count)count.textContent=allCheckoutAttempts.length;
+  if(paid)paid.textContent=allCheckoutAttempts.filter(order=>checkoutAttemptStatus(order)==='paid').length;
+  if(unpaid)unpaid.textContent=allCheckoutAttempts.filter(order=>checkoutAttemptStatus(order)!=='paid').length;
+  const results=document.getElementById('checkoutAttemptResults');if(results)results.textContent=`${attempts.length} attempts`;
+  if(!attempts.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="es-icon">🧾</div><strong>No checkout attempts found</strong><p>Customers appear here after starting Razorpay checkout.</p></div></td></tr>';return;}
+  tbody.innerHTML=attempts.map(order=>{
+    const status=checkoutAttemptStatus(order),isPaid=status==='paid';
+    const label=isPaid?'Payment done':status==='created'?'Pending':status.replaceAll('_',' ');
+    const cls=isPaid?'green':status==='failed'?'red':status==='cancelled'?'gray':'orange';
+    const seats=Array.isArray(order.seatIds)&&order.seatIds.length?order.seatIds.join(', '):(order.seats||order.customer?.tickets||1);
+    const amount=Number(order.grossAmount??order.amount)/100;
+    return `<tr><td>${fmtDate(order.createdAt)}</td><td><strong>${esc(order.customer?.name||'Guest')}</strong><div style="font-size:.7rem;color:var(--muted)">${esc(order.customer?.userId||'')}</div></td><td>${esc(order.customer?.email||'—')}<br>${esc(order.customer?.phone||'—')}</td><td>${esc(order.event?.name||'—')}</td><td>${esc(String(seats))}</td><td>${money(amount)}</td><td><span class="badge ${cls}">${esc(label)}</span></td><td style="font-family:monospace;font-size:.7rem;overflow-wrap:anywhere">${esc(order.paymentId||order.orderId||order.id)}</td></tr>`;
+  }).join('');
+}
+window.filterCheckoutAttempts=function(){
+  const q=(document.getElementById('checkoutAttemptSearch')?.value||'').trim().toLowerCase();
+  const selected=document.getElementById('checkoutAttemptStatus')?.value||'';
+  renderCheckoutAttempts(allCheckoutAttempts.filter(order=>{
+    const status=checkoutAttemptStatus(order);
+    const searchable=[order.customer?.name,order.customer?.email,order.customer?.phone,order.event?.name,order.receipt,order.orderId,order.paymentId].join(' ').toLowerCase();
+    return (!q||searchable.includes(q))&&(!selected||(selected==='paid'?status==='paid':status===selected));
+  }));
+};
 window.filterPayments = function() {
   const q = document.getElementById('paymentSearch').value.toLowerCase();
   const st = document.getElementById('paymentStatusFilter').value;
@@ -2540,6 +2594,17 @@ onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200
   syncWABookings();
   updateStats();
   renderMarketing();
+});
+
+onSnapshot(query(collection(db,'razorpayOrders'),orderBy('createdAt','desc'),limit(500)), snap => {
+  allCheckoutAttempts = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderCheckoutAttempts();
+  const badge=document.getElementById('badgeCheckoutAttempts');
+  if(badge) badge.textContent=String(allCheckoutAttempts.length);
+}, error => {
+  console.warn('Could not load Razorpay checkout activity:', error);
+  const tbody=document.getElementById('checkoutAttemptsTable');
+  if(tbody) tbody.innerHTML=`<tr><td colspan="8">Could not load checkout activity: ${esc(error.message||'Permission denied')}</td></tr>`;
 });
 
 onSnapshot(query(collection(db,'bookings'),orderBy('createdAt','desc'),limit(500)), snap => {

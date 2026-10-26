@@ -192,6 +192,19 @@ async function createOrder(request, env) {
     }),
   });
   if (!order.id) throw new Error("Razorpay did not return a payment order.");
+  const firestoreToken = await firestoreAccessToken(env);
+  const createdAt = new Date().toISOString();
+  const checkoutAttempt = {
+    orderId: order.id, receipt, amount: Number(order.amount), grossAmount: grossAmountPaise,
+    currency: order.currency || "INR", status: "created", method: "checkout",
+    event: { id: clean(event.id, 120), name: clean(event.name, 200) },
+    customer: { name: clean(customer.name), email: clean(customer.email, 180).toLowerCase(), phone: clean(customer.phone, 32), tickets: Math.max(1, Number(customer.tickets) || 1) },
+    seats: Math.max(1, Number(body.seats || customer.tickets) || 1),
+    seatIds: Array.isArray(body.seatIds) ? body.seatIds.map(value => clean(value, 40)).filter(Boolean).slice(0, 20) : [],
+    walletAmount, note: clean(body.note, 240), createdAt: { __firestoreTimestamp: createdAt },
+  };
+  const attemptSaved = await createFirestoreDocument(env, "razorpayOrders", order.id, checkoutAttempt, firestoreToken);
+  if (!attemptSaved) throw new Error("Could not save this checkout attempt. Please try again.");
   return json({
     success: true,
     provider: "razorpay",
@@ -262,6 +275,7 @@ async function verifyPayment(request, env) {
       createdAt: { __firestoreTimestamp: new Date().toISOString() },
       paidAt: { __firestoreTimestamp: new Date().toISOString() },
     }, firestoreToken);
+    await patchFirestoreDocument(env, "razorpayOrders", orderId, { status: "captured", paymentId, capturedAt: { __firestoreTimestamp: new Date().toISOString() } }, firestoreToken);
     return json({ success: true, verified: true, method: finalPayment.method || "Razorpay", packageId: order.notes.adPackage });
   }
   const booking = body.booking || {};
@@ -300,6 +314,7 @@ async function verifyPayment(request, env) {
     paidAt: { __firestoreTimestamp: new Date().toISOString() },
   };
   await patchFirestoreDocument(env, "payments", paymentId, paymentRecord, firestoreToken);
+  await patchFirestoreDocument(env, "razorpayOrders", orderId, { status: "captured", paymentId, capturedAt: { __firestoreTimestamp: new Date().toISOString() } }, firestoreToken);
   if (walletAmount > 0) {
     const wallet = await getFirestoreDocument(env, "wallets", walletUid, firestoreToken);
     if (!wallet || Number(wallet.balance || 0) < walletAmount) {
@@ -332,6 +347,18 @@ async function verifyPayment(request, env) {
     seatIds, status: "captured", method: finalPayment.method || "Razorpay",
   });
   return json({ success: true, verified: true, method: finalPayment.method || "Razorpay" });
+}
+
+async function updateCheckoutStatus(request, env) {
+  const body = await request.json();
+  const orderId = clean(body.orderId, 100);
+  const status = clean(body.status, 24).toLowerCase();
+  if (!orderId || !["failed", "cancelled"].includes(status)) return json({ success: false, error: "Checkout status is invalid." }, 400);
+  const token = await firestoreAccessToken(env);
+  const order = await getFirestoreDocument(env, "razorpayOrders", orderId, token);
+  if (!order) return json({ success: false, error: "Payment order was not found." }, 404);
+  if (order.status !== "captured") await patchFirestoreDocument(env, "razorpayOrders", orderId, { status, lastStatusAt: { __firestoreTimestamp: new Date().toISOString() } }, token);
+  return json({ success: true });
 }
 
 async function payWithOneClub(request, env) {
@@ -813,6 +840,7 @@ export default {
       const path = new URL(request.url).pathname.replace(/\/+$/, "");
       if (path === "/createRazorpayOrder") return await createOrder(request, env).then(response => withHeaders(response, headers));
       if (path === "/verifyRazorpayPayment") return await verifyPayment(request, env).then(response => withHeaders(response, headers));
+      if (path === "/updateRazorpayCheckoutStatus") return await updateCheckoutStatus(request, env).then(response => withHeaders(response, headers));
       if (path === "/payWithOneClub") return await payWithOneClub(request, env).then(response => withHeaders(response, headers));
       if (path === "/createGiftCardOrder") return await createGiftCardOrder(request, env).then(response => withHeaders(response, headers));
       if (path === "/giftCardLimits") return await getGiftCardCheckoutLimits(request, env).then(response => withHeaders(response, headers));

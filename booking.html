@@ -1907,7 +1907,7 @@ async function submitBooking(){
   try{
     const user=walletAmount>0?(await walletAuthReady).currentUser:null;
     const authToken=user?await user.getIdToken():'';
-    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json',...(authToken?{Authorization:`Bearer ${authToken}`}:{})},body:JSON.stringify({amount:amountInPaise,walletAmount,grossAmountPaise:Math.round(total*100),receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,note:`${ticketName} · ${ticketCount} ticket(s)`})});
+    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json',...(authToken?{Authorization:`Bearer ${authToken}`}:{})},body:JSON.stringify({amount:amountInPaise,walletAmount,grossAmountPaise:Math.round(total*100),receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,seatIds:selectedSeats,note:`${ticketName} · ${ticketCount} ticket(s)`})});
     const orderResponseText=await orderResponse.text();
     try{orderData=JSON.parse(orderResponseText);}catch(_){throw new Error(orderResponse.status===404?'Razorpay payment service is not deployed yet. Please contact support.':'Could not reach the payment service. Please try again.');}
     if(!orderResponse.ok||!orderData.success||orderData.provider!=='razorpay'||!orderData.razorpayOrderId||!orderData.keyId) throw new Error(orderData.error||'Live Razorpay order service is unavailable.');
@@ -1927,6 +1927,13 @@ async function submitBooking(){
     description: eventName,
     prefill: { name, email, contact: phone },
     theme: { color: "#1dae79", backdrop_color: "#090b10" },
+    modal:{
+      ondismiss: async ()=>{
+        try{await fetch(`${razorpayFunctionsUrl}/updateRazorpayCheckoutStatus`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:orderData.razorpayOrderId,status:'cancelled'})});}catch(statusError){console.warn('Could not record cancelled checkout:',statusError);}
+        setBookingSubmissionBusy(false, total);
+        showPaymentError('Payment was cancelled. Your booking has not been confirmed.');
+      }
+    },
     handler: async function(r){
       const pid = r.razorpay_payment_id || bid;
       [document.getElementById('submitBtn'), document.getElementById('confirmSubmitBtn')].filter(Boolean).forEach(button => { button.disabled=true; button.textContent = 'Verifying payment...'; });
@@ -1974,15 +1981,15 @@ async function submitBooking(){
       clearCheckoutDraft();
       try{sessionStorage.removeItem('culturewave_pending_verified_payment');}catch(_){}
       location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&address="+encodeURIComponent(evData.address||'')+"&mapLink="+encodeURIComponent(evData.mapLink||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
-    },
-    modal:{
-      ondismiss: ()=>{
-        setBookingSubmissionBusy(false, total);
-        showPaymentError('Payment was cancelled. Your booking has not been confirmed.');
-      }
     }
   };
-  try{new Razorpay(options).open();}
+  try{
+    const checkout=new Razorpay(options);
+    checkout.on('payment.failed',async()=>{
+      try{await fetch(`${razorpayFunctionsUrl}/updateRazorpayCheckoutStatus`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:orderData.razorpayOrderId,status:'failed'})});}catch(statusError){console.warn('Could not record failed checkout:',statusError);}
+    });
+    checkout.open();
+  }
   catch(checkoutError){
     console.error('Could not open Razorpay Checkout:',checkoutError);
     setBookingSubmissionBusy(false, total);
