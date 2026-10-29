@@ -575,6 +575,15 @@ exports.createRazorpayOrder = endpoint(async req => {
   if (!Number.isSafeInteger(amount) || amount < 100) throw new Error('Payment amount is invalid.');
   const customer = req.body.customer || {};
   const event = req.body.event || {};
+  const walletAmount = Math.max(0, Math.round(Number(req.body.walletAmount) || 0));
+  const grossAmount = Number.isSafeInteger(Number(req.body.grossAmountPaise))
+    ? Number(req.body.grossAmountPaise)
+    : amount + walletAmount * 100;
+  if (grossAmount !== amount + walletAmount * 100) throw new Error('Booking total does not match the One Club contribution.');
+  const seatIds = Array.isArray(req.body.seatIds)
+    ? [...new Set(req.body.seatIds.map(value => clean(value, 40)).filter(Boolean))].slice(0, 20)
+    : [];
+  const seats = Math.max(1, Number(req.body.seats ?? customer.tickets) || 1);
   const stallSlotIndex = Number.isInteger(Number(req.body.stallSlotIndex)) ? Number(req.body.stallSlotIndex) : null;
   if (stallSlotIndex !== null) {
     if (stallSlotIndex < 0 || stallSlotIndex > 4 || !event.id) throw new Error('Stall slot details are invalid.');
@@ -611,6 +620,8 @@ exports.createRazorpayOrder = endpoint(async req => {
   await db.collection('razorpayOrders').doc(order.id).set({
     orderId: order.id,
     amount,
+    grossAmount,
+    walletAmount,
     currency: 'INR',
     receipt,
     status: 'created',
@@ -623,6 +634,9 @@ exports.createRazorpayOrder = endpoint(async req => {
       phone: clean(customer.phone, 32),
       tickets: Math.max(1, Number(customer.tickets) || 1),
     },
+    seats,
+    seatIds,
+    ...(req.body.note ? {note: clean(req.body.note, 240)} : {}),
     createdAt: FieldValue.serverTimestamp(),
   });
   return {success: true, provider: 'razorpay', keyId: razorpayKeyId.value(), razorpayOrderId: order.id, amount, currency: 'INR'};
@@ -659,7 +673,16 @@ exports.verifyRazorpayPayment = endpoint(async req => {
       receipt: savedOrder.receipt || paymentId,
       eventId: savedOrder.event?.id || null,
       eventName: savedOrder.event?.name || 'CultureWave event',
-      amount: Number(savedOrder.amount) / 100,
+      // Pay Now Activity reads razorpayOrders, while this payments record is
+      // also used by the admin payment tables. Keep the complete checkout
+      // breakdown on the transaction for consistent reporting.
+      amount: Number(savedOrder.grossAmount ?? savedOrder.amount) / 100,
+      grossAmount: Number(savedOrder.grossAmount ?? savedOrder.amount),
+      capturedAmount: Number(savedOrder.amount) / 100,
+      walletAmount: Number(savedOrder.walletAmount || 0),
+      seats: Number(savedOrder.seats || savedOrder.customer?.tickets || 1),
+      seatIds: Array.isArray(savedOrder.seatIds) ? savedOrder.seatIds : [],
+      ...(savedOrder.note ? {note: savedOrder.note} : {}),
       currency: savedOrder.currency || 'INR',
       status: 'paid',
       paymentId,

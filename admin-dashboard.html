@@ -999,14 +999,14 @@
       <p style="opacity:.82;">Customer details and payment outcome for every Razorpay checkout order.</p>
     </div>
     <div class="stats-grid">
-      <div class="stat-card blue"><div class="stat-label">Checkout attempts</div><div class="stat-value" id="checkoutAttemptCount">0</div></div>
-      <div class="stat-card green"><div class="stat-label">Payment done</div><div class="stat-value" id="checkoutPaidCount">0</div></div>
-      <div class="stat-card orange"><div class="stat-label">Not completed</div><div class="stat-value" id="checkoutUnpaidCount">0</div></div>
+      <div class="stat-card blue"><div class="stat-label">Checkout attempts</div><div class="stat-value" id="checkoutAttemptCount">—</div></div>
+      <div class="stat-card green"><div class="stat-label">Payment done</div><div class="stat-value" id="checkoutPaidCount">—</div></div>
+      <div class="stat-card orange"><div class="stat-label">Not completed</div><div class="stat-value" id="checkoutUnpaidCount">—</div></div>
     </div>
     <div class="filter-bar">
       <input id="checkoutAttemptSearch" placeholder="Search name, email, phone or event..." oninput="filterCheckoutAttempts()" />
       <select id="checkoutAttemptStatus" onchange="filterCheckoutAttempts()"><option value="">All outcomes</option><option value="paid">Paid</option><option value="created">Pending</option><option value="failed">Failed</option><option value="cancelled">Cancelled (abandoned checkout)</option></select>
-      <span style="font-size:.76rem;color:var(--muted);margin-left:auto" id="checkoutAttemptResults">0 attempts</span>
+      <span style="font-size:.76rem;color:var(--muted);margin-left:auto" id="checkoutAttemptResults">Loading…</span>
     </div>
     <div class="card" style="padding:0;"><div class="table-wrap" style="border:0;border-radius:16px;"><table class="data-table"><thead><tr><th>Clicked / started</th><th>Customer</th><th>Contact</th><th>Event</th><th>Tickets / seats</th><th>Amount</th><th>Payment status</th><th>Order / payment ID</th></tr></thead><tbody id="checkoutAttemptsTable"><tr><td colspan="8">Loading checkout activity…</td></tr></tbody></table></div></div>
   </div>
@@ -1606,6 +1606,7 @@ let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], a
 let oneClubAdminData=null,oneClubAdminLoading=false;
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allMarketingLeads=[];
 let allCheckoutAttempts=[];
+let checkoutAttemptsLoaded=false;
 let allVendorApplications=[],activeVendorApplicationId=null;
 let allStallApplications=[],activeStallAdminEventId='';
 
@@ -2223,10 +2224,11 @@ function renderCheckoutAttempts(attempts=allCheckoutAttempts){
   const tbody=document.getElementById('checkoutAttemptsTable');
   if(!tbody)return;
   const count=document.getElementById('checkoutAttemptCount'),paid=document.getElementById('checkoutPaidCount'),unpaid=document.getElementById('checkoutUnpaidCount');
-  if(count)count.textContent=allCheckoutAttempts.length;
-  if(paid)paid.textContent=allCheckoutAttempts.filter(order=>checkoutAttemptStatus(order)==='paid').length;
-  if(unpaid)unpaid.textContent=allCheckoutAttempts.filter(order=>checkoutAttemptStatus(order)!=='paid').length;
-  const results=document.getElementById('checkoutAttemptResults');if(results)results.textContent=`${attempts.length} attempts`;
+  if(count)count.textContent=checkoutAttemptsLoaded?allCheckoutAttempts.length:'…';
+  if(paid)paid.textContent=checkoutAttemptsLoaded?allCheckoutAttempts.filter(order=>checkoutAttemptStatus(order)==='paid').length:'…';
+  if(unpaid)unpaid.textContent=checkoutAttemptsLoaded?allCheckoutAttempts.filter(order=>checkoutAttemptStatus(order)!=='paid').length:'…';
+  const results=document.getElementById('checkoutAttemptResults');if(results)results.textContent=checkoutAttemptsLoaded?`${attempts.length} attempts`:'Loading…';
+  if(!checkoutAttemptsLoaded){tbody.innerHTML='<tr><td colspan="8">Loading checkout activity…</td></tr>';return;}
   if(!attempts.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="es-icon">🧾</div><strong>No checkout attempts found</strong><p>Customers appear here after starting Razorpay checkout.</p></div></td></tr>';return;}
   tbody.innerHTML=attempts.map(order=>{
     const status=checkoutAttemptStatus(order),isPaid=status==='paid';
@@ -2597,6 +2599,7 @@ onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200
 });
 
 onSnapshot(query(collection(db,'razorpayOrders'),limit(500)), snap => {
+  checkoutAttemptsLoaded=true;
   allCheckoutAttempts = snap.docs.map(d=>({id:d.id,...d.data()}))
     .sort((a,b)=>{
       const ta=a.createdAt?.toMillis?a.createdAt.toMillis():(a.createdAt?new Date(a.createdAt).getTime():0);
@@ -2608,6 +2611,7 @@ onSnapshot(query(collection(db,'razorpayOrders'),limit(500)), snap => {
   const badge=document.getElementById('badgeCheckoutAttempts');
   if(badge) badge.textContent=String(allCheckoutAttempts.length);
 }, error => {
+  checkoutAttemptsLoaded=true;
   console.error('[PayNow] razorpayOrders error:', error.code, error.message);
   const tbody=document.getElementById('checkoutAttemptsTable');
   if(tbody) tbody.innerHTML=`<tr><td colspan="8" style="color:#b42318;padding:1.5rem">Error loading checkout activity: ${esc(error.message||'Permission denied')} (${esc(error.code||'')})</td></tr>`;
