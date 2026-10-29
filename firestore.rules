@@ -322,6 +322,13 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Checkout attempts include customer contact details and are written by
+    // trusted server services; expose them only to authenticated admins.
+    match /razorpayOrders/{orderId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     match /wallets/{uid} {
       // Wallet balance is changed only by trusted payment/redemption services.
       // Other existing wallet fields (such as organiser credits) remain owner editable.
