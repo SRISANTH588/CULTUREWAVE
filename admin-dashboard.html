@@ -2603,13 +2603,14 @@ onSnapshot(query(collection(db,'razorpayOrders'),limit(500)), snap => {
       const tb=b.createdAt?.toMillis?b.createdAt.toMillis():(b.createdAt?new Date(b.createdAt).getTime():0);
       return tb-ta;
     });
+  console.log('[PayNow] razorpayOrders docs loaded:', allCheckoutAttempts.length);
   renderCheckoutAttempts();
   const badge=document.getElementById('badgeCheckoutAttempts');
   if(badge) badge.textContent=String(allCheckoutAttempts.length);
 }, error => {
-  console.warn('Could not load Razorpay checkout activity:', error);
+  console.error('[PayNow] razorpayOrders error:', error.code, error.message);
   const tbody=document.getElementById('checkoutAttemptsTable');
-  if(tbody) tbody.innerHTML=`<tr><td colspan="8">Could not load checkout activity: ${esc(error.message||'Permission denied')}</td></tr>`;
+  if(tbody) tbody.innerHTML=`<tr><td colspan="8" style="color:#b42318;padding:1.5rem">Error loading checkout activity: ${esc(error.message||'Permission denied')} (${esc(error.code||'')})</td></tr>`;
 });
 
 onSnapshot(query(collection(db,'bookings'),orderBy('createdAt','desc'),limit(500)), snap => {
