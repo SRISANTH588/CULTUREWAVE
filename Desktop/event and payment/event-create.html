@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CultureWave | Create Event</title>
+  <meta name="robots" content="noindex, nofollow"/>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -529,15 +530,23 @@
     /* RESPONSIVE */
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
-      .sidebar { position: static; }
+      .sidebar { position: fixed; left: -280px; top: 0; height: 100vh; height:100dvh; max-height:100vh; max-height:100dvh; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); width: 280px; z-index: 50; transition: left .28s cubic-bezier(.4,0,.2,1); box-shadow: none; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+      .sidebar.open { left: 0; box-shadow: 8px 0 32px rgba(0,0,0,.15); }
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .hamburger { display: flex; }
     }
     @media (max-width: 600px) {
       .topbar-inner { padding: 0 0.8rem; }
       .layout { padding: 0.7rem; }
       .progress-wrap { display: none; }
     }
+    .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
+    .sb-overlay.open{display:block;}
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
+    .hamburger span{display:block;width:22px;height:2px;background:#333;border-radius:2px;}
+    @media (max-width: 900px) { .hamburger{display:flex;} }
   </style>
+  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
 <body>
 
@@ -545,6 +554,7 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div style="display:flex;align-items:center;gap:1.2rem;">
+      <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
       <div class="brand">
         <div class="brand-icon">C</div>
         <strong>CultureWave</strong>
@@ -599,46 +609,51 @@
       </button>
       <button class="step-btn" data-step="4">
         <span class="step-num">5</span>
-        <div class="step-info"><strong>Ticket Design</strong><span>Style & branding</span></div>
+        <div class="step-info"><strong>Seating Plan</strong><span>Venue layout for customers</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="5">
         <span class="step-num">6</span>
-        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
+        <div class="step-info"><strong>Ticket Design</strong><span>Style & branding</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="6">
         <span class="step-num">7</span>
-        <div class="step-info"><strong>RSVP Form</strong><span>Attendee fields</span></div>
+        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="7">
         <span class="step-num">8</span>
-        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
+        <div class="step-info"><strong>RSVP Form</strong><span>Attendee fields</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="8">
         <span class="step-num">9</span>
-        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
+        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="9">
         <span class="step-num">10</span>
-        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
+        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="10">
         <span class="step-num">11</span>
-        <div class="step-info"><strong>Invite Only</strong><span>Access control & guests</span></div>
+        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="11">
         <span class="step-num">12</span>
-        <div class="step-info"><strong>Sold Out</strong><span>Mark & manage sold out</span></div>
+        <div class="step-info"><strong>Invite Only</strong><span>Access control & guests</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="12">
         <span class="step-num">13</span>
+        <div class="step-info"><strong>Sold Out</strong><span>Mark & manage sold out</span></div>
+        <span class="step-check"></span>
+      </button>
+      <button class="step-btn" data-step="13">
+        <span class="step-num">14</span>
         <div class="step-info"><strong>Settings</strong><span>Access & preferences</span></div>
         <span class="step-check"></span>
       </button>
@@ -907,14 +922,50 @@
           </div>
         </div>
       </div>
+
       <div class="step-actions">
         <button class="btn-ghost" onclick="goStep(2)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
+        <button class="btn-primary" onclick="goStep(4)">Next: Seating Plan &#8594;</button>
       </div>
     </div>
 
-    <!-- STEP 4: TICKET DESIGN -->
+    <!-- STEP 5: SEATING PLAN -->
     <div class="step-panel" data-panel="4">
+      <div class="card">
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;"><div><h2>Seating Plan</h2><p>Create a simple seat map, generate one, or upload an existing venue plan.</p></div><button class="btn-primary" type="button" onclick="openAiSeatingModal()">✨ Generate with AI</button></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-bottom:1rem;">
+          <button id="seatingBuilderTab" type="button" onclick="setSeatingPlanMode('builder')" style="text-align:left;padding:.9rem;border:2px solid var(--blue);border-radius:14px;background:var(--blue-light);cursor:pointer;color:inherit;"><strong style="display:block;font-size:.84rem;">Create on website</strong><span style="display:block;font-size:.72rem;color:var(--muted);margin-top:.25rem;">Build rows and numbered seats</span></button>
+          <button id="seatingUploadTab" type="button" onclick="setSeatingPlanMode('image')" style="text-align:left;padding:.9rem;border:2px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;color:inherit;"><strong style="display:block;font-size:.84rem;">Upload an image</strong><span style="display:block;font-size:.72rem;color:var(--muted);margin-top:.25rem;">Use a venue map from ImageKit</span></button>
+        </div>
+        <div id="seatingBuilderPanel">
+          <div class="grid-2" style="margin-bottom:.75rem;">
+            <div class="field"><label for="seatingStageLabel">Stage label</label><input id="seatingStageLabel" value="STAGE" placeholder="e.g. Main Stage" oninput="updateSeatingMeta('stage', this.value)" /></div>
+            <div class="field"><label for="seatingPlanTitle">Plan title</label><input id="seatingPlanTitle" value="Venue Seating Plan" placeholder="e.g. Auditorium Layout" oninput="updateSeatingMeta('title', this.value)" /></div>
+          </div>
+          <div style="font-size:.74rem;color:var(--muted);margin-bottom:.55rem;">For example, add three rows and name each ticket type <strong>VIP</strong>. Each row can use seats or sofas and sit on the left, center, or right.</div>
+          <div id="seatingRowsList" style="display:flex;flex-direction:column;gap:.55rem;"></div>
+          <button type="button" onclick="addSeatingRow()" style="margin-top:.7rem;background:var(--blue-light);color:var(--blue);border:1px solid rgba(20,84,255,.18);border-radius:9px;padding:.45rem .75rem;font-size:.76rem;font-weight:800;cursor:pointer;">+ Add row</button>
+          <div id="seatingBuilderPreview" style="margin-top:1rem;padding:1rem;border:1px solid var(--border);border-radius:14px;background:#f8faff;"></div>
+        </div>
+        <div id="seatingImagePanel" style="display:none;">
+          <div class="upload-zone" onclick="document.getElementById('seatingPlanInput').click()" style="padding:1.2rem;">
+            <strong style="font-size:0.84rem;">Click to upload seating plan</strong>
+            <span>PNG, JPG &middot; max 5 MB</span>
+          </div>
+          <input type="file" id="seatingPlanInput" accept="image/*" style="display:none;" onchange="loadSeatingPlan(this)" />
+          <input id="seatingPlanUrl" type="url" placeholder="Or paste seating plan image URL" oninput="syncSeatingPlan()" style="margin-top:.6rem;" />
+          <img id="seatingPlanPreview" src="" alt="Seating plan preview" style="display:none;max-width:100%;max-height:420px;object-fit:contain;margin-top:.75rem;border:1px solid var(--border);border-radius:12px;" />
+          <button id="seatingPlanRemoveBtn" type="button" onclick="removeSeatingPlan()" style="display:none;margin-top:.5rem;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;">Remove seating plan</button>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-ghost" onclick="goStep(3)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(5)">Next: Ticket Design &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: TICKET DESIGN -->
+    <div class="step-panel" data-panel="5">
 
       <!-- 3-step process header -->
       <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:none;padding:1.2rem 1.3rem;">
@@ -936,6 +987,21 @@
             <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.5;">Each ticket is generated as a unique image with a QR code and sent via WhatsApp</div>
           </div>
         </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Ticket Delivery</h2><p>Choose how attendees receive the ticket.</p></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;">
+          <button id="ticketDeliveryShow" type="button" onclick="setTicketDelivery('show')" style="text-align:left;padding:1rem;border:2px solid var(--blue);border-radius:14px;background:var(--blue-light);cursor:pointer;color:inherit;">
+            <strong style="display:block;font-size:.86rem;">Show Ticket</strong>
+            <span style="display:block;margin-top:.25rem;font-size:.74rem;color:var(--muted);">Show the designed ticket on success.html after booking.</span>
+          </button>
+          <button id="ticketDeliveryWhatsApp" type="button" onclick="setTicketDelivery('whatsapp')" style="text-align:left;padding:1rem;border:2px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;color:inherit;">
+            <strong style="display:block;font-size:.86rem;">Send on WhatsApp</strong>
+            <span style="display:block;margin-top:.25rem;font-size:.74rem;color:var(--muted);">Send the designed ticket to admin for WhatsApp delivery.</span>
+          </button>
+        </div>
+        <div id="ticketDeliveryNote" style="margin-top:.7rem;font-size:.74rem;color:var(--muted);">Customers will see this ticket design on the booking success page.</div>
       </div>
 
       <!-- STEP 1: Customize -->
@@ -1028,6 +1094,17 @@
           <div class="field"><label for="tdTagline">Custom Message</label><input id="tdTagline" type="text" placeholder="e.g. Thank you for joining!" oninput="updateTicketPreview()" /></div>
         </div>
         <div class="field" style="margin-bottom:0.75rem;"><label for="tdFooter">Footer Note</label><input id="tdFooter" type="text" placeholder="e.g. Non-transferable. Valid ID required." oninput="updateTicketPreview()" /></div>
+
+        <div class="field" style="margin-bottom:0.75rem;">
+          <label for="logoInput">Organiser Logo</label>
+          <div class="upload-zone" onclick="document.getElementById('logoInput').click()" style="padding:1rem;">
+            <strong style="font-size:0.84rem;">Click to upload logo</strong>
+            <span>PNG, JPG &middot; max 5 MB</span>
+          </div>
+          <input type="file" id="logoInput" accept="image/*" style="display:none;" onchange="loadLogoFile(this)" />
+          <input id="logoUrl" type="url" placeholder="Or paste logo image URL" oninput="syncLogoUrl()" style="margin-top:.5rem;" />
+          <button id="logoRemoveBtn" type="button" onclick="removeLogo()" style="display:none;margin-top:.4rem;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;">Remove logo</button>
+        </div>
 
         <!-- Field toggles -->
         <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.4rem;">Toggle Fields</div>
@@ -1154,13 +1231,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(3)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
+        <button class="btn-ghost" onclick="goStep(4)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(6)">Next: Media &#8594;</button>
       </div>
     </div>
 
-    <!-- STEP 4: MEDIA -->
-    <div class="step-panel" data-panel="5">
+    <!-- STEP 7: MEDIA -->
+    <div class="step-panel" data-panel="6">
 
       <!-- Card Image -->
       <div class="card">
@@ -1263,6 +1340,17 @@
         </div>
       </div>
 
+      <div class="card">
+        <div class="card-head">
+          <h2>Desktop &amp; Tablet Background <span style="font-size:.68rem;color:var(--muted);font-weight:700;">Optional</span></h2>
+          <p>Wide background image for the event details page. It is shown on desktop and tablet only; mobile continues to use the event poster.</p>
+        </div>
+        <div class="field">
+          <label for="desktopBackgroundUrl">Background Image URL</label>
+          <input id="desktopBackgroundUrl" type="url" placeholder="https://example.com/event-background.jpg" />
+        </div>
+      </div>
+
       <!-- Gallery -->
       <div class="card">
         <div class="card-head"><h2>📸 Photo Gallery</h2><p>Add up to 10 photos shown on your event page</p></div>
@@ -1274,6 +1362,26 @@
         <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;" onchange="loadGalleryFiles(this)" />
       </div>
 
+      <div class="card">
+        <div class="card-head"><h2>Featured Artists <span style="font-size:.68rem;color:var(--muted);font-weight:700;">Optional</span></h2><p>Add the artists assigned to this event. They will appear on the event details page.</p></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.6rem;align-items:end;">
+          <div class="field"><label for="artistName">Artist name</label><input id="artistName" type="text" placeholder="e.g. Korolova" /></div>
+          <div class="field"><label for="artistImage">Artist image URL</label><input id="artistImage" type="url" placeholder="https://example.com/artist.jpg" /></div>
+          <button class="btn-primary" type="button" style="height:42px;white-space:nowrap;" onclick="addArtist()">+ Add artist</button>
+        </div>
+        <div id="artistList" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.85rem;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div style="display:flex;align-items:center;gap:.5rem;"><h2>Event Details</h2><span style="background:#ef4444;color:#fff;font-size:.62rem;font-weight:800;padding:.18rem .5rem;border-radius:999px;">*</span></div><p>Complete these details so attendees have the information they need before booking.</p></div>
+        <div class="grid-2">
+          <div class="field"><label for="eventLanguage">Language</label><input id="eventLanguage" type="text" placeholder="e.g. English, Hindi" required /></div>
+          <div class="field"><label for="layoutType">Layout type</label><select id="layoutType" required><option value="" disabled selected>Select layout</option><option value="Indoor">Indoor</option><option value="Outdoor">Outdoor</option></select></div>
+          <div class="field"><label for="kidsFriendly">Kid friendly?</label><select id="kidsFriendly" required><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+          <div class="field"><label for="petsFriendly">Pet friendly?</label><select id="petsFriendly" required><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+        </div>
+      </div>
+
       <!-- Promo Video -->
       <div class="card">
         <div class="card-head"><h2>🎬 Promo Video</h2><p>A short teaser can increase ticket sales by up to 30%</p></div>
@@ -1281,19 +1389,25 @@
           <label for="videoUrl">YouTube or Vimeo URL</label>
           <input id="videoUrl" type="url" placeholder="https://youtube.com/watch?v=..." oninput="syncVideoEmbed()" />
         </div>
+        <div class="field" style="margin-top:.75rem;">
+          <label for="videoFile">Or upload a video (MP4, MOV, or WebM; up to 50 MB)</label>
+          <input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/webm" onchange="uploadPromoVideo(this)" />
+          <div id="videoUploadStatus" role="status" style="margin-top:.35rem;font-size:.8rem;color:var(--muted);"></div>
+        </div>
         <div id="videoEmbedWrap" style="display:none;margin-top:.75rem;border-radius:14px;overflow:hidden;">
           <iframe id="videoEmbedFrame" style="width:100%;height:210px;border:none;display:block;"></iframe>
+          <video id="videoPreviewPlayer" controls playsinline style="display:none;width:100%;max-height:360px;background:#000;"></video>
         </div>
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(3)">← Back</button>
-        <button class="btn-primary" onclick="goStep(6)">Next: RSVP Form →</button>
+        <button class="btn-ghost" onclick="goStep(5)">← Back</button>
+        <button class="btn-primary" onclick="goStep(7)">Next: RSVP Form →</button>
       </div>
     </div>
 
-    <!-- STEP 5: RSVP -->
-    <div class="step-panel" data-panel="6">
+    <!-- STEP 7: RSVP -->
+    <div class="step-panel" data-panel="7">
 
       <div style="display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:start;">
 
@@ -1418,7 +1532,7 @@
             <button class="btn-primary" style="font-size:.74rem;padding:.3rem .65rem;" onclick="navigator.clipboard.writeText('https://CultureWave.in/e/your-event/rsvp');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.75rem;">
-            <div onclick="window.open('https://wa.me/?text=Register: https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128172;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">WhatsApp</div></div>
+            <div onclick="window.open('https://wa.me/?text='+encodeURIComponent('Hi! I would like to invite you to my event. Please register here: https://CultureWave.in/e/your-event/rsvp'),'_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128172;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">WhatsApp</div></div>
             <div onclick="window.open('https://twitter.com/intent/tweet?text=Register: https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128038;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Twitter</div></div>
             <div onclick="window.open('mailto:?subject=Register&body=https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#9993;&#65039;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Email</div></div>
             <div onclick="alert('Copy the link and paste in your Instagram story!')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128247;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Instagram</div></div>
@@ -1428,13 +1542,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(5)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(7)">Next: Coupons &#8594;</button>
+        <button class="btn-ghost" onclick="goStep(6)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(8)">Next: Coupons &#8594;</button>
       </div>
     </div>
 
-    <!-- STEP 6: COUPONS -->
-    <div class="step-panel" data-panel="7">
+    <!-- STEP 8: COUPONS -->
+    <div class="step-panel" data-panel="8">
       <div class="card">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
           <div><h2>Discount Coupons</h2><p>Create promo codes for your event</p></div>
@@ -1447,13 +1561,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(6)">← Back</button>
-        <button class="btn-primary" onclick="goStep(8)">Next: FAQs →</button>
+        <button class="btn-ghost" onclick="goStep(7)">← Back</button>
+        <button class="btn-primary" onclick="goStep(9)">Next: FAQs →</button>
       </div>
     </div>
 
-    <!-- STEP 7: FAQS -->
-    <div class="step-panel" data-panel="8">
+    <!-- STEP 9: FAQS -->
+    <div class="step-panel" data-panel="9">
       <div class="card">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
           <div><h2>Frequently Asked Questions</h2><p>Help attendees with common queries</p></div>
@@ -1466,13 +1580,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(7)">← Back</button>
-        <button class="btn-primary" onclick="goStep(9)">Next: Settings →</button>
+        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
+        <button class="btn-primary" onclick="goStep(10)">Next: Additional Info →</button>
       </div>
     </div>
 
-    <!-- STEP 8: ADDITIONAL INFO -->
-    <div class="step-panel" data-panel="9">
+    <!-- STEP 10: ADDITIONAL INFO -->
+    <div class="step-panel" data-panel="10">
       <div class="card">
         <div class="card-head"><h2>Terms & Conditions</h2><p>Legal terms attendees must agree to</p></div>
         <div class="field">
@@ -1505,23 +1619,23 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
-        <button class="btn-primary" onclick="goStep(10)">Next: Invite Only →</button>
+        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
+        <button class="btn-primary" onclick="goStep(11)">Next: Invite Only →</button>
       </div>
     </div>
 
-    <!-- STEP 9: INVITE ONLY -->
-    <div class="step-panel" data-panel="10">
+    <!-- STEP 11: INVITE ONLY -->
+    <div class="step-panel" data-panel="11">
       <div class="card">
         <div class="card-head"><h2>Invite Only Access</h2><p>Restrict who can register for this event</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
           <div class="toggle-row">
             <div><strong>🔒 Enable Invite Only</strong><span>Only guests with an invite link or code can register</span></div>
-            <button class="toggle" id="toggleInvite" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleInvite" onclick="this.classList.toggle('on');if(!this.classList.contains('on'))document.getElementById('toggleInviteLink').classList.remove('on')"></button>
           </div>
           <div class="toggle-row">
             <div><strong>🔗 Generate Invite Link</strong><span>Share a private link with selected guests</span></div>
-            <button class="toggle" id="toggleInviteLink" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleInviteLink" onclick="this.classList.toggle('on');if(this.classList.contains('on'))document.getElementById('toggleInvite').classList.add('on')"></button>
           </div>
         </div>
       </div>
@@ -1530,7 +1644,7 @@
         <div class="field">
           <label for="guestEmails">Guest Emails</label>
           <textarea id="guestEmails" style="min-height:100px;" placeholder="one@email.com&#10;two@email.com&#10;three@email.com"></textarea>
-          <span class="field-hint">One email per line. Guests will receive an invite email.</span>
+          <span class="field-hint">One email per line. Only these addresses can register unless they also have the invite code or private link.</span>
         </div>
       </div>
       <div class="card">
@@ -1542,13 +1656,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
-        <button class="btn-primary" onclick="goStep(11)">Next: Sold Out →</button>
+        <button class="btn-ghost" onclick="goStep(10)">← Back</button>
+        <button class="btn-primary" onclick="goStep(12)">Next: Sold Out →</button>
       </div>
     </div>
 
-    <!-- STEP 10: SOLD OUT -->
-    <div class="step-panel" data-panel="11">
+    <!-- STEP 12: SOLD OUT -->
+    <div class="step-panel" data-panel="12">
       <div class="card">
         <div class="card-head"><h2>Sold Out Status</h2><p>Mark this event as sold out or manage overflow</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1558,11 +1672,11 @@
           </div>
           <div class="toggle-row">
             <div><strong>📋 Enable Waitlist</strong><span>Collect waitlist registrations when sold out</span></div>
-            <button class="toggle" id="toggleWaitlist" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleWaitlist" onclick="this.classList.toggle('on');if(!this.classList.contains('on')){document.getElementById('toggleNotifyWaitlist').classList.remove('on');document.getElementById('overflowAction').value='close';}"></button>
           </div>
           <div class="toggle-row">
             <div><strong>🔔 Notify Waitlist</strong><span>Auto-notify waitlisted guests if spots open up</span></div>
-            <button class="toggle" id="toggleNotifyWaitlist" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleNotifyWaitlist" onclick="this.classList.toggle('on');if(this.classList.contains('on')){document.getElementById('toggleWaitlist').classList.add('on');document.getElementById('overflowAction').value='notify';}else if(document.getElementById('overflowAction').value==='notify'){document.getElementById('overflowAction').value='waitlist';}"></button>
           </div>
         </div>
       </div>
@@ -1577,7 +1691,7 @@
         <div class="card-head"><h2>Overflow Options</h2><p>What happens when capacity is reached</p></div>
         <div class="field">
           <label for="overflowAction">When capacity is full</label>
-          <select id="overflowAction">
+          <select id="overflowAction" onchange="if(this.value==='waitlist'||this.value==='notify')document.getElementById('toggleWaitlist').classList.add('on');if(this.value==='notify')document.getElementById('toggleNotifyWaitlist').classList.add('on');if(this.value==='waitlist'||this.value==='close')document.getElementById('toggleNotifyWaitlist').classList.remove('on');">
             <option value="close">Close registrations</option>
             <option value="waitlist">Move to waitlist</option>
             <option value="notify">Show sold out & notify me</option>
@@ -1585,13 +1699,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(10)">← Back</button>
-        <button class="btn-primary" onclick="goStep(12)">Next: Settings →</button>
+        <button class="btn-ghost" onclick="goStep(11)">← Back</button>
+        <button class="btn-primary" onclick="goStep(13)">Next: Settings →</button>
       </div>
     </div>
 
-    <!-- STEP 11: SETTINGS -->
-    <div class="step-panel" data-panel="12">
+    <!-- STEP 13: SETTINGS -->
+    <div class="step-panel" data-panel="13">
       <div class="card">
         <div class="card-head"><h2>Visibility & Display</h2><p>Control how your event appears publicly</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1614,13 +1728,15 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(11)">← Back</button>
+        <button class="btn-ghost" onclick="goStep(12)">← Back</button>
         <button class="btn-success" id="createEventBtn">🚀 Create Event</button>
       </div>
     </div>
 
   </div><!-- /content -->
 </div><!-- /layout -->
+
+<div class="modal-overlay" id="aiSeatingModal"><div class="modal" style="max-width:680px;"><h3>✨ Generate Seating Plan with AI</h3><p style="color:var(--muted);font-size:.84rem;">Describe the venue, then refine the generated structured layout in the editor.</p><div class="field"><label for="aiSeatingPrompt">Describe your seating arrangement</label><textarea id="aiSeatingPrompt" style="min-height:95px;" placeholder="Example: Stage at the top, VIP in front, Premium behind VIP, General admission at the back, two backstage areas on both sides."></textarea></div><div class="grid-2"><div class="field"><label for="aiVenueType">Venue type</label><select id="aiVenueType"><option>Concert</option><option>Club</option><option>Theatre</option><option>Auditorium</option><option>Outdoor</option></select></div><div class="field"><label for="aiSeatingType">Seating type</label><select id="aiSeatingType"><option>Mixed</option><option>Standing</option><option>Seated</option></select></div><div class="field"><label for="aiSectionCount">Number of sections</label><input id="aiSectionCount" type="number" min="1" max="12" value="3" /></div><div class="field"><label for="aiSectionNames">Section names</label><input id="aiSectionNames" placeholder="VIP, Premium, General" /></div></div><div class="modal-actions"><button class="btn-ghost" type="button" onclick="closeAiSeatingModal()">Cancel</button><button class="btn-primary" type="button" onclick="generateAiSeatingPlan()">✨ Generate layout</button></div></div></div>
 
 <!-- ADD DATE MODAL -->
 <div class="modal-overlay" id="addDateModal">
@@ -1688,9 +1804,9 @@
       <div class="field"><label for="tDesc">Description</label><input id="tDesc" type="text" placeholder="What's included?" /></div>
       <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:0.75rem;">
         <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:0.55rem;">&#127939; Single / Per Person</div>
-        <div class="grid-2">
+        <div class="grid-2" id="singleTicketGrid">
           <div class="field"><label for="tPrice">Price per person (₹)</label><input id="tPrice" type="number" min="0" value="0" placeholder="0 = Free" /></div>
-          <div class="field"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /></div>
+          <div class="field" id="ticketStockField"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /><div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">Attendee spots before this ticket sells out</div></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.75rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;">
@@ -1705,9 +1821,10 @@
         <div class="grid-3">
           <div class="field"><label for="tGroupMin">Min. persons <span class="req">*</span></label><input id="tGroupMin" type="number" min="2" placeholder="e.g. 3" oninput="updateBulkPreview()" /></div>
           <div class="field"><label for="tGroupMax">Max. persons</label><input id="tGroupMax" type="number" min="2" placeholder="e.g. 10" oninput="updateBulkPreview()" /></div>
-          <div class="field"><label for="tGroupPrice">Price per person (₹)</label><input id="tGroupPrice" type="number" min="0" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
+          <div class="field"><label for="tGroupPrice">Price per person (₹) <span class="req">*</span></label><input id="tGroupPrice" type="number" min="1" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
         </div>
         <div id="bulkPreview" style="margin-top:0.55rem;font-size:0.76rem;color:#065f46;font-weight:700;"></div>
+        <div style="font-size:.7rem;color:#42695b;margin-top:.35rem;">Set Total Quantity above for the whole group ticket. Each attendee in a booked group uses one spot; the ticket sells out when all spots are booked.</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -1755,6 +1872,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="imagekit.js"></script>
 <script>
 firebase.initializeApp({
   apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
@@ -1762,7 +1880,7 @@ firebase.initializeApp({
   projectId: "ogshootsluxe-36740",
   storageBucket: "ogshootsluxe-36740.firebasestorage.app",
   messagingSenderId: "5471814825",
-  appId: "1:5471814825:web:07e84f2f88486da817d5b8",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8"
 });
 
 const db = firebase.firestore();
@@ -1770,6 +1888,26 @@ const auth = firebase.auth();
 function serverTimestamp() { return firebase.firestore.FieldValue.serverTimestamp(); }
 function collection(db, name) { return db.collection(name); }
 async function addDoc(ref, data) { return await ref.add(data); }
+async function saveEventInviteAccess(eventId, ownerId, config) {
+  const accessRef=db.collection('eventAccess').doc(eventId);
+  if(!config.inviteOnly){await accessRef.delete().catch(()=>{});return;}
+  await accessRef.set({ownerId,inviteOnly:config.inviteOnly,inviteLinkEnabled:config.inviteLinkEnabled,inviteCode:config.inviteCode,guestEmails:config.guestEmails,inviteToken:config.inviteLinkEnabled?config.inviteToken:'',updatedAt:serverTimestamp()},{merge:true});
+  if(config.inviteLinkEnabled&&config.inviteToken) await db.collection('eventAccessLinks').doc(config.inviteToken).set({eventId,ownerId,createdAt:serverTimestamp()});
+}
+
+async function getCurrentUser() {
+  return new Promise(resolve => {
+    const unsub = auth.onAuthStateChanged(async firebaseUser => {
+      unsub();
+      if (!firebaseUser) { resolve(null); return; }
+      try {
+        const snap = await db.collection('users').doc(firebaseUser.uid).get();
+        const data = snap.exists ? snap.data() : {};
+        resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: data.name || firebaseUser.displayName || firebaseUser.email, role: data.role || 'client' });
+      } catch { resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: firebaseUser.displayName || firebaseUser.email, role: 'client' }); }
+    });
+  });
+}
 
 // ── STATE ──
 let currentStep = 0;
@@ -1777,41 +1915,445 @@ let eventType = 'in-person';
 let tickets = [];
 let coupons = [];
 let faqs = [];
+let artists = [];
 let uid = null;
+let coverFile = null;
+let cardImgFile = null;
+let logoFile = null;
+let seatingPlanFile = null;
+let ticketDeliveryMode = 'show';
+let seatingPlanMode = 'builder';
+let seatingPlanLayout = {
+  title: 'Venue Seating Plan',
+  stage: 'STAGE',
+  rows: [],
+  sections: [],
+};
+let draftSaveTimer = null;
+const legacyLocalDraftKey = 'culturewave:event-create:draft';
+function getLocalDraftKey() {
+  return uid ? `culturewave:event-create:draft:${uid}` : null;
+}
+
+function scheduleDraftSave() {
+  if (new URLSearchParams(location.search).get('eventId')) return;
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(saveLocalDraft, 250);
+}
+
+function saveLocalDraft() {
+  if (new URLSearchParams(location.search).get('eventId')) return;
+  const localDraftKey = getLocalDraftKey();
+  if (!localDraftKey) return;
+  try {
+    const fields = {};
+    document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
+      if (el.type !== 'file') fields[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+    });
+    const toggles = {};
+    document.querySelectorAll('.toggle[id]').forEach(el => { toggles[el.id] = el.classList.contains('on'); });
+    localStorage.setItem(localDraftKey, JSON.stringify({
+      ownerId: uid,
+      fields, toggles, eventType, eventDates, tickets, coupons, faqs, artists, galleryImages,
+      ticketMode, perDateTickets, ticketDeliveryMode, ticketDesign, rsvpCQs,
+      seatingPlanMode, seatingPlanLayout,
+      savedAt: Date.now(),
+    }));
+  } catch (error) {
+    console.warn('Could not save local event draft:', error);
+  }
+}
+
+function restoreLocalDraft() {
+  if (new URLSearchParams(location.search).get('eventId')) return;
+  const localDraftKey = getLocalDraftKey();
+  if (!localDraftKey) return;
+  try {
+    const raw = localStorage.getItem(localDraftKey);
+    if (!raw) return;
+    const draft = JSON.parse(raw);
+    if (draft.ownerId && draft.ownerId !== uid) {
+      localStorage.removeItem(localDraftKey);
+      return;
+    }
+    Object.entries(draft.fields || {}).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el && el.type !== 'file') el[el.type === 'checkbox' ? 'checked' : 'value'] = value;
+    });
+    Object.entries(draft.toggles || {}).forEach(([id, on]) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('on', Boolean(on));
+    });
+    if (draft.eventType) { eventType = draft.eventType; setEventType(eventType); }
+    if (Array.isArray(draft.eventDates)) { eventDates = draft.eventDates; renderDateCards(); }
+    if (Array.isArray(draft.tickets)) { tickets = draft.tickets; renderTickets(); }
+    if (Array.isArray(draft.coupons)) { coupons = draft.coupons; renderCoupons(); }
+    if (Array.isArray(draft.faqs)) { faqs = draft.faqs; renderFaqs(); }
+    if (Array.isArray(draft.artists)) { artists = draft.artists; renderArtists(); }
+    if (Array.isArray(draft.galleryImages)) { galleryImages = draft.galleryImages; renderGallery(); }
+    if (draft.ticketMode) setTicketMode(draft.ticketMode);
+    if (draft.perDateTickets) perDateTickets = draft.perDateTickets;
+    if (draft.ticketDeliveryMode) setTicketDelivery(draft.ticketDeliveryMode);
+    if (draft.seatingPlanLayout) seatingPlanLayout = draft.seatingPlanLayout;
+    if (draft.seatingPlanMode) setSeatingPlanMode(draft.seatingPlanMode);
+    if (draft.ticketDesign) {
+      ticketDesign = draft.ticketDesign;
+      applyThemeToPreview(ticketDesign.g1, ticketDesign.g2);
+    }
+    if (Array.isArray(draft.rsvpCQs)) { rsvpCQs = draft.rsvpCQs; renderRsvpCQs(); }
+    showCardImg(document.getElementById('cardImgUrl').value.trim());
+    showCoverPreview(document.getElementById('coverUrl').value.trim());
+    showLogoPreview(document.getElementById('logoUrl').value.trim());
+    showSeatingPlan(document.getElementById('seatingPlanUrl').value.trim());
+    renderSeatingBuilder();
+  } catch (error) {
+    console.warn('Could not restore local event draft:', error);
+  }
+}
+
+function renderSeatingBuilder() {
+  const list = document.getElementById('seatingRowsList');
+  const preview = document.getElementById('seatingBuilderPreview');
+  if (!list || !preview) return;
+  const rows = seatingPlanLayout.rows || [];
+  const sections = seatingPlanLayout.sections || [];
+  list.innerHTML = sections.length ? sections.map((section, index) => `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 90px auto;gap:.55rem;align-items:end;padding:.65rem;border:1px solid var(--border);border-radius:11px;background:#fff;">
+      <div class="field"><label>Section name</label><input value="${section.name || ''}" oninput="updateAiSection(${index}, 'name', this.value)" /></div>
+      <div class="field"><label>Capacity</label><input type="number" min="0" value="${Number(section.capacity || 0)}" oninput="updateAiSection(${index}, 'capacity', this.value)" /></div>
+      <div class="field"><label>Ticket category</label><input value="${section.ticketCategory || ''}" oninput="updateAiSection(${index}, 'ticketCategory', this.value)" /></div>
+      <div class="field"><label>Color</label><input type="color" value="${section.color || '#2563eb'}" oninput="updateAiSection(${index}, 'color', this.value)" /></div>
+      <button type="button" onclick="removeAiSection(${index})" style="background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.48rem .6rem;font-weight:800;cursor:pointer;">Remove</button>
+    </div>`).join('') + '<button type="button" onclick="addAiSection()" style="margin-top:.7rem;background:var(--blue-light);color:var(--blue);border:1px solid rgba(20,84,255,.18);border-radius:9px;padding:.45rem .75rem;font-size:.76rem;font-weight:800;cursor:pointer;">+ Add section</button>' : rows.map((row, index) => `
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;align-items:end;padding:.65rem;border:1px solid var(--border);border-radius:11px;background:#fff;">
+      <div class="field"><label>Row name</label><input value="${row.label || ''}" oninput="updateSeatingRow(${index}, 'label', this.value)" /></div>
+      <div class="field"><label>Seats / sofas</label><input type="number" min="1" max="100" value="${Number(row.seats || 1)}" oninput="updateSeatingRow(${index}, 'seats', this.value)" /></div>
+      <div class="field"><label>Ticket name</label><input value="${row.ticketType || ''}" placeholder="VIP / Gold" oninput="updateSeatingRow(${index}, 'ticketType', this.value)" /></div>
+      <div class="field"><label>Style</label><select onchange="updateSeatingRow(${index}, 'seatStyle', this.value)"><option value="seat" ${row.seatStyle !== 'sofa' ? 'selected' : ''}>Individual seats</option><option value="sofa" ${row.seatStyle === 'sofa' ? 'selected' : ''}>Sofa</option></select></div>
+      <div class="field"><label>Position</label><select onchange="updateSeatingRow(${index}, 'align', this.value)"><option value="left" ${row.align === 'left' ? 'selected' : ''}>Left</option><option value="center" ${!row.align || row.align === 'center' ? 'selected' : ''}>Center</option><option value="right" ${row.align === 'right' ? 'selected' : ''}>Right</option></select></div>
+      <div class="field"><label>Orientation</label><select onchange="updateSeatingRow(${index}, 'direction', this.value)"><option value="horizontal" ${row.direction !== 'vertical' ? 'selected' : ''}>Horizontal</option><option value="vertical" ${row.direction === 'vertical' ? 'selected' : ''}>Vertical</option></select></div>
+      <button type="button" onclick="removeSeatingRow(${index})" style="background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.48rem .6rem;font-weight:800;cursor:pointer;">Remove</button>
+    </div>`).join('');
+  const title = document.getElementById('seatingPlanTitle');
+  const stage = document.getElementById('seatingStageLabel');
+  if (title && title.value !== seatingPlanLayout.title) title.value = seatingPlanLayout.title || 'Venue Seating Plan';
+  if (stage && stage.value !== seatingPlanLayout.stage) stage.value = seatingPlanLayout.stage || 'STAGE';
+  preview.innerHTML = sections.length ? `<div style="position:relative;height:420px;overflow:hidden;border-radius:16px;background:#10151f;">${sections.map(section => `<div style="position:absolute;left:${section.x}%;top:${section.y}%;width:${section.width}%;height:${section.height}%;display:grid;place-items:center;padding:.35rem;box-sizing:border-box;border:2px solid rgba(255,255,255,.3);border-radius:${section.shape === 'rounded' ? '18px' : '5px'};background:${section.color};color:#fff;font-size:.72rem;font-weight:900;text-align:center;cursor:move;">${section.name}</div>`).join('')}</div>` : `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${seatingPlanLayout.stage || 'STAGE'}</div>` +
+    (rows.length ? rows.map(row => {
+      const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
+      const justify = row.align === 'left' ? 'flex-start' : row.align === 'right' ? 'flex-end' : 'center';
+      const direction = row.direction === 'vertical' ? 'column' : 'row';
+      const unitWidth = row.seatStyle === 'sofa' ? '56px' : '26px';
+      const unitRadius = row.seatStyle === 'sofa' ? '14px' : '7px';
+      const alignItems = row.align === 'left' ? 'flex-start' : row.align === 'right' ? 'flex-end' : 'center';
+      return `<div style="margin:.65rem 0;"><div style="font-size:.64rem;font-weight:800;color:#64748b;margin:0 0 .25rem 29px;">${row.ticketType || 'General Admission'}</div><div style="display:flex;align-items:center;gap:.45rem;"><span style="width:24px;font-size:.72rem;font-weight:900;color:var(--muted);">${row.label || ''}</span><div style="display:flex;flex-direction:${direction};flex-wrap:${direction === 'row' ? 'wrap' : 'nowrap'};align-items:${direction === 'column' ? alignItems : 'center'};justify-content:${direction === 'row' ? justify : 'flex-start'};gap:.3rem;flex:1;">${Array.from({length: count}, (_, i) => `<span style="display:grid;place-items:center;width:${unitWidth};height:26px;border-radius:${unitRadius};background:${row.seatStyle === 'sofa' ? '#fce7f3' : '#e8efff'};color:${row.seatStyle === 'sofa' ? '#be185d' : '#1242c5'};font-size:.62rem;font-weight:800;">${row.seatStyle === 'sofa' ? 'Sofa ' : ''}${row.label || ''}${i + 1}</span>`).join('')}</div></div></div>`;
+    }).join('') : '<p style="text-align:center;color:var(--muted);font-size:.78rem;">Add a row to preview the seating plan.</p>');
+}
+
+window.setSeatingPlanMode = function(mode) {
+  seatingPlanMode = mode === 'image' ? 'image' : 'builder';
+  const builder = document.getElementById('seatingBuilderPanel');
+  const image = document.getElementById('seatingImagePanel');
+  const builderTab = document.getElementById('seatingBuilderTab');
+  const imageTab = document.getElementById('seatingUploadTab');
+  if (builder) builder.style.display = seatingPlanMode === 'builder' ? '' : 'none';
+  if (image) image.style.display = seatingPlanMode === 'image' ? '' : 'none';
+  if (builderTab) { builderTab.style.borderColor = seatingPlanMode === 'builder' ? 'var(--blue)' : 'var(--border)'; builderTab.style.background = seatingPlanMode === 'builder' ? 'var(--blue-light)' : '#fff'; }
+  if (imageTab) { imageTab.style.borderColor = seatingPlanMode === 'image' ? 'var(--blue)' : 'var(--border)'; imageTab.style.background = seatingPlanMode === 'image' ? 'var(--blue-light)' : '#fff'; }
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.updateSeatingRow = function(index, key, value) {
+  if (!seatingPlanLayout.rows[index]) return;
+  seatingPlanLayout.rows[index][key] = key === 'seats' ? Math.max(1, Math.min(100, Number(value) || 1)) : value.trim().slice(0, 40);
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.addSeatingRow = function() {
+  const next = String.fromCharCode(65 + seatingPlanLayout.rows.length);
+  seatingPlanLayout.rows.push({ label: next, seats: 8, ticketType: '', seatStyle: 'seat', align: 'center', direction: 'horizontal' });
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.removeSeatingRow = function(index) {
+  seatingPlanLayout.rows.splice(index, 1);
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.updateSeatingMeta = function(key, value) {
+  seatingPlanLayout[key] = value.trim().slice(0, 80);
+  renderSeatingBuilder();
+  updateProgress();
+};
+window.updateAiSection = function(index, key, value) { const section = seatingPlanLayout.sections[index]; if (!section) return; section[key] = key === 'capacity' ? Number(value || 0) : value; renderSeatingBuilder(); scheduleDraftSave(); };
+window.removeAiSection = function(index) { seatingPlanLayout.sections.splice(index, 1); renderSeatingBuilder(); scheduleDraftSave(); };
+window.addAiSection = function() { seatingPlanLayout.sections.push({ id:`section-${Date.now()}`, name:'NEW SECTION', type:'section', x:20, y:70, width:30, height:16, shape:'rounded', color:'#2563eb', capacity:0, ticketCategory:'', price:0 }); renderSeatingBuilder(); };
+
+window.openAiSeatingModal = () => document.getElementById('aiSeatingModal').classList.add('open');
+window.closeAiSeatingModal = () => document.getElementById('aiSeatingModal').classList.remove('open');
+window.generateAiSeatingPlan = () => {
+  const prompt = document.getElementById('aiSeatingPrompt').value.trim().toLowerCase();
+  if (!prompt) { alert('Describe the seating layout you want first.'); return; }
+  const listed = document.getElementById('aiSectionNames').value.split(',').map(name => name.trim()).filter(Boolean);
+  const positionalPrompt = /\b(vertical|vertically|column|columns|horizontal|horizontally|row|rows|sofa|sofas|couch|couches|couple)\b/.test(prompt);
+  if (positionalPrompt) {
+    const rows = [];
+    const quantity = (pattern, fallback) => {
+      const match = prompt.match(pattern);
+      return Math.max(1, Math.min(100, match ? Number(match[1]) : fallback));
+    };
+    const hasVerticalSeats = /\b(vertical|vertically|column|columns)\b/.test(prompt);
+    const hasHorizontalChairs = /\b(horizontal|horizontally|row|rows|chair|chairs)\b/.test(prompt);
+    const hasSofa = /\b(sofa|sofas|couch|couches|couple)\b/.test(prompt);
+    if (hasVerticalSeats) rows.push({ label: 'V', ticketType: 'Vertical Seats', seats: quantity(/(?:vertical(?:ly)?\s+(?:seats?|chairs?)|columns?)\D{0,12}(\d+)/, 8), seatStyle: 'seat', align: /left/.test(prompt) ? 'left' : 'center', direction: 'vertical' });
+    if (hasHorizontalChairs) rows.push({ label: 'H', ticketType: 'Horizontal Chairs', seats: quantity(/(?:horizontal(?:ly)?\s+(?:seats?|chairs?)|rows?)\D{0,12}(\d+)/, 8), seatStyle: 'seat', align: 'center', direction: 'horizontal' });
+    if (hasSofa) rows.push({ label: 'CS', ticketType: 'Couple Sofa', seats: quantity(/(?:couple\s+)?(?:sofas?|couches?)\D{0,12}(\d+)/, 1), seatStyle: 'sofa', align: /right/.test(prompt) ? 'right' : 'center', direction: 'horizontal' });
+    if (!rows.length && listed.length) listed.slice(0, 12).forEach((name, index) => rows.push({ label: String.fromCharCode(65 + index), ticketType: name, seats: 8, seatStyle: 'seat', align: 'center', direction: 'horizontal' }));
+    if (rows.length) {
+      seatingPlanLayout = { title: `${document.getElementById('aiVenueType').value} Seating Plan`, stage: 'STAGE', rows, sections: [] };
+      seatingPlanMode = 'builder';
+      closeAiSeatingModal();
+      renderSeatingBuilder();
+      updateProgress();
+      alert('Generated the requested seat directions and sofa position. Review the preview and adjust the rows below.');
+      return;
+    }
+  }
+  const defaults = prompt.includes('fanpit') ? ['FANPIT', 'PREMIUM', 'GENERAL'] : ['VIP', 'PREMIUM', 'GENERAL'];
+  const names = (listed.length ? listed : defaults).slice(0, Math.max(1, Number(document.getElementById('aiSectionCount').value) || 3));
+  const colors = ['#eab308', '#a855f7', '#2563eb', '#16a34a', '#ec4899', '#f97316'];
+  seatingPlanLayout = {
+    title: `${document.getElementById('aiVenueType').value} Seating Plan`, stage: 'STAGE',
+    rows: [],
+    sections: [
+      { id: 'stage', name: 'STAGE', type: 'stage', x: 25, y: 5, width: 50, height: 12, shape: 'rounded', color: '#111827', capacity: 0, ticketCategory: '', price: 0 },
+      ...names.map((name, index) => ({ id: `section-${Date.now()}-${index}`, name: name.toUpperCase(), type: 'section', x: 12 + (index % 2) * 39, y: 23 + Math.floor(index / 2) * 27, width: names.length === 1 ? 76 : 37, height: 20, shape: index === 0 ? 'rounded' : 'rectangle', color: colors[index % colors.length], capacity: 100, ticketCategory: name, price: 0 }))
+    ]
+  };
+  seatingPlanMode = 'builder';
+  closeAiSeatingModal();
+  renderSeatingBuilder();
+  updateProgress();
+  alert('AI generated your seating plan. You can edit its sections below.');
+};
+
+async function uploadSelectedImage(file, folder, urlId, clearPending, render) {
+  try {
+    const url = await uploadImageToImageKit(file, folder);
+    document.getElementById(urlId).value = url;
+    clearPending();
+    render(url);
+    updateProgress();
+    await persistUploadedImage(urlId, url);
+  } catch (error) {
+    console.warn('Image upload will retry when the event is saved:', error);
+  }
+}
+
+async function persistUploadedImage(urlId, url) {
+  const editId = new URLSearchParams(location.search).get('eventId');
+  if (!editId) {
+    saveLocalDraft();
+    return;
+  }
+  const fieldPath = {
+    coverUrl: 'coverUrl',
+    cardImgUrl: 'cardImgUrl',
+    logoUrl: 'ticketDesign.logoUrl',
+    seatingPlanUrl: 'seatingPlanUrl',
+    videoUrl: 'videoUrl',
+  }[urlId];
+  if (!fieldPath) return;
+  await db.collection('events').doc(editId).update({
+    [fieldPath]: url,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+}
 
 // ── AUTH ──
 async function loadUser() {
-  try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (res.ok) {
-      const { user } = await res.json();
-      uid = user.uid;
-      localStorage.setItem('cw_uid', uid);
-      const init = (user.name || 'U').trim().charAt(0).toUpperCase();
-      const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
-      return;
-    }
-  } catch {}
-  // fallback: Firebase Auth (works on file://)
-  await new Promise(resolve => {
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        uid = user.uid;
-        const init = (user.displayName || user.email || 'U').trim().charAt(0).toUpperCase();
-        const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
-      } else {
-        // not signed in via Firebase — try localStorage fallback
-        uid = localStorage.getItem('cw_uid') || ('local_' + Date.now());
-        localStorage.setItem('cw_uid', uid);
-      }
-      resolve();
-    });
-  });
+  const user = await getCurrentUser();
+  if (!user) { window.location.href = 'login.html'; return; }
+  uid = user.uid;
+  // Previous versions used one browser-wide draft key. Remove it so a new
+  // account never inherits another user's unfinished listing.
+  localStorage.removeItem(legacyLocalDraftKey);
+  restoreLocalDraft();
+  updateProgress();
+  renderRsvpPreview();
+  const init = (user.name || 'U').trim().charAt(0).toUpperCase();
+  const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
 }
 loadUser();
 
+// ── PREFILL FOR EDIT MODE ──
+(async function prefillIfEdit() {
+  const params = new URLSearchParams(location.search);
+  const eventId = params.get('eventId');
+  if (!eventId) return;
+  try {
+    const snap = await db.collection('events').doc(eventId).get();
+    if (!snap.exists) return;
+    const d = snap.data();
+    const user = await getCurrentUser();
+    if (!user || (d.ownerId && d.ownerId !== user.uid)) {
+      history.replaceState(null, '', 'event-create.html');
+      return;
+    }
+    const accessSnap=await db.collection('eventAccess').doc(eventId).get();
+    if(accessSnap.exists) Object.assign(d,accessSnap.data());
+    const g = id => document.getElementById(id);
+    const set = (id, val) => { const el = g(id); if (el && val !== undefined && val !== null) el.value = val; };
+    const setToggle = (id, val) => { const el = g(id); if (!el) return; if (val) el.classList.add('on'); else el.classList.remove('on'); };
+    // basic info
+    set('eventName', d.name || '');
+    set('urlKey', d.urlKey || '');
+    set('summary', d.summary || '');
+    set('description', d.description || '');
+    if (g('category')) g('category').value = d.category || '';
+    set('tags', Array.isArray(d.tags) ? d.tags.join(', ') : (d.tags || ''));
+    // venue
+    set('venueName', d.venueName || '');
+    set('city', d.city || '');
+    if (g('state')) set('state', d.state || '');
+    if (g('address')) set('address', d.address || '');
+    if (g('mapLink')) set('mapLink', d.mapLink || '');
+    if (g('onlineLink')) set('onlineLink', d.onlineLink || '');
+    if (g('onlinePlatform') && d.onlinePlatform) g('onlinePlatform').value = d.onlinePlatform;
+    // schedule
+    if (Array.isArray(d.eventDates) && d.eventDates.length) {
+      eventDates = d.eventDates;
+      renderDateCards();
+    }
+    set('capacity', d.capacity || '');
+    set('eventDuration', d.duration || '');
+    if (g('regDeadline')) set('regDeadline', d.regDeadline || '');
+    if (g('timezone') && d.timezone) g('timezone').value = d.timezone;
+    // tickets
+    if (Array.isArray(d.tickets) && d.tickets.length) {
+      tickets = d.tickets;
+      renderTickets();
+    }
+    if (Array.isArray(d.coupons)) { coupons = d.coupons; renderCoupons(); }
+    if (Array.isArray(d.faqs)) { faqs = d.faqs; renderFaqs(); }
+    if (d.ticketMode) { ticketMode = d.ticketMode; setTicketMode(d.ticketMode); }
+    if (d.ticketDeliveryMode) { ticketDeliveryMode = d.ticketDeliveryMode; setTicketDelivery(d.ticketDeliveryMode); }
+    if (d.perDateTickets) perDateTickets = d.perDateTickets;
+    if (Array.isArray(d.artists)) { artists = d.artists; renderArtists(); }
+    if (Array.isArray(d.galleryImages)) { galleryImages = d.galleryImages; renderGallery(); }
+    // images
+    if (d.coverUrl) {
+      set('coverUrl', d.coverUrl);
+      const prev = g('coverPreview'); if (prev) { prev.src = d.coverUrl; prev.style.display = 'block'; }
+      const ph = g('coverPlaceholder'); if (ph) ph.style.display = 'none';
+    }
+    if (d.desktopBackgroundUrl) set('desktopBackgroundUrl', d.desktopBackgroundUrl);
+    if (d.seatingPlanUrl) {
+      set('seatingPlanUrl', d.seatingPlanUrl);
+      showSeatingPlan(d.seatingPlanUrl);
+    }
+    if (d.seatingPlan) {
+      seatingPlanLayout = d.seatingPlan;
+      setSeatingPlanMode(d.seatingPlanMode || 'builder');
+      renderSeatingBuilder();
+    }
+    if (d.cardImgUrl || d.ticketDesign?.cardImg) {
+      const url = d.cardImgUrl || d.ticketDesign?.cardImg;
+      set('cardImgUrl', url);
+      const prev = g('cardImgPreview'); if (prev) { prev.src = url; prev.style.display = 'block'; }
+      const ph = g('cardImgPlaceholder'); if (ph) ph.style.display = 'none';
+    }
+    // ticket design
+    if (d.ticketDesign) {
+      ticketDesign = { g1: d.ticketDesign.gradientStart || '#1454ff', g2: d.ticketDesign.gradientEnd || '#4c7dff' };
+      set('tdColor1', ticketDesign.g1); set('tdColor2', ticketDesign.g2);
+      applyThemeToPreview(ticketDesign.g1, ticketDesign.g2);
+      if (g('tdOrgName')) set('tdOrgName', d.ticketDesign.organiserName || '');
+      if (g('tdTagline')) set('tdTagline', d.ticketDesign.tagline || '');
+      if (g('tdFooter')) set('tdFooter', d.ticketDesign.footer || '');
+      const ticketToggleKeys = {tdShowQR:'showQR',tdShowSeat:'showSeat',tdShowVenue:'showVenue',tdShowLogo:'showLogo'};
+      Object.entries(ticketToggleKeys).forEach(([id, key]) => { if (key in d.ticketDesign) setToggle(id, d.ticketDesign[key]); });
+      if (g('logoUrl') && d.ticketDesign.logoUrl) {
+        set('logoUrl', d.ticketDesign.logoUrl);
+        showLogoPreview(d.ticketDesign.logoUrl);
+      }
+    }
+    // notes / terms
+    if (g('notes')) set('notes', d.notes || '');
+    if (g('termsText')) set('termsText', d.termsText || '');
+    if (g('refundPolicy')) set('refundPolicy', d.refundPolicy || '');
+    if (g('refundDeadlineDays')) set('refundDeadlineDays', d.refundDeadlineDays || '');
+    if (g('refundPercent')) set('refundPercent', d.refundPercent !== undefined ? d.refundPercent : 100);
+    // toggles
+    setToggle('toggleInvite', d.inviteOnly);
+    setToggle('toggleInviteLink', d.inviteLinkEnabled);
+    window.inviteTokenDraft = d.inviteToken || '';
+    setToggle('toggleSoldOut', d.soldOut);
+    setToggle('toggleWaitlist', d.allowWaitlist);
+    setToggle('toggleNotifyWaitlist', d.notifyWaitlist);
+    setToggle('toggleAttendeeCount', d.showAttendeeCount !== false);
+    setToggle('toggleRefunds', d.enableRefunds !== false);
+    setToggle('togglePublicListing', d.publicListing !== false);
+    setToggle('toggleSharing', d.allowSharing !== false);
+    Object.entries(d.rsvpFields || {}).forEach(([field, enabled]) => {
+      const el = document.querySelector(`.toggle[data-field="${field}"]`);
+      if (el) el.classList.toggle('on', Boolean(enabled));
+    });
+    if (Array.isArray(d.customQuestions)) { rsvpCQs = d.customQuestions; renderRsvpCQs(); }
+    setToggle('rsvpToggleTC', d.requireTC);
+    setToggle('rsvpToggleConfEmail', d.sendConfirmEmail);
+    setToggle('rsvpToggleConfWA', d.sendConfirmWA);
+    set('rsvpConfirmMsg', d.confirmMsg || '');
+    set('guestEmails', Array.isArray(d.guestEmails) ? d.guestEmails.join('\n') : '');
+    set('overflowAction', d.overflowAction || '');
+    if (g('inviteCode')) set('inviteCode', d.inviteCode || '');
+    if (g('soldOutMsg')) set('soldOutMsg', d.soldOutMsg || '');
+    if (g('videoUrl')) set('videoUrl', d.videoUrl || '');
+    if (g('videoUrl')) syncVideoEmbed();
+    if (g('eventLanguage')) set('eventLanguage', d.language || '');
+    if (g('layoutType')) set('layoutType', d.layoutType || '');
+    if (g('kidsFriendly')) set('kidsFriendly', d.kidsFriendly || '');
+    if (g('petsFriendly')) set('petsFriendly', d.petsFriendly || '');
+    if (g('currency') && d.currency) g('currency').value = d.currency;
+    if (g('feeMode') && d.feeMode) g('feeMode').value = d.feeMode;
+    // update page title to indicate edit mode
+    const titleEl = document.querySelector('h1, .page-title, #pageTitle');
+    if (titleEl) titleEl.textContent = 'Edit Event';
+    document.title = 'Edit Event | CultureWave';
+    // change buttons to Save mode
+    const pubBtn = document.getElementById('publishBtn');
+    const draftBtn = document.getElementById('saveDraftBtn');
+    if (pubBtn) pubBtn.textContent = 'Save Changes';
+    if (draftBtn) draftBtn.textContent = 'Save Draft';
+    // preserve existing status on save — remove old listeners by cloning
+    const existingStatus = d.status || 'draft';
+    if (pubBtn) {
+      const newPubBtn = pubBtn.cloneNode(true);
+      pubBtn.parentNode.replaceChild(newPubBtn, pubBtn);
+      newPubBtn.addEventListener('click', () => saveEvent(existingStatus));
+    }
+    if (draftBtn) {
+      const newDraftBtn = draftBtn.cloneNode(true);
+      draftBtn.parentNode.replaceChild(newDraftBtn, draftBtn);
+      newDraftBtn.addEventListener('click', () => saveEvent('draft'));
+    }
+    updateProgress();
+  } catch(e) {
+    console.warn('Could not prefill event:', e);
+  }
+})();
+
 // ── STEP NAVIGATION ──
+function hasRequiredEventDetails() {
+  return ['eventLanguage', 'layoutType', 'kidsFriendly', 'petsFriendly']
+    .every(id => document.getElementById(id)?.value.trim());
+}
+
 window.goStep = function(n) {
+  if (currentStep === 6 && n > 6 && !hasRequiredEventDetails()) {
+    alert('Please complete all required Event Details before continuing.');
+    return;
+  }
   const panels = document.querySelectorAll('.step-panel');
   const btns = document.querySelectorAll('.step-btn');
   panels.forEach(p => p.classList.toggle('active', +p.dataset.panel === n));
@@ -1842,6 +2384,8 @@ function updateProgress() {
   updateAlert();
   updateTopTitle();
   markDoneSteps();
+  if (typeof updateTicketPreview === 'function') updateTicketPreview();
+  scheduleDraftSave();
 }
 
 function markDoneSteps() {
@@ -1850,6 +2394,7 @@ function markDoneSteps() {
     document.getElementById('city').value.trim() || document.getElementById('onlineLink').value.trim(),
     document.getElementById('startDate').value,
     tickets.length > 0,
+    (seatingPlanMode === 'builder' && seatingPlanLayout.rows && seatingPlanLayout.rows.length > 0) || document.getElementById('seatingPlanUrl').value.trim() || (document.getElementById('seatingPlanInput').files && document.getElementById('seatingPlanInput').files.length > 0),
     document.getElementById('coverUrl').value.trim() || (document.getElementById('coverInput').files && document.getElementById('coverInput').files.length > 0) || galleryImages.length > 0,
     true, true, true, true, true, true, true,
   ];
@@ -1936,12 +2481,15 @@ function showCardImg(src) {
 }
 window.loadCardImg = function(input) {
   const file = input.files[0]; if (!file) return;
+  cardImgFile = file;
   const r = new FileReader();
   r.onload = e => { document.getElementById('cardImgUrl').value = ''; showCardImg(e.target.result); };
   r.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-cards', 'cardImgUrl', () => { cardImgFile = null; }, showCardImg);
 };
 window.syncCardImgUrl = function() { showCardImg(document.getElementById('cardImgUrl').value); };
 window.removeCardImg = function() {
+  cardImgFile = null;
   document.getElementById('cardImgUrl').value = '';
   document.getElementById('cardImgInput').value = '';
   showCardImg('');
@@ -1952,9 +2500,76 @@ window.handleCardImgDrop = function(e) {
   dz.style.borderColor = 'var(--border)'; dz.style.background = 'var(--blue-soft)';
   const file = e.dataTransfer.files[0];
   if (!file || !file.type.startsWith('image/')) return;
+  cardImgFile = file;
   const r = new FileReader();
   r.onload = ev => showCardImg(ev.target.result);
   r.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-cards', 'cardImgUrl', () => { cardImgFile = null; }, showCardImg);
+};
+
+function showLogoPreview(src) {
+  const btn = document.getElementById('logoRemoveBtn');
+  const preview = document.getElementById('tpLogo');
+  if (btn) btn.style.display = src ? '' : 'none';
+  if (!preview) return;
+  preview.textContent = '';
+  if (src) {
+    const img = document.createElement('img');
+    img.src = src; img.alt = 'Organiser logo';
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:8px;';
+    preview.appendChild(img);
+  } else {
+    preview.textContent = '\uD83C\uDF9F\uFE0F';
+  }
+}
+window.loadLogoFile = function(input) {
+  const file = input.files[0]; if (!file) return;
+  logoFile = file;
+  const reader = new FileReader();
+  reader.onload = e => { document.getElementById('logoUrl').value = ''; showLogoPreview(e.target.result); };
+  reader.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-logos', 'logoUrl', () => { logoFile = null; }, showLogoPreview);
+};
+window.syncLogoUrl = function() { showLogoPreview(document.getElementById('logoUrl').value.trim()); };
+window.removeLogo = function() {
+  logoFile = null;
+  document.getElementById('logoUrl').value = '';
+  document.getElementById('logoInput').value = '';
+  showLogoPreview('');
+};
+
+function showSeatingPlan(src) {
+  const preview = document.getElementById('seatingPlanPreview');
+  const remove = document.getElementById('seatingPlanRemoveBtn');
+  if (preview) { preview.src = src || ''; preview.style.display = src ? 'block' : 'none'; }
+  if (remove) remove.style.display = src ? '' : 'none';
+}
+window.loadSeatingPlan = function(input) {
+  const file = input.files[0]; if (!file) return;
+  seatingPlanFile = file;
+  const reader = new FileReader();
+  reader.onload = e => { document.getElementById('seatingPlanUrl').value = ''; showSeatingPlan(e.target.result); };
+  reader.readAsDataURL(file);
+  uploadSelectedImage(file, '/seating-plans', 'seatingPlanUrl', () => { seatingPlanFile = null; }, showSeatingPlan);
+};
+window.syncSeatingPlan = function() { showSeatingPlan(document.getElementById('seatingPlanUrl').value.trim()); };
+window.removeSeatingPlan = function() {
+  seatingPlanFile = null;
+  document.getElementById('seatingPlanUrl').value = '';
+  document.getElementById('seatingPlanInput').value = '';
+  showSeatingPlan('');
+};
+
+window.setTicketDelivery = function(mode) {
+  ticketDeliveryMode = mode === 'whatsapp' ? 'whatsapp' : 'show';
+  const show = document.getElementById('ticketDeliveryShow');
+  const wa = document.getElementById('ticketDeliveryWhatsApp');
+  const note = document.getElementById('ticketDeliveryNote');
+  if (show) { show.style.borderColor = ticketDeliveryMode === 'show' ? 'var(--blue)' : 'var(--border)'; show.style.background = ticketDeliveryMode === 'show' ? 'var(--blue-light)' : '#fff'; }
+  if (wa) { wa.style.borderColor = ticketDeliveryMode === 'whatsapp' ? '#16a34a' : 'var(--border)'; wa.style.background = ticketDeliveryMode === 'whatsapp' ? '#f0fdf4' : '#fff'; }
+  if (note) note.textContent = ticketDeliveryMode === 'whatsapp'
+    ? 'Admin will receive a pending request with the attendee list and this ticket design.'
+    : 'Customers will see this ticket design on the booking success page.';
 };
 
 // ── MEDIA: Cover ──
@@ -1974,15 +2589,18 @@ function showCoverPreview(src) {
 }
 window.loadCoverFile = function(input) {
   const file = input.files[0]; if (!file) return;
+  coverFile = file;
   const r = new FileReader();
   r.onload = e => { document.getElementById('coverUrl').value = ''; showCoverPreview(e.target.result); updateProgress(); };
   r.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-covers', 'coverUrl', () => { coverFile = null; }, showCoverPreview);
 };
 window.syncCoverUrl = function() {
   showCoverPreview(document.getElementById('coverUrl').value);
   updateProgress();
 };
 window.removeCover = function() {
+  coverFile = null;
   document.getElementById('coverUrl').value = '';
   document.getElementById('coverInput').value = '';
   showCoverPreview('');
@@ -1993,9 +2611,11 @@ window.handleCoverDrop = function(e) {
   document.getElementById('coverDropZone').style.borderColor = 'var(--border)';
   const file = e.dataTransfer.files[0];
   if (!file || !file.type.startsWith('image/')) return;
+  coverFile = file;
   const r = new FileReader();
   r.onload = ev => { showCoverPreview(ev.target.result); updateProgress(); };
   r.readAsDataURL(file);
+  uploadSelectedImage(file, '/event-covers', 'coverUrl', () => { coverFile = null; }, showCoverPreview);
 };
 
 // ── MEDIA: Gallery ──
@@ -2033,11 +2653,30 @@ window.syncVideoEmbed = function() {
   const url = document.getElementById('videoUrl').value;
   const wrap = document.getElementById('videoEmbedWrap');
   const frame = document.getElementById('videoEmbedFrame');
+  const player = document.getElementById('videoPreviewPlayer');
   const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
   const vi = url.match(/vimeo\.com\/(\d+)/);
-  if (yt) { frame.src = 'https://www.youtube.com/embed/' + yt[1]; wrap.style.display = ''; }
-  else if (vi) { frame.src = 'https://player.vimeo.com/video/' + vi[1]; wrap.style.display = ''; }
-  else { frame.src = ''; wrap.style.display = 'none'; }
+  const directVideo = /^https?:\/\/.+\.(?:mp4|webm|mov)(?:[?#].*)?$/i.test(url);
+  if (yt) { player.pause(); player.removeAttribute('src'); player.load(); player.style.display='none'; frame.style.display='block'; frame.src = 'https://www.youtube.com/embed/' + yt[1]; wrap.style.display = ''; }
+  else if (vi) { player.pause(); player.removeAttribute('src'); player.load(); player.style.display='none'; frame.style.display='block'; frame.src = 'https://player.vimeo.com/video/' + vi[1]; wrap.style.display = ''; }
+  else if (directVideo) { frame.src=''; frame.style.display='none'; player.src=url; player.style.display='block'; wrap.style.display=''; }
+  else { frame.src = ''; frame.style.display='block'; player.pause(); player.removeAttribute('src'); player.load(); player.style.display='none'; wrap.style.display = 'none'; }
+};
+window.uploadPromoVideo = async function(input) {
+  const file=input.files && input.files[0];
+  if(!file) return;
+  const status=document.getElementById('videoUploadStatus');
+  status.textContent='Uploading video…';
+  try {
+    const url=await uploadVideoToImageKit(file,'/event-videos');
+    document.getElementById('videoUrl').value=url;
+    syncVideoEmbed();
+    updateProgress();
+    await persistUploadedImage('videoUrl',url);
+    status.textContent='Video uploaded and saved.';
+  } catch(error) {
+    status.textContent=error.message || 'Video upload failed.';
+  } finally { input.value=''; }
 };
 
 // ── TICKET MODE ──
@@ -2082,8 +2721,8 @@ function renderPerDateTicketCards() {
       <div style="display:flex;flex-direction:column;gap:0.4rem;">
         ${dtix.length ? dtix.map((t, ti) => `
           <div class="ticket-row">
-            <div><div class="tr-name">${t.name}</div>${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);">${t.desc}</div>` : ''}</div>
-            <span class="tr-price">${t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
+            <div><div class="tr-name">${t.name}</div>${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);">${t.desc}</div>` : ''}${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}</div>
+            <span class="tr-price">${t.bulk && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + (Number(t.bulk.pricePerPerson)*Number(t.bulk.minPersons)).toLocaleString('en-IN') + ' group' : Number(t.price) === 0 ? 'Free' : '&#8377;' + Number(t.price).toLocaleString('en-IN')}</span>
             <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
             <button class="tr-del" onclick="removePerDateTicket('${d.date}',${ti})">&#10005;</button>
           </div>`).join('') : `<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.82rem;border:1px dashed var(--border);border-radius:10px;">No tickets for this date yet</div>`}
@@ -2107,6 +2746,12 @@ window.toggleBulkSection = function() {
   btn.classList.toggle('on');
   const on = btn.classList.contains('on');
   document.getElementById('bulkSection').style.display = on ? '' : 'none';
+  const stockField = document.getElementById('ticketStockField');
+  const bulkSection = document.getElementById('bulkSection');
+  const singleGrid = document.getElementById('singleTicketGrid');
+  const preview = document.getElementById('bulkPreview');
+  if (on) bulkSection.insertBefore(stockField, preview);
+  else singleGrid.appendChild(stockField);
   if (!on) document.getElementById('bulkPreview').textContent = '';
 };
 window.updateBulkPreview = function() {
@@ -2129,6 +2774,7 @@ window.closeTicketModal = () => {
   });
   const btn = document.getElementById('toggleBulk');
   btn.classList.remove('on');
+  document.getElementById('singleTicketGrid').appendChild(document.getElementById('ticketStockField'));
   document.getElementById('bulkSection').style.display = 'none';
   document.getElementById('bulkPreview').textContent = '';
   activePerDateIdx = null;
@@ -2137,6 +2783,7 @@ window.addTicket = () => {
   const name = document.getElementById('tName').value.trim();
   if (!name) { alert('Ticket name is required.'); return; }
   const bulkOn = document.getElementById('toggleBulk').classList.contains('on');
+  const groupPriceInput = document.getElementById('tGroupPrice').value.trim();
   const ticket = {
     name,
     price: Number(document.getElementById('tPrice').value || 0),
@@ -2145,10 +2792,12 @@ window.addTicket = () => {
     bulk: bulkOn ? {
       minPersons: Number(document.getElementById('tGroupMin').value || 0),
       maxPersons: Number(document.getElementById('tGroupMax').value || 0),
-      pricePerPerson: Number(document.getElementById('tGroupPrice').value || 0),
+      pricePerPerson: Number(groupPriceInput || 0),
     } : null,
   };
   if (bulkOn && !ticket.bulk.minPersons) { alert('Please enter minimum persons for group pricing.'); return; }
+  if (bulkOn && (!groupPriceInput || Number(groupPriceInput) <= 0)) { alert('Please enter a group price greater than ₹0 per person.'); return; }
+  if (bulkOn && ticket.bulk.maxPersons && ticket.bulk.maxPersons < ticket.bulk.minPersons) { alert('Maximum persons must be greater than or equal to minimum persons.'); return; }
   if (activePerDateIdx !== null) {
     const dateStr = eventDates[activePerDateIdx].date;
     if (!perDateTickets[dateStr]) perDateTickets[dateStr] = [];
@@ -2175,7 +2824,7 @@ function renderTickets() {
         ${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);margin-top:0.1rem;">${t.desc}</div>` : ''}
         ${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;margin-top:0.2rem;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}
       </div>
-      <span class="tr-price">${t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
+      <span class="tr-price">${t.bulk && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + (Number(t.bulk.pricePerPerson)*Number(t.bulk.minPersons)).toLocaleString('en-IN') + ' group' : t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
       <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
       <button class="tr-del" onclick="removeTicket(${i})">&#10005;</button>
     </div>`).join('');
@@ -2214,6 +2863,30 @@ function renderCoupons() {
     </div>`).join('');
 }
 window.removeCoupon = i => { coupons.splice(i, 1); renderCoupons(); };
+
+// ── FEATURED ARTISTS ──
+window.addArtist = () => {
+  const name = document.getElementById('artistName').value.trim();
+  const image = document.getElementById('artistImage').value.trim();
+  if (!name || !image) { alert('Artist name and image URL are required.'); return; }
+  artists.push({ name, image, active: true });
+  document.getElementById('artistName').value = '';
+  document.getElementById('artistImage').value = '';
+  renderArtists();
+  scheduleDraftSave();
+};
+function renderArtists() {
+  const list = document.getElementById('artistList');
+  if (!list) return;
+  if (!artists.length) { list.innerHTML = ''; return; }
+  list.innerHTML = artists.map((artist, i) => `
+    <div style="display:flex;align-items:center;gap:.7rem;padding:.55rem .7rem;border:1px solid var(--border);border-radius:12px;background:var(--blue-soft);">
+      <img src="${String(artist.image || '').replace(/&/g, '&amp;').replace(/\"/g, '&quot;')}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:9px;background:#e2e8f0;" />
+      <strong style="flex:1;font-size:.84rem;">${String(artist.name || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+      <label style="display:flex;align-items:center;gap:.3rem;font-size:.74rem;font-weight:700;cursor:pointer;"><input type="checkbox" ${artist.active !== false ? 'checked' : ''} onchange="artists[${i}].active=this.checked;scheduleDraftSave()" style="accent-color:var(--blue);" /> Active</label>
+      <button class="tr-del" type="button" onclick="artists.splice(${i},1);renderArtists();scheduleDraftSave()">✕</button>
+    </div>`).join('');
+}
 
 // ── FAQ MODAL ──
 window.openFaqModal = () => document.getElementById('faqModal').classList.add('open');
@@ -2256,26 +2929,92 @@ window.removeFaq = i => { faqs.splice(i, 1); renderFaqs(); };
 
 // ── SAVE / PUBLISH ──
 async function saveEvent(status) {
+  const inviteAccessConfig={
+    inviteOnly:document.getElementById('toggleInvite').classList.contains('on'),
+    inviteLinkEnabled:document.getElementById('toggleInviteLink').classList.contains('on'),
+    inviteCode:document.getElementById('inviteCode').value.trim(),
+    guestEmails:[...new Set(document.getElementById('guestEmails').value.split('\n').map(e=>e.trim().toLowerCase()).filter(Boolean))],
+    inviteToken:document.getElementById('toggleInviteLink').classList.contains('on')?(window.inviteTokenDraft||(window.inviteTokenDraft=crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`)):''
+  };
   const name = document.getElementById('eventName').value.trim();
   const urlKey = document.getElementById('urlKey').value.trim() || slugify(name);
   const summary = document.getElementById('summary').value.trim();
   const description = document.getElementById('description').value.trim();
+  const editId = new URLSearchParams(location.search).get('eventId');
 
-  if (!name || !urlKey || !summary || !description) {
+  if (!name || !urlKey) {
     goStep(0);
-    alert('Please complete Event Name, URL Key, Summary and Description.');
+    alert('Please complete Event Name and URL Key.');
     return;
   }
-  if (!uid) { await loadUser(); }
-  if (!uid) { alert("Please sign in to save."); return; }
+  if (!editId && (!summary || !description)) {
+    goStep(0);
+    alert('Please complete Summary and Description.');
+    return;
+  }
+  if (status === 'published' && !hasRequiredEventDetails()) {
+    goStep(6);
+    alert('Please complete all required Event Details before publishing.');
+    return;
+  }
+  let saveUser = auth.currentUser;
+  if (!saveUser) {
+    saveUser = await new Promise(resolve => {
+      let unsubscribe = () => {};
+      unsubscribe = auth.onAuthStateChanged(user => { unsubscribe(); resolve(user); });
+    });
+  }
+  if (!saveUser) { alert("Please sign in to save."); return; }
+  // Use the same Auth instance and UID that Firestore security rules validate.
+  uid = saveUser.uid;
+
+  const saveButton = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
+  if (cardImgFile || coverFile || logoFile || seatingPlanFile) {
+    saveButton.textContent = 'Uploading image...';
+    saveButton.disabled = true;
+    try {
+      if (cardImgFile) {
+        const url = await uploadImageToImageKit(cardImgFile, '/event-cards');
+        document.getElementById('cardImgUrl').value = url;
+        showCardImg(url);
+        cardImgFile = null;
+      }
+      if (coverFile) {
+        const url = await uploadImageToImageKit(coverFile, '/event-covers');
+        document.getElementById('coverUrl').value = url;
+        showCoverPreview(url);
+        coverFile = null;
+      }
+      if (logoFile) {
+        const url = await uploadImageToImageKit(logoFile, '/event-logos');
+        document.getElementById('logoUrl').value = url;
+        showLogoPreview(url);
+        logoFile = null;
+      }
+      if (seatingPlanFile) {
+        const url = await uploadImageToImageKit(seatingPlanFile, '/seating-plans');
+        document.getElementById('seatingPlanUrl').value = url;
+        showSeatingPlan(url);
+        seatingPlanFile = null;
+      }
+    } catch (err) {
+      alert('Image upload failed: ' + err.message);
+      saveButton.textContent = status === 'published' ? 'Publish Event' : 'Save Draft';
+      saveButton.disabled = false;
+      return;
+    }
+  }
 
   const rsvpToggles = {};
   document.querySelectorAll('.toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
   });
+  // Local gallery previews are data URLs and can make a Firestore event document
+  // exceed its 1 MiB limit. Persist only uploaded/pasted image URLs.
+  const savedGalleryImages = galleryImages.filter(src => !String(src || '').startsWith('data:'));
 
   const payload = {
-    ownerId: uid, name, urlKey, summary, description,
+    ownerId: uid, organiserId: uid, name, urlKey, summary, description,
     category: document.getElementById('category').value,
     tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
     eventType,
@@ -2288,19 +3027,34 @@ async function saveEvent(status) {
     onlinePlatform: document.getElementById('onlinePlatform').value,
     eventDates,
     startDate: eventDates.length ? eventDates[0].date : '',
-    capacity: Number(document.getElementById('capacity').value || 0),
+    capacity: tickets.reduce((sum,ticket)=>sum+Math.max(0,Number(ticket.qty||ticket.inventory||0)),0) || Number(document.getElementById('capacity').value || 0),
     duration: Number(document.getElementById('eventDuration').value || 0),
+    language: document.getElementById('eventLanguage').value.trim(),
+    layoutType: document.getElementById('layoutType').value,
+    kidsFriendly: document.getElementById('kidsFriendly').value,
+    petsFriendly: document.getElementById('petsFriendly').value,
     regDeadline: document.getElementById('regDeadline').value,
     timezone: document.getElementById('timezone').value,
     currency: document.getElementById('currency').value,
     feeMode: document.getElementById('feeMode').value,
+    cardImgUrl: document.getElementById('cardImgUrl').value.trim(),
     coverUrl: document.getElementById('coverUrl').value.trim(),
+    desktopBackgroundUrl: document.getElementById('desktopBackgroundUrl').value.trim(),
+    seatingPlanUrl: document.getElementById('seatingPlanUrl').value.trim(),
+    seatingPlanMode,
+    seatingPlan: seatingPlanMode === 'builder' && ((seatingPlanLayout.rows || []).length || (seatingPlanLayout.sections || []).length) ? seatingPlanLayout : null,
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
-    customQuestion: document.getElementById('customQ').value.trim(),
-    tickets, coupons, faqs, eventDates,
+    customQuestions: rsvpCQs,
+    confirmMsg: document.getElementById('rsvpConfirmMsg').value.trim(),
+    requireTC: document.getElementById('rsvpToggleTC').classList.contains('on'),
+    sendConfirmEmail: document.getElementById('rsvpToggleConfEmail').classList.contains('on'),
+    sendConfirmWA: document.getElementById('rsvpToggleConfWA').classList.contains('on'),
+    customQuestion: (document.getElementById('customQ') ? document.getElementById('customQ').value.trim() : ''),
+    tickets, coupons, faqs, artists, galleryImages: savedGalleryImages, eventDates,
     ticketMode,
     perDateTickets,
+    ticketDeliveryMode,
     ticketDesign: {
       gradientStart: ticketDesign.g1,
       gradientEnd: ticketDesign.g2,
@@ -2311,19 +3065,19 @@ async function saveEvent(status) {
       showSeat: document.getElementById('tdShowSeat').classList.contains('on'),
       showVenue: document.getElementById('tdShowVenue').classList.contains('on'),
       showLogo: document.getElementById('tdShowLogo').classList.contains('on'),
+      logoUrl: document.getElementById('logoUrl').value.trim(),
     },
     notes: document.getElementById('notes').value.trim(),
     termsText: document.getElementById('termsText').value.trim(),
     refundPolicy: document.getElementById('refundPolicy').value.trim(),
     refundDeadlineDays: Number(document.getElementById('refundDeadlineDays').value || 0),
     refundPercent: Number(document.getElementById('refundPercent').value || 100),
-    inviteOnly: document.getElementById('toggleInvite').classList.contains('on'),
-    inviteCode: document.getElementById('inviteCode').value.trim(),
-    guestEmails: document.getElementById('guestEmails').value.split('\n').map(e => e.trim()).filter(Boolean),
+    inviteOnly: inviteAccessConfig.inviteOnly,
+    inviteLinkEnabled: inviteAccessConfig.inviteLinkEnabled,
     soldOut: document.getElementById('toggleSoldOut').classList.contains('on'),
     soldOutMsg: document.getElementById('soldOutMsg').value.trim(),
-    allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on'),
-    notifyWaitlist: document.getElementById('toggleNotifyWaitlist').classList.contains('on'),
+    allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on') || ['waitlist','notify'].includes(document.getElementById('overflowAction').value),
+    notifyWaitlist: document.getElementById('toggleNotifyWaitlist').classList.contains('on') || document.getElementById('overflowAction').value === 'notify',
     overflowAction: document.getElementById('overflowAction').value,
     showAttendeeCount: document.getElementById('toggleAttendeeCount').classList.contains('on'),
     enableRefunds: document.getElementById('toggleRefunds').classList.contains('on'),
@@ -2334,18 +3088,42 @@ async function saveEvent(status) {
     updatedAt: serverTimestamp(),
   };
 
+  if(inviteAccessConfig.inviteOnly && !inviteAccessConfig.inviteLinkEnabled && !inviteAccessConfig.inviteCode && !inviteAccessConfig.guestEmails.length){
+    alert('Add invited guest emails, an invite code, or enable the private invite link.'); return;
+  }
+
+  let saveStage = editId ? 'updating the event' : 'creating the event';
   try {
-    const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
+    const btn = saveButton;
     btn.textContent = 'Saving...';
     btn.disabled = true;
-    await addDoc(collection(db, 'events'), payload);
-    window.location.href = 'premium-client-dashboard.html';
+    if (editId) {
+      const {createdAt, ...updatePayload} = payload;
+      await db.collection('events').doc(editId).update({...updatePayload, inviteCode:firebase.firestore.FieldValue.delete(), guestEmails:firebase.firestore.FieldValue.delete(), inviteToken:firebase.firestore.FieldValue.delete(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
+      if(inviteAccessConfig.inviteOnly){saveStage='saving private-event access';saveButton.textContent='Finishing invite setup…';}
+      await saveEventInviteAccess(editId,uid,inviteAccessConfig);
+      localStorage.removeItem(getLocalDraftKey());
+      window.location.href = 'event-manage.html?eventId=' + editId;
+    } else {
+      const created=await addDoc(collection(db, 'events'), payload);
+      if(inviteAccessConfig.inviteOnly){saveStage='saving private-event access';saveButton.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
+      localStorage.removeItem(getLocalDraftKey());
+      const fromParam = new URLSearchParams(location.search).get('from');
+      const dashboardBySource = {
+        nightlife: 'dashboard-nightlife.html',
+        livemusic: 'dashboard-livemusic.html',
+        workshops: 'dashboard-workshops.html',
+        experiences: 'dashboard-experiences.html'
+      };
+      window.location.href = dashboardBySource[fromParam] || 'dashboard-brunch.html';
+    }
   } catch (err) {
-    alert('Error saving event: ' + err.message);
-    document.getElementById('publishBtn').textContent = 'Publish Event';
-    document.getElementById('publishBtn').disabled = false;
-    document.getElementById('saveDraftBtn').textContent = 'Save Draft';
-    document.getElementById('saveDraftBtn').disabled = false;
+    console.error('Event save failed:', err);
+    alert('Could not save the event while ' + saveStage + '. ' + (err.message || 'Please check your connection and try again.'));
+    const publishButton = document.getElementById('publishBtn');
+    const draftButton = document.getElementById('saveDraftBtn');
+    if (publishButton) { publishButton.textContent = editId ? 'Save Changes' : 'Publish Event'; publishButton.disabled = false; }
+    if (draftButton) { draftButton.textContent = 'Save Draft'; draftButton.disabled = false; }
   }
 }
 
@@ -2524,6 +3302,10 @@ window.loadTicketBanner = function(input) {
 window.updateTicketPreview = function() {
   const evName = document.getElementById('eventName')?.value.trim() || 'Event Name';
   const venue = document.getElementById('venueName')?.value.trim() || 'Venue';
+  const firstDate = Array.isArray(eventDates) ? eventDates[0] : null;
+  const firstSlot = firstDate?.slots?.[0];
+  const dateText = firstDate?.date ? fmtDate(firstDate.date) : 'Date';
+  const timeText = firstSlot?.start ? fmtTime(firstSlot.start) + (firstSlot.end ? ' - ' + fmtTime(firstSlot.end) : '') : 'Time';
   const tagline = document.getElementById('tdTagline')?.value.trim() || '';
   const footer = document.getElementById('tdFooter')?.value.trim() || '';
   const showQR = document.getElementById('tdShowQR')?.classList.contains('on');
@@ -2532,6 +3314,7 @@ window.updateTicketPreview = function() {
   const showLogo = document.getElementById('tdShowLogo')?.classList.contains('on');
   const el = id => document.getElementById(id);
   if (el('tpEventName')) el('tpEventName').textContent = evName;
+  if (el('tpDate')) el('tpDate').textContent = '\uD83D\uDCC5 ' + dateText + ' · ' + timeText;
   if (el('tpVenue')) { el('tpVenue').style.display = showVenue ? '' : 'none'; el('tpVenue').textContent = '\uD83D\uDCCD ' + venue; }
   if (el('tpSeatBadge')) el('tpSeatBadge').style.display = showSeat ? '' : 'none';
   if (el('tpQRBlock')) el('tpQRBlock').style.display = showQR ? '' : 'none';
@@ -2609,19 +3392,58 @@ function updateGenerateStatus() {
     creditSummary.style.display = 'none';
   }
 }
-window.generateTickets = function() {
+window.generateTickets = async function() {
   if (!csvAttendees.length) { alert('Please upload a CSV with attendees first.'); return; }
+  if (ticketDeliveryMode !== 'whatsapp') {
+    alert('Select "Send on WhatsApp" above to send a ticket-generation request to admin.');
+    return;
+  }
   const credits = csvAttendees.length * 2;
   const cost = credits * 2;
   if (!confirm(csvAttendees.length + ' tickets will be sent.\n' + credits + ' credits (' + '\u20b9' + cost + ') will be deducted.\n\nProceed?')) return;
   const btn = document.getElementById('generateBtn');
   btn.textContent = '\u23F3 Generating...';
   btn.disabled = true;
-  setTimeout(() => {
-    btn.textContent = '\u2705 ' + csvAttendees.length + ' Tickets Generated & Sent!';
+  try {
+    if (logoFile) {
+      const logoUrl = await uploadImageToImageKit(logoFile, '/event-logos');
+      document.getElementById('logoUrl').value = logoUrl;
+      showLogoPreview(logoUrl);
+      logoFile = null;
+    }
+  } catch (err) {
+    alert('Logo upload failed: ' + err.message);
+    btn.textContent = '\ud83c\udfab Generate & Send All Tickets';
+    btn.disabled = false;
+    return;
+  }
+  const eventId = new URLSearchParams(location.search).get('eventId') || null;
+  const ticketDesignRequest = {
+    gradientStart: ticketDesign.g1,
+    gradientEnd: ticketDesign.g2,
+    organiserName: document.getElementById('tdOrgName').value.trim(),
+    tagline: document.getElementById('tdTagline').value.trim(),
+    footer: document.getElementById('tdFooter').value.trim(),
+    logoUrl: document.getElementById('logoUrl').value.trim(),
+    showQR: document.getElementById('tdShowQR').classList.contains('on'),
+    showSeat: document.getElementById('tdShowSeat').classList.contains('on'),
+    showVenue: document.getElementById('tdShowVenue').classList.contains('on'),
+    showLogo: document.getElementById('tdShowLogo').classList.contains('on'),
+  };
+  db.collection('ticketRequests').add({
+    requestType: 'whatsapp_ticket_generation', status: 'pending', eventId,
+    eventName: document.getElementById('eventName').value.trim(), ownerId: uid,
+    attendees: csvAttendees, whatsappMessage: document.getElementById('tdWAMsg').value,
+    ticketDesign: ticketDesignRequest, requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }).then(() => {
+    btn.textContent = '\u2705 Request Sent to Admin';
     btn.style.background = 'linear-gradient(135deg,#059669,#34d399)';
     btn.disabled = false;
-  }, 2000);
+  }).catch(err => {
+    alert('Could not send request: ' + err.message);
+    btn.textContent = '\ud83c\udfab Generate & Send All Tickets';
+    btn.disabled = false;
+  });
 };
 
 // ── RSVP preview ──
@@ -2676,10 +3498,10 @@ window.renderRsvpPreview = function() {
   html += rsvpPreviewFieldHtml('&#128100;', 'Full Name', 'text', 'Enter your full name', true);
   html += rsvpPreviewFieldHtml('&#9993;&#65039;', 'Email Address', 'email', 'your@email.com', true);
 
-  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="6"] .toggle[data-field].on');
+  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="7"] .toggle[data-field].on');
   // collect active optional fields from toggles in the RSVP panel
   const activeOpt = [];
-  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
+  document.querySelectorAll('.step-panel[data-panel="7"] .toggle[data-field]').forEach(t => {
     if (t.classList.contains('on')) activeOpt.push(t.dataset.field);
   });
   if (activeOpt.length) {
@@ -2758,7 +3580,7 @@ function renderRsvpCQs() {
 window.rsvpCreate = async function() {
   const btn = event.target; btn.textContent = 'Saving...';
   const rsvpToggles = {};
-  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
+  document.querySelectorAll('.step-panel[data-panel="7"] .toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
   });
   const payload = {
@@ -2811,34 +3633,36 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── RSVP step helpers ──
+document.addEventListener('input', scheduleDraftSave);
+document.addEventListener('change', scheduleDraftSave);
+document.addEventListener('click', e => {
+  if (e.target.closest('.toggle')) scheduleDraftSave();
+});
 updateProgress();
 renderRsvpPreview();
 
 // load wallet credits in topbar
 (async function loadWalletBalance() {
-  try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (!res.ok) return;
-    const { user } = await res.json();
-    // real-time listener so it updates after purchase
-    db.collection('wallets').doc(user.uid).onSnapshot(doc => {
-      const credits = doc.exists ? (doc.data().credits || 0) : 0;
-      const el = document.getElementById('topCredits');
-      if (el) el.textContent = credits.toLocaleString('en-IN');
-    });
-  } catch(e) {
-    // fallback: firebase auth
-    auth.onAuthStateChanged(user => {
-      if (!user) return;
-      db.collection('wallets').doc(user.uid).onSnapshot(doc => {
-        const credits = doc.exists ? (doc.data().credits || 0) : 0;
-        const el = document.getElementById('topCredits');
-        if (el) el.textContent = credits.toLocaleString('en-IN');
-      });
-    });
-  }
+  const user = await getCurrentUser();
+  if (!user) return;
+  db.collection('wallets').doc(user.uid).onSnapshot(doc => {
+    const credits = doc.exists ? (doc.data().credits || 0) : 0;
+    const el = document.getElementById('topCredits');
+    if (el) el.textContent = credits.toLocaleString('en-IN');
+  });
+})();
+
+// Mobile sidebar
+(function(){
+  const sidebar = document.querySelector('.sidebar');
+  const btn = document.getElementById('hamburgerBtn');
+  const overlay = document.getElementById('sbOverlay');
+  if(!btn||!sidebar) return;
+  btn.addEventListener('click', ()=>{ sidebar.classList.add('open'); overlay.classList.add('open'); });
+  overlay.addEventListener('click', ()=>{ sidebar.classList.remove('open'); overlay.classList.remove('open'); });
+  document.querySelectorAll('.sb-step').forEach(s => s.addEventListener('click', ()=>{ sidebar.classList.remove('open'); overlay.classList.remove('open'); }));
 })();
 </script>
-
+<div class="sb-overlay" id="sbOverlay"></div>
 </body>
 </html>

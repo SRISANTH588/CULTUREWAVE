@@ -1,0 +1,1984 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Manage Event | CultureWave</title>
+  <meta name="robots" content="noindex, nofollow"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --blue:#3b5bdb;--blue-2:#4c6ef5;--blue-light:#e7f5ff;--blue-soft:#f0f4ff;
+  --green:#2f9e44;--green-light:#ebfbee;--orange:#e67700;--orange-light:#fff9db;
+  --red:#c92a2a;--border:#e9ecef;--muted:#868e96;--text:#1a1a2e;--bg:#f8f9fa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+a{text-decoration:none;color:inherit;}
+button{font:inherit;cursor:pointer;border:0;background:none;}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-back{display:flex;align-items:center;gap:.6rem;padding:1rem 1rem .75rem;border-bottom:1px solid var(--border);font-size:.84rem;font-weight:600;color:var(--blue);cursor:pointer;}
+.sb-back:hover{color:var(--blue-2);}
+.sb-event-info{padding:.85rem 1rem;border-bottom:1px solid var(--border);}
+.sb-event-name{font-size:.92rem;font-weight:800;color:var(--text);margin-bottom:.2rem;line-height:1.3;}
+.sb-event-status{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .55rem;border-radius:999px;font-size:.68rem;font-weight:700;}
+.sb-event-status.live{background:var(--green-light);color:var(--green);}
+.sb-event-status.draft{background:#fff9db;color:#e67700;}
+.sb-event-status.archived{background:#f1f3f5;color:#868e96;}
+
+.sb-section{padding:.6rem 1rem .2rem;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#adb5bd;}
+.sb-item{display:flex;align-items:center;gap:.65rem;padding:.55rem .85rem;margin:.1rem .5rem;border-radius:9px;font-size:.84rem;font-weight:500;color:#495057;cursor:pointer;transition:background .12s,color .12s;width:calc(100% - 1rem);text-align:left;}
+.sb-item:hover{background:#f1f3f5;color:var(--text);}
+.sb-item.active{background:var(--blue);color:#fff;font-weight:700;}
+.sb-item .sb-icon{font-size:.9rem;width:20px;text-align:center;flex:none;}
+.sb-item .sb-sub{font-size:.7rem;opacity:.75;display:block;margin-top:.05rem;}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-height:100vh;min-width:0;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.topbar-left{display:flex;align-items:center;gap:.75rem;}
+.topbar-title{font-size:1rem;font-weight:700;}
+.topbar-sub{font-size:.78rem;color:var(--muted);}
+.topbar-right{display:flex;align-items:center;gap:.6rem;}
+.tb-btn{display:flex;align-items:center;gap:.4rem;padding:.42rem .9rem;border-radius:8px;font-size:.82rem;font-weight:600;border:1px solid var(--border);background:#fff;color:#495057;cursor:pointer;}
+.tb-btn:hover{border-color:var(--blue);color:var(--blue);}
+.tb-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.tb-btn.primary:hover{background:var(--blue-2);}
+.tb-btn.green{background:var(--green);color:#fff;border-color:var(--green);}
+
+.content{flex:1;padding:1.5rem;}
+.panel{display:none;flex-direction:column;gap:1rem;}
+.panel.active{display:flex;}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;display:flex;align-items:center;gap:1rem;}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.2rem;flex:none;}
+.stat-icon.blue{background:#e7f5ff;}
+.stat-icon.green{background:#ebfbee;}
+.stat-icon.purple{background:#f3f0ff;}
+.stat-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.3rem;}
+.stat-val{font-size:1.6rem;font-weight:800;letter-spacing:-.04em;color:var(--text);}
+
+/* CARD */
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+.card-head h2{font-size:.92rem;font-weight:700;}
+.card-head p{font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+
+/* BOOKINGS TABLE */
+.bk-table{width:100%;border-collapse:collapse;}
+.bk-table th{text-align:left;padding:.55rem .85rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border);}
+.bk-table td{padding:.75rem .85rem;font-size:.84rem;color:#334155;border-bottom:1px solid var(--border);}
+.bk-table tr:last-child td{border-bottom:0;}
+.bk-table tr:hover td{background:#f8f9fa;}
+.bk-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:.82rem;font-weight:800;color:#fff;flex:none;}
+.pill{display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:700;}
+.pill.paid{background:#ebfbee;color:var(--green);}
+.pill.pending{background:#fff9db;color:#e67700;}
+.pill.cancelled{background:#fff5f5;color:#c92a2a;}
+.pill.free{background:#f1f3f5;color:#495057;}
+
+/* SEARCH ROW */
+.search-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;}
+.search-box{display:flex;align-items:center;gap:.5rem;padding:.45rem .85rem;border-radius:8px;border:1px solid var(--border);background:#fff;flex:1;max-width:400px;}
+.search-box input{border:0;outline:none;font:inherit;font-size:.82rem;color:var(--text);width:100%;background:none;}
+.export-btn{display:flex;align-items:center;gap:.4rem;padding:.42rem .9rem;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:.82rem;font-weight:600;color:#495057;cursor:pointer;margin-left:auto;}
+.export-btn:hover{border-color:var(--blue);color:var(--blue);}
+.bk-count{font-size:.82rem;font-weight:600;color:var(--muted);white-space:nowrap;}
+
+/* ANALYTICS */
+.an-grid-4{display:grid;grid-template-columns:repeat(5,1fr);gap:.65rem;}
+.an-grid-2{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;}
+.an-metric{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;position:relative;overflow:hidden;}
+.an-metric::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;}
+.an-metric.blue::before{background:linear-gradient(90deg,var(--blue),var(--blue-2));}
+.an-metric.green::before{background:linear-gradient(90deg,#2f9e44,#40c057);}
+.an-metric.orange::before{background:linear-gradient(90deg,#e67700,#f59f00);}
+.an-metric.red::before{background:linear-gradient(90deg,#c92a2a,#e03131);}
+.an-metric.purple::before{background:linear-gradient(90deg,#7048e8,#9775fa);}
+.an-metric.teal::before{background:linear-gradient(90deg,#0891b2,#06b6d4);}
+.an-metric-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.35rem;}
+.an-metric-val{font-size:1.4rem;font-weight:800;letter-spacing:-.04em;color:var(--text);}
+.an-metric-sub{font-size:.7rem;color:var(--muted);margin-top:.2rem;}
+.an-metric-sub .up{color:var(--green);font-weight:700;}
+.an-metric-sub .down{color:#c92a2a;font-weight:700;}
+
+/* PERIOD TABS */
+.period-tabs{display:flex;gap:.2rem;background:#f1f3f5;border-radius:7px;padding:.2rem;}
+.period-tab{padding:.28rem .65rem;border-radius:5px;font-size:.74rem;font-weight:600;color:var(--muted);cursor:pointer;border:0;background:none;}
+.period-tab.active{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+/* BAR CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:.35rem;height:120px;padding:.5rem 0 0;}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem;}
+.bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--blue-2),var(--blue));min-height:3px;position:relative;cursor:pointer;}
+.bar-tooltip{position:absolute;top:-26px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:.6rem;font-weight:700;padding:.15rem .4rem;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;}
+.bar:hover .bar-tooltip{opacity:1;}
+.bar-label{font-size:.58rem;color:var(--muted);font-weight:600;text-align:center;}
+
+/* FUNNEL */
+.funnel-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem .75rem;border-radius:8px;margin-bottom:.35rem;}
+.funnel-row.blue-bg{background:#eff6ff;}
+.funnel-row.purple-bg{background:#f5f3ff;}
+.funnel-row.orange-bg{background:#fff7ed;}
+.funnel-row.green-bg{background:#f0fdf4;}
+.funnel-label{font-size:.84rem;font-weight:600;color:var(--text);}
+.funnel-val{font-size:.92rem;font-weight:800;color:var(--blue);}
+.funnel-drop{font-size:.7rem;color:#c92a2a;font-weight:700;margin-top:.1rem;}
+
+/* EVENT DETAILS FORM */
+.pf-form{display:flex;flex-direction:column;gap:.75rem;}
+.pf-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.pf-field{display:flex;flex-direction:column;gap:.3rem;}
+.pf-field label{font-size:.7rem;font-weight:700;color:#495057;text-transform:uppercase;letter-spacing:.05em;}
+.pf-field input,.pf-field textarea,.pf-field select{padding:.6rem .8rem;border-radius:8px;border:1px solid var(--border);font:inherit;font-size:.86rem;color:var(--text);outline:none;}
+.pf-field input:focus,.pf-field textarea:focus,.pf-field select:focus{border-color:var(--blue);}
+.pf-field textarea{min-height:80px;resize:vertical;}
+.save-btn{height:42px;padding:0 1.5rem;background:var(--blue);color:#fff;border:0;border-radius:8px;font-weight:700;font-size:.86rem;cursor:pointer;align-self:flex-start;}
+.save-btn:hover{background:var(--blue-2);}
+
+/* TICKET ROW */
+.ticket-row{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;background:#f8f9fa;}
+.ticket-name{font-size:.86rem;font-weight:700;flex:1;}
+.ticket-price{font-size:.86rem;font-weight:700;color:var(--blue);}
+.ticket-qty{font-size:.78rem;color:var(--muted);}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:#1a1a2e;color:#fff;padding:.6rem 1.2rem;border-radius:8px;font-size:.82rem;font-weight:600;opacity:0;transition:all .25s;z-index:99;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* CHECKIN MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:480px;padding:1.5rem;box-shadow:0 24px 80px rgba(0,0,0,.2);}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.modal-head h3{font-size:1rem;font-weight:800;}
+.modal-close{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:#f8f9fa;display:grid;place-items:center;cursor:pointer;font-size:.9rem;}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:fixed;left:-270px;top:0;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);width:270px;z-index:50;transition:left .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+  .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.15);}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .an-grid-4{grid-template-columns:1fr 1fr;}
+  .an-grid-2{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:560px){
+  .stat-grid{grid-template-columns:1fr;}
+  .an-grid-4,.an-grid-2{grid-template-columns:1fr 1fr;}
+  .pf-row{grid-template-columns:1fr;}
+  .invitation-row{grid-template-columns:1fr 1fr!important;}
+  .topbar{padding:.6rem .9rem;}
+}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
+.sb-overlay.open{display:block;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
+.hamburger span{display:block;width:22px;height:2px;background:#333;border-radius:2px;}
+@media(max-width:900px){.hamburger{display:flex;}}
+@media(max-width:700px){
+  .topbar{align-items:flex-start;gap:.55rem;flex-wrap:wrap;}
+  .topbar-left{min-width:0;flex:1 1 100%;}
+  .topbar-right{width:100%;display:flex;flex-wrap:wrap;gap:.4rem;}
+  .tb-btn{flex:1 1 auto;justify-content:center;padding:.45rem .55rem;font-size:.75rem;white-space:nowrap;}
+  .content{padding:1rem;min-width:0;}
+  #panel-bookings > div[style*="grid-template-columns"]{grid-template-columns:1fr!important;}
+  .search-row{flex-wrap:wrap;}
+  .search-box{max-width:none;min-width:0;flex-basis:100%;}
+  .bk-count{margin-right:auto;}
+}
+@media(max-width:420px){
+  .topbar-right .tb-btn{flex:1 1 calc(50% - .4rem);}
+  .topbar-title{font-size:.92rem;}
+  .topbar-sub{font-size:.72rem;}
+}
+</style>
+  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-back" onclick="history.back()">&#8592; Back to Dashboard</div>
+  <div class="sb-event-info">
+    <div class="sb-event-name" id="sbEventName">Loading...</div>
+    <span class="sb-event-status draft" id="sbEventStatus">Draft</span>
+  </div>
+  <div class="sb-section">Manage</div>
+  <button class="sb-item active" data-panel="bookings" onclick="switchPanel(this,'bookings')">
+    <span class="sb-icon">&#127915;</span>
+    <span><span style="display:block;">Bookings</span><span class="sb-sub">All reservations</span></span>
+  </button>
+  <button class="sb-item" data-panel="checkin" onclick="switchPanel(this,'checkin')">
+    <span class="sb-icon">&#10003;</span>
+    <span><span style="display:block;">Check-In</span><span class="sb-sub">Scan and verify attendees</span></span>
+  </button>
+  <button class="sb-item" data-panel="invitations" onclick="switchPanel(this,'invitations')">
+    <span class="sb-icon">&#9993;</span>
+    <span><span style="display:block;">Invitations</span><span class="sb-sub">Issue guest tickets</span></span>
+  </button>
+  <button class="sb-item" data-panel="reminders" onclick="switchPanel(this,'reminders')">
+    <span class="sb-icon">&#128276;</span>
+    <span><span style="display:block;">Reminders</span><span class="sb-sub">Configure customer reminders</span></span>
+  </button>
+  <button class="sb-item" data-panel="postsale" onclick="switchPanel(this,'postsale')">
+    <span class="sb-icon">&#128172;</span>
+    <span><span style="display:block;">Post Sale Communication</span><span class="sb-sub">Configure post sale messages</span></span>
+  </button>
+  <button class="sb-item" data-panel="premium-waitlist" onclick="switchPanel(this,'premium-waitlist')">
+    <span class="sb-icon">&#128203;</span>
+    <span><span style="display:block;">Waitlist</span><span class="sb-sub">Manage overflow registrations</span></span>
+  </button>
+  <div class="sb-section">Analytics</div>
+  <button class="sb-item" data-panel="analytics" onclick="switchPanel(this,'analytics')">
+    <span class="sb-icon">&#128202;</span>
+    <span><span style="display:block;">Overview</span><span class="sb-sub">All key metrics at a glance</span></span>
+  </button>
+  <button class="sb-item" data-panel="abandoned" onclick="switchPanel(this,'abandoned')">
+    <span class="sb-icon">&#128722;</span>
+    <span><span style="display:block;">Abandoned Carts</span><span class="sb-sub">Started checkout but did not pay</span></span>
+  </button>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
+      <div>
+        <div class="topbar-title" id="topbarTitle">Event Manager</div>
+        <div class="topbar-sub" id="topbarSub">Loading event...</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn" onclick="viewPublicPage()">&#128065; View Page</button>
+      <button class="tb-btn" onclick="shareEvent()">&#128279; Share</button>
+      <a class="tb-btn" id="editEventLink" href="event-create.html">&#9998; Edit Details</a>
+      <button class="tb-btn primary" id="publishBtn" onclick="togglePublish()">Publish</button>
+    </div>
+  </header>
+  <div class="content">
+
+<!-- BOOKINGS PANEL -->
+<div class="panel active" id="panel-bookings">
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">&#128101;</div>
+      <div><div class="stat-label">Total Bookings</div><div class="stat-val" id="bkTotal">0</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">&#8377;</div>
+      <div><div class="stat-label">Total Revenue</div><div class="stat-val" id="bkRevenue">&#8377;0</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">&#127915;</div>
+      <div><div class="stat-label">Total Tickets Sold</div><div class="stat-val" id="bkTickets">0</div></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+    <div class="card">
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;">Top Tickets <span style="float:right;font-weight:400;">by revenue</span></div>
+      <div id="topTicketsEl"><div style="font-size:.82rem;color:var(--muted);">No data yet</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;">Top Sources <span style="float:right;font-weight:400;">by bookings</span></div>
+      <div id="topSourcesEl"><div style="font-size:.82rem;color:var(--muted);">No data yet</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:.85rem 1.1rem;">
+    <div class="search-row">
+      <div class="search-box">
+        <span style="color:var(--muted);">&#128269;</span>
+        <input type="search" id="bkSearch" placeholder="Search by name, phone, or transaction ID..."/>
+      </div>
+      <span class="bk-count" id="bkCountLabel">0 bookings</span>
+      <button class="export-btn" onclick="exportBookings()">&#8681; Export</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="bk-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Ticket</th>
+            <th>Subtotal</th>
+            <th>Booked On</th>
+            <th>Source</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="bkTableBody">
+          <tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--muted);">No bookings yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CHECK-IN PANEL -->
+<div class="panel" id="panel-checkin">
+  <style>
+    .ci-wrap{display:flex;flex-direction:column;gap:1.25rem;}
+    /* hero */
+    .ci-hero{background:linear-gradient(135deg,#0f0c29 0%,#1e1b4b 40%,#3b5bdb 80%,#4c6ef5 100%);border-radius:20px;padding:2rem 2rem 0;position:relative;overflow:hidden;}
+    .ci-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}
+    .ci-hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;}
+    .ci-hero-title{font-size:1.9rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.1;}
+    .ci-hero-sub{font-size:.84rem;color:rgba(255,255,255,.6);margin-top:.35rem;}
+    .ci-hero-refresh{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;display:grid;place-items:center;cursor:pointer;font-size:1rem;flex:none;}
+    .ci-hero-refresh:hover{background:rgba(255,255,255,.22);}
+    .ci-stats-strip{display:flex;gap:0;margin-top:1.5rem;border-top:1px solid rgba(255,255,255,.1);}
+    .ci-stat-strip-item{flex:1;padding:.85rem 1.1rem;border-right:1px solid rgba(255,255,255,.1);}
+    .ci-stat-strip-item:last-child{border-right:0;}
+    .ci-stat-strip-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:.2rem;}
+    .ci-stat-strip-val{font-size:1.5rem;font-weight:800;color:#fff;}
+    .ci-stat-strip-val.green{color:#4ade80;}
+    .ci-stat-strip-val.blue{color:#93c5fd;}
+    /* body card */
+    .ci-body{background:#fff;border:1px solid var(--border);border-radius:16px;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;}
+    /* search */
+    .ci-search-row{display:flex;gap:.6rem;}
+    .ci-search-box{flex:1;display:flex;align-items:center;gap:.6rem;padding:.72rem 1rem;border-radius:10px;border:1.5px solid var(--border);background:#f8f9fa;transition:border-color .15s;}
+    .ci-search-box:focus-within{border-color:var(--blue);background:#fff;}
+    .ci-search-box input{border:0;outline:none;font:inherit;font-size:.88rem;color:var(--text);width:100%;background:none;}
+    .ci-search-btn{padding:.72rem 1.4rem;border-radius:10px;background:var(--blue);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 2px 8px rgba(59,91,219,.25);}
+    .ci-search-btn:hover{background:var(--blue-2);}
+    /* scan btn */
+    .ci-scan-btn{width:100%;padding:1rem;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-2));border:0;color:#fff;font-weight:800;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.65rem;box-shadow:0 6px 20px rgba(59,91,219,.35);letter-spacing:.01em;transition:all .2s;}
+    .ci-scan-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(59,91,219,.45);}
+    .ci-scan-btn.active{background:linear-gradient(135deg,#c92a2a,#e03131);box-shadow:0 6px 20px rgba(201,42,42,.35);}
+    /* scanner */
+    .ci-scanner-box{display:none!important;}
+    .ci-scanner-box.open{display:block;}
+    #qr-reader video{width:100%!important;}
+    /* tabs */
+    .ci-tabs{display:flex;border-bottom:2px solid var(--border);}
+    .ci-tab{padding:.65rem 1.25rem;font-size:.86rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;background:none;border-top:0;border-left:0;border-right:0;transition:color .15s;}
+    .ci-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+    .ci-tab:hover{color:var(--text);}
+    /* empty */
+    .ci-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 1rem;gap:.75rem;text-align:center;}
+    .ci-empty-icon{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e7f5ff,#f0f4ff);display:grid;place-items:center;font-size:1.8rem;box-shadow:0 4px 16px rgba(59,91,219,.1);}
+    .ci-empty h3{font-size:1rem;font-weight:700;color:var(--text);}
+    .ci-empty p{font-size:.82rem;color:var(--muted);max-width:260px;line-height:1.6;}
+    /* log items */
+    .ci-log-item{display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;border-radius:12px;background:#f8f9fa;border:1px solid var(--border);margin-bottom:.5rem;transition:background .12s;}
+    .ci-log-item:hover{background:#f0f4ff;border-color:rgba(59,91,219,.2);}
+    .ci-log-item:last-child{margin-bottom:0;}
+    .ci-log-avatar{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:.86rem;font-weight:800;color:#fff;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+    .ci-log-name{font-size:.88rem;font-weight:700;color:var(--text);}
+    .ci-log-sub{font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+    .ci-log-time{font-size:.7rem;color:var(--muted);white-space:nowrap;}
+    .ci-log-badge{font-size:.7rem;font-weight:700;padding:.22rem .65rem;border-radius:999px;white-space:nowrap;}
+    .ci-log-badge.success{background:#ebfbee;color:var(--green);}
+    .ci-log-badge.duplicate{background:#fff9db;color:#e67700;}
+    .ci-checkin-btn{padding:.42rem .9rem;border-radius:8px;background:var(--blue);border:0;color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(59,91,219,.25);}
+    .ci-checkin-btn:hover{background:var(--blue-2);}
+    .ci-scan-modal-box{max-width:390px;padding:1.1rem;}
+    .ci-modal-camera{background:#0b1224;border-radius:14px;overflow:hidden;border:3px solid var(--blue);min-height:250px;display:flex;align-items:center;justify-content:center;}
+    #ci-modal-reader{width:100%;}
+    #ci-modal-reader video{width:100%!important;display:block;}
+    #ci-modal-reader__scan_region{border:0!important;}
+    .ci-modal-cancel{width:100%;padding:.7rem;border:1px solid var(--border);border-radius:10px;background:#f8f9fa;color:#495057;font-weight:700;font-size:.84rem;cursor:pointer;margin-top:.7rem;}
+    .ci-modal-cancel:hover{background:#f1f3f5;}
+  </style>
+
+  <div class="ci-wrap">
+
+    <!-- PREMIUM HERO -->
+    <div class="ci-hero">
+      <div class="ci-hero-top">
+        <div>
+          <div class="ci-hero-badge">&#10022; Live Check-In</div>
+          <div class="ci-hero-title">Check-In Attendees</div>
+          <div class="ci-hero-sub" id="ciSubTitle">Scan QR codes or search attendees to verify entry</div>
+        </div>
+        <button class="ci-hero-refresh" onclick="ciRefresh()" title="Refresh">&#8635;</button>
+      </div>
+      <div class="ci-stats-strip">
+        <div class="ci-stat-strip-item">
+          <div class="ci-stat-strip-label">&#128101; Registered</div>
+          <div class="ci-stat-strip-val" id="ciTotal">0</div>
+        </div>
+        <div class="ci-stat-strip-item">
+          <div class="ci-stat-strip-label">&#10003; Checked In</div>
+          <div class="ci-stat-strip-val green" id="ciCheckedIn">0</div>
+        </div>
+        <div class="ci-stat-strip-item">
+          <div class="ci-stat-strip-label">&#8599; Progress</div>
+          <div class="ci-stat-strip-val blue" id="ciProgress">0%</div>
+        </div>
+        <div class="ci-stat-strip-item">
+          <div class="ci-stat-strip-label">&#128247; Mode</div>
+          <div style="font-size:.95rem;font-weight:800;color:#fff;">QR + Search</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BODY CARD -->
+    <div class="ci-body">
+
+      <div class="ci-search-row">
+        <div class="ci-search-box">
+          <span style="color:var(--muted);font-size:1.05rem;">&#128269;</span>
+          <input id="ciSearchInput" type="text" placeholder="Search by name, email, phone..." oninput="ciSearch()"/>
+        </div>
+        <button class="ci-search-btn" onclick="ciSearch()">Search</button>
+      </div>
+
+      <button id="ciScanBtn" class="ci-scan-btn" onclick="toggleCiScanner()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1m1-4v1"/></svg>
+        Scan QR Code to Check-in
+      </button>
+
+      <div class="ci-scanner-box" id="ciScannerBox"><div id="qr-reader"></div></div>
+      <div id="scanStatus" style="display:none;text-align:center;font-size:.82rem;font-weight:600;"></div>
+
+      <div class="ci-tabs">
+        <button class="ci-tab active" id="ciTabRecent" onclick="ciSwitchTab('recent')">Recent Check-ins (<span id="ciRecentCount">0</span>)</button>
+        <button class="ci-tab" id="ciTabSearch" onclick="ciSwitchTab('search')">Search Results (<span id="ciSearchCount">0</span>)</button>
+      </div>
+
+      <div id="ciListRecent">
+        <div class="ci-empty">
+          <div class="ci-empty-icon">&#128100;</div>
+          <h3>No check-ins yet</h3>
+          <p>Scan QR codes or search attendees to check them in</p>
+        </div>
+      </div>
+
+      <div id="ciListSearch" style="display:none;">
+        <div class="ci-empty">
+          <div class="ci-empty-icon">&#128269;</div>
+          <h3>Search Results</h3>
+          <p>Type a name, email or phone above to find attendees</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- QR CAMERA MODAL -->
+<div id="ciScanModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-box ci-scan-modal-box">
+    <div class="modal-head">
+      <div><h3>Scan attendee QR</h3><p style="font-size:.76rem;color:var(--muted);margin-top:.2rem;">Place the ticket inside the frame</p></div>
+      <button class="modal-close" onclick="closeCiScanModal()" aria-label="Close scanner">&#10005;</button>
+    </div>
+    <div class="ci-modal-camera"><div id="ci-modal-reader"></div></div>
+    <div id="ciModalScanStatus" style="text-align:center;font-size:.78rem;color:var(--muted);padding:.7rem 0 .1rem;">Starting camera...</div>
+    <button class="ci-modal-cancel" onclick="closeCiScanModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- CHECK-IN CONFIRM MODAL -->
+<div id="ciConfirmModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.2);">
+    <div id="ciModalHeader" style="background:linear-gradient(135deg,#1242c5,#2f6bff);padding:1.75rem 1.5rem 1.25rem;text-align:center;">
+      <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:1.6rem;margin:0 auto .85rem;">&#128100;</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;" id="ciModalTitle">Confirm Check-In</div>
+      <div style="font-size:.78rem;color:rgba(255,255,255,.7);margin-top:.25rem;" id="ciModalSub">Review details before checking in</div>
+    </div>
+    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.6rem;">
+      <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Name</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--text);" id="ciConfirmName">—</div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Email</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--text);" id="ciConfirmEmail">—</div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Phone</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--text);" id="ciConfirmPhone">—</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+        <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Seats</div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--text);" id="ciConfirmSeats">—</div>
+        </div>
+        <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Amount Paid</div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--text);" id="ciConfirmAmount">—</div>
+        </div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:10px;padding:.75rem 1rem;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Payment</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--text);" id="ciConfirmPayment">—</div>
+      </div>
+      <div id="ciModalReason" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:.75rem 1rem;color:#9a3412;font-size:.8rem;line-height:1.45;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.25rem;" id="ciModalBtns">
+        <button onclick="cancelCiConfirm()" style="padding:.75rem;border-radius:10px;background:#f1f3f5;border:0;font-weight:700;font-size:.88rem;cursor:pointer;color:#495057;">Cancel</button>
+        <button onclick="confirmCiCheckIn()" id="ciModalCheckInBtn" style="padding:.75rem;border-radius:10px;background:var(--blue);border:0;color:#fff;font-weight:700;font-size:.88rem;cursor:pointer;">Check In</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INVITATIONS PANEL -->
+<div class="panel" id="panel-invitations">
+  <div class="card">
+    <div class="card-head"><div><h2>Invite guests</h2><p>Add each guest and the number of complimentary tickets to create. Every ticket gets its own QR code for event check-in.</p></div></div>
+    <div id="invitationRows" style="display:flex;flex-direction:column;gap:.75rem;"></div>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem;">
+      <button class="tb-btn" type="button" onclick="addInvitationRow()">＋ Add guest</button>
+      <button class="tb-btn primary" id="issueInvitationsBtn" type="button" onclick="issueInvitations()">Generate tickets</button>
+    </div>
+    <div id="invitationStatus" aria-live="polite" style="font-size:.82rem;color:var(--muted);margin-top:.75rem;"></div>
+    <div id="issuedInvitationTickets" style="display:flex;flex-direction:column;gap:.6rem;margin-top:.75rem;"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Issued invitation tickets</h2><p>Guest invitations are listed separately from regular bookings and ticket sales.</p></div><span id="invitationHistoryCount" class="bk-count">0 tickets</span></div>
+    <div id="invitationHistoryRows" style="display:flex;flex-direction:column;gap:.5rem;"><div style="padding:1rem;text-align:center;color:var(--muted);">No invitation tickets issued yet.</div></div>
+  </div>
+</div>
+
+<!-- REMINDERS PANEL -->
+<div class="panel" id="panel-reminders">
+  <div class="card">
+    <div class="card-head"><div><h2>Reminders</h2><p>Configure automated reminders for your attendees</p></div></div>
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">24 hours before event</div><div style="font-size:.76rem;color:var(--muted);">Send reminder to all registered attendees</div></div>
+        <div class="tog" id="tog-rem24h" onclick="toggleSwitch('rem24h')" data-on="true" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;"><div class="tog-track" style="position:absolute;inset:0;border-radius:999px;background:#3b5bdb;transition:background .2s;"></div><div class="tog-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;transform:translateX(20px);"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">1 hour before event</div><div style="font-size:.76rem;color:var(--muted);">Final reminder with venue/link details</div></div>
+        <div class="tog" id="tog-rem1h" onclick="toggleSwitch('rem1h')" data-on="false" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;"><div class="tog-track" style="position:absolute;inset:0;border-radius:999px;background:#e9ecef;transition:background .2s;"></div><div class="tog-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;transform:translateX(0);"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Post-event feedback</div><div style="font-size:.76rem;color:var(--muted);">Ask for review 2 hours after event ends</div></div>
+        <div class="tog" id="tog-remFeedback" onclick="toggleSwitch('remFeedback')" data-on="false" style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;"><div class="tog-track" style="position:absolute;inset:0;border-radius:999px;background:#e9ecef;transition:background .2s;"></div><div class="tog-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;transform:translateX(0);"></div></div>
+      </div>
+      <button onclick="saveReminders()" class="save-btn">Save Reminders</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST SALE PANEL -->
+<div class="panel" id="panel-postsale">
+  <div class="card">
+    <div class="card-head"><div><h2>Post Sale Communication</h2><p>Messages sent automatically after booking</p></div></div>
+    <div class="pf-form">
+      <div class="pf-field"><label>Booking Confirmation Message</label><textarea id="psConfirmMsg" placeholder="Hi {name}, your booking for {event} is confirmed! See you on {date}."></textarea></div>
+      <div class="pf-field"><label>WhatsApp Number (for confirmations)</label><input id="psWaNumber" type="tel" placeholder="+91 XXXXX XXXXX"/></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Send WhatsApp confirmation</div><div style="font-size:.76rem;color:var(--muted);">Auto-send on every new booking (1 credit)</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="psWaToggle" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#25d366;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label>
+      </div>
+      <button onclick="savePostSale()" class="save-btn">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS PANEL -->
+<div class="panel" id="panel-analytics">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;">
+    <div>
+      <div style="font-size:1.3rem;font-weight:800;letter-spacing:-.03em;">Event Insights</div>
+      <div style="font-size:.82rem;color:var(--muted);margin-top:.15rem;">Performance analytics for <span id="anEventName" style="font-weight:700;color:var(--text);">this event</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <div class="period-tabs" id="anPeriodTabs">
+        <button class="period-tab" data-days="7">7 days</button>
+        <button class="period-tab" data-days="14">14 days</button>
+        <button class="period-tab active" data-days="30">30 days</button>
+        <button class="period-tab" data-days="90">90 days</button>
+      </div>
+      <button onclick="renderAnalytics()" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;cursor:pointer;font-size:.9rem;">&#8635;</button>
+    </div>
+  </div>
+  <div style="font-size:.78rem;color:var(--muted);" id="anDateRange">&#128197; Loading...</div>
+
+  <!-- top 5 metrics row -->
+  <div class="an-grid-4">
+    <div class="an-metric blue"><div class="an-metric-label">Page Views</div><div class="an-metric-val" id="anViews">0</div></div>
+    <div class="an-metric purple"><div class="an-metric-label">Book Clicks</div><div class="an-metric-val" id="anClicks">0</div></div>
+    <div class="an-metric orange"><div class="an-metric-label">Checkouts</div><div class="an-metric-val" id="anCheckouts">0</div></div>
+    <div class="an-metric green"><div class="an-metric-label">Successful</div><div class="an-metric-val" id="anSuccess">0</div><div class="an-metric-sub" id="anSuccessRev">&#8377;0</div></div>
+    <div class="an-metric red"><div class="an-metric-label">Failed</div><div class="an-metric-val" id="anFailed" style="color:#c92a2a;">0</div><div class="an-metric-sub" id="anFailedRev">&#8377;0</div></div>
+  </div>
+
+  <!-- second metrics row -->
+  <div class="an-grid-2">
+    <div class="an-metric blue" style="display:flex;align-items:center;gap:.85rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#e7f5ff;display:grid;place-items:center;font-size:1.1rem;flex:none;">&#128200;</div>
+      <div><div class="an-metric-label">Conversion Rate</div><div class="an-metric-val" id="anConvRate">0%</div></div>
+    </div>
+    <div class="an-metric green" style="display:flex;align-items:center;gap:.85rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#ebfbee;display:grid;place-items:center;font-size:1.1rem;flex:none;">&#8377;</div>
+      <div><div class="an-metric-label">Revenue</div><div class="an-metric-val" id="anRevenue">&#8377;0</div></div>
+    </div>
+    <div class="an-metric orange" style="display:flex;align-items:center;gap:.85rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#fff9db;display:grid;place-items:center;font-size:1.1rem;flex:none;">&#128717;</div>
+      <div><div class="an-metric-label">Active Carts</div><div class="an-metric-val" id="anActiveCarts">0</div><div class="an-metric-sub" id="anActiveCartsRev">&#8377;0 pending</div></div>
+    </div>
+    <div class="an-metric" style="display:flex;align-items:center;gap:.85rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#f1f3f5;display:grid;place-items:center;font-size:1.1rem;flex:none;">&#128336;</div>
+      <div><div class="an-metric-label">Expired</div><div class="an-metric-val" id="anExpired">0</div><div class="an-metric-sub" id="anExpiredRev">&#8377;0 lost</div></div>
+    </div>
+  </div>
+
+  <!-- charts row -->
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:.75rem;">
+    <div class="card">
+      <div class="card-head"><div><h2>Views and Conversions</h2><p>Daily trend over the selected period</p></div></div>
+      <div class="bar-chart" id="anBarChart"></div>
+      <div style="display:flex;gap:1rem;margin-top:.6rem;">
+        <div style="display:flex;align-items:center;gap:.35rem;font-size:.74rem;color:#495057;"><div style="width:10px;height:10px;border-radius:2px;background:var(--blue);"></div>Views</div>
+        <div style="display:flex;align-items:center;gap:.35rem;font-size:.74rem;color:#495057;"><div style="width:10px;height:10px;border-radius:2px;background:var(--green);"></div>Bookings</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Conversion Funnel</h2><p>Step-by-step drop-off</p></div></div>
+      <div id="anFunnel">
+        <div class="funnel-row blue-bg"><span class="funnel-label">Page Viewed</span><span class="funnel-val" id="fnViews">0</span></div>
+        <div style="font-size:.72rem;color:#c92a2a;font-weight:700;padding:.1rem .75rem;" id="fnDrop1"></div>
+        <div class="funnel-row purple-bg"><span class="funnel-label">Book Clicked</span><span class="funnel-val" id="fnClicks">0</span></div>
+        <div class="funnel-row purple-bg" style="margin-top:.25rem;"><span class="funnel-label">Ticket Selected</span><span class="funnel-val" id="fnTicketSel">0</span></div>
+        <div class="funnel-row orange-bg" style="margin-top:.25rem;"><span class="funnel-label">Checkout Started</span><span class="funnel-val" id="fnCheckout">0</span></div>
+        <div class="funnel-row green-bg" style="margin-top:.25rem;"><span class="funnel-label">Payment Done</span><span class="funnel-val" id="fnPaid">0</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABANDONED CARTS PANEL -->
+<div class="panel" id="panel-abandoned">
+  <div class="card">
+    <div class="card-head"><div><h2>Abandoned Carts</h2><p>Users who started checkout but did not complete payment</p></div></div>
+    <div id="abandonedList">
+      <div style="text-align:center;padding:3rem;color:var(--muted);font-size:.84rem;">No abandoned carts found</div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT DETAILS PANEL -->
+<div class="panel" id="panel-details">
+  <div class="card">
+    <div class="card-head"><div><h2>Basic Information</h2><p>Edit your event name, description and category</p></div></div>
+    <div class="pf-form">
+      <div class="pf-field"><label>Event Name *</label><input id="detName" type="text" placeholder="Event name"/></div>
+      <div class="pf-field"><label>Description</label><textarea id="detDesc" style="min-height:120px;" placeholder="Describe your event..."></textarea></div>
+      <div class="pf-row">
+        <div class="pf-field"><label>Category</label>
+          <select id="detCategory">
+            <option value="">Select category</option>
+            <option value="music">Music</option>
+            <option value="food">Food and Drink</option>
+            <option value="arts">Arts and Culture</option>
+            <option value="sports">Sports and Fitness</option>
+            <option value="business">Business</option>
+            <option value="education">Education</option>
+            <option value="travel">Travel and Adventure</option>
+            <option value="wellness">Health and Wellness</option>
+            <option value="comedy">Comedy</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="pf-field"><label>Tags (comma separated)</label><input id="detTags" type="text" placeholder="yoga, wellness, retreat"/></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Venue</h2><p>Location details for your event</p></div></div>
+    <div class="pf-form">
+      <div class="pf-row">
+        <div class="pf-field"><label>Venue Name</label><input id="detVenue" type="text" placeholder="e.g. Sea View Hall"/></div>
+        <div class="pf-field"><label>City</label><input id="detCity" type="text" placeholder="e.g. Mumbai"/></div>
+      </div>
+      <div class="pf-row">
+        <div class="pf-field"><label>State</label><input id="detState" type="text" placeholder="State"/></div>
+        <div class="pf-field"><label>Address</label><input id="detAddress" type="text" placeholder="Full address"/></div>
+      </div>
+      <div class="pf-field"><label>Google Maps Link</label><input id="detMapLink" type="url" placeholder="https://maps.google.com/..."/></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Media</h2><p>Cover image and event card</p></div></div>
+    <div class="pf-form">
+      <div class="pf-row">
+        <div class="pf-field"><label>Cover Image URL</label><input id="detCoverUrl" type="url" placeholder="https://..."/></div>
+        <div class="pf-field"><label>Card Image URL</label><input id="detCardUrl" type="url" placeholder="https://..."/></div>
+      </div>
+      <div class="pf-field"><label>Desktop &amp; Tablet Background URL <small>(not shown on mobile)</small></label><input id="detDesktopBackgroundUrl" type="url" placeholder="https://..."/></div>
+      <div id="detCoverPreviewWrap" style="display:none;">
+        <img id="detCoverPreview" src="" style="max-width:100%;max-height:200px;border-radius:10px;object-fit:cover;" alt="cover"/>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Additional Info</h2><p>Notes, terms and refund policy</p></div></div>
+    <div class="pf-form">
+      <div class="pf-field"><label>Notes</label><textarea id="detNotes" placeholder="Any additional notes for attendees..."></textarea></div>
+      <div class="pf-field"><label>Terms and Conditions</label><textarea id="detTerms" placeholder="Terms and conditions..."></textarea></div>
+      <div class="pf-row">
+        <div class="pf-field"><label>Refund Policy</label><input id="detRefundPolicy" type="text" placeholder="e.g. No refunds after 48 hours"/></div>
+        <div class="pf-field"><label>Refund Deadline (days)</label><input id="detRefundDays" type="number" placeholder="e.g. 2"/></div>
+      </div>
+    </div>
+  </div>
+  <button class="save-btn" onclick="saveEventDetails()">Save Event Details</button>
+</div>
+
+<!-- TICKETS PANEL -->
+<div class="panel" id="panel-tickets">
+  <div class="card">
+    <div class="card-head"><div><h2>Tickets and Pricing</h2><p>Ticket types for this event</p></div></div>
+    <div id="ticketsList" style="display:flex;flex-direction:column;gap:.6rem;">
+      <div style="text-align:center;padding:2rem;color:var(--muted);font-size:.84rem;border:1px dashed var(--border);border-radius:10px;">No tickets configured</div>
+    </div>
+    <div style="margin-top:1rem;">
+      <a id="editTicketsLink" href="event-create.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:8px;background:var(--blue);color:#fff;font-size:.84rem;font-weight:700;text-decoration:none;">&#9998; Edit Tickets in Full Editor</a>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="panel" id="panel-settings">
+  <div class="card">
+    <div class="card-head"><div><h2>Event Settings</h2><p>Visibility, access and registration options</p></div></div>
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Public Listing</div><div style="font-size:.76rem;color:var(--muted);">Show this event on the public events page</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setPublicListing" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Allow Sharing</div><div style="font-size:.76rem;color:var(--muted);">Let attendees share the event link</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setAllowSharing" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#3b5bdb;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Show Attendee Count</div><div style="font-size:.76rem;color:var(--muted);">Display number of registrations publicly</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setShowCount" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Enable Refunds</div><div style="font-size:.76rem;color:var(--muted);">Allow attendees to request refunds</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setEnableRefunds" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;">
+        <div><div style="font-size:.86rem;font-weight:700;">Invite Only</div><div style="font-size:.76rem;color:var(--muted);">Require approved guest email, invite code, or private link to register</div></div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" id="setInviteOnly" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label>
+      </div>
+      <div id="inviteLinkPanel" style="display:none;padding:.9rem;border:1px solid var(--border);border-radius:10px;">
+        <div style="font-size:.86rem;font-weight:700;">Private invite link</div><p style="font-size:.76rem;color:var(--muted);margin:.25rem 0 .65rem;">Share this link with invited guests. They can use it without entering the code.</p>
+        <input id="inviteLinkValue" readonly style="width:100%;box-sizing:border-box;padding:.65rem;border:1px solid var(--border);border-radius:8px;margin-bottom:.55rem;" />
+        <button type="button" onclick="copyInviteLink()" class="save-btn">Copy invite link</button>
+      </div>
+      <div id="inviteEmailPanel" style="display:none;padding:.9rem;border:1px solid var(--border);border-radius:10px;">
+        <div style="font-size:.86rem;font-weight:700;">Guest invitations</div>
+        <p id="inviteEmailSummary" style="font-size:.76rem;color:var(--muted);margin:.25rem 0 .65rem;"></p>
+        <button type="button" onclick="sendGuestInvitations()" class="save-btn">Send invite emails</button>
+        <div id="inviteEmailStatus" role="status" style="font-size:.78rem;color:var(--muted);margin-top:.55rem;"></div>
+      </div>
+      <button onclick="saveSettings()" class="save-btn">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM LANDING PAGE PANEL -->
+<div class="panel" id="panel-premium-landing">
+  <div style="background:linear-gradient(135deg,#0f0c29 0%,#1e1b4b 40%,#3b5bdb 80%,#4c6ef5 100%);border-radius:20px;padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;"></div>
+    <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem;">&#127775; Premium Feature</div>
+    <div style="font-size:1.8rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Landing Page</div>
+    <div style="font-size:.86rem;color:rgba(255,255,255,.6);margin-top:.35rem;">Create a stunning custom landing page for your event with your branding.</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Custom Landing Page</h2><p>Design a dedicated page for your event</p></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#e7f5ff,#f0f4ff);display:grid;place-items:center;font-size:1.8rem;">&#127775;</div>
+      <div class="premium-lock-message" style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Landing Pages</div>
+      <div class="premium-lock-description" style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">Create beautiful custom landing pages with your logo, brand colours and event details.</div>
+      <button class="premium-upgrade" onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM EMAIL CAMPAIGN PANEL -->
+<div class="panel" id="panel-premium-email">
+  <div style="background:linear-gradient(135deg,#064e3b 0%,#065f46 40%,#059669 80%,#10b981 100%);border-radius:20px;padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;"></div>
+    <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.25rem .85rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem;">&#128140; Premium Feature</div>
+    <div style="font-size:1.8rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Email Campaign</div>
+    <div style="font-size:.86rem;color:rgba(255,255,255,.6);margin-top:.35rem;">Send targeted email campaigns to your registered attendees.</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Email Campaign</h2><p>Reach your attendees directly in their inbox</p></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;text-align:center;border:2px dashed var(--border);border-radius:12px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#d1fae5,#a7f3d0);display:grid;place-items:center;font-size:1.8rem;">&#128140;</div>
+      <div class="premium-lock-message" style="font-size:.95rem;font-weight:700;color:var(--text);">Upgrade to unlock Email Campaigns</div>
+      <div class="premium-lock-description" style="font-size:.82rem;color:var(--muted);max-width:300px;line-height:1.6;">Send bulk emails, reminders and updates to all your registered attendees in one click.</div>
+      <button class="premium-upgrade" onclick="location.href='pricing.html'" style="padding:.6rem 1.5rem;border-radius:9px;background:linear-gradient(135deg,#f59f00,#f76707);border:0;color:#fff;font-weight:700;font-size:.86rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,159,0,.35);">&#10022; Upgrade to Pro</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM WAITLIST PANEL -->
+<div class="panel" id="panel-premium-waitlist">
+  <div class="card">
+    <div class="card-head"><div><h2>Waitlist</h2><p>Guests waiting for a place at this event</p></div><span id="waitlistCount" class="bk-count">0 waiting</span></div>
+    <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;min-width:560px;"><thead><tr style="text-align:left;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;"><th style="padding:.7rem;">Guest</th><th style="padding:.7rem;">Email</th><th style="padding:.7rem;">Phone</th><th style="padding:.7rem;">Joined</th><th style="padding:.7rem;">Status</th></tr></thead><tbody id="waitlistRows"><tr><td colspan="5" style="padding:2rem;text-align:center;color:var(--muted);">Loading waitlist…</td></tr></tbody></table></div>
+    <div id="waitlistNotice" style="font-size:.78rem;color:var(--muted);margin-top:.8rem;"></div>
+  </div>
+</div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<div class="toast" id="toast"></div>
+
+<!-- BOOKING DETAIL MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal-box" style="max-width:560px;padding:0;overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#1242c5,#2f6bff);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:1rem;font-weight:800;color:#fff;">Booking Details</div>
+        <div style="font-size:.76rem;color:rgba(255,255,255,.65);margin-top:.15rem;" id="bmdBookingId">&mdash;</div>
+      </div>
+      <button style="width:30px;height:30px;border-radius:7px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15);color:#fff;display:grid;place-items:center;cursor:pointer;font-size:.9rem;" onclick="document.getElementById('bookingModal').classList.remove('open')">&#10005;</button>
+    </div>
+    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1rem;max-height:75vh;overflow-y:auto;">
+
+      <!-- Customer -->
+      <div>
+        <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem;">Customer</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;">
+            <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Name</div>
+            <div style="font-size:.88rem;font-weight:700;" id="bmdName">&mdash;</div>
+          </div>
+          <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;">
+            <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Phone</div>
+            <div style="font-size:.88rem;font-weight:700;" id="bmdPhone">&mdash;</div>
+          </div>
+          <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;grid-column:1/-1;">
+            <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Email</div>
+            <div style="font-size:.88rem;font-weight:700;" id="bmdEmail">&mdash;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Info -->
+      <div>
+        <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem;">Booking</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;grid-column:1/-1;">
+            <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Transaction ID</div>
+            <div style="font-size:.82rem;font-weight:700;color:var(--blue);font-family:monospace;word-break:break-all;" id="bmdTxnId">&mdash;</div>
+          </div>
+          <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;">
+            <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Ticket</div>
+            <div style="font-size:.88rem;font-weight:700;" id="bmdTicket">&mdash;</div>
+          </div>
+          <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;">
+            <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Booked On</div>
+            <div style="font-size:.88rem;font-weight:700;" id="bmdDate">&mdash;</div>
+          </div>
+          <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;">
+            <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Day &amp; Time</div>
+            <div style="font-size:.88rem;font-weight:700;" id="bmdDayTime">&mdash;</div>
+          </div>
+          <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;grid-column:1/-1;">
+            <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem;">Location</div>
+            <div style="font-size:.88rem;font-weight:700;" id="bmdLocation">&mdash;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Breakdown -->
+      <div>
+        <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem;">Payment</div>
+        <div style="background:#f8f9fa;border:1px solid var(--border);border-radius:9px;overflow:hidden;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .85rem;border-bottom:1px solid var(--border);">
+            <span style="font-size:.84rem;color:#495057;">Subtotal</span>
+            <span style="font-size:.84rem;font-weight:700;" id="bmdSubtotal">&mdash;</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .85rem;border-bottom:1px solid var(--border);">
+            <span style="font-size:.84rem;color:#495057;">Convenience Fee (5%)</span>
+            <span style="font-size:.84rem;font-weight:700;" id="bmdConvFee">&mdash;</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .85rem;border-bottom:1px solid var(--border);">
+            <span style="font-size:.84rem;color:#495057;">Platform Fee</span>
+            <span style="font-size:.84rem;font-weight:700;" id="bmdPlatformFee">&#8377;0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.7rem .85rem;background:#fff;">
+            <span style="font-size:.9rem;font-weight:800;">Total Paid</span>
+            <span style="font-size:.9rem;font-weight:800;color:var(--blue);" id="bmdTotal">&mdash;</span>
+          </div>
+        </div>
+        <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+          <span style="font-size:.72rem;color:var(--muted);">Method:</span>
+          <span style="font-size:.72rem;font-weight:700;" id="bmdMethod">&mdash;</span>
+          <span style="font-size:.72rem;color:var(--muted);">|</span>
+          <span style="font-size:.72rem;font-weight:700;" id="bmdStatus">&mdash;</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+        <button onclick="downloadInvoice()" style="display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:9px;background:var(--blue);color:#fff;font-weight:700;font-size:.84rem;border:0;cursor:pointer;">&#11015;&#65039; Download Invoice</button>
+        <button onclick="resendTicket()" style="display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:9px;background:#fff;color:var(--text);font-weight:700;font-size:.84rem;border:1.5px solid var(--border);cursor:pointer;">&#128231; Resend Ticket</button>
+        <button id="cancelManagedTicketBtn" onclick="cancelManagedTicket()" style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:9px;background:#fff5f5;color:#c92a2a;font-weight:700;font-size:.84rem;border:1px solid #ffc9c9;cursor:pointer;">Cancel ticket</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+});
+const db = firebase.firestore();
+const INVITE_EMAIL_TEMPLATE='template_7i8uvwm';
+const INVITE_EMAIL_SERVICE='service_772zlfa';
+const INVITE_EMAIL_PUBLIC_KEY='id1VEj3wkxsen0bCe';
+emailjs.init({publicKey:INVITE_EMAIL_PUBLIC_KEY});
+const auth = firebase.auth();
+function serverTimestamp(){ return firebase.firestore.FieldValue.serverTimestamp(); }
+</script>
+
+<script>
+const esc = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const money = v => '₹' + Number(v||0).toLocaleString('en-IN');
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+const params = new URLSearchParams(location.search);
+const eventId = params.get('eventId');
+if(!eventId){document.body.innerHTML='<div style="padding:3rem;text-align:center;">No event ID. <a href="premium-client-dashboard.html">Go back</a></div>';}
+
+let eventData=null, allBookings=[], allBookingDocs=[], allPaymentBookingDocs=[], anPeriod=30, hasPremiumPages=false;
+function publicEventPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
+
+function switchPanel(btn,panelId){
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel=document.getElementById('panel-'+panelId);
+  if(panel) panel.classList.add('active');
+  if(panelId==='checkin') ciScanPaused=false;
+  else stopCiScanner();
+}
+
+function avatarColor(name){
+  const colors=['#3b5bdb','#2f9e44','#e67700','#c92a2a','#7048e8','#0891b2','#d6336c'];
+  let h=0;for(let i=0;i<(name||'').length;i++) h=(h+name.charCodeAt(i))%colors.length;
+  return colors[h];
+}
+
+function normStatus(s){const v=(s||'draft').toLowerCase();return v==='published'?'published':v==='archived'?'archived':'unpublished';}
+function normBookingStatus(s){const v=(s||'pending').toLowerCase();return (v==='confirmed'||v==='paid')?'paid':v;}
+function isInvitationBooking(b){return b?.invitation===true||String(b?.source||'').toLowerCase()==='organiser_invitation';}
+function mainBookings(){return allBookings.filter(b=>!isInvitationBooking(b));}
+function formatTimeText(value){
+  return String(value||'').replace(/(^|[^\d])(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/gi,(match,prefix,hourText,minute,meridiem)=>{
+    let hour=Number(hourText); if(meridiem) hour=(hour%12)+(meridiem.toUpperCase()==='PM'?12:0);
+    if(hour>23) return match;
+    return `${prefix}${hour%12||12}:${minute} ${hour>=12?'PM':'AM'}`;
+  });
+}
+function invitationEventDetails(){
+  const eventDates=Array.isArray(eventData?.eventDates)?eventData.eventDates:[];
+  const firstDate=eventDates.find(item=>item?.date)||eventDates[0]||{};
+  const rawDate=eventData?.startDate||eventData?.date||firstDate.date||'';
+  let date='To be announced';
+  if(rawDate?.toDate){
+    const value=rawDate.toDate();
+    if(!Number.isNaN(value.getTime()))date=value.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  }else if(rawDate){
+    const dateOnly=String(rawDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const value=dateOnly?new Date(Number(dateOnly[1]),Number(dateOnly[2])-1,Number(dateOnly[3])):new Date(rawDate);
+    date=!Number.isNaN(value.getTime())?value.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):String(rawDate);
+  }
+  const firstSlot=(firstDate.slots||firstDate.timeSlots||[])[0]||{};
+  const firstSession=(Array.isArray(eventData?.sessions)?eventData.sessions:[]).find(item=>!firstDate.date||item.date===firstDate.date)||{};
+  const startTime=eventData?.startTime||eventData?.time||eventData?.eventTime||eventData?.timing||firstDate.startTime||firstDate.time||firstSlot.start||firstSlot.startTime||firstSession.start||firstSession.startTime||'';
+  const endTime=eventData?.endTime||eventData?.finishTime||firstDate.endTime||firstDate.finishTime||firstSlot.end||firstSlot.endTime||firstSession.end||firstSession.endTime||'';
+  const time=startTime?(endTime?`${formatTimeText(startTime)} – ${formatTimeText(endTime)}`:formatTimeText(startTime)):'Time to be announced';
+  const venue=[eventData?.venueName||eventData?.venue||eventData?.location||eventData?.address,eventData?.city].filter(Boolean).join(', ')||'Venue to be announced';
+  const message=eventData?.invitationMessage||eventData?.description||eventData?.shortDescription||`We’re so happy to have you at ${eventData?.name||'our event'}! Get ready for an evening filled with music, good people and great vibes. Let’s jam, connect and create memories together!`;
+  return {date,time,venue,message};
+}
+function invitationPageUrl(ticket){
+  const id=ticket.bookingId||ticket.id;
+  return new URL(`invite-booked.html?bookingId=${encodeURIComponent(id)}`,location.href).toString();
+}
+function invitationWhatsAppUrl(ticket,url){
+  const details=invitationEventDetails();
+  const guest=ticket.name||bookingName(ticket);
+  const guestWithHonorific=/\s+garu$/i.test(guest)?guest:`${guest} Garu`;
+  const eventName=eventData?.name||'our event';
+  const message=`An invitation for ${guestWithHonorific}\n\nDear ${guestWithHonorific},\nYou are cordially invited to ${eventName} for a memorable experience.\n\n${details.message}\n\nDate: ${details.date}\nTime: ${details.time}\nVenue: ${details.venue}\n\nYour personal invitation and guest pass:\n${url}`;
+  const phone=String(ticket.phone||ticket.customerPhone||'').replace(/\D/g,'');
+  const recipient=phone.length===10?'91'+phone:phone;
+  return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}${recipient?`&phone=${encodeURIComponent(recipient)}`:''}`;
+}
+function invitationEmailContent(ticket,url){
+  const details=invitationEventDetails();
+  const eventName=eventData?.name||'our event';
+  const subject=`Your invitation to ${eventName}`;
+  const invitationNote=`We’d be delighted to have you join us at ${eventName}. We’re looking forward to welcoming you for a memorable experience. Please have your QR guest pass ready when you arrive.`;
+  const message=invitationNote;
+  const html=`<div style="font-family:Arial,sans-serif;color:#222;line-height:1.6"><p>${esc(invitationNote)}</p></div>`;
+  return {subject,message,message_html:html};
+}
+async function sendInvitationTicketEmail(ticket,url){
+  const content=invitationEmailContent(ticket,url);
+  return emailjs.send(INVITE_EMAIL_SERVICE,INVITE_EMAIL_TEMPLATE,{
+    to_email:ticket.email,to_name:ticket.name,name:ticket.name,event_name:eventData?.name||'CultureWave event',
+    booking_url:url,invite_code:ticket.bookingId,guest_name:ticket.name,guest_email:ticket.email,
+    guest_phone:ticket.phone||'Not provided',ticket_count:ticket.ticketCount,event_date:invitationEventDetails().date,
+    event_time:invitationEventDetails().time,event_venue:invitationEventDetails().venue,
+    time:new Date().toLocaleString('en-IN'),email:'support@culturewave.in',
+    ...content,reply_to:'support@culturewave.in'
+  });
+}
+function invitationEmailError(error){
+  return String(error?.text||error?.message||error||'Unknown EmailJS error').slice(0,240);
+}
+window.resendInvitationTicketEmail=async function(id,button){
+  let ticket=allBookings.find(item=>item.id===id||item.bookingId===id);
+  if(!ticket){try{const snapshot=await db.collection('bookings').doc(id).get();if(snapshot.exists)ticket={id:snapshot.id,...snapshot.data()};}catch(_){}}
+  if(!ticket?.customerEmail){showToast('This invitation has no guest email address');return;}
+  if(button){button.disabled=true;button.textContent='Sending…';}
+  try{
+    const emailTicket={bookingId:ticket.bookingId||ticket.id,name:bookingName(ticket),email:bookingEmail(ticket),phone:bookingPhone(ticket),ticketCount:Number(ticket.seats||ticket.tickets||1)};
+    await sendInvitationTicketEmail(emailTicket,invitationPageUrl(emailTicket));
+    if(button){button.textContent='Email sent';button.disabled=true;}
+    const status=document.getElementById('invitationStatus');if(status)status.textContent=`Invitation email sent to ${emailTicket.email}.`;
+    showToast('Invitation email sent');
+  }catch(error){const reason=invitationEmailError(error);console.error('Invitation email resend failed:',error);if(button){button.disabled=false;button.textContent='Retry email';}const status=document.getElementById('invitationStatus');if(status)status.textContent=`Email to ${bookingEmail(ticket)} failed: ${reason}`;showToast('Email failed: '+reason);}
+};
+
+function bookingName(b){return b.customerName||b.customer?.name||b.customer?.fullName||b.buyerName||b.buyer?.name||b.attendeeName||b.fullName||b.name||'Guest';}
+function bookingPhone(b){return b.customerPhone||b.customer?.phone||b.buyerPhone||b.buyer?.phone||b.phone||'';}
+function bookingEmail(b){return b.customerEmail||b.customer?.email||b.buyerEmail||b.buyer?.email||b.email||'\u2014';}
+
+function fmtDate(v){
+  if(!v) return '';
+  try{const d=v.toDate?v.toDate():new Date(v);return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+  catch(e){return String(v);}
+}
+
+async function loadEvent(){
+  if(!eventId) return;
+  const snap=await db.collection('events').doc(eventId).get();
+  if(!snap.exists){showToast('Event not found');return;}
+  eventData={id:snap.id,...snap.data()};
+  if(eventData.ownerId !== auth.currentUser?.uid){
+    document.body.innerHTML='<div style="padding:3rem;text-align:center;font-family:Inter,sans-serif;">You do not have access to manage this event. <a href="premium-client-dashboard.html">Go back</a></div>';
+    return;
+  }
+  const inviteAccessSnap=await db.collection('eventAccess').doc(eventId).get();
+  if(inviteAccessSnap.exists)Object.assign(eventData,inviteAccessSnap.data());
+  const account=await db.collection('users').doc(auth.currentUser.uid).get();
+  const accountData=account.exists ? account.data() : {};
+  const plan=String(accountData.plan||accountData.subscriptionPlan||'').toLowerCase();
+  const planStatus=String(accountData.subscriptionStatus||accountData.planStatus||'active').toLowerCase();
+  hasPremiumPages=['pro','premium','business','growth'].includes(plan) && !['cancelled','expired','inactive'].includes(planStatus);
+  applyPremiumPagesAccess();
+  renderEventMeta();prefillDetails();prefillSettings();prefillTickets();loadBookings();loadWaitlist();
+}
+
+function loadWaitlist(){
+  const rows=document.getElementById('waitlistRows');
+  document.getElementById('waitlistNotice').textContent=eventData.notifyWaitlist&&eventData.allowWaitlist
+    ?'Email notifications are enabled. Waiting guests are emailed automatically when spots reopen.'
+    :'Waitlist signups are collected, but automatic email notifications are currently off.';
+  db.collection('waitlist').where('eventId','==',eventId).where('ownerId','==',auth.currentUser.uid).limit(500).onSnapshot(snap=>{
+    const entries=snap.docs.map(doc=>({id:doc.id,...doc.data()})).sort((a,b)=>{
+      const stamp=v=>v?.toDate?v.toDate().getTime():new Date(v||0).getTime();return stamp(a.createdAt)-stamp(b.createdAt);
+    });
+    document.getElementById('waitlistCount').textContent=`${entries.filter(x=>x.status==='waiting').length} waiting`;
+    rows.innerHTML=entries.length?entries.map(entry=>{
+      const date=entry.createdAt?.toDate?entry.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';
+      const status=entry.status==='notified'?'Notified':entry.status==='removed'?'Removed':'Waiting';
+      return `<tr style="border-top:1px solid var(--border);"><td style="padding:.8rem;font-weight:700;">${esc(entry.name||'Guest')}</td><td style="padding:.8rem;">${esc(entry.email||'—')}</td><td style="padding:.8rem;">${esc(entry.phone||'—')}</td><td style="padding:.8rem;">${date}</td><td style="padding:.8rem;"><span class="status-pill ${entry.status==='notified'?'live':'draft'}">${status}</span></td></tr>`;
+    }).join(''):'<tr><td colspan="5" style="padding:2rem;text-align:center;color:var(--muted);">No one has joined the waitlist yet.</td></tr>';
+  },error=>{console.error('waitlist load failed:',error);rows.innerHTML='<tr><td colspan="5" style="padding:2rem;text-align:center;color:#c92a2a;">Could not load waitlist.</td></tr>';});
+}
+
+function applyPremiumPagesAccess(){
+  if(!hasPremiumPages)return;
+  document.querySelectorAll('.premium-upgrade').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.premium-lock-message').forEach(el=>{
+    el.textContent='Business access enabled';
+    el.style.color='var(--green)';
+  });
+  document.querySelectorAll('.premium-lock-description').forEach(el=>{
+    el.textContent='This Premium Pages feature is included with your active Business plan.';
+  });
+}
+
+function renderEventMeta(){
+  const d=eventData;
+  const name=d.name||'Untitled Event';
+  document.getElementById('sbEventName').textContent=name;
+  document.getElementById('topbarTitle').textContent=name;
+  document.getElementById('topbarSub').textContent=d.city||(d.startDate?fmtDate(d.startDate):'No date set');
+  document.getElementById('anEventName').textContent=name;
+  document.title='Manage: '+name+' | CultureWave';
+  const st=normStatus(d.status);
+  const stEl=document.getElementById('sbEventStatus');
+  stEl.textContent=st==='published'?'Live':st==='archived'?'Archived':'Draft';
+  stEl.className='sb-event-status '+(st==='published'?'live':st==='archived'?'archived':'draft');
+  const pubBtn=document.getElementById('publishBtn');
+  pubBtn.textContent=st==='published'?'Unpublish':'Publish';
+  pubBtn.className='tb-btn '+(st==='published'?'':'primary');
+  const el=document.getElementById('editTicketsLink');
+  if(el) el.href='event-create.html?eventId='+eventId;
+  const editEventLink=document.getElementById('editEventLink');
+  if(editEventLink) editEventLink.href='event-create.html?eventId='+eventId;
+}
+
+window.togglePublish=async function(){
+  if(!eventData) return;
+  const cur=normStatus(eventData.status);
+  const next=cur==='published'?'unpublished':'published';
+  await db.collection('events').doc(eventId).update({status:next,updatedAt:serverTimestamp()});
+  eventData.status=next;renderEventMeta();
+  showToast(next==='published'?'Event published!':'Event unpublished');
+};
+
+window.viewPublicPage=function(){window.open(publicEventPath(eventData?.urlKey||eventData?.name),'_blank');};
+window.shareEvent=function(){
+  const url=location.origin+publicEventPath(eventData?.urlKey||eventData?.name);
+  navigator.clipboard.writeText(url).then(()=>showToast('Link copied!')).catch(()=>prompt('Copy link:',url));
+};
+
+function loadBookings(){
+  // Restrict reads to this event before merging booking and payment records.
+  db.collection('bookings').where('eventId','==',eventId).limit(500).onSnapshot(snap=>{
+    allBookingDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    syncManagedBookings();
+  });
+  db.collection('payments').where('eventId','==',eventId).limit(500).onSnapshot(snap=>{
+    allPaymentBookingDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    syncManagedBookings();
+  },()=>{});
+}
+
+function syncManagedBookings(){
+    const all = [...allBookingDocs, ...allPaymentBookingDocs];
+    const unique = new Map();
+    all.forEach(b=>{
+      const key=b.bookingId||b.id;
+      if(!unique.has(key)) unique.set(key,b);
+      else {
+        const previous=unique.get(key);
+        unique.set(key,{...previous,...b,customer:{...previous.customer,...b.customer},checkedIn:previous.checkedIn||b.checkedIn,checkedInAt:previous.checkedInAt||b.checkedInAt,checkedInDate:previous.checkedInDate||b.checkedInDate});
+      }
+    });
+    const normalizeEventName=value=>String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+    const currentEventName=normalizeEventName(eventData?.name);
+    // Match by ID first, then retain older bookings that predate eventId.
+    allBookings = [...unique.values()].filter(b=>{
+      const bookingEventName=normalizeEventName(b.eventName||b.eventTitle||b.event?.name||b.event?.title||b.title);
+      return b.eventId===eventId || b.event?.id===eventId || b.event?.eventId===eventId ||
+        (!!currentEventName && bookingEventName===currentEventName);
+    });
+    const attendeeCount = allBookings
+      .filter(b=>normBookingStatus(b.status)==='paid')
+      .reduce((sum,b)=>{
+        const raw=b.seats ?? b.quantity ?? (typeof b.tickets==='number' ? b.tickets : 1);
+        const quantity=Number(raw);
+        return sum + (Number.isFinite(quantity) && quantity>0 ? quantity : 1);
+      },0);
+    if(Number(eventData?.totalBooked||0)!==attendeeCount){
+      eventData.totalBooked=attendeeCount;
+      db.collection('events').doc(eventId).update({totalBooked:attendeeCount})
+        .catch(error=>console.warn('Could not refresh public attendee count:',error.message));
+    }
+    renderBookings();renderBookingStats();renderAnalytics();renderCiRecent();renderInvitationHistory();
+}
+
+function renderInvitationHistory(){
+  const invites=allBookings.filter(isInvitationBooking);
+  const count=document.getElementById('invitationHistoryCount');
+  const rows=document.getElementById('invitationHistoryRows');
+  if(!count||!rows)return;
+  const ticketQuantity=invites.reduce((total,booking)=>total+Math.max(1,Number(booking.seats||booking.tickets||1)),0);
+  count.textContent=`${ticketQuantity} ticket${ticketQuantity===1?'':'s'} · ${invites.length} invitation${invites.length===1?'':'s'}`;
+  if(!invites.length){rows.innerHTML='<div style="padding:1rem;text-align:center;color:var(--muted);">No invitation tickets issued yet.</div>';return;}
+  rows.innerHTML=invites.slice().sort((a,b)=>bookingName(a).localeCompare(bookingName(b))).map(ticket=>{
+    const id=ticket.bookingId||ticket.id;
+    const quantity=Math.max(1,Number(ticket.seats||ticket.tickets||1));
+    const url=invitationPageUrl(ticket);
+    const status=normBookingStatus(ticket.status);
+    const whatsappUrl=invitationWhatsAppUrl(ticket,url);
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.7rem;flex-wrap:wrap;padding:.75rem .85rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:700;">${esc(bookingName(ticket))}</div><div style="font-size:.74rem;color:var(--muted);">${esc(bookingEmail(ticket))} · ${esc(ticket.ticketName||'Invitation Ticket')} × ${quantity} · ${esc(id)}</div></div><span class="pill ${status==='cancelled'?'cancelled':'free'}">${status==='cancelled'?'cancelled':'invited'}</span><div style="display:flex;gap:.4rem;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">WhatsApp</a><button class="tb-btn" type="button" onclick="openBookingMenu('${ticket.id}')">Manage</button></div></div>`;
+  }).join('');
+}
+
+function renderBookingStats(){
+  const regularBookings=mainBookings();
+  const paid=regularBookings.filter(b=>normBookingStatus(b.status)==='paid');
+  const totalRev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
+  const totalTickets=paid.reduce((s,b)=>s+Number(b.seats||b.tickets||1),0);
+  document.getElementById('bkTotal').textContent=regularBookings.length;
+  document.getElementById('bkRevenue').textContent=money(totalRev);
+  document.getElementById('bkTickets').textContent=totalTickets;
+  document.getElementById('bkCountLabel').textContent=regularBookings.length+' booking'+(regularBookings.length!==1?'s':'');
+  const ciTotalEl=document.getElementById('ciTotal');
+  const ciCheckedInEl=document.getElementById('ciCheckedIn');
+  const ciProgressEl=document.getElementById('ciProgress');
+  if(ciTotalEl) ciTotalEl.textContent=allBookings.length;
+  const checkedCount=allBookings.filter(b=>b.checkedIn).length;
+  if(ciCheckedInEl) ciCheckedInEl.textContent=checkedCount;
+  if(ciProgressEl) ciProgressEl.textContent=allBookings.length?Math.round(checkedCount/allBookings.length*100)+'%':'0%';
+
+  const ticketMap={};
+  paid.forEach(b=>{
+    const tn=b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
+    if(!ticketMap[tn]) ticketMap[tn]={rev:0,sold:0,bookings:0};
+    ticketMap[tn].rev+=Number(b.amount||0);
+    ticketMap[tn].sold+=Number(b.seats||b.tickets||1);
+    ticketMap[tn].bookings++;
+  });
+  const topT=Object.entries(ticketMap).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3);
+  const maxR=topT[0]?.[1]?.rev||1;
+  const ttEl=document.getElementById('topTicketsEl');
+  ttEl.innerHTML=topT.length?topT.map(([n,d])=>'<div style="margin-bottom:.65rem;"><div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:600;margin-bottom:.3rem;"><span>'+esc(n)+'</span><span style="color:var(--blue);">'+money(d.rev)+'</span></div><div style="height:5px;border-radius:999px;background:#f1f3f5;overflow:hidden;"><div style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--blue-2));width:'+Math.round(d.rev/maxR*100)+'%;"></div></div><div style="font-size:.72rem;color:var(--muted);margin-top:.2rem;">'+d.sold+' sold &middot; '+d.bookings+' bookings</div></div>').join(''):'<div style="font-size:.82rem;color:var(--muted);">No paid bookings yet</div>';
+
+  const srcMap={};
+  regularBookings.forEach(b=>{const src=b.source||b.utm_source||'ORGANIC / DIRECT';if(!srcMap[src])srcMap[src]=0;srcMap[src]++;});
+  const topS=Object.entries(srcMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const maxS=topS[0]?.[1]||1;
+  const tsEl=document.getElementById('topSourcesEl');
+  tsEl.innerHTML=topS.length?topS.map(([s,c])=>'<div style="margin-bottom:.65rem;"><div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:600;margin-bottom:.3rem;"><span>'+esc(s)+'</span><span style="color:var(--muted);font-weight:500;">'+c+' bookings</span></div><div style="height:5px;border-radius:999px;background:#f1f3f5;overflow:hidden;"><div style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--blue-2));width:'+Math.round(c/maxS*100)+'%;"></div></div></div>').join(''):'<div style="font-size:.82rem;color:var(--muted);">No source data yet</div>';
+}
+
+function renderBookings(){
+  const q=(document.getElementById('bkSearch')?.value||'').trim().toLowerCase();
+  let rows=mainBookings();
+  if(q) rows=rows.filter(b=>{
+    const n=bookingName(b).toLowerCase();
+    const p=bookingPhone(b).toLowerCase();
+    const t=(b.transactionId||b.id||'').toLowerCase();
+    return n.includes(q)||p.includes(q)||t.includes(q);
+  });
+  document.getElementById('bkCountLabel').textContent=rows.length+' booking'+(rows.length!==1?'s':'');
+  const tbody=document.getElementById('bkTableBody');
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--muted);">No bookings found</td></tr>';return;}
+  tbody.innerHTML=rows.map(b=>{
+    const name=bookingName(b);
+    const phone=bookingPhone(b);
+    const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const color=avatarColor(name);
+    const tn=b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
+    const tq=b.seats||b.tickets||1;
+    const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'--';
+    const st=normBookingStatus(b.status||'pending');
+    const src=b.source||b.utm_source||'ORGANIC / DIRE...';
+    const sd=b.slotDate||b.eventDate||'';
+    const st2=b.slotTime||b.startTime||'';
+    return '<tr>'
+      +'<td><div style="display:flex;align-items:center;gap:.65rem;"><div class="bk-avatar" style="background:'+color+';">'+esc(initials)+'</div><div><div style="font-weight:700;font-size:.86rem;">'+esc(name)+'</div><div style="font-size:.74rem;color:var(--muted);">'+esc(phone)+'</div></div></div></td>'
+      +'<td><div style="font-weight:600;font-size:.84rem;">'+esc(tn)+'</div><div style="font-size:.74rem;color:var(--muted);">'+tq+' ticket'+(tq>1?'s':'')+(sd?' &middot; '+esc(sd)+(st2?' &middot; '+esc(st2):''):'')+'</div></td>'
+      +'<td style="font-weight:700;">'+(b.amount?money(b.amount):'Free')+'</td>'
+      +'<td><div style="font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:.15rem;">'+esc(src.toUpperCase())+'</div><div style="font-size:.82rem;">'+date+'</div></td>'
+      +'<td><span class="pill '+st+'">'+st+'</span></td>'
+      +'<td><button onclick="openBookingMenu(\''+b.id+'\')" style="padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:.8rem;">&#8943;</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+window.openBookingMenu=function(id){
+  const b=allBookings.find(x=>x.id===id);
+  if(!b) return;
+  const name   = bookingName(b);
+  const phone  = bookingPhone(b)||'—';
+  const email  = bookingEmail(b);
+  const txnId  = b.paymentId||b.transactionId||b.id||'—';
+  const ticket = b.ticketName||b.customer?.ticket||b.event?.ticketName||'General';
+  const seats  = Number(b.seats||b.tickets||1);
+  const amount = Number(b.amount||0);
+  const convFee= b.method==='free'||amount===0 ? 0 : Math.round(amount*0.05/(1.05));
+  const subtotal = amount===0 ? 0 : Math.round(amount - convFee);
+  const location = b.venueName||b.event?.venueName||eventData?.venueName||eventData?.city||'—';
+  const method = b.method||b.paymentMethod||'—';
+  const status = b.status||'pending';
+  const statusColor = status==='paid'||status==='confirmed'?'var(--green)':status==='pending'?'#e67700':'#c92a2a';
+
+  // dates
+  let bookedOn='—', dayTime='—';
+  if(b.createdAt){
+    const d=b.createdAt.toDate?b.createdAt.toDate():new Date(b.createdAt);
+    bookedOn=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    dayTime=d.toLocaleDateString('en-IN',{weekday:'long'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  const money=v=>v===0?'Free':'\u20b9'+Number(v).toLocaleString('en-IN');
+
+  set('bmdBookingId','ID: '+txnId.slice(-12).toUpperCase());
+  set('bmdName',name);
+  set('bmdPhone',phone);
+  set('bmdEmail',email);
+  set('bmdTxnId',txnId);
+  set('bmdTicket',ticket+' × '+seats);
+  set('bmdDate',bookedOn);
+  set('bmdDayTime',dayTime);
+  set('bmdLocation',location);
+  set('bmdSubtotal',money(subtotal));
+  set('bmdConvFee',convFee===0?'—':money(convFee));
+  set('bmdTotal',money(amount));
+  set('bmdMethod',method.toUpperCase());
+  const stEl=document.getElementById('bmdStatus');
+  if(stEl){stEl.textContent=status.toUpperCase();stEl.style.color=statusColor;}
+  const cancelBtn=document.getElementById('cancelManagedTicketBtn');
+  if(cancelBtn){
+    const cancelled=normBookingStatus(status)==='cancelled';
+    cancelBtn.disabled=cancelled||Boolean(b.checkedIn);
+    cancelBtn.textContent=cancelled?'Ticket cancelled':b.checkedIn?'Already checked in':'Cancel ticket';
+    cancelBtn.style.opacity=cancelBtn.disabled?'.55':'1';
+    cancelBtn.style.cursor=cancelBtn.disabled?'not-allowed':'pointer';
+  }
+
+  // store current booking id for actions
+  document.getElementById('bookingModal')._currentBooking=b;
+  document.getElementById('bookingModal').classList.add('open');
+};
+
+window.cancelManagedTicket=async function(){
+  const modal=document.getElementById('bookingModal');
+  const booking=modal?._currentBooking;
+  if(!booking)return;
+  if(booking.checkedIn){showToast('This ticket is already checked in');return;}
+  if(normBookingStatus(booking.status)==='cancelled'){showToast('This ticket is already cancelled');return;}
+  const quantity=Math.max(1,Number(booking.seats||booking.tickets||1));
+  const guest=bookingName(booking);
+  if(!confirm(`Cancel ${quantity} ticket${quantity===1?'':'s'} for ${guest}? The booking will be removed from active attendees and its QR code will no longer allow entry.`))return;
+  const button=document.getElementById('cancelManagedTicketBtn');
+  if(button){button.disabled=true;button.textContent='Cancelling…';}
+  try{
+    const bookingId=booking.bookingId||booking.id;
+    const cancelledAt=serverTimestamp();
+    const update={status:'cancelled',cancelled:true,cancelledAt,cancelledBy:auth.currentUser?.uid||null};
+    const batch=db.batch();
+    batch.update(db.collection('bookings').doc(booking.id),update);
+    batch.set(db.collection('payments').doc(bookingId),{bookingId,eventId,...update},{merge:true});
+    await batch.commit();
+    booking.status='cancelled';booking.cancelled=true;
+    const setCancelled=items=>items.forEach(item=>{if(item.id===booking.id||item.bookingId===bookingId){item.status='cancelled';item.cancelled=true;}});
+    setCancelled(allBookingDocs);setCancelled(allPaymentBookingDocs);
+    const statusEl=document.getElementById('bmdStatus');if(statusEl){statusEl.textContent='CANCELLED';statusEl.style.color='#c92a2a';}
+    if(button){button.disabled=true;button.textContent='Ticket cancelled';}
+    syncManagedBookings();
+    showToast('Ticket cancelled');
+  }catch(error){
+    console.error('Could not cancel booking:',error);
+    showToast(error.code==='permission-denied'?'You do not have permission to cancel this ticket':'Could not cancel ticket. Please retry');
+    if(button){button.disabled=false;button.textContent='Cancel ticket';}
+  }
+};
+
+window.downloadInvoice=function(){
+  const b=document.getElementById('bookingModal')._currentBooking;
+  if(!b) return;
+  const name   = bookingName(b);
+  const email  = bookingEmail(b);
+  const phone  = bookingPhone(b)||'—';
+  const txnId  = b.paymentId||b.transactionId||b.id||'—';
+  const ticket = b.ticketName||b.customer?.ticket||'General';
+  const seats  = Number(b.seats||1);
+  const amount = Number(b.amount||0);
+  const convFee= amount===0?0:Math.round(amount*0.05/1.05);
+  const subtotal=amount===0?0:amount-convFee;
+  const money=v=>v===0?'Free':'Rs.'+Number(v).toLocaleString('en-IN');
+  const event=b.eventName||b.event?.name||eventData?.name||'Event';
+  const venue=b.venueName||eventData?.venueName||eventData?.city||'—';
+  let bookedOn='—';
+  if(b.createdAt){const d=b.createdAt.toDate?b.createdAt.toDate():new Date(b.createdAt);bookedOn=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+  const html=`<!doctype html><html><head><meta charset="UTF-8"/><title>Invoice</title>
+  <style>body{font-family:Arial,sans-serif;padding:40px;color:#1a1a2e;max-width:600px;margin:0 auto;}
+  .head{background:linear-gradient(135deg,#1242c5,#2f6bff);color:#fff;padding:24px;border-radius:12px;margin-bottom:24px;}
+  .head h1{font-size:22px;margin:0 0 4px;} .head p{font-size:13px;opacity:.75;margin:0;}
+  .section{margin-bottom:20px;} .section h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#868e96;margin-bottom:10px;}
+  .row{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #e9ecef;font-size:14px;}
+  .row:last-child{border-bottom:0;} .row.total{font-weight:800;font-size:15px;background:#f0f4ff;border-radius:0 0 8px 8px;}
+  .box{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;overflow:hidden;}
+  .footer{text-align:center;font-size:12px;color:#868e96;margin-top:32px;}</style></head><body>
+  <div class="head"><h1>CultureWave Invoice</h1><p>Booking Confirmation &amp; Receipt</p></div>
+  <div class="section"><h3>Customer</h3><div class="box">
+    <div class="row"><span>Name</span><span>${name}</span></div>
+    <div class="row"><span>Email</span><span>${email}</span></div>
+    <div class="row"><span>Phone</span><span>${phone}</span></div>
+  </div></div>
+  <div class="section"><h3>Booking</h3><div class="box">
+    <div class="row"><span>Event</span><span>${event}</span></div>
+    <div class="row"><span>Ticket</span><span>${ticket} &times; ${seats}</span></div>
+    <div class="row"><span>Venue</span><span>${venue}</span></div>
+    <div class="row"><span>Booked On</span><span>${bookedOn}</span></div>
+    <div class="row"><span>Transaction ID</span><span style="font-family:monospace;font-size:12px;">${txnId}</span></div>
+  </div></div>
+  <div class="section"><h3>Payment</h3><div class="box">
+    <div class="row"><span>Subtotal</span><span>${money(subtotal)}</span></div>
+    <div class="row"><span>Convenience Fee (5%)</span><span>${money(convFee)}</span></div>
+    <div class="row"><span>Platform Fee</span><span>Rs.0</span></div>
+    <div class="row total"><span>Total Paid</span><span>${money(amount)}</span></div>
+  </div></div>
+  <div class="footer">Thank you for booking with CultureWave &mdash; by OGSHOOTS LUXE</div>
+  </body></html>`;
+  const w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+};
+
+window.resendTicket=async function(){
+  const b=document.getElementById('bookingModal')._currentBooking;
+  if(!b) return;
+  const btn=document.querySelector('#bookingModal button[onclick="resendTicket()"]');
+  if(btn){btn.textContent='Sending...';btn.disabled=true;}
+  try{
+    const ts=firebase.firestore.FieldValue.serverTimestamp();
+    const update={resendRequested:true,resendRequestedAt:ts};
+    await db.collection('bookings').doc(b.id).update(update).catch(()=>{});
+    await db.collection('payments').doc(b.id).update(update).catch(()=>{});
+    showToast('\u2705 Resend request sent to admin WhatsApp tab');
+  }catch(e){showToast('Error: '+e.message);}
+  if(btn){btn.textContent='\ud83d\udce7 Resend Ticket';btn.disabled=false;}
+};
+
+window.exportBookings=function(){
+  const rows=[['Name','Phone','Ticket','Qty','Amount','Status','Date','Source']];
+  mainBookings().forEach(b=>{
+    const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN'):'';
+    rows.push([bookingName(b)==='Guest'?'':bookingName(b),bookingPhone(b),b.ticketName||b.customer?.ticket||b.event?.ticketName||'General',b.seats||b.tickets||1,b.amount||0,normBookingStatus(b.status||'pending'),date,b.source||'direct']);
+  });
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv,'+encodeURIComponent(csv);
+  a.download='bookings-'+(eventData?.name||eventId)+'.csv';
+  a.click();
+};
+
+document.getElementById('bkSearch').addEventListener('input',renderBookings);
+
+let html5QrCode=null,scannerRunning=false,ciScanPaused=false,ciPendingBooking=null,ciRecentItems=[];
+
+window.ciRefresh=function(){ renderBookingStats(); showToast('Refreshed'); };
+
+window.ciSwitchTab=function(tab){
+  document.getElementById('ciTabRecent').classList.toggle('active',tab==='recent');
+  document.getElementById('ciTabSearch').classList.toggle('active',tab==='search');
+  document.getElementById('ciListRecent').style.display=tab==='recent'?'block':'none';
+  document.getElementById('ciListSearch').style.display=tab==='search'?'block':'none';
+};
+
+function ciDateValue(value){
+  if(!value) return 0;
+  const date=value.toDate?value.toDate():new Date(value);
+  return Number.isNaN(date.getTime())?0:date.getTime();
+}
+
+function renderCiRecent(){
+  const recent=allBookings.filter(b=>b.checkedIn).sort((a,b)=>ciDateValue(b.checkedInDate||b.checkedInAt)-ciDateValue(a.checkedInDate||a.checkedInAt)).slice(0,20);
+  ciRecentItems=recent;
+  const countEl=document.getElementById('ciRecentCount');
+  if(countEl) countEl.textContent=recent.length;
+  const list=document.getElementById('ciListRecent');
+  if(!list) return;
+  if(!recent.length){list.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128100;</div><h3>No check-ins yet</h3><p>Scan QR codes or search attendees to check them in</p></div>';return;}
+  list.innerHTML=recent.map(x=>{
+    const n=bookingName(x);
+    const e=bookingEmail(x);
+    const ini=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
+    let h=0;for(let i=0;i<n.length;i++)h=(h+n.charCodeAt(i))%cols.length;
+    const stamp=x.checkedInDate||x.checkedInAt;
+    const date=ciDateValue(stamp)?new Date(ciDateValue(stamp)).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Recently';
+    return '<div class="ci-log-item"><div class="ci-log-avatar" style="background:'+cols[h]+';">'+esc(ini)+'</div><div style="flex:1;min-width:0;"><div class="ci-log-name">'+esc(n)+'</div><div class="ci-log-sub">'+esc(e)+'</div></div><span class="ci-log-badge success">Checked In</span><span class="ci-log-time">'+date+'</span></div>';
+  }).join('');
+}
+
+window.ciSearch=function(){
+  const q=document.getElementById('ciSearchInput').value.trim().toLowerCase();
+  const listEl=document.getElementById('ciListSearch');
+  const countEl=document.getElementById('ciSearchCount');
+  if(!q){listEl.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128269;</div><h3>Search Results</h3><p>Type a name, email or phone above</p></div>';countEl.textContent=0;return;}
+  const results=allBookings.filter(b=>{
+    const n=bookingName(b).toLowerCase();
+    const e=bookingEmail(b).toLowerCase();
+    const p=bookingPhone(b).toLowerCase();
+    return n.includes(q)||e.includes(q)||p.includes(q);
+  });
+  countEl.textContent=results.length;
+  window.ciSwitchTab('search');
+  if(!results.length){listEl.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">&#128269;</div><h3>No results</h3><p>No attendees found</p></div>';return;}
+  listEl.innerHTML=results.map(b=>{
+    const name=bookingName(b);
+    const email=bookingEmail(b);
+    const phone=bookingPhone(b)||'\u2014';
+    const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const cols=['#3b5bdb','#2f9e44','#e67700','#7048e8','#0891b2','#d6336c'];
+    let h=0;for(let i=0;i<name.length;i++)h=(h+name.charCodeAt(i))%cols.length;
+    return '<div class="ci-log-item"><div class="ci-log-avatar" style="background:'+cols[h]+';">'+esc(ini)+'</div><div style="flex:1;min-width:0;"><div class="ci-log-name">'+esc(name)+'</div><div class="ci-log-sub">'+esc(email)+' &middot; '+esc(phone)+'</div></div>'+(b.checkedIn?'<span class="ci-log-badge duplicate">Already Checked In</span>':'<button onclick="processCheckIn(\''+b.id+'\')" style="padding:.38rem .85rem;border-radius:8px;background:var(--blue);border:0;color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;">Check In</button>')+'</div>';
+  }).join('');
+};
+
+window.toggleCiScanner=async function(){
+  if(scannerRunning) await stopCiScanner();
+  else await startCiScanner();
+};
+
+async function startCiScanner(){
+  const modal=document.getElementById('ciScanModal');
+  const statusEl=document.getElementById('ciModalScanStatus');
+  const btn=document.getElementById('ciScanBtn');
+  if(scannerRunning) return;
+  ciScanPaused=false;
+  modal.style.display='flex';
+  modal.setAttribute('aria-hidden','false');
+  statusEl.textContent='Starting camera...';
+  try{
+    html5QrCode=new Html5Qrcode('ci-modal-reader');
+    await html5QrCode.start(
+      {facingMode:'environment'},
+      {fps:10,qrbox:{width:240,height:240}},
+      (text)=>{ if(!ciScanPaused){ ciScanPaused=true; stopCiScanner().then(()=>processCheckIn(text)); } },
+      ()=>{}
+    );
+    scannerRunning=true;
+    statusEl.textContent='Scanning... point at the QR code';
+  }catch(e){
+    statusEl.textContent='Camera error: '+e.message;
+    statusEl.style.color='#c92a2a';
+    await closeCiScanModal();
+  }
+}
+
+window.closeCiScanModal=async function(){
+  await stopCiScanner();
+  ciScanPaused=false;
+  const modal=document.getElementById('ciScanModal');
+  if(modal){modal.style.display='none';modal.setAttribute('aria-hidden','true');}
+};
+
+async function stopCiScanner(){
+  if(html5QrCode&&scannerRunning){try{await html5QrCode.stop();html5QrCode.clear();}catch(e){}}
+  scannerRunning=false;
+  html5QrCode=null;
+  const modal=document.getElementById('ciScanModal');
+  if(modal){modal.style.display='none';modal.setAttribute('aria-hidden','true');}
+}
+
+window.processCheckIn=function(val){
+  const raw=String(val||'').replace(/^\uFEFF/,'').trim();
+  if(!raw) return;
+  let ticketId=raw;
+  try{
+    const decoded=decodeURIComponent(raw);
+    try{
+      const data=JSON.parse(decoded);
+      ticketId=data.id||data.bookingId||data.booking_id||data.ticketId||data.booking?.id||'';
+    }catch(_){
+      const url=new URL(decoded);
+      ticketId=url.searchParams.get('bookingId')||url.searchParams.get('booking_id')||url.searchParams.get('id')||decoded;
+    }
+  }catch(_){}
+  const b=allBookings.find(x=>x.id===ticketId||x.bookingId===ticketId||x.ticketId===ticketId);
+  if(!b){showCiModal(null,'invalid');return;}
+  if(normBookingStatus(b.status)==='cancelled'||b.cancelled){showCiModal(b,'cancelled');return;}
+  if(b.checkedIn){showCiModal(b,'already');return;}
+  ciPendingBooking=b;
+  showCiModal(b,'confirm');
+};
+
+function showCiModal(b,type){
+  const name=b?bookingName(b):'Unknown ticket';
+  const email=b?bookingEmail(b):'\u2014';
+  const phone=b?(bookingPhone(b)||'\u2014'):'\u2014';
+  document.getElementById('ciConfirmName').textContent=name;
+  document.getElementById('ciConfirmEmail').textContent=email;
+  document.getElementById('ciConfirmPhone').textContent=phone;
+  const rawSeats=b?(b.seats??b.ticketCount??b.tickets??1):null;
+  const seatText=Array.isArray(rawSeats)?`${rawSeats.length} (${rawSeats.join(', ')})`:typeof rawSeats==='string'&&!/^\d+$/.test(rawSeats.trim())?`${rawSeats.split(',').filter(Boolean).length} (${rawSeats})`:`${Number(rawSeats)||1}`;
+  document.getElementById('ciConfirmSeats').textContent=b?seatText+(Number(Array.isArray(rawSeats)?rawSeats.length:rawSeats)===1?' seat':' seats'):'—';
+  const amount=Number(b?.amount||0);
+  document.getElementById('ciConfirmAmount').textContent=b?(amount>0?money(amount):'Free'):'—';
+  document.getElementById('ciConfirmPayment').textContent=b?(b.method||b.paymentMethod||b.payment?.method||'—'):'—';
+  const hdr=document.getElementById('ciModalHeader');
+  const title=document.getElementById('ciModalTitle');
+  const sub=document.getElementById('ciModalSub');
+  const checkBtn=document.getElementById('ciModalCheckInBtn');
+  const cancelBtn=document.querySelector('#ciModalBtns button:first-child');
+  const reason=document.getElementById('ciModalReason');
+  reason.style.display='none';
+  reason.textContent='';
+  if(type==='invalid'){
+    hdr.style.background='#c92a2a';title.textContent='Invalid Ticket';
+    sub.textContent='This QR code could not be verified';
+    reason.textContent='Reason: No matching booking was found for this QR code.';
+    reason.style.display='block';
+    checkBtn.style.display='none';cancelBtn.style.gridColumn='1/-1';
+  } else if(type==='cancelled'){
+    hdr.style.background='#c92a2a';title.textContent='Cancelled Ticket';
+    sub.textContent='This ticket is no longer valid for entry';
+    reason.textContent='Reason: The organiser cancelled this booking.';
+    reason.style.display='block';
+    checkBtn.style.display='none';cancelBtn.style.gridColumn='1/-1';
+  } else if(type==='already'){
+    hdr.style.background='#d97706';title.textContent='\u26a0 Already Checked In';
+    sub.textContent='This ticket was already used for entry';
+    reason.textContent='Reason: This ticket has already been checked in and cannot be used again.';
+    reason.style.display='block';
+    checkBtn.style.display='none';cancelBtn.style.gridColumn='1/-1';
+  } else {
+    hdr.style.background='var(--blue)';title.textContent='Confirm Check-In';
+    sub.textContent='Review details before checking in';
+    checkBtn.style.display='';cancelBtn.style.gridColumn='';
+  }
+  document.getElementById('ciConfirmModal').style.display='flex';
+}
+
+window.cancelCiConfirm=async function(){
+  document.getElementById('ciConfirmModal').style.display='none';
+  ciPendingBooking=null;
+  await stopCiScanner();
+};
+
+window.confirmCiCheckIn=async function(){
+  const b=ciPendingBooking; if(!b) return;
+  document.getElementById('ciConfirmModal').style.display='none';
+  const checkedInDate=new Date().toISOString();
+  await db.collection('bookings').doc(b.id).update({checkedIn:true,checkedInAt:serverTimestamp(),checkedInDate});
+  b.checkedIn=true;
+  b.checkedInDate=checkedInDate;
+  const name=bookingName(b);
+  showToast('\u2713 Checked in: '+name);
+  renderCiRecent();
+  const total=allBookings.length;
+  const checked=allBookings.filter(x=>x.checkedIn).length;
+  const ciCheckedInEl=document.getElementById('ciCheckedIn');
+  const ciProgressEl=document.getElementById('ciProgress');
+  if(ciCheckedInEl) ciCheckedInEl.textContent=checked;
+  if(ciProgressEl) ciProgressEl.textContent=total?Math.round(checked/total*100)+'%':'0%';
+  ciPendingBooking=null;
+  await stopCiScanner();
+};
+
+window.checkInTicket=async function(){
+  const val=document.getElementById('ciSearchInput').value.trim();
+  if(!val){showToast('Enter a booking ID');return;}
+  ciScanPaused=true;
+  processCheckIn(val);
+};
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const ci=document.getElementById('ciSearchInput');
+  if(ci) ci.addEventListener('keydown',e=>{if(e.key==='Enter') window.checkInTicket();});
+});
+
+
+function renderAnalytics(){
+  const now=new Date();
+  const cutoff=new Date(now-anPeriod*86400000);
+  const s=cutoff.toLocaleDateString('en-IN',{year:'numeric',month:'2-digit',day:'2-digit'});
+  const e=now.toLocaleDateString('en-IN',{year:'numeric',month:'2-digit',day:'2-digit'});
+  document.getElementById('anDateRange').textContent='📅 '+s+' — '+e;
+  const cur=mainBookings().filter(b=>{const d=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return d>=cutoff;});
+  const paid=cur.filter(b=>normBookingStatus(b.status)==='paid');
+  const failed=cur.filter(b=>normBookingStatus(b.status)==='failed');
+  const pending=cur.filter(b=>normBookingStatus(b.status)==='pending');
+  const totalRev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
+  const failedRev=failed.reduce((s,b)=>s+Number(b.amount||0),0);
+  const pendingRev=pending.reduce((s,b)=>s+Number(b.amount||0),0);
+  const views=eventData?.analytics?.views||eventData?.views||0;
+  const clicks=eventData?.analytics?.clicks||eventData?.clicks||0;
+  const convRate=views>0?((paid.length/views)*100).toFixed(2)+'%':'0%';
+  document.getElementById('anViews').textContent=views;
+  document.getElementById('anClicks').textContent=clicks;
+  document.getElementById('anCheckouts').textContent=cur.length;
+  document.getElementById('anSuccess').textContent=paid.length;
+  document.getElementById('anSuccessRev').textContent=money(totalRev);
+  document.getElementById('anFailed').textContent=failed.length;
+  document.getElementById('anFailedRev').textContent=money(failedRev);
+  document.getElementById('anConvRate').textContent=convRate;
+  document.getElementById('anRevenue').textContent=money(totalRev);
+  document.getElementById('anActiveCarts').textContent=pending.length;
+  document.getElementById('anActiveCartsRev').textContent=money(pendingRev)+' pending';
+  document.getElementById('anExpired').textContent=0;
+  document.getElementById('anExpiredRev').textContent=money(0)+' lost';
+  document.getElementById('fnViews').textContent=views;
+  document.getElementById('fnClicks').textContent=clicks;
+  document.getElementById('fnTicketSel').textContent=clicks;
+  document.getElementById('fnCheckout').textContent=cur.length;
+  document.getElementById('fnPaid').textContent=paid.length;
+  const drop1=views>0?Math.round((1-clicks/views)*100):0;
+  document.getElementById('fnDrop1').textContent=drop1>0?'\u2198 '+drop1+'% drop-off':'';
+  const days=Math.min(anPeriod,14);
+  const labels=[];const bookData=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(now-i*86400000);
+    labels.push(d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}));
+    const ds=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+    const de=new Date(ds.getTime()+86400000);
+    bookData.push(paid.filter(b=>{const bd=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return bd>=ds&&bd<de;}).length);
+  }
+  const maxVal=Math.max(...bookData,1);
+  document.getElementById('anBarChart').innerHTML=labels.map((lbl,i)=>'<div class="bar-wrap"><div class="bar" style="height:'+Math.max(Math.round(bookData[i]/maxVal*100),3)+'px;"><div class="bar-tooltip">'+bookData[i]+' bookings</div></div><div class="bar-label">'+lbl+'</div></div>').join('');
+  const abandonedEl=document.getElementById('abandonedList');
+  if(pending.length){
+    abandonedEl.innerHTML=pending.slice(0,10).map(b=>{
+      const name=bookingName(b);
+      const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'--';
+      return '<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-bottom:1px solid var(--border);"><div style="width:34px;height:34px;border-radius:50%;background:'+avatarColor(name)+';display:grid;place-items:center;font-size:.78rem;font-weight:800;color:#fff;flex:none;">'+name.slice(0,2).toUpperCase()+'</div><div style="flex:1;"><div style="font-size:.86rem;font-weight:700;">'+esc(name)+'</div><div style="font-size:.74rem;color:var(--muted);">'+date+'</div></div><div style="font-size:.84rem;font-weight:700;color:#e67700;">'+(b.amount?money(b.amount):'--')+'</div><span class="pill pending">pending</span></div>';
+    }).join('');
+  } else {
+    abandonedEl.innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted);font-size:.84rem;">No abandoned carts found</div>';
+  }
+}
+
+document.querySelectorAll('#anPeriodTabs .period-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    anPeriod=Number(btn.dataset.days);
+    document.querySelectorAll('#anPeriodTabs .period-tab').forEach(t=>t.classList.toggle('active',t===btn));
+    renderAnalytics();
+  });
+});
+
+function prefillDetails(){
+  const d=eventData;
+  const g=id=>document.getElementById(id);
+  const set=(id,v)=>{const el=g(id);if(el&&v!==undefined&&v!==null)el.value=v;};
+  set('detName',d.name||'');set('detDesc',d.description||'');
+  if(g('detCategory'))g('detCategory').value=d.category||'';
+  set('detTags',Array.isArray(d.tags)?d.tags.join(', '):(d.tags||''));
+  set('detVenue',d.venueName||'');set('detCity',d.city||'');set('detState',d.state||'');
+  set('detAddress',d.address||'');set('detMapLink',d.mapLink||'');
+  set('detCoverUrl',d.coverUrl||'');set('detCardUrl',d.cardImgUrl||'');set('detDesktopBackgroundUrl',d.desktopBackgroundUrl||'');
+  set('detNotes',d.notes||'');set('detTerms',d.termsText||'');
+  set('detRefundPolicy',d.refundPolicy||'');set('detRefundDays',d.refundDeadlineDays||'');
+  if(d.coverUrl){const pw=g('detCoverPreviewWrap');if(pw)pw.style.display='block';const pi=g('detCoverPreview');if(pi)pi.src=d.coverUrl;}
+  g('detCoverUrl').addEventListener('input',function(){const pw=document.getElementById('detCoverPreviewWrap');const pi=document.getElementById('detCoverPreview');if(this.value){pw.style.display='block';pi.src=this.value;}else pw.style.display='none';});
+}
+
+window.saveEventDetails=async function(){
+  if(!eventId) return;
+  const g=id=>document.getElementById(id);
+  await db.collection('events').doc(eventId).update({
+    name:g('detName').value.trim(),description:g('detDesc').value.trim(),
+    category:g('detCategory').value,
+    tags:g('detTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    venueName:g('detVenue').value.trim(),city:g('detCity').value.trim(),
+    state:g('detState').value.trim(),address:g('detAddress').value.trim(),
+    mapLink:g('detMapLink').value.trim(),coverUrl:g('detCoverUrl').value.trim(),
+    cardImgUrl:g('detCardUrl').value.trim(),desktopBackgroundUrl:g('detDesktopBackgroundUrl').value.trim(),notes:g('detNotes').value.trim(),
+    termsText:g('detTerms').value.trim(),refundPolicy:g('detRefundPolicy').value.trim(),
+    refundDeadlineDays:Number(g('detRefundDays').value||0),updatedAt:serverTimestamp()
+  });
+  showToast('Event details saved!');
+  eventData.name=g('detName').value.trim();
+  renderEventMeta();
+};
+
+function prefillSettings(){
+  const d=eventData;
+  const setChk=(id,v)=>{const el=document.getElementById(id);if(!el)return;el.checked=!!v;const track=el.nextElementSibling;if(track){const thumb=track.querySelector('span');if(v){track.style.background='#3b5bdb';if(thumb)thumb.style.transform='translateX(18px)';}else{track.style.background='#e9ecef';if(thumb)thumb.style.transform='';}}};
+  setChk('setPublicListing',d.publicListing);
+  setChk('setAllowSharing',d.allowSharing!==false);
+  setChk('setShowCount',d.showAttendeeCount!==false);
+  setChk('setEnableRefunds',d.enableRefunds!==false);
+  setChk('setInviteOnly',d.inviteOnly);
+  const inviteLinkPanel=document.getElementById('inviteLinkPanel');
+  const inviteLinkValue=document.getElementById('inviteLinkValue');
+  if(inviteLinkPanel&&inviteLinkValue&&d.inviteOnly&&d.inviteLinkEnabled&&d.inviteToken){
+    inviteLinkValue.value=`${location.origin}${location.pathname.replace(/event-manage\.html.*/, '')}booking.html?eventId=${encodeURIComponent(eventId)}&inviteToken=${encodeURIComponent(d.inviteToken)}`;
+    inviteLinkPanel.style.display='block';
+  }else if(inviteLinkPanel){inviteLinkPanel.style.display='none';}
+  const inviteEmailPanel=document.getElementById('inviteEmailPanel');
+  const inviteEmailSummary=document.getElementById('inviteEmailSummary');
+  const inviteEmailStatus=document.getElementById('inviteEmailStatus');
+  const invitedEmails=Array.isArray(d.guestEmails)?d.guestEmails:[];
+  if(inviteEmailPanel&&d.inviteOnly&&invitedEmails.length){
+    inviteEmailPanel.style.display='block';
+    inviteEmailSummary.textContent=`${invitedEmails.length} invited email${invitedEmails.length===1?'':'s'}. Emails already sent will be skipped.`;
+    const sent=Array.isArray(d.sentInviteEmails)?d.sentInviteEmails:[];
+    inviteEmailStatus.textContent=sent.length?`${sent.length} invitation${sent.length===1?'':'s'} already sent.`:'No invitation emails sent yet.';
+  }else if(inviteEmailPanel){inviteEmailPanel.style.display='none';}
+}
+window.copyInviteLink=async function(){
+  const value=document.getElementById('inviteLinkValue')?.value;
+  if(!value){showToast('Enable invite link in the event editor first.');return;}
+  try{await navigator.clipboard.writeText(value);showToast('Invite link copied!');}
+  catch(_){const field=document.getElementById('inviteLinkValue');field.select();document.execCommand('copy');showToast('Invite link copied!');}
+};
+window.sendGuestInvitations=async function(){
+  const accessRef=db.collection('eventAccess').doc(eventId);
+  const status=document.getElementById('inviteEmailStatus');
+  const button=document.querySelector('#inviteEmailPanel button');
+  const inviteAccess=eventData;
+  const guests=Array.isArray(inviteAccess.guestEmails)?inviteAccess.guestEmails:[];
+  if(!guests.length){status.textContent='Add guest emails in the event editor first.';return;}
+  if(button){button.disabled=true;button.textContent='Sending…';}
+  let sent=0,failed=0;
+  const alreadySent=new Set(Array.isArray(inviteAccess.sentInviteEmails)?inviteAccess.sentInviteEmails:[]);
+  const bookingUrl=inviteAccess.inviteLinkEnabled&&inviteAccess.inviteToken
+    ?`${location.origin}${location.pathname.replace(/event-manage\.html.*/, '')}booking.html?eventId=${encodeURIComponent(eventId)}&inviteToken=${encodeURIComponent(inviteAccess.inviteToken)}`
+    :`${location.origin}${publicEventPath(eventData.urlKey||eventData.name)}`;
+  for(const email of guests){
+    if(alreadySent.has(email))continue;
+    try{
+      await emailjs.send(INVITE_EMAIL_SERVICE,INVITE_EMAIL_TEMPLATE,{
+        to_email:email,to_name:email.split('@')[0],event_name:eventData.name||'CultureWave event',
+        booking_url:bookingUrl,invite_code:inviteAccess.inviteCode||''
+      });
+      await accessRef.update({sentInviteEmails:firebase.firestore.FieldValue.arrayUnion(email)});
+      alreadySent.add(email);sent++;
+    }catch(error){console.error('Invite email failed:',email,error);failed++;}
+  }
+  eventData.sentInviteEmails=[...alreadySent];
+  status.textContent=failed?`${sent} sent; ${failed} failed. You can retry failed addresses.`:`${sent?`${sent} sent`:'All invitations were already sent.'}`;
+  if(button){button.disabled=false;button.textContent='Send invite emails';}
+};
+
+window.saveSettings=async function(){
+  if(!eventId) return;
+  await db.collection('events').doc(eventId).update({
+    publicListing:document.getElementById('setPublicListing').checked,
+    allowSharing:document.getElementById('setAllowSharing').checked,
+    showAttendeeCount:document.getElementById('setShowCount').checked,
+    enableRefunds:document.getElementById('setEnableRefunds').checked,
+    inviteOnly:document.getElementById('setInviteOnly').checked,
+    updatedAt:serverTimestamp()
+  });
+  showToast('Settings saved!');
+};
+
+function prefillTickets(){
+  const tickets=eventData?.tickets||[];
+  const el=document.getElementById('ticketsList');
+  renderInvitationRows();
+  if(!tickets.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.84rem;border:1px dashed var(--border);border-radius:10px;">No tickets configured</div>';return;}
+  el.innerHTML=tickets.map(t=>'<div class="ticket-row"><div class="ticket-name">'+esc(t.name||'General')+'</div><div class="ticket-price">'+(t.price?money(t.price):'Free')+'</div><div class="ticket-qty">'+(t.qty?t.qty+' seats':'Unlimited')+'</div></div>').join('');
+  renderInvitationRows();
+}
+
+let invitationRowCount=0;
+function renderInvitationRows(){
+  const host=document.getElementById('invitationRows');if(!host)return;
+  if(!host.children.length)addInvitationRow();
+}
+window.addInvitationRow=function(){
+  const host=document.getElementById('invitationRows');if(!host)return;
+  const id=++invitationRowCount;
+  const row=document.createElement('div');row.className='invitation-row';row.dataset.invitationRow=String(id);
+  row.style.cssText='display:grid;grid-template-columns:1.2fr 1.3fr 1fr 1.2fr auto;gap:.55rem;align-items:end;padding:.8rem;background:#f8f9fa;border:1px solid var(--border);border-radius:10px;';
+  row.innerHTML=`<label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">GUEST NAME *<input data-field="name" autocomplete="name" required placeholder="Guest name" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">EMAIL *<input data-field="email" type="email" autocomplete="email" required placeholder="guest@example.com" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">PHONE<input data-field="phone" type="tel" autocomplete="tel" placeholder="Phone (optional)" style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><label style="display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;font-weight:700;color:#495057;">NUMBER OF TICKETS *<input data-field="ticketCount" type="number" min="1" max="249" step="1" value="1" inputmode="numeric" required style="min-width:0;padding:.6rem .7rem;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:.82rem;"></label><button type="button" aria-label="Remove guest" title="Remove guest" onclick="this.closest('.invitation-row').remove()" style="padding:.55rem;color:#c92a2a;font-size:1.1rem;">×</button>`;
+  host.appendChild(row);
+};
+
+window.issueInvitations=async function(){
+  const user=auth.currentUser;
+  if(!user||!eventData||eventData.ownerId!==user.uid){showToast('Only the event organiser can issue tickets');return;}
+  const rows=[...document.querySelectorAll('#invitationRows .invitation-row')];
+  const status=document.getElementById('invitationStatus');
+  const button=document.getElementById('issueInvitationsBtn');
+  const guests=rows.map(row=>({
+    name:row.querySelector('[data-field="name"]').value.trim(),
+    email:row.querySelector('[data-field="email"]').value.trim().toLowerCase(),
+    phone:row.querySelector('[data-field="phone"]').value.trim(),
+    ticketCount:Number(row.querySelector('[data-field="ticketCount"]').value||0)
+  }));
+  if(!guests.length||guests.some(guest=>!guest.name)){status.textContent='Enter a name for every guest before generating tickets.';return;}
+  if(guests.some(guest=>!guest.email)){status.textContent='Enter an email address for every guest so we can send their invitation.';return;}
+  if(guests.some(guest=>!Number.isInteger(guest.ticketCount)||guest.ticketCount<1)){status.textContent='Enter at least one ticket for every guest.';return;}
+  const totalTickets=guests.reduce((total,guest)=>total+guest.ticketCount,0);
+  if(totalTickets>249){status.textContent='Generate invitations for up to 249 tickets at a time.';return;}
+  if(guests.some(guest=>!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email))){status.textContent='Check the email address format and try again.';return;}
+  button.disabled=true;button.textContent='Generating…';status.textContent='Creating tickets…';
+  try{
+    const batch=db.batch();const issued=[];
+    guests.forEach(guest=>{
+      const bookingRef=db.collection('bookings').doc();
+      const bookingId=bookingRef.id;
+      const ticketName='Invitation Ticket';
+      const data={bookingId,eventId,eventName:eventData.name||'Event',ticketName,
+        ticketItems:[{ticketName,quantity:guest.ticketCount}],
+        amount:0,seats:guest.ticketCount,tickets:guest.ticketCount,seatIds:[],status:'confirmed',paymentId:null,
+        customerName:guest.name,customerEmail:guest.email,customerPhone:guest.phone,
+        userId:null,organiserId:user.uid,ownerId:user.uid,source:'organiser_invitation',
+        invitation:true,eventDate:eventData.startDate||eventData.date||null,
+        venueName:eventData.venueName||eventData.venue||null,city:eventData.city||null,
+        eventEmoji:eventData.emoji||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+      batch.set(bookingRef,data);
+      batch.set(db.collection('payments').doc(bookingId),data);
+      issued.push({bookingId,name:guest.name||'INVITED GUEST',email:guest.email,phone:guest.phone,ticketName,ticketCount:guest.ticketCount,seats:guest.ticketCount});
+    });
+    batch.update(db.collection('events').doc(eventId),{totalBooked:firebase.firestore.FieldValue.increment(totalTickets)});
+    await batch.commit();
+    let emailed=0, emailFailed=0;
+    for(const ticket of issued){
+      status.textContent=`Sending invitation emails (${emailed+emailFailed+1}/${issued.length})…`;
+      try{await sendInvitationTicketEmail(ticket,invitationPageUrl(ticket));ticket.emailSent=true;emailed++;}
+      catch(error){ticket.emailError=invitationEmailError(error);console.error('Invitation email failed:',ticket.email,error);ticket.emailSent=false;emailFailed++;}
+    }
+    const list=document.getElementById('issuedInvitationTickets');
+    list.innerHTML=issued.map(ticket=>{
+      const url=invitationPageUrl({...ticket,status:'confirmed'});
+      const whatsappUrl=invitationWhatsAppUrl(ticket,url);
+      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.85rem 1rem;border:1px solid var(--border);border-radius:10px;background:#fff;"><div><div style="font-weight:800;">${esc(ticket.name)}</div><div style="font-size:.76rem;color:var(--muted);">${ticket.ticketCount} ticket${ticket.ticketCount===1?'':'s'} · ${esc(ticket.email)} · ${ticket.emailSent?'Email sent':'Email failed'} · ${esc(ticket.bookingId)}</div>${ticket.emailError?`<div style="font-size:.72rem;color:#b42318;margin-top:.25rem;">${esc(ticket.emailError)}</div>`:''}</div><div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="tb-btn" href="${url.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Open invite page</a><a class="tb-btn" style="background:#25d366;border-color:#25d366;color:#10351d;" href="${whatsappUrl.replace(/&/g,'&amp;')}" target="_blank" rel="noopener">Send WhatsApp invite</a>${ticket.emailSent?'':`<button class="tb-btn" type="button" onclick="resendInvitationTicketEmail('${ticket.bookingId}',this)">Retry email</button>`}</div></div>`;
+    }).join('');
+    status.textContent=emailFailed?`${issued.length} invitation${issued.length===1?'':'s'} created; ${emailed} email${emailed===1?'':'s'} sent and ${emailFailed} failed. ${issued.find(ticket=>ticket.emailError)?.emailError||'Use Retry email for failed messages.'}`:`${issued.length} invitation${issued.length===1?'':'s'} created; all ${emailed} email${emailed===1?'':'s'} sent with ${totalTickets} ticket${totalTickets===1?'':'s'} assigned.`;
+    document.getElementById('invitationRows').innerHTML='';addInvitationRow();
+  }catch(error){console.error('Could not issue invitation tickets:',error);status.textContent=error.code==='permission-denied'?'Could not create tickets. Confirm you are signed in as the event owner and retry.':'Ticket generation failed. Please retry.';}
+  finally{button.disabled=false;button.textContent='Generate tickets';}
+};
+
+window.toggleSwitch=function(id){
+  const tog=document.getElementById('tog-'+id);
+  if(!tog) return;
+  const on=tog.dataset.on==='true';
+  const newOn=!on;
+  tog.dataset.on=String(newOn);
+  tog.querySelector('.tog-track').style.background=newOn?'#3b5bdb':'#e9ecef';
+  tog.querySelector('.tog-thumb').style.transform=newOn?'translateX(20px)':'translateX(0)';
+};
+
+window.saveReminders=function(){
+  const vals={
+    rem24h: document.getElementById('tog-rem24h')?.dataset.on==='true',
+    rem1h: document.getElementById('tog-rem1h')?.dataset.on==='true',
+    remFeedback: document.getElementById('tog-remFeedback')?.dataset.on==='true'
+  };
+  showToast('Reminders saved!');
+};
+window.savePostSale=function(){showToast('Post sale settings saved!');};
+
+auth.onAuthStateChanged(user=>{
+  if(!user){location.href='login.html';return;}
+  loadEvent();
+});
+
+// Mobile sidebar
+(function(){
+  const sidebar = document.querySelector('.sidebar');
+  const btn = document.getElementById('hamburgerBtn');
+  if(!btn||!sidebar) return;
+  const overlay=()=>document.getElementById('sbOverlay');
+  const closeSidebar=()=>{sidebar.classList.remove('open');overlay()?.classList.remove('open');};
+  btn.addEventListener('click', ()=>{sidebar.classList.add('open');overlay()?.classList.add('open');});
+  document.addEventListener('click',event=>{if(event.target?.id==='sbOverlay')closeSidebar();});
+  document.querySelectorAll('.sb-item,.sb-back').forEach(item=>item.addEventListener('click',closeSidebar));
+})();
+</script>
+<div class="sb-overlay" id="sbOverlay"></div>
+</body>
+</html>

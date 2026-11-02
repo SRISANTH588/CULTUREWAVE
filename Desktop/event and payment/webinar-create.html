@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CultureWave | Create Webinar</title>
+  <meta name="robots" content="noindex, nofollow"/>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -528,16 +529,23 @@
     }
     /* RESPONSIVE */
     @media (max-width: 900px) {
+      .sidebar { position: fixed; left: -280px; top: 0; height: 100vh; height:100dvh; max-height:100vh; max-height:100dvh; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); width: 280px; z-index: 50; transition: left .28s cubic-bezier(.4,0,.2,1); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+      .sidebar.open { left: 0; box-shadow: 8px 0 32px rgba(0,0,0,.15); }
+      .hamburger { display: flex; }
       .layout { grid-template-columns: 1fr; }
-      .sidebar { position: static; }
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
     }
+    .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
+    .sb-overlay.open{display:block;}
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
+    .hamburger span{display:block;width:22px;height:2px;background:#333;border-radius:2px;}
     @media (max-width: 600px) {
       .topbar-inner { padding: 0 0.8rem; }
       .layout { padding: 0.7rem; }
       .progress-wrap { display: none; }
     }
   </style>
+  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
 <body>
 
@@ -562,6 +570,7 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div style="display:flex;align-items:center;gap:1.2rem;">
+      <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
       <div class="brand">
         <div class="brand-icon">C</div>
         <strong>CultureWave</strong>
@@ -1046,6 +1055,17 @@
         </div>
         <div class="field" style="margin-bottom:0.75rem;"><label for="tdFooter">Footer Note</label><input id="tdFooter" type="text" placeholder="e.g. Non-transferable. Join link is personal." oninput="updateTicketPreview()" /></div>
 
+        <div class="field" style="margin-bottom:0.75rem;">
+          <label for="logoInput">Organiser Logo</label>
+          <div class="upload-zone" onclick="document.getElementById('logoInput').click()" style="padding:1rem;">
+            <strong style="font-size:0.84rem;">Click to upload logo</strong>
+            <span>PNG, JPG &middot; max 5 MB</span>
+          </div>
+          <input type="file" id="logoInput" accept="image/*" style="display:none;" onchange="loadLogoFile(this)" />
+          <input id="logoUrl" type="url" placeholder="Or paste logo image URL" oninput="syncLogoUrl()" style="margin-top:.5rem;" />
+          <button id="logoRemoveBtn" type="button" onclick="removeLogo()" style="display:none;margin-top:.4rem;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.28rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;">Remove logo</button>
+        </div>
+
         <!-- Field toggles -->
         <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.4rem;">Toggle Fields</div>
         <div style="display:flex;flex-direction:column;gap:0.35rem;">
@@ -1435,7 +1455,7 @@
             <button class="btn-primary" style="font-size:.74rem;padding:.3rem .65rem;" onclick="navigator.clipboard.writeText('https://CultureWave.in/e/your-event/rsvp');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.75rem;">
-            <div onclick="window.open('https://wa.me/?text=Register: https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128172;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">WhatsApp</div></div>
+            <div onclick="window.open('https://wa.me/?text='+encodeURIComponent('Hi! I would like to invite you to my event. Please register here: https://CultureWave.in/e/your-event/rsvp'),'_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128172;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">WhatsApp</div></div>
             <div onclick="window.open('https://twitter.com/intent/tweet?text=Register: https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128038;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Twitter</div></div>
             <div onclick="window.open('mailto:?subject=Register&body=https://CultureWave.in/e/your-event/rsvp','_blank')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#9993;&#65039;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Email</div></div>
             <div onclick="alert('Copy the link and paste in your Instagram story!')" style="border:1px solid var(--border);border-radius:12px;padding:.65rem .4rem;text-align:center;cursor:pointer;background:#fff;"><div style="font-size:1.3rem;">&#128247;</div><div style="font-size:.68rem;font-weight:800;color:var(--muted);">Instagram</div></div>
@@ -1534,11 +1554,11 @@
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
           <div class="toggle-row">
             <div><strong>🔒 Enable Invite Only</strong><span>Only guests with an invite link or code can register</span></div>
-            <button class="toggle" id="toggleInvite" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleInvite" onclick="this.classList.toggle('on');if(!this.classList.contains('on'))document.getElementById('toggleInviteLink').classList.remove('on')"></button>
           </div>
           <div class="toggle-row">
             <div><strong>🔗 Generate Invite Link</strong><span>Share a private link with selected guests</span></div>
-            <button class="toggle" id="toggleInviteLink" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleInviteLink" onclick="this.classList.toggle('on');if(this.classList.contains('on'))document.getElementById('toggleInvite').classList.add('on')"></button>
           </div>
         </div>
       </div>
@@ -1547,7 +1567,7 @@
         <div class="field">
           <label for="guestEmails">Guest Emails</label>
           <textarea id="guestEmails" style="min-height:100px;" placeholder="one@email.com&#10;two@email.com&#10;three@email.com"></textarea>
-          <span class="field-hint">One email per line. Participants will receive an invite email.</span>
+          <span class="field-hint">One email per line. Only these addresses can register unless they also have the invite code or private link.</span>
         </div>
       </div>
       <div class="card">
@@ -1575,11 +1595,11 @@
           </div>
           <div class="toggle-row">
             <div><strong>📋 Enable Waitlist</strong><span>Collect waitlist registrations when sold out</span></div>
-            <button class="toggle" id="toggleWaitlist" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleWaitlist" onclick="this.classList.toggle('on');if(!this.classList.contains('on')){document.getElementById('toggleNotifyWaitlist').classList.remove('on');document.getElementById('overflowAction').value='close';}"></button>
           </div>
           <div class="toggle-row">
             <div><strong>🔔 Notify Waitlist</strong><span>Auto-notify waitlisted guests if spots open up</span></div>
-            <button class="toggle" id="toggleNotifyWaitlist" onclick="this.classList.toggle('on')"></button>
+            <button class="toggle" id="toggleNotifyWaitlist" onclick="this.classList.toggle('on');if(this.classList.contains('on')){document.getElementById('toggleWaitlist').classList.add('on');document.getElementById('overflowAction').value='notify';}else if(document.getElementById('overflowAction').value==='notify'){document.getElementById('overflowAction').value='waitlist';}"></button>
           </div>
         </div>
       </div>
@@ -1594,7 +1614,7 @@
         <div class="card-head"><h2>Overflow Options</h2><p>What happens when capacity is reached</p></div>
         <div class="field">
           <label for="overflowAction">When capacity is full</label>
-          <select id="overflowAction">
+          <select id="overflowAction" onchange="if(this.value==='waitlist'||this.value==='notify')document.getElementById('toggleWaitlist').classList.add('on');if(this.value==='notify')document.getElementById('toggleNotifyWaitlist').classList.add('on');if(this.value==='waitlist'||this.value==='close')document.getElementById('toggleNotifyWaitlist').classList.remove('on');">
             <option value="close">Close registrations</option>
             <option value="waitlist">Move to waitlist</option>
             <option value="notify">Show sold out & notify me</option>
@@ -1705,9 +1725,9 @@
       <div class="field"><label for="tDesc">Description</label><input id="tDesc" type="text" placeholder="What's included?" /></div>
       <div style="background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:0.75rem;">
         <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:0.55rem;">&#127939; Single / Per Person</div>
-        <div class="grid-2">
+        <div class="grid-2" id="singleTicketGrid">
           <div class="field"><label for="tPrice">Price per person (₹)</label><input id="tPrice" type="number" min="0" value="0" placeholder="0 = Free" /></div>
-          <div class="field"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /></div>
+          <div class="field" id="ticketStockField"><label for="tQty">Total Quantity</label><input id="tQty" type="number" min="1" placeholder="e.g. 100" /><div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">Attendee spots, including group members</div></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.75rem;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;">
@@ -1725,6 +1745,7 @@
           <div class="field"><label for="tGroupPrice">Price per person (₹)</label><input id="tGroupPrice" type="number" min="0" placeholder="e.g. 120" oninput="updateBulkPreview()" /></div>
         </div>
         <div id="bulkPreview" style="margin-top:0.55rem;font-size:0.76rem;color:#065f46;font-weight:700;"></div>
+        <div style="font-size:.7rem;color:#42695b;margin-top:.35rem;">Set Total Quantity above for the whole group ticket. Each attendee in a booked group uses one spot; the ticket sells out when all spots are booked.</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -1772,6 +1793,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="imagekit.js"></script>
 <script>
 firebase.initializeApp({
   apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
@@ -1779,7 +1801,7 @@ firebase.initializeApp({
   projectId: "ogshootsluxe-36740",
   storageBucket: "ogshootsluxe-36740.firebasestorage.app",
   messagingSenderId: "5471814825",
-  appId: "1:5471814825:web:07e84f2f88486da817d5b8",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8"
 });
 
 const db = firebase.firestore();
@@ -1787,6 +1809,26 @@ const auth = firebase.auth();
 function serverTimestamp() { return firebase.firestore.FieldValue.serverTimestamp(); }
 function collection(db, name) { return db.collection(name); }
 async function addDoc(ref, data) { return await ref.add(data); }
+async function saveEventInviteAccess(eventId,ownerId,config){
+  const ref=db.collection('eventAccess').doc(eventId);
+  if(!config.inviteOnly){await ref.delete().catch(()=>{});return;}
+  await ref.set({ownerId,inviteOnly:config.inviteOnly,inviteLinkEnabled:config.inviteLinkEnabled,inviteCode:config.inviteCode,guestEmails:config.guestEmails,inviteToken:config.inviteLinkEnabled?config.inviteToken:'',updatedAt:serverTimestamp()},{merge:true});
+  if(config.inviteLinkEnabled&&config.inviteToken)await db.collection('eventAccessLinks').doc(config.inviteToken).set({eventId,ownerId,createdAt:serverTimestamp()});
+}
+
+async function getCurrentUser() {
+  return new Promise(resolve => {
+    const unsub = auth.onAuthStateChanged(async firebaseUser => {
+      unsub();
+      if (!firebaseUser) { resolve(null); return; }
+      try {
+        const snap = await db.collection('users').doc(firebaseUser.uid).get();
+        const data = snap.exists ? snap.data() : {};
+        resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: data.name || firebaseUser.displayName || firebaseUser.email, role: data.role || 'client' });
+      } catch { resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: firebaseUser.displayName || firebaseUser.email, role: 'client' }); }
+    });
+  });
+}
 
 // ── STATE ──
 let currentStep = 0;
@@ -1795,35 +1837,17 @@ let tickets = [];
 let coupons = [];
 let faqs = [];
 let uid = null;
+let coverFile = null;
+let cardImgFile = null;
+let logoFile = null;
 
 // ── AUTH ──
 async function loadUser() {
-  try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (res.ok) {
-      const { user } = await res.json();
-      uid = user.uid;
-      localStorage.setItem('cw_uid', uid);
-      const init = (user.name || 'U').trim().charAt(0).toUpperCase();
-      const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
-      return;
-    }
-  } catch {}
-  // fallback: Firebase Auth (works on file://)
-  await new Promise(resolve => {
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        uid = user.uid;
-        const init = (user.displayName || user.email || 'U').trim().charAt(0).toUpperCase();
-        const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
-      } else {
-        // not signed in via Firebase — try localStorage fallback
-        uid = localStorage.getItem('cw_uid') || ('local_' + Date.now());
-        localStorage.setItem('cw_uid', uid);
-      }
-      resolve();
-    });
-  });
+  const user = await getCurrentUser();
+  if (!user) { window.location.href = 'login.html'; return; }
+  uid = user.uid;
+  const init = (user.name || 'U').trim().charAt(0).toUpperCase();
+  const av = document.getElementById('topAvatar'); if(av) av.textContent = init;
 }
 loadUser();
 
@@ -1953,12 +1977,14 @@ function showCardImg(src) {
 }
 window.loadCardImg = function(input) {
   const file = input.files[0]; if (!file) return;
+  cardImgFile = file;
   const r = new FileReader();
   r.onload = e => { document.getElementById('cardImgUrl').value = ''; showCardImg(e.target.result); };
   r.readAsDataURL(file);
 };
 window.syncCardImgUrl = function() { showCardImg(document.getElementById('cardImgUrl').value); };
 window.removeCardImg = function() {
+  cardImgFile = null;
   document.getElementById('cardImgUrl').value = '';
   document.getElementById('cardImgInput').value = '';
   showCardImg('');
@@ -1969,9 +1995,40 @@ window.handleCardImgDrop = function(e) {
   dz.style.borderColor = 'var(--border)'; dz.style.background = 'var(--blue-soft)';
   const file = e.dataTransfer.files[0];
   if (!file || !file.type.startsWith('image/')) return;
+  cardImgFile = file;
   const r = new FileReader();
   r.onload = ev => showCardImg(ev.target.result);
   r.readAsDataURL(file);
+};
+
+function showLogoPreview(src) {
+  const btn = document.getElementById('logoRemoveBtn');
+  const preview = document.getElementById('tpLogo');
+  if (btn) btn.style.display = src ? '' : 'none';
+  if (!preview) return;
+  preview.textContent = '';
+  if (src) {
+    const img = document.createElement('img');
+    img.src = src; img.alt = 'Organiser logo';
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:8px;';
+    preview.appendChild(img);
+  } else {
+    preview.textContent = '\uD83C\uDF9F\uFE0F';
+  }
+}
+window.loadLogoFile = function(input) {
+  const file = input.files[0]; if (!file) return;
+  logoFile = file;
+  const reader = new FileReader();
+  reader.onload = e => { document.getElementById('logoUrl').value = ''; showLogoPreview(e.target.result); };
+  reader.readAsDataURL(file);
+};
+window.syncLogoUrl = function() { showLogoPreview(document.getElementById('logoUrl').value.trim()); };
+window.removeLogo = function() {
+  logoFile = null;
+  document.getElementById('logoUrl').value = '';
+  document.getElementById('logoInput').value = '';
+  showLogoPreview('');
 };
 
 // ── MEDIA: Cover ──
@@ -1991,6 +2048,7 @@ function showCoverPreview(src) {
 }
 window.loadCoverFile = function(input) {
   const file = input.files[0]; if (!file) return;
+  coverFile = file;
   const r = new FileReader();
   r.onload = e => { document.getElementById('coverUrl').value = ''; showCoverPreview(e.target.result); updateProgress(); };
   r.readAsDataURL(file);
@@ -2000,6 +2058,7 @@ window.syncCoverUrl = function() {
   updateProgress();
 };
 window.removeCover = function() {
+  coverFile = null;
   document.getElementById('coverUrl').value = '';
   document.getElementById('coverInput').value = '';
   showCoverPreview('');
@@ -2010,6 +2069,7 @@ window.handleCoverDrop = function(e) {
   document.getElementById('coverDropZone').style.borderColor = 'var(--border)';
   const file = e.dataTransfer.files[0];
   if (!file || !file.type.startsWith('image/')) return;
+  coverFile = file;
   const r = new FileReader();
   r.onload = ev => { showCoverPreview(ev.target.result); updateProgress(); };
   r.readAsDataURL(file);
@@ -2124,6 +2184,12 @@ window.toggleBulkSection = function() {
   btn.classList.toggle('on');
   const on = btn.classList.contains('on');
   document.getElementById('bulkSection').style.display = on ? '' : 'none';
+  const stockField = document.getElementById('ticketStockField');
+  const bulkSection = document.getElementById('bulkSection');
+  const singleGrid = document.getElementById('singleTicketGrid');
+  const preview = document.getElementById('bulkPreview');
+  if (on) bulkSection.insertBefore(stockField, preview);
+  else singleGrid.appendChild(stockField);
   if (!on) document.getElementById('bulkPreview').textContent = '';
 };
 window.updateBulkPreview = function() {
@@ -2146,6 +2212,7 @@ window.closeTicketModal = () => {
   });
   const btn = document.getElementById('toggleBulk');
   btn.classList.remove('on');
+  document.getElementById('singleTicketGrid').appendChild(document.getElementById('ticketStockField'));
   document.getElementById('bulkSection').style.display = 'none';
   document.getElementById('bulkPreview').textContent = '';
   activePerDateIdx = null;
@@ -2273,6 +2340,13 @@ window.removeFaq = i => { faqs.splice(i, 1); renderFaqs(); };
 
 // ── SAVE / PUBLISH ──
 async function saveEvent(status) {
+  const inviteAccessConfig={
+    inviteOnly:document.getElementById('toggleInvite').classList.contains('on'),
+    inviteLinkEnabled:document.getElementById('toggleInviteLink').classList.contains('on'),
+    inviteCode:document.getElementById('inviteCode').value.trim(),
+    guestEmails:[...new Set(document.getElementById('guestEmails').value.split('\n').map(e=>e.trim().toLowerCase()).filter(Boolean))],
+    inviteToken:document.getElementById('toggleInviteLink').classList.contains('on')?(window.inviteTokenDraft||(window.inviteTokenDraft=crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`)):''
+  };
   const name = document.getElementById('eventName').value.trim();
   const urlKey = document.getElementById('urlKey').value.trim() || slugify(name);
   const summary = document.getElementById('summary').value.trim();
@@ -2286,13 +2360,44 @@ async function saveEvent(status) {
   if (!uid) { await loadUser(); }
   if (!uid) { alert("Please sign in to save."); return; }
 
+  const saveButton = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
+  if (cardImgFile || coverFile || logoFile) {
+    saveButton.textContent = 'Uploading image...';
+    saveButton.disabled = true;
+    try {
+      if (cardImgFile) {
+        const url = await uploadImageToImageKit(cardImgFile, '/event-cards');
+        document.getElementById('cardImgUrl').value = url;
+        showCardImg(url);
+        cardImgFile = null;
+      }
+      if (coverFile) {
+        const url = await uploadImageToImageKit(coverFile, '/event-covers');
+        document.getElementById('coverUrl').value = url;
+        showCoverPreview(url);
+        coverFile = null;
+      }
+      if (logoFile) {
+        const url = await uploadImageToImageKit(logoFile, '/event-logos');
+        document.getElementById('logoUrl').value = url;
+        showLogoPreview(url);
+        logoFile = null;
+      }
+    } catch (err) {
+      alert('Image upload failed: ' + err.message);
+      saveButton.textContent = status === 'published' ? 'Publish Event' : 'Save Draft';
+      saveButton.disabled = false;
+      return;
+    }
+  }
+
   const rsvpToggles = {};
   document.querySelectorAll('.toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
   });
 
   const payload = {
-    ownerId: uid, name, urlKey, summary, description,
+    ownerId: uid, organiserId: uid, name, urlKey, summary, description,
     category: document.getElementById('category').value,
     tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
     eventType,
@@ -2305,12 +2410,13 @@ async function saveEvent(status) {
     onlinePlatform: document.getElementById('onlinePlatform').value,
     eventDates,
     startDate: eventDates.length ? eventDates[0].date : '',
-    capacity: Number(document.getElementById('capacity').value || 0),
+    capacity: Number(document.getElementById('capacity').value || 0) || tickets.reduce((sum,ticket)=>sum+Math.max(0,Number(ticket.qty||0)),0),
     duration: Number(document.getElementById('eventDuration').value || 0),
     regDeadline: document.getElementById('regDeadline').value,
     timezone: document.getElementById('timezone').value,
     currency: document.getElementById('currency').value,
     feeMode: document.getElementById('feeMode').value,
+    cardImgUrl: document.getElementById('cardImgUrl').value.trim(),
     coverUrl: document.getElementById('coverUrl').value.trim(),
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
@@ -2328,19 +2434,19 @@ async function saveEvent(status) {
       showSeat: document.getElementById('tdShowSeat').classList.contains('on'),
       showVenue: document.getElementById('tdShowVenue').classList.contains('on'),
       showLogo: document.getElementById('tdShowLogo').classList.contains('on'),
+      logoUrl: document.getElementById('logoUrl').value.trim(),
     },
     notes: document.getElementById('notes').value.trim(),
     termsText: document.getElementById('termsText').value.trim(),
     refundPolicy: document.getElementById('refundPolicy').value.trim(),
     refundDeadlineDays: Number(document.getElementById('refundDeadlineDays').value || 0),
     refundPercent: Number(document.getElementById('refundPercent').value || 100),
-    inviteOnly: document.getElementById('toggleInvite').classList.contains('on'),
-    inviteCode: document.getElementById('inviteCode').value.trim(),
-    guestEmails: document.getElementById('guestEmails').value.split('\n').map(e => e.trim()).filter(Boolean),
+    inviteOnly: inviteAccessConfig.inviteOnly,
+    inviteLinkEnabled: inviteAccessConfig.inviteLinkEnabled,
     soldOut: document.getElementById('toggleSoldOut').classList.contains('on'),
     soldOutMsg: document.getElementById('soldOutMsg').value.trim(),
-    allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on'),
-    notifyWaitlist: document.getElementById('toggleNotifyWaitlist').classList.contains('on'),
+    allowWaitlist: document.getElementById('toggleWaitlist').classList.contains('on') || ['waitlist','notify'].includes(document.getElementById('overflowAction').value),
+    notifyWaitlist: document.getElementById('toggleNotifyWaitlist').classList.contains('on') || document.getElementById('overflowAction').value === 'notify',
     overflowAction: document.getElementById('overflowAction').value,
     showAttendeeCount: document.getElementById('toggleAttendeeCount').classList.contains('on'),
     enableRefunds: document.getElementById('toggleRefunds').classList.contains('on'),
@@ -2351,11 +2457,16 @@ async function saveEvent(status) {
     updatedAt: serverTimestamp(),
   };
 
+  if(inviteAccessConfig.inviteOnly && !inviteAccessConfig.inviteLinkEnabled && !inviteAccessConfig.inviteCode && !inviteAccessConfig.guestEmails.length){
+    alert('Add invited guest emails, an invite code, or enable the private invite link.'); return;
+  }
+
   try {
-    const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
+    const btn = saveButton;
     btn.textContent = 'Saving...';
     btn.disabled = true;
-    await addDoc(collection(db, 'events'), payload);
+    const created=await addDoc(collection(db, 'events'), payload);
+    if(inviteAccessConfig.inviteOnly){btn.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
     window.location.href = 'premium-client-dashboard.html';
   } catch (err) {
     alert('Error saving event: ' + err.message);
@@ -2833,29 +2944,23 @@ renderRsvpPreview();
 
 // load wallet credits in topbar
 (async function loadWalletBalance() {
-  try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (!res.ok) return;
-    const { user } = await res.json();
-    // real-time listener so it updates after purchase
-    db.collection('wallets').doc(user.uid).onSnapshot(doc => {
-      const credits = doc.exists ? (doc.data().credits || 0) : 0;
-      const el = document.getElementById('topCredits');
-      if (el) el.textContent = credits.toLocaleString('en-IN');
-    });
-  } catch(e) {
-    // fallback: firebase auth
-    auth.onAuthStateChanged(user => {
-      if (!user) return;
-      db.collection('wallets').doc(user.uid).onSnapshot(doc => {
-        const credits = doc.exists ? (doc.data().credits || 0) : 0;
-        const el = document.getElementById('topCredits');
-        if (el) el.textContent = credits.toLocaleString('en-IN');
-      });
-    });
-  }
+  const user = await getCurrentUser();
+  if (!user) return;
+  db.collection('wallets').doc(user.uid).onSnapshot(doc => {
+    const credits = doc.exists ? (doc.data().credits || 0) : 0;
+    const el = document.getElementById('topCredits');
+    if (el) el.textContent = credits.toLocaleString('en-IN');
+  });
+})();
+
+// Mobile sidebar
+(function(){
+  var sidebar=document.querySelector('.sidebar'),btn=document.getElementById('hamburgerBtn'),overlay=document.getElementById('sbOverlay');
+  if(!btn||!sidebar) return;
+  btn.addEventListener('click',function(){sidebar.classList.add('open');overlay.classList.add('open');});
+  overlay.addEventListener('click',function(){sidebar.classList.remove('open');overlay.classList.remove('open');});
 })();
 </script>
-
+<div class="sb-overlay" id="sbOverlay"></div>
 </body>
 </html>

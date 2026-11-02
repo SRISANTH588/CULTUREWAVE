@@ -4,84 +4,113 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>CultureWave | Event</title>
+  <meta name="description" content="Explore event details, venue information, tickets and registration on CultureWave."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="CultureWave"/>
+  <meta property="og:title" content="Events in Hyderabad | CultureWave"/>
+  <meta property="og:description" content="Explore event details, venue information, tickets and registration on CultureWave."/>
+  <meta property="og:image" content="https://culturewave.in/herosection.jpeg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Events in Hyderabad | CultureWave"/>
+  <meta name="twitter:description" content="Explore event details, venue information, tickets and registration on CultureWave."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
   <style>
-    :root{--blue:#1454ff;--blue-2:#4c7dff;--green:#10b981;--red:#ef4444;--border:#dbe4f0;--muted:#64748b;--text:#0f172a;}
+    :root{--blue:#1242c5;--blue-2:#2f6bff;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:Manrope,sans-serif;background:#f4f6fb;color:var(--text);font-size:14px;}
     a{text-decoration:none;color:inherit;}
     button{font:inherit;cursor:pointer;}
+    body{background:#f0f4ff;font-size:14px;font-family:Manrope,Arial,sans-serif;}
 
-    /* TOP NAV */
-    .topnav{background:#fff;border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);}
-    .brand{display:flex;align-items:center;gap:.55rem;}
-    .brand-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.9rem;font-weight:900;color:#fff;}
-    .brand-name{font-size:1rem;font-weight:900;letter-spacing:-.04em;}
-    .nav-actions{display:flex;gap:.6rem;}
-    .btn{border:0;border-radius:12px;padding:.55rem 1rem;font-weight:800;font-size:.82rem;display:inline-flex;align-items:center;gap:.35rem;cursor:pointer;}
-    .btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff;box-shadow:0 4px 14px rgba(20,84,255,.28);}
-    .btn-ghost{background:#fff;color:var(--text);border:1.5px solid var(--border);}
-    .btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
+    /* HERO BANNER */
+    .hero-banner{width:100%;height:420px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0a0f1e,#1242c5,#2f6bff);}
+    .hero-banner img{width:100%;height:100%;object-fit:cover;}
+    .hero-banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,15,30,.15) 0%,rgba(10,15,30,.75) 100%);}
+    .hero-badges{position:absolute;top:1.2rem;left:1.4rem;display:flex;gap:.5rem;flex-wrap:wrap;}
+    .badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:900;padding:.3rem .8rem;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;backdrop-filter:blur(8px);}
+    .badge-live{background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);color:#6ee7b7;}
+    .badge-draft{background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#fcd34d;}
+    .badge-premium{background:linear-gradient(135deg,rgba(245,158,11,.3),rgba(251,191,36,.2));border:1px solid rgba(245,158,11,.5);color:#fcd34d;}
+    .badge-category{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;}
+    .hero-edit-btn{position:absolute;top:1.2rem;right:1.4rem;display:none;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;padding:.4rem .9rem;font-size:.78rem;font-weight:800;backdrop-filter:blur(8px);cursor:pointer;}
+    .hero-content{position:absolute;bottom:0;left:0;right:0;padding:2rem 1.8rem 1.8rem;}
+    .hero-title{font-size:2.4rem;font-weight:900;color:#fff;letter-spacing:-.05em;line-height:1.15;margin-bottom:.75rem;text-shadow:0 2px 12px rgba(0,0,0,.3);}
+    .hero-meta-row{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;}
+    .hero-meta-item{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:rgba(255,255,255,.8);font-weight:600;}
+    .hero-meta-item span{font-size:.9rem;}
 
     /* LAYOUT */
-    .shell{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start;}
+    .shell{max-width:600px;margin:0 auto;padding:2rem 1.5rem;display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start;}
 
-    /* COVER */
-    .cover{width:100%;aspect-ratio:16/7;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,#1454ff,#4c7dff,#7c3aed);margin-bottom:1.75rem;position:relative;}
-    .cover img{width:100%;height:100%;object-fit:cover;}
-    .cover-placeholder{width:100%;height:100%;display:grid;place-items:center;font-size:4rem;}
-    .cover-status{position:absolute;top:1rem;left:1rem;font-size:.72rem;font-weight:900;padding:.3rem .75rem;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;}
-    .cover-status.live{background:#dcfce7;color:#166534;}
-    .cover-status.draft{background:#fff7ed;color:#b45309;}
+    /* HIGHLIGHTS STRIP */
+    .highlights{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem;}
+    .hl-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:.9rem 1rem;display:flex;align-items:center;gap:.75rem;box-shadow:0 2px 12px rgba(18,66,197,.05);}
+    .hl-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:1.1rem;flex:none;}
+    .hl-icon.blue{background:#e8f0ff;}
+    .hl-icon.green{background:#dcfce7;}
+    .hl-icon.gold{background:#fef3c7;}
+    .hl-icon.purple{background:#f3e8ff;}
+    .hl-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+    .hl-value{font-size:.9rem;font-weight:800;color:var(--text);margin-top:.1rem;}
 
-    /* EVENT META */
-    .ev-category{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:900;color:var(--blue);background:#e8f0ff;border-radius:999px;padding:.22rem .65rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;}
-    .ev-title{font-size:2rem;font-weight:900;letter-spacing:-.05em;line-height:1.2;margin-bottom:1rem;}
-    .meta-row{display:flex;align-items:center;gap:.55rem;font-size:.88rem;color:#475569;margin-bottom:.65rem;}
-    .meta-icon{width:34px;height:34px;border-radius:10px;background:#f1f5f9;border:1px solid var(--border);display:grid;place-items:center;font-size:1rem;flex:none;}
-    .meta-row strong{display:block;font-size:.88rem;font-weight:800;color:var(--text);}
-    .meta-row span{font-size:.78rem;color:var(--muted);}
+    /* SECTION */
+    .section{background:#fff;border:1px solid var(--border);border-radius:20px;padding:1.4rem;margin-bottom:1.2rem;box-shadow:0 2px 12px rgba(18,66,197,.04);}
+    .section-title{font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+    .section-title::before{content:'';width:3px;height:14px;background:linear-gradient(135deg,var(--blue),var(--blue-2));border-radius:999px;}
+    .description{font-size:.92rem;color:#475569;line-height:1.85;white-space:pre-wrap;}
 
-    /* ORGANISER CHIP */
-    .org-chip{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:#fff;border:1px solid var(--border);border-radius:16px;margin:1.5rem 0;cursor:pointer;transition:border-color .2s;}
-    .org-chip:hover{border-color:var(--blue);}
-    .org-avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-weight:900;font-size:1rem;color:#fff;flex:none;}
-    .org-info strong{display:block;font-size:.9rem;font-weight:800;}
-    .org-info span{font-size:.76rem;color:var(--muted);}
-    .org-arrow{margin-left:auto;color:var(--muted);font-size:1.1rem;}
+    /* ORGANISER */
+    .org-chip{display:flex;align-items:center;gap:.85rem;padding:1rem 1.1rem;background:linear-gradient(135deg,#eef3ff,#f0f4ff);border:2px solid var(--blue);border-radius:16px;cursor:pointer;transition:border-color .2s,box-shadow .2s;box-shadow:0 4px 18px rgba(18,66,197,.13);}
+    .org-chip:hover{border-color:var(--blue-2);box-shadow:0 6px 24px rgba(18,66,197,.18);}
+    .org-chip-label{font-size:.68rem;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.15rem;}
+    .org-avatar{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-weight:900;font-size:1.1rem;color:#fff;flex:none;box-shadow:0 4px 12px rgba(18,66,197,.25);}
+    .org-info strong{display:block;font-size:.92rem;font-weight:800;}
+    .org-info span{font-size:.76rem;color:var(--muted);margin-top:.1rem;display:block;}
+    .org-arrow{margin-left:auto;color:var(--muted);font-size:1.2rem;}
 
-    /* DESCRIPTION */
-    .section-title{font-size:1rem;font-weight:900;letter-spacing:-.03em;margin-bottom:.75rem;padding-top:1.5rem;border-top:1px solid var(--border);}
-    .description{font-size:.9rem;color:#475569;line-height:1.75;white-space:pre-wrap;}
+    /* META ROWS */
+    .meta-row{display:flex;align-items:center;gap:.75rem;font-size:.88rem;color:#475569;margin-bottom:.75rem;}
+    .meta-icon{width:38px;height:38px;border-radius:11px;background:#f1f5f9;border:1px solid var(--border);display:grid;place-items:center;font-size:1rem;flex:none;}
+    .meta-row strong{display:block;font-size:.9rem;font-weight:800;color:var(--text);}
+    .meta-row span{font-size:.78rem;color:var(--muted);margin-top:.1rem;display:block;}
 
-    /* TICKET TYPES */
-    .ticket-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-    .ticket-card.featured{border-color:var(--blue);background:#f0f5ff;}
-    .ticket-name{font-size:.95rem;font-weight:800;}
-    .ticket-desc{font-size:.76rem;color:var(--muted);margin-top:.2rem;}
-    .ticket-price{font-size:1.1rem;font-weight:900;color:var(--text);white-space:nowrap;}
-    .ticket-price small{font-size:.7rem;font-weight:700;color:var(--muted);}
+    /* TICKET CARDS */
+    .ticket-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;margin-bottom:.85rem;cursor:pointer;transition:border-color .2s,box-shadow .2s;overflow:hidden;}
+    .ticket-card:hover{border-color:var(--blue);box-shadow:0 4px 20px rgba(18,66,197,.1);}
+    .ticket-card.selected{box-shadow:0 0 0 3px rgba(18,66,197,.15);}
+    .ticket-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:none;display:grid;place-items:center;transition:all .2s;}
+    .ticket-card.selected .ticket-radio{border-color:var(--blue);background:var(--blue);}
+    .ticket-card.selected .ticket-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;}
+    .ticket-vip-badge{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;font-size:.62rem;font-weight:900;padding:.18rem .55rem;border-radius:999px;letter-spacing:.06em;}
 
-    /* STICKY SIDEBAR */
+    /* SIDEBAR */
     .sidebar{position:sticky;top:80px;display:flex;flex-direction:column;gap:1rem;}
-    .register-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:1.5rem;box-shadow:0 8px 32px rgba(15,23,42,.08);}
-    .reg-price{font-size:1.6rem;font-weight:900;letter-spacing:-.04em;margin-bottom:.25rem;}
+    .register-card{background:#fff;border:1px solid var(--border);border-radius:22px;padding:1.6rem;box-shadow:0 8px 36px rgba(18,66,197,.1);overflow:hidden;position:relative;}
+    .register-card::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(47,107,255,.08),transparent 70%);pointer-events:none;}
+    .reg-price{font-size:1.8rem;font-weight:900;letter-spacing:-.05em;margin-bottom:.2rem;color:var(--text);}
     .reg-price small{font-size:.8rem;font-weight:700;color:var(--muted);}
     .reg-meta{font-size:.78rem;color:var(--muted);margin-bottom:1.25rem;}
-    .reg-btn{width:100%;height:50px;background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff;border:0;border-radius:14px;font-size:.95rem;font-weight:900;box-shadow:0 6px 20px rgba(20,84,255,.32);margin-bottom:.75rem;transition:transform .15s;}
-    .reg-btn:hover{transform:translateY(-2px);}
-    .reg-share{width:100%;height:42px;background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:14px;font-size:.84rem;font-weight:800;}
+    .reg-btn{width:100%;height:54px;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:14px;font-size:.95rem;font-weight:900;box-shadow:0 8px 24px rgba(18,66,197,.32);margin-bottom:.75rem;transition:transform .15s,box-shadow .15s;}
+    .reg-btn:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(18,66,197,.42);}
+    .reg-share{width:100%;height:44px;background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:14px;font-size:.84rem;font-weight:800;transition:border-color .2s,color .2s;}
     .reg-share:hover{border-color:var(--blue);color:var(--blue);}
     .reg-divider{border:0;border-top:1px solid var(--border);margin:.85rem 0;}
-    .reg-detail{display:flex;align-items:center;gap:.6rem;font-size:.8rem;color:#475569;margin-bottom:.55rem;}
-    .reg-detail-icon{font-size:1rem;width:20px;text-align:center;}
+    .reg-detail{display:flex;align-items:center;gap:.65rem;font-size:.8rem;color:#475569;margin-bottom:.6rem;}
+    .reg-detail-icon{font-size:1rem;width:22px;text-align:center;flex:none;}
 
     /* SHARE MODAL */
-    .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;place-items:center;z-index:50;padding:1rem;}
+    .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;place-items:center;z-index:50;padding:1rem;backdrop-filter:blur(4px);}
     .modal-bg.open{display:grid;}
-    .modal{background:#fff;border-radius:20px;padding:1.5rem;width:min(480px,100%);box-shadow:0 24px 64px rgba(15,23,42,.2);}
+    .event-booking-modal{position:fixed;z-index:120;inset:0;display:none;background:transparent;}
+    .event-booking-modal.open{display:block;}
+    .event-booking-modal iframe{display:block;width:100%;height:100%;height:100dvh;border:0;background:transparent;}
+    body.event-booking-open{overflow:hidden;}
+    #galleryLightbox{position:fixed;place-items:center;background:rgba(0,0,0,.9);padding:1rem;}
+    #galleryLightbox img{max-width:94vw;max-height:88vh;border-radius:18px;object-fit:contain;}
+    #galleryLightbox button{position:absolute;top:18px;right:18px;z-index:2;width:42px;height:42px;border:0;border-radius:50%;background:#17191f;color:#fff;font-size:26px;}
+    .modal{background:#fff;border-radius:22px;padding:1.6rem;width:min(480px,100%);box-shadow:0 24px 64px rgba(15,23,42,.2);}
     .modal h3{font-size:1.1rem;font-weight:900;margin-bottom:1rem;}
     .share-link{display:flex;gap:.5rem;align-items:center;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:.6rem .85rem;margin-bottom:1rem;}
     .share-link span{flex:1;font-size:.78rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -91,118 +120,525 @@
     .share-item .si-icon{font-size:1.4rem;}
     .share-item .si-label{font-size:.65rem;font-weight:800;color:var(--muted);margin-top:.2rem;}
 
-    /* SKELETON */
-    .skel{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
-    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
     /* TOAST */
     .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
-    @media(max-width:860px){
-      .shell{grid-template-columns:1fr;}
-      .sidebar{position:static;}
+    /* FAQ */
+    .faq-item{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:.6rem;}
+    .faq-item summary{font-weight:800;font-size:.9rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:.9rem 1rem;background:#fff;color:#17203a;}
+    .faq-item summary:hover{background:#f8faff;}
+    .faq-item[open] summary{border-bottom:1px solid var(--border);color:var(--blue);}
+    .faq-item .faq-ans{padding:.85rem 1rem;font-size:.86rem;color:#475569;line-height:1.7;background:#fff;}
+
+    /* MOBILE / TABLET / LAPTOP — all use mobile layout */
+    .mob-register-bar{display:flex;align-items:center;justify-content:space-between;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:.85rem 1.1rem;z-index:40;box-shadow:0 -4px 20px rgba(18,66,197,.1);gap:1rem;}
+    .incomplete-booking{display:none;position:fixed;left:1rem;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:45;max-width:560px;margin:0 auto;padding:.55rem;border:1px solid rgba(255,255,255,.12);border-radius:30px;background:rgba(25,26,30,.96);box-shadow:0 10px 35px rgba(0,0,0,.5);backdrop-filter:blur(16px);}
+    .incomplete-booking.show{display:block;}
+    .incomplete-booking button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:.7rem;padding:.9rem 1.1rem;border:0;border-radius:999px;background:#f8f8f8;color:#17181b;text-align:left;}
+    .incomplete-booking-copy{min-width:0;display:flex;flex-direction:column;gap:.25rem;}
+    .incomplete-booking-title{font-size:.93rem;font-weight:900;}
+    .incomplete-booking-timer{font-size:.78rem;color:#777980;font-weight:600;}
+    .incomplete-booking-arrow{font-size:1.65rem;line-height:1;color:#28292c;}
+    body.has-incomplete-booking #mobRegBar{display:none;}
+    .mob-reg-left{display:flex;flex-direction:column;gap:.1rem;}
+    .mob-reg-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+    .mob-reg-price{font-size:1.25rem;font-weight:900;color:var(--text);line-height:1;}
+    .mob-reg-btn{flex:1;max-width:200px;height:48px;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:14px;font-size:.92rem;font-weight:900;box-shadow:0 6px 18px rgba(18,66,197,.3);}
+    .sidebar{display:none !important;}
+    body{padding-bottom:80px;}
+    #ticketsSection{display:none !important;}
+    #highlightsStrip{display:none !important;}
+    .hero-banner{height:auto;min-height:0;background:none !important;}
+    .hero-banner-overlay{display:none;}
+    .hero-content{display:none;}
+    .hero-badges{top:.7rem;left:.9rem;}
+    .hero-edit-btn{top:.7rem;right:.9rem;}
+    .mob-topbar{display:flex !important;}
+    .topbar{display:none;}
+    .mobile-nav{top:52px;}
+    #orgChip{display:none !important;}
+    .shell{grid-template-columns:1fr;overflow:hidden;max-width:100vw;box-sizing:border-box;padding:1rem;}
+    .shell > div:first-child{min-width:0;max-width:100%;overflow:hidden;}
+    .section{overflow:hidden;word-break:break-word;max-width:100%;box-sizing:border-box;}
+    .description{word-break:break-word;overflow-wrap:anywhere;}
+    .org-chip{max-width:100%;overflow:hidden;box-sizing:border-box;}
+    #seatingPlanSection > div:last-child{overflow-x:auto;}
+    .mob-section-card{overflow:hidden;word-break:break-word;max-width:100%;box-sizing:border-box;}
+
+    /* MOBILE TOP BAR */
+    .mob-topbar{display:none;align-items:center;gap:.6rem;padding:.55rem .9rem;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30;}
+    .mob-topbar-org{display:flex;align-items:center;gap:.45rem;flex:1;min-width:0;cursor:pointer;}
+    .mob-topbar-avatar{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.7rem;font-weight:900;color:#fff;flex:none;overflow:hidden;}
+    .mob-topbar-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
+    .mob-topbar-name{font-size:.84rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .mob-topbar-actions{display:flex;align-items:center;gap:.5rem;flex:none;}
+    .mob-topbar-home{width:32px;height:32px;display:grid;place-items:center;font-size:1.1rem;text-decoration:none;border:1px solid var(--border);border-radius:9px;}
+    .mob-topbar-login{height:32px;padding:0 .9rem;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:9px;font-size:.76rem;font-weight:800;white-space:nowrap;}
+    /* MOBILE POSTER */
+    .mob-poster{display:block;width:calc(100% - 2rem);aspect-ratio:3/4;object-fit:cover;margin:1rem auto 0;border-radius:20px;box-shadow:0 8px 32px rgba(18,66,197,.18),0 2px 8px rgba(0,0,0,.12);border:3px solid #fff;outline:1.5px solid var(--border);}
+    .mob-event-header{display:block !important;padding:1.2rem 1rem 0;background:#fff;overflow:hidden;}
+    .mob-hosted-line{font-size:.88rem;color:#555;margin-bottom:.6rem;}
+    .mob-hosted-line a{color:var(--blue);font-weight:700;text-decoration:none;}
+    .mob-event-title{font-size:1.5rem;font-weight:900;color:var(--text);letter-spacing:-.04em;line-height:1.2;margin-bottom:.6rem;word-break:break-word;}
+    .mob-event-summary{font-size:.92rem;color:#555;line-height:1.6;margin-bottom:1rem;word-break:break-word;}
+    .mob-info-list{display:flex;flex-direction:column;gap:.85rem;margin-top:1.2rem;}
+    .mob-info-row{display:flex;align-items:center;gap:.85rem;overflow:hidden;}
+    .mob-info-icon-box{width:56px;min-width:56px;height:56px;border-radius:14px;background:#f3f4f6;display:grid;place-items:center;flex:none;}
+    .mob-info-text-title{font-size:.95rem;font-weight:800;color:var(--text);}
+    .mob-info-text-sub{font-size:.84rem;color:#6b7280;margin-top:.1rem;word-break:break-word;overflow-wrap:anywhere;}
+    /* organised by + share cards */
+    .mob-section-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:1rem 1.1rem;margin:1.2rem 1rem 0;}
+    .mob-section-label{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:.75rem;}
+    .mob-org-row{display:flex;align-items:center;gap:.75rem;cursor:pointer;}
+    .mob-org-avatar{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:.9rem;font-weight:900;color:#fff;flex:none;overflow:hidden;}
+    .mob-org-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
+    .mob-org-name{font-size:.95rem;font-weight:800;color:var(--text);}
+    .mob-org-sub{font-size:.76rem;color:var(--muted);margin-top:.1rem;}
+    .mob-share-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+    .mob-share-btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border-radius:12px;font-size:.82rem;font-weight:800;cursor:pointer;border:1px solid;}
+    .mob-share-wa{background:#f0fdf4;border-color:#bbf7d0;color:#166534;}
+    .mob-share-copy{background:#f8faff;border-color:var(--border);color:var(--text);}
+    .mob-about-host{display:none;}
+    .mob-seating-title{display:none;}
+    .mob-detail-tabs{display:none;}
+    .nightlife-mobile{display:none;}
+    .seating-plan-intro{font-size:.84rem;color:#64748b;margin-bottom:.85rem;}
+    .event-info-accordion>summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;list-style:none;}
+    .event-info-accordion>summary::-webkit-details-marker{display:none;}
+    .event-info-accordion>summary span{transition:transform .18s ease;}
+    .event-info-accordion[open]>summary span{transform:rotate(180deg);}
+    .event-info-content{display:grid;gap:1rem;padding-top:.35rem;}
+    .event-info-content [hidden]{display:none!important;}
+    .event-info-content section+section{border-top:1px solid rgba(127,135,150,.22);padding-top:.9rem;}
+    .event-info-content h3{margin:0 0 .35rem;font-size:.82rem;font-weight:800;color:#17203a;}
+    .event-info-content p{margin:0;font-size:.84rem;line-height:1.65;color:#475569;white-space:pre-wrap;overflow-wrap:anywhere;}
+    .night-faqs{margin-top:2.2rem;}
+
+    /* Phone-only event-detail refinements. Desktop keeps its existing layout. */
+    @media (max-width:768px), (min-width:769px){
+      body{background:#05070c;color:#f8fafc;padding-bottom:calc(104px + env(safe-area-inset-bottom));}
+      .topbar,.mobile-nav,.desktop-hero-stage .hero-banner{display:none!important;}
+      .mob-topbar{height:70px;display:grid!important;grid-template-columns:42px 1fr 42px;padding:.7rem 1rem;background:rgba(5,7,12,.94);border:0;position:sticky;top:0;backdrop-filter:blur(18px);}
+      .mob-topbar-org,.mob-topbar-actions{display:none!important;}
+      .mob-detail-back,.mob-detail-share{width:42px;height:42px;border:1px solid #343945;border-radius:50%;display:grid;place-items:center;color:#fff;background:#11151f;font-size:1.9rem;line-height:1;text-decoration:none;}
+      .mob-detail-share{font-size:1.6rem;padding-bottom:.22rem;justify-self:end;}
+      .mob-detail-nav-title{align-self:center;padding:0 .5rem;font-size:.82rem;font-weight:900;letter-spacing:.03em;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;}
+      .mob-poster{width:calc(100% - 2.25rem);margin:.35rem auto 0;border:1px solid #3d414a;outline:0;border-radius:23px;box-shadow:0 16px 32px rgba(0,0,0,.45);}
+      .mob-event-header{padding:1.55rem 1.4rem .45rem;background:#05070c;color:#fff;}
+      .mob-hosted-line,.mob-event-summary{color:#aeb4c0;}
+      .mob-hosted-line a{color:#fff;}
+      .mob-event-title{font-size:1.55rem;color:#fff;text-transform:uppercase;letter-spacing:-.03em;}
+      .mob-info-list{border-top:1px solid #252a34;padding-top:1rem;gap:.85rem;}
+      .mob-info-row{padding:.05rem 0;}.mob-info-icon-box{width:45px;min-width:45px;height:45px;border-radius:12px;background:#171b23!important;}
+      .mob-info-text-title{color:#fff;font-size:.9rem;}.mob-info-text-sub{color:#aeb4c0;}
+      .mob-detail-tabs{position:static!important;top:auto!important;z-index:45;display:grid!important;grid-template-columns:repeat(4,1fr);gap:.18rem;margin:0 1.2rem 1.2rem!important;padding:.25rem;background:#292d36;border:1px solid #4a4e58;border-radius:999px;visibility:visible!important;opacity:1!important;}
+      .mob-detail-tabs-spacer{display:none;}
+      .mob-detail-tabs button{height:39px;border:0;border-radius:999px;background:transparent;color:#e5e7eb;font-size:.84rem;font-weight:800;}.mob-detail-tabs button.active{background:#fff;color:#10131a;}
+      .shell{padding:0 1.4rem;background:#05070c;}.section,.mob-section-card{background:#0f1219!important;border-color:#292e38!important;color:#fff;box-shadow:none!important;}
+      .section-title,.mob-section-label{color:#fff!important;}.section-title::before{background:#ff5a19;}.description{color:#d2d6de!important;}
+      #descSection{padding:1.25rem 1.1rem;margin-top:1.15rem;}
+      #descSection .section-title{margin-bottom:.7rem;}
+      #descSection .description{font-size:.94rem;line-height:1.72;}
+      .mob-about-host{width:100%;display:flex;align-items:center;gap:.75rem;margin-top:1.15rem;padding:.8rem .85rem;text-align:left;background:#181c25;border:1px solid #303641;border-radius:14px;color:#fff;}
+      .mob-about-host-avatar{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#ff6a2a,#b53010);color:#fff;font-weight:900;font-size:.8rem;flex:none;}
+      .mob-about-host-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
+      .mob-about-host-copy{display:flex;flex-direction:column;gap:.12rem;min-width:0;}
+      .mob-about-host-copy small{font-size:.69rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+      .mob-about-host-copy strong{font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .mob-about-host-arrow{margin-left:auto;font-size:1.5rem;color:var(--blue);line-height:1;}
+      #mobOrgCard{display:none!important;}
+      #seatingPlanSection{padding:1.25rem 1.1rem;background:#0f1219;}
+      #seatingPlanSection .section-title{font-size:.76rem;margin-bottom:.45rem;}
+      .mob-seating-title{display:inline;}
+      .desktop-seating-title{display:none;}
+      .seating-plan-intro{font-size:.82rem;line-height:1.55;margin-bottom:.85rem;}
+      #seatingPlanSection > div:last-child{padding:.55rem;border-radius:15px;background:#171b23;box-shadow:none;}
+      #seatingPlanImage{border-radius:10px!important;}
+      .mob-gallery-section{margin:1.4rem 0;}.mob-detail-heading{font-size:1.35rem;font-weight:900;letter-spacing:-.04em;margin:0 0 .85rem;}.mob-gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;}.mob-gallery-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px;background:#171b23;}.mob-gallery-grid img:first-child{grid-row:span 2;grid-column:span 2;aspect-ratio:auto;height:100%;}
+      .faq-item{background:#151922;border-color:#303641;}.faq-item summary,.faq-item .faq-ans,.faq-item summary:hover,.faq-item summary:focus-visible{background:#151922;color:#fff;}.faq-item summary:focus-visible{outline:2px solid #ff6b2d;outline-offset:-2px;}.faq-item .faq-ans{color:#c5cad3;}.seating-plan-intro{color:#aeb4c0;}
+      .event-info-content h3{color:#f8fafc;}.event-info-content p{color:#c5cad3;}
+      .mob-register-bar{left:1rem;right:1rem;bottom:.8rem;border:1px solid #464b55;border-radius:18px;padding:.7rem 1rem;background:#252a33;box-shadow:0 12px 30px rgba(0,0,0,.5);}.mob-reg-label{color:#b8bec8;}.mob-reg-price{color:#fff;}.mob-reg-btn{background:#ff5a19;box-shadow:none;border-radius:13px;}
+      .shell{display:none!important;}.nightlife-mobile{display:block;padding:0 1.45rem calc(10rem + env(safe-area-inset-bottom));color:#f7f7f8;}.nightlife-mobile h2{font-size:1.45rem;letter-spacing:-.05em;line-height:1.1;margin:0 0 1rem;font-weight:900;}.night-offers{margin:0 0 2.7rem;}.night-offer-card{min-height:112px;display:flex;align-items:center;gap:.9rem;padding:1rem 1.15rem;background:linear-gradient(135deg,#123d33,#0b2824);border:1px solid #3d806d;border-radius:22px;box-shadow:0 14px 30px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.08);}.offer-brand{width:48px;height:58px;display:grid;place-items:center;line-height:1;background:linear-gradient(145deg,#ff2780,#c5105a);box-shadow:0 8px 18px rgba(232,20,107,.25);color:#fff;font-weight:900;text-align:center;border-radius:13px;font-size:.72rem;}.night-offer-card span:nth-child(2){display:flex;flex:1;flex-direction:column;gap:.28rem}.night-offer-card strong{font-size:1.05rem}.night-offer-card small{font-size:.78rem;color:#b7d5ca}.night-offer-card>b{padding:.35rem .5rem;border-radius:999px;background:rgba(255,105,36,.16);color:#ff793e;font-size:.76rem}.night-about{scroll-margin-top:135px}.night-about p{font-size:1rem;line-height:1.56;color:#e0e0e3;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}.night-about.expanded p{-webkit-line-clamp:unset}.night-about button{border:0;background:transparent;color:#ff661d;font-weight:800;padding:.15rem 0 .9rem;font-size:.92rem}.night-details{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 1rem;padding:1.4rem;background:#11151d;border:1px solid #292e37;border-radius:25px}.night-details>div{display:flex;align-items:center;gap:.85rem}.night-details i{width:45px;height:45px;border-radius:13px;background:#372016;color:#ff641c;display:grid;place-items:center;font-size:1.25rem;font-style:normal}.night-details span{font-size:.8rem;color:#c2c4c9}.night-details strong{display:block;color:#fff;font-size:1rem;margin-top:.2rem}.night-divider{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:center;margin:3rem 0 2.3rem}.night-divider span{height:1px;background:#7c818c}.night-divider b{font-size:.77rem;letter-spacing:.2em;white-space:nowrap}.night-photos,.night-venue{scroll-margin-top:135px;margin-bottom:3rem}.night-gallery{display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:120px 120px;gap:.55rem}.night-gallery img{width:100%;height:100%;object-fit:cover;border-radius:19px;background:#1a1e27;cursor:pointer}.night-gallery img:first-child{grid-row:span 2}.night-gallery img:nth-child(n+4){display:none}.night-venue{position:relative}.night-venue p{color:#c4c7ce;font-size:.93rem}.night-venue button{position:absolute;right:0;bottom:-.1rem;width:48px;height:48px;border:0;border-radius:14px;background:linear-gradient(145deg,#ff6b2d,#e34212);color:#fff;font-size:1.45rem;box-shadow:0 10px 22px rgba(225,66,18,.3)}.night-help{box-sizing:border-box;width:100%;display:flex;align-items:center;gap:.8rem;text-align:left;text-decoration:none;cursor:pointer;padding:1rem 1.1rem;background:#4a3005;border:1px solid #805712;color:#ffbd25;border-radius:19px;margin-bottom:1.2rem}.night-help i{font-size:2rem;font-style:normal}.night-help span{font-size:.91rem;font-weight:800;line-height:1.25;flex:1}.night-help b{width:35px;height:35px;display:grid;place-items:center;border-radius:50%;background:#7a5204;font-size:1.8rem}.night-terms{border-top:1px solid #272b33;border-bottom:1px solid #272b33;padding:.2rem 0}.night-terms summary{padding:1.15rem 0;font-weight:900;font-size:1.15rem;list-style:none;display:flex;justify-content:space-between}.night-terms p{padding:0 0 1rem;line-height:1.6;color:#c5c8cf}.night-terms[open] summary span{transform:rotate(180deg)}
     }
-    @media(max-width:480px){
-      .ev-title{font-size:1.5rem;}
-      .shell{padding:1rem;}
+
+    @media (max-width:768px), (min-width:769px){
+      .night-details i svg{width:25px;height:25px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+      .night-seating-map{margin-top:1rem;padding:.65rem;border:1px solid #343945;border-radius:16px;background:#171b23;overflow-x:auto;}
+      .night-seating-map img{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:10px;}
+      .night-org-card{margin:1rem 0 0;padding:1rem 1.1rem;border:1px solid #2c323b;border-radius:20px;background:#11151d;}
+      .night-org-label{margin-bottom:.7rem;color:#aeb4c0;font-size:.68rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;}
+      .night-org-row{display:flex;align-items:center;gap:.75rem;width:100%;padding:0;border:0;background:transparent;color:#fff;text-align:left;font:inherit;}
+      .night-org-avatar{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#1242c5,#2f6bff);font-size:.78rem;font-weight:900;overflow:hidden;flex:none;}
+      .night-org-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}.night-org-row strong{display:block;font-size:.92rem;}.night-org-row small{display:block;margin-top:.14rem;color:#aeb4c0;font-size:.75rem;}
+    }
+
+    /* The event poster is a compact card on desktop instead of spanning the page. */
+    .night-details i{flex:none;}
+    .night-details i svg{display:block;width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+    .night-help i{display:grid;place-items:center;color:#ffbd25;}
+    .night-help i svg{display:block;width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;}
+    @media (min-width:769px){
+      .desktop-hero-stage .hero-banner{display:none!important;}
+      .desktop-hero-stage .mob-poster{display:block;width:min(1120px,calc(100% - 2rem));max-width:100%;height:auto;aspect-ratio:21/9;object-fit:cover;margin:0 auto;position:relative;z-index:3;}
+      .desktop-hero-stage.has-desktop-background{background-image:var(--desktop-event-background);background-size:cover;background-position:center;}
+      .desktop-hero-stage.has-desktop-background .hero-banner{display:block!important;height:420px!important;background:transparent!important;}
+      .desktop-hero-stage.has-desktop-background .hero-banner-overlay{display:block;background:linear-gradient(to bottom,rgba(10,15,30,.12),rgba(10,15,30,.62));}
+      .desktop-hero-stage.has-desktop-background .mob-poster{margin:-92px auto 0;}
+    }
+
+    /* Nightlife event detail polish — scoped to this page so the existing Firebase
+       booking and event rendering logic remains intact. */
+    .mob-poster-copy{display:none}
+    @media (max-width:768px), (min-width:769px){
+      .desktop-hero-stage{position:relative;padding:0 0 .1rem}
+      .mob-topbar{display:none!important}.mob-poster-actions{display:flex;justify-content:space-between;align-items:center;margin:.8rem 1.2rem .25rem}.mob-poster-action{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid rgba(232,235,241,.3);border-radius:50%;background:rgba(5,7,11,.72);box-shadow:0 4px 10px rgba(0,0,0,.22);backdrop-filter:blur(10px);color:#fff;transition:transform .18s ease,background .18s ease}.mob-poster-action:hover,.mob-poster-action:focus-visible{background:rgba(29,32,38,.82);transform:scale(1.05);outline:none}.mob-poster-action svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+      .mob-poster{display:block!important;aspect-ratio:3/4;object-fit:cover}
+      .mob-poster-copy{position:absolute;z-index:3;left:2rem;right:2rem;top:2rem;bottom:1.1rem;display:flex;flex-direction:column;color:#fff;pointer-events:none;text-shadow:0 2px 13px rgba(0,0,0,.6)}
+      .mob-poster-copy span{font-size:.78rem;font-weight:900;letter-spacing:.24em;margin-top:auto}
+      .mob-poster-copy strong{font-family:Impact,"Arial Narrow",sans-serif;font-size:3.1rem;letter-spacing:.01em;line-height:.8;color:#fff}
+      .mob-poster-copy em{font-family:Impact,"Arial Narrow",sans-serif;font-style:normal;font-size:2.08rem;letter-spacing:.035em;line-height:1.05;color:#ff5a19}
+      .mob-poster-copy small{font-size:.6rem;font-weight:900;letter-spacing:.17em;margin-top:.75rem}
+      .mob-poster-copy b{font-family:Impact,"Arial Narrow",sans-serif;font-size:1.65rem;letter-spacing:.04em;line-height:.88;margin-top:.12rem}
+      .mob-poster-copy button{pointer-events:auto;align-self:flex-end;margin-top:auto;border:1px solid rgba(255,255,255,.24);background:rgba(8,10,14,.72);backdrop-filter:blur(10px);border-radius:999px;color:#fff;font-size:.79rem;font-weight:800;padding:.55rem .8rem}
+      .mob-event-header{padding-top:1.4rem}.mob-hosted-line{display:none}.mob-event-summary{font-size:.91rem;color:#ff7b47;margin-top:.48rem;margin-bottom:1.15rem}
+      .mob-event-title{font-family:Impact,"Arial Narrow",sans-serif;font-weight:400;font-size:2.02rem;letter-spacing:.025em;line-height:.94}
+      .mob-info-list{gap:.6rem}.mob-info-row{min-height:52px}.mob-info-row:nth-child(2),.mob-info-row:nth-child(4){display:none!important}.mob-venue-direction{margin-left:auto;width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center;padding:0;border:1px solid #ff7743;border-radius:16px;background:linear-gradient(145deg,#ff6b2d,#df3d0f);color:#fff;box-shadow:0 9px 20px rgba(225,66,18,.36),inset 0 1px rgba(255,255,255,.25);transition:transform .18s ease,filter .18s ease}.mob-venue-direction:hover,.mob-venue-direction:focus-visible{filter:brightness(1.08);transform:translateY(-2px);outline:none}.mob-venue-direction svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+      .mob-info-icon-box{background:#151a22!important;border:1px solid #252b35}.mob-info-icon-box svg{stroke:#ff631f!important}.mob-info-text-title{font-size:.91rem}.mob-info-text-sub{font-size:.82rem}.mob-info-row:first-child .mob-info-text-sub{color:#fff;font-weight:800}#mobDateDay{color:#fff!important}
+      .mob-detail-tabs{margin-top:.8rem;margin-bottom:1.8rem}.nightlife-mobile h2{font-size:1.55rem}
+      .night-offers{margin-bottom:2.5rem}.night-offer-card{box-shadow:inset 0 1px rgba(255,255,255,.04)}
+      .night-about p{margin:0}.night-details{margin-top:.2rem}.night-share-card{margin:1.2rem 0 0;padding:1rem 1.1rem;border:1px solid #2c323b;border-radius:20px;background:#11151d}.night-share-card h3{margin:0 0 .78rem;font-size:.96rem;color:#fff}.night-share-actions{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}.night-share-actions button{height:42px;border:1px solid #343a45;border-radius:12px;background:#1b2029;color:#fff;font-size:.79rem;font-weight:800}.night-share-actions button:first-child{border-color:#356053;background:#15342c;color:#d5f1de}.night-gallery{grid-template-rows:127px 127px}.night-open-gallery{width:100%;margin-top:.8rem;padding:.8rem;border:1px solid #343a45;border-radius:13px;background:#1b2029;color:#fff;font:inherit;font-size:.82rem;font-weight:800}.night-photos{margin-bottom:2.7rem}.night-artists{margin:0 0 2.7rem}.night-artists-track{display:flex;gap:.75rem;overflow-x:auto;padding:0 .1rem .25rem;scroll-snap-type:x proximity}.night-artist-card{flex:0 0 128px;overflow:hidden;border:1px solid #2c323b;border-radius:18px;background:#11151d;scroll-snap-align:start}.night-artist-card img{display:block;width:100%;aspect-ratio:1/1.14;object-fit:cover;background:#1b2029}.night-artist-card strong{display:block;padding:.7rem .75rem;color:#fff;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .mob-register-bar{display:grid;grid-template-columns:1fr auto;gap:.75rem;padding:.7rem;overflow:hidden;background:#242a31;border:1px solid #3a4048;border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,.5);left:1rem;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));}.mob-register-bar::before{display:none}.mob-reg-left{padding:.12rem .35rem}.mob-reg-label{display:none}.mob-reg-price{font-size:1.03rem}.mob-reg-btn{height:48px;margin:0;min-width:132px;font-size:.9rem;background:#1242c5;color:#fff}.night-help{margin-top:.35rem}
+    }
+    @media(max-width:768px), (min-width:769px){
+      .night-offers h2{font-size:1.1rem;letter-spacing:-.025em;margin:0 0 .55rem;color:#f5f5f7}
+      .night-offer-card{width:100%;min-height:0;gap:.75rem;padding:.6rem .8rem;background:linear-gradient(145deg,#202023,#19191c);border-color:#39393e;border-radius:22px;box-shadow:0 12px 28px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.045);text-align:left}
+      .offer-brand{width:58px;height:58px;display:grid;place-items:center;background:linear-gradient(145deg,#3214a5,#6d35ed);box-shadow:0 9px 22px rgba(81,42,220,.35);color:#e4d5ff;border-radius:18px;flex:none}
+      .offer-brand svg{width:34px;height:34px;display:block;fill:currentColor}
+      .night-offer-copy{min-width:0;display:flex;flex:1;flex-direction:column;gap:.25rem}
+      .night-offer-card strong{font-size:1.08rem;font-weight:800;line-height:1.25;color:#f7f7f8;letter-spacing:-.025em}
+      .night-offer-card small{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;line-height:1.25;color:#b9b9c1}
+      .night-offer-card>b{flex:none;padding:.28rem .42rem;border-radius:999px;background:rgba(255,255,255,.08);color:#c8c4d2;font-size:.67rem;font-weight:800}
+    }
+    @media (min-width:769px){
+      .mob-event-header,.mob-detail-tabs,.nightlife-mobile{width:min(1120px,calc(100% - 2rem));margin-left:auto;margin-right:auto;}
+      .nightlife-mobile{padding-left:0;padding-right:0;}
+      .mob-event-header{padding-left:0;padding-right:0;}
+      .mob-detail-tabs{position:static!important;top:auto!important;margin:0 auto 1.2rem!important;}
+      .mob-detail-tabs-spacer{display:none;}
+      .mob-event-header{padding-bottom:1rem;}
+      .mob-event-title{font-size:2.5rem;line-height:1.08;letter-spacing:.015em;}
+      .mob-event-summary{max-width:95ch;font-size:1.2rem;line-height:1.8;letter-spacing:.005em;}
+      .mob-info-text-title{font-size:1.12rem;}
+      .mob-info-text-sub{font-size:1rem;}
+      .nightlife-mobile h2{font-size:1.9rem;margin-bottom:1.3rem;}
+      .night-about p{max-width:95ch;font-size:1.2rem;line-height:1.9;letter-spacing:.005em;}
+      .night-details{margin-top:1rem;line-height:1.6;}
+      .night-details span{font-size:.95rem;}
+      .night-details strong{font-size:1.12rem;}
     }
   </style>
+  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
 <body>
 
-<nav class="topnav">
-  <a class="brand" href="index.html">
-    <div class="brand-icon">🌊</div>
-    <span class="brand-name">CultureWave</span>
-  </a>
-  <div class="nav-actions">
-    <button class="btn btn-ghost" id="navShareBtn" onclick="openShare()">🔗 Share</button>
-    <a class="btn btn-ghost" id="navEditBtn" href="#" style="display:none;">✏️ Edit Event</a>
+<!-- MOBILE TOP BAR -->
+<div class="mob-topbar" id="mobTopbar">
+  <a class="mob-detail-back mob-detail-home" href="index.html" aria-label="Back to category">←</a>
+  <div class="mob-detail-nav-title" id="mobDetailNavTitle">Event details</div>
+  <button class="mob-detail-share" type="button" onclick="openShare()" aria-label="Share event">Share event</button>
+  <div class="mob-topbar-org" onclick="goToProfile()">
+    <div class="mob-topbar-avatar" id="mobTopAvatar">🎪</div>
+    <span class="mob-topbar-name" id="mobTopOrgName">Organiser</span>
+  </div>
+  <div class="mob-topbar-actions">
+    <a class="mob-topbar-home" href="#" onclick="goToProfile();return false;">🏠</a>
+    <a href="login.html"><button class="mob-topbar-login">Login</button></a>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="nav-wrap">
+    <div class="brand-block">
+      <div class="logo">CultureWave</div>
+      <div class="brand-sub">by OGSHOOTS LUXE</div>
+    </div>
+    <nav class="topnav">
+      <a href="events.html">Events</a>
+      <a href="restaurants.html">Restaurants</a>
+      <a href="features.html">Features</a>
+      <a href="pricing.html">Pricing</a>
+    </nav>
+    <div class="auth-actions">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="login.html">Get Started</a>
+    </div>
+    <div style="display:flex;gap:.6rem;margin-left:auto;align-items:center;">
+      <button class="btn btn-ghost" onclick="openShare()">🔗 Share</button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <a href="events.html">Events</a>
+  <a href="restaurants.html">Restaurants</a>
+  <a href="features.html">Features</a>
+  <a href="pricing.html">Pricing</a>
+  <div class="mobile-nav-ctas">
+    <a class="nav-link" href="login.html">Login</a>
+    <a class="nav-cta" href="login.html">Get Started</a>
   </div>
 </nav>
 
+<nav class="mob-poster-actions" aria-label="Event navigation">
+  <a href="events.html" class="mob-poster-action" aria-label="Back to events"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+</nav>
+
+<div class="desktop-hero-stage" id="desktopHeroStage">
+<div class="hero-banner" id="heroBanner">
+  <div class="hero-banner-overlay"></div>
+  <div class="hero-badges">
+    <span class="badge badge-category" id="evCategory">🎪 Event</span>
+    <span class="badge badge-premium" id="premiumBadge" style="display:none;">⭐ Premium Event</span>
+    <span class="badge badge-live" id="liveBadge" style="display:none;">● Live</span>
+    <span class="badge badge-draft" id="draftBadge" style="display:none;">✎ Draft</span>
+  </div>
+  <a class="hero-edit-btn" id="navEditBtn" href="#" style="display:none;">✏️ Edit Event</a>
+  <div class="hero-content">
+    <h1 class="hero-title" id="evTitle">Loading event...</h1>
+    <div class="hero-meta-row">
+      <div class="hero-meta-item"><span>📅</span><span id="evDate">—</span></div>
+      <div class="hero-meta-item"><span>📍</span><span id="evVenue">—</span><span id="evCity" style="opacity:.7;"></span></div>
+      <div class="hero-meta-item" id="evCapacityRow" style="display:none;"><span>👥</span><span id="evCapacity">—</span></div>
+      <div class="hero-meta-item" id="evAttendeeCountRow" style="display:none;"><span>🎟️</span><span><strong id="evAttendeeCount">0</strong> registered</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE POSTER -->
+<img class="mob-poster" id="mobPoster" src="" alt="Event poster"/>
+<div class="mob-poster-copy" aria-hidden="true"></div>
+</div>
+
+<!-- MOBILE EVENT HEADER -->
+<div class="mob-event-header" id="mobEventHeader">
+  <div class="mob-hosted-line">Hosted by <a onclick="goToProfile();return false;" href="#" id="mobHostedName">Organiser</a></div>
+  <div class="mob-event-title" id="mobEvTitle">Loading...</div>
+  <div class="mob-event-summary" id="mobEvSummary"></div>
+  <div class="mob-info-list">
+    <!-- Date -->
+    <div class="mob-info-row">
+      <div class="mob-info-icon-box" style="background:#e8f0ff;flex-direction:column;gap:0;padding:0;overflow:hidden;">
+        <div style="background:var(--blue);color:#fff;font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;width:100%;text-align:center;padding:.22rem 0;" id="mobDateMonth">—</div>
+        <div style="font-size:1.25rem;font-weight:900;color:var(--text);line-height:1;padding:.28rem 0;" id="mobDateDay">—</div>
+      </div>
+      <div style="overflow:hidden;">
+        <div class="mob-info-text-title" id="mobInfoDate">TBA</div>
+        <div class="mob-info-text-sub" id="mobInfoTime"></div>
+      </div>
+    </div>
+    <!-- Duration -->
+    <div class="mob-info-row" id="mobDurationRow">
+      <div class="mob-info-icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div>
+        <div class="mob-info-text-title">Duration</div>
+        <div class="mob-info-text-sub" id="mobInfoDuration">TBA</div>
+      </div>
+    </div>
+    <!-- Venue -->
+    <div class="mob-info-row">
+      <div class="mob-info-icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1242c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div style="overflow:hidden;">
+        <div class="mob-info-text-title" id="mobInfoVenue">Raasta</div>
+        <div class="mob-info-text-sub" id="mobInfoVenueCity">Madhapur, Hyderabad</div>
+      </div>
+      <button class="mob-venue-direction" type="button" onclick="openDirections()" aria-label="Get directions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4.5l5 5-7.5 10-3-6-6-3 11.5-6z"/><path d="M9 13.5l3-3"/></svg></button>
+    </div>
+    <div class="mob-info-row" id="mobAttendeeCountRow" style="display:none;">
+      <div class="mob-info-icon-box">🎟️</div>
+      <div><div class="mob-info-text-title"><span id="mobAttendeeCount">0</span> registered</div><div class="mob-info-text-sub">Attendee count</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Phone-only quick navigation, inspired by the event discovery flow. -->
+<div class="mob-detail-tabs-spacer" id="mobDetailTabsSpacer" aria-hidden="true"></div>
+<nav class="mob-detail-tabs" aria-label="Event details sections">
+  <button class="active" type="button" data-mob-tab="about" onclick="showMobileDetailTab('about')">About</button>
+  <button type="button" data-mob-tab="photos" onclick="showMobileDetailTab('photos')">Photos</button>
+  <button type="button" data-mob-tab="venue" onclick="showMobileDetailTab('venue')">Venue</button>
+  <button type="button" data-mob-tab="help" onclick="showMobileDetailTab('help')">Help</button>
+</nav>
+
+<main class="nightlife-mobile" id="nightlifeMobile">
+  <section class="night-offers" id="nightOffers" hidden></section>
+  <section class="night-about" id="nightAbout"><h2>About</h2><p id="nightAboutCopy">Event details will be available soon.</p><button type="button" id="nightMore" onclick="toggleNightAbout()" hidden>...more</button><div class="night-details" id="nightDetails" hidden></div></section>
+  <section class="night-share-card" id="nightShareCard" aria-label="Share this event"><h3>Share this event</h3><div class="night-share-actions"><button type="button" onclick="shareWA()">WhatsApp</button><button type="button" onclick="copyLink()">Copy link</button></div></section>
+  <section class="night-org-card" aria-label="Organised by"><div class="night-org-label">Organised by</div><button type="button" class="night-org-row" onclick="goToProfile()"><span class="night-org-avatar" id="nightOrgAvatar">JN</span><span><strong id="nightOrgName">Organiser</strong><small>View profile →</small></span></button></section>
+  <div class="night-divider"><span></span><b>CHECK OUT THE VIBE</b><span></span></div>
+  <section class="night-photos" id="nightPhotos"><h2>Photos &amp; Videos</h2><div id="nightGallery" class="night-gallery"></div><div id="nightPromoVideo" style="display:none;margin-top:1rem;"></div><button class="night-open-gallery" id="nightOpenGallery" type="button" onclick="openNightGallery()" hidden>Open gallery</button></section>
+  <section class="night-artists" id="nightArtists" hidden><h2>Featured Artists</h2><div class="night-artists-track" id="nightArtistsTrack"></div></section>
+  <section class="night-venue" id="nightVenue"><h2>Venue &amp; seating</h2><p id="nightVenueCopy">2.1km • Raasta • Madhapur, Hyderabad</p><div class="night-seating-map" id="nightSeatingPlan" hidden></div><button type="button" onclick="openDirections()" aria-label="Get directions">↗</button></section>
+  <a class="night-help" id="nightHelpLink" href="https://wa.me/919848047428?text=Hi%20CultureWave%2C%20I%20need%20help%20with%20this%20event." target="_blank" rel="noopener noreferrer" aria-label="Contact CultureWave support on WhatsApp"><i aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M7 26v-4a17 17 0 0 1 34 0v4"/><rect x="6" y="23" width="8" height="14" rx="4"/><rect x="34" y="23" width="8" height="14" rx="4"/><path d="M38 37a7 7 0 0 1-7 6h-5"/><circle cx="24" cy="43" r="1.5"/></svg></i><span>Have queries or need help with<br>something? Hit us up</span><b aria-hidden="true">›</b></a>
+  <details class="night-terms event-info-accordion" id="mobileEventInfo" hidden>
+    <summary>Event information <span aria-hidden="true">⌄</span></summary>
+    <div class="event-info-content">
+      <section id="mobileTermsSection" hidden><h3>Terms &amp; Conditions</h3><p id="mobileTermsText"></p></section>
+      <section id="mobileRefundSection" hidden><h3>Refund Policy</h3><p id="mobileRefundText"></p></section>
+      <section id="mobileInstructionsSection" hidden><h3>Special Instructions</h3><p id="mobileInstructionsText"></p></section>
+    </div>
+  </details>
+  <section class="night-faqs" id="mobileFaqsSection" hidden><h2>Frequently Asked Questions</h2><div id="mobileFaqsList"></div></section>
+</main>
+
 <div class="shell">
-
-  <!-- LEFT COLUMN -->
+  <!-- LEFT -->
   <div>
-    <div class="cover" id="coverEl">
-      <div class="cover-placeholder">🎉</div>
-    </div>
 
-    <div class="ev-category" id="evCategory">🎪 Event</div>
-    <h1 class="ev-title" id="evTitle">Loading event...</h1>
-
-    <div class="meta-row">
-      <div class="meta-icon">📅</div>
-      <div><strong id="evDate">—</strong><span id="evTime"></span></div>
-    </div>
-    <div class="meta-row">
-      <div class="meta-icon">📍</div>
-      <div><strong id="evVenue">—</strong><span id="evCity"></span></div>
-    </div>
-    <div class="meta-row" id="evCapacityRow" style="display:none;">
-      <div class="meta-icon">👥</div>
-      <div><strong id="evCapacity">—</strong><span>Capacity</span></div>
+    <!-- HIGHLIGHTS -->
+    <div class="highlights" id="highlightsStrip">
+      <div class="hl-card"><div class="hl-icon blue">📅</div><div><div class="hl-label">Date</div><div class="hl-value" id="hlDate">TBA</div></div></div>
+      <div class="hl-card"><div class="hl-icon green">📍</div><div><div class="hl-label">Venue</div><div class="hl-value" id="hlVenue">TBA</div></div></div>
+      <div class="hl-card"><div class="hl-icon gold">🎟️</div><div><div class="hl-label">Tickets from</div><div class="hl-value" id="hlPrice">Free</div></div></div>
+      <div class="hl-card"><div class="hl-icon purple">👥</div><div><div class="hl-label">Capacity</div><div class="hl-value" id="hlCap">Open</div></div></div>
     </div>
 
     <!-- ORGANISER -->
-    <div class="org-chip" id="orgChip" onclick="goToProfile()">
+    <div class="org-chip" id="orgChip" onclick="goToProfile()" style="margin-bottom:1.2rem;">
       <div class="org-avatar" id="orgAvatar">🎪</div>
-      <div class="org-info">
-        <strong id="orgName">Organiser</strong>
-        <span>View all events →</span>
-      </div>
+      <div class="org-info"><div class="org-chip-label">Hosted by</div><strong id="orgName">Organiser</strong><span>View all events →</span></div>
       <span class="org-arrow">›</span>
     </div>
 
-    <!-- DESCRIPTION -->
-    <div id="descSection" style="display:none;">
+    <!-- ABOUT -->
+    <div class="section" id="descSection" style="display:none;">
       <div class="section-title">About this event</div>
       <div class="description" id="evDesc"></div>
+      <section id="acceptedStallsSection" style="display:none;margin-top:1.2rem;padding:1rem;border:1px solid #eadfc9;background:#fbf7ee;border-radius:16px;">
+        <div class="section-title">🏪 Meet the event stalls</div>
+        <div id="acceptedStallsList" style="display:grid;gap:.65rem;"></div>
+      </section>
+      <!-- Mobile-only: keeps the host close to the event story. -->
+      <button class="mob-about-host" id="mobAboutHost" type="button" onclick="goToProfile()">
+        <span class="mob-about-host-avatar" id="mobAboutHostAvatar">CW</span>
+        <span class="mob-about-host-copy"><small>Hosted by</small><strong id="mobAboutHostName">Organiser</strong></span>
+        <span class="mob-about-host-arrow">›</span>
+      </button>
+    </div>
+
+    <div class="mob-gallery-section" id="mobGallerySection" style="display:none;">
+      <div class="mob-detail-heading">Photos &amp; videos</div>
+      <div class="mob-gallery-grid" id="mobGalleryGrid"></div>
+      <div id="mobPromoVideo" style="display:none;margin-top:.75rem;"></div>
     </div>
 
     <!-- TICKETS -->
-    <div id="ticketsSection" style="display:none;">
-      <div class="section-title">Tickets</div>
+    <div class="section" id="ticketsSection" style="display:none;">
       <div id="ticketsList"></div>
     </div>
 
-    <!-- FAQS -->
-    <div id="faqsSection" style="display:none;">
-      <div class="section-title">FAQs</div>
+    <section class="section" id="foodAtEvent" style="display:none;border:1px solid #eadfc9;background:#fbf7ee;border-radius:16px;padding:1.1rem 1.25rem;">
+      <div class="section-title">🍴 Order food at the venue</div>
+      <p style="color:#716650;margin:.25rem 0 .85rem;">Preorder from the venue restaurant and collect during the event.</p>
+      <div id="foodAtEventLinks" style="display:flex;gap:.65rem;flex-wrap:wrap;"></div>
+    </section>
+
+    <!-- SEATING PLAN -->
+    <div class="section" id="seatingPlanSection" style="display:none;">
+      <div class="section-title"><span class="mob-seating-title">Venue &amp; seating plan</span><span class="desktop-seating-title">Seating Plan</span></div>
+      <p class="seating-plan-intro">See the venue layout before choosing your seat.</p>
+      <div style="border:1px solid var(--border);border-radius:14px;padding:.75rem;overflow:auto;background:#f8faff;">
+        <img id="seatingPlanImage" src="" alt="Seating plan" style="display:block;width:100%;max-height:520px;object-fit:contain;border-radius:10px;"/>
+        <div id="seatingPlanBuilder" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- MOBILE ORGANISED BY + SHARE (shown on mobile after seating plan) -->
+    <div class="mob-section-card" id="mobOrgCard" style="margin:0 0 1.2rem;">
+      <div class="mob-section-label">Organised by</div>
+      <div class="mob-org-row" onclick="goToProfile()">
+        <div class="mob-org-avatar" id="mobOrgAvatar">JN</div>
+        <div>
+          <div class="mob-org-name" id="mobOrgName">Organiser</div>
+          <div class="mob-org-sub">View profile →</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="section event-info-accordion desktop-event-info" id="desktopEventInfo" hidden>
+      <summary class="section-title">Event information <span aria-hidden="true">⌄</span></summary>
+      <div class="event-info-content">
+        <section id="desktopTermsSection" hidden><h3>Terms &amp; Conditions</h3><p id="desktopTermsText"></p></section>
+        <section id="desktopRefundSection" hidden><h3>Refund Policy</h3><p id="desktopRefundText"></p></section>
+        <section id="desktopInstructionsSection" hidden><h3>Special Instructions</h3><p id="desktopInstructionsText"></p></section>
+      </div>
+    </details>
+
+    <div class="section" id="faqsSection" style="display:none;">
+      <div class="section-title">Frequently Asked Questions</div>
       <div id="faqsList"></div>
     </div>
+
   </div>
 
-  <!-- RIGHT SIDEBAR -->
+  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="register-card">
       <div class="reg-price" id="regPrice">Free</div>
       <div class="reg-meta" id="regMeta">Register to attend</div>
       <button class="reg-btn" id="regBtn" onclick="register()">Register Now 🎉</button>
+      <div id="soldOutMessage" hidden style="margin-top:.65rem;padding:.65rem .75rem;border-radius:10px;background:#fff1f2;color:#9f1239;font-size:.8rem;line-height:1.5;"></div>
       <button class="reg-share" onclick="openShare()">🔗 Share Event</button>
       <hr class="reg-divider"/>
       <div class="reg-detail"><span class="reg-detail-icon">📅</span><span id="sideDate">—</span></div>
       <div class="reg-detail"><span class="reg-detail-icon">📍</span><span id="sideVenue">—</span></div>
       <div class="reg-detail" id="sideCapRow" style="display:none;"><span class="reg-detail-icon">👥</span><span id="sideCap">—</span></div>
     </div>
-
-    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:1rem 1.1rem;">
-      <div style="font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:.65rem;">Organised by</div>
-      <div style="display:flex;align-items:center;gap:.65rem;cursor:pointer;" onclick="goToProfile()">
-        <div class="org-avatar" id="sideOrgAvatar" style="width:38px;height:38px;border-radius:10px;font-size:.9rem;">🎪</div>
-        <div>
-          <div style="font-size:.9rem;font-weight:800;" id="sideOrgName">Organiser</div>
-          <div style="font-size:.74rem;color:var(--muted);">View profile →</div>
-        </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:18px;padding:1.1rem;">
+      <div style="font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:.75rem;">Organised by</div>
+      <div style="display:flex;align-items:center;gap:.7rem;cursor:pointer;" onclick="goToProfile()">
+        <div class="org-avatar" id="sideOrgAvatar" style="width:40px;height:40px;border-radius:11px;font-size:.95rem;">🎪</div>
+        <div><div style="font-size:.9rem;font-weight:800;" id="sideOrgName">Organiser</div><div style="font-size:.74rem;color:var(--muted);">View profile →</div></div>
+      </div>
+    </div>
+    <!-- SHARE BUTTONS -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:18px;padding:1.1rem;">
+      <div style="font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:.75rem;">Share this event</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+        <button onclick="shareWA()" style="display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem;border-radius:10px;border:1px solid #dcfce7;background:#f0fdf4;color:#166534;font-size:.78rem;font-weight:800;cursor:pointer;">💬 WhatsApp</button>
+        <button onclick="copyLink()" style="display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem;border-radius:10px;border:1px solid var(--border);background:#f8faff;color:var(--text);font-size:.78rem;font-weight:800;cursor:pointer;">🔗 Copy Link</button>
       </div>
     </div>
   </div>
-
 </div>
 
+<!-- MOBILE STICKY BOTTOM BAR -->
+<div class="mob-register-bar" id="mobRegBar">
+  <div class="mob-reg-left">
+    <span class="mob-reg-label">Basic rate</span>
+    <span class="mob-reg-price" id="mobRegPrice">Free</span>
+  </div>
+  <button class="mob-reg-btn" onclick="register()">Book tickets</button>
+</div>
+
+<div class="incomplete-booking" id="incompleteBookingReminder" aria-live="polite">
+  <button type="button" onclick="register()">
+    <span class="incomplete-booking-copy"><span class="incomplete-booking-title" id="incompleteBookingTitle"></span><span class="incomplete-booking-timer" id="incompleteBookingTimer"></span></span>
+    <span class="incomplete-booking-arrow" aria-hidden="true">›</span>
+  </button>
+</div>
+
+<div class="event-booking-modal" id="eventBookingModal" aria-hidden="true"><iframe id="eventBookingFrame" title="Book event tickets" allowtransparency="true"></iframe></div>
+
 <!-- SHARE MODAL -->
+<div class="modal-bg" id="galleryLightbox" onclick="if(event.target===this)closeNightLightbox()"><button aria-label="Close gallery" onclick="closeNightLightbox()">×</button><img id="galleryLightboxImage" alt="Event gallery image"/></div>
 <div class="modal-bg" id="shareModal">
   <div class="modal">
     <h3>🔗 Share this event</h3>
@@ -225,6 +661,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 firebase.initializeApp({
@@ -236,20 +673,74 @@ firebase.initializeApp({
   appId: "1:5471814825:web:07e84f2f88486da817d5b8"
 });
 const db = firebase.firestore();
+const auth = firebase.auth();
+
+async function getCurrentUser() {
+  return new Promise(resolve => {
+    const unsub = auth.onAuthStateChanged(async firebaseUser => {
+      unsub();
+      if (!firebaseUser) { resolve(null); return; }
+      try {
+        const snap = await db.collection('users').doc(firebaseUser.uid).get();
+        const data = snap.exists ? snap.data() : {};
+        resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: data.name || firebaseUser.displayName || firebaseUser.email, role: data.role || 'client' });
+      } catch { resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: firebaseUser.displayName || firebaseUser.email, role: 'client' }); }
+    });
+  });
+}
 
 const params = new URLSearchParams(location.search);
-const eventId = params.get('eventId');
+const eventPathParts = location.pathname.split('/').filter(Boolean).map(part => { try { return decodeURIComponent(part); } catch (_) { return part; } });
+const eventSlug = eventPathParts[0] === 'event' ? (eventPathParts[1] || '') : eventPathParts.length === 2 ? eventPathParts[1] : '';
+let eventId = params.get('eventId');
+const sourceBackUrl = '/index.html';
+document.querySelectorAll('.mob-detail-home, .mob-poster-action').forEach(link => {
+  link.href = sourceBackUrl;
+  link.setAttribute('aria-label', 'Back to previous page');
+});
 let evData = {};
 let ownerUid = null;
+let nightGalleryImages = [];
 
 function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function promoVideoMarkup(url){
+  const value=String(url||'').trim();
+  if(!value) return '';
+  const yt=value.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  const vi=value.match(/vimeo\.com\/(\d+)/);
+  if(yt) return `<iframe src="https://www.youtube.com/embed/${encodeURIComponent(yt[1])}" title="Event promo video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px;"></iframe>`;
+  if(vi) return `<iframe src="https://player.vimeo.com/video/${encodeURIComponent(vi[1])}" title="Event promo video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px;"></iframe>`;
+  if(/^https?:\/\//i.test(value)) return `<video src="${esc(value)}" controls playsinline preload="metadata" style="width:100%;max-height:520px;background:#000;border-radius:12px;"></video>`;
+  return '';
+}
 
+function toEventDate(value){
+  if(!value) return null;
+  if(value.toDate) return value.toDate();
+  if(value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  const raw=String(value);
+  const d=/^\d{4}-\d{2}-\d{2}$/.test(raw) ? new Date(raw+'T12:00:00') : new Date(raw);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+function getEventStart(data){ return toEventDate(data.startDate) || toEventDate(Array.isArray(data.eventDates) ? data.eventDates[0]?.date : null); }
+function formatTimeText(value){
+  return String(value||'').replace(/(^|[^\d])(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/gi,(match,prefix,hourText,minute,meridiem)=>{
+    let hour=Number(hourText);
+    if(meridiem) hour=(hour%12)+(meridiem.toUpperCase()==='PM'?12:0);
+    if(hour>23) return match;
+    return `${prefix}${hour%12||12}:${minute} ${hour>=12?'PM':'AM'}`;
+  });
+}
+function getEventTime(data){
+  const firstDate = Array.isArray(data.eventDates) ? data.eventDates[0] : null;
+  return formatTimeText(data.startTime || data.time || firstDate?.startTime || firstDate?.time || firstDate?.slots?.[0]?.start || '');
+}
 function fmtDate(ts){
-  if(!ts) return 'Date TBA';
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const d = toEventDate(ts);
+  if(!d) return 'Date TBA';
   return d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
-function fmtTime(t){ return t ? t : ''; }
+function fmtTime(t){ return formatTimeText(t); }
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -258,133 +749,913 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'), 2500);
 }
 
-function getShareUrl(){ return `${location.origin}/event-detail.html?eventId=${eventId}`; }
+function slugifyEventName(name){
+  return String(name || 'event').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'event';
+}
+function getEventPath(name,urlKey='',id=eventId){
+  const slug = encodeURIComponent(slugifyEventName(urlKey||name));
+  const path = eventPathParts.length === 2
+    ? `/${encodeURIComponent(eventPathParts[0])}/${slug}`
+    : `/event/${slug}`;
+  return id ? `${path}?eventId=${encodeURIComponent(id)}` : path;
+}
+function getPublicEventUrl(data=evData){
+  const path=getEventPath(data.name,data.urlKey,data.id||eventId);
+  return `${location.origin}${path}`;
+}
+function getShareUrl(){ return getPublicEventUrl(); }
 
 function openShare(){
+  if(evData.allowSharing===false) return;
   document.getElementById('shareUrl').textContent = getShareUrl();
   document.getElementById('shareModal').classList.add('open');
 }
 function closeShare(){ document.getElementById('shareModal').classList.remove('open'); }
-function copyLink(){ navigator.clipboard.writeText(getShareUrl()).then(()=>showToast('Link copied!')); closeShare(); }
-function shareWA(){ window.open(`https://wa.me/?text=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
-function shareTwitter(){ window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this event on CultureWave!')}&url=${encodeURIComponent(getShareUrl())}`, '_blank'); }
-function shareEmail(){ window.open(`mailto:?subject=${encodeURIComponent(evData.name||'Event')}&body=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
+function copyLink(){ if(evData.allowSharing===false) return; navigator.clipboard.writeText(getShareUrl()).then(()=>showToast('Link copied!')); closeShare(); }
+function shareWA(){
+  if(evData.allowSharing===false) return;
+  const name=evData.name||'this event';
+  const venue=[evData.venueName||evData.venue||evData.location,evData.city].filter(Boolean).join(', ');
+  const eventStart=getEventStart(evData);
+  const date=evData.dateLabel||(eventStart?fmtDate(eventStart):'');
+  const time=formatTimeText(evData.startTime||evData.time||'');
+  const price=Number(evData.price||0);
+  const priceStr=price>0?`\n🎟️ Tickets from ₹${price}`:'\n🎟️ Free entry';
+  const lines=[
+    `🎉 *${name}*`,
+    venue?`📍 ${venue}`:'',
+    date?`📅 ${date}${time?' · '+time:''}`:'',
+    priceStr,
+    '',
+    'Book your spot on CultureWave:',
+    getShareUrl()
+  ].filter(l=>l!==undefined);
+  window.open(`https://wa.me/?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+}
+function shareTwitter(){ if(evData.allowSharing===false) return; window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this event on CultureWave!')}&url=${encodeURIComponent(getShareUrl())}`, '_blank'); }
+function shareEmail(){ if(evData.allowSharing===false) return; window.open(`mailto:?subject=${encodeURIComponent(evData.name||'Event')}&body=${encodeURIComponent('Check out this event: '+getShareUrl())}`, '_blank'); }
 
 function goToProfile(){
-  if(ownerUid) location.href = `client-profile.html?uid=${ownerUid}`;
+  if(ownerUid) location.href = `/client-profile.html?uid=${encodeURIComponent(ownerUid)}`;
 }
 
+function showMobileDetailTab(tab){
+  const helpTarget = document.getElementById('mobileFaqsSection')?.hidden ? 'nightHelp' : 'mobileFaqsSection';
+  const targets = {
+    about: 'nightAbout',
+    photos: 'nightPhotos',
+    venue: 'nightVenue',
+    help: helpTarget
+  };
+  document.querySelectorAll('[data-mob-tab]').forEach(button => button.classList.toggle('active', button.dataset.mobTab === tab));
+  const target = document.getElementById(targets[tab]) || document.getElementById('nightAbout');
+  if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Detect when tab bar is stuck to top and toggle background
+(function(){
+  const tabs = document.querySelector('.mob-detail-tabs');
+  if(!tabs) return;
+  const sentinel = document.createElement('div');
+  sentinel.style.cssText = 'height:1px;margin-bottom:-1px;pointer-events:none;';
+  tabs.parentNode.insertBefore(sentinel, tabs);
+  new IntersectionObserver(([entry]) => {
+    tabs.classList.toggle('is-stuck', !entry.isIntersecting);
+  }, {threshold: 0, rootMargin: '0px'}).observe(sentinel);
+})();
+function toggleNightAbout(){ const section=document.getElementById('nightAbout'); section.classList.toggle('expanded'); document.getElementById('nightMore').textContent=section.classList.contains('expanded')?'Show less':'...more'; }
+function openDirections(){ const venue=evData.mapLink||`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([evData.venueName,evData.address,evData.city].filter(Boolean).join(', ')||'Event venue')}`; window.open(venue, '_blank', 'noopener'); }
+function openNightLightbox(src){ document.getElementById('galleryLightboxImage').src=src; document.getElementById('galleryLightbox').classList.add('open'); }
+function openNightGallery(){
+  // Event detail routes use /event/<slug>, so resolve the gallery from the
+  // site root instead of relative to the current event slug.
+  const galleryUrl=new URL('/event-gallery.html',location.origin);
+  if(eventId)galleryUrl.searchParams.set('eventId',eventId);
+  galleryUrl.searchParams.set('back',location.pathname+location.search+location.hash);
+  location.href=galleryUrl.toString();
+}
+function closeNightLightbox(){ document.getElementById('galleryLightbox').classList.remove('open'); }
+
+function couponDate(value){
+  if(!value) return null;
+  if(value.toDate) return value.toDate();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isActiveOffer(coupon){
+  if(!coupon || !String(coupon.code || '').trim() || !Number(coupon.value)) return false;
+  if(coupon.active === false || coupon.enabled === false || coupon.disabled === true || coupon.unavailable === true) return false;
+  if(['inactive', 'disabled', 'expired', 'unavailable'].includes(String(coupon.status || '').toLowerCase())) return false;
+
+  const now = new Date();
+  const startsAt = couponDate(coupon.startsAt || coupon.startDate || coupon.validFrom);
+  const endsAt = couponDate(coupon.expiresAt || coupon.expiryDate || coupon.endDate || coupon.validUntil);
+  if((startsAt && startsAt > now) || (endsAt && endsAt < now)) return false;
+
+  const limit = Number(coupon.limit || coupon.usageLimit || 0);
+  const used = Number(coupon.used || coupon.usedCount || coupon.redemptions || 0);
+  return !(limit > 0 && used >= limit);
+}
+
+function renderNightOffers(coupons){
+  const section = document.getElementById('nightOffers');
+  const activeOffers = (Array.isArray(coupons) ? coupons : []).filter(isActiveOffer);
+  section.replaceChildren();
+  section.hidden = activeOffers.length === 0;
+  if(!activeOffers.length) return;
+
+  let index = 0;
+  const heading = document.createElement('h2');
+  heading.textContent = 'Offers for you';
+  const card = document.createElement('article');
+  card.className = 'night-offer-card';
+  const brand = document.createElement('span');
+  brand.className = 'offer-brand';
+  brand.setAttribute('aria-hidden', 'true');
+  brand.innerHTML = '<svg viewBox="0 0 24 24" focusable="false"><path d="M20.59 13.41 11 3.83A2.8 2.8 0 0 0 9.02 3H4a1 1 0 0 0-1 1v5.02c0 .74.29 1.45.82 1.98l9.59 9.59a2.25 2.25 0 0 0 3.18 0l4-4a2.25 2.25 0 0 0 0-3.18ZM7.5 8A1.5 1.5 0 1 1 7.5 5a1.5 1.5 0 0 1 0 3Z"/></svg>';
+  const copy = document.createElement('span');
+  const title = document.createElement('strong');
+  const subtitle = document.createElement('small');
+  const counter = document.createElement('b');
+  copy.className = 'night-offer-copy';
+  copy.append(title, subtitle);
+  card.append(brand, copy, counter);
+  section.append(heading, card);
+
+  const showOffer = () => {
+    const offer = activeOffers[index];
+    const isPercent = ['percent', 'percentage'].includes(String(offer.type || '').toLowerCase());
+    const amount = isPercent ? `${offer.value}%` : `₹${Number(offer.value).toLocaleString('en-IN')}`;
+    title.textContent = `Get ${isPercent ? amount : `Flat ${amount}`} OFF`;
+    const minTickets = Number(offer.minTickets || offer.minimumTickets || offer.minTicketCount || offer.minQty || 0);
+    const minOrder = Number(offer.minOrder || offer.minimumOrder || 0);
+    const eligibility = offer.description || offer.desc || [
+      minTickets ? `minimum ${minTickets} tickets` : '',
+      minOrder ? `total ticket value above ₹${minOrder.toLocaleString('en-IN')}` : ''
+    ].filter(Boolean).join(' and ');
+    const codeLabel = `Code ${String(offer.code).toUpperCase()}`;
+    subtitle.textContent = eligibility ? `Valid on ${eligibility} · ${codeLabel}` : `Use ${String(offer.code).toUpperCase()} at checkout`;
+    counter.textContent = `${index + 1}/${activeOffers.length}`;
+  };
+  showOffer();
+  if(activeOffers.length > 1) {
+    card.style.cursor = 'pointer';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    const nextOffer = () => { index = (index + 1) % activeOffers.length; showOffer(); };
+    card.addEventListener('click', nextOffer);
+    card.addEventListener('keydown', event => { if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); nextOffer(); } });
+  }
+}
+
+function renderNightArtists(artists){
+  const section = document.getElementById('nightArtists');
+  const track = document.getElementById('nightArtistsTrack');
+  const assignedArtists = (Array.isArray(artists) ? artists : []).filter(artist => {
+    const status = String((artist || {}).status || '').toLowerCase();
+    return artist && artist.active !== false && artist.assigned !== false && !['inactive', 'disabled', 'unavailable'].includes(status)
+      && String(artist.name || '').trim() && String(artist.image || artist.imageUrl || artist.photoUrl || '').trim();
+  });
+  track.replaceChildren();
+  section.hidden = assignedArtists.length === 0;
+  if (!assignedArtists.length) return;
+  assignedArtists.forEach(artist => {
+    const card = document.createElement('article');
+    card.className = 'night-artist-card';
+    const image = document.createElement('img');
+    image.src = artist.image || artist.imageUrl || artist.photoUrl;
+    image.alt = artist.name;
+    const name = document.createElement('strong');
+    name.textContent = artist.name;
+    card.append(image, name);
+    track.append(card);
+  });
+}
+
+function renderNightDetails(data){
+  const details = document.getElementById('nightDetails');
+  const minutes = Number(data.duration || 0);
+  const duration = minutes ? (minutes >= 60 ? (minutes % 60 ? `${(minutes / 60).toFixed(1)} hours` : `${minutes / 60} hours`) : `${minutes} mins`) : '';
+  const icons={
+    language:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h11M8.5 3v2c0 4.1-2.2 7-5 9m2-6c1.1 1.6 2.7 2.8 4.5 3.5"/><path d="M14 20l3.5-9 3.5 9m-5.8-3h4.6M14 5h7m-3.5-2v2c0 3.2 1.2 5.3 3.5 7"/></svg>',
+    duration:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3c0 4.5 2.1 6.7 5 9-2.9 2.3-5 4.5-5 9m10-18c0 4.5-2.1 6.7-5 9 2.9 2.3 5 4.5 5 9"/><path d="M9 6h6m-6 12h6"/></svg>',
+    layout:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M3 21h18M8 21v-5h8v5"/></svg>',
+    kids:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.4 2 4 2 4-2 4-2"/><path d="M8.5 9h.01M15.5 9h.01"/></svg>',
+    pets:'<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="15.5" rx="5" ry="4"/><ellipse cx="5.5" cy="9" rx="1.7" ry="2.2"/><ellipse cx="10" cy="6.5" rx="1.7" ry="2.2"/><ellipse cx="14.5" cy="6.5" rx="1.7" ry="2.2"/><ellipse cx="18.5" cy="9" rx="1.7" ry="2.2"/></svg>'
+  };
+  const items = [
+    ['language', 'Language', data.language],
+    ['duration', 'Duration', duration],
+    ['layout', 'Layout', data.layoutType],
+    ['kids', 'Kid Friendly?', data.kidsFriendly],
+    ['pets', 'Pet Friendly?', data.petsFriendly],
+  ].filter(([, , value]) => String(value || '').trim());
+  details.replaceChildren();
+  details.hidden = items.length === 0;
+  items.forEach(([icon, label, value]) => {
+    const item = document.createElement('div');
+    const symbol = document.createElement('i');
+    symbol.innerHTML = icons[icon] || '';
+    const copy = document.createElement('span');
+    copy.textContent = label;
+    const strong = document.createElement('strong');
+    strong.textContent = value;
+    copy.append(strong);
+    item.append(symbol, copy);
+    details.append(item);
+  });
+}
+
+function syncMobileTabs(){
+  const helpTarget = document.getElementById('mobileFaqsSection')?.hidden ? 'nightHelp' : 'mobileFaqsSection';
+  const sections = [['about','nightAbout'],['photos','nightPhotos'],['venue','nightVenue'],['help',helpTarget]];
+  const marker = window.scrollY + 155;
+  let active = 'about';
+  sections.forEach(([tab,id]) => { const el=document.getElementById(id); if(el && el.offsetTop <= marker) active=tab; });
+  document.querySelectorAll('[data-mob-tab]').forEach(button => button.classList.toggle('active',button.dataset.mobTab===active));
+}
+window.addEventListener('scroll', syncMobileTabs, {passive:true});
+requestAnimationFrame(syncMobileTabs);
+window.addEventListener('resize', syncMobileTabs, {passive:true});
+
+function renderSeatingLayout(layout, target){
+  if(!target) return;
+  const sections = Array.isArray(layout.sections) ? layout.sections : [];
+  if(sections.length) {
+    target.innerHTML = `<div style="position:relative;min-width:420px;height:420px;overflow:hidden;border-radius:14px;background:#10151f;">${sections.map(section => `<div style="position:absolute;left:${Number(section.x)||0}%;top:${Number(section.y)||0}%;width:${Number(section.width)||20}%;height:${Number(section.height)||14}%;display:grid;place-items:center;box-sizing:border-box;padding:.35rem;border:2px solid rgba(255,255,255,.3);border-radius:${section.shape==='rounded'?'18px':'5px'};background:${esc(section.color||'#2563eb')};color:#fff;font-size:.72rem;font-weight:900;text-align:center;">${esc(section.name||'SECTION')}</div>`).join('')}</div>`;
+    return;
+  }
+  const rows = Array.isArray(layout.rows) ? layout.rows : [];
+  target.innerHTML = `<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:9px;padding:.55rem;margin-bottom:1rem;">${esc(layout.stage || 'STAGE')}</div>` + rows.map(row => {
+    const count = Math.max(1, Math.min(100, Number(row.seats) || 1));
+    const justify = row.align === 'left' ? 'flex-start' : row.align === 'right' ? 'flex-end' : 'center';
+    const direction = row.direction === 'vertical' ? 'column' : 'row';
+    const alignItems = row.align === 'left' ? 'flex-start' : row.align === 'right' ? 'flex-end' : 'center';
+    const sofa = row.seatStyle === 'sofa';
+    return `<div style="margin:.65rem 0;min-width:420px;"><div style="font-size:.64rem;font-weight:800;color:#64748b;margin:0 0 .25rem 29px;">${esc(row.ticketType || 'General Admission')}</div><div style="display:flex;align-items:center;gap:.45rem;"><span style="width:24px;font-size:.72rem;font-weight:900;color:#64748b;">${esc(row.label || '')}</span><div style="display:flex;flex-direction:${direction};flex-wrap:${direction === 'row' ? 'wrap' : 'nowrap'};align-items:${direction === 'column' ? alignItems : 'center'};justify-content:${direction === 'row' ? justify : 'flex-start'};gap:.3rem;flex:1;">${Array.from({length:count},(_,i)=>`<span style="display:grid;place-items:center;width:${sofa ? '58px' : '30px'};height:30px;border-radius:${sofa ? '15px' : '7px'};background:${sofa ? '#fce7f3' : '#e8efff'};color:${sofa ? '#be185d' : '#1242c5'};font-size:.62rem;font-weight:800;">${sofa ? 'Sofa ' : ''}${esc(row.label || '')}${i+1}</span>`).join('')}</div></div></div>`;
+  }).join('');
+}
+
+let selectedTicketIndex = 0;
+let incompleteBookingTimerInterval = null;
+
+function readPendingBookingDraft(){
+  if(!eventId)return null;
+  const key=`culturewave:checkout-draft:${eventId}`;
+  try{
+    const draft=JSON.parse(localStorage.getItem(key)||'null');
+    if(!draft||String(draft.eventId||'')!==String(eventId))return null;
+    const selections=Array.isArray(draft.selections)?draft.selections:[];
+    const count=selections.reduce((sum,item)=>sum+Math.max(0,Number(item.quantity)||0),0)
+      ||(Array.isArray(draft.quantities)?draft.quantities.reduce((sum,value)=>sum+Math.max(0,Number(value)||0),0):0);
+    const expiresAt=Number(draft.checkoutExpiresAt)||(Number(draft.savedAt)?Number(draft.savedAt)+10*60*1000:0);
+    if(!count||!expiresAt||expiresAt<=Date.now()){
+      if(expiresAt&&expiresAt<=Date.now())localStorage.removeItem(key);
+      return null;
+    }
+    if(!draft.checkoutExpiresAt){draft.checkoutExpiresAt=expiresAt;localStorage.setItem(key,JSON.stringify(draft));}
+    return {...draft,checkoutExpiresAt:expiresAt,ticketCount:count};
+  }catch(error){console.warn('Could not read pending booking:',error);return null;}
+}
+
+function updateIncompleteBookingReminder(){
+  const reminder=document.getElementById('incompleteBookingReminder');
+  if(!reminder)return;
+  const draft=readPendingBookingDraft();
+  if(!draft){
+    reminder.classList.remove('show');
+    document.body.classList.remove('has-incomplete-booking');
+    if(incompleteBookingTimerInterval){clearInterval(incompleteBookingTimerInterval);incompleteBookingTimerInterval=null;}
+    return;
+  }
+  document.getElementById('incompleteBookingTitle').textContent=`${draft.ticketCount} ticket${draft.ticketCount===1?'':'s'} added`;
+  const seconds=Math.max(0,Math.ceil((draft.checkoutExpiresAt-Date.now())/1000));
+  document.getElementById('incompleteBookingTimer').textContent=seconds
+    ? `Complete your booking in ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')} min`
+    : 'Booking time expired';
+  reminder.classList.add('show');
+  document.body.classList.add('has-incomplete-booking');
+  if(!incompleteBookingTimerInterval)incompleteBookingTimerInterval=setInterval(updateIncompleteBookingReminder,1000);
+}
+
+window.addEventListener('pageshow',updateIncompleteBookingReminder);
+window.addEventListener('storage',event=>{
+  if(event.key===`culturewave:checkout-draft:${eventId}`)updateIncompleteBookingReminder();
+});
+
+function selectTicket(i){
+  selectedTicketIndex = i;
+  const allCards = document.querySelectorAll('.ticket-card');
+  const td = evData.ticketDesign || {};
+  const g1 = td.gradientStart || '#1242c5';
+  allCards.forEach((el,idx)=>{
+    el.classList.toggle('selected', idx === i);
+    el.style.border = idx === i ? `2px solid ${g1}` : '1.5px solid var(--border)';
+    const indicator = el.querySelector('span');
+    if(indicator) indicator.textContent = idx === i ? 'Selected' : 'Click to select';
+  });
+  const t = (evData.tickets||[])[i] || {};
+  const price = Number(t.price || 0);
+  document.getElementById('regPrice').innerHTML = price ? `₹${price.toLocaleString('en-IN')}<small> onwards</small>` : 'Free';
+  document.getElementById('regMeta').textContent = price ? 'Per person · Taxes may apply' : 'Free to attend';
+}
+
+function eventIsSoldOut(data){
+  const tickets=Array.isArray(data.tickets)?data.tickets:[];
+  const ticketCap=tickets.reduce((sum,t)=>sum+Math.max(0,Number(t.qty||t.inventory)||0),0);
+  const cap=ticketCap||Number(data.capacity||0);
+  const ticketListExhausted=tickets.length>0&&tickets.every(t=>{
+    if(t.soldOut===true) return true;
+    const remaining=t.available??t.remaining;
+    if(remaining!=null) return Number(remaining)<=0;
+    const limit=Number(t.qty||t.inventory||0);
+    return limit>0&&Number(t.booked||t.soldCount||0)>=limit;
+  });
+  return data.soldOut===true||(cap>0&&Number(data.totalBooked||0)>=cap)||ticketListExhausted;
+}
+function eventWaitlistOpen(data){
+  return data.allowWaitlist===true&&(data.soldOut===true||data.overflowAction==='waitlist'||data.overflowAction==='notify');
+}
 function register(){
-  if(eventId) location.href = `event-rsvp-form.html?eventId=${eventId}`;
+  if(!eventId) return;
+  const soldOut=eventIsSoldOut(evData);
+  const waitlistOpen=eventWaitlistOpen(evData);
+  if(soldOut&&!waitlistOpen) return;
+  const tickets = Array.isArray(evData.tickets) && evData.tickets.length ? evData.tickets : [];
+  const t = tickets[selectedTicketIndex] || tickets[0] || {};
+  const pendingDraft=readPendingBookingDraft();
+  const price = Number(t.price || evData.price || 0);
+  const rawEventDate=evData.startDate||evData.date||(evData.eventDates||[])[0]?.date||'';
+  const eventDate=rawEventDate?.toDate?rawEventDate.toDate().toISOString():rawEventDate;
+  const qs = new URLSearchParams({
+    eventId,
+    bookingSession: pendingDraft?.bookingSession || (globalThis.crypto?.randomUUID?.() || `booking-${Date.now()}-${Math.random().toString(36).slice(2)}`),
+    eventName: evData.name || '',
+    venueName: evData.venueName || evData.city || '',
+    city: evData.city || '',
+    mapLink: evData.mapLink || '',
+    category: evData.category || '',
+    ticketName: t.name || 'General Admission',
+    ticketIndex: String(selectedTicketIndex),
+    ticketPrice: String(price),
+    eventPrice: String(Number(evData.price || 0)),
+    eventDate: String(eventDate),
+    eventTime: evData.startTime || evData.time || evData.eventDates?.[0]?.startTime || evData.eventDates?.[0]?.time || evData.eventDates?.[0]?.slots?.[0]?.startTime || evData.eventDates?.[0]?.slots?.[0]?.start || evData.eventDates?.[0]?.slots?.[0]?.time || '',
+    eventEndTime: evData.endTime || evData.finishTime || evData.eventDates?.[0]?.endTime || evData.eventDates?.[0]?.finishTime || '',
+    movieLanguage: evData.language || '',
+    movieRating: evData.rating || evData.certificate || evData.ageRating || '',
+    posterUrl: evData.cardImgUrl || evData.coverUrl || '',
+    seatingPlanUrl: evData.seatingPlanUrl || '',
+    seatingPlan: evData.seatingPlan ? JSON.stringify(evData.seatingPlan) : '',
+  });
+  if(pendingDraft)qs.set('resume','1');
+  const bookingUrl = `/booking.html?${qs.toString()}`;
+  if(window.matchMedia('(max-width: 768px)').matches){
+    openEventBookingSheet(bookingUrl);
+    return;
+  }
+  const desktopBookingUrl = new URL(bookingUrl, location.origin);
+  desktopBookingUrl.searchParams.set('picker', '1');
+  location.href = `${desktopBookingUrl.pathname}${desktopBookingUrl.search}`;
 }
 
-function renderEvent(data){
+function openEventBookingSheet(url){
+  const modal=document.getElementById('eventBookingModal');
+  const frame=document.getElementById('eventBookingFrame');
+  if(!modal||!frame){location.href=url;return;}
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  document.body.classList.add('event-booking-open');
+  frame.src=`${url}${url.includes('?')?'&':'?'}embed=1`;
+}
+
+function closeEventBookingSheet(){
+  const modal=document.getElementById('eventBookingModal');
+  const frame=document.getElementById('eventBookingFrame');
+  if(!modal)return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('event-booking-open');
+  if(frame)frame.src='about:blank';
+}
+
+window.addEventListener('message',event=>{
+  if(event.origin!==location.origin||event.source!==document.getElementById('eventBookingFrame')?.contentWindow)return;
+  if(event.data?.type==='culturewave:close-booking-sheet')closeEventBookingSheet();
+  if(event.data?.type==='culturewave:go-to-checkout'){
+    const bookingUrl=new URL(document.getElementById('eventBookingFrame').src,location.href);
+    const draft=event.data.draft;
+    if(draft&&String(draft.eventId||'')===String(bookingUrl.searchParams.get('eventId')||'')){
+      try{localStorage.setItem(`culturewave:checkout-draft:${draft.eventId}`,JSON.stringify(draft));}
+      catch(error){console.error('Could not preserve checkout details:',error);return;}
+    }
+    bookingUrl.searchParams.delete('embed');
+    bookingUrl.searchParams.set('resume','1');
+    location.href=`${bookingUrl.pathname}${bookingUrl.search}${bookingUrl.hash}`;
+  }
+});
+
+function updateRegistrationStatus(data){
+  const soldOut=eventIsSoldOut(data);
+  const waitlistOpen=eventWaitlistOpen(data);
+  const label=soldOut?(waitlistOpen?'Join Waitlist':'Sold Out'):'Register Now 🎉';
+  const mobileLabel=soldOut?(waitlistOpen?'Join Waitlist':'Sold Out'):'Book tickets';
+  const message=document.getElementById('soldOutMessage');
+  if(message){message.hidden=!soldOut;message.textContent=soldOut?(data.soldOutMsg||'This event is sold out.'):'';}
+  const button=document.getElementById('regBtn');
+  const mobile=document.querySelector('.mob-reg-btn');
+  if(button){button.textContent=label;button.disabled=soldOut&&!waitlistOpen;button.style.opacity=button.disabled?'.55':'';button.style.cursor=button.disabled?'not-allowed':'';}
+  if(mobile){mobile.textContent=mobileLabel;mobile.disabled=soldOut&&!waitlistOpen;mobile.style.opacity=mobile.disabled?'.55':'';mobile.style.cursor=mobile.disabled?'not-allowed':'';}
+}
+
+async function renderEvent(data){
   evData = data;
+  updateIncompleteBookingReminder();
+  showFoodOrderingForEvent(data);
+  const helpLink=document.getElementById('nightHelpLink');
+  if(helpLink) helpLink.href=`https://wa.me/919848047428?text=${encodeURIComponent(`Hi CultureWave, I need help with ${data.name||'this event'}.`)}`;
+  const ticketCapacity=(data.tickets||[]).reduce((sum,ticket)=>sum+Math.max(0,Number(ticket.qty||ticket.inventory||0)),0);
+  const displayCapacity=ticketCapacity||Number(data.capacity||0);
+  updateRegistrationStatus(data);
   ownerUid = data.ownerId;
   document.title = `${data.name||'Event'} | CultureWave`;
-
-  // cover
-  const coverEl = document.getElementById('coverEl');
-  if(data.coverUrl){
-    coverEl.innerHTML = `<img src="${esc(data.coverUrl)}" alt="${esc(data.coverAlt||data.name)}"/>`;
+  const seoDescription = String(data.summary || data.description || `${data.name || 'Event'} at ${data.venueName || data.city || 'a local venue'}. Explore event details and ticket options on CultureWave.`).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
+  const setSeoMeta = (selector, attribute, value) => {
+    let element = document.head.querySelector(selector);
+    if (!element) {
+      element = document.createElement('meta');
+      document.head.appendChild(element);
+    }
+    element.setAttribute(attribute, value);
+  };
+  const eventCanonical = new URL(getPublicEventUrl(data));
+  let canonicalLink = document.head.querySelector('link[rel="canonical"]');
+  if (!canonicalLink) {
+    canonicalLink = document.createElement('link');
+    canonicalLink.rel = 'canonical';
+    document.head.appendChild(canonicalLink);
   }
-  const norm = (data.status||'draft').toLowerCase();
-  if(norm==='published') coverEl.innerHTML += '<span class="cover-status live">Live</span>';
-  else coverEl.innerHTML += '<span class="cover-status draft">Draft</span>';
+  canonicalLink.href = eventCanonical.href;
+  setSeoMeta('meta[name="description"]', 'name', 'description');
+  document.head.querySelector('meta[name="description"]').content = seoDescription;
+  setSeoMeta('meta[property="og:title"]', 'property', 'og:title');
+  document.head.querySelector('meta[property="og:title"]').content = document.title;
+  setSeoMeta('meta[property="og:description"]', 'property', 'og:description');
+  document.head.querySelector('meta[property="og:description"]').content = seoDescription;
+  setSeoMeta('meta[property="og:url"]', 'property', 'og:url');
+  document.head.querySelector('meta[property="og:url"]').content = eventCanonical.href;
+  setSeoMeta('meta[property="og:image"]', 'property', 'og:image');
+  document.head.querySelector('meta[property="og:image"]').content = new URL(data.cardImgUrl || data.coverUrl || 'party.jpg', location.href).href;
+  setSeoMeta('meta[name="twitter:title"]', 'name', 'twitter:title');
+  document.head.querySelector('meta[name="twitter:title"]').content = document.title;
+  setSeoMeta('meta[name="twitter:description"]', 'name', 'twitter:description');
+  document.head.querySelector('meta[name="twitter:description"]').content = seoDescription;
+  setSeoMeta('meta[name="twitter:image"]', 'name', 'twitter:image');
+  document.head.querySelector('meta[name="twitter:image"]').content = document.head.querySelector('meta[property="og:image"]').content;
+  if (eventId) {
+    let eventSchema = document.getElementById('eventStructuredData');
+    if (!eventSchema) {
+      eventSchema = document.createElement('script');
+      eventSchema.id = 'eventStructuredData';
+      eventSchema.type = 'application/ld+json';
+      document.head.appendChild(eventSchema);
+    }
+    const eventStartForSchema = getEventStart(data);
+    const eventOffer = (data.tickets || []).find(ticket => Number.isFinite(Number(ticket.price)));
+    const eventSchemaData = {
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: data.name || 'CultureWave Event',
+      description: seoDescription,
+      url: eventCanonical.href,
+      image: [new URL(data.cardImgUrl || data.coverUrl || 'party.jpg', location.href).href],
+      eventStatus: 'https://schema.org/EventScheduled',
+      organizer: { '@type': 'Organization', name: 'CultureWave', url: 'https://culturewave.in/' }
+    };
+    if (eventStartForSchema) eventSchemaData.startDate = eventStartForSchema.toISOString();
+    if (data.venueName || data.city || data.address) {
+      eventSchemaData.location = {
+        '@type': 'Place',
+        name: data.venueName || data.city || 'Venue to be announced',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: data.address || undefined,
+          addressLocality: data.city || undefined,
+          addressRegion: 'Telangana',
+          addressCountry: 'IN'
+        }
+      };
+    }
+    if (eventOffer) {
+      eventSchemaData.offers = {
+        '@type': 'Offer',
+        price: Number(eventOffer.price),
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock',
+        url: eventCanonical.href
+      };
+    }
+    eventSchema.textContent = JSON.stringify(eventSchemaData);
+  }
+  renderNightOffers([...(Array.isArray(data.coupons) ? data.coupons : []), ...(Array.isArray(data.offers) ? data.offers : [])]);
+  renderNightArtists(data.artists);
+  renderNightDetails(data);
+  const eventStart = getEventStart(data);
 
-  // meta
+  // Optional wide background is displayed on tablet and desktop only.
+  const hero = document.getElementById('heroBanner');
+  const posterSrc = data.cardImgUrl || data.coverUrl || 'party.jpg';
+  const desktopCoverSrc = data.coverUrl || posterSrc;
+  const mobPoster = document.getElementById('mobPoster');
+  const setPosterImage = () => { mobPoster.src = window.matchMedia('(min-width:769px)').matches ? desktopCoverSrc : posterSrc; };
+  setPosterImage();
+  window.matchMedia('(min-width:769px)').addEventListener('change', setPosterImage);
+  const desktopBackgroundSrc = data.desktopBackgroundUrl;
+  if(desktopBackgroundSrc) {
+    hero.classList.add('has-desktop-background');
+    const desktopStage = document.getElementById('desktopHeroStage');
+    desktopStage.classList.add('has-desktop-background');
+    desktopStage.style.setProperty('--desktop-event-background', `url('${esc(desktopBackgroundSrc)}')`);
+  }
+  hero.style.backgroundSize = 'cover';
+  hero.style.backgroundPosition = 'center';
+
+  // mobile poster image is assigned above so its source follows the viewport.
+  // mobile event header
+  document.getElementById('mobEvTitle').textContent = data.name||'Untitled Event';
+  document.getElementById('mobEvSummary').textContent = data.summary||data.tagline||'';
+  document.getElementById('mobDetailNavTitle').textContent = data.name||'Event details';
+
+  // A poster is useful as the first gallery tile when no extra photos were added.
+  const gallerySource = data.galleryImages || data.gallery || data.photos || [];
+  const gallery = Array.isArray(gallerySource) ? gallerySource.filter(Boolean) : [];
+  const galleryImages = [...new Set([posterSrc, ...gallery].filter(Boolean))].slice(0, 8);
+  nightGalleryImages = galleryImages;
+  const promoVideo = promoVideoMarkup(data.videoUrl);
+  for (const id of ['nightPromoVideo','mobPromoVideo']) {
+    const container=document.getElementById(id);
+    if(container){container.innerHTML=promoVideo;container.style.display=promoVideo?'':'none';}
+  }
+  if(promoVideo) document.getElementById('mobGallerySection').style.display='block';
+  if(galleryImages.length){
+    document.getElementById('mobGalleryGrid').innerHTML = galleryImages.map((src,index) =>
+      `<img src="${esc(src)}" alt="${esc(data.name||'Event')} photo ${index+1}" loading="lazy"/>`
+    ).join('');
+    document.getElementById('mobGallerySection').style.display = 'block';
+    document.getElementById('nightGallery').innerHTML = galleryImages.slice(0,5).map((src,index) => `<img src="${esc(src)}" alt="${esc(data.name||'Event')} gallery image ${index+1}" onclick="openNightLightbox('${esc(src)}')"/>`).join('');
+    document.getElementById('nightOpenGallery').hidden = false;
+  }
+  document.getElementById('nightVenueCopy').textContent = `2.1km • ${data.venueName||'Raasta'} • ${data.city||'Madhapur, Hyderabad'}`;
+
+  // highlights strip
+  const firstTicket = (data.tickets||[])[0] || {};
+  const firstGroupPrice = Number(firstTicket.bulk?.pricePerPerson||0);
+  const firstGroupMin = Number(firstTicket.bulk?.minPersons||0);
+  const isGroupTicket = firstGroupPrice>0 && firstGroupMin>0;
+  const price0 = isGroupTicket ? firstGroupPrice*firstGroupMin : Number(firstTicket.price)>0 ? Number(firstTicket.price) : Number(data.price||0);
+  const mins = Number(data.duration||0);
+  const durationLabel = mins ? (mins >= 60 ? (mins/60 % 1 === 0 ? (mins/60)+' Hrs' : (mins/60).toFixed(1)+' Hrs') : mins+' Mins') : '';
+  function fmtShortDate(ts){
+    const d = toEventDate(ts);
+    if(!d) return 'TBA';
+    const day = d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+    const weekday = d.toLocaleDateString('en-IN',{weekday:'long'});
+    return day+', '+weekday;
+  }
+  // mobile date box
+  if(eventStart){
+    const d = eventStart;
+    document.getElementById('mobDateMonth').textContent = d.toLocaleDateString('en-IN',{month:'short'}).toUpperCase();
+    document.getElementById('mobDateDay').textContent = d.toLocaleDateString('en-IN',{day:'2-digit'});
+  }
+  document.getElementById('mobInfoDate').textContent = data.dateLabel || fmtShortDate(eventStart);
+  const eventTime = getEventTime(data);
+  document.getElementById('mobInfoTime').textContent = eventTime;
+  if(durationLabel){ document.getElementById('mobInfoDuration').textContent = durationLabel; }
+  else { document.getElementById('mobDurationRow').style.display='none'; }
+  document.getElementById('mobInfoVenue').textContent = data.venueName || 'Raasta';
+  document.getElementById('mobInfoVenueCity').textContent = data.city || 'Madhapur, Hyderabad';
+  // mobile bottom bar
+  document.getElementById('mobRegPrice').innerHTML = price0 ? `${isGroupTicket?'Group from':'From'} ₹${Number(price0).toLocaleString('en-IN')}` : 'Free';
+
+  // desktop badges + hero
   document.getElementById('evCategory').textContent = '🎪 ' + (data.category||'Event');
+  const norm = (data.status||'draft').toLowerCase();
+  if(norm==='published') document.getElementById('liveBadge').style.display='';
+  else document.getElementById('draftBadge').style.display='';
+  const hasVIP = (data.tickets||[]).some(t=>/vip|premium|gold|platinum/i.test(t.name||''));
+  const highPrice = (data.tickets||[]).some(t=>Number(t.price||0)>1000);
+  if(hasVIP||highPrice) document.getElementById('premiumBadge').style.display='';
   document.getElementById('evTitle').textContent = data.name||'Untitled Event';
-  document.getElementById('evDate').textContent = fmtDate(data.startDate);
-  document.getElementById('evTime').textContent = fmtTime(data.startTime);
+  document.getElementById('evDate').textContent = fmtDate(eventStart);
   document.getElementById('evVenue').textContent = data.venueName||'Venue TBA';
-  document.getElementById('evCity').textContent = data.city||'';
-  document.getElementById('sideDate').textContent = fmtDate(data.startDate) + (data.startTime ? ' · '+data.startTime : '');
-  document.getElementById('sideVenue').textContent = (data.venueName||'Venue TBA') + (data.city ? ', '+data.city : '');
+  document.getElementById('evCity').textContent = data.city ? ' · '+data.city : '';
+  const attendeeCount = Math.max(Number(data.totalBooked)||0,(data.tickets||[]).reduce((sum,ticket)=>sum + (Number(ticket.booked)||0),0));
+  if(data.showAttendeeCount!==false){
+    document.getElementById('evAttendeeCount').textContent = attendeeCount.toLocaleString('en-IN');
+    document.getElementById('evAttendeeCountRow').style.display='flex';
+    document.getElementById('mobAttendeeCount').textContent = attendeeCount.toLocaleString('en-IN');
+    document.getElementById('mobAttendeeCountRow').style.display='flex';
+  }
+  if(data.allowSharing===false){
+    document.querySelectorAll('[onclick="openShare()"]').forEach(button=>button.style.display='none');
+    document.getElementById('nightShareCard').style.display='none';
+  }
+  if(displayCapacity){ document.getElementById('evCapacity').textContent = displayCapacity.toLocaleString('en-IN')+' seats'; document.getElementById('evCapacityRow').style.display='flex'; }
+  document.getElementById('hlDate').textContent = fmtDate(eventStart);
+  document.getElementById('hlVenue').textContent = data.venueName||data.city||'TBA';
+  document.getElementById('hlPrice').textContent = price0 ? '₹'+Number(price0).toLocaleString('en-IN') : 'Free';
+  document.getElementById('hlCap').textContent = displayCapacity ? displayCapacity.toLocaleString('en-IN')+' seats' : 'Open';
+  // Keep organiser-provided policies and instructions collapsed until requested.
+  const eventInfoItems = [
+    { value: data.termsText || data.termsAndConditions || data.terms || data.legalTerms, mobileSection: 'mobileTermsSection', mobileText: 'mobileTermsText', desktopSection: 'desktopTermsSection', desktopText: 'desktopTermsText' },
+    { value: data.refundPolicy || data.refundRules || data.cancellationPolicy, mobileSection: 'mobileRefundSection', mobileText: 'mobileRefundText', desktopSection: 'desktopRefundSection', desktopText: 'desktopRefundText' },
+    { value: data.notes || data.specialInstructions || data.attendeeInstructions || data.instructions, mobileSection: 'mobileInstructionsSection', mobileText: 'mobileInstructionsText', desktopSection: 'desktopInstructionsSection', desktopText: 'desktopInstructionsText' }
+  ];
+  let hasEventInfo = false;
+  eventInfoItems.forEach(item => {
+    const value = String(item.value || '').trim();
+    if (!value) return;
+    hasEventInfo = true;
+    [
+      [item.mobileSection, item.mobileText],
+      [item.desktopSection, item.desktopText]
+    ].forEach(([sectionId, textId]) => {
+      document.getElementById(textId).textContent = value;
+      document.getElementById(sectionId).hidden = false;
+    });
+  });
+  document.getElementById('mobileEventInfo').hidden = !hasEventInfo;
+  document.getElementById('desktopEventInfo').hidden = !hasEventInfo;
 
-  if(data.capacity){
-    document.getElementById('evCapacity').textContent = Number(data.capacity).toLocaleString('en-IN') + ' seats';
-    document.getElementById('evCapacityRow').style.display = 'flex';
-    document.getElementById('sideCap').textContent = Number(data.capacity).toLocaleString('en-IN') + ' capacity';
-    document.getElementById('sideCapRow').style.display = 'flex';
+  // sidebar
+  document.getElementById('sideDate').textContent = fmtDate(eventStart)+(eventTime?' · '+eventTime:'');
+  document.getElementById('sideVenue').textContent = (data.venueName||'Venue TBA')+(data.city?', '+data.city:'');
+  if(displayCapacity){
+    document.getElementById('sideCap').textContent = displayCapacity.toLocaleString('en-IN')+' capacity';
+    document.getElementById('sideCapRow').style.display='flex';
   }
 
   // price
-  const price = data.tickets?.[0]?.price || data.price || 0;
-  document.getElementById('regPrice').innerHTML = price ? `₹${Number(price).toLocaleString('en-IN')}<small> onwards</small>` : 'Free';
-  document.getElementById('regMeta').textContent = price ? 'Per person · Taxes may apply' : 'Free to attend';
+  document.getElementById('regPrice').innerHTML = price0 ? `&#8377;${Number(price0).toLocaleString('en-IN')}<small> onwards</small>` : 'Free';
+  document.getElementById('regMeta').textContent = price0 ? isGroupTicket ? `Group of ${firstGroupMin} · ₹${firstGroupPrice.toLocaleString('en-IN')}/person · Taxes may apply` : 'Per person · Taxes may apply' : 'Free to attend';
 
-  // description
-  if(data.description){
-    document.getElementById('evDesc').textContent = data.description;
-    document.getElementById('descSection').style.display = 'block';
-  }
+  // About always reflects the live Firebase description (with summary as fallback).
+  const about = String(data.description || data.about || data.summary || 'Event details will be available soon.').trim();
+  document.getElementById('nightAboutCopy').textContent = about;
+  document.getElementById('nightMore').hidden = about.length <= 260;
+  document.getElementById('nightAbout').classList.remove('expanded');
+  document.getElementById('evDesc').textContent = about;
+  document.getElementById('descSection').style.display='block';
+  renderAcceptedStalls(data);
 
   // tickets
   const tickets = data.tickets||[];
+  const td = data.ticketDesign||{};
+  const g1 = td.gradientStart||'#1242c5';
+  const g2 = td.gradientEnd||'#2f6bff';
+  const logoUrl = td.logoUrl||'';
+  const tagline = td.tagline||'';
+  const footer  = td.footer||'';
+  const showQR    = td.showQR    !== false;
+  const showSeat  = td.showSeat  !== false;
+  const showVenue = td.showVenue !== false;
+  const showLogo  = td.showLogo  !== false;
+
   if(tickets.length){
-    document.getElementById('ticketsList').innerHTML = tickets.map((t,i)=>`
-      <div class="ticket-card ${i===0?'featured':''}">
-        <div>
-          <div class="ticket-name">${esc(t.name||'General Admission')}</div>
-          ${t.description?`<div class="ticket-desc">${esc(t.description)}</div>`:''}
+    document.getElementById('ticketsList').innerHTML = tickets.map((t,i)=>{
+      const groupMin = Number(t.bulk?.minPersons || 0);
+      const groupMax = Number(t.bulk?.maxPersons || 0);
+      const groupPrice = Number(t.bulk?.pricePerPerson || 0);
+      const inventory = Number(t.qty||t.inventory||0);
+      const remaining = t.available ?? t.remaining;
+      const ticketSoldOut = t.soldOut===true || (remaining!=null && Number(remaining)<=0) || (inventory>0 && Number(t.booked||t.soldCount||0)>=inventory);
+      const priceStr = ticketSoldOut ? 'SOLD OUT' : groupMin && groupPrice>0 ? `&#8377;${(groupMin*groupPrice).toLocaleString('en-IN')} group` : Number(t.price)>0 ? `&#8377;${Number(t.price).toLocaleString('en-IN')}` : 'Free';
+      const groupLabel = groupMin && groupPrice > 0 ? `${groupMin}${groupMax ? '–'+groupMax : '+'} people · ₹${groupPrice.toLocaleString('en-IN')}/person` : '';
+      const firstDate = Array.isArray(data.eventDates)&&data.eventDates[0];
+      const dateLabel = firstDate ? new Date(firstDate.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : fmtDate(eventStart);
+      const venueLabel = data.venueName||data.city||'Venue TBA';
+      const isVIP = /vip|premium|gold|platinum/i.test(t.name||'');
+      return `
+      <div class="ticket-card ${i===0?'selected':''}" onclick="selectTicket(${i})" style="border:${i===0?'2px solid '+g1:'1.5px solid var(--border)'}">
+        <div style="background:linear-gradient(135deg,${g1},${g2});padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;">
+          ${showLogo&&logoUrl?`<img src="${esc(logoUrl)}" style="width:38px;height:38px;border-radius:9px;object-fit:contain;background:rgba(255,255,255,.15);flex:none;"/>`:`<div style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:1.1rem;flex:none;">&#127915;</div>`}
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:.5rem;">
+              <div style="font-size:.95rem;font-weight:800;color:#fff;">${esc(t.name||'General Admission')}</div>
+              ${isVIP?'<span class="ticket-vip-badge">VIP</span>':''}
+            </div>
+            ${showVenue?`<div style="font-size:.72rem;color:rgba(255,255,255,.75);margin-top:.15rem;">&#128205; ${esc(venueLabel)}</div>`:''}
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:${ticketSoldOut?'.82rem':'1.1rem'};font-weight:900;color:${ticketSoldOut?'#fecaca':'#fff'};">${priceStr}</div>
+            ${groupLabel?`<div style="font-size:.62rem;font-weight:800;color:#d9c6ff;margin-top:.25rem;white-space:nowrap;">${esc(groupLabel)}</div>`:''}
+            ${t.qty?`<div style="font-size:.65rem;color:rgba(255,255,255,.65);">${Number(t.qty).toLocaleString('en-IN')} seats</div>`:''}
+          </div>
         </div>
-        <div class="ticket-price">${t.price?`₹${Number(t.price).toLocaleString('en-IN')}`:'Free'}<br/><small>${t.available?Number(t.available).toLocaleString('en-IN')+' left':''}</small></div>
-      </div>`).join('');
-    document.getElementById('ticketsSection').style.display = 'block';
+        <div style="display:flex;align-items:center;border-top:2px dashed #e2eafc;">
+          <div style="width:1.2rem;height:1.2rem;border-radius:50%;background:#f0f4ff;border:1.5px solid #e2eafc;margin-left:-.65rem;"></div>
+          <div style="flex:1;"></div>
+          <div style="width:1.2rem;height:1.2rem;border-radius:50%;background:#f0f4ff;border:1.5px solid #e2eafc;margin-right:-.65rem;"></div>
+        </div>
+        <div style="padding:.85rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#fff;">
+          <div>
+            <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;">Date</div>
+            <div style="font-size:.88rem;font-weight:800;color:#0a0f1e;margin-top:.15rem;">${dateLabel}</div>
+            ${tagline?`<div style="font-size:.7rem;color:#64748b;font-style:italic;margin-top:.25rem;">${esc(tagline)}</div>`:''}
+            ${footer?`<div style="font-size:.65rem;color:#9ca3af;margin-top:.1rem;">${esc(footer)}</div>`:''}
+          </div>
+          ${showQR?`<div style="width:44px;height:44px;background:#0a0f1e;border-radius:7px;display:grid;place-items:center;"><svg width="34" height="34" viewBox="0 0 44 44" fill="none"><rect x="0" y="0" width="18" height="18" rx="2" fill="white"/><rect x="4" y="4" width="10" height="10" rx="1" fill="#0f172a"/><rect x="26" y="0" width="18" height="18" rx="2" fill="white"/><rect x="30" y="4" width="10" height="10" rx="1" fill="#0f172a"/><rect x="0" y="26" width="18" height="18" rx="2" fill="white"/><rect x="4" y="30" width="10" height="10" rx="1" fill="#0f172a"/><rect x="26" y="26" width="4" height="4" fill="white"/><rect x="32" y="26" width="4" height="4" fill="white"/><rect x="38" y="26" width="6" height="4" fill="white"/><rect x="26" y="32" width="6" height="4" fill="white"/><rect x="34" y="32" width="4" height="4" fill="white"/></svg></div>`:''}
+        </div>
+        <div style="padding:.5rem 1.1rem;background:#f8fafc;border-top:1px solid #f0f2f8;display:flex;align-items:center;gap:.5rem;">
+          <div class="ticket-radio"></div>
+          <span style="font-size:.74rem;font-weight:700;color:#64748b;">${i===0?'Selected':'Click to select'}</span>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('ticketsSection').style.display='block';
+  }
+
+  if(data.seatingPlanUrl){
+    document.getElementById('seatingPlanImage').src = data.seatingPlanUrl;
+    document.getElementById('seatingPlanSection').style.display = 'block';
+  } else if (data.seatingPlan && (Array.isArray(data.seatingPlan.rows) || Array.isArray(data.seatingPlan.sections))) {
+    renderSeatingLayout(data.seatingPlan, document.getElementById('seatingPlanBuilder'));
+    document.getElementById('seatingPlanImage').style.display = 'none';
+    document.getElementById('seatingPlanBuilder').style.display = 'block';
+    document.getElementById('seatingPlanSection').style.display = 'block';
+  }
+
+  // The desktop details shell is hidden on phones, so render the venue plan in
+  // the mobile Venue & seating section too.
+  const nightSeatingPlan = document.getElementById('nightSeatingPlan');
+  if(data.seatingPlanUrl){
+    nightSeatingPlan.innerHTML = `<img src="${esc(data.seatingPlanUrl)}" alt="Seating plan"/>`;
+    nightSeatingPlan.hidden = false;
+  } else if(data.seatingPlan && (Array.isArray(data.seatingPlan.rows) || Array.isArray(data.seatingPlan.sections))){
+    renderSeatingLayout(data.seatingPlan, nightSeatingPlan);
+    nightSeatingPlan.hidden = false;
+  } else {
+    nightSeatingPlan.hidden = true;
+    nightSeatingPlan.innerHTML = '';
   }
 
   // faqs
-  const faqs = data.faqs||[];
+  const faqs = Array.isArray(data.faqs) ? data.faqs.map(f => ({
+    question: String(f?.question || f?.q || f?.questionText || f?.title || '').trim(),
+    answer: String(f?.answer || f?.a || f?.answerText || f?.response || '').trim()
+  })).filter(f => f.question && f.answer) : [];
   if(faqs.length){
-    document.getElementById('faqsList').innerHTML = faqs.map(f=>`
-      <details style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:.85rem 1rem;margin-bottom:.6rem;">
-        <summary style="font-weight:800;font-size:.9rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">
-          ${esc(f.question)} <span style="color:var(--muted);font-size:1.1rem;">+</span>
-        </summary>
-        <div style="margin-top:.6rem;font-size:.86rem;color:#475569;line-height:1.65;">${esc(f.answer)}</div>
+    const faqMarkup = faqs.map(f=>`
+      <details class="faq-item">
+        <summary><span>${esc(f.question)}</span><span aria-hidden="true" style="color:var(--muted);font-size:1.1rem;flex:none;margin-left:1rem;">+</span></summary>
+        <div class="faq-ans">${esc(f.answer)}</div>
       </details>`).join('');
-    document.getElementById('faqsSection').style.display = 'block';
+    document.getElementById('faqsList').innerHTML = faqMarkup;
+    document.getElementById('mobileFaqsList').innerHTML = faqMarkup;
+    document.getElementById('faqsSection').style.display='block';
+    document.getElementById('mobileFaqsSection').hidden = false;
+  } else {
+    document.getElementById('faqsSection').style.display='none';
+    document.getElementById('mobileFaqsSection').hidden = true;
   }
 
   // load organiser
   if(data.ownerId){
-    db.collection('organisers').doc(data.ownerId).get().then(snap=>{
+    try{
+      const snap = await db.collection('organisers').doc(data.ownerId).get();
       const org = snap.exists ? snap.data() : {};
-      const name = org.name || 'Organiser';
+      console.log('org doc exists:', snap.exists, 'avatarUrl:', org.avatarUrl, 'ownerId:', data.ownerId);
+      const name = org.name || data.organiserName || 'Organiser';
       const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      ['orgAvatar','sideOrgAvatar'].forEach(id=>{
+      ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar','mobAboutHostAvatar','nightOrgAvatar'].forEach(id=>{
         const el = document.getElementById(id);
-        if(org.avatarUrl) el.innerHTML = `<img src="${esc(org.avatarUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
+        if(!el) return;
+        if(org.avatarUrl) el.innerHTML = `<img src="${org.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
         else el.textContent = initials;
       });
-      document.getElementById('orgName').textContent = name;
-      document.getElementById('sideOrgName').textContent = name;
-    });
+      ['orgName','sideOrgName','mobTopOrgName','mobHostedName','mobOrgName','mobAboutHostName','nightOrgName'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.textContent = name;
+      });
+      // fallback: also try users collection if organiser doc missing
+      if(!snap.exists){
+        const usnap = await db.collection('users').doc(data.ownerId).get();
+        if(usnap.exists){
+          const u = usnap.data();
+          const uname = u.name || u.displayName || 'Organiser';
+          const uinitials = uname.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+          ['orgAvatar','sideOrgAvatar','mobTopAvatar','mobOrgAvatar','mobAboutHostAvatar','nightOrgAvatar'].forEach(id=>{
+            const el = document.getElementById(id);
+            if(!el) return;
+            if(u.avatarUrl||u.photoURL) el.innerHTML = `<img src="${u.avatarUrl||u.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="avatar"/>`;
+            else el.textContent = uinitials;
+          });
+          ['orgName','sideOrgName','mobTopOrgName','mobHostedName','mobOrgName','mobAboutHostName','nightOrgName'].forEach(id=>{
+            const el = document.getElementById(id);
+            if(el) el.textContent = uname;
+          });
+        }
+      }
+    }catch(e){ console.error('org load error',e); }
   }
 }
 
+function renderAcceptedStalls(data){
+  const approvedStalls=(data.acceptedStalls||[]).filter(stall=>stall.status==='accepted');
+  const section=document.getElementById('acceptedStallsSection'),list=document.getElementById('acceptedStallsList');
+  if(section&&list){section.style.display=approvedStalls.length?'':'none';list.innerHTML=approvedStalls.map(stall=>`<article style="padding:.8rem;border-radius:12px;background:#fff;border:1px solid #efe7d8"><strong style="display:block">${esc(stall.stallName||'Event stall')}</strong><span style="display:block;color:#716650;font-size:.82rem;margin-top:.25rem">${esc(stall.description||stall.products||'')}</span>${stall.location?`<small style="display:block;color:#8a7653;margin-top:.35rem">${esc(stall.location)}</small>`:''}</article>`).join('');}
+}
+
+async function showFoodOrderingForEvent(data) {
+  const section = document.getElementById('foodAtEvent');
+  const links = document.getElementById('foodAtEventLinks');
+  if (!section || !links || !data.venueName) return;
+  try {
+    const snap = await db.collection('restaurants').where('venueName', '==', data.venueName).limit(20).get();
+    const matches = snap.docs.filter(doc => {
+      const restaurant = doc.data();
+      return ['published','live','active'].includes(String(restaurant.status||'').toLowerCase()) && Array.isArray(restaurant.menuItems) && restaurant.menuItems.length;
+    });
+    if (!matches.length) return;
+    links.innerHTML = matches.map(doc => {
+      const name = doc.data().name || data.venueName;
+      const href = `food-order.html?restaurantId=${encodeURIComponent(doc.id)}&eventId=${encodeURIComponent(data.id || eventId || '')}&eventName=${encodeURIComponent(data.name || '')}&venue=${encodeURIComponent(data.venueName || '')}`;
+      return `<a href="${href}" style="display:inline-flex;align-items:center;padding:.7rem 1rem;border-radius:9px;background:#b58a49;color:#fff;font-weight:800;text-decoration:none;">Order from ${esc(name)} →</a>`;
+    }).join('');
+    section.style.display = '';
+  } catch (error) { console.warn('Venue food menu:', error.message); }
+}
+
 async function init(){
-  if(!eventId){ document.getElementById('evTitle').textContent='Event not found'; return; }
+  let resolvedEventId = eventId;
+  if (resolvedEventId && eventSlug) {
+    const byId = await db.collection('events').doc(resolvedEventId).get();
+    if (byId.exists && slugifyEventName(byId.data().urlKey||byId.data().name) !== eventSlug) {
+      history.replaceState(null, '', getEventPath(byId.data().name,byId.data().urlKey,resolvedEventId));
+    }
+  }
+  if (!resolvedEventId && eventSlug) {
+    let matches = await db.collection('events').where('urlKey', '==', eventSlug).limit(1).get();
+    if (matches.empty) matches = await db.collection('events').where('slug', '==', eventSlug).limit(1).get();
+    if (!matches.empty) resolvedEventId = matches.docs[0].id;
+    if (!resolvedEventId) {
+      const allEvents = await db.collection('events').get();
+      const matchingEvent = allEvents.docs.find(doc => slugifyEventName(doc.data().name) === eventSlug || slugifyEventName(doc.data().urlKey) === eventSlug);
+      if (matchingEvent) resolvedEventId = matchingEvent.id;
+    }
+  }
+  if(!resolvedEventId){
+    if (eventSlug) { document.getElementById('evTitle').textContent='Event not found'; return; }
+    await renderEvent({name:'THURSDAY AFRO HOUSE AT RAASTA',summary:'Afro House Takeover · DJ RAM DASARP',description:"Turn your night into a full blown vibe as DJ Ram Dasarp takes over with an electrifying Afro House set designed to keep you moving. This is more than a party - it's an immersive escape where rhythm, mood and atmosphere fuse to create something unforgettable. Step into a darker, edgier space where deep beats and hypnotic grooves drive the floor into a trance. From Afro House grooves to late-night energy, every moment is made for the dancefloor.",venueName:'Raasta',city:'Madhapur, Hyderabad',startDate:new Date('2026-09-17'),dateLabel:'17th Sep - 24th Sep',dateMore:'+1 more',duration:180,price:1000,cardImgUrl:'party.jpg',galleryImages:['party.jpg','y.jpg','banner.jpeg','herosection.jpeg'],tickets:[{name:'General Admission',price:1000}]});
+    return;
+  }
 
   // check owner
   let myUid = null;
   try{
-    const res = await fetch('/api/auth/me',{credentials:'include'});
-    if(res.ok){ const p = await res.json(); myUid = p.user?.uid; }
+    const user = await getCurrentUser();
+    if(user){ myUid = user.uid; }
   }catch(e){}
 
-  const snap = await db.collection('events').doc(eventId).get();
+  const snap = await db.collection('events').doc(resolvedEventId).get();
   if(!snap.exists){ document.getElementById('evTitle').textContent='Event not found'; return; }
 
+  eventId = resolvedEventId;
   const data = {id:snap.id,...snap.data()};
-  renderEvent(data);
+  if (!eventSlug || eventSlug !== slugifyEventName(data.urlKey||data.name)) {
+    history.replaceState(null, '', getEventPath(data.name,data.urlKey,resolvedEventId));
+  }
+  await renderEvent(data);
+
+  db.collection('events').doc(resolvedEventId).onSnapshot(liveSnap=>{
+    if(!liveSnap.exists) return;
+    const liveData = liveSnap.data();
+    evData={...evData,...liveData};
+    renderAcceptedStalls(evData);
+    updateRegistrationStatus(evData);
+    evData.allowSharing = liveData.allowSharing;
+    evData.showAttendeeCount = liveData.showAttendeeCount;
+    if(liveData.showAttendeeCount!==false){
+      const count = Math.max(Number(liveData.totalBooked)||0,(liveData.tickets||[]).reduce((sum,ticket)=>sum + (Number(ticket.booked)||0),0));
+      document.getElementById('evAttendeeCount').textContent = count.toLocaleString('en-IN');
+      document.getElementById('evAttendeeCountRow').style.display='flex';
+      document.getElementById('mobAttendeeCount').textContent = count.toLocaleString('en-IN');
+      document.getElementById('mobAttendeeCountRow').style.display='flex';
+    }else{
+      document.getElementById('evAttendeeCountRow').style.display='none';
+      document.getElementById('mobAttendeeCountRow').style.display='none';
+    }
+    const sharingAllowed = liveData.allowSharing !== false;
+    document.querySelectorAll('[onclick="openShare()"]').forEach(button=>button.style.display=sharingAllowed?'':'none');
+    document.getElementById('nightShareCard').style.display=sharingAllowed?'':'none';
+  },error=>console.warn('Event display settings:',error.message));
 
   // show edit button if owner
   if(myUid && myUid === data.ownerId){
     const editBtn = document.getElementById('navEditBtn');
-    editBtn.href = `event-create.html?eventId=${eventId}`;
-    editBtn.style.display = 'inline-flex';
+    if(editBtn){ editBtn.href = `event-create.html?eventId=${eventId}`; editBtn.style.display='block'; }
   }
 }
 
@@ -393,5 +1664,18 @@ document.getElementById('shareModal').addEventListener('click', e=>{ if(e.target
 
 init();
 </script>
+<script>
+  const ham = document.getElementById('hamburger');
+  const mNav = document.getElementById('mobileNav');
+  if(ham) ham.addEventListener('click', () => {
+    ham.classList.toggle('open');
+    mNav.classList.toggle('open');
+    document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
+  });
+  if(mNav) mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    ham.classList.remove('open'); mNav.classList.remove('open'); document.body.style.overflow = '';
+  }));
+</script>
+<script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
 </body>
 </html>

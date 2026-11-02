@@ -1,0 +1,703 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isAnonymousApplicant() {
+      return request.auth != null &&
+        request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    function validListerActivation(uid, applicationId, tokenHash) {
+      let token = get(/databases/$(database)/documents/onboardingActivationTokens/$(tokenHash)).data;
+      let application = get(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data;
+      return request.auth != null && request.auth.uid == uid &&
+        token.applicationId == applicationId &&
+        token.email.lower() == request.auth.token.email.lower() &&
+        token.used == false && token.expiresAt > request.time &&
+        application.status == 'APPROVED' &&
+        application.email.lower() == request.auth.token.email.lower() &&
+        application.activationTokenHash == tokenHash;
+    }
+
+    // Public booking pages may update only the aggregate attendee counter.
+    // Event fields and attendee details remain owner/admin controlled.
+    function attendeeCountIncrement() {
+      let previous = resource.data.get('totalBooked', 0);
+      let next = request.resource.data.get('totalBooked', -1);
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalBooked']) &&
+        (previous is int || previous is float) && next is int &&
+        next > previous && next <= previous + 20 &&
+        resource.data.status in ['published', 'live', 'active'];
+    }
+
+    function validPaidProof(booking, eventId) {
+      let paymentId = booking.get('paymentId', '');
+      let proofPath = /databases/$(database)/documents/verifiedPayments/$(paymentId);
+      let proof = get(proofPath).data;
+      let bookingSeats = booking.get('seatIds', []);
+      let proofSeats = proof.get('seatIds', []);
+      return booking.get('status', '') == 'paid' &&
+        paymentId is string && paymentId.size() > 0 &&
+        proof.status == 'captured' && proof.paymentId == paymentId &&
+        proof.bookingId == booking.get('bookingId', '') &&
+        proof.eventId == eventId && proof.amount == booking.amount * 100 &&
+        proof.tickets == booking.get('seats', -1) &&
+        bookingSeats is list && proofSeats is list &&
+        bookingSeats.size() == proofSeats.size() &&
+        bookingSeats.hasAll(proofSeats) && proofSeats.hasAll(bookingSeats);
+    }
+
+    // Seat selections are written atomically with the corresponding booking.
+    // Public booking pages may append only the seats listed on that booking.
+    function bookedSeatAppend(eventId) {
+      let bookingId = request.resource.data.get('lastSeatBookingId', '');
+      let bookingPath = /databases/$(database)/documents/bookings/$(bookingId);
+      let booking = getAfter(bookingPath).data;
+      let oldSeats = resource.data.get('bookedSeats', []);
+      let newSeats = request.resource.data.get('bookedSeats', []);
+      let bookingSeats = booking.get('seatIds', []);
+      return bookingId is string && bookingId.size() > 0 &&
+        existsAfter(bookingPath) &&
+        booking.get('bookingId', '') == bookingId &&
+        booking.get('eventId', '') == eventId &&
+        booking.get('status', '') in ['confirmed', 'paid', 'success', 'completed'] &&
+        bookingSeats is list && bookingSeats.size() > 0 && bookingSeats.size() <= 20 &&
+        ((booking.get('status', '') == 'confirmed' && booking.get('amount', -1) == 0) ||
+          validPaidProof(booking, eventId)) &&
+        oldSeats is list && newSeats is list &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bookedSeats', 'lastSeatBookingId']) &&
+        newSeats.hasAll(oldSeats) &&
+        newSeats.hasAll(bookingSeats) &&
+        newSeats.size() == oldSeats.size() + bookingSeats.size() &&
+        resource.data.status in ['published', 'live', 'active'];
+    }
+
+    function waitlistEventAllows(eventId) {
+      let eventData = get(/databases/$(database)/documents/events/$(eventId)).data;
+      return eventData.allowWaitlist == true &&
+        eventData.status in ['published', 'live', 'active'] &&
+        (eventData.get('soldOut', false) == true ||
+          (eventData.overflowAction in ['waitlist', 'notify'] &&
+            eventData.get('capacity', 0) is number &&
+            eventData.get('capacity', 0) > 0 &&
+            eventData.get('totalBooked', 0) >= eventData.get('capacity', 0)));
+    }
+
+    function inviteAllowsBooking(eventId) {
+      let eventData = get(/databases/$(database)/documents/events/$(eventId)).data;
+      return eventData.get('inviteOnly', false) != true ||
+        (request.auth != null && exists(/databases/$(database)/documents/eventInviteClaims/$(eventId + '_' + request.auth.uid)));
+    }
+
+    function inviteAllowsWaitlist(eventId) {
+      return inviteAllowsBooking(eventId);
+    }
+
+    function validInviteClaim(eventId) {
+      let eventData = get(/databases/$(database)/documents/events/$(eventId)).data;
+      let access = get(/databases/$(database)/documents/eventAccess/$(eventId)).data;
+      let method = request.resource.data.get('method', '');
+      return eventData.get('inviteOnly', false) == true &&
+        request.resource.data.get('eventId', '') == eventId &&
+        request.resource.data.get('userId', '') == request.auth.uid &&
+        ((method == 'email' && request.auth.token.email in access.get('guestEmails', [])) ||
+         (method == 'code' && access.get('inviteCode', '') != '' &&
+          request.resource.data.get('inviteCode', '') == access.get('inviteCode', '')) ||
+         (method == 'link' && access.get('inviteLinkEnabled', false) == true &&
+          access.get('inviteToken', '') != '' &&
+          request.resource.data.get('inviteToken', '') == access.get('inviteToken', '') &&
+          get(/databases/$(database)/documents/eventAccessLinks/$(request.resource.data.get('inviteToken', ''))).data.eventId == eventId));
+    }
+
+    function ownsEvent(eventId) {
+      return request.auth != null &&
+        (get(/databases/$(database)/documents/events/$(eventId)).data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    // Legacy client OTP storage is disabled. New onboarding OTPs are server only.
+    match /emailOtps/{email} {
+      allow read, write: if false;
+    }
+
+    // User documents are self-readable; privileged accounts are server created.
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      // Lister/admin accounts are provisioned only by trusted server code.
+      // Preserve ordinary customer sign-up without granting a privileged role.
+      allow create: if (request.auth != null && request.auth.uid == uid &&
+        request.resource.data.role in ['client', 'customer'] &&
+        request.resource.data.get('status', '') != 'admin') ||
+        (request.resource.data.role == 'lister' &&
+         request.resource.data.uid == uid &&
+         validListerActivation(uid, request.resource.data.onboardingApplicationId, request.resource.data.activationTokenHash));
+      allow update: if isAdmin() || (request.auth != null && request.auth.uid == uid &&
+        request.resource.data.get('role', '') == resource.data.get('role', '') &&
+        request.resource.data.get('status', '') == resource.data.get('status', '')) ||
+        (request.auth != null && request.auth.uid == uid &&
+         resource.data.role in ['client', 'customer'] &&
+         request.resource.data.role == 'lister' &&
+         validListerActivation(uid, request.resource.data.onboardingApplicationId, request.resource.data.activationTokenHash));
+      allow delete: if isAdmin();
+
+      match /following/{organiserId} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null && request.auth.uid == uid &&
+          request.resource.data.organiserId == organiserId &&
+          exists(/databases/$(database)/documents/organisers/$(organiserId));
+        allow delete: if request.auth != null && request.auth.uid == uid;
+        allow update: if false;
+      }
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Notification creation is server-only so clients cannot trigger push delivery to others.
+      allow write: if false;
+    }
+
+    match /publicPushSubscriptions/{subscriptionId} {
+      allow read: if false;
+      allow create: if request.auth != null &&
+        request.resource.data.keys().hasOnly(['endpoint', 'keys', 'ownerUid', 'createdAt']) &&
+        request.resource.data.ownerUid == request.auth.uid &&
+        request.resource.data.endpoint is string && request.resource.data.endpoint.size() <= 3000 &&
+        request.resource.data.get('keys', {}).get('p256dh', '') is string &&
+        request.resource.data.get('keys', {}).get('auth', '') is string &&
+        request.resource.data.createdAt == request.time;
+      allow update: if request.auth != null && resource.data.ownerUid == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['endpoint', 'keys', 'createdAt']) &&
+        request.resource.data.ownerUid == resource.data.ownerUid &&
+        request.resource.data.endpoint is string && request.resource.data.endpoint.size() <= 3000 &&
+        request.resource.data.get('keys', {}).get('p256dh', '') is string &&
+        request.resource.data.get('keys', {}).get('auth', '') is string &&
+        request.resource.data.createdAt == request.time;
+      allow delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Authenticated users can read/write their own data
+    match /events/{id} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid &&
+        (request.resource.data.get('type', '') != 'ad_campaign' || request.resource.data.status == 'pending_review');
+      allow update: if (request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin())) ||
+        attendeeCountIncrement() || bookedSeatAppend(id);
+      allow delete: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /stallApplications/{applicationId} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.ownerUid == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid &&
+        applicationId == request.resource.data.paymentId &&
+        request.resource.data.slotIndex is int && request.resource.data.slotIndex >= 0 && request.resource.data.slotIndex < 5 &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.termsAccepted == true &&
+        request.resource.data.eventId is string &&
+        request.resource.data.paymentId is string &&
+        request.resource.data.fee is number &&
+        request.resource.data.stallName is string &&
+        request.resource.data.email is string &&
+        exists(/databases/$(database)/documents/verifiedPayments/$(request.resource.data.paymentId)) &&
+        get(/databases/$(database)/documents/verifiedPayments/$(request.resource.data.paymentId)).data.status == 'captured' &&
+        get(/databases/$(database)/documents/verifiedPayments/$(request.resource.data.paymentId)).data.bookingId == request.resource.data.paymentId &&
+        get(/databases/$(database)/documents/verifiedPayments/$(request.resource.data.paymentId)).data.eventId == request.resource.data.eventId &&
+        get(/databases/$(database)/documents/verifiedPayments/$(request.resource.data.paymentId)).data.amount == request.resource.data.fee * 100 &&
+        (get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.stallSlots[request.resource.data.slotIndex].open == true ||
+          get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.stallSlots[request.resource.data.slotIndex].applicationPaymentId == request.resource.data.paymentId) &&
+        get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.stallSlots[request.resource.data.slotIndex].fee == request.resource.data.fee;
+      allow update, delete: if isAdmin();
+    }
+
+    // Event stall listings are managed by the lister who owns the parent event.
+    match /stalls/{stallId} {
+      allow read: if true;
+      allow create: if request.auth != null &&
+        request.resource.data.ownerId == request.auth.uid &&
+        request.resource.data.eventId is string &&
+        exists(/databases/$(database)/documents/events/$(request.resource.data.eventId)) &&
+        get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.ownerId == request.auth.uid &&
+        request.resource.data.name is string && request.resource.data.name.size() > 0 &&
+        request.resource.data.category is string &&
+        request.resource.data.status == 'active';
+      allow update, delete: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /eventAccess/{eventId} {
+      allow read, write: if ownsEvent(eventId);
+    }
+
+    match /eventAccessLinks/{token} {
+      allow read: if request.auth != null && resource.data.ownerId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid &&
+        ownsEvent(request.resource.data.eventId);
+      allow update: if request.auth != null && resource.data.ownerId == request.auth.uid &&
+        ownsEvent(resource.data.eventId);
+      allow delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /eventInviteClaims/{claimId} {
+      allow create: if request.auth != null && validInviteClaim(request.resource.data.eventId);
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || ownsEvent(resource.data.eventId));
+      allow update, delete: if request.auth != null && ownsEvent(resource.data.eventId);
+    }
+
+    match /bookings/{id} {
+      allow read: if
+        // Guest opening their own invite link — bookingId is the secret
+        id == resource.data.bookingId ||
+        (request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        (request.auth.token.email_verified == true &&
+          request.auth.token.email is string &&
+          resource.data.get('customerEmail', '') is string &&
+          resource.data.get('customerEmail', '') == request.auth.token.email.lower()) ||
+        resource.data.organiserId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid || isAdmin()
+        || (resource.data.eventId != null &&
+          get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.ownerId == request.auth.uid)
+      ));
+      allow create: if request.resource.data.eventId is string &&
+        (request.resource.data.get('userId', null) == null ||
+          (request.auth != null && request.resource.data.userId == request.auth.uid)) &&
+        (request.auth == null
+          ? get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.get('inviteOnly', false) != true &&
+            ((request.resource.data.get('amount', -1) == 0 && request.resource.data.get('status', '') == 'confirmed') || validPaidProof(request.resource.data, request.resource.data.eventId))
+          : (ownsEvent(request.resource.data.eventId) ||
+            (inviteAllowsBooking(request.resource.data.eventId) &&
+              ((request.resource.data.get('amount', -1) == 0 && request.resource.data.get('status', '') == 'confirmed') || validPaidProof(request.resource.data, request.resource.data.eventId)))));
+      allow update: if (request.auth != null && ownsEvent(resource.data.eventId)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'confirmationEmail', 'confirmationEmailStatus', 'confirmationEmailSentAt'
+        ]) && (resource.data.get('amount', -1) == 0 || validPaidProof(resource.data, resource.data.eventId))) ||
+        (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checkedIn', 'checkedInAt', 'checkedInDate'
+        ]));
+      allow delete: if request.auth != null;
+    }
+
+    // Guests can join a waitlist only for an event that has enabled it.
+    // Attendees can read their own entry; event owners can manage their entries.
+    match /waitlist/{entryId} {
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.eventId is string &&
+        waitlistEventAllows(request.resource.data.eventId) &&
+        inviteAllowsWaitlist(request.resource.data.eventId) &&
+        request.resource.data.ownerId == get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.ownerId &&
+        request.resource.data.status == 'waiting';
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid || isAdmin()
+      );
+      allow update, delete: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /payments/{id} {
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.organiserId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid || isAdmin()
+        || (resource.data.eventId != null &&
+          get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.ownerId == request.auth.uid)
+      );
+      allow create: if request.resource.data.eventId is string &&
+        (request.auth == null
+          ? get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.get('inviteOnly', false) != true &&
+            ((request.resource.data.get('amount', -1) == 0 && request.resource.data.get('status', '') == 'confirmed') || validPaidProof(request.resource.data, request.resource.data.eventId))
+          : (ownsEvent(request.resource.data.eventId) ||
+            (inviteAllowsBooking(request.resource.data.eventId) &&
+              ((request.resource.data.get('amount', -1) == 0 && request.resource.data.get('status', '') == 'confirmed') || validPaidProof(request.resource.data, request.resource.data.eventId)))));  // event owners can issue invitation tickets
+      allow update, delete: if request.auth != null && ownsEvent(resource.data.eventId);
+    }
+
+    match /verifiedPayments/{paymentId} {
+      allow read, write: if false;
+    }
+
+    // Checkout attempts include customer contact details and are written by
+    // trusted server services; expose them only to authenticated admins.
+    match /razorpayOrders/{orderId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /wallets/{uid} {
+      // Wallet balance is changed only by trusted payment/redemption services.
+      // Other existing wallet fields (such as organiser credits) remain owner editable.
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid &&
+        !('balance' in request.resource.data);
+      allow update: if request.auth != null && request.auth.uid == uid &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['balance', 'lastGiftCardId', 'lastBookingPaymentId']);
+      allow delete: if false;
+    }
+
+    match /giftCards/{giftCardId} {
+      allow read, write: if false;
+    }
+    match /giftCardPurchases/{purchaseId} {
+      allow read, write: if false;
+    }
+
+    match /kyc/{uid} {
+      // Identity data should be handled only by trusted Admin SDK routes.
+      allow read, write: if isAdmin();
+    }
+
+    // Vendor onboarding contains PAN, Aadhaar and banking data. Keep all
+    // application reads and writes in a trusted Admin SDK endpoint.
+    match /vendorApplications/{uid} {
+      // Application data includes government IDs and financial account details.
+      // Keep all application reads and writes in the Admin SDK only.
+      allow read, write: if isAdmin();
+    }
+
+    match /vendorOnboarding/{applicationId} {
+      // Public listers may create a new application only through a short-lived
+      // anonymous Firebase identity. Applicant data and KYC images remain
+      // readable only by administrators; applicants cannot change submissions.
+      allow create: if request.auth != null &&
+        request.auth.token.firebase.sign_in_provider == 'anonymous' &&
+        request.resource.data.keys().hasOnly([
+          'applicationId', 'email', 'emailVerified', 'applicantUid', 'name', 'contact',
+          'vendor', 'business', 'address', 'listing', 'bank', 'identity', 'consent',
+          'documents', 'documentIds', 'status', 'agreementStatus', 'userId',
+          'preferredCategory', 'preferredDashboard',
+          'submittedAt', 'createdAt', 'updatedAt', 'consentAt'
+        ]) &&
+        (!('preferredCategory' in request.resource.data.keys()) ||
+          (request.resource.data.preferredCategory is string && request.resource.data.preferredCategory.size() <= 40)) &&
+        (!('preferredDashboard' in request.resource.data.keys()) ||
+          request.resource.data.preferredDashboard in ['dashboard-nightlife.html', 'dashboard-brunch.html', 'dashboard-restaurant.html', 'dashboard-workshops.html', 'dashboard-experiences.html', 'dashboard-livemusic.html', 'premium-client-dashboard.html']) &&
+        request.resource.data.applicationId == applicationId &&
+        request.resource.data.applicantUid == request.auth.uid &&
+        request.resource.data.emailVerified == true &&
+        request.resource.data.email is string && request.resource.data.email.size() <= 180 &&
+        request.resource.data.email == request.resource.data.contact.email &&
+        request.resource.data.name is string && request.resource.data.name.size() > 0 &&
+        request.resource.data.status == 'NEW' &&
+        request.resource.data.agreementStatus == 'NOT_SENT' &&
+        request.resource.data.userId == null && request.resource.data.consent == true &&
+        request.resource.data.documents is list && request.resource.data.documents.size() >= 2 && request.resource.data.documents.size() <= 12 &&
+        request.resource.data.documentIds is list && request.resource.data.documentIds.size() == request.resource.data.documents.size() &&
+        request.resource.data.submittedAt == request.time && request.resource.data.createdAt == request.time;
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isAnonymousApplicant() &&
+        resource.data.status != 'SIGNED' &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status', 'agreementStatus', 'signedAgreement', 'updatedAt'
+        ]) &&
+        request.resource.data.status == 'SIGNED' &&
+        request.resource.data.agreementStatus == 'SIGNED' &&
+        request.resource.data.updatedAt == request.time &&
+        request.resource.data.signedAgreement is map &&
+        request.resource.data.signedAgreement.keys().hasOnly([
+          'path', 'name', 'tokenHash', 'signerName', 'signerAddress',
+          'signingDate', 'signerEmail', 'signedAt'
+        ]) &&
+        request.resource.data.signedAgreement.path == 'firestore-signed:final' &&
+        request.resource.data.signedAgreement.name == 'SIGNED_VENDOR_AGREEMENT.pdf' &&
+        request.resource.data.signedAgreement.tokenHash is string &&
+        request.resource.data.signedAgreement.signerName is string &&
+        request.resource.data.signedAgreement.signerAddress is string &&
+        request.resource.data.signedAgreement.signingDate is string &&
+        request.resource.data.signedAgreement.signerEmail is string &&
+        request.resource.data.signedAgreement.signedAt == request.time &&
+        get(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.applicationId == applicationId &&
+        getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.used == true &&
+        getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.signerUid == request.auth.uid &&
+        getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.signedAgreement.tokenHash)).data.signedAgreementId == 'final'
+      ) || (request.auth != null &&
+        resource.data.status == 'APPROVED' &&
+        resource.data.email.lower() == request.auth.token.email.lower() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['userId', 'accountSetupStatus', 'updatedAt']) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.accountSetupStatus == 'ACTIVE' &&
+        request.resource.data.updatedAt == request.time &&
+        validListerActivation(request.auth.uid, applicationId, resource.data.get('activationTokenHash', '')) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'lister' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.onboardingApplicationId == applicationId &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.activationTokenHash == resource.data.get('activationTokenHash', '')
+      );
+
+      match /documents/{fileId} {
+        allow get, list: if isAdmin();
+        allow create: if request.auth != null &&
+          request.auth.token.firebase.sign_in_provider == 'anonymous' &&
+          request.resource.data.keys().hasOnly([
+            'applicationId', 'fileId', 'applicantUid', 'type', 'name',
+            'contentType', 'size', 'dataUrl', 'uploadedAt'
+          ]) &&
+          request.resource.data.applicationId == applicationId &&
+          request.resource.data.fileId == fileId &&
+          request.resource.data.applicantUid == request.auth.uid &&
+          request.resource.data.type in ['pan', 'aadhaar', 'Business registration', 'Address proof', 'Cancelled cheque', 'GST certificate', 'MSME / Udyam', 'Other'] &&
+          request.resource.data.contentType == 'image/jpeg' &&
+          request.resource.data.dataUrl is string && request.resource.data.dataUrl.size() <= 560000 &&
+          request.resource.data.dataUrl.matches('^data:image/jpeg;base64,.*') &&
+          request.resource.data.size is int && request.resource.data.size <= 450000 &&
+          request.resource.data.uploadedAt == request.time &&
+          getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.applicantUid == request.auth.uid &&
+          getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.documentIds.hasAny([fileId]);
+        allow update, delete: if isAdmin();
+      }
+
+      match /activity/{activityId} {
+        allow get, list: if isAdmin();
+        allow create: if request.auth != null &&
+          request.auth.token.firebase.sign_in_provider == 'anonymous' &&
+          request.resource.data.keys().hasOnly(['applicationId', 'action', 'performedBy', 'applicantUid', 'timestamp']) &&
+          request.resource.data.applicationId == applicationId &&
+          request.resource.data.action == 'Application Submitted' &&
+          request.resource.data.performedBy == 'applicant' &&
+          request.resource.data.applicantUid == request.auth.uid &&
+          request.resource.data.timestamp == request.time &&
+          getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.applicantUid == request.auth.uid;
+        allow update, delete: if isAdmin();
+      }
+
+      match /signedAgreement/{agreementId} {
+        allow get: if isAdmin() || (
+          isAnonymousApplicant() && agreementId == 'final' &&
+          resource.data.applicationId == applicationId &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(resource.data.tokenHash)).data.applicationId == applicationId &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(resource.data.tokenHash)).data.used == true
+        );
+        allow list: if isAdmin();
+        allow create: if isAdmin() || (
+          isAnonymousApplicant() && agreementId == 'final' &&
+          request.resource.data.keys().hasOnly([
+            'applicationId', 'tokenHash', 'signerUid', 'signerName',
+            'signerAddress', 'signerEmail', 'signingDate', 'serviceFeePercent',
+            'dataUrl', 'signatureDataUrl', 'contentType', 'size', 'createdAt'
+          ]) &&
+          request.resource.data.applicationId == applicationId &&
+          request.resource.data.tokenHash is string &&
+          request.resource.data.signerUid == request.auth.uid &&
+          request.resource.data.signerName is string &&
+          request.resource.data.signerAddress is string &&
+          request.resource.data.signerEmail is string &&
+          request.resource.data.signingDate is string &&
+          request.resource.data.serviceFeePercent is number &&
+          request.resource.data.contentType == 'application/pdf' &&
+          request.resource.data.dataUrl is string &&
+          request.resource.data.dataUrl.size() <= 900000 &&
+          request.resource.data.dataUrl.matches('^data:application/pdf;base64,.*') &&
+          request.resource.data.signatureDataUrl is string &&
+          request.resource.data.signatureDataUrl.size() <= 100000 &&
+          request.resource.data.signatureDataUrl.matches('^data:image/png;base64,.*') &&
+          request.resource.data.size is int && request.resource.data.size <= 675000 &&
+          request.resource.data.createdAt == request.time &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.applicationId == applicationId &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.used == false &&
+          get(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.expiresAt > request.time &&
+          getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.used == true &&
+          getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.signerUid == request.auth.uid &&
+          getAfter(/databases/$(database)/documents/onboardingSigningTokens/$(request.resource.data.tokenHash)).data.signedAgreementId == agreementId
+        );
+        allow update, delete: if isAdmin();
+      }
+    }
+    match /onboardingCounters/{counterId} {
+      allow read, write: if false;
+    }
+    match /onboardingOtp/{documentId} {
+      allow read, write: if false;
+    }
+    match /onboardingSessions/{documentId} {
+      allow read, write: if false;
+    }
+    match /onboardingActivity/{activityId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /onboardingSigningTokens/{tokenHash} {
+      allow get: if isAdmin() || (isAnonymousApplicant() &&
+        ((resource.data.used == false && resource.data.expiresAt > request.time) ||
+         (resource.data.used == true && resource.data.signedAgreementId == 'final')));
+      allow list: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly([
+          'applicationId', 'email', 'name', 'businessName', 'address',
+          'fee', 'agreementText', 'createdAt', 'expiresAt', 'used', 'signerUid'
+        ]) &&
+        request.resource.data.applicationId is string &&
+        request.resource.data.email is string &&
+        request.resource.data.name is string &&
+        request.resource.data.businessName is string &&
+        request.resource.data.address is string &&
+        request.resource.data.fee is number &&
+        request.resource.data.agreementText is string &&
+        request.resource.data.agreementText.size() <= 30000 &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.expiresAt is timestamp &&
+        request.resource.data.used == false && request.resource.data.signerUid == null;
+      allow update: if isAdmin() || (
+        isAnonymousApplicant() && resource.data.used == false &&
+        resource.data.expiresAt > request.time &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'used', 'signerUid', 'signedAgreementId', 'signedAt'
+        ]) &&
+        request.resource.data.used == true &&
+        request.resource.data.signerUid == request.auth.uid &&
+        request.resource.data.signedAgreementId == 'final' &&
+        request.resource.data.signedAt == request.time &&
+        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.status == 'SIGNED' &&
+        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.signedAgreement.tokenHash == tokenHash &&
+        getAfter(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)/signedAgreement/final).data.tokenHash == tokenHash
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /onboardingActivationTokens/{tokenHash} {
+      allow get: if isAdmin() || (request.auth != null &&
+        resource.data.expiresAt > request.time &&
+        (resource.data.used == false || resource.data.activatedBy == request.auth.uid));
+      allow list: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly([
+          'applicationId', 'email', 'name', 'businessName', 'phone',
+          'preferredCategory', 'preferredDashboard', 'createdAt', 'expiresAt', 'used', 'activatedBy'
+        ]) &&
+        (!('preferredCategory' in request.resource.data.keys()) ||
+          (request.resource.data.preferredCategory is string && request.resource.data.preferredCategory.size() <= 40)) &&
+        (!('preferredDashboard' in request.resource.data.keys()) ||
+          request.resource.data.preferredDashboard in ['dashboard-nightlife.html', 'dashboard-brunch.html', 'dashboard-restaurant.html', 'dashboard-workshops.html', 'dashboard-experiences.html', 'dashboard-livemusic.html', 'premium-client-dashboard.html']) &&
+        request.resource.data.applicationId is string &&
+        request.resource.data.email is string &&
+        request.resource.data.name is string &&
+        request.resource.data.businessName is string &&
+        request.resource.data.phone is string &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.expiresAt is timestamp &&
+        request.resource.data.used == false &&
+        request.resource.data.activatedBy == null;
+      allow update: if request.auth != null &&
+        resource.data.used == false &&
+        resource.data.email.lower() == request.auth.token.email.lower() &&
+        resource.data.expiresAt > request.time &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'activatedBy', 'activatedAt']) &&
+        request.resource.data.used == true &&
+        request.resource.data.activatedBy == request.auth.uid &&
+        request.resource.data.activatedAt == request.time &&
+        get(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.userId == request.auth.uid &&
+        get(/databases/$(database)/documents/vendorOnboarding/$(resource.data.applicationId)).data.accountSetupStatus == 'ACTIVE' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'lister' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.onboardingApplicationId == resource.data.applicationId &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.activationTokenHash == tokenHash;
+      allow delete: if isAdmin();
+    }
+
+    match /organisers/{uid} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /playlists/{id} {
+      // Saved playlists are guest-facing content; only owners/admins may mutate them.
+      allow read: if true;
+      allow create: if request.auth != null && (request.auth.uid == request.resource.data.ownerId || isAdmin());
+      allow update, delete: if request.auth != null && (request.auth.uid == resource.data.ownerId || isAdmin());
+    }
+
+    match /campaigns/{id} {
+      allow read: if request.auth != null && (isAdmin() || resource.data.ownerId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow update: if request.auth != null && (isAdmin() ||
+        (resource.data.ownerId == request.auth.uid &&
+         request.resource.data.ownerId == resource.data.ownerId &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+           'name', 'urlKey', 'summary', 'description', 'goal', 'category', 'tags', 'platforms',
+           'influencerTier', 'targetAge', 'targetGender', 'targetLocation', 'startDate', 'endDate',
+           'applicationDeadline', 'contentDeadline', 'currency', 'totalBudget', 'perInfluencerBudget',
+           'paymentType', 'commissionRate', 'targetReach', 'targetImpressions', 'targetEngagement',
+           'openApplication', 'autoApprove', 'requireMediaKit', 'minFollowers', 'minEngagement',
+           'maxInfluencers', 'mandatoryMentions', 'dosList', 'dontsList', 'requireApproval',
+           'requireCaptionApproval', 'approvalDays', 'coverUrl', 'videoUrl', 'briefNotes',
+           'influencers', 'deliverables', 'coupons', 'faqs', 'publicListing', 'showStats',
+           'notifyApps', 'allowSharing', 'ndaRequired', 'termsText', 'updatedAt',
+           'creativeUrl', 'creativePath', 'creativeName', 'creativeType', 'packageId'
+         ])));
+      allow delete: if request.auth != null && (isAdmin() || resource.data.ownerId == request.auth.uid);
+    }
+
+    match /adPackageOrders/{id} {
+      allow read: if request.auth != null && (isAdmin() || resource.data.ownerId == request.auth.uid);
+      allow write: if false;
+    }
+
+    match /webinars/{id} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /restaurants/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /foodOrders/{id} {
+      allow create: if request.resource.data.restaurantId is string &&
+        exists(/databases/$(database)/documents/restaurants/$(request.resource.data.restaurantId)) &&
+        get(/databases/$(database)/documents/restaurants/$(request.resource.data.restaurantId)).data.status in ['published', 'live', 'active'] &&
+        get(/databases/$(database)/documents/restaurants/$(request.resource.data.restaurantId)).data.menuItems is list &&
+        request.resource.data.ownerId == get(/databases/$(database)/documents/restaurants/$(request.resource.data.restaurantId)).data.ownerId &&
+        request.resource.data.customerName is string &&
+        request.resource.data.customerPhone is string &&
+        request.resource.data.items is list && request.resource.data.items.size() > 0 &&
+        request.resource.data.total is number && request.resource.data.total > 0 &&
+        request.resource.data.status == 'new' &&
+        request.resource.data.paymentStatus == 'pay_at_venue';
+      allow read: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+      allow update: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin()) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']);
+      allow delete: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /clientProjects/{id} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /payouts/{id} {
+      allow read, write: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /inquiries/{id} {
+      allow read, write: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    match /surveys/{id} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /surveyResponses/{id} {
+      allow create: if true;
+      allow read: if request.auth != null && resource.data.ownerId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Admin-only collections — only authenticated users (admin check done in app)
+    match /adminLogs/{id} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

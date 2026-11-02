@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Check-In Scanner</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+        authDomain: "ogshootsluxe-36740.firebaseapp.com",
+        projectId: "ogshootsluxe-36740",
+        storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+        messagingSenderId: "5471814825",
+        appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+      });
+    }
+  </script>
+  <style>
+    :root{
+      --blue:#3b5bdb;--blue-2:#4c6ef5;--green:#2f9e44;--green-light:#ebfbee;
+      --orange:#e67700;--red:#c92a2a;--border:#e9ecef;--muted:#868e96;
+      --text:#1a1a2e;--bg:#f8f9fa;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.25rem;}
+
+    .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem;}
+    .page-title{font-size:1.1rem;font-weight:800;letter-spacing:-.03em;color:var(--text);}
+    .page-sub{font-size:.78rem;color:var(--muted);margin-top:.15rem;}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    @media(max-width:700px){.grid{grid-template-columns:1fr;}}
+
+    /* STATS */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem;}
+    .stat-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:.9rem 1rem;text-align:center;}
+    .stat-num{font-size:1.8rem;font-weight:800;letter-spacing:-.04em;}
+    .stat-num.green{color:var(--green);}
+    .stat-num.orange{color:var(--orange);}
+    .stat-num.blue{color:var(--blue);}
+    .stat-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:.2rem;}
+
+    /* CARD */
+    .card{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    .card-head{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .card-head h2{font-size:.92rem;font-weight:800;}
+    .card-head p{font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+    .card-body{padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.85rem;}
+
+    /* SCANNER */
+    .scanner-box{border:2px dashed var(--border);border-radius:12px;overflow:hidden;background:#f8f9fa;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative;}
+    .scanner-box.active{border-color:var(--blue);background:#000;}
+    #reader{width:100%;}
+    #reader video{width:100%!important;border-radius:0;}
+
+    .start-btn{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.4rem;border-radius:10px;background:var(--blue);color:#fff;font-weight:700;font-size:.88rem;border:0;cursor:pointer;box-shadow:0 4px 14px rgba(59,91,219,.3);}
+    .start-btn:hover{background:var(--blue-2);}
+    .stop-btn{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.4rem;border-radius:10px;background:#fff;color:var(--red);font-weight:700;font-size:.88rem;border:1.5px solid #fca5a5;cursor:pointer;}
+    .stop-btn:hover{background:#fff5f5;}
+
+    .scan-status{text-align:center;font-size:.82rem;font-weight:600;color:var(--muted);padding:.4rem 0;}
+    .scan-status.active{color:var(--blue);animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{opacity:.5;}50%{opacity:1;}}
+
+    /* MANUAL */
+    .manual-row{display:flex;gap:.5rem;}
+    .manual-row input{flex:1;padding:.62rem .85rem;border-radius:9px;border:1px solid var(--border);font:inherit;font-size:.86rem;color:var(--text);outline:none;}
+    .manual-row input:focus{border-color:var(--blue);}
+    .manual-row button{padding:.62rem 1.1rem;border-radius:9px;background:var(--green);border:0;color:#fff;font-weight:700;font-size:.84rem;cursor:pointer;white-space:nowrap;}
+    .manual-row button:hover{background:#25803a;}
+
+    /* RESULT */
+    .result{border-radius:12px;padding:1rem;display:none;flex-direction:column;gap:.65rem;}
+    .result.success{background:#f0fdf4;border:1.5px solid #86efac;}
+    .result.already{background:#fffbeb;border:1.5px solid #fde68a;}
+    .result.failed{background:#fff5f5;border:1.5px solid #fca5a5;}
+    .result.notfound{background:#f8f9fa;border:1.5px solid var(--border);}
+
+    .result-icon{font-size:2rem;text-align:center;}
+    .result-title{font-size:1rem;font-weight:800;text-align:center;}
+    .result.success .result-title{color:var(--green);}
+    .result.already .result-title{color:var(--orange);}
+    .result.failed .result-title{color:var(--red);}
+    .result.notfound .result-title{color:var(--muted);}
+
+    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+    .result-field{background:#fff;border:1px solid var(--border);border-radius:9px;padding:.55rem .75rem;}
+    .result-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.15rem;}
+    .result-value{font-size:.86rem;font-weight:700;color:var(--text);}
+
+    .scan-again{width:100%;padding:.65rem;border-radius:9px;background:#fff;border:1.5px solid var(--border);color:var(--text);font-weight:700;font-size:.84rem;cursor:pointer;}
+    .scan-again:hover{border-color:var(--blue);color:var(--blue);}
+
+    /* LOG */
+    .log-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;border-radius:10px;background:#f8f9fa;border:1px solid var(--border);margin-bottom:.4rem;}
+    .log-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+    .log-dot.green{background:var(--green);}
+    .log-dot.yellow{background:var(--orange);}
+    .log-dot.red{background:var(--red);}
+    .log-info{flex:1;min-width:0;}
+    .log-info strong{display:block;font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
+    .log-info span{font-size:.72rem;color:var(--muted);}
+    .log-time{font-size:.7rem;color:var(--muted);white-space:nowrap;}
+
+    .empty-log{text-align:center;padding:1.5rem;color:var(--muted);font-size:.82rem;border:1px dashed var(--border);border-radius:10px;}
+  </style>
+</head>
+<body>
+
+<div class="page-head">
+  <div>
+    <div class="page-title">📷 Check-In Scanner</div>
+    <div class="page-sub">Scan attendee QR codes to verify and check in</div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-num blue" id="statRegistered">0</div>
+    <div class="stat-label">Registered</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num green" id="statCheckedIn">0</div>
+    <div class="stat-label">Checked In</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num orange" id="statTotal">0</div>
+    <div class="stat-label">Total Scans</div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- LEFT: Scanner + Manual -->
+  <div style="display:flex;flex-direction:column;gap:1rem;">
+
+    <div class="card">
+      <div class="card-head">
+        <div><h2>Camera Scanner</h2><p>Point camera at the QR code on the ticket</p></div>
+        <div style="display:flex;gap:.5rem;" id="scanBtnWrap">
+          <button class="start-btn" id="startBtn" onclick="startScanner()">▶ Start Camera</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="scanner-box" id="scannerBox">
+          <div id="reader"></div>
+          <div id="scannerPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:2rem;">
+            <div style="font-size:2.5rem;">📷</div>
+            <div style="font-size:.86rem;font-weight:600;color:var(--muted);">Click Start Camera to begin scanning</div>
+          </div>
+        </div>
+        <div class="scan-status" id="scanStatus">Ready — click Start Camera</div>
+
+        <!-- Result -->
+        <div class="result" id="result">
+          <div class="result-icon" id="resultIcon"></div>
+          <div class="result-title" id="resultTitle"></div>
+          <div class="result-grid" id="resultGrid"></div>
+          <button class="scan-again" onclick="resetResult()">🔄 Scan Next Attendee</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><h2>Manual Entry</h2><p>Type booking ID if QR won't scan</p></div></div>
+      <div class="card-body">
+        <div class="manual-row">
+          <input type="text" id="manualId" placeholder="Enter Booking ID e.g. CV1234567890…"/>
+          <button onclick="manualLookup()">✓ Check In</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Scan Log -->
+  <div class="card">
+    <div class="card-head"><div><h2>Recent Scans</h2><p>Live check-in activity</p></div></div>
+    <div class="card-body" style="max-height:520px;overflow-y:auto;">
+      <div id="scanLog">
+        <div class="empty-log">No scans yet — start scanning to see activity here</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const db = firebase.firestore();
+  let scanner = null;
+  let scanning = false;
+  let paused = false;
+  let stats = { total: 0 };
+
+  // ── LOAD LIVE COUNTS FROM FIRESTORE ──
+  function loadLiveCounts() {
+    db.collection('bookings').onSnapshot(snap => {
+      const all = snap.docs.map(d => d.data());
+      const registered = all.length;
+      const checkedIn  = all.filter(d => d.checkedIn).length;
+      document.getElementById('statRegistered').textContent = registered;
+      document.getElementById('statCheckedIn').textContent  = checkedIn;
+    });
+  }
+  loadLiveCounts();
+
+  // ── START SCANNER ──
+  async function startScanner() {
+    const statusEl = document.getElementById("scanStatus");
+    const box = document.getElementById("scannerBox");
+    const placeholder = document.getElementById("scannerPlaceholder");
+    const btnWrap = document.getElementById("scanBtnWrap");
+
+    statusEl.textContent = "Starting camera…";
+    statusEl.className = "scan-status";
+
+    try {
+      scanner = new Html5Qrcode("reader");
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 240, height: 240 } },
+        onScanSuccess,
+        () => {}
+      );
+      scanning = true;
+      paused = false;
+      placeholder.style.display = "none";
+      box.classList.add("active");
+      statusEl.textContent = "Scanning… point at QR code";
+      statusEl.className = "scan-status active";
+      btnWrap.innerHTML = `<button class="stop-btn" onclick="stopScanner()">⏹ Stop</button>`;
+    } catch (err) {
+      statusEl.textContent = "Camera error: " + err.message;
+      statusEl.className = "scan-status";
+    }
+  }
+
+  async function stopScanner() {
+    if (scanner && scanning) {
+      await scanner.stop();
+      scanner.clear();
+    }
+    scanning = false;
+    const box = document.getElementById("scannerBox");
+    const placeholder = document.getElementById("scannerPlaceholder");
+    const btnWrap = document.getElementById("scanBtnWrap");
+    box.classList.remove("active");
+    placeholder.style.display = "flex";
+    document.getElementById("scanStatus").textContent = "Scanner stopped";
+    document.getElementById("scanStatus").className = "scan-status";
+    btnWrap.innerHTML = `<button class="start-btn" id="startBtn" onclick="startScanner()">▶ Start Camera</button>`;
+  }
+
+  function onScanSuccess(text) {
+    if (paused) return;
+    paused = true;
+    processQR(text);
+  }
+
+  // ── PARSE QR ──
+  function parseQR(text) {
+    // Tickets may contain JSON, a ticket URL, or a plain booking ID.
+    const raw = String(text || "").replace(/^\uFEFF/, "").trim();
+    if (!raw) return null;
+
+    let value = raw;
+    try { value = decodeURIComponent(raw); } catch (_) { /* Keep the original value. */ }
+
+    try {
+      const data = JSON.parse(value);
+      const id = data.id || data.bookingId || data.booking_id || data.booking?.id;
+      return id ? { ...data, id: String(id).trim() } : null;
+    } catch (_) {
+      try {
+        const url = new URL(value);
+        const id = url.searchParams.get("bookingId") || url.searchParams.get("booking_id") || url.searchParams.get("id");
+        if (id) return { id: id.trim() };
+      } catch (_) { /* Treat it as a plain booking ID below. */ }
+      return { id: value };
+    }
+  }
+
+  async function findBooking(bookingId) {
+    const collections = ["bookings", "payments"];
+    for (const name of collections) {
+      const direct = await db.collection(name).doc(bookingId).get();
+      if (direct.exists) return direct;
+      const byField = await db.collection(name).where("bookingId", "==", bookingId).limit(1).get();
+      if (!byField.empty) return byField.docs[0];
+    }
+    return null;
+  }
+
+  async function processQR(text) {
+    const parsed = parseQR(text);
+    if (!parsed) {
+      showResult("notfound", "❓", "Invalid QR Code", []);
+      return;
+    }
+    await checkIn(parsed.id, parsed);
+  }
+
+  // ── CHECK IN ──
+  async function checkIn(bookingId, qrData) {
+    document.getElementById("scanStatus").textContent = "Looking up booking…";
+    try {
+      const snap = await findBooking(bookingId);
+
+      if (!snap) {
+        showResult("notfound", "❌", "Booking Not Found",
+          [["Booking ID", bookingId.slice(-10).toUpperCase()], ["Status", "Not in system"]]
+        );
+        addLog("red", bookingId.slice(-10).toUpperCase(), "Not found");
+        stats.total++; updateStats();
+        return;
+      }
+
+      const data = snap.data();
+      const shortId = bookingId.slice(-10).toUpperCase();
+      const name   = data.customerName || data.customer?.name || "Guest";
+      const event  = data.eventName    || data.event?.name    || "—";
+      const seats  = data.seatIds && data.seatIds.length ? data.seatIds.join(", ") : (data.seats || "1");
+      const amount = data.amount ? "₹" + Number(data.amount).toLocaleString("en-IN") : "Free";
+      const type   = data.bookingType  || "event";
+
+      if (data.checkedIn) {
+        const checkedAt = data.checkedInAt?.toDate
+          ? data.checkedInAt.toDate().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+          : "Earlier";
+        showResult("already", "⚠️", "Already Checked In",
+          [["Name", name], ["Event", event], ["Booking ID", shortId], ["Checked in at", checkedAt]]
+        );
+        addLog("yellow", name, event + " · Already checked in");
+        stats.total++; updateStats();
+        return;
+      }
+
+      await snap.ref.update({
+        checkedIn: true,
+        checkedInAt: firebase.firestore.FieldValue.serverTimestamp(),
+        checkedInDate: new Date().toISOString()
+      });
+
+      showResult("success", "✅", "Check-In Successful!",
+        [["Name", name], ["Event", event], ["Booking ID", shortId], ["Seats", seats], ["Amount", amount], ["Type", type]]
+      );
+      addLog("green", name, event);
+      stats.total++; updateStats();
+
+    } catch (e) {
+      showResult("failed", "🚫", "Error: " + e.message, []);
+      stats.total++; updateStats();
+    }
+  }
+
+  // ── SHOW RESULT ──
+  function showResult(type, icon, title, fields) {
+    const el = document.getElementById("result");
+    el.className = "result " + type;
+    el.style.display = "flex";
+    document.getElementById("resultIcon").textContent = icon;
+    document.getElementById("resultTitle").textContent = title;
+    document.getElementById("resultGrid").innerHTML = fields.map(([l, v]) =>
+      `<div class="result-field"><div class="result-label">${l}</div><div class="result-value">${v}</div></div>`
+    ).join("");
+    document.getElementById("scanStatus").textContent = "";
+    document.getElementById("scanStatus").className = "scan-status";
+  }
+
+  function resetResult() {
+    document.getElementById("result").style.display = "none";
+    document.getElementById("result").className = "result";
+    document.getElementById("manualId").value = "";
+    document.getElementById("scanStatus").textContent = scanning ? "Scanning… point at QR code" : "Ready — click Start Camera";
+    document.getElementById("scanStatus").className = scanning ? "scan-status active" : "scan-status";
+    paused = false;
+  }
+
+  // ── MANUAL ──
+  async function manualLookup() {
+    const val = document.getElementById("manualId").value.trim();
+    if (!val) return;
+    paused = true;
+    await checkIn(val, { id: val });
+  }
+  document.getElementById("manualId").addEventListener("keydown", e => {
+    if (e.key === "Enter") manualLookup();
+  });
+
+  // ── STATS ──
+  function updateStats() {
+    document.getElementById('statTotal').textContent = stats.total;
+  }
+
+  // ── LOG ──
+  function addLog(color, name, sub) {
+    const log = document.getElementById("scanLog");
+    // remove empty state
+    const empty = log.querySelector(".empty-log");
+    if (empty) empty.remove();
+
+    const time = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const item = document.createElement("div");
+    item.className = "log-item";
+    item.innerHTML = `
+      <div class="log-dot ${color}"></div>
+      <div class="log-info"><strong>${name}</strong><span>${sub || ""}</span></div>
+      <div class="log-time">${time}</div>`;
+    log.prepend(item);
+    while (log.children.length > 20) log.removeChild(log.lastChild);
+  }
+</script>
+</body>
+</html>

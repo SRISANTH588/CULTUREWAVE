@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,follow" />
+  <title>Order food | CultureWave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{font-family:Manrope,system-ui,sans-serif;color:#211f1a;background:#f5f2ec;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0}a{color:inherit}.top{padding:1rem max(1.2rem,calc((100vw - 1100px)/2));background:#211f1a;color:#fffaf1;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;letter-spacing:-.04em}.brand span{color:#e3bd79}.top a{text-decoration:none;font-size:.86rem;color:#e3bd79;font-weight:700}
+    main{max-width:1100px;margin:0 auto;padding:2rem 1.2rem 4rem}.hero{background:#26231d;color:#fffaf1;padding:2.1rem;border-radius:8px;margin-bottom:1.2rem;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-80px;top:-130px;background:rgba(227,189,121,.12)}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:#e3bd79;font-size:.72rem;font-weight:800}.hero h1{font:500 clamp(2rem,5vw,3.4rem)/1.05 Georgia,serif;margin:.65rem 0}.hero p{color:#d5d0c5;margin:0}.layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:1.2rem;align-items:start}.panel{background:#fffdfa;border:1px solid #e7dfd2;border-radius:8px;padding:1.2rem}.panel h2{font:500 1.5rem Georgia,serif;margin:0 0 1rem}.menu{display:grid;gap:.7rem}.item{display:flex;justify-content:space-between;gap:1rem;border:1px solid #eee7dc;padding:.9rem;border-radius:6px;background:#fff}.item h3{font-size:.95rem;margin:0}.item p{font-size:.78rem;color:#777267;margin:.25rem 0 0}.item-cat{color:#9c896b;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.item-right{display:flex;align-items:center;gap:.7rem;flex:none}.price{font-weight:800}.qty{display:flex;align-items:center;gap:.45rem}.qty button{width:30px;height:30px;border:1px solid #d9c9a6;border-radius:4px;background:#f5eddd;font-weight:800;cursor:pointer}.summary{position:sticky;top:1rem}.cart-lines{display:grid;gap:.5rem;margin-bottom:1rem}.cart-line{display:flex;justify-content:space-between;color:#5b574e;font-size:.82rem}.total{display:flex;justify-content:space-between;border-top:1px solid #e9e1d5;padding-top:.8rem;font-weight:800;margin-bottom:1rem}.field{display:grid;gap:.35rem;margin:.75rem 0}.field label{font-size:.75rem;font-weight:800}.field input{width:100%;padding:.75rem;border:1px solid #ded6c8;border-radius:5px;font:inherit;background:white}.submit{width:100%;border:0;border-radius:5px;background:#b58a49;color:#fff;padding:.85rem 1rem;font:800 .9rem Manrope;cursor:pointer}.submit:disabled{opacity:.55;cursor:wait}.hint{font-size:.72rem;color:#817b70;line-height:1.5;margin:.7rem 0 0}.state{padding:1.3rem;text-align:center;color:#716650}.success{display:none;margin-top:1rem;padding:1rem;background:#edf5ed;border:1px solid #c6dfc8;border-radius:6px;color:#275a31}.success a{display:inline-block;margin-top:.65rem;color:#275a31;font-weight:800}
+    @media(max-width:760px){main{padding-top:1rem}.layout{grid-template-columns:1fr}.summary{position:static}.hero{padding:1.5rem}.item{align-items:flex-start}.item-right{gap:.45rem}}
+  </style>
+</head>
+<body>
+  <header class="top"><a class="brand" href="restaurants.html" aria-label="CultureWave restaurants">Culture<span>Wave</span></a><a href="restaurants.html">← Restaurants</a></header>
+  <main>
+    <section class="hero"><div class="eyebrow" id="orderContext">Restaurant menu</div><h1 id="restaurantName">Loading menu…</h1><p id="restaurantLocation"></p></section>
+    <div class="layout">
+      <section class="panel"><h2>Choose from the menu</h2><div class="menu" id="menuItems"><div class="state">Loading dishes…</div></div></section>
+      <aside class="panel summary"><h2>Your order</h2><div class="cart-lines" id="cartLines"><div class="state">Your basket is empty.</div></div><div class="total"><span>Total • pay at venue</span><span id="cartTotal">₹0</span></div>
+        <form id="orderForm"><div class="field"><label for="customerName">Your name</label><input id="customerName" required maxlength="80" autocomplete="name" /></div><div class="field"><label for="customerPhone">Mobile number</label><input id="customerPhone" type="tel" required minlength="10" maxlength="15" autocomplete="tel" /></div><div class="field"><label for="pickupNote">Pickup note (optional)</label><input id="pickupNote" maxlength="120" placeholder="e.g. Table 12" /></div><button class="submit" id="submitOrder" type="submit">Place food order</button></form>
+        <p class="hint">This sends a preorder request to the venue. Pay when you collect your food. For event orders, collect at the venue during the event.</p><div class="success" id="orderSuccess"><strong>Order request sent.</strong><div id="successInfo"></div><a id="whatsappOrder" target="_blank" rel="noopener" style="display:none">Send order to restaurant on WhatsApp →</a></div>
+      </aside>
+    </div>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",authDomain:"ogshootsluxe-36740.firebaseapp.com",projectId:"ogshootsluxe-36740",storageBucket:"ogshootsluxe-36740.firebasestorage.app",messagingSenderId:"5471814825",appId:"1:5471814825:web:07e84f2f88486da817d5b8"});
+    const db=firebase.firestore(), params=new URLSearchParams(location.search), restaurantId=params.get('restaurantId'), eventId=params.get('eventId')||'', eventName=params.get('eventName')||'', eventVenue=params.get('venue')||'';
+    let restaurant=null, menu=[], quantities={};
+    const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const fmt=n=>'₹'+Number(n||0).toLocaleString('en-IN');
+    async function load(){
+      if(!restaurantId){document.getElementById('restaurantName').textContent='Menu unavailable';return;}
+      try{const snap=await db.collection('restaurants').doc(restaurantId).get();if(!snap.exists)throw new Error('Restaurant not found');restaurant=snap.data();menu=Array.isArray(restaurant.menuItems)?restaurant.menuItems.filter(i=>i.available!==false&&i.name&&Number(i.price)>0):[];
+        document.getElementById('restaurantName').textContent=restaurant.name||'Restaurant';document.getElementById('restaurantLocation').textContent=[restaurant.venueName,restaurant.city].filter(Boolean).join(' · ');
+        if(eventName){document.getElementById('orderContext').textContent='Order for '+eventName;document.title='Food at '+eventName+' | CultureWave';}
+        document.getElementById('menuItems').innerHTML=menu.length?menu.map((item,i)=>`<article class="item"><div><div class="item-cat">${esc(item.category||'From the menu')}</div><h3>${esc(item.name)}</h3>${item.description?`<p>${esc(item.description)}</p>`:''}</div><div class="item-right"><span class="price">${fmt(item.price)}</span><div class="qty"><button type="button" onclick="changeQty(${i},-1)" aria-label="Remove one ${esc(item.name)}">−</button><strong id="qty${i}">0</strong><button type="button" onclick="changeQty(${i},1)" aria-label="Add one ${esc(item.name)}">+</button></div></div></article>`).join(''):'<div class="state">This restaurant has not added menu items yet.</div>';
+      }catch(e){document.getElementById('restaurantName').textContent='Menu unavailable';document.getElementById('menuItems').innerHTML=`<div class="state">${esc(e.message||'Could not load menu.')}</div>`;}
+    }
+    window.changeQty=(i,d)=>{quantities[i]=Math.max(0,(quantities[i]||0)+d);document.getElementById('qty'+i).textContent=quantities[i];renderCart();};
+    function cart(){return menu.map((item,i)=>({...item,qty:quantities[i]||0})).filter(i=>i.qty>0)}
+    function renderCart(){const items=cart(),total=items.reduce((sum,i)=>sum+i.price*i.qty,0);document.getElementById('cartLines').innerHTML=items.length?items.map(i=>`<div class="cart-line"><span>${esc(i.name)} × ${i.qty}</span><strong>${fmt(i.price*i.qty)}</strong></div>`).join(''):'<div class="state">Your basket is empty.</div>';document.getElementById('cartTotal').textContent=fmt(total);document.getElementById('submitOrder').disabled=!items.length;}
+    document.getElementById('orderForm').addEventListener('submit',async e=>{e.preventDefault();const items=cart();if(!restaurant||!items.length)return;const button=document.getElementById('submitOrder');button.disabled=true;button.textContent='Sending…';
+      const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim(),total=items.reduce((sum,i)=>sum+i.price*i.qty,0),orderRef=db.collection('foodOrders').doc();
+      const payload={restaurantId,restaurantName:restaurant.name||'',ownerId:restaurant.ownerId||restaurant.organiserId||'',venueName:eventVenue||restaurant.venueName||'',eventId:eventId||null,eventName:eventName||null,customerName:name,customerPhone:phone,pickupNote:document.getElementById('pickupNote').value.trim(),items:items.map(i=>({name:i.name,price:Number(i.price),quantity:i.qty})),total,status:'new',paymentStatus:'pay_at_venue',createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+      try{await orderRef.set(payload);document.getElementById('orderSuccess').style.display='block';document.getElementById('successInfo').textContent=`Order ${orderRef.id.slice(-6).toUpperCase()} · ${fmt(total)} payable at pickup.`;document.getElementById('orderForm').style.display='none';const wa=String(restaurant.foodOrderWhatsapp||restaurant.ownerWhatsapp||'').replace(/\D/g,'');if(wa){const message=`Food order ${orderRef.id.slice(-6).toUpperCase()} for ${name}${eventName?' at '+eventName:''}: `+items.map(i=>`${i.name} × ${i.qty}`).join(', ')+`. Total ${fmt(total)}. Pickup note: ${document.getElementById('pickupNote').value.trim()||'None'}.`;const link=document.getElementById('whatsappOrder');link.href=`https://wa.me/${wa}?text=${encodeURIComponent(message)}`;link.style.display='inline-block';}}
+      catch(err){alert('Could not send order: '+err.message);button.disabled=false;button.textContent='Place food order';}
+    });
+    load();
+  </script>
+</body>
+</html>
