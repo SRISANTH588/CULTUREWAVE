@@ -1,0 +1,2303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CultureWave | Book Tickets</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    :root{--blue:#1242c5;--blue-2:#2f6bff;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{max-width:100%;overflow-x:hidden;}
+    body{background:#f0f4ff;font-family:'Manrope',sans-serif;font-size:14px;}
+    main{padding:0 !important;margin:0 !important;max-width:100% !important;overflow-x:hidden !important;}
+    a{text-decoration:none;color:inherit;}
+    button{font:inherit;cursor:pointer;}
+    .bk-stepper-wrap{background:linear-gradient(135deg,#0a0f1e,#1242c5);padding:1.5rem 1rem 0;width:100%;}
+    .bk-stepper{max-width:640px;margin:0 auto;display:flex;align-items:center;padding:0 .5rem;}
+    .bk-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;padding-bottom:1rem;border-bottom:3px solid transparent;transition:border-color .3s;}
+    .bk-step.active{border-bottom-color:#2f6bff;}
+    .bk-step.done{border-bottom-color:rgba(126,179,255,.4);}
+    .bk-step-num{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:grid;place-items:center;font-size:.78rem;font-weight:800;color:rgba(255,255,255,.4);transition:all .3s;}
+    .bk-step.active .bk-step-num{background:#2f6bff;border-color:#2f6bff;color:#fff;box-shadow:0 0 0 4px rgba(47,107,255,.3);}
+    .bk-step.done .bk-step-num{background:rgba(126,179,255,.2);border-color:rgba(126,179,255,.5);color:#7eb3ff;}
+    .bk-step-lbl{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.35);}
+    .bk-step.active .bk-step-lbl{color:#fff;}
+    .bk-step.done .bk-step-lbl{color:rgba(126,179,255,.7);}
+    .bk-conn{flex:none;width:2rem;height:2px;background:rgba(255,255,255,.12);margin-bottom:1rem;}
+    .bk-wrap{max-width:640px;margin:0 auto;padding:1.2rem 1rem 4rem;overflow-x:hidden;box-sizing:border-box;width:100%;}
+    .bk-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;align-items:start;width:100%;box-sizing:border-box;}
+    .bk-panel{display:none;flex-direction:column;gap:1rem;}
+    .bk-panel.active{display:flex;}
+    .bk-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:.9rem;box-shadow:0 4px 24px rgba(18,66,197,.07);overflow:hidden;box-sizing:border-box;width:100%;}
+    .bk-card h2{font-size:1.1rem;font-weight:900;color:var(--text);margin-bottom:.2rem;letter-spacing:-.03em;}
+    .bk-card .sub{font-size:.84rem;color:var(--muted);margin-bottom:1.2rem;}
+    .bk-field{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.85rem;}
+    .bk-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#5f6f95;}
+    .bk-input{display:flex;align-items:center;gap:.4rem;padding:0 .65rem;height:44px;border-radius:12px;border:1.5px solid var(--border);background:#f7faff;transition:border-color .2s,box-shadow .2s;min-width:0;}
+    .bk-input:focus-within{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(18,66,197,.08);}
+    .bk-input input,.bk-input select{flex:1;min-width:0;border:none;outline:none;background:transparent;font:inherit;font-size:.82rem;color:var(--text);}
+    .bk-input input::placeholder{color:#b0bcd4;}
+    .bk-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+    @media(max-width:480px){.bk-row{grid-template-columns:1fr;}}
+    .bk-verify-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;min-width:0;}
+    .bk-verify-row .bk-input{flex:1;min-width:0;}
+    .bk-verify-btn{height:44px;padding:0 .7rem;background:var(--blue);color:#fff;border:0;border-radius:12px;font-size:.72rem;font-weight:800;white-space:nowrap;flex:none;}
+    .bk-verify-tag{display:inline-flex;align-items:center;padding:.2rem .45rem;border-radius:999px;font-size:.65rem;font-weight:800;white-space:nowrap;flex:none;}
+    .bk-verify-tag.ok{background:#dcfce7;color:#166534;}
+    .bk-verify-tag.pending{background:#fef9c3;color:#854d0e;}
+    .bk-otp-wrap{display:none;margin-top:.5rem;gap:.5rem;}
+    .bk-otp-wrap input{flex:1;min-width:0;height:44px;border-radius:10px;border:1.5px solid var(--border);padding:0 .75rem;font:inherit;font-size:1rem;letter-spacing:.2em;text-align:center;outline:none;}
+    .bk-otp-wrap input:focus{border-color:var(--blue);}
+    .bk-otp-wrap button{height:44px;padding:0 .85rem;background:var(--blue);color:#fff;border:0;border-radius:10px;font-size:.78rem;font-weight:800;flex:none;}
+    .bk-ticket-card{border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:.65rem;cursor:pointer;transition:border-color .2s,box-shadow .2s;}
+    .bk-ticket-card.selected{border-color:var(--blue);box-shadow:0 0 0 3px rgba(18,66,197,.1);}
+    .bk-ticket-inner{padding:.9rem 1rem;display:flex;align-items:center;gap:.75rem;background:linear-gradient(135deg,var(--blue),var(--blue-2));}
+    .bk-ticket-name{font-size:.92rem;font-weight:800;color:#fff;flex:1;}
+    .bk-ticket-price{font-size:1rem;font-weight:900;color:#fff;}
+    .bk-ticket-radio{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.5);flex:none;display:grid;place-items:center;transition:all .2s;}
+    .bk-ticket-card.selected .bk-ticket-radio{background:#fff;border-color:#fff;}
+    .bk-ticket-card.selected .bk-ticket-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--blue);}
+    .bk-qty{display:flex;align-items:center;gap:.85rem;margin-top:.5rem;}
+    .bk-qty-btn{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-size:1.3rem;font-weight:800;display:grid;place-items:center;transition:all .2s;}
+    .bk-qty-btn:hover{border-color:var(--blue);color:var(--blue);}
+    .bk-qty-val{font-size:1.2rem;font-weight:900;min-width:2rem;text-align:center;}
+    .bk-coupon-row{display:flex;gap:.5rem;}
+    .bk-coupon-row input{flex:1;height:44px;border-radius:10px;border:1.5px solid var(--border);padding:0 1rem;font:inherit;font-size:.88rem;outline:none;}
+    .bk-coupon-row input:focus{border-color:var(--blue);}
+    .bk-coupon-btn{height:44px;padding:0 1.1rem;background:var(--blue);color:#fff;border:0;border-radius:10px;font-size:.82rem;font-weight:800;}
+    .bk-coupon-msg{font-size:.76rem;font-weight:700;margin-top:.35rem;}
+    .bk-coupon-msg.ok{color:#166534;}
+    .bk-coupon-msg.err{color:#991b1b;}
+    .avail-coupon-chip{display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;background:#fffbeb;border:1.5px dashed #f5c518;border-radius:10px;cursor:pointer;margin-bottom:.35rem;transition:background .15s;}
+    .avail-coupon-chip:hover{background:#fef3c7;}
+    .avail-coupon-code{font-size:.75rem;font-weight:900;color:#92400e;letter-spacing:.06em;flex:1;}
+    .avail-coupon-val{font-size:.7rem;font-weight:800;color:#166534;background:#dcfce7;padding:.15rem .45rem;border-radius:6px;}
+    .avail-coupon-tap{font-size:.62rem;font-weight:700;color:#b45309;white-space:nowrap;}
+    .bk-bill{background:#f7faff;border:1px solid var(--border);border-radius:16px;padding:1rem 1.2rem;}
+    .bk-bill-row{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.84rem;color:#374151;font-weight:600;padding:.38rem 0;border-bottom:1px solid rgba(18,66,197,.06);}
+    .bk-bill-row span:first-child{flex:1;min-width:0;}
+    .bk-bill-row span:last-child,.bk-bill-row strong{flex:none;text-align:right;word-break:break-all;}
+    .bk-bill-row:last-child{border-bottom:none;}
+    .bk-bill-row span,.bk-bill-row strong{color:#0a0f1e !important;}
+    .bk-bill-row.total{font-size:.98rem;font-weight:900;color:var(--text);padding-top:.6rem;}
+    .bk-bill-row.total strong{color:var(--blue) !important;font-size:1.1rem;}
+    .bk-bill-row.discount{color:#166534;}
+    .bk-bill-row.discount span,.bk-bill-row.discount strong{color:#166534 !important;}
+    .bk-tc{display:flex;align-items:flex-start;gap:.6rem;padding:.85rem;background:#f7faff;border:1px solid var(--border);border-radius:12px;font-size:.8rem;color:#475569;line-height:1.6;}
+    .bk-tc input[type=checkbox]{margin-top:.15rem;flex:none;width:16px;height:16px;accent-color:var(--blue);}
+    .bk-btn-next{width:100%;height:52px;background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:14px;font-size:.95rem;font-weight:900;box-shadow:0 6px 20px rgba(18,66,197,.28);transition:transform .15s;}
+    .bk-btn-next:hover{transform:translateY(-2px);}
+    .bk-btn-next:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+    .bk-btn-back{height:48px;padding:0 1.2rem;background:#fff;border:1.5px solid var(--border);border-radius:12px;font-size:.86rem;font-weight:800;color:var(--muted);}
+    .bk-btn-back:hover{border-color:var(--blue);color:var(--blue);}
+    .bk-nav{display:flex;gap:.7rem;margin-top:.25rem;}
+    .bk-bill-row[hidden]{display:none!important;}
+    .bk-panel#panel3 .checkout-pay-action{position:relative;width:min(560px,100%);min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:.55rem;padding:.45rem .55rem;border:1px solid #dedee2;border-radius:15px;background:#f7f7f8;color:#161719;}
+    .checkout-payment-picker{position:relative;min-width:0;flex:1;}
+    .checkout-payment-toggle{width:100%;min-height:48px;display:flex;align-items:center;gap:.45rem;padding:.2rem .25rem;border:0;background:transparent;color:#161719;text-align:left;}
+    .checkout-payment-mark{width:25px;height:25px;display:grid;place-items:center;flex:none;border-radius:6px;background:#dbeafe;color:#1242c5;font-size:.78rem;font-weight:900;}
+    .checkout-payment-label{min-width:0;display:flex;flex:1;flex-direction:column;gap:.05rem;}
+    .checkout-payment-label small{color:#55565a;font-size:.61rem;}
+    .checkout-payment-label strong{overflow:hidden;color:#161719;font-size:.75rem;text-overflow:ellipsis;white-space:nowrap;}
+    .checkout-payment-chevron{color:#55565a;font-size:.85rem;}
+    .checkout-payment-menu{position:absolute;z-index:50;left:0;bottom:calc(100% + .65rem);width:min(250px,82vw);padding:.35rem;border:1px solid #41434a;border-radius:14px;background:#202124;box-shadow:0 12px 36px rgba(0,0,0,.45);}
+    .checkout-payment-menu[hidden]{display:none!important;}
+    .checkout-payment-option{width:100%;display:flex;flex-direction:column;gap:.18rem;padding:.7rem .75rem;border:0;border-radius:10px;background:transparent;color:#f4f4f5;text-align:left;}
+    .checkout-payment-option+.checkout-payment-option{border-top:1px solid #37383d;}
+    .checkout-payment-option strong{font-size:.78rem;}
+    .checkout-payment-option small{color:#b2b3b9;font-size:.65rem;}
+    .checkout-payment-option[aria-selected="true"]{background:#303137;}
+    .checkout-payment-option:disabled{opacity:.5;}
+    .checkout-pay-total{min-width:52px;display:flex;flex-direction:column;gap:.05rem;}
+    .checkout-pay-total strong{color:#161719;font-size:.83rem;white-space:nowrap;}
+    .checkout-pay-total small{color:#55565a;font-size:.62rem;}
+    .bk-secure{text-align:center;font-size:.72rem;color:var(--muted);margin-top:.5rem;}
+    .bk-receipt{background:#fff;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 4px 24px rgba(18,66,197,.08);position:sticky;top:80px;}
+    .bk-receipt-banner{height:130px;background:linear-gradient(135deg,#0a0f1e,#1242c5,#2f6bff);display:grid;place-items:center;font-size:2.8rem;position:relative;overflow:hidden;}
+    .bk-receipt-banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45;}
+    .bk-receipt-body{padding:1.2rem;}
+    .bk-receipt-name{font-size:.98rem;font-weight:900;color:var(--text);margin-bottom:.15rem;}
+    .bk-receipt-venue{font-size:.74rem;color:var(--muted);margin-bottom:.9rem;}
+    .bk-rrow{display:flex;justify-content:space-between;font-size:.8rem;color:#374151;font-weight:600;padding:.32rem 0;border-bottom:1px solid #f0f4ff;}
+    .bk-rrow:last-child{border-bottom:none;}
+    .bk-rrow strong{color:#0a0f1e;}
+    .bk-rtotal{display:flex;justify-content:space-between;font-weight:900;font-size:.95rem;color:var(--text);margin-top:.7rem;padding-top:.7rem;border-top:1.5px dashed var(--border);}
+    .bk-rtotal span:last-child{color:var(--blue);font-size:1.05rem;}
+    .bk-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin-top:.9rem;}
+    .bk-trust-item{background:#f7faff;border:1px solid var(--border);border-radius:11px;padding:.55rem .3rem;text-align:center;font-size:.6rem;font-weight:700;color:var(--muted);}
+    .bk-trust-item span{display:block;font-size:.95rem;margin-bottom:.15rem;}
+    .bk-seating{border:1px solid var(--border);border-radius:14px;padding:.85rem;background:#f8fafc;overflow-x:auto;margin-bottom:1rem;}
+    .bk-review-head{display:none;}
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    .payment-error-popup{--payment-error-accent:#ff5b68;position:fixed;left:1rem;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:200;width:min(440px,calc(100% - 2rem));margin:0 auto;padding:1.15rem 1.2rem 1rem;display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:.85rem 1rem;background:linear-gradient(145deg,#21191c,#171416 72%);border:1px solid rgba(255,255,255,.1);border-top:2px solid var(--payment-error-accent);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.58),0 3px 18px rgba(255,74,88,.1);color:#f7f3f4;opacity:0;transform:translateY(calc(100% + 2rem));transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .25s ease;}
+    .payment-error-popup.show{opacity:1;transform:translateY(0);}
+    .payment-error-icon{width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(255,91,104,.42);border-radius:14px;background:rgba(255,91,104,.12);color:var(--payment-error-accent);font-size:1.15rem;font-weight:800;}
+    .payment-error-copy{min-width:0;padding-right:1.2rem;}
+    .payment-error-title{margin-bottom:.22rem;color:#fff;font-size:.96rem;font-weight:900;letter-spacing:-.02em;}
+    .payment-error-msg{color:#c6b9bd;font-size:.78rem;line-height:1.5;}
+    .payment-error-actions{grid-column:2;display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;}
+    .payment-error-retry{min-height:44px;padding:.7rem 1.05rem;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:linear-gradient(135deg,#ff6874,#e93d50);color:#fff;font-size:.8rem;font-weight:900;box-shadow:0 5px 14px rgba(229,58,77,.23);transition:filter .15s,transform .15s;}
+    .payment-error-retry:hover{filter:brightness(1.06);transform:translateY(-1px);}
+    .payment-error-help{color:#e7dadd;font-size:.74rem;font-weight:700;text-decoration:none;border-bottom:1px solid rgba(231,218,221,.38);padding-bottom:2px;}
+    .payment-error-close{position:absolute;top:.72rem;right:.8rem;width:32px;height:32px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.04);color:#b8aaae;font-size:1.25rem;line-height:1;padding:0;}
+    @media(max-width:560px){.payment-error-popup{left:.85rem;right:.85rem;bottom:calc(.85rem + env(safe-area-inset-bottom));width:auto;padding:1rem 1rem .95rem;border-radius:20px;grid-template-columns:40px minmax(0,1fr);gap:.75rem .8rem;}.payment-error-icon{width:40px;height:40px;border-radius:13px}.payment-error-copy{padding-right:1.2rem}.payment-error-title{font-size:.92rem}.payment-error-msg{font-size:.76rem}.payment-error-actions{gap:.65rem}.payment-error-retry{min-height:42px}.payment-error-close{top:.62rem;right:.65rem;width:30px;height:30px}}
+    @media(max-width:860px){.bk-grid{grid-template-columns:1fr;}.bk-receipt{position:static;}}
+    @media(max-width:560px){
+      .bk-step-lbl{display:none;}
+      .bk-conn{width:.75rem;}
+      .bk-stepper{padding:0;}
+      .bk-card{padding:.85rem;border-radius:14px;}
+      .bk-wrap{padding:.75rem .85rem 4rem;}
+      .bk-btn-next,.bk-btn-back{font-size:.85rem;}
+      .bk-bill{padding:.85rem;}
+      .bk-bill-row{font-size:.8rem;}
+      .bk-ticket-inner{padding:.75rem;}
+      .bk-ticket-name{font-size:.84rem;}
+      .bk-ticket-price{font-size:.9rem;}
+    }
+    .bk-ticket-picker{display:none;}.bk-picker-bar{display:none;}
+    .guest-contact-card{position:relative;isolation:isolate;overflow:hidden;margin:0 0 1.25rem!important;padding:1.25rem!important;border:1px solid rgba(148,174,255,.2)!important;border-radius:24px!important;background:radial-gradient(ellipse at 100% 0%,rgba(84,126,255,.2),transparent 42%),linear-gradient(145deg,#171d2a,#10141d 72%)!important;box-shadow:0 22px 55px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.06)!important;color:#fff;}
+    .guest-contact-card::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(120deg,rgba(255,255,255,.035),transparent 45%);pointer-events:none;}
+    .guest-contact-head{display:flex;align-items:center;gap:.85rem;margin-bottom:1.2rem;}
+    .guest-contact-icon{display:grid;place-items:center;width:46px;height:46px;flex:none;border:1px solid rgba(142,171,255,.3);border-radius:15px;background:linear-gradient(145deg,rgba(87,127,255,.24),rgba(37,59,116,.18));font-size:1.25rem;box-shadow:inset 0 1px rgba(255,255,255,.1);}
+    .guest-contact-kicker{display:block;margin-bottom:.22rem;color:#91adff;font-size:.62rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase;}
+    .guest-contact-card h2{margin:0!important;color:#f8faff!important;font-size:1.22rem!important;font-weight:900;letter-spacing:-.045em;}
+    .guest-contact-card .sub{margin:.28rem 0 0!important;color:#9ca8bd!important;font-size:.76rem;line-height:1.5;}
+    .guest-contact-card .bk-field{gap:.42rem;margin-bottom:.8rem;}
+    .guest-contact-card .bk-label{color:#b8c4dc;font-size:.62rem;letter-spacing:.12em;}
+    .guest-contact-card .bk-input{height:50px;padding:0 .85rem;border:1px solid rgba(148,163,184,.2);border-radius:13px;background:rgba(5,9,17,.62);box-shadow:inset 0 1px 3px rgba(0,0,0,.2);}
+    .guest-contact-card .bk-input:focus-within{border-color:#7798ff;box-shadow:0 0 0 3px rgba(91,132,255,.16);}
+    .guest-contact-card .bk-input>span{font-size:1rem;opacity:.9;}
+    .guest-contact-card .bk-input input{color:#f8faff;font-size:.88rem;}
+    .guest-contact-card .bk-input input::placeholder{color:#667187;}
+    .guest-contact-continue{display:flex;align-items:center;justify-content:center;gap:.65rem;width:100%;height:52px;margin-top:.4rem;border:1px solid rgba(255,255,255,.13);border-radius:15px;background:linear-gradient(110deg,#7898ff,#3d66ec 58%,#2448bd);color:#fff;font-size:.86rem;font-weight:900;letter-spacing:.01em;box-shadow:0 10px 24px rgba(48,83,194,.34),inset 0 1px rgba(255,255,255,.22);transition:transform .18s,filter .18s;}
+    .guest-contact-continue:hover{filter:brightness(1.08);transform:translateY(-1px);}
+    .guest-contact-note{display:flex;justify-content:center;align-items:center;gap:.4rem;margin-top:.8rem;color:#77839a;font-size:.65rem;font-weight:700;}
+    @media(max-width:768px), (min-width:769px){
+      body{background:#05070c;color:#fff;padding-bottom:104px;}.topbar,.mobile-nav,.bk-stepper-wrap{display:none!important}.bk-wrap{padding:0;max-width:none!important}.bk-grid{display:block}.bk-panel.active{display:block}.bk-panel.ticket-picker> :not(.bk-ticket-picker):not(.bk-picker-bar){display:none}.bk-ticket-picker{display:block;min-height:100vh;padding:calc(env(safe-area-inset-top) + 1rem) 1.2rem 7.5rem;background:#05070c}.bk-picker-head{display:flex;gap:.85rem;align-items:flex-start;margin-bottom:1.5rem}.bk-picker-back{width:40px;height:40px;border:1px solid #303641;border-radius:50%;background:#151922;color:#fff;font-size:1.5rem;flex:none}.bk-picker-title{font-size:1.05rem;font-weight:900;line-height:1.25}.bk-picker-location{margin-top:.28rem;color:#aeb4c0;font-size:.78rem}.bk-picker-info{display:flex;gap:.7rem;margin:1.25rem 0 1.7rem}.bk-picker-date,.bk-picker-time{min-width:82px;padding:.7rem .85rem;border:1.5px solid #ff661d;border-radius:15px;background:#14181f;color:#fff}.bk-picker-date b{display:block;font-size:.69rem;color:#ff9a70;text-transform:uppercase;letter-spacing:.08em}.bk-picker-date strong,.bk-picker-time strong{display:block;margin-top:.16rem;font-size:1rem}.bk-picker-time{display:flex;align-items:center;min-width:130px}.bk-picker-sheet{margin:0 -1.2rem;padding:1.15rem 1.2rem 1.8rem;border-radius:27px 27px 0 0;background:#151922;min-height:55vh}.bk-picker-handle{width:40px;height:4px;border-radius:999px;background:#59606c;margin:0 auto 1.25rem}.bk-picker-label{font-size:.72rem;font-weight:900;letter-spacing:.12em;color:#b7bdc8;margin-bottom:1rem}.bk-picker-ticket{padding:1rem 0;border-bottom:1px dashed #434954}.bk-picker-ticket:last-child{border-bottom:0}.bk-picker-ticket-top{display:flex;align-items:center;gap:.65rem}.bk-picker-ticket-name{font-size:1rem;font-weight:900;flex:1}.bk-picker-ticket-price{font-size:1rem;font-weight:900;color:#fff}.bk-picker-details{border:1px solid #3c424d;border-radius:999px;background:transparent;color:#d9dde4;padding:.38rem .65rem;font-size:.68rem;font-weight:800}.bk-picker-desc{display:none;margin:.65rem 0 0;color:#aeb4c0;font-size:.78rem;line-height:1.55}.bk-picker-desc.open{display:block}.bk-picker-ticket-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:.8rem}.bk-picker-availability{font-size:.72rem;color:#aeb4c0}.bk-picker-add,.bk-picker-qty{height:36px;border-radius:10px;font-size:.76rem;font-weight:900}.bk-picker-add{min-width:70px;border:1px solid #ff661d;background:#ff661d;color:#16110e}.bk-picker-add:disabled{border-color:#5b616b;background:#2a2f37;color:#959ba5}.bk-picker-qty{display:flex;align-items:center;gap:.8rem;padding:0 .55rem;border:1px solid #ff661d;color:#fff}.bk-picker-qty button{border:0;background:transparent;color:#ff8a58;font-size:1.25rem;line-height:1}.bk-picker-bar{position:fixed;z-index:30;display:none;align-items:center;gap:.75rem;left:.85rem;right:.85rem;bottom:calc(env(safe-area-inset-bottom) + .7rem);padding:.72rem .75rem .72rem 1rem;border:1px solid #434a55;border-radius:18px;background:#252a33;box-shadow:0 12px 30px rgba(0,0,0,.5)}.bk-picker-bar.show{display:flex}.bk-picker-total{flex:1}.bk-picker-total small{display:block;color:#bdc3cc;font-size:.68rem;font-weight:800}.bk-picker-total strong{font-size:1rem}.bk-picker-proceed{height:46px;padding:0 1.15rem;border:0;border-radius:13px;background:#ff5a19;color:#fff;font-weight:900}.bk-picker-state{padding:1.2rem 0;color:#aeb4c0;text-align:center;font-size:.85rem}.picker-seat-section{margin-top:1.25rem;padding-top:1.1rem;border-top:1px solid #343a45}.picker-seat-section .bk-picker-label{margin-bottom:.7rem}.picker-seat-section .bk-seating{background:#0c1017;border-color:#343a45}.picker-seat-section #qtyField{display:block!important}.picker-seat-section .bk-qty-btn{background:#151922;border-color:#3d4552;color:#fff}.picker-seat-section .bk-qty-val{color:#fff}.picker-seat-section #qtyField>div:last-child{background:#0c1017!important;border-color:#343a45!important}.picker-seat-section #qtyField span{color:#fff!important}
+    }
+    /* Premium mobile ticket experience — intentionally original to CultureWave. */
+    @media(max-width:768px), (min-width:769px){
+      .bk-ticket-picker{background:radial-gradient(ellipse 95% 32% at 100% 0%,rgba(32,81,190,.23),transparent 62%),linear-gradient(160deg,#080b13 0%,#05070c 58%,#0a0d15 100%)}
+      .bk-picker-head{position:relative;padding:.45rem 0 .15rem;margin-bottom:1.7rem}.bk-picker-head>div{min-width:0}.bk-picker-head::after{content:'CULTUREWAVE SELECT';position:absolute;top:1.4rem;right:1.25rem;color:#86a9ff;font-size:.56rem;font-weight:900;letter-spacing:.15em}.bk-picker-back{width:42px;height:42px;border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.055);box-shadow:inset 0 1px rgba(255,255,255,.08);font-size:1.7rem}.bk-picker-title{padding-right:1rem;font-size:1.2rem;letter-spacing:-.04em}.bk-picker-location{display:flex;align-items:center;gap:.35rem;color:#a8b0c1;font-size:.8rem}.bk-picker-location::before{content:'⌖';color:#7ca2ff}
+      .bk-picker-info{gap:.65rem;margin:1.4rem 0 1.8rem}.bk-picker-date,.bk-picker-time{min-width:112px;padding:.8rem .9rem;border:1px solid rgba(123,159,255,.34);border-radius:16px;background:linear-gradient(135deg,rgba(39,72,150,.34),rgba(14,18,29,.82));box-shadow:inset 0 1px rgba(255,255,255,.05),0 12px 24px rgba(0,0,0,.16)}.bk-picker-date b{color:#93b0ff}.bk-picker-date strong,.bk-picker-time strong{font-size:.91rem}.bk-picker-time{min-width:138px}
+      .bk-picker-sheet{border:1px solid rgba(255,255,255,.07);border-bottom:0;border-radius:30px 30px 0 0;background:linear-gradient(145deg,#171c28,#11151f);box-shadow:0 -18px 50px rgba(0,0,0,.24);padding:1.35rem 1.15rem 2rem}.bk-picker-handle{background:linear-gradient(90deg,#56647a,#8795aa);width:46px}.bk-picker-label{color:#aeb9ce;font-size:.65rem;letter-spacing:.18em}
+      .bk-picker-ticket{margin:.7rem 0;padding:1rem;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:linear-gradient(135deg,rgba(29,35,48,.96),rgba(15,18,27,.98));box-shadow:0 10px 22px rgba(0,0,0,.16)}.bk-picker-ticket:last-child{border-bottom:1px solid rgba(255,255,255,.08)}.bk-picker-ticket-top{gap:.5rem}.bk-picker-ticket-name{font-size:1rem;letter-spacing:-.025em}.bk-picker-ticket-price{color:#fff;font-size:1.05rem}.bk-picker-details{order:3;margin-left:auto;border-color:rgba(160,180,218,.27);color:#bdc8da;background:rgba(255,255,255,.035)}.bk-picker-desc{color:#aeb7c6}.bk-picker-ticket-bottom{margin-top:.9rem}.bk-picker-availability{color:#8290a7}.bk-picker-add{border:0;border-radius:10px;background:linear-gradient(135deg,#547eff,#2451d3);color:#fff;box-shadow:0 7px 16px rgba(36,81,211,.28)}.bk-picker-qty{border-color:#527cff;background:rgba(59,97,205,.16)}.bk-picker-qty button{color:#9cb6ff}
+      .picker-seat-section{border-top-color:rgba(255,255,255,.1);margin-top:1.5rem}.picker-seat-section .bk-seating{border-color:rgba(135,160,220,.19);border-radius:16px;background:linear-gradient(145deg,#0d111a,#111827)}.picker-seat-status{margin:-.35rem 0 .9rem;color:#94a3b8;font-size:.76rem}.bk-picker-bar{border-color:rgba(139,163,224,.25);background:rgba(20,26,38,.93);backdrop-filter:blur(18px);box-shadow:0 16px 42px rgba(0,0,0,.5)}.bk-picker-proceed{min-width:106px;background:linear-gradient(135deg,#5b84ff,#2148c9);box-shadow:0 8px 20px rgba(33,72,201,.35)}.bk-picker-total small{letter-spacing:.05em}.bk-picker-total strong{font-size:1.12rem;color:#fff}
+    }
+    @media(max-width:768px), (min-width:769px){
+      .bk-picker-info{margin:1.1rem 0 3.1rem}.bk-picker-date,.bk-picker-time{min-width:auto;padding:0;border:0;background:none;box-shadow:none}.bk-picker-date{display:flex;gap:.45rem;align-items:center}.bk-picker-date b{font-size:.8rem;color:#aab2c2;text-transform:none;letter-spacing:0}.bk-picker-date strong,.bk-picker-time strong{margin:0;font-size:.83rem;font-weight:700;color:#aab2c2}.bk-picker-time::before{content:'•';margin-right:.35rem;color:#64748b}.bk-picker-sheet{margin:0;padding:0;border:0;background:transparent;box-shadow:none;border-radius:0;min-height:0}.bk-picker-intro{margin:-.35rem 0 1.15rem;color:#8892a4;font-size:.8rem;line-height:1.5}.bk-picker-ticket{margin:0;padding:1.3rem 1.15rem;border-radius:0;border-width:0 0 1px;border-color:rgba(255,255,255,.09);background:transparent;box-shadow:none}.bk-picker-ticket:first-of-type{border:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;background:rgba(255,255,255,.035)}.bk-picker-ticket:last-child{border:1px solid rgba(255,255,255,.12);border-top:0;border-radius:0 0 20px 20px;background:rgba(255,255,255,.035)}.bk-picker-ticket:only-child{border:1px solid rgba(255,255,255,.12);border-radius:20px}.bk-picker-ticket-name{font-size:1.05rem;text-transform:uppercase;letter-spacing:.02em}.bk-picker-ticket-price{position:absolute;margin-top:1.8rem;font-size:.95rem}.bk-picker-ticket{position:relative;min-height:112px}.bk-picker-ticket-bottom{justify-content:flex-end;margin-top:1.25rem}.bk-picker-availability{position:absolute;left:1.15rem;bottom:1.3rem}.bk-picker-add,.bk-picker-qty{min-width:130px;height:48px;border:1px solid rgba(255,255,255,.75);border-radius:13px;background:transparent;box-shadow:none;color:#fff;font-size:.95rem;text-transform:uppercase}.bk-picker-qty{justify-content:center;gap:1rem;border-color:#527cff;background:rgba(59,97,205,.13)}.bk-picker-qty button{font-size:1.4rem}.bk-picker-desc{margin:1rem 0 .1rem;padding-right:.5rem}.bk-picker-ticket:has(.bk-picker-desc.open){min-height:210px}.bk-picker-bar{left:0;right:0;bottom:0;border-radius:0;border-width:1px 0 0;padding:.9rem 1.2rem calc(env(safe-area-inset-bottom) + .9rem);background:rgba(9,12,19,.97)}.bk-picker-proceed{height:50px;min-width:132px;border-radius:14px;font-size:.95rem}.picker-seat-section{margin-top:1.75rem}.picker-seat-section .bk-picker-label{margin-bottom:1rem}
+      .bk-review-head{display:flex;align-items:center;gap:.9rem;padding:1.15rem 1.2rem 1.25rem;background:#080b12;border-bottom:1px solid rgba(255,255,255,.08)}.bk-review-head h1{font-size:1.15rem;letter-spacing:-.04em}.bk-review-head p{margin-top:.18rem;color:#929caf;font-size:.73rem}.bk-review-head .bk-picker-back{width:38px;height:38px}.bk-panel#panel3{padding-bottom:7rem;background:#121417;min-height:100vh}.bk-panel#panel3 .bk-card{margin:0;padding:1.25rem 1.2rem;border:0;border-radius:0;background:#121417;box-shadow:none;color:#fff}.bk-panel#panel3 .bk-card h2{font-size:1.22rem;color:#fff}.bk-panel#panel3 .sub{color:#929caf;margin-bottom:1.1rem}.bk-panel#panel3 .bk-card>div:first-of-type{background:#070a11!important;border-color:rgba(255,255,255,.08)!important;border-radius:18px!important;padding:1rem!important}.bk-panel#panel3 .bk-card>div:first-of-type div{color:#bcc4d2!important}.bk-panel#panel3 .bk-card>div:first-of-type strong{color:#fff!important}.bk-panel#panel3 .bk-label{color:#aeb7c8}.bk-panel#panel3 .bk-coupon-row input{background:#090c13;border-color:#29303d;color:#fff}.bk-panel#panel3 .bk-coupon-btn{background:#315bdc}.bk-panel#panel3 .bk-bill{background:#070a11;border-color:rgba(255,255,255,.08);border-radius:18px}.bk-panel#panel3 .bk-bill-row,.bk-panel#panel3 .bk-bill-row span,.bk-panel#panel3 .bk-bill-row strong{color:#e9edf5!important;border-color:rgba(255,255,255,.08)}.bk-panel#panel3 .bk-bill-row.total strong{color:#8facff!important}.bk-panel#panel3 .bk-tc{margin:0 1.2rem;background:#181c24;border-color:#303643;color:#b9c1cf}.bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;margin:0;padding:.85rem 1.2rem calc(env(safe-area-inset-bottom) + .85rem);background:#080b12;border-top:1px solid rgba(255,255,255,.09)}.bk-panel#panel3 .bk-btn-back{display:none}.bk-panel#panel3 .bk-btn-next{height:52px;background:linear-gradient(135deg,#5b84ff,#2148c9);border-radius:14px}.bk-panel#panel3 .bk-nav+.bk-secure{display:none}
+      /* Mobile checkout — ticketing-app inspired review screen. */
+      .bk-panel#panel3{gap:0;background:#161719;padding-bottom:8.2rem}.bk-panel#panel3 .bk-review-head{background:#08090d}.bk-panel#panel3 .checkout-event{padding:1.05rem 1.75rem 1.5rem}.checkout-event h2{margin:0;color:#f3f4f6;font-size:1.2rem;font-weight:800;letter-spacing:-.045em}.checkout-event>p{margin:.22rem 0 1.25rem;color:#9b9da5;font-size:.79rem}.checkout-ticket,.checkout-offer,.checkout-bill{background:#05070d!important;border:1px solid rgba(255,255,255,.035)!important;border-radius:22px!important;box-shadow:0 8px 18px rgba(0,0,0,.16)}.checkout-ticket{padding:1.2rem 1.05rem}.checkout-ticket-top,.checkout-ticket-bottom{display:flex;align-items:center;justify-content:space-between;gap:.65rem}.checkout-ticket-top{color:#f7f7f8;font-size:.84rem}.checkout-ticket-top span{color:#a6a7ad}.checkout-ticket-bottom{margin-top:1.2rem;color:#dbdce1;font-size:.87rem}.checkout-ticket-bottom>span{flex:1}.checkout-quantity{display:flex;align-items:center;gap:.8rem;border:1px solid #363941;border-radius:12px;padding:.42rem .65rem;color:#f1f2f3}.checkout-quantity button{border:0;background:none;color:#1ab883;font-size:1.2rem;font-weight:900;line-height:1}.checkout-quantity b{font-size:.85rem}.checkout-ticket-bottom>strong{font-size:.92rem;color:#ededf0}.checkout-cashback{display:flex;align-items:center;justify-content:space-between;margin:0 1.75rem 2.15rem;padding:.95rem 1.05rem;border:1px solid rgba(113,222,173,.25);border-radius:18px;background:linear-gradient(100deg,rgba(29,126,90,.32),rgba(41,112,84,.15));color:#e4eee9;font-size:.83rem}.checkout-cashback strong{color:#40d79a;font-size:.9rem}.checkout-section{padding:0 1.75rem 2.15rem}.checkout-section h3{margin:0 0 .75rem;color:#e5e5e7;font-size:1rem;letter-spacing:-.04em}.checkout-offer{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.05rem}.checkout-offer strong{display:block;color:#eeeff1;font-size:.91rem}.checkout-offer span:not(.checkout-chevron){display:block;margin-top:.45rem;color:#21b77d;font-size:.78rem}.checkout-chevron{color:#aeb0b7;font-size:2rem;font-weight:300}.checkout-coupon{margin-top:.65rem}.checkout-coupon .bk-coupon-row input{background:#0b0d13;border-color:#2b2e36;color:#fff}.checkout-coupon .bk-coupon-btn{background:#1cac78}.checkout-bill{padding:1.05rem}.checkout-bill .bk-bill-row{padding:.48rem 0;color:#bbbcc3!important;border:0}.checkout-bill .bk-bill-row span,.checkout-bill .bk-bill-row strong{color:#dedee2!important}.checkout-bill .bk-bill-row.total{margin-top:.5rem;padding-top:1rem;border-top:1px dashed #41434c}.checkout-bill .bk-bill-row.total strong{color:#fff!important}.checkout-remember{padding:1.3rem 1.75rem;border-top:1px solid #38393c;color:#e5e5e7}.checkout-remember summary{font-size:1rem;font-weight:800;list-style:none;cursor:pointer}.checkout-remember summary::-webkit-details-marker{display:none}.checkout-remember summary::after{content:'⌄';float:right;color:#999ba2;font-size:1.35rem}.checkout-remember p{margin-top:.8rem;color:#a5a7ae;font-size:.76rem;line-height:1.55}.bk-panel#panel3 .bk-tc{margin:0 1.75rem 1rem;padding:0;background:none;border:0;font-size:.67rem}.bk-panel#panel3 .bk-tc a{color:#4cce99!important}.bk-panel#panel3 .bk-nav{display:grid;grid-template-columns:1fr 1.25fr;align-items:center;gap:.8rem;padding:.85rem 1.75rem calc(env(safe-area-inset-bottom) + .85rem);background:rgba(18,19,21,.98)}.checkout-pay-method{display:flex;flex-direction:column;gap:.18rem;color:#e9eaed}.checkout-pay-method small{color:#9698a0;font-size:.56rem;font-weight:900;letter-spacing:.07em}.checkout-pay-method strong{font-size:.78rem}.bk-panel#panel3 .bk-btn-next{height:52px;background:#1dae79;border-radius:15px;box-shadow:none}.bk-panel#panel3 .bk-btn-back{display:none}
+      /* Layout fixes for compact ticket cards and seat controls. */
+      .bk-picker-head::after{display:none}.bk-picker-ticket{min-height:0!important}.bk-picker-ticket-top{display:block;padding-right:118px}.bk-picker-ticket-name{display:block}.bk-picker-ticket-price{position:static;display:block;margin:.3rem 0 0}.bk-picker-details{position:absolute;top:1.15rem;right:1.15rem;margin:0}.bk-picker-ticket-bottom{justify-content:space-between;margin-top:1.15rem}.bk-picker-availability{position:static}.bk-picker-ticket:has(.bk-picker-desc.open){min-height:0!important}.bk-picker-ticket:has(.bk-picker-desc.open) .bk-picker-ticket-bottom{margin-top:1rem}.picker-seat-section #qtyField>div:nth-of-type(2){padding:.7rem .85rem!important;background:#111722!important;border:1px solid #30394a!important;border-radius:12px!important}.picker-seat-section #qtyField>div:nth-of-type(3){color:#9ca9bd!important}.picker-seat-section #qtyField>div:nth-of-type(2) span{color:#dce5f5!important}
+    }
+    @media(max-width:768px), (min-width:769px){
+      .checkout-offer{width:100%;border:0;text-align:left;font:inherit}.checkout-coupon{padding-top:.15rem}.checkout-coupon-title{margin:.9rem 0 .5rem;color:#a6a8af;font-size:.66rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.checkout-no-coupons{margin-top:.75rem;color:#8f929a;font-size:.76rem}.checkout-coupon .avail-coupon-chip{width:100%;border:1px solid rgba(67,206,150,.32);border-radius:12px;background:#0b1713;color:#edf8f3;text-align:left}.checkout-coupon .avail-coupon-code{color:#e8f6ef}.checkout-coupon .avail-coupon-val{margin-left:auto;background:transparent;color:#45d49c}.checkout-coupon .avail-coupon-tap{color:#45d49c;font-size:.7rem;font-weight:900}.bk-panel#panel3 .bk-btn-next{grid-column:2;justify-self:stretch}
+    }
+    @media (min-width:769px){
+      .bk-ticket-picker{max-width:1040px;margin:0 auto;padding:2rem 2rem 9rem;}
+      .bk-picker-head{margin-bottom:2rem;}
+      .bk-picker-back{width:50px;height:50px;font-size:1.9rem;}
+      .bk-picker-title{font-size:1.7rem;}
+      .bk-picker-location{font-size:1.05rem;}
+      .bk-picker-info{margin:1.5rem 0 2.2rem;gap:1rem;}
+      .bk-picker-date strong,.bk-picker-time strong{font-size:1.2rem;}
+      .bk-picker-sheet{padding:1.7rem 1.5rem 2rem;}
+      .bk-picker-label{font-size:.95rem;margin-bottom:1.3rem;}
+      .bk-picker-intro{font-size:1rem;margin-bottom:1.5rem;}
+      .bk-picker-ticket{padding:1.6rem 1.5rem;}
+      .bk-picker-ticket-name{font-size:1.4rem;}
+      .bk-picker-ticket-price{font-size:1.3rem;}
+      .bk-picker-desc{font-size:1.05rem;line-height:1.75;}
+      .bk-picker-ticket-bottom{margin-top:1.4rem;}
+      .bk-picker-availability{font-size:.95rem;}
+      .bk-picker-details{font-size:.9rem;padding:.5rem .8rem;}
+      .bk-picker-add,.bk-picker-qty{min-width:150px;height:54px;font-size:1rem;}
+      .picker-seat-section{margin-top:2.2rem;padding-top:1.7rem;}
+      .picker-seat-section .bk-picker-label{font-size:.95rem;}
+      .picker-seat-status{font-size:.95rem;}
+      .picker-seat-section .bk-seating{padding:1.1rem;max-height:70vh;}
+      .bk-picker-bar{left:50%;right:auto;width:min(1000px,calc(100% - 2rem));transform:translateX(-50%);}
+      .bk-picker-total small{font-size:.88rem;}
+      .bk-picker-total strong{font-size:1.35rem;}
+      .bk-picker-proceed{height:54px;font-size:1.05rem;}
+      .bk-panel#panel3 .bk-nav{grid-template-columns:1fr;}
+      .bk-panel#panel3 .bk-nav>.bk-btn-next{grid-column:1;width:100%;height:52px;min-height:52px;justify-self:stretch;font-size:.95rem;}
+      .bk-panel#panel4 .bk-nav .bk-btn-next{width:220px;height:46px;min-height:46px;justify-self:end;font-size:.9rem;}
+    }
+    /* Ticket chooser styling based on the supplied mobile reference. */
+    #ticketSelectionSheet{margin:0 -1.2rem;padding:1.5rem 1.15rem 2rem;border-radius:30px 30px 0 0;background:#05070d;min-height:55vh;}
+    #ticketSelectionSheet>.bk-picker-label{margin:0 0 1.15rem;color:#c5c9d2;font-size:.78rem;letter-spacing:.16em;}
+    #ticketSelectionSheet .bk-picker-intro{display:none;}
+    #pickerTicketList{overflow:hidden;padding:0 .95rem;border:1px solid rgba(255,255,255,.045);border-radius:26px;background:#101216;}
+    #pickerTicketList .bk-picker-ticket{display:grid;grid-template-columns:minmax(0,1fr) 116px;align-items:start;gap:.75rem 1rem;margin:0;padding:1.25rem .05rem;border:0;border-bottom:1px dashed rgba(210,215,225,.2);border-radius:0;background:transparent;box-shadow:none;min-height:0;}
+    #pickerTicketList .bk-picker-ticket:last-child{border-bottom:0;}
+    .bk-picker-ticket-copy{min-width:0;}
+    #pickerTicketList .bk-picker-ticket-name{display:block;color:#e5e6e9;font-size:.95rem;font-weight:800;line-height:1.4;letter-spacing:-.025em;text-transform:none;}
+    #pickerTicketList .bk-picker-ticket-price{display:block;position:static;margin:.25rem 0 0;color:#f3f4f6;font-size:.95rem;font-weight:900;}
+    #pickerTicketList .bk-picker-add,#pickerTicketList .bk-picker-qty{grid-column:2;grid-row:1;justify-self:stretch;align-self:start;min-width:0;width:100%;height:48px;margin:0;border:1px solid #242832;border-radius:13px;background:#05070d;color:#19b981;font-size:.95rem;font-weight:900;letter-spacing:.02em;box-shadow:none;}
+    #pickerTicketList .bk-picker-add:disabled{color:#8a909b;background:#191c22;}
+    #pickerTicketList .bk-picker-qty{display:flex;justify-content:space-around;align-items:center;gap:.25rem;border-color:rgba(31,190,137,.5);background:#07130f;color:#fff;}
+    #pickerTicketList .bk-picker-qty button{color:#38d39b;}
+    #pickerTicketList .bk-picker-qty button:disabled{opacity:.35;cursor:not-allowed;}
+    #pickerTicketList .bk-picker-ticket-bottom{display:contents;}
+    #pickerTicketList .bk-picker-ticket-copy{grid-column:1;grid-row:1;}
+    #pickerTicketList .bk-picker-desc{grid-column:1/-1;grid-row:2;}
+    #pickerTicketList .bk-picker-availability{grid-column:1/-1;color:#fca5a5;}
+    #pickerTicketList .bk-picker-details{grid-column:1/-1;justify-self:start;margin-top:.05rem;padding:.35rem .7rem;border:1px solid #353a44;border-radius:999px;background:transparent;color:#c6cad2;font-size:.75rem;font-weight:700;}
+    #pickerTicketList .bk-picker-desc{grid-column:1/-1;margin:-.2rem 0 .1rem;color:#aeb4c0;font-size:.8rem;line-height:1.55;}
+    #pickerTicketList .bk-picker-desc:not(.open){display:none;}
+    @media(max-width:380px){#pickerTicketList .bk-picker-ticket{grid-template-columns:minmax(0,1fr) 96px;gap:.65rem;}#pickerTicketList .bk-picker-add,#pickerTicketList .bk-picker-qty{height:44px;}}
+    /* Keep iOS Safari from zooming the page when a small form field receives focus. */
+    @media(max-width:768px){.bk-input input,.bk-input select,.bk-otp-wrap input,.bk-coupon-row input,#couponSheetInput{font-size:16px!important;}}
+    /* Checkout review layout based on the supplied mobile reference. */
+    @media(max-width:768px){
+    .bk-panel#panel3{background:#121315;min-height:100vh;padding-bottom:8.4rem;gap:0;color:#f5f5f6;}
+    .bk-panel#panel3 .bk-review-head{min-height:68px;padding:.8rem 1.2rem;background:#121315;border:0;}
+    .bk-panel#panel3 .bk-review-head h1{font-size:1rem;letter-spacing:-.02em;}
+    .bk-panel#panel3 .bk-review-head p{display:none;}
+    .checkout-expiry{height:38px;display:flex;align-items:center;justify-content:center;gap:.25rem;background:#242528;color:#d5d5d8;font-size:.78rem;}
+    .checkout-expiry strong{color:#54d898;font-variant-numeric:tabular-nums;}
+    .checkout-expiry.expiring{color:#ffb4b4;background:#321d20;}
+    .checkout-expiry.expiring strong{color:#ff4d5a;}
+    .checkout-expiry.expired{height:auto;min-height:42px;padding:.55rem 1rem;color:#ffb4b4;background:#321d20;text-align:center;}
+    .checkout-event{padding:1.1rem 1.2rem 1.2rem;}
+    .checkout-event-head{display:flex;align-items:center;gap:1rem;margin:0 0 1.1rem;min-width:0;}
+    .checkout-event-head img{width:90px;height:120px;flex:none;object-fit:cover;border-radius:12px;background:#25262a;}
+    .checkout-event-head img[src=""]{visibility:hidden;}
+    .checkout-event-head>div{min-width:0;}
+    .checkout-event h2{margin:0;color:#f5f5f6;font-size:1.08rem;font-weight:800;line-height:1.45;letter-spacing:-.03em;}
+    .checkout-event>div>p{margin:.35rem 0 0;color:#999ba2;font-size:.82rem;line-height:1.45;}
+    .checkout-ticket{padding:1rem;border:1px solid #36373b!important;border-radius:22px!important;background:#1d1e21!important;box-shadow:none!important;}
+    .checkout-ticket-top,.checkout-ticket-bottom{display:flex;align-items:center;justify-content:space-between;gap:.6rem;}
+    .checkout-ticket-top{padding-bottom:.9rem;border-bottom:1px solid #36373b;color:#f1f1f2;font-size:.83rem;}
+    .checkout-ticket-top span{color:#b2b3b8;white-space:nowrap;}
+    .checkout-ticket-bottom{margin-top:.85rem;color:#f0f0f1;font-size:.84rem;}
+    .checkout-ticket-bottom>span{flex:1;font-weight:800;line-height:1.45;}
+    .checkout-ticket-bottom>strong{font-size:.9rem;white-space:nowrap;}
+    .checkout-ticket-remove-row{display:flex;justify-content:flex-end;margin:.3rem 0 .8rem;}
+    .checkout-ticket-remove{padding:.2rem 0;border:0;border-bottom:1px dashed #85868c;background:none;color:#a9aab0;font-size:.72rem;}
+    .checkout-ticket-note{display:flex;align-items:center;gap:.7rem;padding-top:.8rem;border-top:1px solid #36373b;color:#d7d7da;font-size:.78rem;}
+    .checkout-ticket-note>span:first-child{color:#92949a;font-size:1.2rem;}
+    .checkout-voucher{display:flex;align-items:center;justify-content:space-between;margin:0 1.2rem 1.8rem;padding:1rem 1.1rem;border:1px solid #37383c;border-radius:22px;background:#1d1e21;}
+    .checkout-voucher[hidden]{display:none;}
+    .checkout-voucher>div{display:flex;flex-direction:column;align-items:flex-start;gap:.42rem;}
+    .checkout-voucher small{color:#c8b2ff;font-size:.68rem;}
+    .checkout-voucher strong{color:#f2f2f4;font-size:.9rem;}
+    .checkout-voucher button{padding:0;border:0;border-bottom:1px dashed #8b8c91;background:none;color:#a7a8ad;font-size:.74rem;}
+    .checkout-voucher-art{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f879b4,#8a1ab4 54%,#31214c);color:#fff;font-size:1.75rem;font-weight:900;transform:rotate(-12deg);}
+    .checkout-divider{display:flex;align-items:center;gap:.8rem;margin:0 1.2rem 1rem;color:#ededee;}
+    .checkout-divider span{height:1px;flex:1;background:#393a3e;}
+    .checkout-divider b{font-size:.69rem;font-weight:700;letter-spacing:.16em;white-space:nowrap;}
+    .checkout-offers-list{margin:0 1.2rem 2rem;padding:0 .9rem;border:1px solid #37383c;border-radius:22px;background:#1d1e21;}
+    .checkout-offer-row{width:100%;min-height:76px;display:grid;grid-template-columns:32px minmax(0,1fr) 18px;align-items:center;gap:.65rem;border:0;background:transparent;color:#f1f1f2;text-align:left;}
+    .checkout-offer-row+.checkout-offer-row{border-top:1px solid #38393d;}
+    .checkout-offer-row strong{font-size:.82rem;font-weight:800;}
+    .checkout-offer-row>span:last-child{font-size:1.4rem;font-weight:300;}
+    .checkout-offer-icon{width:28px;height:28px;display:grid;place-items:center;border:1.5px solid #e4e5e8;border-radius:9px;font-size:1rem;}
+    .checkout-payment-summary{padding:0 1.2rem 2rem;}
+    .checkout-payment-summary .checkout-bill{padding:.45rem 1rem;border-color:#37383c!important;border-radius:22px!important;background:#1d1e21!important;}
+    .checkout-payment-summary .bk-bill-row{min-height:48px;align-items:center;padding:.5rem 0;color:#dedee1!important;border:0!important;font-size:.82rem;}
+    .checkout-payment-summary .bk-bill-row span,.checkout-payment-summary .bk-bill-row strong{color:#dedee1!important;}
+    .checkout-payment-summary .checkout-order-row{min-height:58px;font-size:.9rem;font-weight:700;}
+    .checkout-payment-summary .bk-bill-row.total{margin-top:.2rem;padding-top:.55rem;border-top:1px solid #38393d!important;font-size:.9rem;font-weight:800;}
+    .checkout-payment-summary .bk-bill-row.total strong{color:#fff!important;font-size:.95rem;}
+    .checkout-invoice{margin:0 1.2rem 1.7rem;padding:1rem;border:1px solid #37383c;border-radius:22px;background:#1d1e21;}
+    .checkout-invoice-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.55rem;color:#b4b5bb;}
+    .checkout-invoice-head>span{font-size:1.35rem;}
+    .checkout-invoice-head strong{flex:1;color:#f3f3f4;font-size:.86rem;}
+    .checkout-invoice-head button{border:0;background:none;color:#c3c4c8;font-size:.75rem;}
+    .checkout-invoice p{margin:.35rem 0 0 1.95rem;color:#a4a5ab;font-size:.78rem;line-height:1.5;overflow-wrap:anywhere;}
+    .checkout-invoice p[hidden]{display:none;}
+    .checkout-invoice>small{display:block;margin-top:1rem;padding-top:.8rem;border-top:1px solid #37383c;color:#a4a5ab;font-size:.72rem;line-height:1.5;}
+    .checkout-sheet-backdrop{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center;}
+    .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:1.15rem 1.2rem calc(env(safe-area-inset-bottom) + 1.1rem);border:1px solid #393a3f;border-bottom:0;border-radius:24px 24px 0 0;background:#18191c;color:#f5f5f6;box-shadow:0 -15px 50px rgba(0,0,0,.4);}
+    .checkout-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .checkout-sheet-head h2{font-size:1rem;}
+    .checkout-sheet-close{border:0;background:transparent;color:#ddd;font-size:1.6rem;}
+    .checkout-sheet .bk-label{color:#babdc5;}
+    .checkout-sheet .bk-input{background:#101114;border-color:#383a40;}
+    .checkout-sheet .bk-input input{color:#f5f5f6;}
+    .checkout-sheet-actions{display:flex;gap:.65rem;margin-top:1rem;}
+    .checkout-sheet-actions button{flex:1;min-height:46px;border:1px solid #44464d;border-radius:12px;background:#24262b;color:#f4f4f5;font-weight:800;}
+    .checkout-sheet-actions button:last-child{border:0;background:#1dae79;color:#fff;}
+    .bk-panel#panel3 .checkout-remember{margin:0 1.2rem 1rem;padding:1rem 0;border-color:#393a3e;}
+    .bk-panel#panel3 .bk-tc{margin:0 1.2rem 1rem;}
+    .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:flex;justify-content:flex-end;align-items:center;gap:.7rem;margin:0;padding:.65rem 1.2rem calc(env(safe-area-inset-bottom) + .65rem);border-top:1px solid #38393d;background:#18191c;}
+      .bk-panel#panel3 .checkout-pay-action{position:relative;width:min(560px,100%);min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:.55rem;padding:.45rem .55rem;border:1px solid #dedee2;border-radius:15px;background:#f7f7f8;color:#161719;}
+      .checkout-payment-picker{position:relative;min-width:0;flex:1;}
+      .checkout-payment-toggle{width:100%;min-height:48px;display:flex;align-items:center;gap:.45rem;padding:.2rem .25rem;border:0;background:transparent;color:#161719;text-align:left;}
+      .checkout-payment-mark{width:25px;height:25px;display:grid;place-items:center;flex:none;border-radius:6px;background:#dbeafe;color:#1242c5;font-size:.78rem;font-weight:900;}
+      .checkout-payment-label{min-width:0;display:flex;flex:1;flex-direction:column;gap:.05rem;}
+      .checkout-payment-label small{color:#55565a;font-size:.61rem;}
+      .checkout-payment-label strong{overflow:hidden;color:#161719;font-size:.75rem;text-overflow:ellipsis;white-space:nowrap;}
+      .checkout-payment-chevron{color:#55565a;font-size:.85rem;}
+      .checkout-payment-menu{position:absolute;z-index:50;left:0;bottom:calc(100% + .65rem);width:min(250px,82vw);padding:.35rem;border:1px solid #41434a;border-radius:14px;background:#202124;box-shadow:0 12px 36px rgba(0,0,0,.45);}
+      .checkout-payment-menu[hidden]{display:none!important;}
+      .checkout-payment-option{width:100%;display:flex;flex-direction:column;gap:.18rem;padding:.7rem .75rem;border:0;border-radius:10px;background:transparent;color:#f4f4f5;text-align:left;}
+      .checkout-payment-option+ .checkout-payment-option{border-top:1px solid #37383d;}
+      .checkout-payment-option strong{font-size:.78rem;}
+      .checkout-payment-option small{color:#b2b3b9;font-size:.65rem;}
+      .checkout-payment-option[aria-selected="true"]{background:#303137;}
+      .checkout-payment-option:disabled{opacity:.5;}
+      .checkout-pay-total{min-width:52px;display:flex;flex-direction:column;gap:.05rem;}
+      .checkout-pay-total strong{color:#161719;font-size:.83rem;white-space:nowrap;}
+      .checkout-pay-total small{color:#55565a;font-size:.62rem;}
+      .bk-panel#panel3 .checkout-pay-action .bk-btn-next{width:auto!important;min-width:112px;height:46px!important;min-height:46px!important;padding:0 .75rem;border-radius:12px;background:#ff5a19!important;box-shadow:none!important;color:#fff!important;font-size:.78rem;font-weight:900;white-space:nowrap;}
+    .bk-panel#panel3 .bk-btn-next{grid-column:1/-1!important;width:100%!important;justify-self:stretch!important;}
+    .bk-panel#panel3 .checkout-pay-action .bk-btn-next{grid-column:auto!important;width:auto!important;justify-self:auto!important;}
+    }
+    @media(max-width:768px){
+      .bk-panel#panel1.ticket-picker::before{content:"";position:fixed;z-index:40;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(2px);}
+      .bk-panel#panel1 .bk-ticket-picker{position:fixed;z-index:50;left:0;right:0;bottom:0;height:min(84dvh,780px);min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 1.2rem calc(env(safe-area-inset-bottom) + 6.8rem);border:1px solid #303136;border-bottom:0;border-radius:28px 28px 0 0;background:#121315;color:#f5f5f6;box-shadow:0 -12px 40px rgba(0,0,0,.5);}
+      .bk-panel#panel1 .bk-picker-head{position:sticky;z-index:2;top:0;display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:.3rem;margin:0 -1.2rem 0;padding:.75rem 1.2rem;border-bottom:1px solid #303136;background:#121315;}
+      .bk-panel#panel1 .bk-picker-head .bk-picker-back{width:40px;height:40px;border:0;background:transparent;color:#f4f4f5;font-size:1.8rem;line-height:1;}
+      .bk-panel#panel1 .bk-picker-head h1{margin:0;color:#f5f5f6;text-align:center;font-size:1.02rem;font-weight:650;}
+      .bk-panel#panel1 .bk-picker-info{gap:.6rem;margin:1.2rem 0 1.3rem;}
+      .bk-panel#panel1 .bk-picker-date,.bk-panel#panel1 .bk-picker-time{padding:.55rem .7rem;border:1px solid #36373b;border-radius:13px;background:#1d1e21;color:#d9d9dc;box-shadow:none;}
+      .bk-panel#panel1 .bk-picker-date b{color:#b7a8ff;}
+      .bk-panel#panel1 .bk-picker-date strong,.bk-panel#panel1 .bk-picker-time strong{color:#eeeef0;}
+      .bk-panel#panel1 .bk-picker-sheet{margin:0;padding:.75rem 0 1.2rem;border:0;border-radius:0;background:#121315;box-shadow:none;}
+      .bk-panel#panel1 .bk-picker-label{margin-bottom:.35rem;color:#f1f1f2;font-size:.9rem;letter-spacing:0;text-transform:none;}
+      .bk-panel#panel1 .bk-picker-intro{margin:.25rem 0 .8rem;color:#9b9ca2;}
+      .bk-panel#panel1 .bk-picker-ticket{margin:.65rem 0;padding:1rem;border:1px solid #36373b!important;border-radius:17px!important;background:#1d1e21!important;box-shadow:0 2px 8px rgba(0,0,0,.2)!important;}
+      .bk-panel#panel1 .bk-picker-ticket-name,.bk-panel#panel1 .bk-picker-ticket-price{color:#f4f4f5;}
+      .bk-panel#panel1 .bk-picker-availability{color:#a5a6ac;}
+      .bk-panel#panel1 .bk-picker-add,.bk-panel#panel1 .bk-picker-qty{min-width:94px;height:44px;border:0;border-radius:12px;background:linear-gradient(135deg,#5946e8,#3f42cc);color:#fff;box-shadow:0 6px 14px rgba(75,67,218,.2);text-transform:none;}
+      .bk-panel#panel1 .bk-picker-qty{min-width:100px;}
+      .bk-panel#panel1 .guest-contact-card{min-height:calc(100% - 60px);margin:0!important;padding:0!important;overflow:visible;border:0!important;border-radius:0!important;background:#121315!important;box-shadow:none!important;color:#f4f4f5;}
+      .bk-panel#panel1 .guest-contact-card::before{display:none;}
+      .guest-contact-sheet-head{position:sticky;z-index:2;top:0;display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:.3rem;margin:0 -1.2rem 1.35rem;padding:.75rem 1.2rem;border-bottom:1px solid #303136;background:#121315;}
+      .guest-contact-sheet-head button{width:40px;height:40px;border:0;background:transparent;color:#f4f4f5;font-size:1.8rem;line-height:1;}
+      .guest-contact-sheet-head h2{margin:0!important;color:#f5f5f6!important;text-align:center;font-size:1.02rem!important;font-weight:650!important;}
+      .bk-panel#panel1 .guest-contact-head{display:none;}
+      .bk-panel#panel1 .guest-contact-card .bk-field{gap:.45rem;margin:0 0 1.15rem;}
+      .bk-panel#panel1 .guest-contact-card .bk-label{color:#aeb0b8;font-size:.78rem;letter-spacing:0;text-transform:none;}
+      .bk-panel#panel1 .guest-contact-card .bk-input{height:56px;padding:0 .85rem;border:1px solid #36373b;border-radius:14px;background:#1d1e21;box-shadow:none;}
+      .bk-panel#panel1 .guest-contact-card .bk-input:focus-within{border-color:#8974ff;box-shadow:0 0 0 3px rgba(137,116,255,.15);}
+      .bk-panel#panel1 .guest-contact-card .bk-input>span{color:#a1a2a8;}
+      .bk-panel#panel1 .guest-contact-card .bk-input input{color:#f4f4f5;font-size:1rem;}
+      .bk-panel#panel1 .guest-contact-card .bk-input input::placeholder{color:#777980;}
+      .bk-panel#panel1 .guest-contact-continue,.bk-panel#panel1 .guest-contact-note{display:none;}
+      .bk-panel#panel1 .bk-picker-bar{z-index:60;left:0;right:0;bottom:0;gap:.7rem;padding:.8rem 1.2rem calc(env(safe-area-inset-bottom) + .8rem);border:0;border-top:1px solid #303136;border-radius:0;background:rgba(24,25,28,.98);box-shadow:0 -6px 24px rgba(0,0,0,.35);backdrop-filter:blur(14px);color:#f4f4f5;}
+      .bk-panel#panel1 .bk-picker-total small{color:#a5a6ac;font-size:.8rem;}
+      .bk-panel#panel1 .bk-picker-total strong{color:#f4f4f5;font-size:1.05rem;}
+      .bk-panel#panel1 .bk-picker-proceed{height:52px;min-width:132px;border-radius:13px;background:linear-gradient(135deg,#5946e8,#3f42cc);box-shadow:0 6px 14px rgba(75,67,218,.2);color:#fff;font-size:.92rem;}
+      .bk-panel#panel1 .bk-picker-proceed:disabled{background:#44454a;box-shadow:none;color:#aaaab0;}
+      .bk-panel#panel1.details-step .bk-picker-head,.bk-panel#panel1.details-step .bk-picker-info,.bk-panel#panel1.details-step .bk-picker-sheet{display:none!important;}
+      .bk-panel#panel1.details-step .bk-ticket-picker{padding-top:0;}
+      .bk-panel#panel1.details-step .guest-contact-card{display:block!important;}
+    }
+    @media (min-width:769px){
+      body{background:#08090d;color:#f5f5f6;padding-bottom:7.5rem;}
+      .bk-wrap{width:min(1200px,calc(100% - 3rem));max-width:1200px!important;margin:0 auto;padding:1.5rem 0 8rem;}
+      .bk-grid{display:block!important;grid-template-columns:minmax(0,1fr)!important;}
+      .bk-panel#panel1.desktop-details-step .bk-ticket-picker{width:min(900px,100%);min-height:0;margin:1.5rem auto;padding:1.5rem 2rem 2rem;border:1px solid #303641;border-radius:24px;background:linear-gradient(145deg,#171d2a,#10141d 72%);box-shadow:0 22px 55px rgba(0,0,0,.34);}
+      .bk-panel#panel1.desktop-details-step .bk-picker-head,.bk-panel#panel1.desktop-details-step .bk-picker-info,.bk-panel#panel1.desktop-details-step .bk-picker-sheet{display:none!important;}
+      .bk-panel#panel1.desktop-details-step .guest-contact-card{display:block!important;min-height:0;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;}
+      .bk-panel#panel1.desktop-details-step .guest-contact-card::before{display:none;}
+      .guest-contact-sheet-head{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:1rem;margin:0 0 1.5rem;padding:0 0 1rem;border-bottom:1px solid rgba(255,255,255,.1);}
+      .guest-contact-sheet-head button{width:42px;height:42px;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:#202633;color:#f4f5f7;font-size:1.5rem;line-height:1;}
+      .guest-contact-sheet-head h2{margin:0!important;color:#f8faff!important;text-align:center;font-size:1.25rem!important;font-weight:800!important;letter-spacing:-.03em;}
+      .guest-contact-head{display:none;}
+      .bk-panel#panel1.desktop-details-step .guest-contact-card .bk-field{gap:.45rem;margin:0 0 1rem;}
+      .bk-panel#panel1.desktop-details-step .guest-contact-card .bk-label{font-size:.7rem;color:#b8c4dc;}
+      .bk-panel#panel1.desktop-details-step .guest-contact-card .bk-input{height:54px;border-radius:13px;}
+      .bk-panel#panel1.desktop-details-step .guest-contact-continue{max-width:420px;margin:1.25rem auto 0;}
+      .bk-panel#panel1.desktop-details-step .guest-contact-note{margin-top:.9rem;}
+      .bk-panel#panel3{width:100%;min-height:100vh;gap:0;padding:0 0 7.5rem;border:1px solid #292b30;border-radius:24px;background:#121315;color:#f5f5f6;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.35);}
+      .bk-panel#panel3 .bk-review-head{display:flex;align-items:center;gap:1rem;padding:1.15rem 1.75rem;background:#0d0e11;border-bottom:1px solid #292b30;}
+      .bk-panel#panel3 .bk-review-head h1{color:#f5f5f6;font-size:1.2rem;letter-spacing:-.03em;}
+      .bk-panel#panel3 .bk-review-head p{margin-top:.2rem;color:#9b9da5;font-size:.78rem;}
+      .bk-panel#panel3 .bk-review-head .bk-picker-back{width:42px;height:42px;border:1px solid #383b42;border-radius:50%;background:#1d1f24;color:#f5f5f6;font-size:1.5rem;}
+      .checkout-expiry{min-height:42px;display:flex;align-items:center;justify-content:center;gap:.3rem;background:#222428;color:#d5d5d8;font-size:.82rem;}
+      .checkout-expiry strong{color:#54d898;font-variant-numeric:tabular-nums;}
+      .checkout-expiry.expiring{color:#ffb4b4;background:#321d20;}.checkout-expiry.expiring strong{color:#ff4d5a;}
+      .checkout-expiry.expired{height:auto;min-height:42px;padding:.55rem 1rem;color:#ffb4b4;background:#321d20;text-align:center;}
+      .checkout-event{padding:1.5rem 2rem 1.75rem;}
+      .checkout-event-head{display:flex;align-items:center;gap:1.2rem;margin:0 0 1.25rem;min-width:0;}
+      .checkout-event-head img{width:112px;height:142px;flex:none;object-fit:cover;border-radius:14px;background:#25262a;}
+      .checkout-event-head img[src=""]{visibility:hidden;}.checkout-event-head>div{min-width:0;}
+      .checkout-event h2{margin:0;color:#f5f5f6;font-size:1.3rem;font-weight:800;line-height:1.35;letter-spacing:-.03em;}
+      .checkout-event>div>p{margin:.4rem 0 0;color:#9b9da5;font-size:.9rem;line-height:1.45;}
+      .checkout-ticket,.checkout-offer,.checkout-bill{border:1px solid #36373b!important;border-radius:20px!important;background:#1d1e21!important;box-shadow:none!important;}
+      .checkout-ticket{padding:1.25rem 1.4rem;}
+      .checkout-ticket-top,.checkout-ticket-bottom{display:flex;align-items:center;justify-content:space-between;gap:.75rem;}
+      .checkout-ticket-top{padding-bottom:1rem;border-bottom:1px solid #36373b;color:#f1f1f2;font-size:.95rem;}.checkout-ticket-top span{color:#a6a7ad;}
+      .checkout-ticket-bottom{margin-top:1rem;color:#dedee2;font-size:.95rem;}.checkout-ticket-bottom>span{flex:1;}.checkout-ticket-bottom>strong{color:#f4f4f5;font-size:1rem;}
+      .checkout-ticket-remove-row{display:flex;justify-content:flex-end;margin:.25rem 0 .8rem;}
+      .checkout-ticket-remove{padding:.25rem 0;border:0;border-bottom:1px dashed #85868c;background:none;color:#a9aab0;font-size:.78rem;}
+      .checkout-ticket-note{display:flex;align-items:center;gap:.7rem;padding-top:.9rem;border-top:1px solid #36373b;color:#c6c7cc;font-size:.9rem;}
+      .checkout-divider{display:flex;align-items:center;gap:1rem;margin:1.25rem 2rem .85rem;color:#ededee;}
+      .checkout-divider span{height:1px;flex:1;background:#393a3e;}.checkout-divider b{font-size:.74rem;font-weight:700;letter-spacing:.16em;white-space:nowrap;}
+      .checkout-offers-list{margin:0 2rem 1.6rem;padding:0 1rem;border:1px solid #37383c;border-radius:20px;background:#1d1e21;}
+      .checkout-offer-row{width:100%;min-height:68px;display:grid;grid-template-columns:36px minmax(0,1fr) 20px;align-items:center;gap:.8rem;border:0;background:transparent;color:#f1f1f2;text-align:left;}
+      .checkout-offer-row+.checkout-offer-row{border-top:1px solid #38393d;}.checkout-offer-row strong{font-size:.9rem;font-weight:800;}
+      .checkout-offer-icon{width:30px;height:30px;display:grid;place-items:center;border:1.5px solid #dedfe2;border-radius:9px;font-size:1rem;}
+      .checkout-section{padding:0 2rem 1.5rem;}.checkout-bill{padding:.55rem 1.2rem;}
+      .checkout-bill .bk-bill-row{min-height:52px;align-items:center;padding:.6rem 0;border:0;color:#dedee2!important;font-size:.9rem;}
+      .checkout-bill .bk-bill-row span,.checkout-bill .bk-bill-row strong{color:#dedee2!important;}
+      .checkout-bill .bk-bill-row.total{margin-top:.35rem;padding-top:.8rem;border-top:1px solid #38393d;}.checkout-bill .bk-bill-row.total strong{color:#fff!important;font-size:1.05rem;}
+      .checkout-invoice{margin:0 2rem 1.5rem;padding:1.2rem 1.3rem;border:1px solid #37383c;border-radius:20px;background:#1d1e21;}
+      .checkout-invoice-head{display:flex;align-items:center;gap:.8rem;margin-bottom:.55rem;color:#b4b5bb;}.checkout-invoice-head>span{font-size:1.4rem;}
+      .checkout-invoice-head strong{flex:1;color:#f3f3f4;font-size:.95rem;}.checkout-invoice-head button{border:0;background:none;color:#c3c4c8;font-size:.8rem;}
+      .checkout-invoice p{margin:.4rem 0 0 2.2rem;color:#a4a5ab;font-size:.85rem;line-height:1.5;overflow-wrap:anywhere;}.checkout-invoice p[hidden]{display:none;}
+      .checkout-invoice>small{display:block;margin-top:1rem;padding-top:.8rem;border-top:1px solid #37383c;color:#a4a5ab;font-size:.78rem;line-height:1.5;}
+      .bk-panel#panel3 .checkout-remember{margin:0 2rem 1.3rem;padding:1rem 0;border-color:#393a3e;color:#e5e5e7;}
+      .bk-panel#panel3 .checkout-remember summary{font-size:.95rem;font-weight:800;}.bk-panel#panel3 .checkout-remember p{color:#a5a7ae;font-size:.8rem;line-height:1.55;}
+      .bk-panel#panel3 .bk-tc{margin:0 2rem 1rem;padding:.85rem;background:#181c24;border:1px solid #303643;border-radius:12px;color:#b9c1cf;}
+      .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:flex;justify-content:flex-end;align-items:center;margin:0;padding:.8rem max(calc((100vw - 1160px)/2),2rem);border-top:1px solid #303136;background:rgba(18,19,21,.97);backdrop-filter:blur(16px);}
+      .bk-panel#panel3 .bk-btn-back{display:none;}
+      .bk-panel#panel3 .checkout-pay-action{width:100%;max-width:560px;min-height:62px;gap:.35rem;padding:.4rem .45rem;}
+      .bk-panel#panel3 .checkout-pay-action .bk-btn-next{min-width:104px;height:46px!important;padding:0 .6rem;font-size:.76rem;}
+      .bk-panel#panel3 .checkout-pay-action{width:100%;min-height:62px;gap:.35rem;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;}
+      .bk-panel#panel3 .checkout-payment-picker{flex:0 1 44%;}
+      .bk-panel#panel3 .checkout-payment-toggle{min-height:56px;gap:.45rem;padding:.25rem .1rem;color:#f4f4f5;}
+      .bk-panel#panel3 .checkout-payment-mark{width:29px;height:18px;border-radius:4px;background:#fff;color:#0876bd;font-size:.42rem;font-weight:900;letter-spacing:-.04em;}
+      .bk-panel#panel3 .checkout-payment-label small{color:#98999f;font-size:.58rem;font-weight:500;letter-spacing:0;}
+      .bk-panel#panel3 .checkout-payment-label strong{color:#f5f5f6;font-size:.77rem;}
+      .bk-panel#panel3 .checkout-payment-chevron{color:#a9aab0;}
+      .bk-panel#panel3 .checkout-pay-action .checkout-pay-submit{display:flex;flex:1 1 56%;align-items:center;justify-content:space-between;gap:.55rem;width:auto!important;min-width:0;height:54px!important;min-height:54px!important;padding:0 .8rem;border:0;border-radius:14px;background:#fff!important;box-shadow:none!important;color:#171719!important;font-size:.86rem;font-weight:800;white-space:nowrap;}
+      .checkout-submit-total{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:.05rem;}
+      .checkout-submit-total small{color:#4f5055;font-size:.63rem;font-weight:500;}
+      .checkout-submit-total strong{color:#171719;font-size:.9rem;font-weight:800;}
+      .checkout-submit-label{display:flex;align-items:center;gap:.35rem;color:#171719;font-size:.85rem;font-weight:800;}
+      .checkout-submit-label b{font-size:1.2rem;line-height:1;}
+      .bk-panel#panel3 .checkout-pay-action .checkout-pay-submit:disabled{opacity:.65;}
+    }
+  </style>
+  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
+  <style id="booking-payment-bar-final">
+    @media (max-width: 600px) {
+      .bk-panel#panel3 .bk-nav{justify-content:stretch!important;padding:.55rem 1rem calc(env(safe-area-inset-bottom) + .55rem)!important;background:#18191c!important;}
+      .bk-panel#panel3 .checkout-pay-action{display:flex!important;width:100%!important;max-width:none!important;min-height:62px!important;gap:.45rem!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;}
+      .bk-panel#panel3 #checkoutPaymentPicker{flex:0 1 44%!important;min-width:0!important;}
+      .bk-panel#panel3 #checkoutPaymentToggle{display:flex!important;width:100%!important;min-height:56px!important;gap:.4rem!important;padding:.25rem 0!important;background:transparent!important;color:#f4f4f5!important;}
+      .bk-panel#panel3 .checkout-payment-mark{width:29px!important;height:18px!important;border-radius:4px!important;background:#fff!important;color:#0876bd!important;font-size:.42rem!important;}
+      .bk-panel#panel3 .checkout-payment-label{display:flex!important;min-width:0!important;flex:1!important;flex-direction:column!important;align-items:flex-start!important;gap:.05rem!important;}
+      .bk-panel#panel3 .checkout-payment-label small{color:#98999f!important;font-size:.58rem!important;}
+      .bk-panel#panel3 .checkout-payment-label strong{color:#f5f5f6!important;font-size:.77rem!important;}
+      .bk-panel#panel3 #submitBtn.checkout-pay-submit{display:flex!important;flex:1 1 56%!important;align-items:center!important;justify-content:space-between!important;gap:.5rem!important;width:auto!important;min-width:0!important;height:54px!important;min-height:54px!important;padding:0 .8rem!important;border:0!important;border-radius:14px!important;background:#fff!important;box-shadow:none!important;color:#171719!important;font-size:.86rem!important;white-space:nowrap!important;}
+      .bk-panel#panel3 #submitBtn .checkout-submit-total{display:flex!important;min-width:0!important;flex-direction:column!important;align-items:flex-start!important;gap:.05rem!important;}
+      .bk-panel#panel3 #submitBtn .checkout-submit-total small{color:#4f5055!important;font-size:.63rem!important;font-weight:500!important;}
+      .bk-panel#panel3 #submitBtn .checkout-submit-total strong{color:#171719!important;font-size:.9rem!important;font-weight:800!important;}
+      .bk-panel#panel3 #submitBtn .checkout-submit-label{display:flex!important;align-items:center!important;gap:.3rem!important;color:#171719!important;font-size:.85rem!important;font-weight:800!important;white-space:nowrap!important;}
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="nav-wrap">
+    <div class="brand-block"><div class="logo">CultureWave</div><div class="brand-sub">by OGSHOOTS LUXE</div></div>
+    <nav class="topnav">
+      <a href="events.html">Events</a><a href="restaurants.html">Restaurants</a>
+      <a href="features.html">Features</a><a href="pricing.html">Pricing</a>
+    </nav>
+    <div class="auth-actions">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="login.html">Get Started</a>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<nav class="mobile-nav" id="mobileNav">
+  <a href="events.html">Events</a><a href="restaurants.html">Restaurants</a>
+  <a href="features.html">Features</a><a href="pricing.html">Pricing</a>
+  <div class="mobile-nav-ctas">
+    <a class="nav-link" href="login.html">Login</a>
+    <a class="nav-cta" href="login.html">Get Started</a>
+  </div>
+</nav>
+
+<div style="width:100%;max-width:100%;overflow-x:hidden;">
+<div class="bk-stepper-wrap">
+  <div class="bk-stepper">
+    <div class="bk-step active" id="tab1"><div class="bk-step-num">1</div><span class="bk-step-lbl">Contact</span></div>
+    <div class="bk-conn"></div>
+    <div class="bk-step" id="tab2"><div class="bk-step-num">2</div><span class="bk-step-lbl">Seats</span></div>
+    <div class="bk-conn"></div>
+    <div class="bk-step" id="tab3"><div class="bk-step-num">3</div><span class="bk-step-lbl">Summary</span></div>
+    <div class="bk-conn"></div>
+    <div class="bk-step" id="tab4"><div class="bk-step-num">4</div><span class="bk-step-lbl">Pay</span></div>
+  </div>
+</div>
+
+<div class="bk-wrap">
+  <section id="inviteAccessGate" style="display:none;max-width:520px;margin:2rem auto;padding:1.25rem;border:1px solid #dbe2ea;border-radius:18px;background:#fff;box-shadow:0 12px 36px rgba(15,23,42,.08);">
+    <h2 style="margin:0 0 .4rem;">Private event</h2><p style="margin:0 0 1rem;color:#64748b;">Enter your invite code, or open the private invite link. Invited email addresses can continue automatically.</p>
+    <label for="inviteCodeEntry" style="display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem;">Invite code</label>
+    <input id="inviteCodeEntry" autocomplete="off" style="width:100%;padding:.8rem;border:1px solid #cbd5e1;border-radius:10px;box-sizing:border-box;" placeholder="Enter invite code" />
+    <button type="button" onclick="redeemInviteCode()" style="width:100%;margin-top:.75rem;padding:.8rem;border:0;border-radius:10px;background:#1242c5;color:#fff;font-weight:800;">Continue</button>
+    <div id="inviteAccessStatus" role="status" style="margin-top:.6rem;color:#b91c1c;font-size:.82rem;"></div>
+  </section>
+  <div class="bk-grid">
+    <div>
+
+      <!-- STEP 1: YOUR DETAILS -->
+      <div class="bk-panel active" id="panel1">
+        <section class="bk-ticket-picker" id="ticketPicker">
+          <div class="bk-picker-head"><button class="bk-picker-back" type="button" onclick="closeBookingSheet()" aria-label="Close booking">×</button><h1>Book your seat</h1><span aria-hidden="true"></span></div>
+          <div hidden><span id="pickerEventTitle">Loading event…</span><span id="pickerEventLocation"></span></div>
+          <div class="bk-picker-info"><div class="bk-picker-date"><b id="pickerDay">—</b><strong id="pickerDate">—</strong></div><div class="bk-picker-time"><strong id="pickerTime">—</strong></div></div>
+          <div id="guestContactCard" class="bk-card guest-contact-card" style="display:none;">
+            <div class="guest-contact-sheet-head"><button type="button" onclick="backToTicketSelection()" aria-label="Back to tickets">‹</button><h2>Your Details</h2><button type="button" onclick="closeBookingSheet()" aria-label="Close booking">×</button></div>
+            <div class="guest-contact-head"><div class="guest-contact-icon" aria-hidden="true">✦</div><div><span class="guest-contact-kicker">Guest checkout</span><h2>Your Details</h2><p class="sub">Where should we send your ticket confirmation?</p></div></div>
+            <div class="bk-field"><label class="bk-label" for="bookName">Full name</label><div class="bk-input"><span aria-hidden="true">👤</span><input type="text" id="bookName" placeholder="Enter your full name" autocomplete="name"/></div></div>
+            <div class="bk-field"><label class="bk-label" for="bookPhone">Phone number</label><div class="bk-input"><span aria-hidden="true">📱</span><input type="tel" id="bookPhone" placeholder="10-digit number" autocomplete="tel" inputmode="tel"/></div></div>
+            <div class="bk-field"><label class="bk-label" for="bookEmail">Email address</label><div class="bk-input"><span aria-hidden="true">✉️</span><input type="email" id="bookEmail" placeholder="you@example.com" autocomplete="email" inputmode="email"/></div></div>
+            <input type="hidden" id="bookState" value=""/>
+            <button type="button" class="guest-contact-continue" onclick="continueToTicketSelection()">Continue to tickets <span aria-hidden="true">→</span></button>
+            <div class="guest-contact-note"><span aria-hidden="true">🔒</span> Your details are used for this booking</div>
+          </div>
+          <div class="bk-picker-sheet" id="ticketSelectionSheet"><div id="pickerImageSeatMount"></div><div class="bk-picker-label">SELECT TICKETS</div><p class="bk-picker-intro">Choose a pass to reserve your place at this event.</p><div id="pickerTicketList"><div class="bk-picker-state">Loading tickets…</div></div><div id="pickerSeatMount"></div></div>
+        </section>
+        <div class="bk-picker-bar" id="pickerBar"><div class="bk-picker-total"><small id="pickerCount">0 tickets</small><strong id="pickerTotal">₹0</strong></div><button class="bk-picker-proceed" type="button" onclick="showBookingDetails()">Next</button></div>
+      </div>
+
+      <!-- STEP 2: SEATS -->
+      <div class="bk-panel" id="panel2">
+        <div class="bk-card">
+          <h2>Select Ticket &amp; Seats</h2>
+          <p class="sub">Choose your ticket type and number of seats.</p>
+          <div id="ticketList"></div>
+          <div id="seatingWrap" style="display:none;">
+            <div class="bk-seating" id="seatingContainer"></div>
+          </div>
+        </div>
+        <div class="bk-nav">
+          <button class="bk-btn-back" onclick="goStep(1)">← Back</button>
+          <button class="bk-btn-next" onclick="goStep3()">Continue → Review</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: SUMMARY + COUPON + BILL -->
+      <div class="bk-panel" id="panel3">
+        <header class="bk-review-head"><button class="bk-picker-back" type="button" onclick="returnToTicketPicker()" aria-label="Back">‹</button><div><h1>Review your booking</h1><p id="reviewEventMeta">Review your booking</p></div></header>
+        <div class="checkout-expiry" aria-live="off">Complete your booking in <strong id="checkoutCountdown">10:00</strong> mins</div>
+        <div class="checkout-event">
+          <div class="checkout-event-head"><img id="checkoutPoster" alt="Event poster"/><div><h2 id="s3Event">—</h2><p id="checkoutLocation">Review your booking</p></div></div>
+          <div class="checkout-ticket">
+            <div class="checkout-ticket-top"><strong id="checkoutDate">—</strong><span id="s3Qty">1 ticket</span></div>
+            <div class="checkout-ticket-bottom"><span id="s3Ticket">—</span><strong id="b_subtotal">₹0</strong><span id="checkoutQty" hidden>1</span></div>
+            <div class="checkout-ticket-remove-row"><button class="checkout-ticket-remove" type="button" onclick="removeCheckoutSelection()">Remove</button></div>
+            <div class="checkout-ticket-note"><span aria-hidden="true">▣</span><span>M-Ticket: Entry using the QR code on your ticket</span></div>
+          </div>
+        </div>
+        <div class="checkout-divider"><span></span><b>OFFERS</b><span></span></div>
+        <section class="checkout-offers-list">
+          <button type="button" class="checkout-offer-row" onclick="openCouponSheet()"><span class="checkout-offer-icon" aria-hidden="true">%</span><strong>View all event offers</strong><span aria-hidden="true">›</span></button>
+          <button type="button" class="checkout-offer-row" onclick="showPaymentOfferInfo()"><span class="checkout-offer-icon" aria-hidden="true">▱</span><strong>View all payment offers</strong><span aria-hidden="true">›</span></button>
+        </section>
+
+      <!-- COUPON FULL-SCREEN SHEET -->
+      <div id="couponSheet" style="display:none;position:fixed;inset:0;z-index:100;background:#0a0c12;overflow-y:auto;padding:0 0 3rem;">
+        <div style="display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.2rem;background:#0a0c12;border-bottom:1px solid #1e2230;position:sticky;top:0;z-index:2;">
+          <button onclick="closeCouponSheet()" style="width:38px;height:38px;border:1px solid #2a2f3a;border-radius:50%;background:#151922;color:#fff;font-size:1.5rem;flex:none;">‹</button>
+          <div><div style="font-size:1rem;font-weight:900;color:#fff;letter-spacing:.02em;">APPLY COUPON</div><div style="font-size:.75rem;color:#8892a4;margin-top:.1rem;">Your cart: <span id="couponSheetCart">₹0</span></div></div>
+        </div>
+        <div style="padding:1rem 1.2rem .5rem;">
+          <div style="display:flex;align-items:center;background:#151922;border:1px solid #2a2f3a;border-radius:14px;overflow:hidden;">
+            <input id="couponSheetInput" type="text" placeholder="Enter Coupon Code" style="flex:1;background:transparent;border:0;outline:none;padding:.85rem 1rem;font:inherit;font-size:.92rem;color:#fff;text-transform:uppercase;letter-spacing:.05em;"/>
+            <button onclick="applySheetCoupon()" style="padding:0 1.1rem;height:100%;background:transparent;border:0;color:#1dae79;font-size:.82rem;font-weight:900;letter-spacing:.05em;">APPLY</button>
+          </div>
+          <div class="bk-coupon-msg" id="couponMsg" style="margin-top:.5rem;"></div>
+        </div>
+        <div style="padding:.5rem 1.2rem .3rem;font-size:.78rem;font-weight:900;color:#e5e7eb;">More offers</div>
+        <div id="couponSheetList" style="padding:0 1.2rem;"></div>
+      </div>
+      <div id="checkoutContactSheet" class="checkout-sheet-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="checkoutContactTitle" onclick="if(event.target===this)closeCheckoutContactSheet()">
+        <section class="checkout-sheet">
+          <div class="checkout-sheet-head"><h2 id="checkoutContactTitle">Edit guest details</h2><button class="checkout-sheet-close" type="button" onclick="closeCheckoutContactSheet()" aria-label="Close">×</button></div>
+          <div class="bk-field"><label class="bk-label" for="checkoutEditName">Full name</label><div class="bk-input"><input id="checkoutEditName" autocomplete="name" placeholder="Enter your full name"/></div></div>
+          <div class="bk-field"><label class="bk-label" for="checkoutEditPhone">Phone number</label><div class="bk-input"><input id="checkoutEditPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="10-digit number"/></div></div>
+          <div class="bk-field"><label class="bk-label" for="checkoutEditEmail">Email address</label><div class="bk-input"><input id="checkoutEditEmail" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com"/></div></div>
+          <div class="checkout-sheet-actions"><button type="button" onclick="closeCheckoutContactSheet()">Cancel</button><button type="button" onclick="saveCheckoutContactDetails()">Save details</button></div>
+        </section>
+      </div>
+      <div id="paymentOffersSheet" class="checkout-sheet-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="paymentOffersTitle" onclick="if(event.target===this)closePaymentOffersSheet()">
+        <section class="checkout-sheet">
+          <div class="checkout-sheet-head"><h2 id="paymentOffersTitle">Razorpay payment offers</h2><button class="checkout-sheet-close" type="button" onclick="closePaymentOffersSheet()" aria-label="Close">×</button></div>
+          <div id="paymentOffersContent" style="color:#c4c6cc;font-size:.86rem;line-height:1.6;"></div>
+          <div class="checkout-sheet-actions"><button type="button" onclick="closePaymentOffersSheet()">Close</button><button type="button" onclick="closePaymentOffersSheet();submitBooking()">See eligible offers</button></div>
+        </section>
+      </div>
+      <div id="removeTicketSheet" class="checkout-sheet-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="removeTicketTitle" onclick="if(event.target===this)closeRemoveTicketSheet()">
+        <section class="checkout-sheet">
+          <div class="checkout-sheet-head"><h2 id="removeTicketTitle">Want to remove a ticket?</h2><button class="checkout-sheet-close" type="button" onclick="closeRemoveTicketSheet()" aria-label="Close">×</button></div>
+          <p style="margin:-.45rem 0 1rem;color:#b8bac1;font-size:.84rem;">Select the ticket you want to remove.</p>
+          <div id="removeTicketChoices"></div>
+          <div class="checkout-sheet-actions"><button type="button" onclick="closeRemoveTicketSheet()">Keep tickets</button></div>
+        </section>
+      </div>
+        <div class="checkout-divider"><span></span><b>PAYMENT SUMMARY</b><span></span></div>
+        <section class="checkout-section checkout-payment-summary"><div class="bk-bill checkout-bill"><div class="bk-bill-row checkout-order-row"><span>Order amount <small id="checkoutOrderBreakdown" style="display:block;margin-top:.3rem;color:#aeb0b7;font-size:.68rem;font-weight:500;"></small><span id="b_price" hidden>Ticket</span></span><strong id="checkoutTicketTotal">₹0</strong></div><div class="bk-bill-row discount" id="b_discountRow" style="display:none;"><span>Discount</span><span id="b_discount">-₹0</span></div><div class="bk-bill-row"><span>Platform fee</span><span id="b_fee">₹0</span></div><div class="bk-bill-row discount" id="oneClubAppliedRow" style="display:none"><span>One Club applied</span><strong id="oneClubApplied">−₹0.00</strong></div><div class="bk-bill-row" id="oneClubStatusRow" hidden><span id="oneClubStatus" role="status"></span></div><div class="bk-bill-row total"><span id="b_totalLabel">Grand Total</span><strong id="b_total">₹0</strong></div></div></section>
+        <div class="checkout-divider"><span></span><b>INVOICE DETAILS</b><span></span></div>
+        <section class="checkout-invoice"><div class="checkout-invoice-head"><span aria-hidden="true">♙</span><strong id="checkoutInvoiceName">Guest</strong><button type="button" onclick="editCheckoutDetails()">Edit&nbsp; ›</button></div><p id="checkoutInvoicePhone"></p><p id="checkoutInvoiceEmail"></p><p id="checkoutInvoiceLocation"></p><small>Information above will be used for generating the invoice and sending out the tickets.</small></section>
+        <details class="checkout-remember"><summary>Things to remember</summary><p>Your ticket will be confirmed after successful payment. Please carry a valid ID to the venue.</p></details>
+        <div class="bk-nav">
+          <button class="bk-btn-back" onclick="returnToTicketPicker()">← Back</button>
+          <div class="checkout-pay-action">
+            <div class="checkout-payment-picker" id="checkoutPaymentPicker">
+              <button class="checkout-payment-toggle" id="checkoutPaymentToggle" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="toggleCheckoutPaymentMenu()"><span class="checkout-payment-mark" aria-hidden="true">Paytm</span><span class="checkout-payment-label"><small>Pay using</small><strong id="checkoutPaymentMethodLabel">Paytm UPI</strong></span><span class="checkout-payment-chevron" aria-hidden="true">⌄</span></button>
+              <div class="checkout-payment-menu" id="checkoutPaymentMenu" role="listbox" aria-label="Choose payment method" hidden>
+                <button class="checkout-payment-option" id="payOnlineOption" type="button" role="option" aria-selected="true" onclick="selectCheckoutPayment('online')"><strong>Pay online</strong><small>UPI, cards, net banking</small></button>
+                <button class="checkout-payment-option" id="oneClubOption" type="button" role="option" aria-selected="false" onclick="selectCheckoutPayment('oneclub')" disabled><strong>One Club</strong><small id="oneClubMethodBalance">Balance loading…</small></button>
+              </div>
+            </div>
+            <button class="bk-btn-next checkout-pay-submit" id="submitBtn" onclick="submitBooking()"><span class="checkout-submit-total"><small id="checkoutTotalLabel">Total</small><strong id="checkoutGrandTotal">₹0</strong></span><span class="checkout-submit-label">Pay now <b aria-hidden="true">›</b></span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: CONFIRM & PAY -->
+      <div class="bk-panel" id="panel4">
+        <div class="bk-card">
+          <h2>Confirm &amp; Pay</h2>
+          <p class="sub">Final review before completing your booking.</p>
+          <div class="bk-bill">
+            <div class="bk-bill-row"><span>Event</span><strong id="c_event">—</strong></div>
+            <div class="bk-bill-row"><span>Name</span><strong id="c_name">—</strong></div>
+            <div class="bk-bill-row"><span>WhatsApp</span><strong id="c_phone">—</strong></div>
+            <div class="bk-bill-row"><span>Email</span><strong id="c_email">—</strong></div>
+            <div class="bk-bill-row"><span>Ticket</span><strong id="c_ticket">—</strong></div>
+            <div class="bk-bill-row"><span>Seats</span><strong id="c_qty">—</strong></div>
+            <div class="bk-bill-row discount" id="c_discountRow" style="display:none;"><span>Discount</span><strong id="c_discount">—</strong></div>
+            <div class="bk-bill-row"><span>Platform fee</span><strong id="c_fee">—</strong></div>
+            <div class="bk-bill-row total"><span>Total</span><strong id="c_total">—</strong></div>
+          </div>
+        </div>
+        <div class="bk-nav">
+          <button class="bk-btn-back" onclick="goStep(3)">← Back</button>
+          <button class="bk-btn-next" id="confirmSubmitBtn" onclick="submitBooking()">🔒 Pay Now</button>
+        </div>
+        <p class="bk-secure">🛡️ Secured by Razorpay · 256-bit SSL encryption</p>
+      </div>
+
+    </div>
+
+    <!-- RECEIPT SIDEBAR -->
+    <aside class="bk-receipt" id="bkReceipt" style="display:none;">
+      <div class="bk-receipt-banner" id="receiptBanner">🎟️</div>
+      <div class="bk-receipt-body">
+        <div class="bk-receipt-name" id="rEventName">Select event</div>
+        <div class="bk-receipt-venue" id="rVenue">—</div>
+        <div class="bk-rrow"><span>Name</span><strong id="rName">—</strong></div>
+        <div class="bk-rrow"><span>Seats</span><strong id="rSeats">1</strong></div>
+        <div class="bk-rrow"><span>Ticket</span><strong id="rTicket">—</strong></div>
+        <div class="bk-rrow"><span>Status</span><strong id="rStatus">Pending</strong></div>
+        <div class="bk-rtotal"><span>Total</span><span id="rTotal">₹0</span></div>
+        <div class="bk-trust" style="display:none;">
+          <div class="bk-trust-item"><span>🔒</span>Secure Pay</div>
+          <div class="bk-trust-item"><span>⚡</span>Instant Confirm</div>
+          <div class="bk-trust-item"><span>🎫</span>E-Ticket</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div><!-- end outer wrap -->
+
+<script>
+// ── FIREBASE ──
+firebase.initializeApp({
+  apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain:"ogshootsluxe-36740.firebaseapp.com",
+  projectId:"ogshootsluxe-36740",
+  storageBucket:"ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId:"5471814825",
+  appId:"1:5471814825:web:07e84f2f88486da817d5b8"
+});
+const db = firebase.firestore();
+const bookingAuth = firebase.auth();
+const bookingAuthReady=new Promise(resolve=>bookingAuth.onAuthStateChanged(resolve,()=>resolve(null)));
+let oneClubBalance=0,oneClubApplied=0,checkoutPaymentMethod='online';
+
+// ── EMAILJS ──
+const EJ_KEY = "PDb2vpOIeLkbZBBFP";
+const EJ_SVC = "service_esppdwf";
+const EJ_TPL = "template_caj3zqw";
+const EJ_OTP_TPL = "template_8ho2pwf";
+emailjs.init({ publicKey: EJ_KEY });
+
+// ── URL PARAMS ──
+const urlP = new URLSearchParams(location.search);
+const embeddedBooking = urlP.get('embed') === '1';
+const resumeCheckout = urlP.get('resume') === '1';
+const startWithTicketPicker = urlP.get('picker') === '1' && !embeddedBooking;
+const bookingSession = urlP.get('bookingSession') || '';
+if(embeddedBooking){
+  document.documentElement.style.setProperty('background','transparent','important');
+  document.body.style.setProperty('background','transparent','important');
+}
+const eventId = urlP.get("eventId") || "";
+const passedName = urlP.get("eventName") || "";
+const passedVenue = urlP.get("venueName") || "";
+const passedTicketName = urlP.get("ticketName") || "";
+const passedTicketIndexParam = urlP.get("ticketIndex");
+const passedTicketIndex = passedTicketIndexParam == null || passedTicketIndexParam === "" ? NaN : Number(passedTicketIndexParam);
+const passedTicketPrice = Number(urlP.get("ticketPrice") || 0);
+const passedEventDate = urlP.get("eventDate") || "";
+const passedEventTime = urlP.get("eventTime") || "";
+const passedPosterUrl = urlP.get("posterUrl") || "";
+let passedSeatingPlanUrl = urlP.get("seatingPlanUrl") || "";
+let passedSeatingPlan = null;
+try { passedSeatingPlan = JSON.parse(urlP.get("seatingPlan") || "null"); } catch(_){}
+
+// ── STATE ──
+let evData = {};
+let tickets = [];
+let selectedTicketIdx = 0;
+let qty = 1;
+let discountAmt = 0;
+let couponApplied = "";
+let appliedCouponData = null;
+let emailVerified = false;
+let generatedOtp = "";
+let selectedSeats = [];
+let bookedSeats = [];
+let pickerQuantities = [];
+let checkoutCountdownEndsAt = 0;
+let checkoutCountdownTimer = null;
+let checkoutExpired = false;
+let bookingSubmissionInProgress = false;
+const razorpayFunctionsUrl='https://culturewave-razorpay.culturewaveindia.workers.dev';
+try{localStorage.removeItem('culturewave:preferred-payment-method');}catch(_){ }
+const inviteTokenParam = urlP.get('inviteToken') || '';
+function inviteSessionKey(){ return `inviteAccess:${eventId}`; }
+async function inviteAccessAllowed(){
+  if(evData.inviteOnly !== true) return true;
+  const uid=bookingAuth.currentUser?.uid;
+  if(!uid)return false;
+  const claimRef=db.collection('eventInviteClaims').doc(`${eventId}_${uid}`);
+  try{if((await claimRef.get()).exists)return true;}catch(_){return false;}
+  const makeClaim=async(method,extra={})=>{try{await claimRef.set({eventId,userId:uid,method,...extra,createdAt:firebase.firestore.FieldValue.serverTimestamp()});return true;}catch(_){return false;}};
+  if(bookingAuth.currentUser.email&&await makeClaim('email'))return true;
+  if(inviteTokenParam&&await makeClaim('link',{inviteToken:inviteTokenParam}))return true;
+  return false;
+}
+function showInviteGate(){
+  document.getElementById('inviteAccessGate').style.display='block';
+  document.querySelector('.bk-grid').style.display='none';
+}
+window.redeemInviteCode=async function(){
+  const entered=document.getElementById('inviteCodeEntry').value.trim();
+  const status=document.getElementById('inviteAccessStatus');
+  if(!entered){status.textContent='Enter your invite code.';return;}
+  const uid=bookingAuth.currentUser?.uid;
+  if(!uid){status.textContent='Sign in before using your invite code.';return;}
+  const claimRef=db.collection('eventInviteClaims').doc(`${eventId}_${uid}`);
+  try{
+    if(!(await claimRef.get()).exists)await claimRef.set({eventId,userId:uid,method:'code',inviteCode:entered,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    location.reload();
+  }catch(_){status.textContent='That invite code is not valid.';}
+};
+
+function fmt(n){ return n===0?"Free":"₹"+Number(n).toLocaleString("en-IN"); }
+function showToast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2500); }
+
+function setBookingSubmissionBusy(busy, total){
+  bookingSubmissionInProgress = busy;
+  const submitBtn = document.getElementById('submitBtn');
+  const confirmBtn = document.getElementById('confirmSubmitBtn');
+  [submitBtn, confirmBtn].filter(Boolean).forEach(button => {
+    button.disabled = busy;
+    if(busy) {
+      const label=button.querySelector('.checkout-submit-label');
+      if(label) label.textContent='Processing...';
+      else button.textContent='Processing...';
+    }
+  });
+  if(!busy){
+    const subtotal=selectedTicketSubtotal();
+    const afterDiscount=Math.max(0,subtotal-(appliedCouponData?calculateCouponDiscount(appliedCouponData,subtotal):0));
+    const gross=afterDiscount+platformFee(afterDiscount);
+    const payable=Math.max(0,gross-calculateOneClubApplied(gross));
+    if(submitBtn){const label=submitBtn.querySelector('.checkout-submit-label');if(label)label.innerHTML=payable?'Pay now <b aria-hidden="true">›</b>':'Book now <b aria-hidden="true">›</b>';else submitBtn.textContent=payable?'Pay now ›':'Book now ›';}
+    if(confirmBtn) confirmBtn.textContent = total ? '🔒 Pay Now' : '✅ Book Now (Free)';
+  }
+}
+
+function showPaymentError(reason, options={}){
+  const {verified=false, bookingId=''}=options;
+  let el = document.getElementById('paymentErrorBanner');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'paymentErrorBanner';
+    el.className = 'payment-error-popup';
+    el.innerHTML = `
+      <div class="payment-error-icon" aria-hidden="true">!</div>
+      <div class="payment-error-copy">
+        <div class="payment-error-title"></div>
+        <div class="payment-error-msg" id="paymentErrorMsg"></div>
+      </div>
+      <div class="payment-error-actions">
+        <button class="payment-error-retry" type="button" onclick="retryPayment()">Try payment again</button>
+        <a class="payment-error-help" href="https://wa.me/919848047428?text=Hi%20CultureWave%2C%20my%20event%20payment%20did%20not%20go%20through.%20Please%20help." target="_blank" rel="noopener noreferrer">Contact support</a>
+      </div>
+      <button class="payment-error-close" type="button" aria-label="Dismiss payment message" onclick="document.getElementById('paymentErrorBanner').remove()">×</button>
+    `;
+    document.body.appendChild(el);
+  }
+  const title=el.querySelector('.payment-error-title');
+  const retry=el.querySelector('.payment-error-retry');
+  const help=el.querySelector('.payment-error-help');
+  title.textContent=verified?'Payment received':'Payment not completed';
+  retry.hidden=verified;
+  help.textContent=verified?'Contact support':'Contact support';
+  help.href=verified
+    ? 'https://wa.me/919848047428?text='+encodeURIComponent(`Hi CultureWave, my payment was verified but booking save failed. Booking reference ${bookingId}. Please help.`)
+    : 'https://wa.me/919848047428?text=Hi%20CultureWave%2C%20my%20event%20payment%20did%20not%20go%20through.%20Please%20help.';
+  if(verified) el.dataset.verified='true'; else delete el.dataset.verified;
+  document.getElementById('paymentErrorMsg').textContent = reason;
+  requestAnimationFrame(() => el.classList.add('show'));
+}
+
+function retryPayment(){
+  const popup = document.getElementById('paymentErrorBanner');
+  if(popup?.dataset.verified==='true') return;
+  const button = document.getElementById('submitBtn');
+  if(button && !button.disabled) button.click();
+  if(popup){
+    popup.classList.remove('show');
+    window.setTimeout(() => popup.remove(), 350);
+  }
+}
+
+function eventDateValue(value){ return value && value.toDate ? value.toDate() : new Date(value); }
+function formatTimeText(value){
+  return String(value||'').replace(/(^|[^\d])(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/gi,(match,prefix,hourText,minute,meridiem)=>{
+    let hour=Number(hourText); if(meridiem) hour=(hour%12)+(meridiem.toUpperCase()==='PM'?12:0);
+    if(hour>23) return match;
+    return `${prefix}${hour%12||12}:${minute} ${hour>=12?'PM':'AM'}`;
+  });
+}
+function eventStartTime(){
+  const firstDate=(evData.eventDates||[])[0]||{};
+  const firstSlot=(firstDate.slots||[])[0]||{};
+  return formatTimeText(evData.startTime || evData.time || firstDate.startTime || firstDate.time || firstDate.start || firstSlot.startTime || firstSlot.start || firstSlot.time || '');
+}
+function ticketMax(ticket){
+  const remainingValue = ticket.available ?? ticket.remaining;
+  const remaining = remainingValue != null
+    ? Math.max(0, Number(remainingValue)||0)
+    : (Number(ticket.qty||ticket.inventory||0) > 0
+      ? Math.max(0, Number(ticket.qty||ticket.inventory) - Number(ticket.booked||ticket.soldCount||0))
+      : Number.POSITIVE_INFINITY);
+  const configured = Number(ticket.maxPerBooking ?? ticket.maxQty ?? ticket.quantityLimit ?? 0);
+  const bulkIsConfigured = Number(ticket.bulk?.minPersons||0)>0 && Number(ticket.bulk?.pricePerPerson||0)>0;
+  const bulkMax = bulkIsConfigured ? Number(ticket.bulk.maxPersons || 0) : 0;
+  return ticket.soldOut ? 0 : Math.min(remaining, configured || remaining, bulkMax || remaining);
+}
+function ticketMinRequired(ticket){ return Number(ticket?.bulk?.minPersons||0)>0 && Number(ticket?.bulk?.pricePerPerson||0)>0 ? Number(ticket.bulk.minPersons) : 1; }
+function eventCapacity(){
+  const explicit=Number(evData.capacity||0);
+  const finite=tickets.map(t=>Number(t.qty||t.inventory||0)).filter(n=>n>0);
+  const ticketTypeCapacity=finite.reduce((sum,n)=>sum+n,0);
+  return ticketTypeCapacity || explicit;
+}
+function remainingEventCapacity(){
+  const cap=eventCapacity();
+  return cap>0?Math.max(0,cap-Number(evData.totalBooked||0)):Number.POSITIVE_INFINITY;
+}
+function eventSoldOut(){
+  const cap=eventCapacity();
+  return evData.soldOut===true || (cap>0 && Number(evData.totalBooked||0)>=cap) || (tickets.length>0 && tickets.every(t=>ticketMax(t)===0));
+}
+function canJoinWaitlist(){
+  if(!evData.allowWaitlist) return false;
+  const manual=evData.soldOut===true;
+  return manual || evData.overflowAction==='waitlist' || evData.overflowAction==='notify';
+}
+function renderSoldOutPanel(){
+  const msg=String(evData.soldOutMsg||'This event is sold out.');
+  const user=bookingAuth.currentUser;
+  const waitlist=canJoinWaitlist();
+  return `<div style="padding:1rem;border:1px solid #fecaca;border-radius:14px;background:#fff7f7;color:#7f1d1d;">
+    <strong style="display:block;font-size:1rem;margin-bottom:.35rem;">⛔ Sold out</strong>
+    <p style="margin:0 0 .85rem;line-height:1.5;">${msg.replace(/[&<>\"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch]))}</p>
+    ${waitlist?`<div style="padding-top:.75rem;border-top:1px solid #fecaca;"><strong>Join the waitlist</strong><p style="font-size:.84rem;margin:.3rem 0 .7rem;">${evData.notifyWaitlist?'We’ll email you if a place opens.':'Your request will be recorded with the event organizer.'}</p><input id="waitlistName" value="${String(user?.displayName||'').replace(/[&<>\"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch]))}" placeholder="Your name" style="width:100%;padding:.7rem;border:1px solid #e5baba;border-radius:9px;margin-bottom:.45rem;"><input id="waitlistPhone" placeholder="Phone number" style="width:100%;padding:.7rem;border:1px solid #e5baba;border-radius:9px;margin-bottom:.6rem;"><button type="button" onclick="joinEventWaitlist()" style="width:100%;padding:.75rem;border:0;border-radius:9px;background:#b91c1c;color:#fff;font-weight:700;cursor:pointer;">Join waitlist</button><div id="waitlistStatus" style="font-size:.82rem;margin-top:.5rem;"></div></div>`:''}
+  </div>`;
+}
+window.joinEventWaitlist=async function(){
+  const user=bookingAuth.currentUser;
+  const status=document.getElementById('waitlistStatus');
+  const button=document.querySelector('#pickerTicketList button[onclick="joinEventWaitlist()"]');
+  if(!user){ if(status) status.textContent='Sign in to join the waitlist.'; return; }
+  if(!canJoinWaitlist()){ if(status) status.textContent='The waitlist is not available for this event.'; return; }
+  if(button){button.disabled=true;button.textContent='Joining…';}
+  try{
+    const entryRef=db.collection('waitlist').doc(`${eventId}_${user.uid}`);
+    const existing=await entryRef.get();
+    if(existing.exists){ if(status) status.textContent='You are already on the waitlist.'; if(button){button.textContent='Joined';} return; }
+    await entryRef.set({
+      eventId, eventName:evData.name||passedName||'Event', ownerId:evData.ownerId||evData.organiserId||'',
+      userId:user.uid, name:document.getElementById('waitlistName')?.value.trim()||user.displayName||'Guest',
+      email:user.email||'', phone:document.getElementById('waitlistPhone')?.value.trim()||'',
+      status:'waiting', createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    if(status) status.textContent=evData.notifyWaitlist?'You’re on the waitlist. We’ll email you when a spot opens.':'You’re on the waitlist. Your request was sent to the event organizer.';
+    if(button){button.textContent='Joined';}
+  }catch(error){
+    console.error('waitlist signup failed:',error);
+    if(status) status.textContent='Could not join the waitlist. Please try again.';
+    if(button){button.disabled=false;button.textContent='Join waitlist';}
+  }
+};
+const MAX_TOTAL_TICKETS = Number.POSITIVE_INFINITY;
+function selectedTicketItems(){
+  const items=tickets.map((ticket,index)=>({ticket,index,quantity:pickerQuantities[index]||0})).filter(item=>item.quantity>0);
+  if(items.length) return items;
+  return pickerQuantities.length ? [] : [{ticket:tickets[selectedTicketIdx]||{name:'General Admission',price:0},index:selectedTicketIdx,quantity:qty}];
+}
+function reconcileSelectedTickets(nextTickets){
+  const previous=tickets;
+  const selected=selectedTicketItems().map(item=>({index:item.index,id:String(item.ticket.id||item.ticket.ticketId||''),name:String(item.ticket.name||''),price:Number(item.ticket.price||0),quantity:item.quantity}));
+  const selectedItem=previous[selectedTicketIdx];
+  const selectedId=String(selectedItem?.id||selectedItem?.ticketId||'');
+  const selectedName=String(selectedItem?.name||'');
+  const selectedPrice=Number(selectedItem?.price||0);
+  tickets=nextTickets;
+  pickerQuantities=tickets.map(()=>0);
+  const used=new Set();
+  let resolvedSelectedIndex=-1;
+  selected.forEach(item=>{
+    let index=item.id?tickets.findIndex((ticket,i)=>!used.has(i)&&String(ticket.id||ticket.ticketId||'')===item.id):-1;
+    if(index<0&&tickets[item.index]&&!used.has(item.index)&&String(tickets[item.index].name||'')===item.name&&Number(tickets[item.index].price||0)===item.price)index=item.index;
+    if(index<0)index=tickets.findIndex((ticket,i)=>!used.has(i)&&String(ticket.name||'')===item.name&&Number(ticket.price||0)===item.price);
+    if(index>=0){pickerQuantities[index]=item.quantity;used.add(index);if(item.index===selectedTicketIdx)resolvedSelectedIndex=index;}
+  });
+  let nextIndex=selectedId?tickets.findIndex(ticket=>String(ticket.id||ticket.ticketId||'')===selectedId):-1;
+  if(nextIndex<0&&resolvedSelectedIndex>=0)nextIndex=resolvedSelectedIndex;
+  if(nextIndex<0)nextIndex=tickets.findIndex(ticket=>String(ticket.name||'')===selectedName&&Number(ticket.price||0)===selectedPrice);
+  if(nextIndex>=0)selectedTicketIdx=nextIndex;
+}
+function draftTicketSelections(){
+  return tickets.map((ticket,index)=>({
+    id:String(ticket.id||ticket.ticketId||''),
+    name:String(ticket.name||''),
+    price:Number(ticket.price||0),
+    quantity:Math.max(0,Number(pickerQuantities[index]||0)),
+    index
+  })).filter(item=>item.quantity>0);
+}
+function restoreDraftTicketSelections(draft){
+  pickerQuantities=tickets.map(()=>0);
+  let firstSelected=-1;
+  const selections=Array.isArray(draft.selections)?draft.selections:[];
+  if(selections.length){
+    selections.forEach(item=>{
+      const id=String(item.id||'');
+      const name=String(item.name||'');
+      const price=Number(item.price||0);
+      let index=id?tickets.findIndex(ticket=>String(ticket.id||ticket.ticketId||'')===id):-1;
+      if(index<0)index=tickets.findIndex(ticket=>String(ticket.name||'')===name&&Number(ticket.price||0)===price);
+      if(index<0){
+        const nameMatches=tickets.map((ticket,i)=>String(ticket.name||'')===name?i:-1).filter(i=>i>=0);
+        if(nameMatches.length===1)index=nameMatches[0];
+      }
+      if(index>=0){
+        pickerQuantities[index]+=Math.max(0,Number(item.quantity||0));
+        if(firstSelected<0)firstSelected=index;
+      }
+    });
+  }else{
+    // Older drafts only held indices. Prefer the ticket identity in the URL
+    // because fallback popup data may have contained only one ticket.
+    const oldQuantities=Array.isArray(draft.quantities)?draft.quantities:[];
+    const requestedName=String(passedTicketName||'').toLowerCase();
+    const requestedIndex=tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===requestedName&&Number(ticket.price||0)===passedTicketPrice);
+    if(requestedIndex>=0){
+      const count=oldQuantities.reduce((sum,value)=>sum+Math.max(0,Number(value)||0),0);
+      pickerQuantities[requestedIndex]=count;
+      firstSelected=requestedIndex;
+    }
+  }
+  if(firstSelected<0){
+    const name=String(draft.ticketName||'');
+    const price=Number(draft.ticketPrice||0);
+    firstSelected=tickets.findIndex(ticket=>String(ticket.name||'')===name&&Number(ticket.price||0)===price);
+  }
+  if(firstSelected>=0)selectedTicketIdx=firstSelected;
+  else if(pickerQuantities.length)selectedTicketIdx=Math.max(0,Math.min(pickerQuantities.length-1,Number(draft.ticketIndex)||0));
+}
+function groupTicketPrice(ticket, quantity){
+  const bulk=ticket?.bulk||{};
+  const min=Number(bulk.minPersons||0), max=Number(bulk.maxPersons||0), groupPrice=Number(bulk.pricePerPerson||0);
+  return min>0 && groupPrice>0 && quantity>=min && (!max||quantity<=max) ? groupPrice : Number(ticket?.price||0);
+}
+function groupTicketHint(ticket){
+  const bulk=ticket?.bulk||{};
+  const min=Number(bulk.minPersons||0), price=Number(bulk.pricePerPerson||0);
+  if(!min || !(price>0)) return '';
+  return `Group of ${min}`;
+}
+function selectedTicketCount(){ return selectedTicketItems().reduce((sum,item)=>sum+item.quantity,0); }
+function selectedTicketSubtotal(){ return selectedTicketItems().reduce((sum,item)=>sum+groupTicketPrice(item.ticket,item.quantity)*item.quantity,0); }
+function selectedTicketLabel(){ return selectedTicketItems().map(item=>{ const isGroup=ticketMinRequired(item.ticket)>1&&item.quantity>=ticketMinRequired(item.ticket); return isGroup?`${item.ticket.name||'Ticket'} (group of ${item.quantity})`:`${item.ticket.name||'Ticket'} × ${item.quantity}`; }).join(', '); }
+function platformFee(amount){const cart=Math.max(0,Number(amount)||0);return cart===0?0:Math.round(cart*(cart>700?.059:.10));}
+function couponMinimumOrder(coupon){return Number(coupon?.minOrder??coupon?.minimumOrder??coupon?.minimumSpend??0)||0;}
+function calculateCouponDiscount(coupon,subtotal){
+  const value=Number(coupon?.value??coupon?.discount??coupon?.amount??coupon?.off??0);
+  if(!(value>0)||subtotal<couponMinimumOrder(coupon))return 0;
+  const isPercent=coupon.type==='percent'||coupon.type==='percentage';
+  const raw=isPercent?Math.round(subtotal*value/100):value;
+  const maximum=Number(coupon.maxDiscount??coupon.maximumDiscount??0)||0;
+  return Math.max(0,Math.min(subtotal,maximum>0?Math.min(raw,maximum):raw));
+}
+function startCheckoutCountdown(){
+  if(!checkoutCountdownEndsAt){
+    const draftKey=`culturewave:checkout-draft:${eventId}`;
+    try{
+      const draft=JSON.parse(localStorage.getItem(draftKey)||'null');
+      checkoutCountdownEndsAt=Number(draft?.checkoutExpiresAt)||(
+        Number(draft?.savedAt)>0?Number(draft.savedAt)+10*60*1000:Date.now()+10*60*1000
+      );
+      if(draft){draft.checkoutExpiresAt=checkoutCountdownEndsAt;localStorage.setItem(draftKey,JSON.stringify(draft));}
+    }catch(_){checkoutCountdownEndsAt=Date.now()+10*60*1000;}
+  }
+  const update=()=>{
+    if(checkoutExpired)return;
+    const seconds=Math.max(0,Math.ceil((checkoutCountdownEndsAt-Date.now())/1000));
+    const timer=document.getElementById('checkoutCountdown');
+    const bar=timer?.closest('.checkout-expiry');
+    if(bar)bar.classList.toggle('expiring',seconds<=180&&seconds>0);
+    if(timer)timer.textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+    if(seconds===0){
+      if(checkoutCountdownTimer){clearInterval(checkoutCountdownTimer);checkoutCountdownTimer=null;}
+      expireCheckout();
+    }
+  };
+  update();
+  if(!checkoutCountdownTimer)checkoutCountdownTimer=setInterval(update,1000);
+}
+function expireCheckout(){
+  if(checkoutExpired)return;
+  checkoutExpired=true;
+  clearCheckoutDraft();
+  const bar=document.querySelector('.checkout-expiry');
+  if(bar){bar.classList.remove('expiring');bar.classList.add('expired');bar.setAttribute('role','alert');bar.setAttribute('aria-live','assertive');bar.textContent='Booking time expired. Your ticket was not completed. Returning to event details…';}
+  setTimeout(returnToEventDetails,2500);
+}
+function closePaymentOffersSheet(){document.getElementById('paymentOffersSheet').style.display='none';}
+function showPaymentOfferInfo(){
+  const offers=evData.razorpayPaymentOffers||evData.paymentOffers||[];
+  const content=document.getElementById('paymentOffersContent');
+  if(Array.isArray(offers)&&offers.length){
+    content.innerHTML=offers.map(offer=>`<article style="padding:.85rem 0;border-bottom:1px solid #383a40"><strong style="display:block;color:#f5f5f6">${escapeHtml(offer.title||offer.name||offer.display_text||'Payment offer')}</strong><span>${escapeHtml(offer.description||offer.desc||offer.terms||'')}</span></article>`).join('');
+  }else{
+    content.textContent='Razorpay applies payment offers based on your payment method, card or bank, and order amount. Choose “See eligible offers” to open Razorpay Checkout and view every offer currently available for this payment.';
+  }
+  document.getElementById('paymentOffersSheet').style.display='flex';
+}
+function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+function removeCheckoutSelection(){
+  if(selectedTicketCount()<=1){returnToEventDetails();return;}
+  openRemoveTicketSheet();
+}
+function renderRemoveTicketChoices(){
+  const choices=document.getElementById('removeTicketChoices');
+  const items=selectedTicketItems();
+  choices.innerHTML=items.map(item=>{
+    const name=escapeHtml(item.ticket.name||'Ticket');
+    const lineTotal=groupTicketPrice(item.ticket,item.quantity)*item.quantity;
+    const canRemoveOne=item.quantity>1&&ticketMinRequired(item.ticket)===1;
+    const actions=canRemoveOne
+      ? `<div style="display:flex;align-items:center;gap:.45rem;"><button type="button" aria-label="Remove one ${name}" onclick="removeTicketFromCheckout(${item.index},false)" style="width:36px;height:36px;border:1px solid #53555c;border-radius:10px;background:#24262b;color:#fff;font-size:1.2rem;font-weight:800;">−</button><strong aria-label="Quantity ${item.quantity}" style="min-width:1.4rem;text-align:center;color:#fff;">${item.quantity}</strong><button type="button" onclick="removeTicketFromCheckout(${item.index},true)" style="padding:.5rem .65rem;border:0;border-radius:10px;background:#e34b3b;color:#fff;font-weight:800;">Remove all</button></div>`
+      : `<button type="button" onclick="removeTicketFromCheckout(${item.index},true)" style="padding:.5rem .8rem;border:0;border-radius:10px;background:#e34b3b;color:#fff;font-weight:800;">Remove ticket</button>`;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.8rem 0;border-bottom:1px solid #383a40;"><div style="min-width:0;"><strong style="display:block;color:#f4f4f5;font-size:.87rem;">${name}</strong><small style="display:block;margin-top:.25rem;color:#aeb0b8;">${item.quantity} selected · ${fmt(lineTotal)}</small></div><div style="display:flex;gap:.45rem;flex:none;">${actions}</div></div>`;
+  }).join('');
+}
+function openRemoveTicketSheet(){
+  renderRemoveTicketChoices();
+  document.getElementById('removeTicketSheet').style.display='flex';
+}
+function closeRemoveTicketSheet(){document.getElementById('removeTicketSheet').style.display='none';}
+function removeTicketFromCheckout(index,removeAll){
+  const current=Number(pickerQuantities[index]||0);
+  const ticket=tickets[index];
+  if(!current||!ticket)return;
+  pickerQuantities[index]=removeAll?0:Math.max(0,current-1);
+  if(selectedTicketCount()<=0){closeRemoveTicketSheet();returnToEventDetails();return;}
+  if(selectedTicketIdx===index&&pickerQuantities[index]===0){
+    const nextIndex=pickerQuantities.findIndex(Boolean);
+    if(nextIndex>=0)selectedTicketIdx=nextIndex;
+  }
+  if(selectedSeats.length>selectedTicketCount())selectedSeats=selectedSeats.slice(0,selectedTicketCount());
+  qty=selectedTicketCount()||1;
+  saveCheckoutDraft();
+  renderTicketPicker();
+  updatePickerBar();
+  document.getElementById('s3Ticket').textContent=selectedTicketLabel();
+  updateBill();
+  renderRemoveTicketChoices();
+}
+function returnToEventDetails(){
+  closeRemoveTicketSheet();
+  clearCheckoutDraft();
+  if(eventId){
+    const slug=String(evData.name||passedName||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';
+    location.href=`/event/${encodeURIComponent(slug)}?eventId=${encodeURIComponent(eventId)}`;
+    return;
+  }
+  history.back();
+}
+function clearCheckoutDraft(){
+  if(!eventId)return;
+  try{localStorage.removeItem(`culturewave:checkout-draft:${eventId}`);}catch(_){ }
+}
+function saveCheckoutDraft(){
+  if(!eventId)return;
+  try{
+    const selected=tickets[selectedTicketIdx]||{};
+    const draft={
+      eventId,bookingSession,
+      name:document.getElementById('bookName')?.value.trim()||'',
+      phone:document.getElementById('bookPhone')?.value.trim()||'',
+      email:document.getElementById('bookEmail')?.value.trim()||'',
+      quantities:pickerQuantities,
+      selections:draftTicketSelections(),
+      ticketName:String(selected.name||''),
+      ticketPrice:Number(selected.price||0),
+      seats:selectedSeats,
+      ticketIndex:selectedTicketIdx,
+      savedAt:Date.now(),
+      checkoutExpiresAt:checkoutCountdownEndsAt||undefined
+    };
+    localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify(draft));
+  }catch(error){console.warn('Could not save checkout ticket selection:',error);}
+}
+function editCheckoutDetails(){
+  document.getElementById('checkoutEditName').value=document.getElementById('bookName').value.trim();
+  document.getElementById('checkoutEditPhone').value=document.getElementById('bookPhone').value.trim();
+  document.getElementById('checkoutEditEmail').value=document.getElementById('bookEmail').value.trim();
+  document.getElementById('checkoutContactSheet').style.display='flex';
+}
+function closeCheckoutContactSheet(){document.getElementById('checkoutContactSheet').style.display='none';}
+function syncCheckoutInvoice(){
+  document.getElementById('checkoutInvoiceName').textContent=document.getElementById('bookName').value.trim()||'Guest';
+  [['checkoutInvoicePhone','bookPhone'],['checkoutInvoiceEmail','bookEmail']].forEach(([displayId,inputId])=>{
+    const value=document.getElementById(inputId).value.trim();
+    const display=document.getElementById(displayId);
+    display.textContent=value;
+    display.hidden=!value;
+  });
+  const location=[evData.venueName||evData.venue||evData.location||evData.address,evData.city,evData.state||evData.stateName].filter(Boolean).join(', ');
+  const locationDisplay=document.getElementById('checkoutInvoiceLocation');
+  locationDisplay.textContent=location;
+  locationDisplay.hidden=!location;
+}
+['bookName','bookPhone','bookEmail'].forEach(id=>document.getElementById(id)?.addEventListener('input',syncCheckoutInvoice));
+function saveCheckoutContactDetails(){
+  const name=document.getElementById('checkoutEditName').value.trim();
+  const phone=document.getElementById('checkoutEditPhone').value.trim();
+  const email=document.getElementById('checkoutEditEmail').value.trim();
+  if(!name){showToast('Enter your full name');return;}
+  if(phone.replace(/\D/g,'').length<10){showToast('Enter a valid phone number');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Enter a valid email address');return;}
+  document.getElementById('bookName').value=name;
+  document.getElementById('bookPhone').value=phone;
+  document.getElementById('bookEmail').value=email;
+  syncCheckoutInvoice();
+  closeCheckoutContactSheet();
+}
+function eventCoupons(){
+  const source=evData.coupons || evData.discountCoupons || evData.offers || evData.couponCodes || evData.promos || [];
+  return Array.isArray(source) ? source.filter(c=>c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0) : [];
+}
+function renderTicketPicker(){
+  const list=document.getElementById('pickerTicketList');
+  const title=document.getElementById('pickerEventTitle'); const location=document.getElementById('pickerEventLocation');
+  title.textContent=evData.name||'Event'; location.textContent=[evData.venueName||evData.venue,evData.city].filter(Boolean).join(', ');
+  const date=eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date);
+  if(!Number.isNaN(date.getTime())){ document.getElementById('pickerDay').textContent=date.toLocaleDateString('en-IN',{weekday:'short'}); document.getElementById('pickerDate').textContent=date.toLocaleDateString('en-IN',{day:'numeric',month:'short'}); }
+  const startTime=eventStartTime();
+  const endTime=evData.endTime || evData.finishTime || '';
+  document.getElementById('pickerTime').textContent=startTime ? `${formatTimeText(startTime)}${endTime ? ` – ${formatTimeText(endTime)}` : ''}` : 'Time TBA';
+  if(eventSoldOut()){
+    list.innerHTML=renderSoldOutPanel();
+    return;
+  }
+  if(!tickets.length){ list.innerHTML='<div class="bk-picker-state">No tickets are available for this event.</div>'; return; }
+  list.innerHTML=tickets.map((ticket,index)=>{
+    const quantity=pickerQuantities[index]||0;
+    const selectedElsewhere=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0);
+    const max=Math.min(ticketMax(ticket),remainingEventCapacity()-selectedElsewhere,MAX_TOTAL_TICKETS-selectedElsewhere);
+    const min=ticketMinRequired(ticket), sold=max<min;
+    const description=ticket.description||ticket.details||ticket.desc||'';
+    const groupHint=groupTicketHint(ticket), groupRate=Number(ticket.bulk?.pricePerPerson||0);
+    const ticketPrice=groupHint?groupRate*(quantity||min):Number(ticket.price||0);
+    const quantityControl=sold
+      ? '<button class="bk-picker-add" disabled>SOLD OUT</button>'
+      : quantity?`<div class="bk-picker-qty"><button type="button" aria-label="Remove one ticket" onclick="changePickerQty(${index},-1)">−</button><b>${quantity}</b><button type="button" aria-label="Add one ticket" onclick="changePickerQty(${index},1)">+</button></div>`:`<button class="bk-picker-add" type="button" onclick="changePickerQty(${index},1)">＋ Add</button>`;
+    return `<article class="bk-picker-ticket"><div class="bk-picker-ticket-copy"><span class="bk-picker-ticket-name">${String(ticket.name||'Ticket')}</span><span class="bk-picker-ticket-price">${fmt(ticketPrice)}${groupHint?'<small style="display:block;font-size:.65em;opacity:.75;">group ticket total</small>':''}</span>${groupHint?`<div style="margin-top:.4rem;color:#45d49c;font-size:.72rem;font-weight:700;">${groupHint}</div>`:''}</div>${quantityControl}${description?`<p class="bk-picker-desc open" id="pickerDesc${index}">${escapeHtml(description)}</p>`:''}${sold?'<span class="bk-picker-availability">Sold out</span>':''}</article>`;
+  }).join('');
+  updatePickerBar();
+}
+function togglePickerDetails(index,button){ const el=document.getElementById('pickerDesc'+index); if(el){const open=el.classList.toggle('open');button?.setAttribute('aria-expanded',String(open));if(button)button.innerHTML=open?'Details ⌃':'Details ⌄';} }
+function changePickerQty(index, change){
+  const max = ticketMax(tickets[index]);
+  const currentForThis = pickerQuantities[index] || 0;
+  const remainingEvent=remainingEventCapacity();
+  const otherTickets=pickerQuantities.reduce((sum,value,i)=>sum+(i===index?0:value),0);
+  const minRequired = ticketMinRequired(tickets[index]);
+  const step = minRequired>1 ? minRequired : 1;
+  const available = Math.min(max, remainingEvent-otherTickets, MAX_TOTAL_TICKETS-otherTickets);
+  let requested = change>0
+    ? (currentForThis===0 ? minRequired : currentForThis+step)
+    : (currentForThis<=step ? 0 : currentForThis-step);
+  if(change>0 && requested>available){ showToast(`Not enough attendee spots for another group of ${step}`); return; }
+  const next = Math.max(0, Math.min(available, requested));
+  pickerQuantities[index] = next;
+  selectedTicketIdx = index;
+  qty = selectedTicketCount() || 1;
+  if(selectedSeats.length > qty) selectedSeats = selectedSeats.slice(0, qty);
+  if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+  renderTicketPicker();
+  updateQtyPrice();
+}
+function updatePickerBar(){
+  const count=pickerQuantities.reduce((sum,value)=>sum+value,0);
+  const total=pickerQuantities.reduce((sum,value,index)=>sum+groupTicketPrice(tickets[index],value)*value,0);
+  document.getElementById('pickerCount').textContent=`${count} ticket${count===1?'':'s'}`;
+  document.getElementById('pickerTotal').textContent=fmt(total);
+  const isMobileSheet=window.matchMedia('(max-width: 768px)').matches&&document.getElementById('panel1').classList.contains('active');
+  document.getElementById('pickerBar').classList.toggle('show',count>0||isMobileSheet);
+  document.querySelectorAll('.picker-seat-section').forEach(seatSection=>{
+    const isUploadedImage=Boolean(seatSection.querySelector('#seatingContainer img'));
+    seatSection.style.display=isUploadedImage||count ? '' : 'none';
+  });
+  const seatStatus=document.getElementById('pickerSeatStatus');
+  const hasMap=document.getElementById('seatingWrap').style.display !== 'none' && !document.querySelector('#seatingContainer img');
+  if(seatStatus) seatStatus.textContent=hasMap ? `${selectedSeats.length} of ${count} seat${count===1?'':'s'} selected` : 'Choose the number of seats for your tickets';
+  const button=document.querySelector('.bk-picker-proceed');
+  if(button){
+    if(isMobileSheet&&document.getElementById('panel1').classList.contains('details-step')){button.textContent='Continue  →';button.onclick=continueToTicketSelection;button.disabled=false;}
+    else {button.textContent=hasMap&&selectedSeats.length!==count?'Select seats':'Proceed  →';button.onclick=showBookingDetails;button.disabled=count===0;}
+  }
+}
+function showBookingDetails(){
+  if(!pickerQuantities.some(Boolean)){ showToast('Add at least one ticket'); return; }
+  const hasSeating = document.getElementById('seatingWrap').style.display !== 'none';
+  const isImagePlan = hasSeating && document.querySelector('#seatingContainer img');
+  const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
+  if(window.matchMedia('(max-width: 768px)').matches){
+    const panel=document.getElementById('panel1');
+    panel.classList.add('details-step');
+    document.getElementById('guestContactCard').style.display='';
+    document.getElementById('ticketSelectionSheet').style.display='none';
+    updatePickerBar();
+    document.getElementById('ticketPicker').scrollTop=0;
+    return;
+  }
+  if(startWithTicketPicker){
+    if(hasSeating && !isImagePlan && selectedSeats.length !== ticketCount){ showToast(`Please select ${ticketCount} seat${ticketCount===1?'':'s'}`); return; }
+    document.getElementById('ticketSelectionSheet').style.display='none';
+    document.getElementById('guestContactCard').style.display='';
+    document.getElementById('panel1').classList.add('desktop-details-step');
+    document.getElementById('pickerBar').classList.remove('show');
+    const continueButton=document.querySelector('.guest-contact-continue');
+    if(continueButton) continueButton.innerHTML='Continue to checkout <span aria-hidden="true">→</span>';
+    return;
+  }
+  if(hasSeating && !isImagePlan && selectedSeats.length !== ticketCount){ showToast(`Please select ${ticketCount} seat${ticketCount===1?'':'s'}`); return; }
+  const phone = document.getElementById('bookPhone').value.trim();
+  if(!phone || phone.replace(/\D/g,'').length < 10){ showToast('Enter a valid WhatsApp number'); return; }
+  const name = document.getElementById('bookName').value.trim();
+  const email = document.getElementById('bookEmail').value.trim();
+  if(!name){ showToast('Enter your full name'); return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Enter a valid email address'); return; }
+  if(!emailVerified && bookingAuth.currentUser?.email !== email){
+    emailVerified = true; // Guest email is collected for booking confirmation; verification is optional.
+  }
+  document.getElementById('panel1').classList.remove('ticket-picker');
+  document.getElementById('pickerBar').classList.remove('show');
+  goStep3();
+}
+function continueToTicketSelection(){
+  const name=document.getElementById('bookName').value.trim();
+  const phone=document.getElementById('bookPhone').value.trim();
+  const email=document.getElementById('bookEmail').value.trim();
+  if(!name){showToast('Enter your full name');return;}
+  if(phone.replace(/\D/g,'').length<10){showToast('Enter a valid phone number');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Enter a valid email address');return;}
+  if(startWithTicketPicker && !window.matchMedia('(max-width: 768px)').matches){
+    const hasSelectableSeatMap=evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections));
+    if(hasSelectableSeatMap&&selectedSeats.length!==selectedTicketCount()){showToast(`Please select ${selectedTicketCount()} seat${selectedTicketCount()===1?'':'s'}`);return;}
+    if(!emailVerified&&bookingAuth.currentUser?.email!==email)emailVerified=true;
+    const selected=tickets[selectedTicketIdx]||{};
+    const draft={eventId,bookingSession,name,phone,email,quantities:pickerQuantities,selections:draftTicketSelections(),ticketName:String(selected.name||''),ticketPrice:Number(selected.price||0),seats:selectedSeats,ticketIndex:selectedTicketIdx,savedAt:Date.now()};
+    try{localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify(draft));}
+    catch(error){console.error('Could not preserve checkout details:',error);showToast('Could not save your booking details. Please try again.');return;}
+    urlP.delete('picker');
+    urlP.set('resume','1');
+    history.replaceState(null,'',`${location.pathname}?${urlP.toString()}`);
+    document.getElementById('panel1').classList.remove('ticket-picker','desktop-details-step');
+    document.getElementById('pickerBar').classList.remove('show');
+    goStep3();
+    return;
+  }
+  if(window.matchMedia('(max-width: 768px)').matches&&document.getElementById('panel1').classList.contains('details-step')){
+    const hasSelectableSeatMap=evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections));
+    if(hasSelectableSeatMap&&selectedSeats.length!==selectedTicketCount()){
+      backToTicketSelection();
+      showToast(`Please select ${selectedTicketCount()} seat${selectedTicketCount()===1?'':'s'} before continuing`);
+      return;
+    }
+    if(!emailVerified&&bookingAuth.currentUser?.email!==email)emailVerified=true;
+    if(embeddedBooking){
+      try{
+        const selected=tickets[selectedTicketIdx]||{};
+        const draft={eventId,bookingSession,name,phone,email,quantities:pickerQuantities,selections:draftTicketSelections(),ticketName:String(selected.name||''),ticketPrice:Number(selected.price||0),seats:selectedSeats,ticketIndex:selectedTicketIdx,savedAt:Date.now()};
+        localStorage.setItem(`culturewave:checkout-draft:${eventId}`,JSON.stringify(draft));
+        window.parent.postMessage({type:'culturewave:go-to-checkout',draft},location.origin);
+      }catch(_){showToast('Could not save your booking details. Please try again.');return;}
+      return;
+    }
+    document.getElementById('panel1').classList.remove('ticket-picker','details-step');
+    document.getElementById('pickerBar').classList.remove('show');
+    goStep3();
+    return;
+  }
+  document.getElementById('guestContactCard').style.display='none';
+  document.getElementById('ticketSelectionSheet').style.display='block';
+  const button=document.querySelector('.bk-picker-proceed');
+  if(button) button.textContent='Checkout';
+  updatePickerBar();
+}
+function returnToTicketPicker(){
+  document.getElementById('panel1').classList.add('ticket-picker');
+  document.getElementById('panel1').classList.remove('details-step','desktop-details-step');
+  document.getElementById('guestContactCard').style.display='none';
+  document.getElementById('ticketSelectionSheet').style.display='block';
+  goStep(1);
+  updatePickerBar();
+}
+function backToTicketSelection(){
+  document.getElementById('panel1').classList.remove('details-step','desktop-details-step');
+  document.getElementById('guestContactCard').style.display='none';
+  document.getElementById('ticketSelectionSheet').style.display='block';
+  updatePickerBar();
+  document.getElementById('ticketPicker').scrollTop=0;
+}
+function closeBookingSheet(){
+  if(window.parent!==window){window.parent.postMessage({type:'culturewave:close-booking-sheet'},location.origin);return;}
+  history.back();
+}
+
+// ── STEPPER ──
+function goStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById("panel"+i).classList.toggle("active",i===n);
+    const tab=document.getElementById("tab"+i);
+    tab.classList.remove("active","done");
+    if(i<n) tab.classList.add("done");
+    if(i===n) tab.classList.add("active");
+  }
+  document.querySelector(".bk-trust").style.display = n === 1 ? "none" : "grid";
+  const isMobile = true;
+  const showReceipt = n !== 1 && !isMobile;
+  document.getElementById("bkReceipt").style.display = showReceipt ? "block" : "none";
+  document.querySelector(".bk-grid").style.gridTemplateColumns = showReceipt ? "1fr 320px" : "1fr";
+  document.querySelector(".bk-wrap").style.maxWidth = showReceipt ? "960px" : "640px";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ── OTP EMAIL VERIFY ──
+function sendOtp(){
+  const email = document.getElementById("bookEmail").value.trim();
+  if(!email || !email.includes("@")){ showToast("Enter a valid email first"); return; }
+  generatedOtp = String(Math.floor(100000+Math.random()*900000));
+  emailjs.send(EJ_SVC, EJ_OTP_TPL, {
+    to_email: email, to_name: "User",
+    otp_code: generatedOtp,
+    reply_to: "support.culturewave@gmail.com"
+  }).then(()=>{
+    document.getElementById("otpWrap").style.display="flex";
+    showToast("OTP sent to "+email);
+  }).catch(()=>{ showToast("Failed to send OTP. Try again."); });
+}
+
+function verifyOtp(){
+  const entered = document.getElementById("otpInput").value.trim();
+  if(entered === generatedOtp){
+    emailVerified = true;
+    document.getElementById("verifyTag").textContent = "✓ Verified";
+    document.getElementById("verifyTag").className = "bk-verify-tag ok";
+    document.getElementById("otpWrap").style.display = "none";
+    showToast("Email verified!");
+  } else {
+    showToast("Wrong OTP. Try again.");
+  }
+}
+
+// ── STEP 1 → 2 ──
+function goStep2(){
+  const name = document.getElementById("bookName").value.trim();
+  const phone = document.getElementById("bookPhone").value.trim();
+  const email = document.getElementById("bookEmail").value.trim();
+  if(!name){ showToast("Enter your full name"); return; }
+  if(!phone || phone.replace(/\D/g,'').length < 10){ showToast("Enter a valid WhatsApp number"); return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast("Enter a valid email"); return; }
+  document.getElementById("rName").textContent = name;
+  goStep(2);
+}
+
+// ── TICKET CARDS ──
+function buildTickets(){
+  const list = document.getElementById("ticketList");
+  if(!tickets.length){
+    list.innerHTML = `<div style="padding:.75rem;background:#f7faff;border-radius:12px;font-size:.86rem;color:var(--muted);">No tickets are available for this event.</div>`;
+    return;
+  }
+  list.innerHTML = tickets.map((t,i)=>`
+    <div class="bk-ticket-card ${i===0?"selected":""}" onclick="selectTicket(${i})">
+      <div class="bk-ticket-inner" style="background:linear-gradient(135deg,#1242c5,#2f6bff);">
+        <span class="bk-ticket-name">${t.name||"General Admission"}</span>
+        <span class="bk-ticket-price">${t.price?fmt(t.price):"Free"}</span>
+        <div class="bk-ticket-radio"></div>
+      </div>
+    </div>`).join("");
+  updateQtyPrice();
+}
+
+function selectTicket(i){
+  selectedTicketIdx = i;
+  document.querySelectorAll(".bk-ticket-card").forEach((c,idx)=>c.classList.toggle("selected",idx===i));
+  discountAmt = 0; couponApplied = ""; appliedCouponData = null;
+  document.getElementById("couponMsg").textContent = "";
+  document.getElementById("b_discountRow").style.display = "none";
+  updateQtyPrice();
+}
+
+function updateQtyPrice(){
+  document.getElementById("rTicket").textContent = selectedTicketLabel();
+  updateBill();
+}
+
+// ── STEP 2 → 3 ──
+function goStep3(){
+  const hasSeating = document.getElementById("seatingWrap").style.display !== "none";
+  const isImagePlan = hasSeating && document.querySelector("#seatingContainer img");
+  if(hasSeating && !isImagePlan && selectedSeats.length === 0){
+    showToast("Please select at least one seat"); return;
+  }
+  document.getElementById("s3Event").textContent = evData.name||passedName||"—";
+  const poster=document.getElementById('checkoutPoster');
+  if(poster){poster.src=evData.cardImgUrl||evData.coverUrl||'';poster.alt=`${evData.name||'Event'} poster`;}
+  document.getElementById("s3Ticket").textContent = selectedTicketLabel();
+  document.getElementById("s3Qty").textContent = selectedTicketCount();
+  const eventDate = eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || passedEventDate);
+  const dateLabel = !Number.isNaN(eventDate.getTime()) ? eventDate.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}) : '';
+  const locationLabel = [evData.venueName||evData.venue, evData.city].filter(Boolean).join(' · ');
+  document.getElementById('reviewEventMeta').textContent = [dateLabel, locationLabel].filter(Boolean).join('  ·  ') || 'Review your booking';
+  document.getElementById('checkoutLocation').textContent = locationLabel || 'Event booking';
+  const checkoutTime=(eventStartTime()||formatTimeText(passedEventTime)).replace(/:00(?=\s)/,'');
+  document.getElementById('checkoutDate').textContent = [dateLabel,checkoutTime].filter(Boolean).join(' | ') || 'Date & time TBA';
+  syncCheckoutInvoice();
+  startCheckoutCountdown();
+  updateBill();
+  goStep(3);
+}
+
+// ── BILL ──
+function updateBill(){
+  const subtotal = selectedTicketSubtotal();
+  discountAmt = appliedCouponData ? calculateCouponDiscount(appliedCouponData,subtotal) : 0;
+  const afterDiscount = Math.max(0, subtotal - discountAmt);
+  const fee = platformFee(afterDiscount);
+  const total = afterDiscount + fee;
+  document.getElementById("b_price").textContent = selectedTicketLabel();
+  const orderBreakdown=selectedTicketItems().map(item=>`${item.ticket.name||'Ticket'} · ${fmt(groupTicketPrice(item.ticket,item.quantity))} × ${item.quantity}`).join('  |  ');
+  document.getElementById('checkoutOrderBreakdown').textContent=orderBreakdown;
+  document.getElementById("b_subtotal").textContent = fmt(subtotal);
+  document.getElementById("checkoutTicketTotal").textContent = fmt(subtotal);
+  document.getElementById("checkoutQty").textContent = selectedTicketCount();
+  document.getElementById("s3Qty").textContent = `${selectedTicketCount()} ticket${selectedTicketCount()===1?'':'s'}`;
+  oneClubApplied=calculateOneClubApplied(total);
+  const payable=Math.max(0,total-oneClubApplied);
+  const checkoutSubmitLabel=document.querySelector('#submitBtn .checkout-submit-label');
+  if(checkoutSubmitLabel)checkoutSubmitLabel.innerHTML=payable?'Pay now <b aria-hidden="true">›</b>':'Book now <b aria-hidden="true">›</b>';
+  else document.getElementById("submitBtn").textContent=payable?'Pay now ›':'Book now ›';
+  const firstCoupon=eventCoupons()[0];
+  const firstCouponValue=firstCoupon ? Number(firstCoupon.value??firstCoupon.discount??0) : 0;
+  const firstCouponLabel=firstCoupon ? ((firstCoupon.type==='percent'||firstCoupon.type==='percentage') ? `Save ${firstCouponValue}% with ${firstCoupon.code||firstCoupon.couponCode}` : `Save ₹${firstCouponValue} with ${firstCoupon.code||firstCoupon.couponCode}`) : 'Add a coupon to save more';
+  const offerSaving=document.getElementById('offerSaving');
+  if(offerSaving)offerSaving.textContent=couponApplied?`${couponApplied} applied`:firstCouponLabel;
+  const discountRow=document.getElementById("b_discountRow");
+  discountRow.style.display=discountAmt>0?"":"none";
+  document.querySelector("#b_discountRow > span:first-child").textContent=discountAmt>0?`Coupon${couponApplied?` (${couponApplied})`:''}`:"Discount";
+  document.getElementById("b_discount").textContent="-"+fmt(discountAmt);
+  document.getElementById("b_fee").textContent = fee ? fmt(fee) : "₹0";
+  document.getElementById('oneClubApplied').textContent='−'+fmt(oneClubApplied);
+  document.getElementById('oneClubAppliedRow').style.display=oneClubApplied>0?'':'none';
+  document.getElementById("b_total").textContent = payable ? fmt(payable) : "Free";
+  document.getElementById("b_totalLabel").textContent = checkoutPaymentMethod==='oneclub'&&oneClubApplied>0 ? 'Pay online now' : 'Grand Total';
+  document.getElementById("checkoutGrandTotal").textContent = payable ? fmt(payable) : "Free";
+  document.getElementById("checkoutTotalLabel").textContent = checkoutPaymentMethod==='oneclub'&&oneClubApplied>0 ? 'Pay online now' : 'Total';
+  document.getElementById("rTotal").textContent = payable ? fmt(payable) : "Free";
+}
+
+// ── COUPON ──
+function openCouponSheet(){
+  const subtotal = selectedTicketSubtotal();
+  document.getElementById('couponSheetCart').textContent = fmt(subtotal);
+  renderCouponSheet();
+  document.getElementById('couponSheet').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeCouponSheet(){
+  document.getElementById('couponSheet').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function applySheetCoupon(){
+  const input = document.getElementById('couponSheetInput');
+  applyCoupon(input ? input.value.trim() : '');
+}
+function removeCoupon(){
+  discountAmt = 0;
+  couponApplied = '';
+  appliedCouponData = null;
+  const input = document.getElementById('couponSheetInput');
+  if(input) input.value = '';
+  const msg = document.getElementById('couponMsg');
+  if(msg){ msg.textContent=''; msg.className='bk-coupon-msg'; }
+  updateBill();
+  renderCouponSheet();
+  closeCouponSheet();
+}
+function renderCouponSheet(){
+  const coupons = eventCoupons();
+  const subtotal = selectedTicketSubtotal();
+  const list = document.getElementById('couponSheetList');
+  if(!list) return;
+  if(!coupons.length){ list.innerHTML='<div style="color:#8892a4;font-size:.9rem;padding:1rem 0;">No coupons available for this event.</div>'; return; }
+  list.innerHTML = coupons.map(c=>{
+    const code = String(c.code||c.couponCode||c.promoCode||'').trim().toUpperCase();
+    const value = Number(c.value??c.discount??c.amount??c.off??0);
+    const isPct = c.type==='percent'||c.type==='percentage';
+    const saving = calculateCouponDiscount(c,subtotal);
+    const minOrder = couponMinimumOrder(c);
+    const eligible = subtotal >= minOrder;
+    const isApplied = couponApplied === code;
+    const tabColor = isApplied ? '#1dae79' : eligible ? (isPct&&value>=20?'#ff5a19':isPct&&value>=15?'#e67e22':'#1dae79') : '#4b5563';
+    const desc = c.description||c.desc||`Get ${isPct?value+'%':'₹'+value} OFF${c.maxDiscount?` upto ₹${c.maxDiscount}`:''}${minOrder?` on orders above ₹${minOrder}`:''}${c.maxUses?` · Limited offer`:''}`;
+    return `<div style="display:flex;border-radius:18px;overflow:hidden;background:#111520;border:1.5px solid ${isApplied?'#1dae79':'#1e2535'};margin-bottom:1rem;min-height:110px;">
+      <div style="width:62px;min-width:62px;background:${tabColor};display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:#0a0c12;"></div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:#0a0c12;"></div>
+        <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:.72rem;font-weight:900;color:#fff;letter-spacing:.12em;">${isPct?value+'% OFF':'₹'+value+' OFF'}</span>
+      </div>
+      <div style="flex:1;padding:1rem 1.1rem;border-left:2px dashed #2a3040;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem;">
+          <span style="font-size:1rem;font-weight:900;color:#fff;letter-spacing:.05em;">${code}</span>
+          ${isApplied
+            ? `<button onclick="removeCoupon()" style="border:0;background:transparent;color:#ef4444;font-size:.82rem;font-weight:900;letter-spacing:.05em;padding:0;">REMOVE</button>`
+            : `<button onclick="tapCoupon('${code}')" style="border:0;background:transparent;color:${eligible?tabColor:'#4b5563'};font-size:.82rem;font-weight:900;letter-spacing:.05em;padding:0;">APPLY</button>`
+          }
+        </div>
+        ${isApplied?`<div style="font-size:.82rem;color:#1dae79;font-weight:700;margin-bottom:.4rem;">✓ Applied! You save ₹${saving}</div>`:
+          eligible&&saving?`<div style="font-size:.82rem;color:#1dae79;font-weight:700;margin-bottom:.4rem;">Save ₹${saving} on this order!</div>`:''}
+        ${!eligible&&minOrder?`<div style="font-size:.78rem;color:#f59e0b;margin-bottom:.4rem;">Add ₹${minOrder-subtotal} more to avail this offer</div>`:''}
+        <div style="border-top:1px dashed #2a3040;margin:.5rem 0;"></div>
+        <div style="font-size:.78rem;color:#8892a4;line-height:1.6;">${desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function tapCoupon(code){
+  const input = document.getElementById('couponSheetInput');
+  if(input) input.value = code;
+  applyCoupon(code);
+}
+function applyManualCoupon(){
+  const input = document.getElementById('couponSheetInput');
+  if(input) applyCoupon(input.value.trim());
+}
+
+function toggleCouponOffers(){}
+
+async function applyCoupon(selectedCode){
+  const code = String(selectedCode||'').trim().toUpperCase();
+  const msg = document.getElementById("couponMsg");
+  if(!code){ msg.textContent="Enter a coupon code"; msg.className="bk-coupon-msg err"; return; }
+  if(couponApplied === code){ msg.textContent="Already applied"; msg.className="bk-coupon-msg err"; return; }
+  const subtotal = selectedTicketSubtotal();
+
+  // 1. Try coupons already loaded in evData
+  let match = eventCoupons().find(c => String(c.code||c.couponCode||c.promoCode||'').trim().toUpperCase() === code);
+
+  // 2. Fallback: fetch directly from Firestore coupons subcollection or top-level collection
+  if(!match && eventId){
+    try{
+      // Try subcollection first
+      const subSnap = await db.collection('events').doc(eventId).collection('coupons').where('code','==',code).limit(1).get();
+      if(!subSnap.empty) match = subSnap.docs[0].data();
+    }catch(_){}
+    if(!match){
+      try{
+        // Try top-level coupons collection
+        const topSnap = await db.collection('coupons').where('eventId','==',eventId).where('code','==',code).limit(1).get();
+        if(!topSnap.empty) match = topSnap.docs[0].data();
+      }catch(_){}
+    }
+  }
+
+  if(match){
+    const value=Number(match.value??match.discount??match.amount??match.off??0);
+    if(!value){ msg.textContent="Invalid coupon"; msg.className="bk-coupon-msg err"; return; }
+    const minimum=couponMinimumOrder(match);
+    if(subtotal<minimum){ msg.textContent=`This coupon requires a minimum order of ${fmt(minimum)}`; msg.className="bk-coupon-msg err"; return; }
+    appliedCouponData = match;
+    discountAmt = calculateCouponDiscount(match,subtotal);
+    couponApplied = code;
+    const label = (match.type==='percent'||match.type==='percentage') ? `${value}% discount` : `₹${value} off`;
+    msg.textContent = `✓ ${label} applied! You save ${fmt(discountAmt)}`;
+    msg.className = "bk-coupon-msg ok";
+    updateBill();
+    renderCouponSheet();
+    closeCouponSheet();
+  } else {
+    msg.textContent = "Invalid or expired coupon code";
+    msg.className = "bk-coupon-msg err";
+  }
+}
+
+// ── STEP 3 → 4 ──
+function goStep4(){
+  const subtotal = selectedTicketSubtotal();
+  discountAmt = appliedCouponData ? calculateCouponDiscount(appliedCouponData,subtotal) : 0;
+  const afterDiscount = Math.max(0, subtotal - discountAmt);
+  const fee = platformFee(afterDiscount);
+  const total = afterDiscount + fee;
+  document.getElementById("c_event").textContent = evData.name||passedName||"—";
+  document.getElementById("c_name").textContent = document.getElementById("bookName").value;
+  document.getElementById("c_phone").textContent = document.getElementById("bookPhone").value;
+  document.getElementById("c_email").textContent = document.getElementById("bookEmail").value;
+  document.getElementById("c_ticket").textContent = selectedTicketLabel();
+  document.getElementById("c_qty").textContent = selectedTicketCount();
+  document.getElementById("c_fee").textContent = fee ? fmt(fee) : "₹0";
+  oneClubApplied=calculateOneClubApplied(total);
+  const payable=Math.max(0,total-oneClubApplied);
+  document.getElementById("c_total").textContent = payable ? fmt(payable) : "Free";
+  document.getElementById('oneClubApplied').textContent='−'+fmt(oneClubApplied);
+  document.getElementById('oneClubAppliedRow').style.display=oneClubApplied>0?'':'none';
+  document.getElementById("c_discountRow").style.display = discountAmt>0 ? "" : "none";
+  document.querySelector("#c_discountRow > span").textContent=discountAmt>0?`Coupon${couponApplied?` (${couponApplied})`:''}`:"Discount";
+  document.getElementById("c_discount").textContent = "-"+fmt(discountAmt);
+  document.getElementById("confirmSubmitBtn").textContent = payable===0 ? "✅ Book Now" : "🔒 Pay Now";
+  goStep(4);
+}
+function calculateOneClubApplied(total){
+  if(checkoutPaymentMethod!=='oneclub'||oneClubBalance<=0||total<=0)return 0;
+  return oneClubBalance>=total?total:Math.min(oneClubBalance,Math.max(0,Math.floor(total-1)));
+}
+function toggleCheckoutPaymentMenu(){const menu=document.getElementById('checkoutPaymentMenu'),toggle=document.getElementById('checkoutPaymentToggle');menu.hidden=!menu.hidden;toggle.setAttribute('aria-expanded',String(!menu.hidden))}
+function selectCheckoutPayment(method){if(method==='oneclub'&&oneClubBalance<=0)return;checkoutPaymentMethod=method==='oneclub'?'oneclub':'online';document.getElementById('checkoutPaymentMethodLabel').textContent=checkoutPaymentMethod==='oneclub'?'One Club':'Paytm UPI';document.querySelector('.checkout-payment-mark').textContent=checkoutPaymentMethod==='oneclub'?'OC':'Paytm';document.getElementById('payOnlineOption').setAttribute('aria-selected',String(checkoutPaymentMethod==='online'));document.getElementById('oneClubOption').setAttribute('aria-selected',String(checkoutPaymentMethod==='oneclub'));document.getElementById('checkoutPaymentMenu').hidden=true;document.getElementById('checkoutPaymentToggle').setAttribute('aria-expanded','false');updateBill()}
+document.addEventListener('click',event=>{if(!event.target.closest('#checkoutPaymentPicker')){const menu=document.getElementById('checkoutPaymentMenu');if(menu){menu.hidden=true;document.getElementById('checkoutPaymentToggle').setAttribute('aria-expanded','false')}}});
+async function loadOneClubBalance(user){const option=document.getElementById('oneClubOption'),label=document.getElementById('oneClubMethodBalance'),statusRow=document.getElementById('oneClubStatusRow'),status=document.getElementById('oneClubStatus');oneClubBalance=0;statusRow.hidden=true;if(!user){option.disabled=true;label.textContent='Sign in to use One Club';if(checkoutPaymentMethod==='oneclub')selectCheckoutPayment('online');updateBill();return}try{const response=await fetch(`${razorpayFunctionsUrl}/oneClubBalance`,{method:'POST',headers:{Authorization:`Bearer ${await user.getIdToken()}`}});const result=await response.json();if(!response.ok||!result.success)throw new Error(result.error||`Balance request failed (${response.status})`);oneClubBalance=Math.max(0,Number(result.balance)||0);option.disabled=oneClubBalance<=0;label.textContent=oneClubBalance>0?`Available · ₹${oneClubBalance.toLocaleString('en-IN')}`:'No balance available';if(!oneClubBalance&&checkoutPaymentMethod==='oneclub')selectCheckoutPayment('online');updateBill()}catch(error){oneClubBalance=0;option.disabled=true;label.textContent='Balance unavailable';status.textContent='One Club balance could not load. Please try again.';statusRow.hidden=false;if(checkoutPaymentMethod==='oneclub')selectCheckoutPayment('online');else updateBill();console.warn('Could not load One Club balance:',error)}}
+bookingAuth.onAuthStateChanged(loadOneClubBalance);
+const walletAuthReady=bookingAuthReady.then(()=>bookingAuth);
+
+async function saveBooking(data){
+  try{
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    // Link this booking to the account only when the signed-in email matches
+    // the email entered for checkout. Otherwise keep it as a guest booking.
+    const signedInUser=bookingAuth.currentUser;
+    const normalizedCustomerEmail=String(data.email||'').trim().toLowerCase();
+    const userId=signedInUser?.email&&signedInUser.email.trim().toLowerCase()===normalizedCustomerEmail
+      ? signedInUser.uid
+      : null;
+    // Resolve organiserId — try evData fields first, then fetch event doc directly
+    let organiserId = evData.ownerId || evData.organiserId || null;
+    if(!organiserId && eventId){
+      try{
+        const evSnap = await db.collection('events').doc(eventId).get();
+        if(evSnap.exists) organiserId = evSnap.data().ownerId || evSnap.data().organiserId || null;
+      }catch(_){}
+    }
+    // Ensure seatIds is always a proper array of strings
+    const seatIds = Array.isArray(data.seatIds) ? data.seatIds.map(String).filter(Boolean) : [];
+    let walletAccessTokenHash = null;
+    if(data.walletAccessToken && crypto.subtle){
+      try{
+        walletAccessTokenHash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data.walletAccessToken))), byte => byte.toString(16).padStart(2,'0')).join('');
+      }catch(error){console.warn('Wallet pass token hashing unavailable:',error);}
+    }
+    const ticketItems = selectedTicketItems().map(item=>({ticketIndex:item.index,ticketName:item.ticket.name||'Ticket',quantity:item.quantity}));
+    const doc = {
+      bookingId: data.bookingId, walletAccessTokenHash, eventId: eventId||null,
+      eventName: data.eventName, ticketName: data.ticketName,
+      ticketItems,
+      amount: data.amount, walletAmount:Number(data.walletAmount||0), seats: data.seats, seatIds: seatIds,
+      status: data.status, paymentId: data.paymentId||null, paymentMethod:data.method||null,
+      customerName: data.name, customerEmail: normalizedCustomerEmail,
+      customerPhone: data.phone, customerState:data.state||'', userId: userId,
+      organiserId: organiserId,
+      ownerId: organiserId,
+      eventDate: evData.startDate || evData.date || null,
+      venueName: evData.venueName || evData.venue || null,
+      city: evData.city || null,
+      eventEmoji: evData.emoji || null,
+      createdAt: ts
+    };
+    const batch = db.batch();
+    batch.set(db.collection('bookings').doc(data.bookingId), doc);
+    batch.set(db.collection('payments').doc(data.bookingId), doc);
+    if(eventId && seatIds.length){
+      batch.update(db.collection('events').doc(eventId), {
+        bookedSeats: firebase.firestore.FieldValue.arrayUnion(...seatIds),
+        lastSeatBookingId: data.bookingId
+      });
+    }
+    await batch.commit();
+    return true;
+  }catch(e){ console.error("saveBooking:",e); }
+  return false;
+}
+
+// ── SEND EMAIL ──
+async function sendEmail(data){
+  try{
+    // Use the email entered for this booking, or the signed-in account email.
+    const accountEmail = data.email;
+    if(!accountEmail) throw new Error('No email address is available for this booking.');
+    await emailjs.send(EJ_SVC, EJ_TPL, {
+      to_name: data.name, to_email: accountEmail,
+      recipient_email: accountEmail, user_email: accountEmail,
+      event_name: data.eventName, booking_id: data.bookingId.slice(-10).toUpperCase(),
+      amount: data.amount, seats: selectedSeats.length ? selectedSeats.join(", ") : String(data.seats),
+      seats_label: selectedSeats.length ? "Seat Numbers" : "Seats", booking_type: "Event Booking",
+      date_time: [eventDateValue(evData.startDate || evData.date || (evData.eventDates||[])[0]?.date).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}), eventStartTime()].filter(Boolean).join(" • "),
+      payment_method: data.method||"Online",
+      ticket_url: "https://culturewave.in/success.html?bookingId="+encodeURIComponent(data.bookingId)+"&event="+encodeURIComponent(data.eventName)+"&amount="+encodeURIComponent(data.amount)+"&status=Confirmed&eventId="+encodeURIComponent(eventId),
+      reply_to: "support.culturewave@gmail.com"
+    });
+    // Delivery has succeeded even if the optional audit write is blocked by a
+    // restrictive Firestore rule, so never report a false email failure here.
+    try {
+      await db.collection("bookings").doc(data.bookingId).set({
+        confirmationEmail: accountEmail,
+        confirmationEmailStatus: "sent",
+        confirmationEmailSentAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    } catch (auditError) {
+      console.warn("Could not record confirmation email status:", auditError);
+    }
+    return true;
+  }catch(e){ console.error("email failed:",e); }
+  return false;
+}
+
+// ── SUBMIT ──
+async function submitBooking(){
+  if(checkoutExpired || (checkoutCountdownEndsAt && Date.now()>=checkoutCountdownEndsAt)){
+    expireCheckout();
+    return;
+  }
+  if(bookingSubmissionInProgress) return;
+  setBookingSubmissionBusy(true);
+  const amountShownToCustomer=selectedTicketSubtotal();
+  try{
+    const fresh=await db.collection('events').doc(eventId).get({source:'server'});
+    if(fresh.exists){
+      evData={id:fresh.id,...fresh.data()};
+      reconcileSelectedTickets(Array.isArray(evData.tickets)?evData.tickets:[]);
+      if(selectedTicketSubtotal()!==amountShownToCustomer){
+        document.getElementById('s3Ticket').textContent=selectedTicketLabel();
+        updateBill();
+        setBookingSubmissionBusy(false, selectedTicketSubtotal());
+        showToast('The ticket price changed. Please review the updated total before paying.');
+        return;
+      }
+    }
+  }catch(error){console.error('Could not recheck event capacity:',error);setBookingSubmissionBusy(false, selectedTicketSubtotal());showToast('Could not verify availability. Please try again.');return;}
+  if(eventSoldOut() || (eventCapacity()>0 && Number(evData.totalBooked||0)+selectedTicketCount()>eventCapacity())){
+    setBookingSubmissionBusy(false, selectedTicketSubtotal());pickerQuantities=tickets.map(()=>0);selectedSeats=[];document.getElementById('panel1').classList.add('ticket-picker');goStep(1);renderTicketPicker();updatePickerBar();showToast(evData.soldOutMsg||'This event is sold out.');return;
+  }
+  if(selectedTicketCount()<=0){setBookingSubmissionBusy(false, selectedTicketSubtotal());showToast('Select at least one ticket before paying');return;}
+  const ticketName = selectedTicketLabel();
+  const ticketCount = selectedTicketCount();
+  // Recheck immediately before payment in case another guest took a seat while
+  // this page was open.
+  if(evData.seatingPlan && (Array.isArray(evData.seatingPlan.rows) || Array.isArray(evData.seatingPlan.sections))){
+    await fetchBookedSeats();
+    if(selectedSeats.length !== ticketCount){
+      renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+      updatePickerBar();
+      setBookingSubmissionBusy(false, selectedTicketSubtotal());
+      showToast('One or more selected seats were just booked. Please choose another seat.');
+      return;
+    }
+  }
+  const subtotal = selectedTicketSubtotal();
+  discountAmt = appliedCouponData ? calculateCouponDiscount(appliedCouponData,subtotal) : 0;
+  const afterDiscount = Math.max(0, subtotal - discountAmt);
+  const fee = platformFee(afterDiscount);
+  const total = afterDiscount + fee;
+  const name = document.getElementById("bookName").value.trim();
+  // Use the email the customer provided for this booking.
+  const email = document.getElementById("bookEmail").value.trim() || bookingAuth.currentUser?.email || "";
+  const phone = document.getElementById("bookPhone").value.trim();
+  const state = document.getElementById("bookState").value.trim();
+  const eventName = evData.name||passedName||"Event";
+  const eventDate = evData.startDate || evData.date || (evData.eventDates||[])[0]?.date || '';
+  const eventTime = eventStartTime()||formatTimeText(passedEventTime);
+  const bid = "CV"+Date.now();
+  const walletAccessToken = Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2,'0')).join('');
+
+  const walletUse=checkoutPaymentMethod==='oneclub';
+  const walletAmount=walletUse?calculateOneClubApplied(total):0;
+  const customerPayable=Math.max(0,total-walletAmount);
+  if(customerPayable === 0 && walletAmount > 0){
+    const user=(await walletAuthReady).currentUser;
+    if(!user){setBookingSubmissionBusy(false,total);showPaymentError('Sign in to use your One Club balance.');return}
+    try{
+      const response=await fetch(`${razorpayFunctionsUrl}/payWithOneClub`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${await user.getIdToken()}`},body:JSON.stringify({bookingId:bid,amountPaise:Math.round(total*100),event:{id:eventId,name:eventName},tickets:ticketCount,seatIds:selectedSeats,customer:{name,email,phone}})});
+      const result=await response.json();
+      if(!response.ok||!result.success)throw new Error(result.error||'Could not use your One Club balance. Please try again.');
+    }catch(error){setBookingSubmissionBusy(false,total);showPaymentError(error.message||'Could not use your One Club balance. Please try again.');return}
+    document.getElementById("rStatus").textContent = "✅ Confirmed";
+    const saved = await saveBooking({ bookingId:bid, walletAccessToken, eventName, ticketName, amount:total, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:bid, method:"One Club", name, email, phone, state });
+    if(!saved){
+      setBookingSubmissionBusy(false, 0);
+      showToast('Could not save your booking. Please try again.');
+      return;
+    }
+    await fetchBookedSeats();
+    if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+    const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:bid, method:"One Club" });
+    if(!emailSent) showToast("Booking confirmed, but we could not send the confirmation email.");
+    clearCheckoutDraft();
+    location.href = "success.html?bookingId="+encodeURIComponent(bid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&address="+encodeURIComponent(evData.address||'')+"&mapLink="+encodeURIComponent(evData.mapLink||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
+    return;
+  }
+
+  if(total===0){
+    document.getElementById("rStatus").textContent = "✅ Confirmed";
+    const saved = await saveBooking({ bookingId:bid, walletAccessToken, eventName, ticketName, amount:0, seats:ticketCount, seatIds:selectedSeats, status:"confirmed", name, email, phone, state });
+    if(!saved){setBookingSubmissionBusy(false,0);showToast('Could not save your booking. Please try again.');return}
+    await fetchBookedSeats();
+    if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections)))renderSeating(evData.seatingPlan,document.getElementById('seatingContainer'));
+    const emailSent=await sendEmail({name,email,eventName,amount:"Free",seats:ticketCount,bookingId:bid,method:"Free"});
+    if(!emailSent)showToast("Booking confirmed, but we could not send the confirmation email.");
+    clearCheckoutDraft();
+    location.href="success.html?bookingId="+encodeURIComponent(bid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount=0&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&address="+encodeURIComponent(evData.address||'')+"&mapLink="+encodeURIComponent(evData.mapLink||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
+    return;
+  }
+
+  const amountInPaise=Math.round(customerPayable*100);
+  let orderData;
+  try{
+    const user=walletAmount>0?(await walletAuthReady).currentUser:null;
+    const authToken=user?await user.getIdToken():'';
+    const orderResponse=await fetch(`${razorpayFunctionsUrl}/createRazorpayOrder`,{method:'POST',headers:{'Content-Type':'application/json',...(authToken?{Authorization:`Bearer ${authToken}`}:{})},body:JSON.stringify({amount:amountInPaise,walletAmount,grossAmountPaise:Math.round(total*100),receipt:bid,customer:{name,email,phone,tickets:ticketCount},event:{id:eventId,name:eventName},seats:ticketCount,seatIds:selectedSeats,note:`${ticketName} · ${ticketCount} ticket(s)`})});
+    const orderResponseText=await orderResponse.text();
+    try{orderData=JSON.parse(orderResponseText);}catch(_){throw new Error(orderResponse.status===404?'Razorpay payment service is not deployed yet. Please contact support.':'Could not reach the payment service. Please try again.');}
+    if(!orderResponse.ok||!orderData.success||orderData.provider!=='razorpay'||!orderData.razorpayOrderId||!orderData.keyId) throw new Error(orderData.error||'Live Razorpay order service is unavailable.');
+    if(Number(orderData.amount)!==amountInPaise) throw new Error('Payment amount does not match your checkout total. Please refresh and try again.');
+  }catch(orderError){
+    console.error('Razorpay order creation failed:',orderError);
+    setBookingSubmissionBusy(false, total);
+    showPaymentError(orderError.message||'Could not start payment. Please try again.');
+    return;
+  }
+  const options = {
+    key: orderData.keyId,
+    order_id: orderData.razorpayOrderId,
+    amount: amountInPaise,
+    currency: "INR",
+    name: "CultureWave",
+    description: eventName,
+    prefill: { name, email, contact: phone },
+    theme: { color: "#1dae79", backdrop_color: "#090b10" },
+    modal:{
+      ondismiss: async ()=>{
+        try{await fetch(`${razorpayFunctionsUrl}/updateRazorpayCheckoutStatus`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:orderData.razorpayOrderId,status:'cancelled'})});}catch(statusError){console.warn('Could not record cancelled checkout:',statusError);}
+        setBookingSubmissionBusy(false, total);
+        showPaymentError('Payment was cancelled. Your booking has not been confirmed.');
+      }
+    },
+    handler: async function(r){
+      const pid = r.razorpay_payment_id || bid;
+      [document.getElementById('submitBtn'), document.getElementById('confirmSubmitBtn')].filter(Boolean).forEach(button => { button.disabled=true; button.textContent = 'Verifying payment...'; });
+      let verified = false;
+      let paymentMethod='Razorpay';
+      let verificationMessage='Payment signature verification failed.';
+      try{
+        const verifyUser=walletAmount>0?(await walletAuthReady).currentUser:null;
+        const verifyToken=verifyUser?await verifyUser.getIdToken():'';
+        const verification=await fetch(`${razorpayFunctionsUrl}/verifyRazorpayPayment`,{method:'POST',headers:{'Content-Type':'application/json',...(verifyToken?{Authorization:`Bearer ${verifyToken}`}:{})},body:JSON.stringify({...r,booking:{bookingId:pid,eventId,amountPaise:Math.round(customerPayable*100)+walletAmount*100,tickets:ticketCount,seatIds:selectedSeats}})});
+        const verificationData=await verification.json();
+        verified=verification.ok&&verificationData.verified===true;
+        paymentMethod=verificationData.method||paymentMethod;
+        if(!verified)verificationMessage=verificationData.error||verificationMessage;
+      }catch(verifyErr){
+        console.error('Payment signature verification failed:',verifyErr);
+        verificationMessage='Could not verify this payment with the booking server. Contact support before retrying.';
+      }
+      if(!verified){
+        setBookingSubmissionBusy(false, total);
+        showPaymentError(verificationMessage);
+        return;
+      }
+      // Keep the payment reference available if the browser is closed or the
+      // booking write/redirect is interrupted after Razorpay confirms payment.
+      try{
+        sessionStorage.setItem('culturewave_pending_verified_payment',JSON.stringify({
+          bookingId:pid,walletAccessToken,eventName,ticketName,amount:total,walletAmount,
+          seats:ticketCount,seatIds:selectedSeats,name,email,phone,state,paymentMethod,
+          eventId,eventDate,eventTime,savedAt:Date.now()
+        }));
+      }catch(storageError){console.warn('Could not cache verified payment recovery details:',storageError);}
+      document.getElementById("rStatus").textContent = "✅ Confirmed";
+      const saved = await saveBooking({ bookingId:pid, walletAccessToken, eventName, ticketName, amount:total, walletAmount, seats:ticketCount, seatIds:selectedSeats, status:"paid", paymentId:pid, method:paymentMethod, name, email, phone, state });
+      if(!saved){
+        // Payment is verified — redirect to success regardless of Firestore save.
+        // saveBooking failure is usually a Firestore rules race; the server-side
+        // verifyRazorpayPayment function already persists the booking server-side.
+        console.warn('Client-side saveBooking failed after verified payment — redirecting to success anyway. bookingId:', pid);
+      }
+      await fetchBookedSeats();
+      if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+      const emailSent = await sendEmail({ name, email, eventName, amount:fmt(total), seats:ticketCount, bookingId:pid, method:paymentMethod });
+      if(!emailSent) showToast("Payment succeeded, but we could not send the confirmation email.");
+      clearCheckoutDraft();
+      try{sessionStorage.removeItem('culturewave_pending_verified_payment');}catch(_){}
+      location.href = "success.html?bookingId="+encodeURIComponent(pid)+"&walletToken="+encodeURIComponent(walletAccessToken)+"&event="+encodeURIComponent(eventName)+"&amount="+encodeURIComponent(fmt(total))+"&status=Confirmed&eventId="+encodeURIComponent(eventId)+"&ticket="+encodeURIComponent(ticketName)+"&seats="+encodeURIComponent(ticketCount)+"&seatIds="+encodeURIComponent(selectedSeats.join(", "))+"&date="+encodeURIComponent(eventDate)+"&time="+encodeURIComponent(eventTime)+"&endTime="+encodeURIComponent(evData.endTime||evData.finishTime||'')+"&language="+encodeURIComponent(evData.language||'')+"&rating="+encodeURIComponent(evData.rating||evData.certificate||evData.ageRating||'')+"&venue="+encodeURIComponent(evData.venueName||evData.venue||'')+"&city="+encodeURIComponent(evData.city||'')+"&address="+encodeURIComponent(evData.address||'')+"&mapLink="+encodeURIComponent(evData.mapLink||'')+"&poster="+encodeURIComponent(evData.cardImgUrl||evData.coverUrl||'');
+    }
+  };
+  try{
+    const checkout=new Razorpay(options);
+    checkout.on('payment.failed',async()=>{
+      try{await fetch(`${razorpayFunctionsUrl}/updateRazorpayCheckoutStatus`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:orderData.razorpayOrderId,status:'failed'})});}catch(statusError){console.warn('Could not record failed checkout:',statusError);}
+    });
+    checkout.open();
+  }
+  catch(checkoutError){
+    console.error('Could not open Razorpay Checkout:',checkoutError);
+    setBookingSubmissionBusy(false, total);
+    showPaymentError('Could not open Razorpay Checkout. Please try again.');
+  }
+}
+
+// ── SEATING PLAN ──
+function bookingSeatIds(booking){
+  const raw = booking.seatIds ?? booking.seatId ?? [];
+  const values = Array.isArray(raw) ? raw : String(raw).split(',');
+  return values.map(value => String(value).trim()).filter(Boolean);
+}
+
+function isConfirmedBooking(booking){
+  return ['confirmed','paid','success','completed'].includes(String(booking.status || '').toLowerCase());
+}
+
+function applyBookedSeats(seats){
+  bookedSeats = [...new Set(seats)];
+  // A seat taken by another customer must also be removed from this screen's
+  // temporary selection before the guest can continue to checkout.
+  selectedSeats = selectedSeats.filter(seatId => !bookedSeats.includes(seatId));
+}
+
+async function fetchBookedSeats(){
+  if(!eventId) return;
+  try{
+    const eventSnap=await db.collection('events').doc(eventId).get();
+    const seats=eventSnap.exists&&Array.isArray(eventSnap.data().bookedSeats)?eventSnap.data().bookedSeats.map(String).filter(Boolean):[];
+    applyBookedSeats(seats);
+  }catch(e){console.error('fetchBookedSeats:',e);}
+}
+
+function watchBookedSeats(){
+  if(!eventId) return;
+  // The public event document exposes booked seats; attendee records remain private.
+  db.collection('events').doc(eventId).onSnapshot(evSnap=>{
+    if(!evSnap.exists)return;
+    const evSeats=(evSnap.data().bookedSeats||[]).map(String).filter(Boolean);
+    applyBookedSeats(evSeats);
+    if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))) renderSeating(evData.seatingPlan,document.getElementById('seatingContainer'));
+  },error=>console.error('watchBookedSeats:',error));
+}
+
+function renderSeating(layout, container){
+  if(!layout) return;
+  const sections=Array.isArray(layout.sections) ? layout.sections : [];
+  // AI-generated plans use positioned sections rather than seat rows. Give every
+  // selectable section numbered places so a guest can choose it on any screen.
+  if(sections.length){
+    const selectable=sections.filter(section=>section.type!=="stage" && Number(section.capacity||0)>0);
+    const stage=sections.find(section=>section.type==="stage");
+    container.innerHTML = `<div style="min-width:300px;"><div style="text-align:center;font-size:.64rem;font-weight:900;letter-spacing:.14em;color:#fff;background:#111827;border-radius:8px;padding:.55rem;margin-bottom:.8rem;">${stage?.name||layout.stage||"STAGE"}</div><p style="margin:0 0 .7rem;font-size:.7rem;color:#64748b;text-align:center;">Tap a section to choose a place</p><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem;">${selectable.map((section,index)=>{
+      const capacity=Math.max(1,Number(section.capacity)||1);
+      const prefix=section.id||`section-${index}`;
+      const selected=selectedSeats.filter(id=>id.startsWith(`${prefix}-`)).length;
+      const booked=bookedSeats.filter(id=>id.startsWith(`${prefix}-`)).length;
+      const available=Math.max(0,capacity-booked);
+      const full=available===0;
+      const encoded=encodeURIComponent(prefix);
+      return `<button type="button" onclick="toggleSectionSeat(decodeURIComponent('${encoded}'))" ${full?'disabled':''} style="min-height:88px;padding:.7rem;border:2px solid ${selected?'#1242c5':'rgba(255,255,255,.28)'};border-radius:${section.shape==='rounded'?'16px':'8px'};background:${full?'#374151':(section.color||'#2563eb')};color:#fff;text-align:center;font:inherit;cursor:${full?'not-allowed':'pointer'};opacity:${full?'.55':'1'};"><strong style="display:block;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${section.name||'SECTION'}</strong><span style="display:block;margin-top:.35rem;font-size:.62rem;opacity:.9;">${selected ? `${selected} selected · ` : ''}${available} available</span></button>`;
+    }).join('')}</div></div>`;
+    return;
+  }
+  if(!Array.isArray(layout.rows)) return;
+  container.innerHTML = `<div style="text-align:center;font-size:.64rem;font-weight:900;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,#172554,#2563eb);border-radius:8px;padding:.45rem;margin-bottom:.7rem;">${layout.stage||"STAGE"}</div>`
+    + layout.rows.map(row=>{
+      const count=Math.max(1,Math.min(100,Number(row.seats)||1));
+      const justify=row.align==="left"?"flex-start":row.align==="right"?"flex-end":"center";
+      const direction=row.direction==="vertical"?"column":"row";
+      const sofa=row.seatStyle==="sofa";
+      const alignItems=row.align==="left"?"flex-start":row.align==="right"?"flex-end":"center";
+      return `<div style="margin:.5rem 0;"><div style="font-size:.6rem;font-weight:800;color:#64748b;margin:0 0 .2rem 24px;">${row.ticketType||"General Admission"}</div><div style="display:flex;align-items:center;gap:.35rem;"><span style="width:20px;font-size:.65rem;font-weight:900;color:#64748b;">${row.label||""}</span><div style="display:flex;flex-direction:${direction};flex-wrap:${direction==="row"?"wrap":"nowrap"};align-items:${direction==="column"?alignItems:"center"};justify-content:${direction==="row"?justify:"flex-start"};gap:.25rem;flex:1;">${Array.from({length:count},(_,i)=>{
+        const seatId=(row.label||"")+String(i+1);
+        const isBooked=bookedSeats.includes(seatId);
+        const w=sofa?"50px":"26px"; const br=sofa?"13px":"6px";
+        if(isBooked) return `<span role="img" aria-label="Booked seat ${seatId}" style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:#dc2626;color:#fff;font-size:.72rem;font-weight:900;cursor:not-allowed;border:1.5px solid #991b1b;box-shadow:inset 0 1px rgba(255,255,255,.22);" title="Booked — ${seatId}">🚫</span>`;
+        const isSelected=selectedSeats.includes(seatId);
+        return `<span id="seat_${seatId}" onclick="toggleSeat('${seatId}','${sofa}')" style="display:grid;place-items:center;width:${w};height:26px;border-radius:${br};background:${isSelected?'#1242c5':(sofa?'#fce7f3':'#e8efff')};color:${isSelected?'#fff':(sofa?'#be185d':'#1242c5')};box-shadow:${isSelected?'0 0 0 2px #2f6bff':'none'};font-size:.55rem;font-weight:800;cursor:pointer;transition:all .15s;">${sofa?"Sofa ":""} ${seatId}</span>`;
+      }).join("")}</div></div></div>`;
+    }).join("");
+}
+
+function toggleSectionSeat(sectionId){
+  const section=(evData.seatingPlan?.sections||[]).find((item,index)=>(item.id||`section-${index}`)===sectionId);
+  if(!section) return;
+  const capacity=Math.max(1,Number(section.capacity)||1);
+  const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
+  const chosen=selectedSeats.find(id=>id.startsWith(`${sectionId}-`));
+  if(chosen){
+    selectedSeats.splice(selectedSeats.indexOf(chosen),1);
+  }else{
+    if(ticketCount && selectedSeats.length>=ticketCount){ showToast(`You selected ${ticketCount} ticket${ticketCount===1?'':'s'} — remove a seat to change it`); return; }
+    let place=1;
+    while(place<=capacity && (bookedSeats.includes(`${sectionId}-${place}`)||selectedSeats.includes(`${sectionId}-${place}`))) place++;
+    if(place>capacity){ showToast('This section is sold out'); return; }
+    selectedSeats.push(`${sectionId}-${place}`);
+  }
+  qty=selectedTicketCount()||selectedSeats.length||1;
+  document.getElementById('rSeats').textContent=qty;
+  updateQtyPrice();
+  updatePickerBar();
+  renderSeating(evData.seatingPlan,document.getElementById('seatingContainer'));
+}
+
+function toggleSeat(seatId, sofa){
+  const el = document.getElementById("seat_"+seatId);
+  if(!el) return;
+  if(bookedSeats.includes(seatId)){
+    showToast('This seat has already been booked');
+    renderSeating(evData.seatingPlan, document.getElementById('seatingContainer'));
+    return;
+  }
+  const idx = selectedSeats.indexOf(seatId);
+  if(idx === -1){
+    const ticketCount=pickerQuantities.reduce((sum,value)=>sum+value,0);
+    if(ticketCount && selectedSeats.length >= ticketCount){ showToast(`You selected ${ticketCount} ticket${ticketCount===1?'':'s'} — remove a seat to change it`); return; }
+    selectedSeats.push(seatId);
+    el.style.background = "#1242c5"; el.style.color = "#fff"; el.style.boxShadow = "0 0 0 2px #2f6bff";
+  } else {
+    selectedSeats.splice(idx,1);
+    el.style.background = sofa==="true" ? "#fce7f3" : "#e8efff";
+    el.style.color = sofa==="true" ? "#be185d" : "#1242c5";
+    el.style.boxShadow = "";
+  }
+  qty = selectedTicketCount() || selectedSeats.length || 1;
+  document.getElementById("rSeats").textContent = qty;
+  updateQtyPrice();
+  updatePickerBar();
+}
+
+// ── INIT ──
+async function init(){
+  const mobileBookingSheet=window.matchMedia('(max-width: 768px)').matches;
+  document.getElementById('panel1').classList.add('ticket-picker');
+  document.getElementById('guestContactCard').style.display=(mobileBookingSheet||startWithTicketPicker)?'none':'';
+  document.getElementById('ticketSelectionSheet').style.display=(mobileBookingSheet||startWithTicketPicker)?'block':'none';
+  updatePickerBar();
+  if(eventId){
+    try{
+      const snap = await db.collection("events").doc(eventId).get();
+      if(snap.exists){
+        evData = {id:snap.id,...snap.data()};
+        if(evData.inviteOnly === true) await bookingAuthReady;
+        if(!(await inviteAccessAllowed())) { showInviteGate(); return; }
+        tickets = Array.isArray(evData.tickets) ? evData.tickets : [];
+        pickerQuantities = tickets.map(()=>0);
+        applyBookedSeats(Array.isArray(evData.bookedSeats)?evData.bookedSeats.map(String):[]);
+        document.getElementById("rEventName").textContent = evData.name||passedName;
+        document.getElementById("rVenue").textContent = evData.venueName||evData.city||"";
+        // seating plan
+        if(evData.seatingPlanUrl){
+          const img = document.createElement("img");
+          img.src = evData.seatingPlanUrl;
+          img.alt = `${evData.name||'Event'} seating plan`;
+          img.style = "display:block;width:100%;max-height:60vh;object-fit:contain;border-radius:14px;";
+          document.getElementById("seatingContainer").appendChild(img);
+          document.getElementById("seatingWrap").style.display = "";
+        } else if(evData.seatingPlan&&(Array.isArray(evData.seatingPlan.rows)||Array.isArray(evData.seatingPlan.sections))){
+          renderSeating(evData.seatingPlan, document.getElementById("seatingContainer"));
+          document.getElementById("seatingWrap").style.display = "";
+        }
+        watchBookedSeats();
+        // Keep ticket selection and the seating plan together in the picker flow.
+        {
+          const seatWrap = document.getElementById('seatingWrap');
+          if(seatWrap.style.display !== 'none'){
+            const section = document.createElement('section');
+            const isUploadedImage=Boolean(seatWrap.querySelector('img'));
+            section.className = `picker-seat-section${isUploadedImage?' picker-image-seat-section':''}`;
+            section.innerHTML = isUploadedImage ? '<div class="bk-picker-label">SEATING PLAN</div>' : '<div class="bk-picker-label">SELECT SEATS</div><p class="picker-seat-status" id="pickerSeatStatus">Select your tickets first</p>';
+            section.appendChild(seatWrap);
+            document.getElementById(isUploadedImage?'pickerImageSeatMount':'pickerSeatMount').appendChild(section);
+          }
+        }
+        // receipt banner
+        if(evData.cardImgUrl||evData.coverUrl){
+          const img = document.createElement("img");
+          img.src = evData.cardImgUrl||evData.coverUrl;
+          document.getElementById("receiptBanner").innerHTML = "";
+          document.getElementById("receiptBanner").appendChild(img);
+        }
+        renderTicketPicker();
+        // Embedded event popups collect tickets and attendee details first.
+        // Standalone links and resumed bookings open directly on checkout.
+        if(resumeCheckout || (!embeddedBooking && !startWithTicketPicker)){
+          let draft=null;
+          const draftKey=`culturewave:checkout-draft:${eventId}`;
+          const navigationEntry=performance.getEntriesByType?.('navigation')?.[0];
+          const isPageReload=navigationEntry?.type==='reload'||(!navigationEntry&&performance.navigation?.type===1);
+          if(resumeCheckout||isPageReload){
+            try{
+              draft=JSON.parse(localStorage.getItem(draftKey)||'null');
+            }catch(resumeError){console.error('Could not resume checkout:',resumeError);}
+          }
+          const draftMatchesSession=draft&&String(draft.eventId||eventId)===String(eventId)&&
+            (bookingSession?String(draft.bookingSession||'')===bookingSession:!draft.bookingSession);
+          if(draftMatchesSession&&Date.now()-Number(draft.savedAt||0)<30*60*1000){
+            document.getElementById('bookName').value=draft.name||'';
+            document.getElementById('bookPhone').value=draft.phone||'';
+            document.getElementById('bookEmail').value=draft.email||'';
+            document.getElementById('bookState').value='';
+            restoreDraftTicketSelections(draft);
+            selectedSeats=Array.isArray(draft.seats)?draft.seats.map(String):[];
+            syncCheckoutInvoice();
+          }else{
+            const requestedByIndex=Number.isInteger(passedTicketIndex)&&passedTicketIndex>=0&&passedTicketIndex<tickets.length?passedTicketIndex:-1;
+            const requestedTicket=requestedByIndex>=0?requestedByIndex:tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase()&&Number(ticket.price||0)===passedTicketPrice);
+            selectedTicketIdx=requestedTicket>=0?requestedTicket:0;
+            const defaultQuantity=tickets.length?Math.max(1,ticketMinRequired(tickets[selectedTicketIdx])):1;
+            pickerQuantities=tickets.map((_,index)=>index===selectedTicketIdx?defaultQuantity:0);
+            document.getElementById('bookName').value=bookingAuth.currentUser?.displayName||'';
+            document.getElementById('bookPhone').value=bookingAuth.currentUser?.phoneNumber||'';
+            document.getElementById('bookEmail').value=bookingAuth.currentUser?.email||'';
+            document.getElementById('bookState').value='';
+          }
+          renderTicketPicker();
+          document.getElementById('panel1').classList.remove('details-step');
+          document.getElementById('pickerBar').classList.remove('show');
+          goStep3();
+        }
+        db.collection('events').doc(eventId).onSnapshot(liveSnap=>{
+          if(!liveSnap.exists) return;
+          const amountBeforeRefresh=selectedTicketSubtotal();
+          const ticketBeforeRefresh=selectedTicketLabel();
+          evData={id:liveSnap.id,...liveSnap.data()};
+          reconcileSelectedTickets(Array.isArray(evData.tickets)?evData.tickets:[]);
+          const amountAfterRefresh=selectedTicketSubtotal();
+          if(document.getElementById('panel3').classList.contains('active')){
+            document.getElementById('s3Ticket').textContent=selectedTicketLabel();
+            const liveDate=eventDateValue(evData.startDate||evData.date||(evData.eventDates||[])[0]?.date||passedEventDate);
+            const liveDateLabel=!Number.isNaN(liveDate.getTime())?liveDate.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}):'';
+            const liveTime=(eventStartTime()||formatTimeText(passedEventTime)).replace(/:00(?=\s)/,'');
+            document.getElementById('checkoutDate').textContent=[liveDateLabel,liveTime].filter(Boolean).join(' | ')||'Date & time TBA';
+            updateBill();
+            if(amountAfterRefresh!==amountBeforeRefresh||selectedTicketLabel()!==ticketBeforeRefresh)showToast('Checkout updated to match your selected ticket.');
+          }
+          if(eventSoldOut()){
+            pickerQuantities=tickets.map(()=>0);
+            selectedSeats=[];
+            if(!document.getElementById('panel1').classList.contains('active')){document.getElementById('panel1').classList.add('ticket-picker');goStep(1);}
+            renderTicketPicker();
+            updatePickerBar();
+          } else if(document.getElementById('panel1').classList.contains('active')) {
+            renderTicketPicker();
+          }
+        },error=>console.error('Live event availability listener failed:',error));
+      } else {
+        document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">This event could not be found.</div>';
+      }
+    }catch(e){
+      console.error('Event data or checkout setup failed:',e);
+      // The event page already has this public event and selected ticket. Use
+      // those URL details to render checkout if the iframe read/setup fails;
+      // submitBooking still rechecks the event with Firestore before payment.
+      evData={...evData,id:eventId,name:evData.name||passedName,venueName:evData.venueName||passedVenue,
+        date:evData.date||passedEventDate,startTime:evData.startTime||passedEventTime,
+        coverUrl:evData.coverUrl||passedPosterUrl,price:Number(evData.price||urlP.get('eventPrice')||passedTicketPrice)};
+      tickets=(Array.isArray(evData.tickets)?evData.tickets:[]).filter(ticket=>ticket&&typeof ticket==='object');
+      if(!tickets.length) tickets=[{name:passedTicketName||'General Admission',price:passedTicketPrice}];
+      pickerQuantities=tickets.map(()=>0);
+      const requestedByIndex=Number.isInteger(passedTicketIndex)&&passedTicketIndex>=0&&passedTicketIndex<tickets.length?passedTicketIndex:-1;
+      const requestedTicket=requestedByIndex>=0?requestedByIndex:tickets.findIndex(ticket=>String(ticket.name||'').toLowerCase()===passedTicketName.toLowerCase()&&Number(ticket.price||0)===passedTicketPrice);
+      selectedTicketIdx=requestedTicket>=0?requestedTicket:0;
+      pickerQuantities[selectedTicketIdx]=Math.max(1,ticketMinRequired(tickets[selectedTicketIdx]));
+      document.getElementById('bookName').value=bookingAuth.currentUser?.displayName||'';
+      document.getElementById('bookPhone').value=bookingAuth.currentUser?.phoneNumber||'';
+      document.getElementById('bookEmail').value=bookingAuth.currentUser?.email||'';
+      document.getElementById('bookState').value='';
+      try{renderTicketPicker();}catch(renderError){console.error('Could not render fallback ticket:',renderError);}
+      if((embeddedBooking&&!resumeCheckout)||startWithTicketPicker){
+        document.getElementById('panel1').classList.add('ticket-picker');
+        document.getElementById('guestContactCard').style.display='none';
+        document.getElementById('ticketSelectionSheet').style.display='block';
+        goStep(1);
+        updatePickerBar();
+      }else{
+        try{goStep3();}catch(checkoutError){
+          console.error('Could not fully render fallback checkout:',checkoutError);
+          document.getElementById('s3Event').textContent=evData.name||'Event booking';
+          document.getElementById('s3Ticket').textContent=selectedTicketLabel();
+          const fallbackDate=eventDateValue(passedEventDate);
+          const fallbackDateLabel=!Number.isNaN(fallbackDate.getTime())?fallbackDate.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}):'';
+          const fallbackTime=formatTimeText(passedEventTime).replace(/:00(?=\s)/,'');
+          document.getElementById('checkoutDate').textContent=[fallbackDateLabel,fallbackTime].filter(Boolean).join(' | ')||'Date & time TBA';
+          document.getElementById('checkoutLocation').textContent=passedVenue||'Event booking';
+          const fallbackSubmitLabel=document.querySelector('#submitBtn .checkout-submit-label');
+          if(fallbackSubmitLabel)fallbackSubmitLabel.innerHTML=passedTicketPrice?'Pay now <b aria-hidden="true">›</b>':'Confirm booking <b aria-hidden="true">›</b>';
+          else document.getElementById('submitBtn').textContent=passedTicketPrice?'Pay now ›':'Confirm booking ›';
+          goStep(3);
+        }
+      }
+    }
+  } else {
+    document.getElementById('pickerTicketList').innerHTML='<div class="bk-picker-state">Missing event link. Please open booking from an event page.</div>';
+    return;
+  }
+  buildTickets();
+}
+
+init();
+
+// hamburger
+const ham=document.getElementById("hamburger"),mNav=document.getElementById("mobileNav");
+ham.addEventListener("click",()=>{ ham.classList.toggle("open"); mNav.classList.toggle("open"); document.body.style.overflow=mNav.classList.contains("open")?"hidden":""; });
+mNav.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{ ham.classList.remove("open"); mNav.classList.remove("open"); document.body.style.overflow=""; }));
+</script>
+<script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
+</body>
+</html>

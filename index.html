@@ -1,282 +1,3214 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cityvibe | Events, Booking & Payments</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="nav-wrap">
-        <div class="brand-block">
-          <div class="logo">cityvibe</div>
-          <div class="brand-sub">by OGSHOOTS LUXE</div>
-        </div>
-        <nav class="topnav">
-          <a href="events.html">Events Listed</a>
-          <a href="features.html">Features</a>
-          <a href="pricing.html">Pricing</a>
-          <a href="how-it-works.html">How it works</a>
-        </nav>
-        <div class="auth-actions">
-          <a class="nav-link" href="login.html">Login</a>
-          <a class="nav-cta" href="login.html">Get Started</a>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="theme-color" content="#000000"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
+  <title>CultureWave | Events, Live Music &amp; Dining in Hyderabad</title>
+  <meta name="description" content="Discover events, live music, dining, workshops and experiences in Hyderabad. Explore what is happening and book your next outing with CultureWave."/>
+  <link rel="canonical" href="https://culturewave.in/"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="CultureWave"/>
+  <meta property="og:title" content="CultureWave | Events, Live Music & Dining in Hyderabad"/>
+  <meta property="og:description" content="Discover events, live music, dining, workshops and experiences in Hyderabad. Explore what is happening and book your next outing with CultureWave."/>
+  <meta property="og:url" content="https://culturewave.in/"/>
+  <meta property="og:image" content="https://culturewave.in/herosection.jpeg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="CultureWave | Events, Live Music & Dining in Hyderabad"/>
+  <meta name="twitter:description" content="Discover events, live music, dining, workshops and experiences in Hyderabad. Explore what is happening and book your next outing with CultureWave."/>
+  <meta name="twitter:image" content="https://culturewave.in/herosection.jpeg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css?v=footer-colors-20261022"/>
+  <style>
+    *{box-sizing:border-box;}
+    .seo-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+    /* ── BASE ── */
+    html,body{background:#000!important;color:#fff!important;}
+    body{padding-bottom:0;}
+
+    /* ── TOPBAR ── */
+    .topbar{background:#000!important;border-bottom:0!important;box-shadow:none!important;}
+    .logo{color:#fff!important;}.brand-sub{color:#888!important;}
+    .topnav a{color:#aaa!important;}.topnav a:hover{color:#fff!important;background:#111!important;}
+    @media(min-width:961px){.desktop-organizer-menu{position:relative;display:flex;align-items:center}.desktop-organizer-trigger{display:block;padding:.65rem .75rem;border-radius:999px;color:#aaa!important;font-weight:700;white-space:nowrap}.desktop-organizer-trigger:hover,.desktop-organizer-menu:focus-within .desktop-organizer-trigger{background:#111;color:#fff!important}.desktop-organizer-dropdown{display:none;position:absolute;top:100%;left:50%;z-index:50;width:340px;padding:.8rem;transform:translateX(-50%);border:1px solid #38343f;border-radius:18px;background:#111;box-shadow:0 18px 45px rgba(0,0,0,.55)}.desktop-organizer-menu:hover .desktop-organizer-dropdown,.desktop-organizer-menu:focus-within .desktop-organizer-dropdown{display:grid;gap:.65rem}.topbar .topnav .desktop-organizer-card{display:grid!important;gap:.4rem;padding:1rem!important;border:1px solid #39343f!important;border-radius:13px!important;background:linear-gradient(120deg,#251b35,#1b1b20 75%)!important;color:#fff!important;font-size:inherit!important;letter-spacing:normal!important;line-height:normal!important;text-decoration:none!important;white-space:normal!important}.desktop-organizer-card>span{color:#b8a5d2;font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.desktop-organizer-card strong{font-size:.95rem}.desktop-organizer-card p{margin:0;color:#aaa;font-size:.78rem;line-height:1.45}.desktop-organizer-card b{justify-self:start;margin-top:.15rem;padding:.55rem .8rem;border-radius:999px;background:#fff;color:#111;font-size:.75rem}.topbar .topnav .desktop-organizer-card:hover{border-color:#8d6acb!important;background:linear-gradient(120deg,#302143,#222126 75%)!important}}
+    .index-auth-actions{gap:.5rem;padding:.3rem;border:1px solid #333!important;border-radius:999px;background:#111!important;}
+    .index-auth-actions .nav-link{padding:.6rem .95rem;border:0;background:transparent;color:#aaa!important;font-size:.82rem;}
+    .index-auth-actions .nav-link:hover{background:#222!important;color:#fff!important;}
+    .index-auth-actions .nav-cta{margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff!important;color:#000!important;border-radius:999px;font-weight:800;}
+    .index-mobile-ctas{gap:.65rem;}
+    .index-mobile-ctas .nav-link,.index-mobile-ctas .nav-cta{font-size:1rem;padding:.78rem 1.15rem;}
+    .index-mobile-ctas .nav-cta{margin-left:0;}
+    .desktop-header-search{display:none;}
+
+    @media(min-width:961px){
+      .topbar{background:#000!important;border:0!important;box-shadow:none!important;}
+      .topbar .nav-wrap{width:100%!important;max-width:1800px!important;min-height:100px!important;padding:.5rem 20px!important;gap:clamp(10px,1.4vw,24px)!important;}
+      .topbar .brand-block{display:grid!important;flex:0 0 auto!important;position:relative!important;left:64px!important;}
+      .topbar .topnav{display:flex!important;position:relative!important;left:120px!important;flex:0 0 auto!important;justify-content:flex-start!important;gap:.35rem!important;white-space:nowrap!important;}
+      .topbar .topnav a{padding:.65rem .75rem!important;font-size:clamp(1.05rem,1.1vw,1.2rem)!important;}
+      .topbar .mobile-header-actions{display:none!important;}
+      .desktop-header-search{display:flex!important;align-items:center!important;gap:10px!important;flex:0 1 360px!important;width:100%!important;max-width:360px!important;min-width:220px!important;height:42px!important;padding:0 12px!important;border:1.5px solid #d9d9dc!important;border-radius:13px!important;background:#fff!important;}
+      .desktop-header-search svg{display:block!important;flex:none!important;width:18px!important;height:18px!important;stroke:#6747f5!important;}
+      .desktop-header-search input{width:100%!important;min-width:0!important;padding:0!important;border:0!important;outline:0!important;background:transparent!important;color:#25252b!important;font-size:clamp(13px,.9vw,15px)!important;font-weight:500!important;}
+      .desktop-header-search input::placeholder{color:#8c8c94!important;opacity:1!important;}
+      .topbar .nav-wrap>.hamburger{display:grid!important;place-items:center!important;flex:0 0 42px!important;width:42px!important;height:42px!important;margin-left:0!important;padding:0!important;border:0!important;border-radius:50%!important;background:#141418!important;color:#fff!important;box-shadow:none!important;}
+      #desktopHeaderSearch,#desktopHeaderSearch+.hamburger{position:relative!important;left:-64px!important;}
+      .topbar .nav-wrap>.hamburger span{display:none!important;}
+      .topbar .nav-wrap>.hamburger::after{content:"U";color:#fff;font-size:1.05rem;font-weight:700;line-height:1;}
+    }
+
+    /* ── HAMBURGER ── */
+    @media(max-width:960px){
+      .topbar .nav-wrap > .auth-actions.index-auth-actions{display:none!important;}
+      .hamburger{display:flex!important;visibility:visible!important;opacity:1!important;flex:none;align-items:center;justify-content:center;width:42px;height:42px;margin-left:.35rem;border:1px solid #333;border-radius:13px;background:#111;}
+      .hamburger span{display:block;background:#fff!important;}
+    }
+
+    /* ── MOBILE NAV ── */
+    @media(max-width:960px){
+      .mobile-nav{inset:0!important;top:0!important;left:0!important;right:0!important;width:100vw!important;max-width:none!important;height:100vh!important;height:100dvh!important;max-height:none!important;overflow-y:auto!important;align-items:stretch!important;justify-content:flex-start!important;gap:0!important;padding:calc(env(safe-area-inset-top) + 1rem) 1.25rem calc(env(safe-area-inset-bottom) + 1.25rem)!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#0a0a0a!important;transform:translateX(100%)!important;z-index:40!important;}
+      .mobile-nav.open{transform:translateX(0)!important;}
+      .mobile-nav::before{display:none!important;}
+      .mobile-nav-head{display:flex;align-items:center;justify-content:flex-start;gap:.8rem;min-height:54px;margin-bottom:1rem;color:#fff;font-size:1.05rem;font-weight:800;}
+      .mobile-nav-close{display:grid;place-items:center;width:46px;height:46px;flex:none;border:1px solid #353535;border-radius:50%;background:#1b1b1d;color:#fff;font-size:2rem;line-height:1;cursor:pointer;}
+      #mobileNav .mobile-profile-card{display:grid!important;position:relative!important;inset:auto!important;flex:0 0 auto!important;align-self:stretch!important;width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;min-height:228px!important;max-height:none!important;box-sizing:border-box!important;grid-template-columns:minmax(0,1fr)!important;align-items:stretch!important;justify-content:stretch!important;gap:14px!important;margin:0 0 1.5rem!important;padding:16px 16px 22px!important;overflow:visible!important;border:1px solid #39343f!important;border-radius:20px!important;background:linear-gradient(120deg,#291e3b,#1b1b20 78%)!important;color:#fff!important;text-decoration:none!important;cursor:pointer;}
+      #mobileNav .mobile-profile-card::before,#mobileNav .mobile-profile-card::after{display:none!important;content:none!important;}
+      #mobileNav .mobile-profile-main{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:100px minmax(0,1fr)!important;align-items:center!important;gap:14px!important;}
+      #mobileNav .mobile-profile-avatar{display:grid!important;place-items:center!important;width:100px!important;height:100px!important;min-width:100px!important;max-width:100px!important;box-sizing:border-box!important;border:5px solid #b99cff!important;border-radius:50%!important;background:#333!important;box-shadow:inset 0 0 0 3px #25252a!important;}
+      #mobileNav .mobile-profile-avatar svg{display:block!important;width:72px!important;height:72px!important;fill:none!important;stroke:#777!important;stroke-width:2!important;}
+      #mobileNav .mobile-profile-info{display:grid!important;position:static!important;grid-template-columns:minmax(0,1fr)!important;gap:4px!important;min-width:0!important;}
+      #mobileNav .mobile-profile-name{display:block!important;overflow:hidden!important;color:#fff!important;font-size:1rem!important;font-weight:800!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+      #mobileNav .mobile-profile-contact,#mobileNav .mobile-profile-progress{display:block!important;color:#aaa!important;font-size:.8rem!important;}
+      #mobileNav .mobile-profile-progress{color:#c7afff!important;}
+      #mobileNav .mobile-profile-divider{display:block!important;position:static!important;width:100%!important;height:1px!important;grid-column:1/-1!important;background:#403a48!important;}
+      #mobileNav .mobile-profile-prompt{display:grid!important;position:static!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 28px!important;align-items:center!important;gap:12px!important;color:#f1edf7!important;font-size:.87rem!important;line-height:1.35!important;}
+      #mobileNav .mobile-profile-arrow{display:grid!important;position:static!important;place-items:center!important;width:26px!important;height:26px!important;box-sizing:border-box!important;border:2px solid #c7afff!important;border-radius:50%!important;color:#c7afff!important;font-size:1rem!important;line-height:1!important;}
+      .mobile-organizer-prompt{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.5rem 1rem;margin:0 0 1.55rem;padding:1.1rem;border:1px solid #39343f;border-radius:20px;background:linear-gradient(120deg,#251b35,#1b1b20 75%);color:#fff;}
+      .mobile-organizer-prompt span{grid-column:1/-1;color:#b8a5d2;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;}
+      .mobile-organizer-prompt strong{font-size:1rem;line-height:1.35;}
+      .mobile-organizer-prompt p{grid-column:1/-1;margin:0;color:#aaa;font-size:.78rem;line-height:1.45;}
+      .mobile-organizer-prompt a{grid-column:1/-1;display:inline-flex;justify-self:start;margin-top:.25rem;padding:.62rem .9rem;border-radius:999px;background:#fff;color:#111;font-size:.78rem;font-weight:800;}
+      .mobile-nav-group{margin-bottom:1.25rem;}
+      .mobile-nav-group-title{margin:0 0 .65rem;color:#f4f4f5;font-size:.95rem;font-weight:800;}
+      .mobile-nav-card{overflow:hidden;border:1px solid #303033;border-radius:20px;background:#1d1d1f;padding:0 .9rem;}
+      .mobile-nav-card>a{display:flex;align-items:center;gap:.85rem;min-height:58px;padding:.65rem .15rem;border:0!important;border-bottom:1px solid #343437!important;border-radius:0!important;background:transparent!important;color:#f4f4f5!important;font-size:.9rem!important;font-weight:700;box-shadow:none!important;}
+      .mobile-nav-card>a:last-child{border-bottom:0!important;}
+      .mobile-nav-card>a::before,.mobile-nav-card>a::after{display:none!important;}
+      .mobile-nav-icon{display:grid;place-items:center;width:25px;height:25px;flex:none;color:#b99cff;}
+      .mobile-nav-icon svg{display:block;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+      .mobile-nav-arrow{margin-left:auto;color:#777;font-size:1.4rem;font-weight:400;}
+      .mobile-nav-ctas{display:none!important;}
+      .mobile-nav-ctas::before{display:none!important;}
+      .mobile-nav-ctas .nav-link,.mobile-nav-ctas .nav-cta{display:flex;align-items:center;justify-content:center;min-height:48px;padding:.6rem!important;border:1px solid #38383b!important;border-radius:14px!important;background:#222!important;color:#fff!important;font-size:.8rem!important;font-weight:800!important;}
+      body:has(.mobile-nav.open)>header,body:has(.mobile-nav.open)>main,body:has(.mobile-nav.open)>footer,body:has(.mobile-nav.open)>.mobile-bottom-nav{transform:none!important;}
+    }
+
+    /* ── OG PICKS ── */
+    .ogp-section{
+      background:#000;
+      padding:0 0 0;
+      border-top:1px solid rgba(255,255,255,.08);
+      position:relative;
+    }
+    .ogp-section::before{
+      content:"";
+      display:block;
+      height:2px;
+      background:linear-gradient(90deg,transparent,#f5c518,#fff8d0,#f5c518,transparent);
+    }
+    .ogp-head{padding:1rem 0 .7rem;text-align:center;}
+    @media(min-width:700px){
+      .ogp-deck-stage{max-width:340px;margin:0 auto;}
+    }
+    .ogp-title{
+      font-size:clamp(1.2rem,4vw,1.6rem);font-weight:900;
+      letter-spacing:.22em;text-transform:uppercase;
+      color:#fff;margin-bottom:.35rem;
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+    }
+    .ogp-tag{
+      font-size:clamp(.65rem,2vw,.78rem);
+      font-weight:700;color:#f5c518;
+      letter-spacing:.18em;text-transform:uppercase;
+      line-height:1.2;margin-bottom:0;
+      white-space:nowrap;
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+    }
+
+    /* ── OG PICKS DECK ── */
+    .ogp-scroll-wrap{
+      background:#000;
+      overflow:hidden;
+      position:relative;
+      padding:1rem 0 1.2rem;
+    }
+    .ogp-deck-stage{
+      position:relative;
+      margin:0;
+    }
+    .ogp-card-active-wrap{
+      position:relative;
+      width:100%;
+      z-index:10;
+    }
+    .ogp-card{
+      display:block;
+      width:100%;
+      border-radius:20px;overflow:hidden;
+      background:#1a1a1a;
+      border:1.5px solid rgba(255,255,255,.13);
+      cursor:pointer;
+      text-decoration:none;
+      box-shadow:0 8px 32px rgba(0,0,0,.7);
+    }
+    .ogp-peek-left{
+      position:absolute;
+      top:4px;
+      left:0;
+      width:100%;
+      border-radius:20px;overflow:hidden;
+      background:#1a1a1a;
+      border:1.5px solid rgba(255,255,255,.1);
+      opacity:.6;
+      pointer-events:none;
+      z-index:5;
+      transform:translateX(-10px);
+      clip-path:inset(0 calc(100% - 12px) 0 0 round 20px 0 0 20px);
+    }
+    .ogp-behind1{
+      position:absolute;
+      top:0; left:0;
+      width:100%;
+      border-radius:20px;overflow:hidden;
+      background:#252525;
+      border:1.5px solid rgba(255,255,255,.09);
+      opacity:.8;
+      pointer-events:none;
+      z-index:8;
+      transform:translateX(10px);
+      clip-path:inset(0 0 0 calc(100% - 12px) round 0 20px 20px 0);
+    }
+    .ogp-behind2{
+      position:absolute;
+      top:0; left:0;
+      width:100%;
+      border-radius:20px;overflow:hidden;
+      background:#2e2e2e;
+      border:1.5px solid rgba(255,255,255,.06);
+      opacity:.55;
+      pointer-events:none;
+      z-index:7;
+      transform:translateX(20px);
+      clip-path:inset(0 0 0 calc(100% - 10px) round 0 20px 20px 0);
+    }
+    /* ── DESKTOP OG PICKS ── */
+    @media(min-width:700px){
+      .ogp-scroll-wrap{padding:1.2rem 0 1.4rem;}
+      .ogp-deck-stage{
+        display:flex;
+        gap:1rem;
+        margin:0;
+        max-width:none;
+        padding:0;
+        overflow:hidden;
+        position:relative;
+      }
+      /* hide mobile peek/folder ghosts on desktop */
+      .ogp-peek-left,.ogp-behind1,.ogp-behind2{display:none;}
+      .ogp-card-active-wrap{
+        display:flex;
+        gap:1rem;
+        width:100%;
+        transition:transform .55s cubic-bezier(.4,0,.2,1);
+        will-change:transform;
+      }
+      .ogp-card{
+        flex:0 0 calc(25% - .75rem);
+        width:calc(25% - .75rem);
+        border-radius:16px;
+      }
+    }
+    .ogp-poster{
+      width:100%;aspect-ratio:3/4;
+      background-size:cover;background-position:center;
+      position:relative;
+    }
+    .ogp-poster::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 45%);
+    }
+    .ogp-date-badge{
+      position:absolute;top:.85rem;left:.85rem;z-index:2;
+      background:#fff;color:#000;
+      border-radius:12px;padding:.45rem .7rem;
+      text-align:center;min-width:52px;
+      box-shadow:0 2px 10px rgba(0,0,0,.5);
+    }
+    .ogp-date-badge-day{font-size:1.4rem;font-weight:900;line-height:1;}
+    .ogp-date-badge-mon{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-top:.1rem;}
+    .ogp-price-badge{
+      position:absolute;bottom:.8rem;right:.8rem;z-index:2;
+      padding:.3rem .8rem;border-radius:999px;
+      font-size:.65rem;font-weight:800;
+    }
+    .ogp-price-free{background:#22c55e;color:#fff;}
+    .ogp-price-paid{background:#ec4899;color:#fff;}
+    .ogp-info{
+      padding:1rem 1.15rem 1.2rem;
+      background:#1a1a1a;
+      border-top:1px solid rgba(255,255,255,.07);
+    }
+    .ogp-title-card{
+      font-size:1.05rem;font-weight:800;
+      color:#fff;line-height:1.25;letter-spacing:-.02em;
+    }
+    .ogp-venue{
+      font-size:.8rem;color:rgba(255,255,255,.45);
+      margin-top:.3rem;font-weight:500;
+    }
+    .ogp-counter{
+      display:flex;align-items:center;justify-content:center;
+      gap:.55rem;padding:.9rem 0 .3rem;
+      background:#000;
+    }
+    .ogp-counter-pill{
+      background:rgba(255,255,255,.12);
+      border-radius:999px;
+      padding:.28rem .85rem;
+      font-size:.78rem;font-weight:800;
+      color:#fff;letter-spacing:.04em;
+    }
+    .ogp-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);
+      transition:background .3s;
+    }
+    .ogp-dot.active{background:#fff;}
+
+    /* ── SCENE STEALERS ── */
+    .ss-section{background:#000;padding:0 0 .5rem;border-top:1px solid rgba(255,255,255,.07);}
+    .ss-banner{
+      position:relative;
+      width:100%;
+      min-height:220px;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+      padding:2.5rem 0 2rem;
+      background:linear-gradient(135deg,#0b1a0b 0%,#1a3a0a 50%,#0b1a0b 100%);
+      border-top:1px solid rgba(180,255,180,.24);
+    }
+    .ss-banner::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 60% 80% at 0% 50%,rgba(120,220,80,.18),transparent 60%),
+        radial-gradient(ellipse 40% 60% at 100% 0%,rgba(245,197,24,.13),transparent 55%);
+      pointer-events:none;
+    }
+    .ss-banner::after{
+      content:"SCENE";
+      position:absolute;
+      right:-1rem;bottom:-1.5rem;
+      font-size:clamp(5rem,18vw,10rem);
+      font-weight:900;
+      letter-spacing:-.06em;
+      color:rgba(180,255,180,.08);
+      line-height:1;
+      pointer-events:none;
+      user-select:none;
+    }
+    .ss-banner-text{position:relative;z-index:2;}
+    .ss-eyebrow{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.68rem;font-weight:800;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:rgba(200,255,200,.78);
+      margin-bottom:.8rem;
+    }
+    .ss-eyebrow::before{
+      content:"";
+      display:inline-block;width:24px;height:1px;
+      background:rgba(200,255,200,.7);
+    }
+    .ss-title{
+      font-size:clamp(2.8rem,8vw,5rem);
+      font-weight:900;
+      line-height:.92;
+      letter-spacing:-.06em;
+      color:#fff;
+      margin:0;
+    }
+    .ss-title em{
+      font-style:italic;
+      display:block;
+      -webkit-text-stroke:1.5px rgba(200,255,200,.86);
+      color:transparent;
+    }
+    .ss-sub{
+      margin-top:.9rem;
+      font-size:.78rem;
+      font-weight:700;
+      color:rgba(200,255,200,.72);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+    .ss-scroll-wrap{overflow:hidden;scrollbar-width:none;}
+    .ss-scroll-wrap::-webkit-scrollbar{display:none;}
+    .ss-scroll{display:flex;gap:.75rem;padding:1rem 1rem 1.2rem;width:max-content;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+    .ss-card:first-child{margin-left:0;}
+    .ss-card:last-child{margin-right:0;}
+    .ss-card{
+      flex:0 0 calc((100vw - 2.75rem) / 2);border-radius:18px;overflow:hidden;
+      background:#111;border:1px solid rgba(255,255,255,.15);
+      text-decoration:none;display:flex;flex-direction:column;
+      box-shadow:0 8px 24px rgba(0,0,0,.5);
+      transition:transform .2s,box-shadow .2s;
+    }
+    .ss-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.6);}
+    .ss-poster{
+      width:100%;aspect-ratio:3/4;object-fit:cover;
+      background:#1a1a1a;display:block;
+      position:relative;
+    }
+    .ss-poster-placeholder{
+      width:100%;aspect-ratio:3/4;
+      background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+      display:grid;place-items:center;font-size:2.5rem;
+      position:relative;
+    }
+    .ss-poster::after,.ss-poster-placeholder::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.1) 55%,transparent 100%);
+      pointer-events:none;
+    }
+    .ss-card-body{padding:.6rem .7rem .75rem;border-top:1px solid rgba(255,255,255,.07);}
+    .ss-price{
+      position:absolute;bottom:.55rem;left:.55rem;z-index:2;
+      background:#f5c518;color:#000;
+      font-size:.62rem;font-weight:900;padding:.22rem .6rem;
+      border-radius:999px;letter-spacing:.02em;
+    }
+    .ss-name{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .ss-date-row{display:flex;align-items:center;gap:.4rem;margin-top:.3rem;}
+    .ss-date-box{background:#1a1a1a;border-radius:5px;padding:.2rem .35rem;text-align:center;flex:none;}
+    .ss-date-day{font-size:.72rem;font-weight:900;color:#fff;line-height:1;}
+    .ss-date-mon{font-size:.52rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;line-height:1;}
+    .ss-venue{font-size:.65rem;color:rgba(255,255,255,.4);font-weight:600;line-height:1.3;}
+    .ss-coupons{
+      position:absolute;z-index:3;left:.65rem;right:auto;bottom:.65rem;
+      width:max-content;max-width:calc(100% - 1.3rem);
+      display:flex;flex-direction:column;gap:.3rem;
+    }
+    .ss-coupon-chip{
+      display:flex;align-items:center;justify-content:flex-start;gap:.5rem;
+      width:max-content;max-width:100%;min-width:0;min-height:32px;
+      padding:.22rem .32rem .22rem .55rem;border-radius:999px;
+      background:linear-gradient(110deg,rgba(7,9,7,.96),rgba(20,19,12,.96));
+      border:1.5px solid #f5c518;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 6px 18px rgba(0,0,0,.65);
+      backdrop-filter:blur(10px);
+    }
+    .ss-coupon-tag{
+      display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+      max-width:9rem;font-size:.62rem;font-weight:900;color:#fff3bf;letter-spacing:.07em;text-transform:uppercase;
+      text-shadow:0 1px 5px rgba(0,0,0,.85);
+    }
+    .ss-coupon-val{
+      flex:none;padding:.2rem .38rem;border-radius:999px;
+      background:#f5c518;font-size:.56rem;font-weight:900;
+      color:#171300;letter-spacing:.03em;white-space:nowrap;
+    }
+    .ss-view-all-wrap{padding:.6rem 0 1.4rem;display:flex;justify-content:center;}
+    .ss-view-all{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.5rem 1.5rem;border:1px solid rgba(255,255,255,.35);
+      border-radius:999px;color:#fff;font-size:.82rem;font-weight:800;
+      text-decoration:none;transition:background .2s,border-color .2s;
+    }
+    .ss-view-all:hover{background:rgba(255,255,255,.1);border-color:#fff;}
+    .ss-dots-mobile{
+      display:flex;align-items:center;justify-content:center;
+      gap:.45rem;padding:.5rem 0 .2rem;background:#000;
+    }
+    .ss-dot-m{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);border:none;padding:0;cursor:pointer;
+      transition:all .3s;
+    }
+    .ss-dot-m.active{width:20px;border-radius:999px;background:#fff;}
+    @media(max-width:699px){
+      .ss-scroll-wrap{overflow:hidden;padding:0!important;}
+      .ss-scroll{display:flex;gap:.75rem;padding:1rem 1rem .25rem;width:max-content;transition:transform .5s cubic-bezier(.4,0,.2,1)!important;}
+      .ss-card{flex:0 0 calc((100vw - 2.75rem) / 2)!important;border-radius:18px;}
+      .ss-price{display:none;}
+      .ss-coupon-chip:nth-child(n+2){display:none;}
+      .ss-dots-mobile{padding:.25rem 0 .1rem;}
+      .ss-view-all-wrap{padding:.25rem 0 .65rem;}
+      .ss-scroll-wrap::before,.ss-scroll-wrap::after{display:none;}
+    }
+    @media(min-width:700px){
+      .ss-card{flex:0 0 180px;}
+      .ss-banner{min-height:260px;padding:3rem 0 2.5rem;}
+      .ss-title{font-size:clamp(3.5rem,6vw,5.5rem);}
+    }
+    @media(min-width:900px){
+      .ss-scroll-wrap{max-width:none;margin:0;}
+      .ss-scroll{gap:1.15rem;padding:1.2rem clamp(1.5rem,5vw,5rem) .25rem;}
+      .ss-card{
+        flex:0 0 clamp(220px,20vw,280px);
+        border-radius:22px;
+        border-color:rgba(200,255,200,.2);
+        box-shadow:0 14px 34px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.025);
+      }
+      .ss-card:hover{
+        transform:translateY(-6px);
+        border-color:rgba(200,255,200,.55);
+        box-shadow:0 22px 44px rgba(0,0,0,.65),0 0 26px rgba(120,220,80,.12);
+      }
+      .ss-card-body{padding:.9rem 1rem 1rem;}
+      .ss-name{font-size:.9rem;line-height:1.35;}
+      .ss-date-row{gap:.55rem;margin-top:.5rem;}
+      .ss-date-box{padding:.3rem .45rem;border-radius:7px;}
+      .ss-date-day{font-size:.82rem;}
+      .ss-date-mon{font-size:.58rem;}
+      .ss-venue{font-size:.72rem;}
+      .ss-price{display:none;}
+      .ss-coupon-chip:nth-child(n+2){display:none;}
+      .ss-dots-mobile{display:none;}
+      .ss-view-all-wrap{padding:.25rem 0 .65rem;}
+    }
+
+    /* ── FINEST TABLES SECTION ── */
+    .ft-section{background:#000;}
+    .ft-banner{
+      position:relative;
+      width:100%;
+      min-height:200px;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+    }
+    .ft-banner-bg{
+      position:absolute;inset:0;
+      background:url('banner.jpeg') center/cover no-repeat;
+      transform-origin:center;
+      transition:transform 6s ease;
+    }
+    .ft-section:hover .ft-banner-bg{transform:scale(1.04);}
+    .ft-banner-overlay{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(to right, rgba(0,0,0,.88) 0%, rgba(0,0,0,.65) 50%, rgba(0,0,0,.2) 100%),
+        linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 60%);
+      z-index:1;
+    }
+    .ft-banner::before{
+      content:"";
+      position:absolute;top:0;left:0;right:0;
+      height:2px;
+      background:linear-gradient(90deg,transparent,#c9a84c,#fff8e1,#c9a84c,transparent);
+      z-index:3;
+    }
+    .ft-banner-content{
+      position:relative;
+      z-index:2;
+      padding:1.8rem 0 2rem;
+      max-width:520px;
+    }
+    .ft-eyebrow{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.62rem;font-weight:800;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:#c9a84c;
+      margin-bottom:.5rem;
+    }
+    .ft-eyebrow::before{
+      content:"";
+      display:inline-block;width:16px;height:1px;
+      background:#c9a84c;
+    }
+    .ft-heading{
+      font-size:clamp(1.6rem,4.5vw,2.4rem);
+      font-weight:900;
+      color:#c9a84c;
+      line-height:.95;
+      letter-spacing:-.04em;
+      text-transform:uppercase;
+      margin:0 0 .4rem;
+      text-shadow:0 2px 12px rgba(0,0,0,.8);
+    }
+    .ft-tagline{
+      font-size:.78rem;
+      color:rgba(255,255,255,.7);
+      font-weight:600;
+      line-height:1.4;
+      margin-bottom:.9rem;
+      text-shadow:0 1px 6px rgba(0,0,0,.9);
+    }
+    .ft-banner-btn{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.45rem 1.1rem;
+      border-radius:999px;
+      background:rgba(201,168,76,.2);
+      border:1px solid #c9a84c;
+      color:#c9a84c;
+      font-size:.75rem;font-weight:800;
+      text-decoration:none;
+      transition:background .2s,color .2s;
+    }
+    .ft-banner-btn:hover{background:#c9a84c;color:#000;}
+    /* scroll cards */
+    .ft-scroll-wrap{background:#000;border-top:1px solid rgba(201,168,76,.15);}
+    .ft-scroll{
+      display:flex;gap:.75rem;
+      padding:1rem 0 .6rem;
+      overflow-x:auto;scroll-snap-type:x mandatory;
+      scrollbar-width:none;-webkit-overflow-scrolling:touch;
+      width:100%;
+    }
+    .ft-scroll::-webkit-scrollbar{display:none;}
+    .ft-card{
+      flex:0 0 44vw;max-width:185px;
+      border-radius:16px;overflow:hidden;
+      background:#111;
+      border:1px solid rgba(201,168,76,.15);
+      scroll-snap-align:start;cursor:pointer;
+      text-decoration:none;display:block;
+      transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+    }
+    .ft-card:hover{transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,0,0,.8);border-color:rgba(201,168,76,.4);}
+    .ft-poster{
+      width:100%;aspect-ratio:3/4;
+      background-size:cover;background-position:center;
+      position:relative;
+    }
+    .ft-poster::after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.65) 0%,transparent 55%);
+    }
+    .ft-price-badge{
+      position:absolute;bottom:.55rem;left:.55rem;z-index:2;
+      padding:.24rem .65rem;border-radius:999px;
+      font-size:.62rem;font-weight:800;
+    }
+    .ft-price-free{background:#22c55e;color:#fff;}
+    .ft-price-paid{background:#ec4899;color:#fff;}
+    .ft-info{padding:.65rem .75rem .8rem;background:#111;}
+    .ft-date{
+      display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;
+    }
+    .ft-date-box{
+      background:#1a1a1a;border:1px solid rgba(201,168,76,.2);
+      border-radius:7px;padding:.2rem .4rem;
+      text-align:center;min-width:32px;
+    }
+    .ft-date-day{font-size:.75rem;font-weight:900;color:#fff;line-height:1;}
+    .ft-date-mon{font-size:.52rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.06em;}
+    .ft-title{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;}
+    .ft-venue{font-size:.63rem;color:rgba(255,255,255,.35);margin-top:.2rem;font-weight:600;}
+    .ft-view-all-wrap{
+      padding:.6rem 0 1.8rem;
+      display:flex;justify-content:center;
+      background:#000;
+    }
+    .ft-view-all{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.55rem 1.5rem;
+      border:1px solid rgba(201,168,76,.3);
+      border-radius:999px;
+      color:#c9a84c;font-size:.82rem;font-weight:800;
+      text-decoration:none;
+      transition:background .2s,border-color .2s;
+    }
+    .ft-view-all:hover{background:rgba(201,168,76,.1);border-color:#c9a84c;}
+    @media(max-width:699px){
+      .ft-scroll{padding:1rem 0 .6rem;padding-left:0;}
+      .ft-card{flex:0 0 44vw;}
+    }
+    @media(min-width:700px){
+      .ft-card{flex:0 0 190px;max-width:210px;}
+      .ft-banner{min-height:200px;}
+      .ft-heading{font-size:clamp(1.8rem,3.5vw,2.6rem);}
+    }
+
+    /* ── TRENDING NOW AUTO-SCROLL ── */
+    .trending-section{background:#000;padding:1.5rem 0 0;border-top:1px solid rgba(255,255,255,.07);}
+    .trending-head{padding:0 0 .9rem;display:flex;align-items:baseline;gap:.7rem;}
+    .trending-label{font-size:.68rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.35);}
+    .trending-title{font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:#fff;letter-spacing:-.04em;margin:0;}
+    .trending-ticker-wrap{overflow:hidden;position:relative;}
+    .trending-ticker-wrap::before,.trending-ticker-wrap::after{
+      content:"";position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none;
+    }
+    .trending-ticker-wrap::before{left:0;background:linear-gradient(to right,#000,transparent);}
+    .trending-ticker-wrap::after{right:0;background:linear-gradient(to left,#000,transparent);}
+    .trending-ticker{
+      display:flex;gap:.75rem;
+      padding:.4rem 0 1.2rem;
+      width:max-content;
+      animation:trendingScroll 28s linear infinite;
+    }
+    .trending-ticker:hover{animation-play-state:paused;}
+    @keyframes trendingScroll{
+      0%{transform:translateX(0);}
+      100%{transform:translateX(-50%);}
+    }
+    .tr-card{
+      flex:0 0 150px;width:150px;
+      border-radius:16px;overflow:hidden;
+      background:#111;
+      border:1px solid rgba(255,255,255,.1);
+      text-decoration:none;display:block;
+      transition:transform .22s ease,border-color .22s ease;
+    }
+    .tr-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.3);}
+    .tr-poster{
+      width:100%;aspect-ratio:3/4;
+      background-size:cover;background-position:center;
+      position:relative;
+    }
+    .tr-poster::after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%);
+    }
+    .tr-date-badge{
+      position:absolute;top:.6rem;left:.6rem;z-index:2;
+      background:#fff;color:#000;
+      border-radius:9px;padding:.3rem .5rem;
+      text-align:center;min-width:38px;
+    }
+    .tr-date-day{font-size:1rem;font-weight:900;line-height:1;}
+    .tr-date-mon{font-size:.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+    .tr-price-badge{
+      position:absolute;bottom:.55rem;left:.55rem;z-index:2;
+      padding:.22rem .6rem;border-radius:999px;
+      font-size:.58rem;font-weight:800;
+    }
+    .tr-price-free{background:#22c55e;color:#fff;}
+    .tr-price-paid{background:#ec4899;color:#fff;}
+    .tr-info{padding:.6rem .7rem .75rem;background:#111;}
+    .tr-title{font-size:.72rem;font-weight:800;color:#fff;line-height:1.3;}
+    .tr-venue{font-size:.6rem;color:rgba(255,255,255,.35);margin-top:.2rem;font-weight:600;}
+    @media(min-width:700px){
+      .tr-card{flex:0 0 170px;width:170px;}
+    }
+
+    /* ── PREMIUM CURATED SECTION ── */
+    .hpe-section{
+      background:#000;
+      padding:0 0 0;
+      position:relative;
+    }
+    /* Full-width premium banner */
+    .hpe-banner{
+      position:relative;
+      width:100%;
+      min-height:220px;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+      padding:2.5rem 0 2rem;
+      background:linear-gradient(135deg,#5b0b12 0%,#8f1621 50%,#3b060b 100%);
+      border-top:1px solid rgba(255,214,214,.24);
+    }
+    /* animated grain texture */
+    .hpe-banner::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 60% 80% at 0% 50%,rgba(255,181,181,.18),transparent 60%),
+        radial-gradient(ellipse 40% 60% at 100% 0%,rgba(255,224,145,.13),transparent 55%);
+      pointer-events:none;
+    }
+    /* decorative large text watermark */
+    .hpe-banner::after{
+      content:"CURATED";
+      position:absolute;
+      right:-1rem;bottom:-1.5rem;
+      font-size:clamp(5rem,18vw,10rem);
+      font-weight:900;
+      letter-spacing:-.06em;
+      color:rgba(255,225,225,.1);
+      line-height:1;
+      pointer-events:none;
+      user-select:none;
+    }
+    .hpe-banner-text{position:relative;z-index:2;}
+    .hpe-eyebrow{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.68rem;font-weight:800;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:rgba(255,228,228,.78);
+      margin-bottom:.8rem;
+    }
+    .hpe-eyebrow::before{
+      content:"";
+      display:inline-block;width:24px;height:1px;
+      background:rgba(255,228,228,.7);
+    }
+    .hpe-heading{
+      font-size:clamp(2.8rem,8vw,5rem);
+      font-weight:900;
+      line-height:.92;
+      letter-spacing:-.06em;
+      color:#fff;
+      margin:0;
+    }
+    .hpe-heading em{
+      font-style:italic;
+      display:block;
+      -webkit-text-stroke:1.5px rgba(255,228,228,.86);
+      color:transparent;
+    }
+    .hpe-sub{
+      margin-top:.9rem;
+      font-size:.78rem;
+      font-weight:700;
+      color:rgba(255,228,228,.72);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+    /* scroll strip */
+    .hpe-scroll-wrap{
+      background:#000;
+      border-top:1px solid rgba(255,255,255,.06);
+      overflow:hidden;
+      position:relative;
+    }
+    .hpe-scroll-wrap::before,.hpe-scroll-wrap::after{
+      content:"";position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;
+    }
+    .hpe-scroll-wrap::before{left:0;background:linear-gradient(to right,#000 30%,transparent);}
+    .hpe-scroll-wrap::after{right:0;background:linear-gradient(to left,#000 30%,transparent);}
+    .hpe-scroll{
+      display:flex;gap:1rem;
+      padding:1.4rem 0 1rem;
+      width:max-content;
+      transition:transform .55s cubic-bezier(.4,0,.2,1);
+      will-change:transform;
+      box-sizing:content-box;
+    }
+    /* centered carousel cards */
+    .hpe-card{
+      flex:0 0 85vw;max-width:260px;
+      border-radius:16px;overflow:hidden;
+      background:#111;
+      border:1px solid rgba(255,255,255,.12);
+      cursor:pointer;
+      text-decoration:none;display:block;
+      transition:transform .4s ease,box-shadow .4s ease,border-color .4s ease;
+      opacity:1;
+      transform:scale(1);
+    }
+    .hpe-card.hpe-active{
+      opacity:1;
+      transform:scale(1);
+      border-color:rgba(255,255,255,.35);
+      box-shadow:0 20px 48px rgba(0,0,0,.8);
+    }
+    .hpe-card:hover{
+      border-color:rgba(255,255,255,.3);
+    }
+    .hpe-poster{
+      width:100%;aspect-ratio:3/4;
+      background-size:cover;background-position:center;
+      position:relative;
+    }
+    .hpe-poster::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.1) 55%,transparent 100%);
+    }
+    .hpe-price-badge{
+      position:absolute;bottom:.55rem;left:.55rem;z-index:2;
+      padding:.24rem .65rem;border-radius:999px;
+      font-size:.62rem;font-weight:800;letter-spacing:.04em;
+    }
+    .hpe-price-free{background:#22c55e;color:#fff;}
+    .hpe-price-paid{background:#ec4899;color:#fff;}
+    .hpe-info{padding:.6rem .7rem .75rem;background:#111;
+      border-top:1px solid rgba(255,255,255,.07);
+    }
+    .hpe-title{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .hpe-venue{font-size:.62rem;color:rgba(255,255,255,.4);margin-top:.2rem;font-weight:600;
+      display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .hpe-date{
+      display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem;
+    }
+    .hpe-date-box{
+      background:#1e1e1e;border:1px solid rgba(255,255,255,.1);
+      border-radius:7px;padding:.2rem .4rem;
+      text-align:center;min-width:32px;
+    }
+    .hpe-date-day{font-size:.75rem;font-weight:900;color:#fff;line-height:1;}
+    .hpe-date-mon{font-size:.52rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.06em;}
+    .hpe-title{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;}
+    .hpe-venue{font-size:.63rem;color:rgba(255,255,255,.35);margin-top:.2rem;font-weight:600;}
+    /* view all */
+    .hpe-view-all-wrap{
+      padding:.8rem 0 2rem;
+      display:flex;justify-content:center;
+      background:#000;
+    }
+    .hpe-dots-mobile{
+      display:none;
+      align-items:center;justify-content:center;
+      gap:.45rem;padding:.5rem 0 .2rem;
+      background:#000;
+    }
+    .hpe-dot-m{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);border:none;padding:0;cursor:pointer;
+      transition:all .3s;
+    }
+    .hpe-dot-m.active{width:20px;border-radius:999px;background:#fff;}
+    .hpe-view-all{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.6rem 1.6rem;
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:999px;
+      color:#fff;font-size:.82rem;font-weight:800;
+      text-decoration:none;
+      transition:background .2s,border-color .2s;
+    }
+    .hpe-view-all:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5);}
+    /* arrow buttons — hidden on mobile */
+    .hpe-arrow{
+      display:none;
+      position:absolute;top:50%;transform:translateY(-50%);
+      z-index:4;width:44px;height:44px;
+      border-radius:50%;border:1px solid rgba(255,255,255,.2);
+      background:rgba(0,0,0,.7);color:#fff;
+      font-size:1.8rem;line-height:1;cursor:pointer;
+      align-items:center;justify-content:center;
+      transition:background .2s,border-color .2s;
+    }
+    .hpe-arrow:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.5);}
+    .hpe-arrow-prev{left:12px;}
+    .hpe-arrow-next{right:12px;}
+    @media(max-width:699px){
+      .hpe-scroll-wrap{overflow:visible;padding:0!important;}
+      .hpe-scroll{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;padding:1rem;width:100%;transform:none!important;transition:none!important;}
+      .hpe-card{flex:none;width:100%;min-width:0;max-width:none;border-radius:18px;margin:0;
+        border:1px solid rgba(255,255,255,.15);
+        box-shadow:0 8px 24px rgba(0,0,0,.5);
+      }
+      .hpe-scroll-wrap::before,.hpe-scroll-wrap::after{display:none;}
+      .hpe-dots-mobile{display:none!important;}
+    }
+    @media(min-width:700px){
+      .hpe-card{flex:0 0 260px;max-width:280px;}
+      .hpe-banner{min-height:260px;padding:3rem 0 2.5rem;}
+      .hpe-heading{font-size:clamp(3.5rem,6vw,5.5rem);}
+    }
+    @media(min-width:768px){
+      .hpe-scroll-wrap{position:relative;overflow:hidden;}
+      .hpe-scroll-wrap::before,.hpe-scroll-wrap::after{display:none;}
+      .hpe-scroll{
+        display:flex;gap:1.2rem;
+        padding:1.4rem 0;
+        width:auto;
+        overflow:hidden;
+        transition:transform .45s cubic-bezier(.4,0,.2,1);
+      }
+      .hpe-card{
+        flex:0 0 calc(25% - 1rem);
+        max-width:none;
+        opacity:1;transform:scale(1);
+      }
+      .hpe-arrow{display:flex;}
+    }
+    /* ── TOP VENUES ── */
+    .tv-section{background:#000;padding:1.8rem 0 2rem;border-top:1px solid rgba(255,255,255,.07);}
+    .tv-head{padding:0 0 .9rem;}
+    .tv-label{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(1.3rem,4vw,1.6rem);font-weight:900;
+      letter-spacing:.08em;text-transform:uppercase;color:#fff;
+    }
+    .tv-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .tv-scroll-wrap::-webkit-scrollbar{display:none;}
+    .tv-scroll{display:flex;gap:1.1rem;padding:0 0 .6rem;width:max-content;align-items:flex-start;}
+    .tv-card{
+      flex:0 0 110px;display:flex;flex-direction:column;align-items:center;
+      text-decoration:none;gap:.55rem;
+      transition:transform .2s;
+    }
+    .tv-card:hover{transform:translateY(-4px);}
+    .tv-circle{
+      width:110px;height:110px;border-radius:50%;
+      background:#1a1a1a;
+      background-size:cover;background-position:center;
+      border:2px solid rgba(255,255,255,.12);
+      flex-shrink:0;
+      overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .tv-circle img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+    .tv-name{
+      font-size:.72rem;font-weight:800;color:#fff;
+      text-align:center;line-height:1.25;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      max-width:110px;
+    }
+    .tv-city{font-size:.62rem;color:rgba(255,255,255,.4);text-align:center;font-weight:600;margin-top:.1rem;}
+    @media(min-width:700px){
+      .tv-card{flex:0 0 130px;}
+      .tv-circle{width:130px;height:130px;}
+      .tv-name{max-width:130px;}
+    }
+    @media(min-width:900px){
+      /* Give Top Venues a clear left inset on desktop while keeping the
+         horizontal venue rail aligned with its heading. */
+      .tv-section{padding-left:clamp(1.5rem,5vw,5rem);padding-right:clamp(1rem,3vw,3rem);}
+      .tv-scroll-wrap{max-width:none;margin:0;}
+      .tv-scroll{padding:0 0 .6rem;}
+      .tv-card{flex:0 0 140px;}
+      .tv-circle{width:140px;height:140px;}
+      .tv-name{max-width:140px;}
+    }
+    @media(min-width:900px){
+      /* Section inner wrappers */
+      .trn-inner{max-width:none;margin:0;padding:0;}
+      .trn-head{padding:0 0 1rem;}
+      .trn-grid{padding:.4rem 0 1rem;}
+      /* trn cards fixed size on desktop */
+      .trn-card{flex:0 0 200px;max-width:200px;}
+      /* ev-grid 2 columns on desktop */
+      .ev-grid{grid-template-columns:repeat(2,1fr);gap:1rem;padding:.5rem 0 1.4rem;}
+      #events .trn-inner{padding:0 clamp(1.5rem,5vw,5rem);}
+      #events .ev-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:clamp(1rem,2vw,1.5rem);padding:1.2rem 0 1.5rem;}
+      #events.trn-section{padding-left:0;padding-right:0;}
+      /* cup section */
+      .cup-head{padding:0 0 .9rem;}
+      .cup-scroll{padding:.4rem 0 1rem;}
+      /* hpe section */
+      .hpe-scroll-wrap{max-width:none;margin:0;padding:0 1rem!important;}
+    }
+    @media(min-width:1100px){
+      .trn-card{flex:0 0 220px;max-width:220px;}
+      .ev-grid{grid-template-columns:repeat(2,1fr);}
+    }
+    .mobile-header-actions,.mobile-bottom-nav,.mobile-brand,.city-picker{display:none;}
+    @media(max-width:700px){
+      .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
+      .topbar .brand-block{display:none;}
+      .mobile-brand{display:flex;align-items:center;color:#fff!important;font-size:1rem;font-weight:900;letter-spacing:.06em;white-space:nowrap;}
+      .mobile-header-actions{display:flex;align-items:center;gap:.45rem;margin-left:auto;}
+      .mobile-city{border:0;background:transparent;color:#fff!important;font:inherit;font-size:.82rem;font-weight:800;white-space:nowrap;cursor:pointer;}
+      .mobile-header-icon{display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#fff!important;font-size:1.35rem;cursor:pointer;}
+      .topbar .hamburger{position:relative;z-index:31;display:flex!important;flex:0 0 42px;width:42px;height:42px;margin-left:.2rem;}
+      .mobile-header-actions{min-width:0;gap:.2rem;}
+      .mobile-bottom-nav{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:24;display:grid;grid-template-columns:repeat(4,1fr);gap:.25rem;padding:.55rem .35rem;border:1px solid #222;border-radius:999px;background:rgba(0,0,0,.94);box-shadow:0 12px 34px rgba(0,0,0,.8);backdrop-filter:blur(18px);}
+      .mobile-bottom-nav a{display:grid;place-items:center;gap:.2rem;padding:.35rem .15rem;border-radius:999px;color:#666;font-size:.68rem;font-weight:800;text-decoration:none;}
+      .mobile-bottom-nav a:first-child{color:#fff;background:#1a1a1a;}
+      .mobile-bottom-nav a strong{font-size:.68rem;font-weight:800;line-height:1.1;}
+      .mobile-bottom-nav .nav-symbol{width:22px;height:22px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8;}
+      .site-footer .footer-bottom{padding-bottom:calc(5rem + env(safe-area-inset-bottom));}
+    }
+    @media(max-width:390px){
+      .mobile-header-actions #themeToggle{display:none;}
+      .mobile-city{font-size:.72rem;}
+      .mobile-header-icon{width:30px;height:30px;}
+    }
+
+    /* ── CITY PICKER ── */
+    .city-picker{position:fixed;inset:0;z-index:60;align-items:flex-start;justify-content:center;padding:5vh 1rem;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);}
+    .city-picker.open{display:flex;}
+    .city-picker-panel{width:min(720px,100%);max-height:90vh;overflow:auto;padding:1.5rem;border:1px solid #333;border-radius:22px;background:#111;box-shadow:0 30px 80px rgba(0,0,0,.8);}
+    .city-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .city-picker-head h2{margin:0;color:#fff;font-size:clamp(1.6rem,5vw,2.3rem);letter-spacing:-.05em;}
+    .city-picker-close{border:0;background:#222;border-radius:50%;width:2.2rem;height:2.2rem;color:#aaa;font-size:1.4rem;cursor:pointer;}
+    .city-picker-search{width:100%;padding:.85rem 1rem;border:1px solid #333;border-radius:10px;font:inherit;outline:none;background:#000;color:#fff;}
+    .city-picker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-top:1rem;}
+    .city-picker-option{padding:.8rem .5rem;border:1px solid #333;border-radius:10px;background:#111;color:#fff;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;}
+    .city-picker-option:hover,.city-picker-option.selected{border-color:#fff;background:#222;color:#fff;}
+    @media(max-width:560px){.city-picker-grid{grid-template-columns:repeat(2,1fr);}.city-picker-panel{padding:1.1rem;}}
+
+    /* ── SEARCH ── */
+    .search-popup{position:fixed;inset:0;z-index:70;display:none;align-items:flex-start;justify-content:center;padding:12vh 1rem;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);}
+    .search-popup.open{display:flex;}
+    .search-panel{width:min(620px,100%);padding:1.5rem;border:1px solid #333;border-radius:22px;background:#111;box-shadow:0 30px 80px rgba(0,0,0,.8);}
+    .search-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .search-panel h2{margin:0;color:#fff;font-size:1.7rem;letter-spacing:-.05em;}
+    .search-close{width:2.2rem;height:2.2rem;border:0;border-radius:50%;background:#222;color:#aaa;font-size:1.4rem;cursor:pointer;}
+    .search-input{width:100%;padding:1rem;border:1px solid #333;border-radius:12px;color:#fff;background:#000;font:inherit;font-size:1rem;outline:none;}
+    .search-input:focus{border-color:#555;}
+    .search-submit{width:100%;margin-top:.8rem;padding:.85rem;border:0;border-radius:10px;background:#fff;color:#000;font:inherit;font-weight:800;cursor:pointer;}
+
+    /* ── HERO SLIDER ── */
+    .hero-slider-wrap{
+      width:100%;position:relative;
+      background:none;
+      padding:1rem 0 0;
+      box-sizing:border-box;
+    }
+    @media(min-width:701px){
+      .hero-slider-wrap{
+        background:none;
+        padding:2rem 2rem 1.5rem;
+      }
+    }
+    .hero-slider-wrap::before{display:none;}
+    .hero-slider{position:relative;z-index:2;width:100%;margin:0 auto;background:transparent!important;padding:0;box-sizing:border-box;overflow:hidden;}
+    @media(min-width:701px){
+      .hero-slider{width:100%;max-width:1200px;overflow:hidden;}
+      .hero-slider-wrap{padding:2rem 2rem 1.5rem;}
+    }
+    .hs-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);will-change:transform;}
+    .hs-slide{flex:0 0 100%;box-sizing:border-box;padding:0 1rem;}
+    @media(max-width:700px){
+      .hs-slide{padding:0 .75rem;}
+    }
+    @media(min-width:701px){
+      .hs-slide{padding:0;}
+    }
+    .hs-card{border:0!important;border-radius:20px;overflow:hidden;background:#171717!important;box-shadow:0 10px 28px rgba(0,0,0,.35)!important;transition:box-shadow .25s ease;}
+    .hs-card:hover{box-shadow:0 16px 36px rgba(0,0,0,.45)!important;}
+    .hs-poster{width:100%;aspect-ratio:3/4;display:block;background-image:var(--hs-card-image,var(--hs-cover-image,var(--hs-fallback-image)));background-size:cover;background-position:center;position:relative;overflow:hidden;}
+    @media(min-width:701px){.hs-poster{aspect-ratio:21/9;background-image:var(--hs-cover-image,var(--hs-card-image,var(--hs-fallback-image)));}}
+    .hs-poster-inner{width:100%;height:100%;display:block;background:none!important;}
+    /* mobile: info inside card */
+    .hs-info{padding:.85rem 1.1rem 1rem;background:#171717!important;}
+    @media(max-width:700px){
+      .hs-info{background:#171717!important;padding:.85rem 1rem 1rem;text-align:left;}
+      .hs-card{border-radius:18px!important;box-shadow:0 8px 24px rgba(0,0,0,.5)!important;}
+    }
+    .hs-date{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:.3rem;}
+    .hs-title{font-size:1rem;font-weight:800;color:#fff;line-height:1.25;margin:0 0 .25rem;letter-spacing:-.02em;}
+    .hs-venue{font-size:.8rem;color:rgba(255,255,255,.45);font-weight:500;}
+    /* Keep the slide controls directly on the banner, without a tint or blur layer. */
+    #heroSlider,#hsTrack,#hsDots{background:transparent!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+    #hsDots::before,#hsDots::after{display:none!important;content:none!important;}
+    .hs-dots{display:flex;align-items:center;justify-content:center;gap:.45rem;padding:.9rem 0 1.2rem;position:relative;z-index:2;background:transparent!important;}
+    @media(max-width:700px){
+      .hs-dots{display:none;}
+    }
+    .hs-dot{width:8px;height:8px;border-radius:999px;background:#333;border:none;cursor:pointer;padding:0;transition:all .3s;}
+    .hs-dot.active{width:24px;background:#fff;}
+    /* mobile counter pill */
+    .hs-counter{
+      display:none;
+    }
+    @media(max-width:700px){
+      .hs-dots{display:none;}
+      .hs-counter{
+        display:flex;align-items:center;justify-content:center;
+        gap:.4rem;padding:.7rem 0 1.2rem;
+      }
+      .hs-counter-dot{width:7px;height:7px;border-radius:50%;background:#444;transition:background .3s;}
+      .hs-counter-dot.active{background:#fff;}
+      .hs-counter-pill{
+        background:rgba(255,255,255,.15);border-radius:999px;
+        padding:.22rem .75rem;
+        font-size:.82rem;font-weight:800;color:#fff;
+        letter-spacing:.04em;
+      }
+    }
+
+    /* ── CATEGORY SECTION ── */
+    .idx-cat-section{width:100%;max-width:none;padding:1.5rem 0 2rem;background:#000;}
+    .idx-cat-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
+    .idx-section-label{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#555;margin-bottom:.5rem;}
+    .idx-section-title{font-size:clamp(1.4rem,4vw,2.4rem);font-weight:800;color:#fff;letter-spacing:-.04em;margin:0 0 1rem;}
+    .idx-cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;}
+    .idx-cat-card{border-radius:14px;overflow:hidden;position:relative;aspect-ratio:1/1;cursor:pointer;text-decoration:none;display:block;transition:transform .2s;}
+    .idx-cat-card:hover{transform:scale(1.02);}
+    .idx-cat-card::before{display:none;}
+    .idx-cat-bg{position:absolute;inset:0;background-size:cover;background-position:center top;}
+    .idx-cat-icon-wrap{display:none;}
+    .idx-cat-arrow{display:none;}
+    .idx-cat-body{display:none;}
+    .idx-cat-sub{display:none;}
+    .idx-cat-label{position:absolute;top:.6rem;left:.7rem;z-index:2;font-size:clamp(.75rem,3.2vw,1rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:.04em;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.6);}
+    .icc-parties{background:#00b4d8;}.icc-parties .idx-cat-bg{background:url('party.jpg') center top/cover no-repeat;}
+    .icc-brunch{background:#f5c518;}.icc-brunch .idx-cat-bg{background:url('brunch.jpg') center top/cover no-repeat;}
+    .icc-culinary{background:#e63946;}.icc-culinary .idx-cat-bg{background:url('culinary.jpg') center top/cover no-repeat;}
+    .icc-workshops{background:#f4a261;}.icc-workshops .idx-cat-bg{background:url('workshop.jpg') center top/cover no-repeat;}
+    .icc-experiences{background:#2ec4b6;}.icc-experiences .idx-cat-bg{background:url('community.jpg') center top/cover no-repeat;}
+    .icc-community{background:#2ec4b6;}.icc-community .idx-cat-bg{background:url('community.jpg') center top/cover no-repeat;}
+    .icc-music{background:#57cc99;}.icc-music .idx-cat-bg{background:url('music.jpg') center top/cover no-repeat;}
+    .icc-sports{background:#4361ee;}.icc-sports .idx-cat-bg{background:url('sports.jpg') center top/cover no-repeat;}
+
+    /* ── FEATURED SECTIONS ── */
+    .idx-feat-section{padding:3rem 0 3.5rem;background:#000;border-top:1px solid #1a1a1a;}
+    .idx-feat-inner{max-width:none;margin:0;padding:0;}
+    .idx-feat-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.6rem;gap:1rem;flex-wrap:wrap;}
+    .idx-feat-cta-link{font-size:.82rem;font-weight:800;color:#666;text-decoration:none;white-space:nowrap;border:1px solid #333;border-radius:999px;padding:.45rem 1rem;transition:color .2s,border-color .2s;}
+    .idx-feat-cta-link:hover{color:#fff;border-color:#666;}
+
+    /* ── EVENT CARDS ── */
+    #events{width:100%;max-width:none;margin:0;padding:3.5rem 0 4.5rem;background:#000;}
+    #events .idx-feat-head{position:relative;justify-content:center;text-align:center;}
+    #events .idx-feat-head-left{text-align:center;}
+    #events .idx-feat-head .idx-section-title{font-size:clamp(2rem,4.2vw,3.4rem);line-height:1.05;margin-bottom:0;}
+    #events .idx-feat-cta-link{display:block;width:max-content;margin:1.5rem auto 0;}
+    #events .event-grid-home{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
+    /* ── NEW EVENT CARD STYLE ── */
+    .event-card,.event-poster-card{
+      background:#111!important;
+      border:1px solid rgba(255,255,255,.08)!important;
+      border-radius:16px;
+      overflow:hidden;
+      cursor:pointer;
+      transition:transform .22s ease,box-shadow .22s ease;
+    }
+    .event-card:hover,.event-poster-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 16px 40px rgba(0,0,0,.7)!important;
+    }
+    /* Do not darken event artwork when a card is hovered. */
+    .event-card:hover,.event-poster-card:hover{box-shadow:none!important;}
+    .event-banner{
+      position:relative;
+      width:100%;
+      aspect-ratio:1/1;
+      background-size:cover;
+      background-position:center;
+      overflow:hidden;
+    }
+    .event-banner::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.45) 0%,transparent 50%);
+      pointer-events:none;
+    }
+    .event-banner::after{display:none!important;}
+    .event-promoted-badge{
+      position:absolute;top:.55rem;left:.55rem;z-index:2;
+      background:#f97316;color:#fff;
+      font-size:.6rem;font-weight:900;
+      padding:.22rem .6rem;border-radius:4px;
+      letter-spacing:.06em;text-transform:uppercase;
+    }
+    /* price pill bottom-left on poster */
+    .event-price-pill{
+      position:absolute;bottom:.6rem;left:.6rem;z-index:2;
+      padding:.28rem .75rem;border-radius:999px;
+      font-size:.68rem;font-weight:800;
+      background:#ec4899;color:#fff;
+    }
+    .event-price-pill.free{background:#22c55e;}
+    .event-body,.event-poster-card .event-body{
+      background:#111!important;
+      padding:.65rem .75rem .8rem;
+      display:flex;gap:.6rem;align-items:flex-start;
+    }
+    /* date box left */
+    .event-date-box{
+      flex-shrink:0;
+      background:#1e1e1e;border-radius:8px;
+      padding:.3rem .45rem;
+      text-align:center;min-width:36px;
+    }
+    .event-date-day{font-size:.95rem;font-weight:900;color:#fff;line-height:1;}
+    .event-date-mon{font-size:.5rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-top:.1rem;}
+    .event-text{flex:1;min-width:0;}
+    .event-poster-card h3,.event-body h3{
+      color:#fff!important;
+      font-size:.82rem;
+      font-weight:800;
+      letter-spacing:-.01em;
+      line-height:1.3;
+      margin:0 0 .2rem;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .event-poster-card p,.event-body p{
+      color:rgba(255,255,255,.4)!important;
+      font-size:.7rem;
+      line-height:1.4;
+      margin:0;
+      display:-webkit-box;
+      -webkit-line-clamp:1;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .event-poster-info,.event-meta{display:none;}
+    .event-poster-price{display:none;}
+    .banner-a{background:linear-gradient(135deg,#0d2b6e,#1565c0)!important;}
+    .banner-b{background:linear-gradient(135deg,#6b1a3a,#b71c1c)!important;}
+    .banner-c{background:linear-gradient(135deg,#1a3a1a,#2e7d32)!important;}
+    @media(max-width:900px){#events .event-grid-home{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:700px){
+      #events{padding:2rem 0 3rem;}
+      #events .idx-feat-inner{padding:0;}
+      #events .idx-feat-head{margin-bottom:1rem;}
+      #events .idx-section-title{font-size:clamp(1rem,5.5vw,2.5rem);white-space:nowrap;}
+      #events .event-grid-home{grid-template-columns:repeat(2,1fr);gap:.6rem;}
+    }
+
+    /* ── RESTAURANTS ── */
+    #restaurants{background:#0a0a0a!important;}
+    #restaurants .idx-section-title{color:#fff!important;}
+
+    /* ── HOW IT WORKS ── */
+    .idx-how{padding:3.5rem 0 4rem;background:#0a0a0a;}
+    .idx-how-inner{max-width:none;margin:0;padding:0;}
+    .idx-how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem;}
+    .idx-how-card{background:#111;border:1px solid #222;border-radius:20px;padding:1.6rem 1.4rem;}
+    .idx-how-num{font-size:2.5rem;font-weight:900;color:rgba(255,255,255,.06);letter-spacing:-.06em;line-height:1;margin-bottom:.75rem;}
+    .idx-how-icon{font-size:1.6rem;margin-bottom:.75rem;}
+    .idx-how-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:.4rem;}
+    .idx-how-desc{font-size:.84rem;color:#666;line-height:1.6;}
+    @media(max-width:700px){
+      .idx-how-inner{padding:0;}
+      .idx-how-inner .idx-section-label,.idx-how-inner .idx-section-title{padding:0;}
+      .idx-how-grid{display:flex;flex-direction:row;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:1rem;padding:0 0 .8rem;scrollbar-width:none;}
+      .idx-how-grid::-webkit-scrollbar{display:none;}
+      .idx-how-card{flex:0 0 78vw;max-width:78vw;scroll-snap-align:center;}
+    }
+
+    /* ── PROMO BANNERS ── */
+    .idx-promo{padding:2rem 0 3.5rem;}
+    .idx-promo-inner{max-width:none;margin:0;padding:0;}
+    .promo-banners{background:#000;}
+    .promo-card{background:#111!important;border:1px solid #222!important;box-shadow:none!important;}
+    .promo-tag{color:#555!important;background:#1a1a1a!important;}
+    .promo-heading{color:#fff!important;}
+    .promo-cta{color:#888!important;}
+
+    /* ── CREATORS & PREMIUM ── */
+    .cp-section{background:#000;position:relative;overflow:hidden;border-top:1px solid rgba(255,255,255,.07);}
+
+    /* full-width banner */
+    .cp-banner{
+      position:relative;
+      width:100%;
+      min-height:260px;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      padding:3rem 0;
+      background:linear-gradient(135deg,#07070f 0%,#110820 45%,#0a0a0a 100%);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .cp-banner::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 55% 90% at 0% 50%,rgba(130,70,255,.18),transparent 55%),
+        radial-gradient(ellipse 40% 60% at 100% 10%,rgba(255,180,60,.1),transparent 50%),
+        radial-gradient(ellipse 30% 50% at 60% 100%,rgba(100,50,255,.1),transparent 55%);
+      pointer-events:none;
+    }
+    .cp-banner-wm{
+      position:absolute;
+      right:-1rem;top:50%;transform:translateY(-50%);
+      font-size:clamp(7rem,20vw,14rem);
+      font-weight:900;letter-spacing:-.06em;
+      color:rgba(255,255,255,.025);
+      line-height:1;pointer-events:none;user-select:none;
+      white-space:nowrap;
+    }
+    .cp-banner-inner{
+      position:relative;z-index:2;
+      max-width:none;margin:0;width:100%;
+    }
+    .cp-eyebrow{
+      display:inline-flex;align-items:center;gap:.6rem;
+      font-size:.62rem;font-weight:900;
+      letter-spacing:.22em;text-transform:uppercase;
+      color:rgba(255,255,255,.35);
+      margin-bottom:1rem;
+    }
+    .cp-eyebrow::before{content:"";display:inline-block;width:22px;height:1px;background:rgba(255,255,255,.3);}
+    .cp-heading{
+      font-size:clamp(3.2rem,7vw,6rem);
+      font-weight:900;
+      line-height:.88;
+      letter-spacing:-.07em;
+      color:#fff;
+      margin:0 0 1rem;
+    }
+    .cp-heading em{
+      font-style:italic;
+      -webkit-text-stroke:2px rgba(255,255,255,.45);
+      color:transparent;
+      display:block;
+    }
+    .cp-sub{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-size:.68rem;font-weight:800;
+      letter-spacing:.2em;text-transform:uppercase;
+      color:rgba(255,255,255,.28);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:999px;
+      padding:.32rem .9rem;
+      background:rgba(255,255,255,.04);
+    }
+
+    /* booking cards strip */
+    .cp-cards-strip{
+      max-width:none;margin:0;
+      padding:1.8rem 0 2.2rem;
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:.9rem;
+    }
+    .cp-card{
+      position:relative;
+      border-radius:20px;
+      padding:1.5rem 1.4rem 1.6rem;
+      display:flex;flex-direction:column;
+      gap:.45rem;
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,.08);
+      background:#0d0d0d;
+      overflow:hidden;
+      transition:transform .22s,box-shadow .22s,border-color .22s;
+    }
+    .cp-card:hover{transform:translateY(-5px);box-shadow:0 22px 55px rgba(0,0,0,.7);border-color:rgba(255,255,255,.2);}
+    .cp-card.cp-gold{
+      background:linear-gradient(155deg,#120e00,#0d0d0d);
+      border-color:rgba(245,197,24,.22);
+    }
+    .cp-card.cp-gold:hover{border-color:rgba(245,197,24,.55);box-shadow:0 22px 55px rgba(245,197,24,.1);}
+    .cp-card.cp-purple{
+      background:linear-gradient(155deg,#0e0820,#0a0a0d);
+      border-color:rgba(150,100,255,.22);
+    }
+    .cp-card.cp-purple:hover{border-color:rgba(150,100,255,.55);box-shadow:0 22px 55px rgba(100,60,255,.12);}
+    .cp-card-shine{
+      position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+    }
+    .cp-card.cp-gold .cp-card-shine{background:linear-gradient(90deg,transparent,rgba(245,197,24,.3),transparent);}
+    .cp-card.cp-purple .cp-card-shine{background:linear-gradient(90deg,transparent,rgba(150,100,255,.3),transparent);}
+    .cp-card-icon{
+      font-size:1.8rem;line-height:1;
+      margin-bottom:.3rem;
+    }
+    .cp-card-tag{
+      font-size:.58rem;font-weight:900;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:rgba(255,255,255,.28);
+    }
+    .cp-card.cp-gold .cp-card-tag{color:rgba(245,197,24,.6);}
+    .cp-card.cp-purple .cp-card-tag{color:rgba(150,100,255,.65);}
+    .cp-card-title{
+      font-size:.95rem;font-weight:900;
+      color:#fff;letter-spacing:-.03em;line-height:1.25;
+    }
+    .cp-card-loc{
+      display:flex;align-items:center;gap:.35rem;
+      font-size:.7rem;font-weight:700;
+      color:rgba(255,255,255,.3);
+      margin:.1rem 0;
+    }
+    .cp-card-loc::before{content:"📍";font-size:.7rem;}
+    .cp-perks{display:grid;gap:.25rem;margin:.15rem 0;}
+    .cp-perk{
+      display:flex;align-items:center;gap:.45rem;
+      font-size:.72rem;font-weight:600;
+      color:rgba(255,255,255,.38);line-height:1.3;
+    }
+    .cp-perk::before{content:"—";color:rgba(255,255,255,.18);flex-shrink:0;}
+    .cp-card.cp-gold .cp-perk::before{content:"✦";color:rgba(245,197,24,.5);}
+    .cp-card.cp-purple .cp-perk::before{content:"✦";color:rgba(150,100,255,.55);}
+    .cp-card-cta{
+      display:inline-flex;align-items:center;gap:.4rem;
+      margin-top:.6rem;
+      padding:.45rem .95rem;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:transparent;
+      color:rgba(255,255,255,.5);
+      font-size:.72rem;font-weight:800;
+      width:fit-content;
+      transition:all .18s;
+    }
+    .cp-card:hover .cp-card-cta{color:#fff;border-color:rgba(255,255,255,.38);background:rgba(255,255,255,.06);}
+    .cp-card.cp-gold .cp-card-cta{border-color:rgba(245,197,24,.25);color:rgba(245,197,24,.7);}
+    .cp-card.cp-gold:hover .cp-card-cta{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.55);color:#f5c518;}
+    .cp-card.cp-purple .cp-card-cta{border-color:rgba(150,100,255,.25);color:rgba(150,100,255,.75);}
+    .cp-card.cp-purple:hover .cp-card-cta{background:rgba(150,100,255,.1);border-color:rgba(150,100,255,.55);color:#b08fff;}
+    @media(max-width:900px){.cp-cards-strip{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:560px){
+      .cp-cards-strip{grid-template-columns:1fr;padding:1.4rem 0 2rem;}
+      .cp-banner{min-height:auto;padding:2.2rem 0;}
+      .cp-heading{font-size:clamp(2.8rem,10vw,4rem);}
+      .cp-heading em{-webkit-text-stroke:1.5px rgba(255,255,255,.45);}
+    }
+
+    /* ── BUTTONS ── */
+    .btn{border-color:#333;}
+    .hero-btn-white{background:#fff!important;color:#000!important;}
+    .hero-btn-ghost{background:transparent!important;border-color:#333!important;color:#fff!important;}
+    .idx-rs-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;}
+
+    /* ── PREMIUM CATEGORY GRID ── */
+    .idx-cat-section{padding:1.5rem 0 2rem;background:#000;}
+    .idx-cat-section .idx-cat-inner{max-width:1240px;margin:0 auto;padding:0 1.4rem;}
+    .idx-cat-section .idx-section-label{
+      font-size:.68rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+      color:#fff;margin-bottom:.4rem;
+    }
+    .idx-cat-section .idx-section-title{
+      font-size:clamp(1.6rem,4vw,2.6rem);font-weight:900;color:#fff;
+      letter-spacing:-.04em;margin:0 0 1.2rem;line-height:1;
+    }
+    .idx-cat-section .idx-cat-grid{
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:.65rem;
+      padding:0;
+    }
+    .idx-cat-section .idx-cat-card{
+      position:relative;
+      height:160px;
+      border-radius:18px;
+      overflow:hidden;
+      display:block;
+      text-decoration:none;
+      cursor:pointer;
+      border:1.5px solid rgba(255,255,255,.18);
+      transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s ease,border-color .28s ease;
+    }
+    .idx-cat-section .idx-cat-card:hover{
+      transform:scale(1.04) translateY(-3px);
+      box-shadow:0 20px 48px rgba(0,0,0,.7);
+      border-color:rgba(255,255,255,.55);
+    }
+    /* photo layer */
+    .idx-cat-section .idx-cat-bg{
+      position:absolute;inset:0;
+      background-size:cover;background-position:center top;
+      transition:transform .4s ease;
+    }
+    .idx-cat-section .idx-cat-card:hover .idx-cat-bg{transform:scale(1.08);}
+    /* dark gradient overlay */
+    .idx-cat-section .idx-cat-card::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.1) 60%,transparent 100%);
+      z-index:1;
+    }
+    /* bold label top-left */
+    .idx-cat-section .idx-cat-label{
+      position:absolute;
+      top:.75rem;left:.8rem;
+      z-index:2;
+      font-size:clamp(.85rem,2.5vw,1.1rem);
+      font-weight:900;
+      color:#fff;
+      line-height:1.1;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      text-shadow:0 2px 8px rgba(0,0,0,.6);
+    }
+    /* arrow badge bottom-right — removed */
+    .idx-cat-section .idx-cat-card::before{display:none;}
+    /* per-card accent colours */
+    .icc-parties  {background:#0e8fa8;}
+    .icc-brunch   {background:#b8860b;}
+    .icc-culinary {background:#b71c1c;}
+    .icc-workshops{background:#b35a00;}
+    .icc-experiences{background:#00796b;}
+    .icc-music    {background:#1b5e20;}
+    /* photo backgrounds */
+    .icc-parties .idx-cat-bg   {background-image:url('party.jpg');}
+    .icc-brunch .idx-cat-bg    {background-image:url('brunch.jpg');}
+    .icc-culinary .idx-cat-bg  {background-image:url('culinary.jpg');}
+    .icc-workshops .idx-cat-bg {background-image:url('workshop.jpg');}
+    .icc-experiences .idx-cat-bg{background-image:url('community.jpg');}
+    .icc-music .idx-cat-bg     {background-image:url('music.jpg');}
+    @media(max-width:600px){
+      .idx-cat-section{padding:1.35rem 0 1.75rem;}
+      .idx-cat-section .idx-cat-inner{padding:0 1rem;}
+      .idx-cat-section .idx-section-label{margin-bottom:.45rem;font-size:.64rem;}
+      .idx-cat-section .idx-section-title{font-size:clamp(1.45rem,6vw,2rem);line-height:1.12;margin-bottom:1rem;}
+      .idx-cat-section .idx-cat-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;}
+      .idx-cat-section .idx-cat-card{
+        height:auto;
+        aspect-ratio:.92 / 1;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,.35);
+      }
+      .idx-cat-section .idx-cat-label{font-size:clamp(.58rem,2.7vw,.78rem);top:.55rem;left:.55rem;right:.4rem;}
+    }
+    @media(max-width:360px){
+      .idx-cat-section .idx-cat-inner{padding:0 .8rem;}
+      .idx-cat-section .idx-cat-grid{gap:.5rem;}
+      .idx-cat-section .idx-cat-label{font-size:.56rem;top:.45rem;left:.45rem;}
+    }
+    /* ── COMING UP IN A FEW DAYS ── */
+    .cup-section{background:#000;padding:1.8rem 0 1.2rem;border-top:1px solid rgba(255,255,255,.07);}
+    /* shared dots */
+    .sec-dots{
+      display:flex;align-items:center;justify-content:center;
+      gap:.45rem;padding:.75rem 0 .2rem;
+    }
+    .sec-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,.25);border:none;padding:0;cursor:pointer;
+      transition:all .3s;
+    }
+    .sec-dot.active{width:20px;border-radius:999px;background:#fff;}
+    .cup-head{
+      display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      padding:0 0 1rem;line-height:1;
+    }
+    .cup-kicker{font-size:.67rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:#c8a8ff;}
+    .cup-heading-main{display:block;max-width:100%;font-size:clamp(1.65rem,3.4vw,3rem);font-weight:900;letter-spacing:-.025em;color:#fff;line-height:1.08;white-space:nowrap;}
+    .cup-heading-main em{display:block;margin-top:.04em;font-style:italic;color:#c8a8ff;line-height:1.08;}
+    .cup-heading-sub{font-family:Manrope,Arial,sans-serif;font-size:.73rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:.2rem;}
+    .cup-scroll{
+      display:flex;
+      gap:.75rem;
+      padding:0 0 .8rem;
+      overflow-x:auto;scroll-snap-type:x mandatory;
+      scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    }
+    .cup-scroll::-webkit-scrollbar{display:none;}
+    .cup-card{
+      flex:0 0 85vw;max-width:260px;
+      border-radius:16px;overflow:hidden;
+      background:#111;border:1px solid rgba(255,255,255,.12);
+      text-decoration:none;display:block;
+      scroll-snap-align:start;
+      transition:transform .4s ease,box-shadow .4s ease,border-color .4s ease;
+    }
+    .cup-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.3);}
+    .cup-poster{
+      width:100%;aspect-ratio:3/4;
+      background-size:cover;background-position:center;
+    }
+    .cup-info{padding:.6rem .7rem .75rem;background:#111;border-top:1px solid rgba(255,255,255,.07);}
+    .cup-title{font-size:.75rem;font-weight:800;color:#fff;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .cup-date{font-size:.63rem;color:rgba(255,255,255,.4);margin-top:.2rem;font-weight:600;}
+    .cup-price{font-size:.68rem;font-weight:800;color:#22c55e;margin-top:.35rem;}
+    .cup-price.paid{color:#fff;}
+    @media(min-width:700px){
+      .cup-card{flex:0 0 180px;max-width:200px;}
+    }
+    @media(min-width:768px){
+      .cup-scroll{gap:1.2rem;padding:1.4rem 0;}
+      .cup-card{
+        flex:0 0 calc(25% - 1rem);
+        max-width:none;
+        border-radius:16px;
+        border-color:rgba(255,255,255,.12);
+        box-shadow:none;
+      }
+      .cup-card:hover{
+        transform:translateY(-4px);
+        border-color:rgba(255,255,255,.35);
+        box-shadow:0 20px 48px rgba(0,0,0,.65);
+      }
+      .cup-info{padding:.6rem .7rem .75rem;}
+    }
+    @media(min-width:900px){
+      .cup-section .trn-inner{padding:0 clamp(1.5rem,5vw,5rem);}
+    }
+    @media(max-width:699px){
+      .cup-section .cup-scroll{gap:.75rem;padding:1rem 1rem 1.2rem;}
+      .cup-head{padding:0 1rem .85rem!important;}
+      .cup-heading-main{font-size:clamp(1.35rem,6.8vw,2.15rem);}
+      .cup-heading-sub{font-size:.62rem;letter-spacing:.08em;}
+      .cup-card{flex:0 0 40vw;max-width:none;border-radius:18px;
+        border:1px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.5);
+        transition:transform .4s ease,box-shadow .4s ease,border-color .4s ease;}
+    }
+
+    /* ── EDGE TO EDGE on mobile: specific sections only, not hero/category/footer ── */
+    @media(max-width:768px){
+      .hpe-section,.tv-section,.ss-section,.ft-section,.cup-section,#events{
+        padding-left:0!important;padding-right:0!important;
+        margin-left:0!important;margin-right:0!important;
+        max-width:100vw!important;width:100vw!important;
+        position:relative;left:50%;right:50%;
+        margin-left:-50vw!important;margin-right:-50vw!important;
+      }
+      .hpe-banner-text,.ss-banner-text,.ft-banner-content,
+      .tv-head,.tv-scroll-wrap,.ss-scroll-wrap,.ft-scroll-wrap,
+      .hpe-scroll-wrap,.hpe-view-all-wrap,.ss-view-all-wrap,.ft-view-all-wrap,
+      .cup-scroll,.ev-grid,.trn-head,.cup-head,.trn-inner{
+        padding-left:0!important;padding-right:0!important;
+        margin-left:0!important;margin-right:0!important;
+        max-width:100%!important;width:100%!important;
+      }
+    }
+    @media(max-width:699px){
+      #events .trn-head{padding-left:1rem!important;padding-right:1rem!important;}
+      #events .ev-grid{padding:.75rem 1rem 1.5rem!important;}
+      .cup-section .cup-scroll{padding:1rem 1rem 1.2rem!important;}
+    }
+
+    /* ── TRENDING RIGHT NOW ── */
+    .trn-section{background:#000;padding:1.8rem 0 2rem;border-top:1px solid rgba(255,255,255,.07);
+      position:relative;
+      overflow:hidden;
+    }
+    .witp-section::before{
+      content:"PLAN";
+      position:absolute;right:-1rem;top:50%;transform:translateY(-50%);
+      font-family:'Barlow Condensed','Impact',sans-serif;
+      font-size:clamp(6rem,22vw,14rem);font-weight:900;
+      color:rgba(255,255,255,.03);letter-spacing:-.06em;
+      pointer-events:none;user-select:none;line-height:1;
+    }
+    .witp-head{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(1.8rem,6vw,2.8rem);font-weight:900;
+      letter-spacing:.12em;text-transform:uppercase;
+      color:#fff;padding:0 0 1.6rem;line-height:1;
+    }
+    .witp-grid{
+      display:flex;gap:.6rem;
+      padding:0 0 1.2rem;
+      overflow-x:auto;scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+      align-items:stretch;
+    }
+    .witp-grid::-webkit-scrollbar{display:none;}
+    .witp-item{
+      flex:1 1 0;
+      min-width:0;
+      display:flex;flex-direction:column;
+      align-items:center;
+      cursor:pointer;
+    }
+    .witp-blob-wrap{
+      position:relative;
+      width:100%;padding-bottom:100%;
+      transition:transform .3s cubic-bezier(.34,1.56,.64,1),filter .3s;
+      filter:drop-shadow(0 4px 14px rgba(0,0,0,.5));
+    }
+    /* tall blobs for THIS WEEK'S and NEXT WEEKEND */
+    .witp-item.tall .witp-blob-wrap{padding-bottom:118%;}
+    .witp-item:hover .witp-blob-wrap{
+      transform:scale(1.06) translateY(-3px);
+    }
+    .witp-item.active .witp-blob-wrap{
+      transform:scale(1.08) translateY(-4px);
+    }
+    /* per-blob active glow — set via inline style on active item */
+    .witp-item[data-glow].active .witp-blob-wrap{
+      filter:drop-shadow(0 0 14px var(--glow)) drop-shadow(0 0 28px var(--glow));
+    }
+    .witp-blob-wrap svg{
+      width:100%;height:100%;
+      position:absolute;inset:0;
+    }
+    .witp-blob-wrap::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 55%);
+      pointer-events:none;
+    }
+    .witp-text{
+      position:absolute;inset:0;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      gap:.1rem;padding:.4rem;
+      z-index:2;
+    }
+    .witp-main{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(1.1rem,3.8vw,1.6rem);font-weight:900;
+      color:#fff;text-align:center;
+      line-height:1;letter-spacing:.04em;
+      text-transform:uppercase;
+      text-shadow:0 0 12px rgba(255,255,255,.7),0 2px 6px rgba(0,0,0,.8);
+    }
+    .witp-sub{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(.6rem,2vw,.78rem);font-weight:800;
+      color:rgba(255,255,255,.85);
+      letter-spacing:.2em;text-transform:uppercase;
+      text-shadow:0 0 8px rgba(255,255,255,.5),0 1px 4px rgba(0,0,0,.7);
+      margin-top:.1rem;
+    }
+    @media(min-width:700px){
+      .witp-grid{gap:.9rem;padding:0 0 1.4rem;}
+    }
+    @media(min-width:1000px){
+      .witp-grid{justify-content:flex-start;max-width:none;margin:0;}
+      .witp-head{max-width:none;margin:0;}
+    }
+
+    .trn-inner{max-width:none;margin:0;padding:0;}
+    #events.trn-section{border:none;padding-top:2.2rem;padding-left:0;padding-right:0;}
+    .ev-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:.75rem;
+      padding:.5rem 0 1.4rem;
+      width:100%;
+    }
+    @media(max-width:699px){
+      .ev-grid{padding:.75rem 1rem 1.5rem;gap:.85rem;align-items:stretch;}
+      #events .ev-grid{gap:.9rem;padding:.75rem 1rem 1rem;}
+      #events .ev-card{border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+    }
+    .ev-card{
+      text-decoration:none;display:block;
+      background:#101010;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:17px;
+      overflow:hidden;
+      transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
+    }
+    .ev-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.28);box-shadow:0 14px 32px rgba(0,0,0,.35);}
+    .ev-poster{
+      width:100%;aspect-ratio:3/4;
+      background-size:cover;background-position:center;
+      position:relative;
+      border-radius:0;
+      overflow:hidden;
+    }
+    .ev-price-pill{
+      position:absolute;bottom:.65rem;left:.65rem;z-index:2;
+      padding:.28rem .85rem;border-radius:999px;
+      font-size:.72rem;font-weight:900;
+    }
+    .ev-price-paid{background:#ec4899;color:#fff;}
+    .ev-price-free{background:#22c55e;color:#fff;}
+    .ev-body{
+      min-height:76px;
+      padding:.7rem .75rem .8rem;
+      background:linear-gradient(180deg,#111,#0d0d0d);
+      border-top:1px solid rgba(255,255,255,.07);
+    }
+    .ev-date{display:none;}
+    .ev-info{min-width:0;}
+    .ev-title{
+      font-size:.82rem;font-weight:800;color:#fff;line-height:1.3;
+      text-transform:uppercase;letter-spacing:.01em;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .ev-venue{
+      font-size:.68rem;color:rgba(255,255,255,.48);
+      margin-top:.25rem;font-weight:600;
+      display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    #events .ev-card{
+      border-radius:22px;
+      border-color:rgba(200,255,200,.2);
+      box-shadow:0 14px 34px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.025);
+    }
+    #events .ev-card:hover{
+      transform:translateY(-6px);
+      border-color:rgba(200,255,200,.55);
+      box-shadow:0 22px 44px rgba(0,0,0,.65),0 0 26px rgba(120,220,80,.12);
+    }
+    #events .ev-body{display:flex;align-items:center;gap:.55rem;padding:.9rem 1rem 1rem;}
+    #events .ev-date{
+      display:flex;flex:none;flex-direction:column;align-items:center;justify-content:center;
+      min-width:38px;padding:.3rem .45rem;border:1px solid rgba(255,255,255,.1);
+      border-radius:7px;background:#1a1a1a;text-align:center;
+    }
+    #events .ev-date-day{font-size:.82rem;font-weight:900;color:#fff;line-height:1;}
+    #events .ev-date-mon{font-size:.58rem;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;line-height:1.2;}
+    #events .ev-title{font-size:.9rem;line-height:1.35;}
+    #events .ev-venue{font-size:.72rem;}
+    @media(max-width:699px){
+      #events .ev-card{border-radius:18px;border-color:rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.5);}
+      #events .ev-body{gap:.4rem;padding:.6rem .7rem .75rem;}
+      #events .ev-date{min-width:32px;padding:.2rem .35rem;border-radius:6px;}
+      #events .ev-date-day{font-size:.72rem;}
+      #events .ev-date-mon{font-size:.52rem;}
+      #events .ev-title{font-size:.75rem;line-height:1.3;}
+      #events .ev-venue{font-size:.63rem;}
+    }
+    /* Keep the homepage event cards aligned to one desktop size system. */
+    @media(min-width:900px){
+      .hpe-card,.ss-card,.cup-card,#events .ev-card{
+        flex:0 0 clamp(220px,20vw,280px);
+        max-width:280px;
+        box-sizing:border-box;
+      }
+      .hpe-poster,.ss-poster,.ss-poster-placeholder,.cup-poster,#events .ev-poster{
+        aspect-ratio:3/4;
+      }
+      .hpe-info,.ss-card-body,.cup-info,#events .ev-body{
+        box-sizing:border-box;
+        min-height:112px;
+      }
+      #events .ev-grid{display:flex;flex-wrap:wrap;align-items:stretch;}
+    }
+    .trn-head{
+      font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+      font-size:clamp(1.3rem,5vw,1.8rem);font-weight:900;
+      letter-spacing:.12em;text-transform:uppercase;
+      color:#fff;padding:0 0 .9rem;
+    }
+    .trn-grid{
+      display:flex;gap:.75rem;
+      padding:.4rem 0 .8rem;
+      overflow-x:auto;scroll-snap-type:x mandatory;
+      scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    }
+    .trn-grid::-webkit-scrollbar{display:none;}
+    .trn-card{
+      flex:0 0 44vw;max-width:190px;
+      border-radius:16px;overflow:hidden;
+      background:#111;border:1px solid rgba(255,255,255,.1);
+      scroll-snap-align:start;
+      text-decoration:none;display:block;
+      transition:transform .2s;
+      position:relative;
+    }
+    .trn-card:hover{transform:translateY(-4px);}
+    .trn-poster{
+      width:100%;aspect-ratio:2/3;
+      background-size:cover;background-position:center;
+      position:relative;
+    }
+    /* big number badge top-left */
+    .trn-num{
+      position:absolute;top:.5rem;left:.6rem;z-index:3;
+      font-size:3.5rem;font-weight:900;line-height:1;
+      color:rgba(255,255,255,.18);
+      font-family:'Barlow Condensed','Impact',sans-serif;
+      letter-spacing:-.04em;
+      pointer-events:none;
+      text-shadow:0 2px 8px rgba(0,0,0,.5);
+    }
+    .trn-date-badge{
+      position:absolute;bottom:.6rem;left:.6rem;z-index:2;
+      background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+      border-radius:10px;padding:.3rem .5rem;
+      display:flex;align-items:center;gap:.5rem;
+    }
+    .trn-badge-day{font-size:1.1rem;font-weight:900;color:#fff;line-height:1;}
+    .trn-badge-mon{font-size:.52rem;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:.06em;}
+    .trn-price-pill{
+      position:absolute;bottom:.6rem;right:.6rem;z-index:2;
+      padding:.25rem .65rem;border-radius:999px;
+      font-size:.62rem;font-weight:800;
+    }
+    .trn-price-free{background:#22c55e;color:#fff;}
+    .trn-price-paid{background:#ec4899;color:#fff;}
+    .trn-info{padding:.7rem .85rem .9rem;background:#111;}
+    .trn-title{font-size:.88rem;font-weight:800;color:#fff;line-height:1.3;}
+    .trn-venue{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:.25rem;font-weight:600;}
+  </style>
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Organization","name":"CultureWave","url":"https://culturewave.in/","description":"Discover events, live music, dining and experiences with CultureWave."}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"CultureWave","url":"https://culturewave.in/","inLanguage":"en-IN"}
+  </script>
+  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="nav-wrap">
+    <a class="mobile-brand" href="index.html">CULTUREWAVE</a>
+    <div class="brand-block">
+      <div class="logo">CultureWave</div>
+      <div class="brand-sub">by OGSHOOTS LUXE</div>
+    </div>
+    <nav class="topnav">
+      <a href="events.html">Events</a>
+      <a href="restaurants.html">Restaurants</a>
+      <div class="desktop-organizer-menu">
+        <a class="desktop-organizer-trigger" href="features.html">For Organizers</a>
+        <div class="desktop-organizer-dropdown">
+          <a class="desktop-organizer-card" href="vendor-onboarding.html"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><b>List your event&nbsp; →</b></a>
         </div>
       </div>
-    </header>
+      <a href="how-it-works.html">How it works</a>
+    </nav>
+    <div class="mobile-header-actions">
+      <button class="mobile-city" id="mobileCityTrigger" type="button">Hyderabad⌄</button>
+      <button class="mobile-header-icon" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
+      <button class="mobile-header-icon" id="searchToggle" type="button" aria-label="Search events">⌕</button>
+    </div>
+    <form class="desktop-header-search" id="desktopHeaderSearch" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.3"/><path d="m16.2 16.2 5 5"/></svg>
+      <input id="desktopHeaderSearchInput" type="search" placeholder="Search for events, movies and restaurants" aria-label="Search for events, movies and restaurants" autocomplete="off"/>
+    </form>
+    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
 
-    <main>
-      <section class="hero hero-home">
-        <div class="main-wrap hero-inner">
-          <div class="hero-copy-block">
-            <span class="eyebrow">Premium event booking</span>
-            <h1>
-              <span class="hero-line">Events made simple.</span><br />
-              <span class="hero-line">Built for fast checkouts.</span>
-            </h1>
-            <p class="hero-copy">
-              One premium platform for event pages, bookings, and payments across India.
-            </p>
-            <div class="hero-actions">
-              <a class="btn btn-primary" href="login.html">Create an Event</a>
-              <a class="btn btn-secondary" href="events.html">Browse Events</a>
-            </div>
-            <div class="hero-note">Launch in minutes. Accept payments your way.</div>
-          </div>
-        </div>
-      </section>
+<nav class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-head"><button class="mobile-nav-close" id="mobileNavClose" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
+  <div class="mobile-profile-card" role="button" tabindex="0" aria-label="Edit your profile">
+    <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span>
+    <span class="mobile-profile-divider"></span>
+    <span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><a class="mobile-profile-arrow" href="edit-profile.html" aria-label="Edit profile">→</a></span>
+  </div>
+  <div class="mobile-organizer-prompt"><span>For organisers</span><strong>Want to organise an event?</strong><p>Bring your event to CultureWave and connect with more people.</p><a href="vendor-onboarding.html">List your event&nbsp; →</a></div>
+  <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Discover</h2><div class="mobile-nav-card">
+    <a href="events.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"/></svg></span><span>Explore events</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="restaurants.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3v7a4 4 0 0 0 8 0V3M7 3v18M19 3v18M19 3c-3 2-4 5-4 9h4"/></svg></span><span>Restaurants</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="category-experiences.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z"/><path d="m19 14 .9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14ZM5 3l.8 1.7L7.5 5.5l-1.7.8L5 8l-.8-1.7-1.7-.8 1.7-.8L5 3Z"/></svg></span><span>Experiences</span><span class="mobile-nav-arrow">›</span></a>
+  </div></section>
+  <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Gift Cards</h2><div class="mobile-nav-card">
+    <a href="claim-gift-card.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8H7.5a2.5 2.5 0 1 1 2.4-3.2L12 8Zm0 0h4.5a2.5 2.5 0 1 0-2.4-3.2L12 8Z"/></svg></span><span>Claim Gift Card</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="buy-gift-card.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg></span><span>Buy Gift Card</span><span class="mobile-nav-arrow">›</span></a>
+  </div></section>
+  <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">One Club</h2><div class="mobile-nav-card">
+    <a href="one-club.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v16H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3"/><path d="M3 8h17M16 13h4M16.5 13.5h.01"/></svg></span><span>Balance &amp; activity</span><span class="mobile-nav-arrow">›</span></a>
+  </div></section>
+  <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Manage</h2><div class="mobile-nav-card">
+    <a href="your-bookings.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18l-7 4-3-2-5 3"/></svg></span><span>Your bookings</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="upcoming-events.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M12 13v3l2 1"/></svg></span><span>Upcoming events</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="account-profile.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Account profile</span><span class="mobile-nav-arrow">›</span></a>
+  </div></section>
+  <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">For organisers</h2><div class="mobile-nav-card">
+    <a href="features.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg></span><span>Organizer tools</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="pricing.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 4h12M6 9h12M8 4c5 0 7 2 7 5s-2 5-7 5l8 6"/></svg></span><span>Pricing</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="how-it-works.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/><path d="M5 4h6M4 8v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/></svg></span><span>How it works</span><span class="mobile-nav-arrow">›</span></a>
+  </div></section>
+  </div></section>
+  <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Support</h2><div class="mobile-nav-card">
+    <a href="customer-service.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span><span>Frequently asked questions</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="mailto:support.culturewave@gmail.com"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5h16v12H8l-4 3V5Z"/><path d="M8 9h8M8 13h5"/></svg></span><span>Chat with us</span><span class="mobile-nav-arrow">›</span></a>
+    <a href="customer-service.html"><span class="mobile-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m4 16-.8 4.8L8 20l11-11-4-4L4 16Z"/><path d="m13.5 6.5 4 4M4 21h16"/></svg></span><span>Share feedback</span><span class="mobile-nav-arrow">›</span></a>
+  </div></section>
+  <div class="mobile-nav-group"><h2 class="mobile-nav-group-title">Account</h2><div class="mobile-nav-ctas index-mobile-ctas">
+    <a class="nav-link" href="login.html">Login</a>
+    <a class="nav-cta" href="login.html">Get Started</a>
+  </div></div>
+</nav>
 
-      <section class="events-section featured-events" id="events">
-        <div class="section-head">
-          <span class="eyebrow">Featured events</span>
-          <h2>Real listings people can book right away.</h2>
-        </div>
-        <div class="event-grid event-grid-home">
-          <article class="event-card" data-name="Sunset Music Festival" data-category="music" data-venue="Mumbai">
-            <div class="event-banner banner-a"></div>
-            <div class="event-body">
-              <h3>Sunset Music Festival</h3>
-              <p>Live sets, skyline views, and premium seating options.</p>
-              <div class="event-meta">
-                <span>Mumbai</span>
-                <span>From ₹1,499</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="events.html">View event</a>
-            </div>
-          </article>
-          <article class="event-card" data-name="BuildOps Summit" data-category="business" data-venue="Bengaluru">
-            <div class="event-banner banner-b"></div>
-            <div class="event-body">
-              <h3>BuildOps Summit</h3>
-              <p>Product, operations, and founder sessions with practical takeaways.</p>
-              <div class="event-meta">
-                <span>Bengaluru</span>
-                <span>From ₹2,499</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="events.html">View event</a>
-            </div>
-          </article>
-          <article class="event-card" data-name="Night Food Carnival" data-category="food" data-venue="Delhi">
-            <div class="event-banner banner-c"></div>
-            <div class="event-body">
-              <h3>Night Food Carnival</h3>
-              <p>Curated vendors, tasting passes, and late-night crowd energy.</p>
-              <div class="event-meta">
-                <span>Delhi</span>
-                <span>From ₹899</span>
-              </div>
-              <a class="btn btn-secondary event-btn" href="events.html">View event</a>
-            </div>
-          </article>
-        </div>
-      </section>
+<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" aria-current="page"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 20v-6h6v6"/></svg><strong>Home</strong></a>
+  <a href="events.html"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7 3v4M17 3v4M3.5 10h17"/></svg><strong>Events</strong></a>
+  <a href="category-sports.html"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 7.8 3.5 2.5 3.5-2.5M8.5 16.2l3.5-2.5 3.5 2.5M12 10.3v3.4"/></svg><strong>Sports</strong></a>
+  <a href="restaurants.html"><svg class="nav-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M6 10v11M18 3v18M15 3v6c0 1.7 1.3 3 3 3"/></svg><strong>Restaurants</strong></a>
+</nav>
 
-      <section class="split-info" id="how">
-        <div class="section-head">
-          <span class="eyebrow">How it works</span>
-          <h2>Discover, book, and pay in three simple steps.</h2>
-        </div>
-        <div class="steps">
-          <div class="step"><strong>1</strong><span>Discover an event that fits your audience or plan.</span></div>
-          <div class="step"><strong>2</strong><span>Book seats, tickets, or tables with a clean checkout flow.</span></div>
-          <div class="step"><strong>3</strong><span>Pay securely and get instant confirmation.</span></div>
-        </div>
-      </section>
+<div class="city-picker" id="cityPicker" role="dialog" aria-modal="true" aria-labelledby="cityPickerTitle">
+  <div class="city-picker-panel">
+    <div class="city-picker-head"><h2 id="cityPickerTitle">Select Your City</h2><button class="city-picker-close" id="cityPickerClose" type="button" aria-label="Close">&times;</button></div>
+    <input class="city-picker-search" id="cityPickerSearch" type="search" placeholder="Search for your city" autocomplete="off"/>
+    <div class="city-picker-grid" id="cityPickerGrid"></div>
+  </div>
+</div>
 
-      <section class="split-info premium-benefits" id="why-cityvibe">
-        <div class="section-head">
-          <span class="eyebrow">Why cityvibe</span>
-          <h2>A premium product feel without the clutter.</h2>
-        </div>
-        <div class="benefit-grid">
-          <article class="benefit-card">
-            <h3>Built for conversion</h3>
-            <p>Every page keeps the next action obvious, fast, and easy to trust.</p>
-          </article>
-          <article class="benefit-card">
-            <h3>Clean event presentation</h3>
-            <p>Listings feel polished enough for premium events, not generic marketplaces.</p>
-          </article>
-          <article class="benefit-card">
-            <h3>Payment-first flow</h3>
-            <p>QR, UPI, card, wallet, and banking options are surfaced right where users need them.</p>
-          </article>
-          <article class="benefit-card">
-            <h3>Organizer ready</h3>
-            <p>Designed to support both the guest journey and the host workflow in one place.</p>
-          </article>
-        </div>
-      </section>
+<div class="search-popup" id="searchPopup" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+  <div class="search-panel">
+    <div class="search-panel-head"><h2 id="searchTitle">Search experiences</h2><button class="search-close" id="searchClose" type="button" aria-label="Close search">&times;</button></div>
+    <form id="searchForm"><input class="search-input" id="searchInput" type="search" placeholder="Search events, venues, categories..." autocomplete="off"/><button class="search-submit" type="submit">Search events</button></form>
+  </div>
+</div>
 
-      <section class="split-info organizer-tools" id="tools">
-        <div class="section-head">
-          <span class="eyebrow">Organizer tools</span>
-          <h2>Everything hosts need to launch and manage events.</h2>
-        </div>
-        <div class="tool-grid">
-          <article class="tool-card">
-            <h3>Demo listing</h3>
-            <p>Organizers get a demo event listing to preview the booking flow and layout.</p>
-          </article>
-          <article class="tool-card">
-            <h3>Payouts</h3>
-            <p>Keep payment handling simple with clear booking and settlement status.</p>
-          </article>
-          <article class="tool-card">
-            <h3>Analytics</h3>
-            <p>See what is selling, when guests convert, and how each listing performs.</p>
-          </article>
-          <article class="tool-card">
-            <h3>Reminders</h3>
-            <p>Stay on top of follow-ups, confirmations, and last-mile event updates.</p>
-          </article>
-        </div>
-      </section>
+<main>
 
-      <section class="testimonials" id="testimonials">
-        <div class="section-head">
-          <span class="eyebrow">Testimonials</span>
-          <h2>Trusted by teams that want fewer booking headaches.</h2>
-        </div>
-        <div class="testimonial-grid">
-          <article class="testimonial-card">
-            <div class="stars">★★★★★</div>
-            <p>
-              “We moved our event pages, bookings, and payments into one place and the workflow got
-              a lot cleaner.”
-            </p>
-            <h3>Priya Nair</h3>
-            <span>Community Host</span>
-          </article>
-          <article class="testimonial-card">
-            <div class="stars">★★★★★</div>
-            <p>
-              “Guests can choose a listing, pay through QR or UPI, and confirm instantly. That cut
-              down the friction we had before.”
-            </p>
-            <h3>Arjun Mehta</h3>
-            <span>Workshop Organizer</span>
-          </article>
-        </div>
-      </section>
+  <h1 class="seo-sr-only">Discover events, live music and dining in Hyderabad</h1>
 
-      <section class="split-info faq-section" id="faq">
-        <div class="section-head">
-          <span class="eyebrow">FAQ</span>
-          <h2>Quick answers, no extra scrolling.</h2>
-        </div>
-        <div class="faq-grid">
-          <details class="faq-card" open>
-            <summary>What can I book on cityvibe?</summary>
-            <p>Events, workshops, restaurant experiences, tables, and other curated listings.</p>
-          </details>
-          <details class="faq-card">
-            <summary>Which payment methods are supported?</summary>
-            <p>UPI, cards, wallet apps, net banking, EMI, and QR-based checkout options.</p>
-          </details>
-          <details class="faq-card">
-            <summary>Do organizers get tools too?</summary>
-            <p>Yes. Hosts can manage listings, payouts, analytics, and reminders from one flow.</p>
-          </details>
-          <details class="faq-card">
-            <summary>Can I create and promote my own event?</summary>
-            <p>Yes. Use the create event flow to preview a demo listing and start accepting bookings.</p>
-          </details>
-        </div>
-      </section>
+  <!-- HERO SLIDER -->
+  <div class="hero-slider-wrap">
+    <section class="hero-slider" id="heroSlider" data-site-section="home-hero">
+      <div class="hs-track" id="hsTrack"></div>
+      <div class="hs-dots" id="hsDots"></div>
+      <div class="hs-counter" id="hsCounter"></div>
+    </section>
+  </div>
 
-      <section class="final-cta">
-        <div class="main-wrap final-cta-inner">
-          <div>
-            <span class="eyebrow">Ready to launch</span>
-            <h2>Create something people actually want to book.</h2>
-          </div>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="login.html">Create an Event</a>
-            <a class="btn btn-secondary" href="events.html">Browse Events</a>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="footer-wrap">
-        <div class="footer-branding">
-          <div class="footer-brand">cityvibe</div>
-          <p>Events, workshops, and restaurant bookings in one smooth flow.</p>
-          <span class="footer-tag">Developed by Srisanth Boddu</span>
-        </div>
-        <div class="footer-links">
-          <a href="events.html">Events Listed</a>
-          <a href="features.html">Features</a>
-          <a href="pricing.html">Pricing</a>
-          <a href="how-it-works.html">How it works</a>
-          <a href="privacy-policy.html">Privacy Policy</a>
-          <a href="terms-and-conditions.html">Terms & Conditions</a>
-          <a href="refund-policy.html">Refund Policy</a>
-        </div>
-        <div class="footer-contact">
-          <h3>Contact</h3>
-          <a href="tel:+916305183601">6305183601</a>
-          <span>Contact details will be updated from the admin panel.</span>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2026 cityvibe. All rights reserved.</span>
-        <span>Built for events, workshops, and restaurant reservations.</span>
-      </div>
-    </footer>
-
-    <div class="modal" id="paymentModal" aria-hidden="true">
-      <div class="modal-card">
-        <button class="close-btn" id="closeModal" aria-label="Close">×</button>
-        <span class="eyebrow">Cashfree checkout</span>
-        <h2 id="paymentHeading">Ready for payment</h2>
-        <p id="confirmationText"></p>
-        <div class="payment-shell">
-          <div class="qr-preview" id="qrPreview"></div>
-          <div class="app-links">
-            <a href="#" id="gpayLink">Open Google Pay</a>
-            <a href="#" id="phonePeLink">Open PhonePe</a>
-            <a href="#" id="paytmLink">Open Paytm</a>
-          </div>
-        </div>
-        <div class="confirmation-box">
-          <div><span>Booking code</span><strong id="bookingCode">PP-0000</strong></div>
-          <div><span>Amount</span><strong id="paidAmount">₹0</strong></div>
-          <div><span>Status</span><strong id="liveStatus">Pending</strong></div>
-        </div>
-        <button class="btn btn-primary wide" id="doneBtn">Done</button>
+  <!-- BROWSE BY CATEGORY -->
+  <section class="idx-cat-section" data-site-section="home-categories">
+    <div class="idx-cat-inner">
+      <div class="idx-section-label">Browse by category</div>
+      <div class="idx-section-title">What are you looking for?</div>
+      <div class="idx-cat-grid">
+        <a href="category-parties.html" class="idx-cat-card icc-parties">
+          <div class="idx-cat-bg"></div>
+          <span class="idx-cat-label">Nightlife</span>
+        </a>
+        <a href="category-brunch.html" class="idx-cat-card icc-brunch">
+          <div class="idx-cat-bg"></div>
+          <span class="idx-cat-label">Brunch & Bites</span>
+        </a>
+        <a href="category-culinary.html" class="idx-cat-card icc-culinary">
+          <div class="idx-cat-bg"></div>
+          <span class="idx-cat-label">Fine Dining</span>
+        </a>
+        <a href="category-workshops.html" class="idx-cat-card icc-workshops">
+          <div class="idx-cat-bg"></div>
+          <span class="idx-cat-label">Workshops</span>
+        </a>
+        <a href="category-experiences.html" class="idx-cat-card icc-experiences">
+          <div class="idx-cat-bg"></div>
+          <span class="idx-cat-label">Experiences</span>
+        </a>
+        <a href="category-music.html" class="idx-cat-card icc-music">
+          <div class="idx-cat-bg"></div>
+          <span class="idx-cat-label">Live Music</span>
+        </a>
       </div>
     </div>
+  </section>
 
-    <script src="script.js"></script>
-  </body>
+
+
+  <!-- HANDPICKED EXPERIENCES -->
+  <section class="hpe-section" data-site-section="home-popular">
+    <div class="hpe-banner">
+      <div class="hpe-banner-text">
+        <div class="hpe-eyebrow">Handpicked Experiences</div>
+        <div class="hpe-heading">Curated<br><em>for you</em></div>
+        <div class="hpe-sub">✦ Only the best. Every time.</div>
+      </div>
+    </div>
+    <div class="hpe-scroll-wrap">
+      <button class="hpe-arrow hpe-arrow-prev" id="hpePrev" aria-label="Previous">&#8249;</button>
+      <div class="hpe-scroll" id="hpeScroll"></div>
+      <button class="hpe-arrow hpe-arrow-next" id="hpeNext" aria-label="Next">&#8250;</button>
+    </div>
+    <div class="hpe-dots-mobile" id="hpeDotsM"></div>
+    <div class="hpe-view-all-wrap">
+      <a href="categories.html" class="hpe-view-all">View All &#8594;</a>
+    </div>
+  </section>
+
+  <!-- CREATORS & PREMIUM MEMBERS -->
+
+
+  <!-- TOP VENUES -->
+  <section class="tv-section" id="tvSection" data-site-section="home-trending">
+    <div class="tv-head">
+      <div class="tv-label">Top Venues</div>
+    </div>
+    <div class="tv-scroll-wrap">
+      <div class="tv-scroll" id="tvScroll"></div>
+    </div>
+  </section>
+
+  <!-- SCENE STEALERS -->
+  <section class="ss-section" data-site-section="home-weekend" hidden>
+    <div class="ss-banner">
+      <div class="ss-banner-text">
+        <div class="ss-eyebrow">Scene Stealers</div>
+        <div class="ss-title">Spotlight<br><em>on you</em></div>
+        <div class="ss-sub">✦ Only the best. Every time.</div>
+      </div>
+    </div>
+    <div class="ss-scroll-wrap">
+      <div class="ss-scroll" id="ssScroll"></div>
+    </div>
+    <div class="ss-dots-mobile" id="ssDotsM"></div>
+    <div class="ss-view-all-wrap">
+      <a href="events.html" class="ss-view-all">View all &#8594;</a>
+    </div>
+  </section>
+
+  <!-- FINEST TABLES SECTION - hidden until listings -->
+  <section class="ft-section" id="ftSection" data-site-section="home-featured" style="display:none;">
+    <div class="ft-banner">
+      <div class="ft-banner-bg"></div>
+      <div class="ft-banner-overlay"></div>
+      <div class="ft-banner-content">
+        <div class="ft-eyebrow">Fine Dining &amp; Experiences</div>
+        <div class="ft-heading">The Finest<br>Tables</div>
+        <div class="ft-tagline">Where every meal becomes a memory.</div>
+        <a href="restaurants.html" class="ft-banner-btn">Reserve a Table &#8594;</a>
+      </div>
+    </div>
+    <div class="ft-scroll-wrap">
+      <div class="ft-scroll" id="ftScroll"></div>
+    </div>
+    <div class="ft-view-all-wrap">
+      <a href="restaurants.html" class="ft-view-all">View all &#8594;</a>
+    </div>
+  </section>
+
+
+
+  <!-- COMING UP IN THE NEXT 21 DAYS -->
+  <section class="cup-section" data-site-section="home-partners">
+    <div class="trn-inner">
+    <div class="cup-head"><span class="cup-kicker">COMING UP IN THE NEXT 21 DAYS</span><span class="cup-heading-main">Good things are coming</span><span class="cup-heading-sub">✦ Handpicked experiences, arriving soon.</span></div>
+    <div class="cup-scroll" id="cupScroll"></div>
+    </div>
+  </section>
+
+  <!-- FEATURED EVENTS -->
+  <section class="trn-section" id="events" data-site-section="home-events">
+    <div class="trn-inner">
+    <div class="trn-head"><span style="font-size:.72rem;font-weight:800;letter-spacing:.14em;color:rgba(255,255,255,.45);display:block;margin-bottom:.4rem;">BOOK THE EVENTS YOU LOVE ✦</span>Book It. Love It. Live It.</div>
+    <div class="ev-grid" id="indexEventsGrid">
+      <div id="indexEventsEmpty" style="text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);display:none;min-width:200px;">
+        <div style="font-size:2.5rem;margin-bottom:.6rem;">🎉</div>
+        <div style="font-weight:700;">No events yet</div>
+        <div style="font-size:.85rem;margin-top:.3rem;">Published events will appear here.</div>
+      </div>
+    </div>
+    <div style="padding:.6rem 0 1.8rem;display:flex;justify-content:center;background:#000;">
+      <a href="events.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.5rem;border:1px solid rgba(255,255,255,.2);border-radius:999px;color:#fff;font-size:.82rem;font-weight:800;text-decoration:none;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.borderColor='rgba(255,255,255,.5)';" onmouseout="this.style.background='';this.style.borderColor='rgba(255,255,255,.2)';">Browse all events &#8594;</a>
+    </div>
+    </div>
+  </section>
+
+</main>
+
+
+<footer class="site-footer" data-site-section="site-footer">
+  <div class="footer-glow-top"></div>
+  <div class="footer-wrap">
+    <div class="footer-branding">
+      <div class="footer-brand">CultureWave</div>
+      <p>Premium events, workshops &amp; restaurant bookings — all in one seamless flow.</p>
+      <div class="footer-socials">
+        <a class="footer-social-button" href="https://www.instagram.com/culturewave.app?stkn=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="footer-social-button" href="mailto:support.culturewave@gmail.com" aria-label="Email">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+        </a>
+        <a class="footer-social-button" href="tel:+916305183601" aria-label="Phone">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Explore</div>
+      <div class="footer-links">
+        <a href="events.html">Events</a>
+        <a href="restaurants.html">Restaurants</a>
+        <a href="features.html">For Organizers</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="how-it-works.html">How it works</a>
+        <a href="about-culturewave.html">About CultureWave</a>
+        <a href="booking.html">Book Now</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
+        <a href="refund-policy.html">Refund Policy</a>
+        <a href="customer-service.html">Customer Service</a>
+      </div>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-col-title" style="border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.6rem;margin-bottom:.2rem;">Contact</div>
+      <div class="footer-contact-row">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <span style="white-space:nowrap;font-size:.78rem;"><a href="tel:+916305183601" style="color:inherit;text-decoration:none;">6305183601</a> | <a href="tel:+919848047428" style="color:inherit;text-decoration:none;">9848047428</a></span>
+      </div>
+      <a class="footer-contact-row" href="mailto:support.culturewave@gmail.com">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg></span>
+        <span>support.culturewave@gmail.com</span>
+      </a>
+      <a class="footer-contact-row" href="https://www.instagram.com/culturewave.app?stkn=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span>
+        <span>@culturewave.app</span>
+      </a>
+      <div class="footer-contact-row">
+        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+        <span>Vijayawada, India</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-bottom">
+    <span>© 2025 OG SHOOTS. All rights reserved. Made with <span class="footer-heart">♥</span> in India.</span>
+    <span class="footer-credit">Developed by <strong>Srisanth Boddu</strong></span>
+    <span class="footer-owned">Owned by OGSHOOTS LUXE</span>
+  </div>
+</footer>
+
+
+<div class="modal" id="paymentModal" aria-hidden="true">
+  <div class="modal-card">
+    <button class="close-btn" id="closeModal" aria-label="Close">×</button>
+    <span class="eyebrow">Cashfree checkout</span>
+    <h2 id="paymentHeading">Ready for payment</h2>
+    <p id="confirmationText"></p>
+    <div class="payment-shell">
+      <div class="qr-preview" id="qrPreview"></div>
+      <div class="app-links">
+        <a href="#" id="gpayLink">Open Google Pay</a>
+        <a href="#" id="phonePeLink">Open PhonePe</a>
+        <a href="#" id="paytmLink">Open Paytm</a>
+      </div>
+    </div>
+    <div class="confirmation-box">
+      <div><span>Booking code</span><strong id="bookingCode">PP-0000</strong></div>
+      <div><span>Amount</span><strong id="paidAmount">₹0</strong></div>
+      <div><span>Status</span><strong id="liveStatus">Pending</strong></div>
+    </div>
+    <button class="btn btn-primary wide" id="doneBtn">Done</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="script.js"></script>
+<script src="push-config.js"></script>
+<script>
+  if (!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+      authDomain: "ogshootsluxe-36740.firebaseapp.com",
+      projectId: "ogshootsluxe-36740",
+      storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+      messagingSenderId: "5471814825",
+      appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+    });
+  }
+  const _idb = firebase.firestore();
+  const _banners = ['banner-a','banner-b','banner-c'];
+  const _rsBanners = ['linear-gradient(135deg,#dc2626,#f97316)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#0891b2,#67e8f9)','linear-gradient(135deg,#065f46,#34d399)','linear-gradient(135deg,#92400e,#fbbf24)'];
+
+  function isPublishedEvent(data) {
+    const status = String(data?.status || '').toLowerCase();
+    const publicListing = data?.publicListing;
+    if (publicListing === false || !['published','live','active'].includes(status)) return false;
+    // filter out completed/past events
+    try {
+      const end = data.endDate || data.startDate;
+      if (end) {
+        const dt = end.toDate ? end.toDate() : new Date(String(end).slice(0,10)+'T23:59:59');
+        if (dt < new Date()) return false;
+      }
+    } catch(e) {}
+    return true;
+  }
+
+  function isPublicEventListing(data) {
+    const status=String(data?.status||'').toLowerCase();
+    return data?.publicListing!==false && ['published','live','active'].includes(status);
+  }
+
+  function eventPublicPath(name,id=''){
+    const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';
+    return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;
+  }
+
+  let homepageEventsPromise;
+  function getHomepageEvents(){
+    if(!homepageEventsPromise){
+      const eventsRef=_idb.collection('events');
+      // Fetch only public listings so mobile does not download drafts and
+      // unrelated event records before it can render the homepage cards.
+      const limit=window.matchMedia('(max-width: 699px)').matches?50:200;
+      homepageEventsPromise = eventsRef.where('status','in',['published','live','active']).limit(limit).get()
+        .then(snap => snap.docs)
+        .catch(error => { homepageEventsPromise=null; throw error; });
+    }
+    return homepageEventsPromise;
+  }
+
+  async function loadIndexEvents() {
+    const grid = document.getElementById('indexEventsGrid');
+    const empty = document.getElementById('indexEventsEmpty');
+    if(!grid) return;
+    if(empty){
+      empty.style.display='block';
+      empty.replaceChildren(document.createTextNode('Loading events…'));
+    }
+    try {
+      const allDocs=await getHomepageEvents();
+      const upcoming=allDocs.filter(doc=>isPublishedEvent(doc.data()));
+      // Keep the homepage event cards useful if all published dates are past
+      // or have stale date metadata; the Events page still lists these items.
+      const docs=(upcoming.length?upcoming:allDocs.filter(doc=>isPublicEventListing(doc.data()))).slice(0,12);
+      if(!docs.length){
+        if(empty){
+          empty.style.display='block';
+          empty.replaceChildren(document.createTextNode('No published events yet. Check back soon.'));
+        }
+        return;
+      }
+      empty.style.display = 'none';
+      grid.querySelectorAll('.ev-card').forEach(card=>card.remove());
+      docs.forEach((doc, i) => renderEventCard(doc, i, grid));
+    } catch(e) {
+      console.error('Events load error:', e.message);
+      if(empty){
+        empty.style.display='block';
+        empty.replaceChildren(document.createTextNode('Events could not load. Check your connection and try again. '));
+        const retry=document.createElement('button');retry.type='button';retry.textContent='Try again';
+        retry.style.cssText='display:block;margin:14px auto 0;padding:10px 18px;border:1px solid #555;border-radius:999px;background:#161616;color:#fff;font:inherit;font-weight:800;cursor:pointer';
+        retry.addEventListener('click',loadIndexEvents);empty.append(retry);
+      }
+    }
+  }
+
+  function renderEventCard(doc, i, grid){
+    const d = doc.data(), id = doc.id;
+    const img = d.cardImgUrl || d.coverUrl || '';
+    const price = d.tickets?.[0]?.price || d.price || 0;
+    const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)','linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
+    let day='', mon='';
+    if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
+    const a = document.createElement('a');
+    a.className = 'ev-card';
+    a.href = eventPublicPath(d.urlKey||d.name,id);
+    a.innerHTML = `
+      <div class="ev-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
+        <span class="ev-price-pill ${price?'ev-price-paid':'ev-price-free'}">${price?`Starts at \u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+      </div>
+      <div class="ev-body">
+        ${day?`<div class="ev-date"><div class="ev-date-day">${day}</div><div class="ev-date-mon">${mon}</div></div>`:''}
+        <div class="ev-info">
+          <div class="ev-title">${d.name||'Untitled'}</div>
+          <div class="ev-venue">${[d.venueName||d.venue, d.city].filter(Boolean).join(' · ')||'India'}</div>
+        </div>
+      </div>`;
+    grid.appendChild(a);
+  }
+
+  async function loadIndexRestaurants() {
+    try {
+      const snap = await _idb.collection('restaurants').where('status','==','published').limit(6).get();
+      const grid = document.getElementById('indexRestaurantsGrid');
+      const empty = document.getElementById('indexRestaurantsEmpty');
+      if (!snap.empty) {
+        empty.style.display = 'none';
+        snap.docs.forEach((doc, i) => {
+          const d = doc.data();
+          const price = d.priceForTwo || d.price || 0;
+          const priceStr = price ? `\u20b9${Number(price).toLocaleString('en-IN')} for two` : 'See menu';
+          const article = document.createElement('article');
+          article.className = 'event-card';
+          article.innerHTML = `
+            <div class="event-banner" style="${d.coverUrl?`background:url('${d.coverUrl}') center/cover no-repeat`:`background:${_rsBanners[i%_rsBanners.length]}`};"></div>
+            <div class="event-body">
+              <h3>${d.name||'Restaurant'}</h3>
+              <p>${d.description||d.summary||''}</p>
+              <div class="event-meta"><span>${d.area||d.city||'TBA'}</span><span>${priceStr}</span></div>
+              <a class="btn btn-secondary event-btn" href="restaurants.html">View restaurant</a>
+            </div>`;
+          grid.appendChild(article);
+        });
+      }
+    } catch(e) { console.warn('Restaurants:', e.message); }
+  }
+
+  function initScrollDots(scrollEl, dotsEl, cardSelector){
+    if(!scrollEl||!dotsEl) return;
+    const cards = scrollEl.querySelectorAll(cardSelector);
+    if(cards.length < 2) return;
+    // build dots
+    cards.forEach((_,i)=>{
+      const b=document.createElement('button');
+      b.className='sec-dot'+(i===0?' active':'');
+      b.addEventListener('click',()=>{
+        scrollEl.scrollTo({left:cards[i].offsetLeft - scrollEl.offsetLeft, behavior:'smooth'});
+      });
+      dotsEl.appendChild(b);
+    });
+    // sync on scroll
+    scrollEl.addEventListener('scroll',()=>{
+      const dots=dotsEl.querySelectorAll('.sec-dot');
+      let closest=0, minDist=Infinity;
+      cards.forEach((c,i)=>{
+        const dist=Math.abs(c.getBoundingClientRect().left - scrollEl.getBoundingClientRect().left);
+        if(dist<minDist){minDist=dist;closest=i;}
+      });
+      dots.forEach((d,i)=>d.classList.toggle('active',i===closest));
+    },{passive:true});
+  }
+
+  function initAutoScroll(id, cardSelector) {
+    cardSelector = cardSelector || '.event-card';
+    const grid = document.getElementById(id);
+    if (!grid) return;
+    let timer;
+    let resumeTimer;
+    let currentIndex = 0;
+    const stop = () => clearInterval(timer);
+    const scheduleResume = () => {
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(start, 2500);
+    };
+    const start = () => {
+      stop();
+      timer = setInterval(() => {
+        const cards = Array.from(grid.querySelectorAll(cardSelector));
+        if (cards.length < 2 || grid.scrollWidth <= grid.clientWidth + 4) return;
+        currentIndex = (currentIndex + 1) % cards.length;
+        grid.scrollTo({ left: currentIndex ? cards[currentIndex].offsetLeft : 0, behavior: 'smooth' });
+      }, 4200);
+    };
+    grid.addEventListener('mouseenter', stop);
+    grid.addEventListener('mouseleave', start);
+    grid.addEventListener('touchstart', stop, { passive: true });
+    grid.addEventListener('touchend', scheduleResume, { passive: true });
+    start();
+  }
+
+  // Trending Now ticker
+  (async function loadTrending(){
+    try{
+      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0,12);
+      const ticker = document.getElementById('trendingTicker');
+      if(!ticker||!docs.length){ if(ticker) ticker.closest('.trending-section').style.display='none'; return; }
+      const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)','linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
+      function makeCard(doc,i){
+        const d=doc.data(),id=doc.id;
+        const img=d.cardImgUrl||d.coverUrl||'';
+        const price=d.tickets?.[0]?.price||d.price||0;
+        let day='',mon='';
+        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
+        const a=document.createElement('a');
+        a.className='tr-card';
+        a.href=eventPublicPath(d.urlKey||d.name,id);
+        a.innerHTML=`
+          <div class="tr-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}">
+            ${day?`<div class="tr-date-badge"><div class="tr-date-day">${day}</div><div class="tr-date-mon">${mon}</div></div>`:''}
+            <span class="tr-price-badge ${price?'tr-price-paid':'tr-price-free'}">${price?`₹${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+          </div>
+          <div class="tr-info">
+            <div class="tr-title">${d.name||'Untitled'}</div>
+            <div class="tr-venue">${d.venue||d.venueName||d.city||'India'}</div>
+          </div>`;
+        return a;
+      }
+      // render twice for seamless infinite loop
+      docs.forEach((doc,i)=>ticker.appendChild(makeCard(doc,i)));
+      docs.forEach((doc,i)=>ticker.appendChild(makeCard(doc,i)));
+    }catch(e){console.warn('Trending:',e.message);}
+  })();
+
+  loadIndexEvents();
+
+  // COMING UP IN A FEW DAYS
+  (async function loadComingUp(){
+    try{
+      const now = new Date();
+      const docs = (await getHomepageEvents()).filter(doc=>{
+        const d=doc.data();
+        if(!isPublishedEvent(d)) return false;
+        if(!d.startDate) return false;
+        try{
+          const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');
+          const diff=(dt-now)/(1000*60*60*24);
+          return diff>=0 && diff<=21;
+        }catch(e){return false;}
+      }).slice(0,10);
+      const scroll=document.getElementById('cupScroll');
+      if(!scroll) return;
+      if(!docs.length){ scroll.innerHTML='<div style="padding:1.5rem 1.2rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;">No upcoming events. Check back soon!</div>'; return; }
+      const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)','linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
+      docs.forEach((doc,i)=>{
+        const d=doc.data(),id=doc.id;
+        const img=d.cardImgUrl||d.coverUrl||'';
+        const price=d.tickets?.[0]?.price||d.price||0;
+        let dateStr='';
+        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');dateStr=dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})+' onwards';}catch(e){}}
+        const a=document.createElement('a');
+        a.className='cup-card';
+        a.href=eventPublicPath(d.urlKey||d.name,id);
+        a.innerHTML=`
+          <div class="cup-poster" style="${img?`background-image:url('${img}')`:grads[i%grads.length]}"></div>
+          <div class="cup-info">
+            <div class="cup-title">${d.name||'Untitled'}</div>
+            <div class="cup-date">${dateStr}</div>
+            <div class="cup-price ${price?'paid':''}">Starts at ${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</div>
+          </div>`;
+        scroll.appendChild(a);
+      });
+    }catch(e){console.warn('CUP:',e.message);}
+  })();
+
+  // OG Picks — mobile: deck stack | desktop: 4-up sliding carousel
+  (async function loadOGPicks(){
+    try{
+      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0,12);
+      const activeWrap = document.getElementById('ogpActiveWrap');
+      const peekLeft   = document.getElementById('ogpPeekLeft');
+      const behind1    = document.getElementById('ogpBehind1');
+      const behind2    = document.getElementById('ogpBehind2');
+      const stage      = document.getElementById('ogpDeckStage');
+      const counter    = document.getElementById('ogpCounter');
+      if(!activeWrap) return;
+
+      if(!docs.length){
+        activeWrap.innerHTML='<div style="padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem;font-weight:700;text-align:center;">No events yet. Check back soon!</div>';
+        return;
+      }
+
+      const grads=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#2d1b69,#11998e)','linear-gradient(135deg,#c94b4b,#4b134f)'];
+      const total = docs.length;
+      let cur = 0;
+
+      function cardHTML(doc, i){
+        const d=doc.data(), id=doc.id;
+        const img=d.cardImgUrl||d.coverUrl||'';
+        const price=d.tickets?.[0]?.price||d.price||0;
+        let day='',mon='';
+        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
+        return `<a class="ogp-card" href="${eventPublicPath(d.urlKey||d.name,id)}">
+          <div class="ogp-poster" style="${img?`background-image:url('${img}')`:grads[i%3]}">
+            ${day?`<div class="ogp-date-badge"><div class="ogp-date-badge-day">${day}</div><div class="ogp-date-badge-mon">${mon}</div></div>`:''}
+            <span class="ogp-price-badge ${price?'ogp-price-paid':'ogp-price-free'}">${price?`\u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+          </div>
+          <div class="ogp-info">
+            <div class="ogp-title-card">${d.name||'Untitled'}</div>
+            <div class="ogp-venue">${d.venue||d.venueName||d.city||'India'}</div>
+          </div></a>`;
+      }
+
+      const isDesktop = () => window.innerWidth >= 700;
+
+      /* ── DESKTOP: 4-up sliding ── */
+      function desktopGoTo(idx){
+        cur = (idx + total) % total;
+        const cards = Array.from(activeWrap.querySelectorAll('.ogp-card'));
+        const perPage = 4;
+        const cardW = cards[0] ? cards[0].offsetWidth + 16 : 0; // card + gap
+        activeWrap.style.transform = `translateX(-${cur * cardW}px)`;
+        // counter
+        if(counter){
+          const pages = Math.ceil(total / perPage);
+          const page = Math.floor(cur / perPage);
+          const dots = Array.from({length:Math.min(pages,5)},(_,i)=>
+            `<span class="ogp-dot${i===page?' active':''}"></span>`).join('');
+          counter.innerHTML = `<span class="ogp-counter-pill">${page+1}/${pages}</span>${dots}`;
+        }
+      }
+
+      /* ── MOBILE: deck stack ── */
+      function goTo(idx){
+        cur = (idx + total) % total;
+        const prev = (cur - 1 + total) % total;
+        const next1 = (cur + 1) % total;
+        const next2 = (cur + 2) % total;
+        activeWrap.innerHTML = cardHTML(docs[cur], cur);
+        peekLeft.innerHTML = cardHTML(docs[prev], prev);
+        behind1.innerHTML = cardHTML(docs[next1], next1);
+        behind2.innerHTML = cardHTML(docs[next2], next2);
+        requestAnimationFrame(()=>{
+          const h = activeWrap.offsetHeight;
+          if(h) stage.style.height = h + 'px';
+        });
+        if(counter){
+          const dots = Array.from({length:Math.min(total,5)},(_,i)=>
+            `<span class="ogp-dot${i===cur%5?' active':''}"></span>`).join('');
+          counter.innerHTML = `<span class="ogp-counter-pill">${cur+1}/${total}</span>${dots}`;
+        }
+      }
+
+      function init(){
+        if(isDesktop()){
+          // render all cards into activeWrap as a flex row
+          stage.style.height = '';
+          activeWrap.style.transform = 'translateX(0)';
+          activeWrap.innerHTML = docs.map((doc,i)=>cardHTML(doc,i)).join('');
+          cur = 0;
+          desktopGoTo(0);
+        } else {
+          activeWrap.style.transform = '';
+          goTo(cur);
+        }
+      }
+
+      init();
+      window.addEventListener('resize', ()=>{ init(); });
+
+      // swipe (mobile)
+      let tx0=0;
+      stage.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;},{passive:true});
+      stage.addEventListener('touchend',e=>{
+        const dx=e.changedTouches[0].clientX-tx0;
+        if(Math.abs(dx)>40){
+          clearInterval(ogpTimer);
+          if(isDesktop()) desktopGoTo(dx<0?cur+4:cur-4);
+          else goTo(dx<0?cur+1:cur-1);
+          ogpTimer=setInterval(tick,4000);
+        }
+      },{passive:true});
+
+      function tick(){
+        if(isDesktop()) desktopGoTo(cur+4);
+        else goTo(cur+1);
+      }
+
+      let ogpTimer=setInterval(tick,4000);
+      stage.addEventListener('mouseenter',()=>clearInterval(ogpTimer));
+      stage.addEventListener('mouseleave',()=>{ ogpTimer=setInterval(tick,4000); });
+    }catch(e){console.warn('OGP:',e.message);}
+  })();
+
+  // Finest Tables — load dining/restaurant events
+  (async function loadFinestTables(){
+    try{
+      const docs = (await getHomepageEvents()).filter(doc => {
+        const d = doc.data();
+        const s = String(d.status||'').toLowerCase();
+        if(!['published','live','active'].includes(s)) return false;
+        const hay = [d.category||'',d.name||'',d.tags||'',d.description||''].join(' ').toLowerCase();
+        return ['dining','culinary','food','gourmet','restaurant','brunch','buffet','chef','table'].some(k=>hay.includes(k));
+      }).slice(0,10);
+      const scroll = document.getElementById('ftScroll');
+      if(!scroll) return;
+      if(!docs.length){
+        scroll.innerHTML=`
+          <div style="padding:1.5rem 1.2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:100%;text-align:center;gap:.6rem;">
+            <div style="font-size:2.5rem;">🍽️</div>
+            <div style="font-size:.95rem;font-weight:900;color:#fff;letter-spacing:-.02em;">No dining events</div>
+            <div style="font-size:.78rem;font-weight:600;color:rgba(255,255,255,.4);line-height:1.5;">We're working on bringing the finest<br>tables to you. Check back soon!</div>
+            <a href="restaurants.html" style="margin-top:.4rem;padding:.5rem 1.2rem;border-radius:999px;border:1px solid rgba(201,168,76,.4);color:#c9a84c;font-size:.75rem;font-weight:800;text-decoration:none;">Browse Restaurants →</a>
+          </div>`;
+        return;
+      }
+      docs.forEach(doc=>{
+        const d=doc.data(), id=doc.id;
+        const img=d.cardImgUrl||d.coverUrl||'';
+        const price=d.tickets?.[0]?.price||d.price||0;
+        let day='',mon='';
+        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
+        const a=document.createElement('a');
+        a.className='ft-card';
+        a.href=eventPublicPath(d.urlKey||d.name,id);
+        a.innerHTML=`
+          <div class="ft-poster" style="${img?`background-image:url('${img}')`:"background:linear-gradient(135deg,#1a3a1a,#2e7d32)"}">
+            <span class="ft-price-badge ${price?'ft-price-paid':'ft-price-free'}">${price?`Starts at \u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+          </div>
+          <div class="ft-info">
+            ${day?`<div class="ft-date"><div class="ft-date-box"><div class="ft-date-day">${day}</div><div class="ft-date-mon">${mon}</div></div></div>`:''}
+            <div class="ft-title">${d.name||'Untitled'}</div>
+            <div class="ft-venue">${d.venue||d.venueName||d.city||'India'}</div>
+          </div>`;
+        scroll.appendChild(a);
+      });
+    }catch(e){console.warn('FT:',e.message);}
+  })();
+
+  // Handpicked Experiences
+  (async function loadHPE(){
+    try{
+      const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0,10);
+      const scroll = document.getElementById('hpeScroll');
+      if(!scroll) return;
+      if(!docs.length){ scroll.closest('.hpe-scroll-wrap').style.display='none'; return; }
+      function makeCard(doc){
+        const d = doc.data(), id = doc.id;
+        const img = d.cardImgUrl || d.coverUrl || '';
+        const price = d.tickets?.[0]?.price || d.price || 0;
+        let day='', mon='';
+        if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');day=dt.getDate();mon=dt.toLocaleString('en-IN',{month:'short'}).toUpperCase();}catch(e){}}
+        const a = document.createElement('a');
+        a.className = 'hpe-card';
+        a.href = eventPublicPath(d.urlKey||d.name,id);
+        a.innerHTML = `
+          <div class="hpe-poster" style="${img?`background-image:url('${img}')`:'background:linear-gradient(135deg,#1a1a1a,#333)'}">
+            <span class="hpe-price-badge ${price?'hpe-price-paid':'hpe-price-free'}">${price?`Starts at \u20b9${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+          </div>
+          <div class="hpe-info">
+            ${day?`<div class="hpe-date"><div class="hpe-date-box"><div class="hpe-date-day">${day}</div><div class="hpe-date-mon">${mon}</div></div></div>`:''}
+            <div class="hpe-title">${d.name||'Untitled'}</div>
+            <div class="hpe-venue">${[d.venue||d.venueName,d.city].filter(Boolean).join(' · ')||'India'}</div>
+          </div>`;
+        return a;
+      }
+      // render cards
+      docs.forEach(doc => scroll.appendChild(makeCard(doc)));
+      const cards = Array.from(scroll.querySelectorAll('.hpe-card'));
+      const total = cards.length;
+      let hpeIdx = 0;
+      let hpeTimer;
+      const prevBtn = document.getElementById('hpePrev');
+      const nextBtn = document.getElementById('hpeNext');
+      const dotsM = document.getElementById('hpeDotsM');
+      const isMobile = () => window.innerWidth < 700;
+
+      /* ── DESKTOP: scroll 4 cards ── */
+      function getVisibleCount(){
+        if(!cards[0]) return 4;
+        const wrapW = scroll.parentElement.offsetWidth;
+        return Math.round(wrapW / (cards[0].offsetWidth + 19)) || 4;
+      }
+
+      function desktopScrollTo(idx){
+        const vis = getVisibleCount();
+        const max = Math.max(0, total - vis);
+        hpeIdx = Math.max(0, Math.min(idx, max));
+        const cardW = cards[0].offsetWidth + 19;
+        scroll.style.transform = `translateX(-${hpeIdx * cardW}px)`;
+        if(prevBtn) prevBtn.style.opacity = hpeIdx === 0 ? '.35' : '1';
+        if(nextBtn) nextBtn.style.opacity = hpeIdx >= max ? '.35' : '1';
+      }
+
+      function init(){
+        if(isMobile()){
+          scroll.style.paddingLeft = '';
+          scroll.style.paddingRight = '';
+          scroll.style.transform = 'none';
+          if(dotsM){ dotsM.innerHTML = ''; dotsM.style.display = 'none'; }
+        } else {
+          scroll.style.paddingLeft = '';
+          scroll.style.paddingRight = '';
+          if(dotsM) dotsM.style.display = 'none';
+          desktopScrollTo(0);
+        }
+      }
+
+      function tick(){
+        if(isMobile()) return;
+        desktopScrollTo(hpeIdx + 1 > Math.max(0, total - getVisibleCount()) ? 0 : hpeIdx + 1);
+      }
+
+      function resetTimer(){ clearInterval(hpeTimer); if(!isMobile()) hpeTimer = setInterval(tick, 3500); }
+
+      init();
+      resetTimer();
+      window.addEventListener('resize', () => { init(); resetTimer(); });
+
+      if(prevBtn) prevBtn.addEventListener('click', () => {
+        if(isMobile()) return;
+        desktopScrollTo(hpeIdx - 1);
+        resetTimer();
+      });
+      if(nextBtn) nextBtn.addEventListener('click', () => {
+        if(isMobile()) return;
+        desktopScrollTo(hpeIdx + 1);
+        resetTimer();
+      });
+
+      const pauseTimer = () => clearInterval(hpeTimer);
+      const resumeTimer = () => resetTimer();
+      scroll.addEventListener('mouseenter', pauseTimer);
+      scroll.addEventListener('mouseleave', resumeTimer);
+      scroll.addEventListener('touchstart', pauseTimer, {passive:true});
+      scroll.addEventListener('touchend', resumeTimer, {passive:true});
+    }catch(e){ console.warn('HPE:', e.message); }
+  })();
+
+  // TOP VENUES
+  (async function loadTopVenues(){
+    try{
+      const scroll = document.getElementById('tvScroll');
+      if(!scroll) return;
+      const allDocs=await getHomepageEvents();
+      const upcoming=allDocs.filter(doc=>isPublishedEvent(doc.data()));
+      const docs=upcoming.length?upcoming:allDocs.filter(doc=>isPublicEventListing(doc.data()));
+      if(!docs.length){ document.getElementById('tvSection').style.display='none'; return; }
+      // aggregate venues
+      const VENUE_OVERRIDES = {
+        'bratt brewing kitchen': { name: 'Bratt Brewing & Kitchen', img: 'bratt.jpeg' },
+      };
+      const VENUE_EXCLUDE = ['taluka tiffins'];
+      const map = {};
+      docs.forEach(doc => {
+        const d = doc.data();
+        const name = d.venueName || d.venue || '';
+        if(!name) return;
+        const rawKey = name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+        const key = ['bratt cafe', 'bratt brewing kitchen', 'bratt brewing and kitchen'].includes(rawKey)
+          ? 'bratt brewing kitchen'
+          : rawKey;
+        if(VENUE_EXCLUDE.includes(key)) return;
+        // Aggregate spelling/case/punctuation variants into one venue card.
+        if(!map[key]) map[key] = {name: VENUE_OVERRIDES[key]?.name || name, city: d.city||'', img: VENUE_OVERRIDES[key]?.img || d.cardImgUrl||d.coverUrl||'', count:0};
+        map[key].count++;
+        if(!map[key].img && (d.cardImgUrl||d.coverUrl)) map[key].img = d.cardImgUrl||d.coverUrl;
+        if(VENUE_OVERRIDES[key]) map[key].img = VENUE_OVERRIDES[key].img;
+      });
+      // apply overrides to already-built map entries
+      Object.keys(VENUE_OVERRIDES).forEach(k => { if(map[k]) map[k].img = VENUE_OVERRIDES[k].img; });
+      const venues = Object.values(map).sort((a,b)=>b.count-a.count).slice(0,12);
+      if(!venues.length){ document.getElementById('tvSection').style.display='none'; return; }
+      venues.forEach(v => {
+        const a = document.createElement('a');
+        a.className = 'tv-card';
+        a.href = `events.html?venue=${encodeURIComponent(v.name)}`;
+        a.innerHTML = `
+          <div class="tv-circle" style="${v.img?`background-image:url('${v.img}');background-size:cover;background-position:center`:'background:#1a1a1a'}">
+            ${!v.img?`<span style="font-size:1.6rem;font-weight:900;color:rgba(255,255,255,.3);text-transform:uppercase">${v.name.charAt(0)}</span>`:''}
+          </div>
+          <div class="tv-name">${v.name}</div>
+          ${v.city?`<div class="tv-city">${v.city}</div>`:''}`;
+        scroll.appendChild(a);
+      });
+    }catch(e){
+      console.warn('TopVenues:', e.message);
+      const section=document.getElementById('tvSection');
+      const scroll=document.getElementById('tvScroll');
+      if(section&&scroll){
+        section.style.display='';
+        let message=document.getElementById('tvLoadError');
+        if(!message){
+          message=document.createElement('div');message.id='tvLoadError';
+          message.style.cssText='padding:.75rem 0;color:rgba(255,255,255,.65);font-size:.9rem';
+          scroll.parentElement.appendChild(message);
+        }
+        message.textContent='Venues could not load. ';
+        const retry=document.createElement('button');retry.type='button';retry.textContent='Try again';
+        retry.style.cssText='margin-left:.5rem;padding:.4rem .8rem;border:1px solid #555;border-radius:999px;background:#161616;color:#fff;font:inherit;font-weight:700;cursor:pointer';
+        retry.addEventListener('click',()=>{message.remove();loadTopVenues();});message.appendChild(retry);
+      }
+    }
+  })();
+
+  // SCENE STEALERS
+  (async function loadSceneStealer(){
+    try{
+      const scroll = document.getElementById('ssScroll');
+      const section = document.querySelector('.ss-section');
+      if(!scroll || !section) return;
+      const now = new Date();
+      const docs = (await getHomepageEvents())
+        .filter(doc => {
+          const d = doc.data();
+          if(!isPublishedEvent(d)) return false;
+          try{
+            const dt = d.startDate?.toDate ? d.startDate.toDate() : d.startDate ? new Date(String(d.startDate).slice(0,10)+'T00:00:00') : null;
+            return dt && dt >= now;
+          }catch(e){ return false; }
+        })
+        .sort((a,b) => {
+          const pa = a.data().startDate?.seconds||0;
+          const pb = b.data().startDate?.seconds||0;
+          return pa - pb;
+        })
+        .slice(0, 12);
+      const hasValidCoupon = d => {
+        const couponSource = [d.coupons,d.discountCoupons,d.offers,d.couponCodes,d.promos]
+          .find(source => Array.isArray(source) && source.length) || [];
+        return couponSource.some(c => c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0);
+      };
+      const couponDocs = docs.filter(doc => hasValidCoupon(doc.data()));
+      if(!couponDocs.length){ section.hidden = true; return; }
+      section.hidden = false;
+      section.style.display = '';
+      couponDocs.forEach(doc => {
+        const d = doc.data();
+        const price = d.tickets?.[0]?.price || d.price || 0;
+        const priceStr = price ? '\u20b9' + Number(price).toLocaleString('en-IN') : 'Free';
+        let dayStr = '', monStr = '';
+        try{
+          const dt = d.startDate?.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
+          dayStr = dt.getDate();
+          monStr = dt.toLocaleDateString('en-IN',{month:'short'}).toUpperCase();
+        }catch(e){}
+        const venue = d.venueName || d.venue || d.city || '';
+        const img = d.cardImgUrl || d.coverUrl || '';
+        // Read the same coupon fields used by booking and show one valid offer.
+        const couponSource = [d.coupons,d.discountCoupons,d.offers,d.couponCodes,d.promos]
+          .find(source => Array.isArray(source) && source.length) || [];
+        const couponsHtml = couponSource
+          .filter(c => c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0)
+          .slice(0,1)
+          .map(c => {
+            const code = String(c.code||c.couponCode||c.promoCode).trim().toUpperCase();
+            const safeCode = code.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+            const value = Number(c.value??c.discount??c.amount??c.off);
+            const val = c.type==='percent'||c.type==='percentage' ? `${value}% OFF` : `\u20b9${value} OFF`;
+            return `<div class="ss-coupon-chip"><span class="ss-coupon-tag">✦ ${safeCode}</span><span class="ss-coupon-val">${val}</span></div>`;
+          }).join('');
+        const a = document.createElement('a');
+        a.className = 'ss-card';
+        a.href = eventPublicPath(d.urlKey||d.name,id);
+        a.innerHTML = `
+          <div style="position:relative;">
+            ${img
+              ? `<img class="ss-poster" src="${img}" alt="${d.name||''}" loading="lazy">`
+              : `<div class="ss-poster-placeholder">${d.eventEmoji||'🎉'}</div>`
+            }
+            <div class="ss-price">Starts at ${priceStr}</div>
+            ${couponsHtml ? `<div class="ss-coupons">${couponsHtml}</div>` : ''}
+          </div>
+          <div class="ss-card-body">
+            <div class="ss-name">${d.name||'Event'}</div>
+            <div class="ss-date-row">
+              ${dayStr ? `<div class="ss-date-box"><div class="ss-date-day">${dayStr}</div><div class="ss-date-mon">${monStr}</div></div>` : ''}
+              <div class="ss-venue">${venue}</div>
+            </div>
+          </div>`;
+        scroll.appendChild(a);
+      });
+      // 2-per-page carousel with dots
+      const ssCards = Array.from(scroll.querySelectorAll('.ss-card'));
+      const ssTotal = ssCards.length;
+      const ssPerPage = 2;
+      const ssPages = () => Math.ceil(ssTotal / ssPerPage);
+      let ssIdx = 0, ssTimer;
+      const dotsM = document.getElementById('ssDotsM');
+      function buildSsDots(){
+        if(!dotsM) return;
+        dotsM.innerHTML = '';
+        for(let i=0;i<ssPages();i++){
+          const d = document.createElement('button');
+          d.className = 'ss-dot-m' + (i===0?' active':'');
+          d.addEventListener('click', () => { ssMobileTo(i); resetSsTimer(); });
+          dotsM.appendChild(d);
+        }
+      }
+      function updateSsDots(p){
+        if(!dotsM) return;
+        Array.from(dotsM.querySelectorAll('.ss-dot-m')).forEach((d,i) => d.classList.toggle('active', i===p));
+      }
+      function ssMobileTo(page){
+        const p = (page + ssPages()) % ssPages();
+        ssIdx = p;
+        const wrapW = scroll.parentElement.offsetWidth;
+        scroll.style.transform = `translateX(-${p * wrapW}px)`;
+        updateSsDots(p);
+      }
+      function resetSsTimer(){ clearInterval(ssTimer); ssTimer = setInterval(() => ssMobileTo(ssIdx + 1), 3500); }
+      if(window.innerWidth < 768){
+        buildSsDots();
+        ssMobileTo(0);
+        resetSsTimer();
+        scroll.addEventListener('touchstart', () => clearInterval(ssTimer), {passive:true});
+        scroll.addEventListener('touchend', resetSsTimer, {passive:true});
+      }
+    }catch(e){ console.warn('SceneStealer:', e.message); }
+  })();
+</script>
+<script>
+  (function() {
+    const carousel = document.getElementById('heroCarousel');
+    if (!carousel) return;
+    const cards = Array.from(carousel.querySelectorAll('.hc-card'));
+    let current = 0, autoTimer, dragStartX = 0, isDragging = false;
+    function setActive(idx) {
+      current = (idx + cards.length) % cards.length;
+      cards.forEach((c, i) => c.classList.toggle('active', i === current));
+      const cardW = cards[0].offsetWidth + 22;
+      const wrapW = carousel.parentElement.offsetWidth;
+      const offset = (current * cardW) - (wrapW / 2) + (cardW / 2);
+      carousel.style.transform = 'translateX(' + (-offset) + 'px)';
+    }
+    function startAuto() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => setActive(current + 1), 3200);
+    }
+    cards.forEach((c, i) => c.addEventListener('click', () => { setActive(i); startAuto(); }));
+    carousel.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.pageX; carousel.style.transition = 'none'; });
+    window.addEventListener('mouseup', e => {
+      if (!isDragging) return;
+      isDragging = false;
+      carousel.style.transition = '';
+      const diff = e.pageX - dragStartX;
+      if (Math.abs(diff) > 50) setActive(diff < 0 ? current + 1 : current - 1);
+      else setActive(current);
+      startAuto();
+    });
+    carousel.addEventListener('touchstart', e => { dragStartX = e.touches[0].pageX; }, {passive:true});
+    carousel.addEventListener('touchend', e => {
+      const diff = e.changedTouches[0].pageX - dragStartX;
+      if (Math.abs(diff) > 40) setActive(diff < 0 ? current + 1 : current - 1);
+      startAuto();
+    }, {passive:true});
+    setActive(1);
+    startAuto();
+  })();
+</script>
+<script>
+  const cityPicker = document.getElementById('cityPicker');
+  const cityPickerGrid = document.getElementById('cityPickerGrid');
+  const cityPickerSearch = document.getElementById('cityPickerSearch');
+  const cities = ['Hyderabad','Vijayawada','Bengaluru','Chennai','Mumbai','Delhi','Pune','Kolkata','Ahmedabad','Surat','Kochi','Goa','Jaipur','Chandigarh','Visakhapatnam','Mysuru'];
+  const renderCityOptions = () => {
+    const query = cityPickerSearch.value.trim().toLowerCase();
+    const selected = localStorage.getItem('culturewaveCity') || 'Hyderabad';
+    const matches = cities.filter(city => city.toLowerCase().includes(query));
+    cityPickerGrid.innerHTML = matches.length ? matches.map(city => `<button class="city-picker-option${city === selected ? ' selected' : ''}" type="button" data-city="${city}">${city}</button>`).join('') : '<div style="grid-column:1/-1;text-align:center;color:#65728a;padding:1.5rem;">No cities found</div>';
+    cityPickerGrid.querySelectorAll('[data-city]').forEach(button => button.addEventListener('click', () => {
+      localStorage.setItem('culturewaveCity', button.dataset.city);
+      document.getElementById('mobileCityTrigger').textContent = button.dataset.city + '⌄';
+      cityPicker.classList.remove('open');
+      document.body.style.overflow = '';
+      window.location.reload();
+    }));
+  };
+  document.getElementById('mobileCityTrigger').addEventListener('click', () => { cityPicker.classList.add('open'); renderCityOptions(); cityPickerSearch.focus(); document.body.style.overflow = 'hidden'; });
+  document.getElementById('cityPickerClose').addEventListener('click', () => { cityPicker.classList.remove('open'); document.body.style.overflow = ''; });
+  cityPicker.addEventListener('click', event => { if(event.target === cityPicker){ cityPicker.classList.remove('open'); document.body.style.overflow = ''; } });
+  cityPickerSearch.addEventListener('input', renderCityOptions);
+  const savedCity = localStorage.getItem('culturewaveCity');
+  if(savedCity) document.getElementById('mobileCityTrigger').textContent = savedCity + '⌄';
+
+  const searchPopup = document.getElementById('searchPopup');
+  const searchInput = document.getElementById('searchInput');
+  document.getElementById('desktopHeaderSearch').addEventListener('submit', event => {
+    event.preventDefault();
+    const query = document.getElementById('desktopHeaderSearchInput').value.trim();
+    if(query) window.location.href = 'events.html?search=' + encodeURIComponent(query);
+  });
+  const closeSearch = () => {
+    searchPopup.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+  document.getElementById('searchToggle').addEventListener('click', () => {
+    searchPopup.classList.add('open');
+    searchInput.focus();
+    document.body.style.overflow = 'hidden';
+  });
+  document.getElementById('searchClose').addEventListener('click', closeSearch);
+  searchPopup.addEventListener('click', event => { if(event.target === searchPopup) closeSearch(); });
+  document.addEventListener('keydown', event => {
+    if(event.key === 'Escape' && searchPopup.classList.contains('open')) closeSearch();
+  });
+  document.getElementById('searchForm').addEventListener('submit', event => {
+    event.preventDefault();
+    const query = searchInput.value.trim();
+    if(query) window.location.href = 'events.html?search=' + encodeURIComponent(query);
+  });
+
+  (function(){
+    (function(){
+    var track = document.getElementById('hsTrack');
+    var dotsWrap = document.getElementById('hsDots');
+    var counterWrap = document.getElementById('hsCounter');
+    if(!track) return;
+    var cur = 0, timer;
+    var _bgGrads = [
+      'linear-gradient(160deg,#1242c5,#9bdcff)',
+      'linear-gradient(160deg,#ff4d2e,#ff9500)',
+      'linear-gradient(160deg,#7c3aed,#ec4899)',
+      'linear-gradient(160deg,#0891b2,#06b6d4)',
+      'linear-gradient(160deg,#16a34a,#4ade80)',
+      'linear-gradient(160deg,#dc2626,#f97316)',
+      'linear-gradient(160deg,#854d0e,#f5c518)'
+    ];
+
+    async function loadHeroSlider() {
+      try {
+        const docs = (await getHomepageEvents()).filter(doc => isPublishedEvent(doc.data())).slice(0, 7);
+        if (!docs.length) { document.getElementById('heroSlider').style.display='none'; return; }
+        docs.forEach(function(doc, i) {
+          const d = doc.data(), id = doc.id;
+          const price = d.tickets?.[0]?.price || d.price || 0;
+          const priceStr = price ? '\u20b9' + Number(price).toLocaleString('en-IN') : 'Free';
+          let dateStr = '';
+          if (d.startDate) {
+            try {
+              const dt = d.startDate.toDate ? d.startDate.toDate() : new Date(String(d.startDate).slice(0,10)+'T00:00:00');
+              dateStr = dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+              const firstDate = Array.isArray(d.eventDates) ? d.eventDates[0] : null;
+              const eventTime = d.startTime || d.time || firstDate?.startTime || firstDate?.time || firstDate?.slots?.[0]?.start || '';
+              if (eventTime) dateStr += ' \u00b7 ' + eventTime;
+            } catch(e){}
+          }
+          const slide = document.createElement('div');
+          slide.className = 'hs-slide';
+          slide.innerHTML = `<div class="hs-card" onclick="location.href='${eventPublicPath(d.urlKey||d.name,id)}'" style="cursor:pointer">
+            <div class="hs-poster">
+              <div class="hs-poster-inner"></div>
+            </div>
+            <div class="hs-info">
+              <div class="hs-date">${dateStr||'Date TBA'}</div>
+              <div class="hs-title">${d.name||'Untitled'}</div>
+              <div class="hs-venue">${d.venue||d.city||'India'} &middot; ${priceStr}</div>
+            </div>
+          </div>`;
+          const poster = slide.querySelector('.hs-poster');
+          if (d.cardImgUrl) poster.style.setProperty('--hs-card-image', `url("${d.cardImgUrl}")`);
+          if (d.coverUrl) poster.style.setProperty('--hs-cover-image', `url("${d.coverUrl}")`);
+          poster.style.setProperty('--hs-fallback-image', _bgGrads[i%_bgGrads.length]);
+          track.appendChild(slide);
+          // dot
+          var dot = document.createElement('button');
+          dot.className = 'hs-dot' + (i===0?' active':'');
+          dot.addEventListener('click', function(){ go(i); resetTimer(); });
+          dotsWrap.appendChild(dot);
+        });
+        // build mobile counter
+        if(counterWrap){
+          var total = docs.length;
+          var pill = document.createElement('span');
+          pill.className = 'hs-counter-pill';
+          pill.textContent = '1/' + total;
+          counterWrap.appendChild(pill);
+          for(var k=0;k<total;k++){
+            var cd = document.createElement('span');
+            cd.className = 'hs-counter-dot' + (k===0?' active':'');
+            counterWrap.appendChild(cd);
+          }
+        }
+        resetTimer();
+      } catch(e) { console.warn('Hero slider:', e.message); }
+    }
+
+    function go(i){
+      var slides = track.querySelectorAll('.hs-slide');
+      cur = (i + slides.length) % slides.length;
+      track.style.transform = 'translateX(-' + cur + '00%)';
+      Array.from(dotsWrap.querySelectorAll('.hs-dot')).forEach(function(d,j){ d.classList.toggle('active', j===cur); });
+      // update counter pill
+      if(counterWrap){
+        var pill = counterWrap.querySelector('.hs-counter-pill');
+        if(pill) pill.textContent = (cur+1) + '/' + slides.length;
+        Array.from(counterWrap.querySelectorAll('.hs-counter-dot')).forEach(function(d,j){ d.classList.toggle('active', j===cur); });
+      }
+    }
+    function resetTimer(){ clearInterval(timer); timer = setInterval(function(){ go(cur+1); }, 3500); }
+    var tx = 0;
+    track.addEventListener('touchstart', function(e){ tx=e.touches[0].clientX; clearInterval(timer); }, {passive:true});
+    track.addEventListener('touchend', function(e){ var dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>40) go(dx<0?cur+1:cur-1); resetTimer(); }, {passive:true});
+
+    loadHeroSlider();
+  })();
+
+  function initHowCarousel(){
+      var grid=document.querySelector('.idx-how-grid');
+      if(!grid||window.innerWidth>700)return;
+      var cards=Array.from(grid.querySelectorAll('.idx-how-card'));
+      if(cards.length<2)return;
+      var idx=0,timer,resumeTimer;
+      function scrollTo(i){idx=(i+cards.length)%cards.length;grid.scrollTo({left:cards[idx].offsetLeft-(grid.offsetWidth/2)+(cards[idx].offsetWidth/2),behavior:'smooth'});}
+      function start(){clearInterval(timer);timer=setInterval(function(){scrollTo(idx+1);},2800);}
+      function pause(){clearInterval(timer);}
+      function scheduleResume(){clearTimeout(resumeTimer);resumeTimer=setTimeout(start,2500);}
+      grid.addEventListener('touchstart',pause,{passive:true});
+      grid.addEventListener('touchend',scheduleResume,{passive:true});
+      start();
+    }
+    window.addEventListener('resize',initHowCarousel);
+    initHowCarousel();
+  })();
+
+  const themeToggle = document.getElementById('themeToggle');
+  const darkModeEnabled = localStorage.getItem('culturewaveDarkMode') === 'true';
+  document.body.classList.toggle('dark-mode', darkModeEnabled);
+  themeToggle.setAttribute('aria-pressed', String(darkModeEnabled));
+  themeToggle.addEventListener('click', () => {
+    const enabled = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('culturewaveDarkMode', String(enabled));
+    themeToggle.setAttribute('aria-pressed', String(enabled));
+  });
+
+  const ham = document.getElementById('hamburger');
+  const mNav = document.getElementById('mobileNav');
+  const closeMenu = () => {
+    ham.classList.remove('open');
+    mNav.classList.remove('open');
+    ham.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  };
+  document.getElementById('mobileNavClose').addEventListener('click', closeMenu);
+  ham.addEventListener('click', () => {
+    const isOpen = !mNav.classList.contains('open');
+    ham.classList.toggle('open', isOpen);
+    mNav.classList.toggle('open', isOpen);
+    ham.setAttribute('aria-expanded', String(isOpen));
+    document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
+  });
+  mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', event => {
+    if(a.dataset.action === 'logout'){
+      event.preventDefault();
+      firebase.auth().signOut().then(() => window.location.assign('index.html')).catch(error => console.warn('Could not sign out:', error));
+      return;
+    }
+    closeMenu();
+  }));
+  document.addEventListener('keydown', event => { if(event.key === 'Escape' && mNav.classList.contains('open')) closeMenu(); });
+  document.addEventListener('click', event => {
+    if(mNav.classList.contains('open') && !mNav.contains(event.target) && !ham.contains(event.target)) closeMenu();
+  });
+</script>
+<script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
+</body>
 </html>

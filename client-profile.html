@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const handle = (params.get('handle') || '').trim().toLowerCase();
+      if (!handle) return;
+      const basePath = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1);
+      history.replaceState(null, '', `${basePath}${encodeURIComponent(handle)}`);
+    })();
+  </script>
+  <title>CultureWave | Organiser Profile</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    :root{--blue:#1242c5;--blue-2:#2f6bff;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--border:#dce4f5;--muted:#64748b;--text:#0a0f1e;}
+    body{background:#f0f4ff;font-size:14px;min-height:100vh;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    a{text-decoration:none;color:inherit;}
+    button{font:inherit;cursor:pointer;}
+
+    /* BANNER */
+    .banner{height:260px;background:linear-gradient(135deg,#0a0f1e 0%,#1242c5 55%,#2f6bff 100%);position:relative;overflow:hidden;}
+    .banner-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,15,30,.1) 0%,rgba(10,15,30,.55) 100%);}
+
+    /* PROFILE CARD */
+    .profile-wrap{max-width:860px;margin:0 auto;padding:0 1.2rem 3rem;}
+    .profile-card{background:#fff;border:1px solid var(--border);border-radius:24px;padding:1.5rem;margin-top:-48px;position:relative;z-index:2;box-shadow:0 8px 40px rgba(18,66,197,.1);}
+    .profile-top{display:flex;align-items:flex-end;gap:1.2rem;margin-bottom:1rem;flex-wrap:wrap;}
+    .avatar{width:96px;height:96px;border-radius:22px;border:4px solid #fff;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:grid;place-items:center;font-size:2rem;font-weight:900;color:#fff;flex:none;box-shadow:0 8px 24px rgba(18,66,197,.25);overflow:hidden;margin-top:-64px;}
+    .avatar img{width:100%;height:100%;object-fit:cover;}
+    .profile-info{flex:1;min-width:0;}
+    .profile-name-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.2rem;}
+    .profile-name{font-size:1.5rem;font-weight:900;letter-spacing:-.04em;color:var(--text);}
+    .verified-badge{display:inline-flex;align-items:center;gap:.25rem;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;font-size:.62rem;font-weight:900;padding:.2rem .55rem;border-radius:999px;letter-spacing:.06em;}
+    .premium-badge{display:inline-flex;align-items:center;gap:.25rem;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:.62rem;font-weight:900;padding:.2rem .55rem;border-radius:999px;letter-spacing:.06em;}
+    .profile-handle{font-size:.8rem;color:var(--muted);font-weight:700;margin-bottom:.35rem;}
+    .description-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:1.25rem 1.5rem;margin-top:1rem;box-shadow:0 4px 18px rgba(18,66,197,.06);}
+    .description-card h2{font-size:.95rem;font-weight:900;color:var(--text);margin-bottom:.5rem;}
+    .profile-description{font-size:.88rem;color:#475569;line-height:1.65;white-space:pre-wrap;}
+    .socials{display:flex;gap:.4rem;flex-wrap:wrap;}
+    .social-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .7rem;border-radius:999px;background:#f1f5f9;border:1px solid var(--border);font-size:.72rem;font-weight:700;color:var(--muted);transition:all .2s;}
+    .social-chip:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+    .profile-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.75rem;}
+    .btn{border:0;border-radius:12px;padding:.55rem 1.1rem;font-weight:800;font-size:.82rem;display:inline-flex;align-items:center;gap:.4rem;transition:transform .15s,box-shadow .15s;cursor:pointer;}
+    .btn-primary{background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;box-shadow:0 6px 18px rgba(18,66,197,.28);}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(18,66,197,.38);}
+    .btn-ghost{background:#fff;color:var(--text);border:1.5px solid var(--border);}
+    .btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
+
+    /* STATS */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:18px;background:#fff;overflow:hidden;margin:1.2rem 0;box-shadow:0 2px 12px rgba(18,66,197,.05);}
+    .stat{text-align:center;padding:1rem .5rem;border-right:1px solid var(--border);}
+    .stat:last-child{border-right:0;}
+    .stat strong{display:block;font-size:1.5rem;font-weight:900;letter-spacing:-.05em;color:var(--blue);}
+    .stat span{font-size:.62rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;display:block;}
+
+    /* EVENTS SECTION */
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .section-head h2{font-size:1rem;font-weight:900;letter-spacing:-.02em;display:flex;align-items:center;gap:.4rem;}
+    .section-head .count{font-size:.72rem;color:var(--muted);font-weight:700;background:#f1f5f9;border:1px solid var(--border);padding:.18rem .6rem;border-radius:999px;}
+
+    /* EVENT GRID */
+    .events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;padding-bottom:2rem;}
+    .ev-card{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 4px 18px rgba(18,66,197,.07);transition:transform .2s,box-shadow .2s;cursor:pointer;}
+    .ev-card:hover{transform:translateY(-4px);box-shadow:0 14px 36px rgba(18,66,197,.13);}
+    .ev-cover{aspect-ratio:3/4;position:relative;overflow:hidden;background:linear-gradient(135deg,#1242c5,#2f6bff);}
+    .ev-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+    .ev-cover-placeholder{width:100%;height:100%;display:grid;place-items:center;font-size:2.5rem;}
+    .ev-status{position:absolute;top:.6rem;left:.6rem;font-size:.62rem;font-weight:900;padding:.2rem .6rem;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;backdrop-filter:blur(6px);}
+    .ev-status.live{background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);color:#6ee7b7;}
+    .ev-status.draft{background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#fcd34d;}
+    .ev-body{padding:.85rem .9rem .9rem;}
+    .ev-date{font-size:.68rem;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;}
+    .ev-name{font-size:.95rem;font-weight:900;letter-spacing:-.02em;color:var(--text);margin-bottom:.25rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .ev-loc{font-size:.72rem;color:var(--muted);margin-bottom:.6rem;display:flex;align-items:center;gap:.25rem;}
+    .ev-footer{display:flex;align-items:center;justify-content:space-between;}
+    .ev-price{font-size:.85rem;font-weight:900;color:var(--text);}
+    .ev-price strong{color:var(--blue);}
+    .ev-cta{background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:0;border-radius:9px;padding:.38rem .8rem;font-size:.72rem;font-weight:800;box-shadow:0 4px 12px rgba(18,66,197,.22);}
+
+    /* EMPTY */
+    .empty{text-align:center;padding:3rem 1rem;color:var(--muted);grid-column:1/-1;}
+    .empty-icon{font-size:2.5rem;margin-bottom:.6rem;}
+    .empty strong{display:block;font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:.25rem;}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:.65rem 1.25rem;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:all .3s;z-index:99;pointer-events:none;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+    /* SKEL */
+    .skel{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    @media(min-width:601px){
+      .topbar .topnav,
+      .topbar .auth-actions{display:none;}
+    }
+
+    @media(max-width:600px){
+      .banner{height:180px;}
+      .avatar{width:80px;height:80px;border-radius:18px;font-size:1.6rem;margin-top:-52px;}
+      .profile-name{font-size:1.25rem;}
+      .stats-row{grid-template-columns:repeat(3,1fr);}
+      .stat:nth-child(3){border-right:0;}
+      .events-grid{grid-template-columns:repeat(2,1fr);}
+      .profile-card{padding:1rem;}
+    }
+    @media(max-width:380px){.events-grid{grid-template-columns:1fr;}}
+  </style>
+  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="nav-wrap">
+    <div class="brand-block">
+      <div class="logo">CultureWave</div>
+      <div class="brand-sub">by OGSHOOTS LUXE</div>
+    </div>
+    <nav class="topnav">
+      <a href="events.html">Events</a>
+      <a href="restaurants.html">Restaurants</a>
+      <a href="features.html">Features</a>
+      <a href="pricing.html">Pricing</a>
+    </nav>
+    <div class="auth-actions">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="login.html">Get Started</a>
+    </div>
+  </div>
+</header>
+
+<!-- BANNER -->
+<div class="banner" id="bannerEl">
+  <div class="banner-overlay"></div>
+</div>
+
+<div class="profile-wrap">
+
+  <!-- PROFILE CARD -->
+  <div class="profile-card">
+    <div class="profile-top">
+      <div class="avatar" id="profileAvatar">🎪</div>
+      <div class="profile-info">
+        <div class="profile-name-row">
+          <span class="profile-name" id="profileName">Loading...</span>
+          <span class="verified-badge" id="verifiedBadge" style="display:none;">⭐ Verified</span>
+          <span class="premium-badge" id="premiumBadge" style="display:none;">✨ Premium</span>
+        </div>
+        <div class="profile-handle" id="profileHandle">@handle</div>
+        <div class="socials" id="profileSocials"></div>
+      </div>
+    </div>
+    <div class="profile-actions" id="profileActions">
+      <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share Profile</button>
+    </div>
+  </div>
+
+  <section class="description-card" id="descriptionCard" style="display:none;">
+    <h2>About</h2>
+    <p class="profile-description" id="profileDescription"></p>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat"><strong id="statEvents">—</strong><span>Events</span></div>
+    <div class="stat"><strong id="statLive">—</strong><span>Live Now</span></div>
+    <div class="stat"><strong id="statFollowers">—</strong><span>Followers</span></div>
+  </div>
+
+  <!-- EVENTS -->
+  <div class="section-head">
+    <h2>🎉 Events</h2>
+    <span class="count" id="eventsSubtitle">0 listings</span>
+  </div>
+
+  <div class="events-grid" id="eventsGrid">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+      <div class="skel" style="aspect-ratio:3/4;border-radius:0;"></div>
+      <div style="padding:.85rem;display:flex;flex-direction:column;gap:.5rem;">
+        <div class="skel" style="height:9px;width:50%;"></div>
+        <div class="skel" style="height:14px;width:80%;"></div>
+        <div class="skel" style="height:9px;width:40%;"></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+      <div class="skel" style="aspect-ratio:3/4;border-radius:0;"></div>
+      <div style="padding:.85rem;display:flex;flex-direction:column;gap:.5rem;">
+        <div class="skel" style="height:9px;width:55%;"></div>
+        <div class="skel" style="height:14px;width:75%;"></div>
+        <div class="skel" style="height:9px;width:38%;"></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+      <div class="skel" style="aspect-ratio:3/4;border-radius:0;"></div>
+      <div style="padding:.85rem;display:flex;flex-direction:column;gap:.5rem;">
+        <div class="skel" style="height:9px;width:45%;"></div>
+        <div class="skel" style="height:14px;width:85%;"></div>
+        <div class="skel" style="height:9px;width:42%;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8"
+});
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+async function getCurrentUser() {
+  return new Promise(resolve => {
+    const unsub = auth.onAuthStateChanged(async firebaseUser => {
+      unsub();
+      if (!firebaseUser) { resolve(null); return; }
+      try {
+        const snap = await db.collection('users').doc(firebaseUser.uid).get();
+        const data = snap.exists ? snap.data() : {};
+        resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: data.name || firebaseUser.displayName || firebaseUser.email, role: data.role || 'client' });
+      } catch { resolve({ uid: firebaseUser.uid, email: firebaseUser.email, name: firebaseUser.displayName || firebaseUser.email, role: 'client' }); }
+    });
+  });
+}
+
+const params = new URLSearchParams(location.search);
+const targetUid = params.get('uid');
+let targetHandle = (params.get('handle') || '').trim().toLowerCase();
+const prettyProfileRoute = params.get('pretty') === '1';
+if (!targetHandle && !targetUid) {
+  const lastPathPart = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '').trim().toLowerCase();
+  if (lastPathPart && lastPathPart !== 'client-profile.html' && /^[a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?$/.test(lastPathPart)) targetHandle = lastPathPart;
+}
+let isOwner = false;
+let profileData = {};
+let isFollowing = false;
+let myUid = null;
+let targetProfileUid = null;
+
+function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function slugifyEventName(name){ return String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event'; }
+function getProfileEventUrl(ev){
+  const handle=String(profileData.handle||targetHandle||'').trim().toLowerCase();
+  const eventSlug=encodeURIComponent(slugifyEventName(ev.urlKey||ev.name));
+  return handle ? `/${encodeURIComponent(handle)}/${eventSlug}` : `/event/${eventSlug}`;
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function shareProfile(){
+  navigator.clipboard.writeText(location.href).then(()=>showToast('Profile link copied!')).catch(()=>showToast(location.href));
+}
+
+async function toggleFollow(){
+  const btn = document.getElementById('followBtn');
+  if(!btn || !targetProfileUid) return;
+  if(!myUid) {
+    const next = `${location.pathname}${location.search}${location.hash}`;
+    location.href = `login.html?next=${encodeURIComponent(next)}`;
+    return;
+  }
+  btn.disabled = true;
+  const wasFollowing = isFollowing;
+  const nextFollowing = !wasFollowing;
+  const el = document.getElementById('statFollowers');
+  const cur = parseInt((el.textContent||'0').replace(/,/g,''))||0;
+  btn.textContent = nextFollowing ? 'Following…' : 'Unfollowing…';
+  try {
+    const followRef = db.collection('users').doc(myUid).collection('following').doc(targetProfileUid);
+    if(nextFollowing){
+      await followRef.set({organiserId: targetProfileUid, followedAt: firebase.firestore.FieldValue.serverTimestamp()});
+    } else {
+      await followRef.delete();
+    }
+    isFollowing = nextFollowing;
+    btn.textContent = isFollowing ? '✔️ Following' : '❤️ Follow';
+    btn.className = isFollowing ? 'btn btn-ghost' : 'btn btn-primary';
+    el.textContent = Math.max(0, cur + (isFollowing ? 1 : -1)).toLocaleString('en-IN');
+    showToast(isFollowing ? 'You are now following!' : 'Unfollowed');
+  } catch(e) {
+    console.error('Could not update organiser follow:', e);
+    isFollowing = wasFollowing;
+    btn.textContent = isFollowing ? '✔️ Following' : '❤️ Follow';
+    btn.className = isFollowing ? 'btn btn-ghost' : 'btn btn-primary';
+    showToast(e.code === 'permission-denied' ? 'Please sign in to follow this organiser.' : 'Could not update your follow. Please try again.');
+  }
+  btn.disabled = false;
+}
+
+function renderEvents(events){
+  const grid = document.getElementById('eventsGrid');
+  grid.innerHTML = '';
+  const total = events.length;
+  const live = events.filter(e=>(e.status||'').toLowerCase()==='published').length;
+  document.getElementById('statEvents').textContent = total;
+  document.getElementById('statLive').textContent = live;
+
+  document.getElementById('eventsSubtitle').textContent = total + ' listing' + (total!==1?'s':'');
+
+  if(!total){
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🎪</div><strong>No events yet</strong><span>This organiser hasn't published any events.</span></div>`;
+    return;
+  }
+
+  const GRADS = [
+    'linear-gradient(135deg,#1242c5,#2f6bff)',
+    'linear-gradient(135deg,#7c3aed,#c084fc)',
+    'linear-gradient(135deg,#0891b2,#67e8f9)',
+    'linear-gradient(135deg,#0d9488,#5eead4)',
+    'linear-gradient(135deg,#dc2626,#f97316)',
+  ];
+
+  grid.innerHTML = events.map((ev,i)=>{
+    const grad = GRADS[i%GRADS.length];
+    const cover = ev.cardImgUrl||ev.coverUrl;
+    const price = ev.tickets?.[0]?.price||ev.price||0;
+    const priceStr = price ? `<strong>₹${Number(price).toLocaleString('en-IN')}</strong> <span style="font-size:.68rem;color:var(--muted);">onwards</span>` : '<strong style="color:#10b981;">Free</strong>';
+    let dateLabel = '';
+    if(ev.startDate){
+      try{
+        const d = ev.startDate.toDate ? ev.startDate.toDate() : new Date(String(ev.startDate).slice(0,10)+'T00:00:00');
+        dateLabel = d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      }catch(e){}
+    }
+    const norm = (ev.status||'draft').toLowerCase();
+    const badge = norm==='published' ? `<span class="ev-status live">LIVE</span>` : '';
+    return `
+    <div class="ev-card" onclick="location.href='${getProfileEventUrl(ev)}'">
+      <div class="ev-cover" style="background:${grad};">
+        ${cover ? `<img src="${cover}" alt="${esc(ev.name)}" loading="lazy"/>` : `<div class="ev-cover-placeholder">🎉</div>`}
+        ${badge}
+      </div>
+      <div class="ev-body">
+        <div class="ev-date">📅 ${dateLabel||'TBA'}</div>
+        <div class="ev-name">${esc(ev.name||'Untitled Event')}</div>
+        <div class="ev-loc">📍 ${esc(ev.venueName||ev.city||'Venue TBA')}</div>
+        <div class="ev-footer">
+          <div class="ev-price">${priceStr}</div>
+          <button class="ev-cta" onclick="event.stopPropagation();location.href='${getProfileEventUrl(ev)}'">View →</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderProfile(data){
+  profileData = data;
+  const publicHandle = String(data.handle || targetHandle || '').trim().toLowerCase();
+  // Keep the current route intact: profile event cards depend on its base path,
+  // and rewriting it here can make event links resolve to the wrong route.
+  const initials = (data.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const avatarEl = document.getElementById('profileAvatar');
+  if(data.avatarUrl){
+    avatarEl.innerHTML = `<img src="${data.avatarUrl}" alt="avatar"/>`;
+  } else {
+    avatarEl.textContent = initials;
+  }
+
+  // banner
+  const bannerEl = document.getElementById('bannerEl');
+  bannerEl.querySelectorAll('.banner-img').forEach(img => img.remove());
+  const bannerSrc = data.bannerUrl || data.coverUrl || '';
+  if(bannerSrc){
+    const img = document.createElement('img');
+    img.className = 'banner-img';
+    img.src = bannerSrc;
+    img.alt = 'banner';
+    bannerEl.insertBefore(img, bannerEl.firstChild);
+  }
+
+  document.getElementById('profileName').textContent = data.name||'Organiser';
+  document.getElementById('profileHandle').textContent = '@'+(data.handle||data.uid?.slice(0,8)||'organiser');
+  const description = (data.bio||'').trim();
+  document.getElementById('profileDescription').textContent = description;
+  document.getElementById('descriptionCard').style.display = description ? '' : 'none';
+  document.getElementById('statFollowers').textContent = (data.followers||0).toLocaleString('en-IN');
+  document.title = `${data.name||'Organiser'} | CultureWave`;
+
+  if(data.verified) document.getElementById('verifiedBadge').style.display='';
+  if(data.plan==='premium'||data.plan==='growth') document.getElementById('premiumBadge').style.display='';
+
+  const socials = [];
+  if(data.instagram){
+    const instagram = String(data.instagram).trim().replace(/^@/, '');
+    const instagramIcon = '<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg>';
+    socials.push(`<a class="social-chip" href="https://instagram.com/${encodeURIComponent(instagram)}" target="_blank" rel="noopener noreferrer">${instagramIcon}<span>${esc(instagram)}</span></a>`);
+  }
+  if(data.twitter)   socials.push(`<a class="social-chip" href="https://twitter.com/${data.twitter}" target="_blank">🐦 @${data.twitter}</a>`);
+  if(data.youtube)   socials.push(`<a class="social-chip" href="https://youtube.com/@${data.youtube}" target="_blank">▶️ YouTube</a>`);
+  if(data.website)   socials.push(`<a class="social-chip" href="${data.website}" target="_blank">🌐 Website</a>`);
+  document.getElementById('profileSocials').innerHTML = socials.join('');
+  document.getElementById('profileSocials').style.display = socials.length ? '' : 'none';
+
+  if(isOwner){
+    document.getElementById('profileActions').innerHTML = `
+      <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share</button>`;
+  } else {
+    const followBusy = !myUid;
+    const followLabel = isFollowing ? '✔️ Following' : '❤️ Follow';
+    const followClass = isFollowing ? 'btn btn-ghost' : 'btn btn-primary';
+    document.getElementById('profileActions').innerHTML = `
+      <button class="${followClass}" id="followBtn" onclick="toggleFollow()">${followLabel}</button>
+      <button class="btn btn-ghost" onclick="shareProfile()">🔗 Share</button>`;
+  }
+}
+
+async function init(){
+  try{ const user = await getCurrentUser(); if(user) myUid = user.uid; }catch(e){}
+
+  let uid = targetUid || null;
+  if(!uid && targetHandle){
+    try{
+      const handleSnap = await db.collection('organisers').where('handle','==',targetHandle).limit(1).get();
+      if(!handleSnap.empty) uid = handleSnap.docs[0].id;
+    }catch(e){ console.error('Could not look up profile handle:', e); }
+    if(!uid){
+      document.getElementById('profileName').textContent = 'Profile not found';
+      document.getElementById('profileHandle').textContent = '@'+targetHandle;
+      document.getElementById('eventsGrid').innerHTML = `<div class="empty"><div class="empty-icon">🔎</div><strong>No profile found</strong><span>Check the profile address and try again.</span></div>`;
+      return;
+    }
+  }
+  uid = uid || myUid;
+  targetProfileUid = uid;
+  if(!uid){
+    document.getElementById('profileName').textContent = 'Sign in to view your profile';
+    document.getElementById('profileHandle').textContent = '';
+    document.getElementById('eventsGrid').innerHTML = `<div class="empty"><div class="empty-icon">🔒</div><strong>Not signed in</strong><a href="login.html" style="color:var(--blue);font-weight:700;">Login to view your profile</a></div>`;
+    return;
+  }
+  isOwner = !!(myUid && myUid === uid);
+
+  // check if current user already follows this profile
+  if(myUid && !isOwner){
+    try{
+      const followSnap = await db.collection('users').doc(myUid).collection('following').doc(uid).get();
+      isFollowing = followSnap.exists;
+    }catch(e){}
+  }
+
+  db.collection('organisers').doc(uid).onSnapshot(async profSnap => {
+    if(profSnap.exists) {
+      renderProfile({uid, ...profSnap.data()});
+      return;
+    }
+    const userSnap = await db.collection('users').doc(uid).get();
+    renderProfile({uid, ...(userSnap.exists ? userSnap.data() : { name: 'Organiser' })});
+  }, error => console.error('Could not watch organiser profile:', error));
+
+  db.collection('events').where('ownerId','==',uid).limit(50).onSnapshot(snap => {
+    const events = snap.docs
+      .map(d=>({...d.data(),id:d.id}))
+      .filter(e=>(e.status||'').toLowerCase()==='published');
+    renderEvents(events);
+  }, error => console.error('Could not watch organiser events:', error));
+}
+
+init();
+</script>
+  <script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
+</body>
+</html>

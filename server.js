@@ -1,14 +1,28 @@
 import http from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, access } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import * as admin from "firebase-admin";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const publicDir = __dirname;
 const orders = new Map();
 const sessions = new Map();
+
+// Load local secrets without adding a runtime dependency. Production should
+// provide the same values through the hosting platform environment settings.
+try {
+  await access(join(__dirname, ".env"));
+  const envFile = await readFile(join(__dirname, ".env"), "utf8");
+  for (const line of envFile.split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!match || process.env[match[1]]) continue;
+    process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, "$2");
+  }
+} catch {
+  // Missing .env is expected when the host supplies environment variables.
+}
 
 if (!admin.getApps().length) {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
@@ -31,9 +45,7 @@ const mimeTypes = {
 
 const dashboardFiles = {
   admin: "admin-dashboard.html",
-  customer: "customer-dashboard.html",
   client: "client-dashboard.html",
-  manager: "client-dashboard.html",
 };
 
 const clientPages = {
@@ -60,7 +72,7 @@ const localDevAccounts = new Map([
       password: "SASI@2006",
       role: "admin",
       name: "Srisanth",
-      email: "srisanth@cityvibe.local",
+      email: "srisanth@culturewave.in",
     },
   ],
   [
@@ -70,10 +82,18 @@ const localDevAccounts = new Map([
       password: "sasi",
       role: "client",
       name: "Sasi",
-      email: "sasi@cityvibe.local",
+      email: "sasi@culturewave.in",
       onboardingComplete: false,
     },
   ],
+]);
+
+const accountAliases = new Map([
+  ["ADMIN", "SRISANTH"],
+  ["SRISANTH", "SRISANTH"],
+  ["SRISANTH588", "SRISANTH"],
+  ["SASI", "SASI"],
+  ["CLIENT", "SASI"],
 ]);
 
 const demoAccounts = new Map();
@@ -115,7 +135,7 @@ function parseCookies(cookieHeader = "") {
 
 function getSession(req) {
   const cookies = parseCookies(req.headers.cookie);
-  const sessionId = cookies.cityvibe_session;
+  const sessionId = cookies.culturewave_session;
   if (!sessionId) return null;
   return sessions.get(sessionId) || null;
 }
@@ -127,7 +147,7 @@ function requireSession(req) {
 }
 
 function setSessionCookie(res, sessionId) {
-  res.setHeader("Set-Cookie", `cityvibe_session=${encodeURIComponent(sessionId)}; HttpOnly; Path=/; SameSite=Lax`);
+  res.setHeader("Set-Cookie", `culturewave_session=${encodeURIComponent(sessionId)}; HttpOnly; Path=/; SameSite=Lax`);
 }
 
 function createSession(user) {
@@ -140,7 +160,7 @@ function createSession(user) {
     phoneNumber: user.phoneNumber || "",
     emailVerified: Boolean(user.emailVerified ?? true),
     admin: user.role === "admin",
-    role: user.role || "customer",
+    role: user.role === "admin" ? "admin" : "client",
     provider: user.provider || "password",
     createdAt: Date.now(),
   };
@@ -151,7 +171,8 @@ function createSession(user) {
 function getAccountByUsername(username) {
   const key = String(username || "").trim().toUpperCase();
   if (!key) return null;
-  return demoAccounts.get(key) || localDevAccounts.get(key) || null;
+  const canonicalKey = accountAliases.get(key) || key;
+  return demoAccounts.get(canonicalKey) || localDevAccounts.get(canonicalKey) || null;
 }
 
 function makeQrSvg(payload) {
@@ -198,13 +219,33 @@ function getPaymentUrl(orderId) {
   return `/pay/${orderId}`;
 }
 
+function getCashfreeConfig() {
+  const appId = process.env.CASHFREE_APP_ID || process.env.CF_APP_ID || "";
+  const secretKey = process.env.CASHFREE_SECRET_KEY || process.env.CF_SECRET_KEY || "";
+  const environment = String(process.env.CASHFREE_ENV || "sandbox").toLowerCase() === "production" ? "production" : "sandbox";
+  return { appId, secretKey, environment };
+}
+
+function getRazorpayConfig() {
+  const keyId = process.env.RAZORPAY_KEY_ID || process.env.RZP_KEY_ID || "";
+  const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.RZP_KEY_SECRET || "";
+  const mode = String(process.env.RAZORPAY_ENV || "test").toLowerCase() === "live" ? "live" : "test";
+  return { keyId, keySecret, mode };
+}
+
+function verifyRazorpaySignature(orderId, paymentId, signature, secret) {
+  if (!orderId || !paymentId || !signature || !secret) return false;
+  const expected = createHmac("sha256", secret).update(`${orderId}|${paymentId}`).digest("hex");
+  return expected === signature;
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
 
   if (req.method === "POST" && url.pathname === "/api/auth/verify") {
     try {
       const body = await readBody(req);
-      const { idToken, role = "customer", onboardingComplete = false } = body;
+      const { idToken, role = "client", onboardingComplete = false } = body;
       if (!idToken) return send(res, 400, { success: false, error: "Missing idToken" });
 
       const decoded = await admin.auth().verifyIdToken(idToken);
@@ -217,7 +258,7 @@ const server = http.createServer(async (req, res) => {
         phoneNumber: decoded.phone_number || "",
         emailVerified: Boolean(decoded.email_verified),
         admin: Boolean(decoded.admin),
-        role,
+        role: role === "admin" ? "admin" : "client",
         onboardingComplete: Boolean(onboardingComplete),
         provider: decoded.firebase?.sign_in_provider || "",
         createdAt: Date.now(),
@@ -228,6 +269,20 @@ const server = http.createServer(async (req, res) => {
     } catch (error) {
       return send(res, 401, { success: false, error: "Invalid Firebase token" });
     }
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/imagekit/auth") {
+    const publicKey = process.env.IMAGEKIT_PUBLIC_KEY || "";
+    const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || "";
+    if (!publicKey || !privateKey) {
+    return send(res, 503, { success: false, error: "ImageKit is not configured on the server." }, { "Access-Control-Allow-Origin": "*" });
+    }
+    const expire = Math.floor(Date.now() / 1000) + 600;
+    const token = randomUUID();
+    const signature = createHmac("sha1", privateKey)
+      .update(token + expire)
+      .digest("hex");
+    return send(res, 200, { token, expire, signature, publicKey }, { "Access-Control-Allow-Origin": "*" });
   }
 
   if (req.method === "POST" && url.pathname === "/api/auth/local-login") {
@@ -256,7 +311,6 @@ const server = http.createServer(async (req, res) => {
       const username = String(body.username || "").trim();
       const fullName = String(body.name || "").trim();
       const password = String(body.password || "");
-      const role = String(body.role || "customer").toLowerCase();
       if (!username || !fullName || !password) {
         return send(res, 400, { success: false, error: "Missing username, name, or password" });
       }
@@ -266,9 +320,9 @@ const server = http.createServer(async (req, res) => {
       const account = {
         username,
         password,
-        role: role === "admin" ? "admin" : role === "client" || role === "manager" ? "client" : "customer",
+        role: "client",
         name: fullName,
-        email: `${username.toLowerCase()}@cityvibe.local`,
+        email: `${username.toLowerCase()}@culturewave.in`,
       };
       demoAccounts.set(username.toUpperCase(), account);
       const session = createSession(account);
@@ -358,9 +412,9 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "POST" && url.pathname === "/api/auth/logout") {
     const cookies = parseCookies(req.headers.cookie);
-    const sessionId = cookies.cityvibe_session;
+    const sessionId = cookies.culturewave_session;
     if (sessionId) sessions.delete(sessionId);
-    res.setHeader("Set-Cookie", "cityvibe_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
+    res.setHeader("Set-Cookie", "culturewave_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
     return send(res, 200, { success: true });
   }
 
@@ -374,10 +428,85 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
   }
 
+  // Public attendee access is deliberately served by the server: the browser
+  // never receives the bookings collection or other guests' personal data.
+  if (req.method === "GET" && url.pathname === "/api/guest/playlist") {
+    try {
+      if (!admin.apps.length) return send(res, 503, { success: false, error: "Playlists are unavailable." });
+      const eventId = String(url.searchParams.get("eventId") || "").trim();
+      let playlists = eventId
+        ? await admin.firestore().collection("playlists").where("eventId", "==", eventId).limit(1).get()
+        : { empty: true };
+      if (playlists.empty) playlists = await admin.firestore().collection("playlists").where("isDefault", "==", true).limit(1).get();
+      if (playlists.empty) return send(res, 404, { success: false, error: "No playlist has been published yet." });
+      const playlist = playlists.docs[0].data();
+      return send(res, 200, { success: true, playlist: { title: playlist.title || "Event Playlist", description: playlist.description || "", songs: Array.isArray(playlist.songs) ? playlist.songs : [] } });
+    } catch (error) {
+      console.error("Public playlist request failed:", error);
+      return send(res, 500, { success: false, error: "We could not load this playlist right now." });
+    }
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/guest/playlist-access") {
+    try {
+      if (!admin.apps.length) return send(res, 503, { success: false, error: "Booking verification is unavailable." });
+      const body = await readBody(req);
+      const phone = String(body.phone || "").replace(/\D/g, "");
+      if (phone.length < 10) return send(res, 400, { success: false, error: "Enter a valid mobile number." });
+      const matchesPhone = (value) => String(value || "").replace(/\D/g, "").slice(-10) === phone.slice(-10);
+      const snap = await admin.firestore().collection("bookings").limit(5000).get();
+      const bookingDoc = snap.docs.find((entry) => {
+        const b = entry.data();
+        const status = String(b.status || "").toLowerCase();
+        return !["cancelled", "failed", "refunded"].includes(status) && matchesPhone(b.customerPhone || b.customer?.phone || b.buyerPhone || b.buyer?.phone || b.phone);
+      });
+      if (!bookingDoc) return send(res, 404, { success: false, error: "No active booking was found for this number." });
+      const booking = bookingDoc.data();
+      const eventId = booking.eventId || booking.event?.id || booking.event?.eventId || null;
+      let playlist = null;
+      if (eventId) {
+        const playlists = await admin.firestore().collection("playlists").where("eventId", "==", eventId).limit(1).get();
+        if (!playlists.empty) playlist = { id: playlists.docs[0].id, ...playlists.docs[0].data() };
+      }
+      if (!playlist) {
+        const playlists = await admin.firestore().collection("playlists").where("isDefault", "==", true).limit(1).get();
+        if (!playlists.empty) playlist = { id: playlists.docs[0].id, ...playlists.docs[0].data() };
+      }
+      return send(res, 200, {
+        success: true,
+        guestName: booking.customerName || booking.customer?.name || booking.buyerName || "Guest",
+        eventName: booking.eventName || booking.event?.name || booking.event?.title || "your event",
+        playlist: playlist ? { title: playlist.title || "Event Playlist", description: playlist.description || "", songs: Array.isArray(playlist.songs) ? playlist.songs : [] } : null,
+      });
+    } catch (error) {
+      console.error("Guest playlist access failed:", error);
+      return send(res, 500, { success: false, error: "We could not verify this booking right now." });
+    }
+  }
+
+  const profileHandleMatch = url.pathname.match(/^\/([a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?)\/?$/i);
+  if (req.method === "GET" && profileHandleMatch && !["api", "logout", "dashboard", "onboarding", "pay"].includes(profileHandleMatch[1].toLowerCase())) {
+    try {
+      const profiles = await admin.firestore().collection("organisers").where("handle", "==", profileHandleMatch[1].toLowerCase()).limit(1).get();
+      if (!profiles.empty) {
+        const html = await readFile(join(publicDir, "client-profile.html"), "utf8");
+        return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
+      }
+    } catch (error) {
+      console.error("Public profile route lookup failed:", error);
+    }
+  }
+
   if (req.method === "GET" && extname(url.pathname)) {
     try {
       const filePath = join(publicDir, url.pathname.slice(1));
-      const file = await readFile(filePath, "utf8");
+      let file = await readFile(filePath, "utf8");
+      if (!file.includes('firebase-config.js') && !file.includes('from "./firebase.js"') && !file.includes("from './firebase.js'") && file.includes('</head>')) {
+        file = file.replace(
+          '</head>',
+          '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="firebase-config.js"></script></head>'
+        );
+      }
       const contentType = mimeTypes[extname(url.pathname)] || "text/plain; charset=utf-8";
       return send(res, 200, file, { "Content-Type": contentType });
     } catch {
@@ -389,9 +518,9 @@ const server = http.createServer(async (req, res) => {
     try {
       const body = await readBody(req);
       const amount = Math.max(1, Number(body.amount || 0));
+      const receipt = body.receipt || `rcpt_${Date.now()}`;
       const orderId = `order_${Math.random().toString(36).slice(2, 10)}`;
       const paymentId = `pay_${Math.random().toString(36).slice(2, 10)}`;
-      const receipt = body.receipt || `rcpt_${Date.now()}`;
       const upiId = body.upiId || "merchant@upi";
       const merchantName = body.merchantName || "Cashfree";
       const qrPayload = `upi:${merchantName}:${orderId}:${amount}`;
@@ -413,6 +542,56 @@ const server = http.createServer(async (req, res) => {
           tr: orderId,
         }),
       };
+
+      const { appId, secretKey, environment } = getCashfreeConfig();
+      if (appId && secretKey) {
+        const apiUrl = environment === "production" ? "https://api.cashfree.com/pg/orders" : "https://sandbox.cashfree.com/pg/orders";
+        const cfResponse = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-version": "2025-01-01",
+            "x-client-id": appId,
+            "x-client-secret": secretKey,
+            "x-request-id": randomUUID(),
+            "x-idempotency-key": randomUUID(),
+          },
+          body: JSON.stringify({
+            order_id: orderId,
+            order_amount: Number((amount / 100).toFixed(2)),
+            order_currency: "INR",
+            customer_details: {
+              customer_id: body.customer?.id || body.customer?.email || body.customer?.phone || `guest_${orderId}`,
+              customer_name: body.customer?.name || "Guest",
+              customer_email: body.customer?.email || "",
+              customer_phone: body.customer?.phone || "",
+            },
+            order_note: body.note || `Payment for ${body.event?.name || "event tickets"}`,
+            order_meta: {
+              return_url: `${body.returnUrl || "http://127.0.0.1:3000/booking.html"}?order_id={order_id}`,
+            },
+          }),
+        });
+        if (cfResponse.ok) {
+          const cfData = await cfResponse.json();
+          order.status = "pending";
+          order.cashfree = cfData;
+          orders.set(orderId, order);
+          return send(res, 200, {
+            success: true,
+            orderId,
+            paymentId: cfData.payment_session_id || paymentId,
+            payment_session_id: cfData.payment_session_id,
+            cf_order_id: cfData.cf_order_id || orderId,
+            amount,
+            currency: "INR",
+            status: order.status,
+            checkoutUrl: getPaymentUrl(orderId),
+            receipt,
+          });
+        }
+      }
+
       orders.set(orderId, order);
       return send(res, 200, {
         success: true,
@@ -428,6 +607,181 @@ const server = http.createServer(async (req, res) => {
       });
     } catch (error) {
       return send(res, 400, { success: false, error: error.message });
+    }
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/bookings/checkout") {
+    try {
+      const body = await readBody(req);
+      const amount = Math.max(1, Number(body.amount || 0));
+      const receipt = body.receipt || `rcpt_${Date.now()}`;
+      const orderId = `order_${Math.random().toString(36).slice(2, 10)}`;
+      const paymentId = `pay_${Math.random().toString(36).slice(2, 10)}`;
+      const upiId = body.upiId || "merchant@upi";
+      const merchantName = body.merchantName || "Cashfree";
+      const qrPayload = `upi:${merchantName}:${orderId}:${amount}`;
+      const order = {
+        id: orderId,
+        paymentId,
+        amount,
+        currency: "INR",
+        status: "created",
+        receipt,
+        customer: body.customer || {},
+        event: body.event || {},
+        qrSvg: makeQrSvg(qrPayload),
+        upiIntent: makeUpiIntent({
+          pa: upiId,
+          pn: merchantName,
+          am: (amount / 100).toFixed(2),
+          tn: body.note || `Payment for ${body.event?.name || "event tickets"}`,
+          tr: orderId,
+        }),
+      };
+
+      const { keyId, keySecret, mode } = getRazorpayConfig();
+      if (keyId && keySecret) {
+        const rpResponse = await fetch("https://api.razorpay.com/v1/orders", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}`,
+          },
+          body: JSON.stringify({
+            amount,
+            currency: "INR",
+            receipt,
+            notes: {
+              eventName: body.event?.name || "event tickets",
+              customerName: body.customer?.name || "Guest",
+              customerEmail: body.customer?.email || "",
+              seats: String(body.seats || 1),
+            },
+          }),
+        });
+        if (rpResponse.ok) {
+          const rpData = await rpResponse.json();
+          order.status = "pending";
+          order.razorpay = rpData;
+          orders.set(orderId, order);
+          return send(res, 200, {
+            success: true,
+            provider: "razorpay",
+            keyId,
+            mode,
+            orderId,
+            razorpayOrderId: rpData.id,
+            amount,
+            currency: rpData.currency || "INR",
+            status: rpData.status || "created",
+            receipt,
+            customer: order.customer,
+            event: order.event,
+            notes: rpData.notes || {},
+          });
+        }
+      }
+
+      orders.set(orderId, order);
+      return send(res, 200, {
+        success: true,
+        provider: "demo",
+        orderId,
+        paymentId,
+        amount,
+        currency: "INR",
+        status: order.status,
+        checkoutUrl: getPaymentUrl(orderId),
+        upiIntent: order.upiIntent,
+        qrSvg: order.qrSvg,
+        receipt,
+      });
+    } catch (error) {
+      return send(res, 400, { success: false, error: error.message });
+    }
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/bookings/free") {
+    try {
+      const body = await readBody(req);
+      const name = String(body.customer?.name || "").trim();
+      const email = String(body.customer?.email || "").trim();
+      const phone = String(body.customer?.phone || "").trim();
+      const bookingId = `bk_${randomUUID().slice(0, 8)}`;
+      const booking = {
+        bookingId,
+        eventId: body.eventId || null,
+        orderId: null,
+        razorpayOrderId: null,
+        paymentId: null,
+        status: "confirmed",
+        event: body.event || {},
+        customer: {
+          id: email || name || "guest",
+          name: name || "Guest",
+          email,
+          phone,
+          ticket: body.ticketName || "General Admission",
+        },
+        amount: 0,
+        currency: "INR",
+        seats: Number(body.seats || 1),
+        method: "free",
+        createdAt: Date.now(),
+        source: "free",
+      };
+      try {
+        if (admin.apps.length) {
+          await admin.firestore().collection("bookings").doc(bookingId).set(booking, { merge: true });
+        }
+      } catch (writeError) {
+        console.warn("Free booking Firestore write skipped:", writeError.message);
+      }
+      return send(res, 200, { success: true, bookingId });
+    } catch (error) {
+      return send(res, 400, { success: false, error: error.message || "Could not create free booking" });
+    }
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/bookings/verify") {
+    try {
+      const body = await readBody(req);
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+      const { keySecret } = getRazorpayConfig();
+      if (!keySecret) {
+        return send(res, 400, { success: false, error: "Missing Razorpay secret key" });
+      }
+      const valid = verifyRazorpaySignature(razorpay_order_id, razorpay_payment_id, razorpay_signature, keySecret);
+      if (!valid) return send(res, 401, { success: false, error: "Invalid payment signature" });
+      const matchingOrder = Array.from(orders.values()).find((entry) => entry.razorpay?.id === razorpay_order_id || entry.id === razorpay_order_id);
+      const booking = matchingOrder
+        ? {
+            bookingId: `bk_${randomUUID().slice(0, 8)}`,
+            orderId: matchingOrder.id,
+            razorpayOrderId: razorpay_order_id,
+            paymentId: razorpay_payment_id,
+            status: "confirmed",
+            event: matchingOrder.event || {},
+            customer: matchingOrder.customer || {},
+            amount: matchingOrder.amount || 0,
+            currency: matchingOrder.currency || "INR",
+            seats: Number(matchingOrder.customer?.tickets || matchingOrder.seats || 1),
+            method: matchingOrder.customer?.method || "upi",
+            createdAt: Date.now(),
+            source: "razorpay",
+          }
+        : null;
+      if (matchingOrder) {
+        matchingOrder.status = "paid";
+        matchingOrder.paymentId = razorpay_payment_id;
+        matchingOrder.verifiedAt = Date.now();
+      }
+      if (booking && admin.apps.length) {
+        await admin.firestore().collection("bookings").doc(booking.bookingId).set(booking, { merge: true });
+      }
+      return send(res, 200, { success: true, verified: true, bookingId: booking?.bookingId || null });
+    } catch (error) {
+      return send(res, 400, { success: false, error: error.message || "Verification failed" });
     }
   }
 
@@ -476,6 +830,164 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
   }
 
+  // ── WHATSAPP OTP ──
+  if (req.method === "POST" && url.pathname === "/api/whatsapp/send-otp") {
+    try {
+      const body = await readBody(req);
+      const phone = String(body.phone || "").trim();
+      const name  = String(body.name  || "User").trim();
+      if (!phone) return send(res, 400, { success: false, error: "Phone number required" });
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const expiresAt = Date.now() + 10 * 60 * 1000;
+      if (admin.apps.length) {
+        await admin.firestore().collection("whatsappOtps").doc(phone).set({ otp, expiresAt, name, createdAt: Date.now() });
+      }
+      // Send via WhatsApp Business API if configured, else log for manual send
+      const waToken   = process.env.WHATSAPP_TOKEN || "";
+      const waPhoneId = process.env.WHATSAPP_PHONE_ID || "";
+      if (waToken && waPhoneId) {
+        const to = phone.replace(/\D/g, "");
+        await fetch(`https://graph.facebook.com/v19.0/${waPhoneId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${waToken}` },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            to,
+            type: "text",
+            text: { body: `Hi ${name}! Your CultureWave OTP is *${otp}*. Valid for 10 minutes. Do not share this with anyone.` }
+          })
+        });
+      } else {
+        console.log(`[WhatsApp OTP] To: ${phone} | Name: ${name} | OTP: ${otp}`);
+      }
+      return send(res, 200, { success: true });
+    } catch (error) {
+      return send(res, 500, { success: false, error: error.message });
+    }
+  }
+
+  // ── WHATSAPP BOOKING CONFIRMATION ──
+  if (req.method === "POST" && url.pathname === "/api/whatsapp/booking-confirm") {
+    try {
+      const body = await readBody(req);
+      const { phone, name, eventName, date, bookingId, amount } = body;
+      if (!phone) return send(res, 400, { success: false, error: "Phone required" });
+      const msg = `Hi ${name||'there'}! 🎉 Your booking is confirmed!\n\n🎟 *${eventName||'Event'}*\n📅 ${date||''}\n🔖 Booking ID: ${bookingId||''}\n💰 Amount: ${amount?'₹'+amount:'Free'}\n\nSee you there! — CultureWave`;
+      const waToken   = process.env.WHATSAPP_TOKEN || "";
+      const waPhoneId = process.env.WHATSAPP_PHONE_ID || "";
+      if (waToken && waPhoneId) {
+        const to = phone.replace(/\D/g, "");
+        await fetch(`https://graph.facebook.com/v19.0/${waPhoneId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${waToken}` },
+          body: JSON.stringify({ messaging_product: "whatsapp", to, type: "text", text: { body: msg } })
+        });
+      } else {
+        console.log(`[WhatsApp Booking] To: ${phone} | ${msg}`);
+      }
+      return send(res, 200, { success: true });
+    } catch (error) {
+      return send(res, 500, { success: false, error: error.message });
+    }
+  }
+
+  // ── INSTAGRAM OAUTH ──
+  if (req.method === "GET" && url.pathname === "/api/instagram/connect") {
+    const session = requireSession(req);
+    if (!session) return send(res, 401, { success: false, error: "Not signed in" });
+    const appId = process.env.INSTAGRAM_APP_ID || process.env.META_APP_ID || "";
+    const redirectUri = encodeURIComponent(`${process.env.APP_BASE_URL || "http://127.0.0.1:3000"}/api/instagram/callback`);
+    if (!appId) {
+      // No app ID configured — show setup instructions
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Instagram Setup</title>
+<style>body{font-family:system-ui;background:#f8f9fa;display:grid;place-items:center;min-height:100vh;margin:0}
+.card{background:#fff;border:1px solid #e9ecef;border-radius:16px;padding:2rem;max-width:480px;width:calc(100%-2rem);text-align:center}
+h2{margin:0 0 .5rem;font-size:1.1rem}p{color:#868e96;font-size:.88rem;line-height:1.6;margin:.5rem 0 1.25rem}
+a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4;color:#fff;text-decoration:none;font-weight:700;font-size:.88rem}</style>
+</head><body><div class="card">
+<div style="font-size:2.5rem;margin-bottom:.75rem">📸</div>
+<h2>Instagram App Not Configured</h2>
+<p>Set the <strong>INSTAGRAM_APP_ID</strong> and <strong>INSTAGRAM_APP_SECRET</strong> environment variables to enable Instagram OAuth.</p>
+<a href="/premium-client-dashboard.html">Go Back</a>
+</div></body></html>`;
+      return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
+    }
+    const state = Buffer.from(JSON.stringify({ uid: session.uid, ts: Date.now() })).toString("base64url");
+    const oauthUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${redirectUri}&scope=instagram_basic,instagram_manage_comments,instagram_manage_messages,pages_show_list,pages_read_engagement&response_type=code&state=${state}`;
+    return send(res, 302, "", { Location: oauthUrl });
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/instagram/callback") {
+    const code = url.searchParams.get("code");
+    const state = url.searchParams.get("state");
+    const error = url.searchParams.get("error");
+    if (error) {
+      return send(res, 302, "", { Location: "/premium-client-dashboard.html?ig_error=" + encodeURIComponent(error) });
+    }
+    if (!code || !state) {
+      return send(res, 302, "", { Location: "/premium-client-dashboard.html?ig_error=missing_code" });
+    }
+    try {
+      const stateData = JSON.parse(Buffer.from(state, "base64url").toString());
+      const uid = stateData.uid;
+      const appId = process.env.INSTAGRAM_APP_ID || process.env.META_APP_ID || "";
+      const appSecret = process.env.INSTAGRAM_APP_SECRET || process.env.META_APP_SECRET || "";
+      const redirectUri = `${process.env.APP_BASE_URL || "http://127.0.0.1:3000"}/api/instagram/callback`;
+      // Exchange code for short-lived token
+      const tokenRes = await fetch(`https://graph.facebook.com/v19.0/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&redirect_uri=${encodeURIComponent(redirectUri)}&code=${code}`);
+      const tokenData = await tokenRes.json();
+      if (!tokenData.access_token) throw new Error(tokenData.error?.message || "Token exchange failed");
+      // Exchange for long-lived token
+      const llRes = await fetch(`https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${tokenData.access_token}`);
+      const llData = await llRes.json();
+      const longToken = llData.access_token || tokenData.access_token;
+      // Get connected Instagram Business Account
+      const pagesRes = await fetch(`https://graph.facebook.com/v19.0/me/accounts?access_token=${longToken}`);
+      const pagesData = await pagesRes.json();
+      const page = pagesData.data?.[0];
+      let igUserId = null, igUsername = null, igFollowers = 0;
+      if (page) {
+        const igRes = await fetch(`https://graph.facebook.com/v19.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token || longToken}`);
+        const igData = await igRes.json();
+        igUserId = igData.instagram_business_account?.id;
+        if (igUserId) {
+          const profileRes = await fetch(`https://graph.facebook.com/v19.0/${igUserId}?fields=username,followers_count,media_count&access_token=${page.access_token || longToken}`);
+          const profileData = await profileRes.json();
+          igUsername = profileData.username;
+          igFollowers = profileData.followers_count || 0;
+        }
+      }
+      // Save to Firestore
+      if (admin.apps.length) {
+        await admin.firestore().collection("organisers").doc(uid).set({
+          igConnected: true,
+          igToken: longToken,
+          igPageToken: page?.access_token || longToken,
+          igUserId,
+          igUsername: igUsername || "",
+          igFollowers,
+          igConnectedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      }
+      return send(res, 302, "", { Location: "/premium-client-dashboard.html?ig_connected=1&ig_user=" + encodeURIComponent(igUsername || "") });
+    } catch (err) {
+      return send(res, 302, "", { Location: "/premium-client-dashboard.html?ig_error=" + encodeURIComponent(err.message) });
+    }
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/instagram/disconnect") {
+    const session = requireSession(req);
+    if (!session) return send(res, 401, { success: false, error: "Not signed in" });
+    if (admin.apps.length) {
+      await admin.firestore().collection("organisers").doc(session.uid).set({
+        igConnected: false, igToken: "", igPageToken: "", igUserId: null, igUsername: "",
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    }
+    return send(res, 200, { success: true });
+  }
+
   if (req.method === "GET" && url.pathname === "/api") {
     return send(res, 200, {
       endpoints: [
@@ -492,10 +1004,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && url.pathname === "/dashboard") {
     const session = requireSession(req);
     if (!session) return send(res, 401, "Unauthorized");
-    if ((session.role === "client" || session.role === "manager") && !session.onboardingComplete) {
-      return send(res, 302, "", { Location: "/onboarding/client" });
-    }
-    return send(res, 302, "", { Location: `/dashboard/${session.role || "customer"}` });
+    return send(res, 302, "", { Location: `/dashboard/${session.role || "client"}` });
   }
 
   if (req.method === "GET" && url.pathname === "/onboarding") {
@@ -517,24 +1026,22 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && url.pathname.startsWith("/dashboard/")) {
     const session = requireSession(req);
     if (!session) {
-      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cityvibe Dashboard</title></head><body style="font-family:system-ui;background:#f6f8ff;color:#10203f;display:grid;place-items:center;min-height:100vh;margin:0"><div style="background:#fff;border:1px solid #dbe5ff;border-radius:24px;padding:24px;max-width:480px;width:calc(100% - 32px)"><h1>Sign in required</h1><p>Please go back to the login page and sign in with Firebase first.</p><a href="/login.html">Go to login</a></div></body></html>`;
+      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CultureWave Dashboard</title></head><body style="font-family:system-ui;background:#f6f8ff;color:#10203f;display:grid;place-items:center;min-height:100vh;margin:0"><div style="background:#fff;border:1px solid #dbe5ff;border-radius:24px;padding:24px;max-width:480px;width:calc(100% - 32px)"><h1>Sign in required</h1><p>Please go back to the login page and sign in with Firebase first.</p><a href="/login.html">Go to login</a></div></body></html>`;
       return send(res, 401, html, { "Content-Type": "text/html; charset=utf-8" });
     }
     const parts = url.pathname.split("/").filter(Boolean);
-    const requestedRole = parts[1] || "customer";
+    const requestedRole = parts[1] || "client";
     const requestedPage = parts[2] || "";
-    if (requestedRole !== session.role && requestedRole !== "customer" && requestedRole !== "client" && requestedRole !== "manager" && requestedRole !== "admin") {
+    if (requestedRole !== session.role && requestedRole !== "client" && requestedRole !== "admin") {
       return send(res, 404, "Not found");
     }
     if (requestedRole !== session.role) {
-      return send(res, 302, "", { Location: `/dashboard/${session.role || "customer"}` });
+      return send(res, 302, "", { Location: `/dashboard/${session.role || "client"}` });
     }
     const fileName =
       requestedRole === "admin"
         ? adminPages[requestedPage] || adminPages[""]
-        : requestedRole === "client" || requestedRole === "manager"
-          ? clientPages[requestedPage] || clientPages[""]
-          : dashboardFiles[requestedRole] || dashboardFiles.customer;
+        : clientPages[requestedPage] || clientPages[""];
     const html = await readFile(join(publicDir, fileName), "utf8");
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
   }
@@ -543,5 +1050,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(3000, "127.0.0.1", () => {
-  console.log("cityvibe running on http://127.0.0.1:3000");
+  console.log("CultureWave running on http://127.0.0.1:3000");
 });
