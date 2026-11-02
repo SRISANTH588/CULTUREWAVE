@@ -1,5 +1,5 @@
 import http from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, access } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHmac, randomUUID } from "node:crypto";
@@ -9,6 +9,20 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const publicDir = __dirname;
 const orders = new Map();
 const sessions = new Map();
+
+// Load local secrets without adding a runtime dependency. Production should
+// provide the same values through the hosting platform environment settings.
+try {
+  await access(join(__dirname, ".env"));
+  const envFile = await readFile(join(__dirname, ".env"), "utf8");
+  for (const line of envFile.split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!match || process.env[match[1]]) continue;
+    process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, "$2");
+  }
+} catch {
+  // Missing .env is expected when the host supplies environment variables.
+}
 
 if (!admin.getApps().length) {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
@@ -58,7 +72,7 @@ const localDevAccounts = new Map([
       password: "SASI@2006",
       role: "admin",
       name: "Srisanth",
-      email: "srisanth@cityvibe.local",
+      email: "srisanth@culturewave.in",
     },
   ],
   [
@@ -68,7 +82,7 @@ const localDevAccounts = new Map([
       password: "sasi",
       role: "client",
       name: "Sasi",
-      email: "sasi@cityvibe.local",
+      email: "sasi@culturewave.in",
       onboardingComplete: false,
     },
   ],
@@ -121,7 +135,7 @@ function parseCookies(cookieHeader = "") {
 
 function getSession(req) {
   const cookies = parseCookies(req.headers.cookie);
-  const sessionId = cookies.cityvibe_session;
+  const sessionId = cookies.culturewave_session;
   if (!sessionId) return null;
   return sessions.get(sessionId) || null;
 }
@@ -133,7 +147,7 @@ function requireSession(req) {
 }
 
 function setSessionCookie(res, sessionId) {
-  res.setHeader("Set-Cookie", `cityvibe_session=${encodeURIComponent(sessionId)}; HttpOnly; Path=/; SameSite=Lax`);
+  res.setHeader("Set-Cookie", `culturewave_session=${encodeURIComponent(sessionId)}; HttpOnly; Path=/; SameSite=Lax`);
 }
 
 function createSession(user) {
@@ -257,6 +271,20 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  if (req.method === "GET" && url.pathname === "/api/imagekit/auth") {
+    const publicKey = process.env.IMAGEKIT_PUBLIC_KEY || "";
+    const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || "";
+    if (!publicKey || !privateKey) {
+    return send(res, 503, { success: false, error: "ImageKit is not configured on the server." }, { "Access-Control-Allow-Origin": "*" });
+    }
+    const expire = Math.floor(Date.now() / 1000) + 600;
+    const token = randomUUID();
+    const signature = createHmac("sha1", privateKey)
+      .update(token + expire)
+      .digest("hex");
+    return send(res, 200, { token, expire, signature, publicKey }, { "Access-Control-Allow-Origin": "*" });
+  }
+
   if (req.method === "POST" && url.pathname === "/api/auth/local-login") {
     try {
       const body = await readBody(req);
@@ -294,7 +322,7 @@ const server = http.createServer(async (req, res) => {
         password,
         role: "client",
         name: fullName,
-        email: `${username.toLowerCase()}@cityvibe.local`,
+        email: `${username.toLowerCase()}@culturewave.in`,
       };
       demoAccounts.set(username.toUpperCase(), account);
       const session = createSession(account);
@@ -384,9 +412,9 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "POST" && url.pathname === "/api/auth/logout") {
     const cookies = parseCookies(req.headers.cookie);
-    const sessionId = cookies.cityvibe_session;
+    const sessionId = cookies.culturewave_session;
     if (sessionId) sessions.delete(sessionId);
-    res.setHeader("Set-Cookie", "cityvibe_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
+    res.setHeader("Set-Cookie", "culturewave_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
     return send(res, 200, { success: true });
   }
 
@@ -400,10 +428,85 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
   }
 
+  // Public attendee access is deliberately served by the server: the browser
+  // never receives the bookings collection or other guests' personal data.
+  if (req.method === "GET" && url.pathname === "/api/guest/playlist") {
+    try {
+      if (!admin.apps.length) return send(res, 503, { success: false, error: "Playlists are unavailable." });
+      const eventId = String(url.searchParams.get("eventId") || "").trim();
+      let playlists = eventId
+        ? await admin.firestore().collection("playlists").where("eventId", "==", eventId).limit(1).get()
+        : { empty: true };
+      if (playlists.empty) playlists = await admin.firestore().collection("playlists").where("isDefault", "==", true).limit(1).get();
+      if (playlists.empty) return send(res, 404, { success: false, error: "No playlist has been published yet." });
+      const playlist = playlists.docs[0].data();
+      return send(res, 200, { success: true, playlist: { title: playlist.title || "Event Playlist", description: playlist.description || "", songs: Array.isArray(playlist.songs) ? playlist.songs : [] } });
+    } catch (error) {
+      console.error("Public playlist request failed:", error);
+      return send(res, 500, { success: false, error: "We could not load this playlist right now." });
+    }
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/guest/playlist-access") {
+    try {
+      if (!admin.apps.length) return send(res, 503, { success: false, error: "Booking verification is unavailable." });
+      const body = await readBody(req);
+      const phone = String(body.phone || "").replace(/\D/g, "");
+      if (phone.length < 10) return send(res, 400, { success: false, error: "Enter a valid mobile number." });
+      const matchesPhone = (value) => String(value || "").replace(/\D/g, "").slice(-10) === phone.slice(-10);
+      const snap = await admin.firestore().collection("bookings").limit(5000).get();
+      const bookingDoc = snap.docs.find((entry) => {
+        const b = entry.data();
+        const status = String(b.status || "").toLowerCase();
+        return !["cancelled", "failed", "refunded"].includes(status) && matchesPhone(b.customerPhone || b.customer?.phone || b.buyerPhone || b.buyer?.phone || b.phone);
+      });
+      if (!bookingDoc) return send(res, 404, { success: false, error: "No active booking was found for this number." });
+      const booking = bookingDoc.data();
+      const eventId = booking.eventId || booking.event?.id || booking.event?.eventId || null;
+      let playlist = null;
+      if (eventId) {
+        const playlists = await admin.firestore().collection("playlists").where("eventId", "==", eventId).limit(1).get();
+        if (!playlists.empty) playlist = { id: playlists.docs[0].id, ...playlists.docs[0].data() };
+      }
+      if (!playlist) {
+        const playlists = await admin.firestore().collection("playlists").where("isDefault", "==", true).limit(1).get();
+        if (!playlists.empty) playlist = { id: playlists.docs[0].id, ...playlists.docs[0].data() };
+      }
+      return send(res, 200, {
+        success: true,
+        guestName: booking.customerName || booking.customer?.name || booking.buyerName || "Guest",
+        eventName: booking.eventName || booking.event?.name || booking.event?.title || "your event",
+        playlist: playlist ? { title: playlist.title || "Event Playlist", description: playlist.description || "", songs: Array.isArray(playlist.songs) ? playlist.songs : [] } : null,
+      });
+    } catch (error) {
+      console.error("Guest playlist access failed:", error);
+      return send(res, 500, { success: false, error: "We could not verify this booking right now." });
+    }
+  }
+
+  const profileHandleMatch = url.pathname.match(/^\/([a-z0-9](?:[a-z0-9._-]{0,58}[a-z0-9])?)\/?$/i);
+  if (req.method === "GET" && profileHandleMatch && !["api", "logout", "dashboard", "onboarding", "pay"].includes(profileHandleMatch[1].toLowerCase())) {
+    try {
+      const profiles = await admin.firestore().collection("organisers").where("handle", "==", profileHandleMatch[1].toLowerCase()).limit(1).get();
+      if (!profiles.empty) {
+        const html = await readFile(join(publicDir, "client-profile.html"), "utf8");
+        return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
+      }
+    } catch (error) {
+      console.error("Public profile route lookup failed:", error);
+    }
+  }
+
   if (req.method === "GET" && extname(url.pathname)) {
     try {
       const filePath = join(publicDir, url.pathname.slice(1));
-      const file = await readFile(filePath, "utf8");
+      let file = await readFile(filePath, "utf8");
+      if (!file.includes('firebase-config.js') && !file.includes('from "./firebase.js"') && !file.includes("from './firebase.js'") && file.includes('</head>')) {
+        file = file.replace(
+          '</head>',
+          '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="firebase-config.js"></script></head>'
+        );
+      }
       const contentType = mimeTypes[extname(url.pathname)] || "text/plain; charset=utf-8";
       return send(res, 200, file, { "Content-Type": contentType });
     } catch {
@@ -598,6 +701,48 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  if (req.method === "POST" && url.pathname === "/api/bookings/free") {
+    try {
+      const body = await readBody(req);
+      const name = String(body.customer?.name || "").trim();
+      const email = String(body.customer?.email || "").trim();
+      const phone = String(body.customer?.phone || "").trim();
+      const bookingId = `bk_${randomUUID().slice(0, 8)}`;
+      const booking = {
+        bookingId,
+        eventId: body.eventId || null,
+        orderId: null,
+        razorpayOrderId: null,
+        paymentId: null,
+        status: "confirmed",
+        event: body.event || {},
+        customer: {
+          id: email || name || "guest",
+          name: name || "Guest",
+          email,
+          phone,
+          ticket: body.ticketName || "General Admission",
+        },
+        amount: 0,
+        currency: "INR",
+        seats: Number(body.seats || 1),
+        method: "free",
+        createdAt: Date.now(),
+        source: "free",
+      };
+      try {
+        if (admin.apps.length) {
+          await admin.firestore().collection("bookings").doc(bookingId).set(booking, { merge: true });
+        }
+      } catch (writeError) {
+        console.warn("Free booking Firestore write skipped:", writeError.message);
+      }
+      return send(res, 200, { success: true, bookingId });
+    } catch (error) {
+      return send(res, 400, { success: false, error: error.message || "Could not create free booking" });
+    }
+  }
+
   if (req.method === "POST" && url.pathname === "/api/bookings/verify") {
     try {
       const body = await readBody(req);
@@ -683,6 +828,67 @@ const server = http.createServer(async (req, res) => {
 <style>body{font-family:system-ui;background:#08101e;color:#edf4ff;display:grid;place-items:center;min-height:100vh;margin:0}.card{background:#101c32;border:1px solid rgba(255,255,255,.1);padding:24px;border-radius:24px;max-width:520px;width:calc(100% - 32px)}button,a{display:block;width:100%;margin-top:12px;padding:14px 16px;border-radius:999px;border:0;text-decoration:none;text-align:center}.ok{background:#7ee0c7;color:#041019}.bad{background:#ff8b8b;color:#041019}.muted{color:#a9b6cf}</style>
 </head><body><div class="card"><h1>Complete payment</h1><p class="muted">Order ${order.id} for ₹${(order.amount / 100).toFixed(2)}</p><a class="ok" href="/api/payments/confirm?orderId=${order.id}&status=paid">Mark success</a><a class="bad" href="/api/payments/confirm?orderId=${order.id}&status=failed">Mark failed</a></div></body></html>`;
     return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
+  }
+
+  // ── WHATSAPP OTP ──
+  if (req.method === "POST" && url.pathname === "/api/whatsapp/send-otp") {
+    try {
+      const body = await readBody(req);
+      const phone = String(body.phone || "").trim();
+      const name  = String(body.name  || "User").trim();
+      if (!phone) return send(res, 400, { success: false, error: "Phone number required" });
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const expiresAt = Date.now() + 10 * 60 * 1000;
+      if (admin.apps.length) {
+        await admin.firestore().collection("whatsappOtps").doc(phone).set({ otp, expiresAt, name, createdAt: Date.now() });
+      }
+      // Send via WhatsApp Business API if configured, else log for manual send
+      const waToken   = process.env.WHATSAPP_TOKEN || "";
+      const waPhoneId = process.env.WHATSAPP_PHONE_ID || "";
+      if (waToken && waPhoneId) {
+        const to = phone.replace(/\D/g, "");
+        await fetch(`https://graph.facebook.com/v19.0/${waPhoneId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${waToken}` },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            to,
+            type: "text",
+            text: { body: `Hi ${name}! Your CultureWave OTP is *${otp}*. Valid for 10 minutes. Do not share this with anyone.` }
+          })
+        });
+      } else {
+        console.log(`[WhatsApp OTP] To: ${phone} | Name: ${name} | OTP: ${otp}`);
+      }
+      return send(res, 200, { success: true });
+    } catch (error) {
+      return send(res, 500, { success: false, error: error.message });
+    }
+  }
+
+  // ── WHATSAPP BOOKING CONFIRMATION ──
+  if (req.method === "POST" && url.pathname === "/api/whatsapp/booking-confirm") {
+    try {
+      const body = await readBody(req);
+      const { phone, name, eventName, date, bookingId, amount } = body;
+      if (!phone) return send(res, 400, { success: false, error: "Phone required" });
+      const msg = `Hi ${name||'there'}! 🎉 Your booking is confirmed!\n\n🎟 *${eventName||'Event'}*\n📅 ${date||''}\n🔖 Booking ID: ${bookingId||''}\n💰 Amount: ${amount?'₹'+amount:'Free'}\n\nSee you there! — CultureWave`;
+      const waToken   = process.env.WHATSAPP_TOKEN || "";
+      const waPhoneId = process.env.WHATSAPP_PHONE_ID || "";
+      if (waToken && waPhoneId) {
+        const to = phone.replace(/\D/g, "");
+        await fetch(`https://graph.facebook.com/v19.0/${waPhoneId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${waToken}` },
+          body: JSON.stringify({ messaging_product: "whatsapp", to, type: "text", text: { body: msg } })
+        });
+      } else {
+        console.log(`[WhatsApp Booking] To: ${phone} | ${msg}`);
+      }
+      return send(res, 200, { success: true });
+    } catch (error) {
+      return send(res, 500, { success: false, error: error.message });
+    }
   }
 
   // ── INSTAGRAM OAUTH ──
@@ -820,7 +1026,7 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
   if (req.method === "GET" && url.pathname.startsWith("/dashboard/")) {
     const session = requireSession(req);
     if (!session) {
-      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cityvibe Dashboard</title></head><body style="font-family:system-ui;background:#f6f8ff;color:#10203f;display:grid;place-items:center;min-height:100vh;margin:0"><div style="background:#fff;border:1px solid #dbe5ff;border-radius:24px;padding:24px;max-width:480px;width:calc(100% - 32px)"><h1>Sign in required</h1><p>Please go back to the login page and sign in with Firebase first.</p><a href="/login.html">Go to login</a></div></body></html>`;
+      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CultureWave Dashboard</title></head><body style="font-family:system-ui;background:#f6f8ff;color:#10203f;display:grid;place-items:center;min-height:100vh;margin:0"><div style="background:#fff;border:1px solid #dbe5ff;border-radius:24px;padding:24px;max-width:480px;width:calc(100% - 32px)"><h1>Sign in required</h1><p>Please go back to the login page and sign in with Firebase first.</p><a href="/login.html">Go to login</a></div></body></html>`;
       return send(res, 401, html, { "Content-Type": "text/html; charset=utf-8" });
     }
     const parts = url.pathname.split("/").filter(Boolean);
@@ -844,5 +1050,5 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
 });
 
 server.listen(3000, "127.0.0.1", () => {
-  console.log("cityvibe running on http://127.0.0.1:3000");
+  console.log("CultureWave running on http://127.0.0.1:3000");
 });
