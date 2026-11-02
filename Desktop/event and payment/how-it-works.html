@@ -3,19 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>How CultureWave Event Booking Works</title>
-  <meta name="description" content="Learn how to discover events, book tickets and manage event listings with CultureWave."/>
-  <link rel="canonical" href="https://culturewave.in/how-it-works.html"/>
-  <meta property="og:type" content="website"/>
-  <meta property="og:site_name" content="CultureWave"/>
-  <meta property="og:title" content="How CultureWave Event Booking Works"/>
-  <meta property="og:description" content="Learn how to discover events, book tickets and manage event listings with CultureWave."/>
-  <meta property="og:url" content="https://culturewave.in/how-it-works.html"/>
-  <meta property="og:image" content="https://culturewave.in/herosection.jpeg"/>
-  <meta name="twitter:card" content="summary_large_image"/>
-  <meta name="twitter:title" content="How CultureWave Event Booking Works"/>
-  <meta name="twitter:description" content="Learn how to discover events, book tickets and manage event listings with CultureWave."/>
-  <meta name="twitter:image" content="https://culturewave.in/herosection.jpeg"/>
+    <title>CultureWave | How It Works</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -528,79 +516,10 @@
         .hw-visual-body { grid-template-columns: 1fr; }
       }
       @media (max-width: 600px) {
-        .hw-steps {
-          display: flex;
-          flex-direction: row;
-          overflow-x: auto;
-          scroll-snap-type: x mandatory;
-          -webkit-overflow-scrolling: touch;
-          gap: 1rem;
-          padding-bottom: 0.8rem;
-          scrollbar-width: none;
-        }
-        .hw-steps::-webkit-scrollbar { display: none; }
-        .hw-steps::before { display: none; }
-        .hw-step {
-          flex: 0 0 72vw;
-          max-width: 260px;
-          scroll-snap-align: center;
-          background: #fff;
-          border: 1.5px solid #e8edf8;
-          border-radius: 20px;
-          padding: 1.4rem 1rem;
-          box-shadow: 0 4px 16px rgba(18,66,197,0.07);
-        }
-      }
-
-      /* Black, white and blue site theme */
-      body { background: #080a10 !important; color: #f7f8fc; }
-      .topbar, .mobile-nav { background: #0b0d13 !important; border-color: #242a36 !important; }
-      .topnav a, .nav-link { color: #e8ebf3 !important; }
-      .topbar .nav-link, .mobile-nav .nav-link { color: #080a10 !important; background: #fff !important; border-radius: 6px; padding: .45rem .8rem; }
-      .brand-sub { color: #9ca8c0 !important; }
-      .hw-hero {
-        background: radial-gradient(ellipse at 78% 10%, rgba(40,99,255,.23), transparent 38%),
-          radial-gradient(ellipse at 10% 100%, rgba(18,66,197,.18), transparent 42%), #080a10;
-        border-color: #202637;
-      }
-      .hw-badge, .hw-faq-tab-label { color: #91b0ff; background: rgba(47,107,255,.12); border-color: rgba(94,143,255,.35); }
-      .hw-hero h1, .hw-step h3, .hw-org-step h3, .hw-org-card h4, .hw-detail-card h3,
-      .hw-timeline-section h2, .hw-tl-phase, .hw-tl-feature h4, .hw-faq h2, .hw-faq-q { color: #f7f8fc; }
-      .hw-hero h1 span, .hw-tl-feature h4 .tl-check { color: #75a0ff; }
-      .hw-hero p, .hw-step p, .hw-org-step p, .hw-org-card p, .hw-detail-card p,
-      .hw-tl-feature p, .hw-faq-a { color: #aab2c2; }
-      .hw-tab { color: #c1c9d8; background: #10131b; border-color: #30394b; }
-      .hw-tab.active { color: #fff; background: #2863ff; border-color: #2863ff; box-shadow: 0 5px 18px rgba(40,99,255,.28); }
-      .hw-steps::before, .hw-organizer-top::before { background: linear-gradient(90deg,#202c47,#3971ff,#202c47); }
-      .hw-step-num, .hw-org-num, .hw-tl-num { color: #fff; background: #2863ff; border-color: #111621; box-shadow: 0 8px 24px rgba(40,99,255,.28); }
-      .hw-org-card, .hw-detail-card { color: #f7f8fc; border-color: #252c3a; background: #10131b; box-shadow: 0 10px 30px rgba(0,0,0,.22); }
-      .hw-org-card-icon, .hw-detail-icon { color: #8db0ff; background: linear-gradient(135deg,#17233e,#172b54); }
-      .hw-detail-card:hover { box-shadow: 0 16px 36px rgba(20,64,170,.18); }
-      .hw-strip { border: 1px solid #345fcb; background: linear-gradient(120deg,#12389e,#2863ff); }
-      .hw-strip h2 { color: #fff; }
-      .hw-strip p { color: rgba(255,255,255,.78); }
-      .hw-strip-btn { color: #fff; border: 1px solid rgba(255,255,255,.34); background: #111827; }
-      .hw-visual { border-color: #252c3a; background: #10131b; box-shadow: 0 12px 34px rgba(0,0,0,.24); }
-      .hw-visual-header { border-color: #293144; background: #171d2a; }
-      .hw-screen { color: #f7f8fc; border-color: #293144; background: #151a24; }
-      .hw-screen h4 { color: #f7f8fc; }
-      .hw-screen p { color: #aab2c2; }
-      .hw-screen-arrow { color: #75a0ff; }
-      .hw-tl-line { background: linear-gradient(180deg,#202c47,#3971ff,#202c47); }
-      .hw-tl-icon-circle { border-color: #31446d; background: #17233e; }
-      .hw-tl-tag { color: #a8c0ff; border-color: #2e416d; background: #111d35; }
-      .hw-tl-divider { border-color: #252c3a; }
-      .hw-highlight { color: #dce7ff; background: rgba(40,99,255,.22); }
-      .hw-faq-item { border-color: #252c3a; background: #10131b; }
-      .hw-faq-q { color: #f7f8fc; background: #10131b; }
-      .hw-faq-q::after { color: #75a0ff; }
-      @media (max-width: 600px) {
-        .hw-step { color: #f7f8fc; border-color: #252c3a; background: #10131b; box-shadow: 0 8px 24px rgba(0,0,0,.22); }
+        .hw-steps { grid-template-columns: 1fr; }
       }
     </style>
-    <link rel="stylesheet" href="marketing-pages.css?v=full-width-neat-20261021" />
-    <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
-</head>
+  </head>
   <body>
     <header class="topbar">
       <div class="nav-wrap">
@@ -611,7 +530,7 @@
         <nav class="topnav">
           <a href="index.html">Home</a>
           <a href="events.html">Events</a>
-          <a href="features.html">For Organizers</a>
+          <a href="features.html">Features</a>
           <a href="pricing.html">Pricing</a>
           <a href="how-it-works.html">How It Works</a>
         </nav>
@@ -619,24 +538,8 @@
           <a class="nav-link" href="login.html">Login</a>
           <a class="nav-cta" href="login.html">Get Started</a>
         </div>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
       </div>
     </header>
-
-    <nav class="mobile-nav" id="mobileNav">
-      <a href="index.html">Home</a>
-      <a href="events.html">Events</a>
-      <a href="features.html">For Organizers</a>
-      <a href="pricing.html">Pricing</a>
-      <a href="how-it-works.html">How It Works</a>
-      <a href="customer-service.html">Customer Service</a>
-      <div class="mobile-nav-ctas">
-        <a class="nav-link" href="login.html">Login</a>
-        <a class="nav-cta" href="login.html">Get Started</a>
-      </div>
-    </nav>
 
     <main>
 
@@ -998,70 +901,33 @@
     </main>
 
     <footer class="site-footer">
-  <div class="footer-glow-top"></div>
-  <div class="footer-wrap">
-    <div class="footer-branding">
-      <div class="footer-brand">CultureWave</div>
-      <p>Premium events, workshops &amp; restaurant bookings — all in one seamless flow.</p>
-      <div class="footer-socials">
-        <a class="footer-social-button" href="https://www.instagram.com/culturewave.app?stkn=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-        </a>
-        <a class="footer-social-button" href="mailto:support.culturewave@gmail.com" aria-label="Email">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-        </a>
-        <a class="footer-social-button" href="tel:+916305183601" aria-label="Phone">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        </a>
+      <div class="footer-wrap">
+        <div class="footer-branding">
+          <div class="footer-brand">CultureWave</div>
+          <p>Events, workshops, and restaurant bookings in one smooth flow.</p>
+          <span class="footer-tag">Developed by Srisanth Boddu</span>
+        </div>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="events.html">Events</a>
+          <a href="features.html">Features</a>
+          <a href="pricing.html">Pricing</a>
+          <a href="how-it-works.html">How It Works</a>
+          <a href="privacy-policy.html">Privacy Policy</a>
+          <a href="terms-and-conditions.html">Terms & Conditions</a>
+          <a href="refund-policy.html">Refund Policy</a>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact</h3>
+          <a href="tel:+916305183601">6305183601</a>
+          <span>Contact details will be updated from the admin panel.</span>
+        </div>
       </div>
-    </div>
-    <div class="footer-col">
-      <div class="footer-col-title">Explore</div>
-      <div class="footer-links">
-        <a href="events.html">Events</a>
-        <a href="restaurants.html">Restaurants</a>
-        <a href="features.html">For Organizers</a>
-        <a href="pricing.html">Pricing</a>
-        <a href="how-it-works.html">How it works</a>
-        <a href="booking.html">Book Now</a>
+      <div class="footer-bottom">
+        <span>© 2026 CultureWave. All rights reserved.</span>
+        <span>Built for events, workshops, and restaurant reservations.</span>
       </div>
-    </div>
-    <div class="footer-col">
-      <div class="footer-col-title">Legal</div>
-      <div class="footer-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
-        <a href="refund-policy.html">Refund Policy</a>
-        <a href="customer-service.html">Customer Service</a>
-      </div>
-    </div>
-    <div class="footer-contact">
-      <div class="footer-col-title" style="border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.6rem;margin-bottom:.2rem;">Contact</div>
-      <div class="footer-contact-row">
-        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-        <span style="white-space:nowrap;font-size:.78rem;"><a href="tel:+916305183601" style="color:inherit;text-decoration:none;">6305183601</a> | <a href="tel:+919848047428" style="color:inherit;text-decoration:none;">9848047428</a></span>
-      </div>
-      <a class="footer-contact-row" href="mailto:support.culturewave@gmail.com">
-        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg></span>
-        <span>support.culturewave@gmail.com</span>
-      </a>
-      <a class="footer-contact-row" href="https://www.instagram.com/culturewave.app?stkn=OGJtc25nNW1jMnFi&amp;utm_source=qr" target="_blank" rel="noopener">
-        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span>
-        <span>@culturewave.app</span>
-      </a>
-      <div class="footer-contact-row">
-        <span class="footer-contact-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
-        <span>Vijayawada, India</span>
-      </div>
-    </div>
-  </div>
-  <div class="footer-divider"></div>
-  <div class="footer-bottom">
-    <span>© 2025 OG SHOOTS. All rights reserved. Made with <span class="footer-heart">♥</span> in India.</span>
-    <span class="footer-credit">Developed by <strong>Srisanth Boddu</strong></span>
-    <span class="footer-owned">Owned by OGSHOOTS LUXE</span>
-  </div>
-</footer>
+    </footer>
 
     <script>
       if ("scrollRestoration" in history) {
@@ -1153,20 +1019,5 @@
         });
       });
     </script>
-    <script>
-      const ham = document.getElementById("hamburger");
-      const mNav = document.getElementById("mobileNav");
-      ham.addEventListener("click", () => {
-        ham.classList.toggle("open");
-        mNav.classList.toggle("open");
-        document.body.style.overflow = mNav.classList.contains("open") ? "hidden" : "";
-      });
-      mNav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
-        ham.classList.remove("open");
-        mNav.classList.remove("open");
-        document.body.style.overflow = "";
-      }));
-    </script>
-    <script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
-</body>
+  </body>
 </html>

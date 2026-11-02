@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CultureWave | Create Campaign</title>
-  <meta name="robots" content="noindex, nofollow"/>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -142,14 +141,9 @@
     .goal-card .gc-icon { font-size: 1.4rem; margin-bottom: 0.35rem; }
     .goal-card label { font-size: 0.76rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; display: block; }
 
-    .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
-    .sb-overlay.open{display:block;}
-    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
-    .hamburger span{display:block;width:22px;height:2px;background:#333;border-radius:2px;}
-    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position:fixed;left:-280px;top:0;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);width:280px;z-index:50;border-radius:0;transition:left .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch; } .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.15);} .hamburger{display:flex;} .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
     @media (max-width: 600px) { .topbar-inner { padding: 0 0.8rem; } .layout { padding: 0.7rem; } .progress-wrap { display: none; } }
   </style>
-  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
 <body>
 
@@ -174,7 +168,6 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div style="display:flex;align-items:center;gap:1.2rem;">
-      <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
       <div class="brand">
         <div class="brand-icon">C</div>
         <strong>CultureWave</strong>
@@ -888,6 +881,12 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8",
 });
 const db = firebase.firestore();
 const auth = firebase.auth();
@@ -906,10 +905,11 @@ let uid = null;
 // ── AUTH ──
 async function loadUser() {
   try {
-    const user = auth.currentUser || await new Promise(resolve => auth.onAuthStateChanged(resolve));
-    if (!user) { window.location.href = '/login.html'; return; }
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!res.ok) { window.location.href = '/login.html'; return; }
+    const { user } = await res.json();
     uid = user.uid;
-    document.getElementById('topAvatar').textContent = (user.displayName || user.email || 'U').trim().charAt(0).toUpperCase();
+    document.getElementById('topAvatar').textContent = (user.name || 'U').trim().charAt(0).toUpperCase();
   } catch {}
 }
 loadUser();
@@ -1284,8 +1284,6 @@ async function saveCampaign(status) {
   try {
     const btn = status === 'published' ? document.getElementById('publishBtn') : document.getElementById('saveDraftBtn');
     btn.textContent = 'Saving...'; btn.disabled = true;
-    payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-    payload.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
     await db.collection('campaigns').add(payload);
     window.location.href = 'premium-client-dashboard.html';
   } catch (err) {
@@ -1304,7 +1302,7 @@ document.getElementById('createCampaignBtn').addEventListener('click', () => sav
   try {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (!res.ok) return;
-    
+    const { user } = await res.json();
     db.collection('wallets').doc(user.uid).onSnapshot(doc => {
       const credits = doc.exists ? (doc.data().credits || 0) : 0;
       const el = document.getElementById('topCredits');
@@ -1323,15 +1321,6 @@ document.getElementById('createCampaignBtn').addEventListener('click', () => sav
 })();
 
 updateProgress();
-
-// Mobile sidebar
-(function(){
-  var sidebar=document.querySelector('.sidebar'),btn=document.getElementById('hamburgerBtn'),overlay=document.getElementById('sbOverlay');
-  if(!btn||!sidebar) return;
-  btn.addEventListener('click',function(){sidebar.classList.add('open');overlay.classList.add('open');});
-  overlay.addEventListener('click',function(){sidebar.classList.remove('open');overlay.classList.remove('open');});
-})();
 </script>
-<div class="sb-overlay" id="sbOverlay"></div>
 </body>
 </html>

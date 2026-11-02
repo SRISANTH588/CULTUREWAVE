@@ -4,7 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>CultureWave | Premium Dashboard</title>
-  <meta name="robots" content="noindex, nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --blue:#3b5bdb;--blue-2:#4c6ef5;--blue-light:#e7f5ff;--blue-soft:#f0f4ff;
@@ -14,7 +16,7 @@
   --text:#1a1a2e;--sidebar-w:240px;--bg:#f8f9fa;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
 a{text-decoration:none;color:inherit;}
 button{font:inherit;cursor:pointer;border:0;background:none;}
 
@@ -436,79 +438,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 @media(max-width:900px){
   .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
   .metrics{grid-template-columns:1fr 1fr;}
 }
-/* MOBILE SIDEBAR */
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;backdrop-filter:blur(2px);}
-.sb-overlay.open{display:block;}
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
-.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
-@media(max-width:900px){
-  .sidebar{
-    display:flex!important;position:fixed;left:-260px;top:0;width:260px;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
-    z-index:50;transition:left .28s cubic-bezier(.4,0,.2,1);
-    overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
-  }
-  .sidebar.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,.2);}
-  .hamburger{display:flex;}
-  .metrics{grid-template-columns:1fr 1fr;}
-  .topbar{padding:.75rem 1rem;}
-  /* Grids collapse */
-  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr !important;}
-  /* Hero banners */
-  .view > div[style*="border-radius:20px"]{padding:1.1rem 1.2rem !important;}
-  /* Tables scroll */
-  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .data-table{min-width:480px;}
-  /* Filter bars */
-  .filter-bar{flex-direction:column;align-items:stretch;}
-  .filter-bar input,.filter-bar select{width:100% !important;min-width:0 !important;}
-  /* Topbar right: hide non-essential */
-  .topbar-right > a{display:none;}
-  /* Stat strips: 2-col */
-  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr !important;}
-  div[style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr 1fr !important;}
-}
-@media(max-width:560px){
-  .metrics{grid-template-columns:1fr !important;}
-  .view{padding:.75rem !important;}
-  /* Hero stats strip: single col */
-  div[style*="display:flex;gap:0;flex-wrap:wrap;margin-top"]{
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-  }
-  /* Topbar compact */
-  .topbar{padding:.6rem .75rem;}
-  .topbar-title{font-size:.88rem;}
-  /* Modals */
-  .modal{padding:1rem;border-radius:16px;}
-  .modal-actions{flex-direction:column;}
-  /* Btn rows */
-  .btn-row{flex-direction:column;}
-  .btn-row .btn{width:100%;justify-content:center;}
-  /* Stat cards: 2-col */
-  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr !important;}
-  /* Page body padding */
-  .page-body{padding:.75rem !important;}
-  /* Bottom nav */
-  .mobile-bottom-nav{display:flex !important;}
-  .content{padding-bottom:4.5rem;}
-}
-/* Mobile bottom nav */
-.mobile-bottom-nav{
-  display:none;
-  position:fixed;bottom:0;left:0;right:0;
-  background:#fff;border-top:1px solid var(--border);
-  z-index:30;padding:.35rem 0 calc(.35rem + env(safe-area-inset-bottom));
-  box-shadow:0 -4px 16px rgba(29,78,216,.08);
-}
-.mbn-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:.12rem;
-  padding:.28rem .2rem;border:0;background:none;cursor:pointer;
-  font-size:.56rem;font-weight:600;color:#9ca3af;transition:color .12s;
-}
-.mbn-item.active{color:var(--blue);}
-.mbn-icon{font-size:1.15rem;line-height:1;}
 </style>
 </head>
 <body>
@@ -548,11 +480,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <button class="sb-item" data-view="surveys"><span class="sb-icon">📋</span> Survey Forms</button>
     <button class="sb-item" data-view="inquiries"><span class="sb-icon">✉</span> Inquiries</button>
     <button class="sb-item" data-view="integrations"><span class="sb-icon">⚙</span> Integrations</button>
-    <a class="sb-item" href="checkin.html" target="_blank"><span class="sb-icon">📷</span> Check-In Scanner</a>
     <div class="sb-section-label">Influencer Marketing <span>▾</span></div>
     <button class="sb-item" data-view="campaigns"><span class="sb-icon">📣</span> My Campaigns</button>
     <button class="sb-item" data-view="custom-website"><span class="sb-icon">🌐</span> Custom Website</button>
-    <button class="sb-item" onclick="location.href='https://wa.me/919848047428?text=' + encodeURIComponent('Hi CultureWave! I need help with my dashboard.')"><span class="sb-icon">💬</span> Contact Us</button>
+    <button class="sb-item" onclick="location.href='https://wa.me/916305183601?text=' + encodeURIComponent('Hi CultureWave! I need help with my dashboard. 👋')"><span class="sb-icon">💬</span> Contact Us</button>
     <div class="sb-section-label">Account <span>▾</span></div>
     <button class="sb-item" data-view="personal-info"><span class="sb-icon">🪪</span> Brand & Profile</button>
     <button class="sb-item" data-view="settings"><span class="sb-icon">⚙</span> Settings</button>
@@ -572,14 +503,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
   <!-- TOPBAR -->
   <header class="topbar">
-    <div style="display:flex;align-items:center;gap:.75rem;">
-      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-      <div class="topbar-title" id="pageTitle">Events</div>
-    </div>
+    <div class="topbar-title" id="pageTitle">Events</div>
     <div class="topbar-right">
-      <a class="tb-link" href="Home.html" target="_blank">⬡ View website</a>
+      <a class="tb-link" href="index.html" target="_blank">⬡ View website</a>
       <button class="tb-icon-btn" id="notifyBtn">🔔<span class="tb-dot"></span></button>
       <button class="tb-user-btn" onclick="switchView('personal-info')">
         <div class="tb-user-avatar" id="topAvatar">C</div>
@@ -612,7 +538,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <div style="font-size:.88rem;color:rgba(255,255,255,.6);margin-top:.4rem;max-width:420px;line-height:1.6;">Create, manage and publish your events. Track bookings and revenue in real time.</div>
       </div>
       <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding-top:.25rem;">
-        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⬡ View Profile</button>
+        <button onclick="location.href='index.html'" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⬡ View Website</button>
         <button onclick="switchView('personal-info')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⚙ Brand Settings</button>
         <button id="createEvBtn" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:9px;background:#fff;border:0;color:var(--blue);font-size:.84rem;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);">✦ Create Event</button>
       </div>
@@ -1054,7 +980,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <div style="font-size:.88rem;color:rgba(255,255,255,.6);margin-top:.4rem;max-width:420px;line-height:1.6;">Host live sessions, workshops and masterclasses. Track registrations in real time.</div>
       </div>
       <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding-top:.25rem;">
-        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⬡ View Profile</button>
+        <button onclick="location.href='index.html'" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⬡ View Website</button>
         <button onclick="switchView('personal-info')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⚙ Brand Settings</button>
         <button onclick="location.href='webinar-create.html'" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:9px;background:#fff;border:0;color:#7c3aed;font-size:.84rem;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);">✦ Create Webinar</button>
       </div>
@@ -1100,7 +1026,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <div style="font-size:.88rem;color:rgba(255,255,255,.6);margin-top:.4rem;max-width:420px;line-height:1.6;">Create treks, camping trips and adventure tours. Manage batches and bookings easily.</div>
       </div>
       <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding-top:.25rem;">
-        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⬡ View Profile</button>
+        <button onclick="location.href='index.html'" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⬡ View Website</button>
         <button onclick="switchView('personal-info')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⚙ Brand Settings</button>
         <button onclick="location.href='adventure-create.html'" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:9px;background:#fff;border:0;color:#e85d04;font-size:.84rem;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);">✦ Create Tour</button>
       </div>
@@ -1146,7 +1072,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         <div style="font-size:.88rem;color:rgba(255,255,255,.6);margin-top:.4rem;max-width:420px;line-height:1.6;">Manage table reservations, dining events and special experiences for your guests.</div>
       </div>
       <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding-top:.25rem;">
-        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⬡ View Profile</button>
+        <button onclick="location.href='index.html'" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⬡ View Website</button>
         <button onclick="switchView('personal-info')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">⚙ Brand Settings</button>
         <button onclick="location.href='restaurant-create.html'" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:9px;background:#fff;border:0;color:#dc2626;font-size:.84rem;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);">✦ Add Reservation</button>
       </div>
@@ -1539,7 +1465,7 @@ Spots are limited — grab yours now! 🔥"></textarea>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding-top:.25rem;">
-        <button onclick="location.href='https://wa.me/919848047428?text=' + encodeURIComponent('Hi CultureWave! I\'d like to discuss an influencer campaign for my brand.')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">&#128172; Talk to Us</button>
+        <button onclick="location.href='https://wa.me/916305183601?text=' + encodeURIComponent('Hi CultureWave! I\'d like to discuss an influencer campaign for my brand. 🚀')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;">&#128172; Talk to Us</button>
         <a href="campaign-create.html" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:9px;background:#fff;border:0;color:#6b21a8;font-size:.84rem;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);text-decoration:none;">&#10022; Start Campaign</a>
       </div>
     </div>
@@ -1587,7 +1513,7 @@ Spots are limited — grab yours now! 🔥"></textarea>
     <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#6b21a8,#a855f7);display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem;">&#128226;</div>
     <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:.4rem;">Ready to launch your first campaign?</h3>
     <p style="font-size:.86rem;color:var(--muted);max-width:380px;margin:0 auto 1.5rem;line-height:1.7;">Get in touch with our team at OGSHOOTS MARKETING &amp; WEBSITE and we&#39;ll build a custom influencer strategy for your brand.</p>
-    <button onclick="location.href='https://wa.me/919848047428?text=' + encodeURIComponent('Hi CultureWave! I want to launch an influencer marketing campaign. Can you help me get started?')" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2rem;border-radius:999px;background:linear-gradient(135deg,#6b21a8,#a855f7);border:0;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(107,66,168,.35);">&#128172; Chat with OGSHOOTS</button>
+    <button onclick="location.href='https://wa.me/916305183601?text=' + encodeURIComponent('Hi CultureWave! I want to launch an influencer marketing campaign. Can you help me get started? 📊')" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2rem;border-radius:999px;background:linear-gradient(135deg,#6b21a8,#a855f7);border:0;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(107,33,168,.35);">&#128172; Chat with OGSHOOTS</button>
   </div>
 
 </div>
@@ -1697,7 +1623,7 @@ Spots are limited — grab yours now! 🔥"></textarea>
                   <span class="url-prefix">culturewave.in/</span>
                   <input class="url-input" id="pfHandle" type="text" placeholder="yourbrand"/>
                 </div>
-                <div class="url-hint">Use lowercase letters, numbers, dots, hyphens, or underscores.</div>
+                <div class="url-hint">Only lowercase letters, numbers, hyphens, and underscores are allowed</div>
               </div>
             </div>
           </div>
@@ -2171,7 +2097,7 @@ var _titles = {
   integrations:'Integrations', campaigns:'My Campaigns', 'custom-website':'Custom Website',
   sales:'Sales Summary', payouts:'Payouts', settings:'Settings', 'personal-info':'Brand & Profile'
 };
-window.switchView = function switchView(name) {
+function switchView(name) {
   document.querySelectorAll('.view').forEach(function(el){ el.classList.toggle('active', el.dataset.view === name); });
   document.querySelectorAll('.sb-item[data-view]').forEach(function(el){ el.classList.toggle('active', el.dataset.view === name); });
   var pt = document.getElementById('pageTitle');
@@ -2209,13 +2135,22 @@ function switchToolTab(btn, toolId) {
   if(panel) panel.style.display='block';
 }
 </script>
-<script src="imagekit.js"></script>
 <script type="module">
-import { app, auth, db, getCurrentUser, logout,
-  collection, doc, query, where, orderBy, limit,
-  onSnapshot, getDocs, getDoc, setDoc, addDoc, updateDoc, serverTimestamp
-} from "./firebase.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { getFirestore, collection, doc, query, where, orderBy, limit,
+         onSnapshot, getDocs, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
+const app = initializeApp({
+  apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain:"ogshootsluxe-36740.firebaseapp.com",
+  projectId:"ogshootsluxe-36740",
+  storageBucket:"ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId:"5471814825",
+  appId:"1:5471814825:web:07e84f2f88486da817d5b8"
+});
+const auth = getAuth(app);
+const db = getFirestore(app);
 window.db = db; window.doc = doc; window.setDoc = setDoc; window.updateDoc = updateDoc;
 
 // ── HELPERS ──
@@ -2311,7 +2246,6 @@ document.addEventListener('change', function(e){
 
 // ── EVENTS VIEW ──
 let allEvents = [], activeTab = 'published', myUid = null;
-function eventPublicPath(name,id=''){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;}
 
 // show empty state immediately
 (function(){
@@ -2325,7 +2259,7 @@ function eventPublicPath(name,id=''){const slug=String(name||'event').normalize(
   document.getElementById('emptyCreateBtn').onclick = () => location.href='event-create.html';
 })();
 
-function normStatus(s){ const v=(s||'draft').toLowerCase(); return (v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished'; }
+function normStatus(s){ const v=(s||'draft').toLowerCase(); return v==='published'?'published':v==='archived'?'archived':'unpublished'; }
 
 function renderEvents() {
   const q = document.getElementById('evSearch').value.trim().toLowerCase();
@@ -2372,10 +2306,9 @@ function renderEvents() {
         <div style="font-size:.84rem;font-weight:600;">${price?money(price):'Free'}</div>
         <div class="ev-actions" style="flex-wrap:wrap;gap:.3rem;">
           <button class="ev-act-btn ${isPublished?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${isPublished?'Unpublish':'Publish'}</button>
-          <a class="ev-act-btn" href="${eventPublicPath(ev.urlKey||ev.name,ev.id)}" target="_blank">View</a>
+          <a class="ev-act-btn" href="event-detail.html?eventId=${ev.id}" target="_blank">View</a>
           <a class="ev-act-btn" href="event-create.html?eventId=${ev.id}">Edit</a>
           <button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button>
-          ${st!=='archived'?`<button class="ev-act-btn" onclick="archiveEvent('${ev.id}')" title="Keep as archived">Keep</button>`:''}
         </div>
       </div>`;
     }).join('')}
@@ -2383,14 +2316,12 @@ function renderEvents() {
 }
 
 window.copyEvLink = function(id){
-  const publicBase = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-    ? location.origin
-    : 'https://srisanth588.github.io/CULTUREWAVE';
-  const event=allEvents.find(item=>item.id===id);
-  const url=`${publicBase}${eventPublicPath(event?.urlKey||event?.name,event?.id)}`;
-  navigator.clipboard.writeText(url)
+  navigator.clipboard.writeText(`${location.origin}/event-detail.html?eventId=${id}`)
     .then(()=>showToast('Link copied!'))
-    .catch(()=>prompt('Copy this link:', url));
+    .catch(()=>{
+      const url = `${location.origin}/event-detail.html?eventId=${id}`;
+      prompt('Copy this link:', url);
+    });
 };
 
 window.togglePublishEvent = async function(id, currentStatus) {
@@ -2402,19 +2333,6 @@ window.togglePublishEvent = async function(id, currentStatus) {
       updatedAt: serverTimestamp()
     });
     showToast(newStatus === 'published' ? '✅ Event published!' : '🟡 Event unpublished');
-  } catch(e) {
-    showToast('Error: ' + e.message);
-  }
-};
-
-window.archiveEvent = async function(id) {
-  if(!myUid) { showToast('Not signed in'); return; }
-  try {
-    await updateDoc(doc(db, 'events', id), {
-      status: 'archived',
-      updatedAt: serverTimestamp()
-    });
-    showToast('📦 Event kept (archived)');
   } catch(e) {
     showToast('Error: ' + e.message);
   }
@@ -2526,7 +2444,7 @@ if(coverInput) coverInput.addEventListener('change', function(){
 // handle slug validation
 const pfHandleEl = document.getElementById('pfHandle');
 if(pfHandleEl) pfHandleEl.addEventListener('input', function(){
-  this.value = this.value.toLowerCase().replace(/[^a-z0-9._-]/g,'').replace(/^[._-]+|[._-]+$/g,'');const h=this.value.trim();if(h){const base=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);const url=location.origin+base+encodeURIComponent(h);const publicUrl=document.getElementById('pfPublicUrl'),view=document.getElementById('pfViewBtn'),copy=document.getElementById('pfCopyBtn');if(publicUrl)publicUrl.textContent=url;if(view)view.href=url;if(copy)copy.onclick=()=>navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!'));}
+  this.value = this.value.toLowerCase().replace(/[^a-z0-9_-]/g,'');
 });
 
 // ── PROFILE ──
@@ -2534,9 +2452,7 @@ let profileUid = null;
 
 async function loadProfile(uid) {
   profileUid = uid;
-  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  const publicBase = isLocal ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE';
-  const url = `${publicBase}/client-profile.html?uid=${uid}`;
+  const url = `${location.origin}/client-profile.html?uid=${uid}`;
   const pfUrl = document.getElementById('pfPublicUrl');
   const pfView = document.getElementById('pfViewBtn');
   const pfCopy = document.getElementById('pfCopyBtn');
@@ -2547,14 +2463,6 @@ async function loadProfile(uid) {
   const snap = await getDoc(doc(db,'organisers',uid));
   if(snap.exists()){
     const d = snap.data();
-    const publicHandle = String(d.handle||'').trim().toLowerCase();
-    if(publicHandle){
-      const basePath = location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);
-      const publicUrl = location.origin + basePath + encodeURIComponent(publicHandle);
-      if(pfUrl) pfUrl.textContent = publicUrl;
-      if(pfView) pfView.href = publicUrl;
-      if(pfCopy) pfCopy.onclick = () => navigator.clipboard.writeText(publicUrl).then(()=>showToast('Profile link copied!'));
-    }
     const g = id => document.getElementById(id);
     if(g('pfName')) g('pfName').value = d.name||'';
     if(g('pfHandle')) g('pfHandle').value = d.handle||'';
@@ -2647,8 +2555,7 @@ window.saveProfile = async function() {
   if(!profileUid) return;
   const btns = document.querySelectorAll('.brand-save-btn');
   btns.forEach(b=>b.textContent='Saving...');
-  try{
-  const payload = {
+  await setDoc(doc(db,'organisers',profileUid), {
     name: document.getElementById('pfName').value.trim(),
     handle: document.getElementById('pfHandle').value.trim().replace(/^@/,''),
     bio: (document.getElementById('pfBio')||{}).value?.trim()||'',
@@ -2663,26 +2570,9 @@ window.saveProfile = async function() {
     metaPixel: (document.getElementById('pfMetaPixel')||{}).value?.trim()||'',
     gtmId: (document.getElementById('pfGtmId')||{}).value?.trim()||'',
     updatedAt: new Date().toISOString()
-  };
-  async function uploadToCloudinary(file, folder){
-    const form = new FormData();
-    form.append('file', file);
-    form.append('upload_preset', 'culturewave_upload');
-    form.append('folder', folder);
-    const res = await fetch('https://api.cloudinary.com/v1_1/antkxxvq/image/upload', {method:'POST', body:form});
-    const data = await res.json();
-    if(res.ok && data.secure_url) return data.secure_url;
-    throw new Error(data.error?.message || 'Upload failed');
-  }
-  const coverFile = document.getElementById('coverFileInput')?.files[0];
-  if(coverFile){ payload.coverUrl = await uploadImageToImageKit(coverFile, '/profile-covers'); console.log('coverUrl:', payload.coverUrl); }
-  const avatarFile = document.getElementById('avatarFileInput')?.files[0];
-  if(avatarFile){ payload.avatarUrl = await uploadImageToImageKit(avatarFile, '/profile-avatars'); console.log('avatarUrl:', payload.avatarUrl); }
-  console.log('saving to organisers/', profileUid, payload);
-  await setDoc(doc(db,'organisers',profileUid), payload, {merge:true});
+  }, {merge:true});
   btns.forEach(b=>{ b.textContent='✓ Saved!'; setTimeout(()=>b.textContent=b.textContent.includes('Bank')?'Save Bank Details':'✓ Save',2000); });
-  showToast('Saved! Avatar: '+(payload.avatarUrl?'✓ uploaded':'not changed'));
-  }catch(err){ console.error('saveProfile error:', err); showToast('Error: '+err.message); btns.forEach(b=>b.textContent='✗ Failed'); }
+  showToast('Brand settings saved!');
 };
 
 window.saveBrandBankDetails = async function() {
@@ -2707,55 +2597,6 @@ window.saveBrandBankDetails = async function() {
 
 // ── SALES + PAYOUTS ──
 let allSalesRows = [];
-const bookingSnapshots = new Map();
-const bookingListeners = new Map();
-
-function refreshDashboardBookings() {
-  const unique = new Map();
-  bookingSnapshots.forEach(rows => rows.forEach(row => unique.set(row.id, row)));
-  const rows = [...unique.values()].sort((a,b) => {
-    const time = value => value?.toDate ? value.toDate().getTime() : new Date(value||0).getTime();
-    return time(b.createdAt) - time(a.createdAt);
-  });
-  allSalesRows = rows;
-  analyticsBookings = rows;
-  const paid = rows.filter(r=>(r.status||'').toLowerCase()==='paid');
-  const totalRev = paid.reduce((s,r)=>s+Number(r.amount||0),0);
-  const settled = paid.filter(r=>r.settled).reduce((s,r)=>s+Number(r.amount||0),0);
-  document.getElementById('salesTotalRev').textContent = money(totalRev);
-  document.getElementById('salesSettled').textContent = money(settled);
-  document.getElementById('salesPending').textContent = money(totalRev-settled);
-  document.getElementById('salesCount').textContent = rows.length;
-  document.getElementById('mBookings').textContent = rows.length;
-  document.getElementById('mRevenue').textContent = money(totalRev);
-  renderOverviewBookings(rows);
-  renderSalesTable(document.querySelector('#salesTabs .tab.active')?.dataset.stab || 'all');
-  renderAnalytics();
-}
-
-function watchBookingSource(key, constraints, uid) {
-  if(bookingListeners.has(key)) return;
-  const stop = onSnapshot(
-    query(collection(db,'bookings'), ...constraints, limit(500)),
-    snap => {
-      bookingSnapshots.set(key, snap.docs.map(d=>({id:d.id,...d.data()})));
-      refreshDashboardBookings();
-    },
-    err => console.error(`Unable to load dashboard bookings (${key}, ${uid}):`, err)
-  );
-  bookingListeners.set(key, stop);
-}
-
-function watchEventBookings(events, uid) {
-  const wanted = new Set(events.map(ev=>`event:${ev.id}`));
-  for(const [key,stop] of bookingListeners) {
-    if(key.startsWith('event:') && !wanted.has(key)) {
-      stop(); bookingListeners.delete(key); bookingSnapshots.delete(key);
-    }
-  }
-  events.forEach(ev=>watchBookingSource(`event:${ev.id}`, [where('eventId','==',ev.id)], uid));
-  refreshDashboardBookings();
-}
 
 function renderSalesTable(filter) {
   filter = filter || 'all';
@@ -2899,11 +2740,38 @@ document.querySelectorAll('.period-tab').forEach(btn => {
   });
 });
 
-function loadFinance(uid) {
-  watchBookingSource('organiser', [where('organiserId','==',uid)], uid);
-  watchBookingSource('owner', [where('ownerId','==',uid)], uid);
+function loadAnalytics(uid) {
   onSnapshot(
-    query(collection(db,'payouts'), where('ownerId','==',uid), limit(50)),
+    query(collection(db,'bookings'), where('ownerId','==',uid), orderBy('createdAt','desc'), limit(500)),
+    snap => {
+      analyticsBookings = snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderAnalytics();
+    }
+  );
+}
+
+function loadFinance(uid) {
+  onSnapshot(
+    query(collection(db,'bookings'), where('ownerId','==',uid), orderBy('createdAt','desc'), limit(100)),
+    snap => {
+      const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
+      allSalesRows = rows;
+      const paid = rows.filter(r=>(r.status||'').toLowerCase()==='paid');
+      const totalRev = paid.reduce((s,r)=>s+Number(r.amount||0),0);
+      const settled = paid.filter(r=>r.settled).reduce((s,r)=>s+Number(r.amount||0),0);
+      document.getElementById('salesTotalRev').textContent = money(totalRev);
+      document.getElementById('salesSettled').textContent = money(settled);
+      document.getElementById('salesPending').textContent = money(totalRev-settled);
+      document.getElementById('salesCount').textContent = rows.length;
+      document.getElementById('mBookings').textContent = rows.length;
+      document.getElementById('mRevenue').textContent = money(totalRev);
+      renderOverviewBookings(rows);
+      const activeTab2 = document.querySelector('#salesTabs .tab.active');
+      renderSalesTable(activeTab2 ? activeTab2.dataset.stab : 'all');
+    }
+  );
+  onSnapshot(
+    query(collection(db,'payouts'), where('ownerId','==',uid), orderBy('createdAt','desc'), limit(50)),
     snap => {
       const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
       const totalPaid = rows.filter(r=>(r.status||'')==='paid').reduce((s,r)=>s+Number(r.amount||0),0);
@@ -2981,8 +2849,7 @@ window.addIgAutoReplyRule = async function() {
   if(!kw){ showToast('Enter at least one keyword'); return; }
   if(!msg){ showToast('Enter a reply message'); return; }
   const eventName = document.getElementById('igReplyEvent').selectedOptions[0]?.text || '';
-  const selectedEvent=allEvents.find(event=>event.id===eventId);
-  const bookingLink = eventId ? `${location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? location.origin : 'https://srisanth588.github.io/CULTUREWAVE'}${eventPublicPath(selectedEvent?.urlKey||selectedEvent?.name||eventName,eventId)}` : '';
+  const bookingLink = eventId ? `${location.origin}/event-detail.html?eventId=${eventId}` : '';
   const rule = { keywords:kw, message:msg, eventId, eventName: eventName==='\u2014 Select an event \u2014'?'':eventName, bookingLink, publicReply, enabled:true, createdAt: new Date().toISOString() };
   igRules.push(rule);
   await setDoc(doc(db,'organisers',myUid),{ igAutoReplyRules: igRules, updatedAt: new Date().toISOString() },{merge:true});
@@ -3060,39 +2927,9 @@ window.disconnectInstagram = async function() {
   }
 })();
 
-window.createSurveyForm = async function() {
-  if(!myUid) return;
-  const title = prompt('Form title', 'Event feedback');
-  if(!title?.trim()) return;
-  const linkToEvent = confirm('Link this form to one of your events?\n\nChoose Cancel for a standalone public form.');
-  let eventId = null, eventName = '';
-  if(linkToEvent) {
-    if(!allEvents.length) { showToast('Create an event first, or make a standalone form.'); return; }
-    const choices = allEvents.map((e,i)=>`${i + 1}. ${e.name || 'Untitled event'}`).join('\n');
-    const selected = Number(prompt(`Choose an event number:\n${choices}`, '1')) - 1;
-    if(!allEvents[selected]) { showToast('Invalid event selection'); return; }
-    eventId = allEvents[selected].id; eventName = allEvents[selected].name || '';
-  }
-  const questions = [{id:'name',label:'Full name',type:'text',required:true},{id:'email',label:'Email address',type:'email',required:true},{id:'feedback',label:'Your feedback',type:'textarea',required:true}];
-  const ref = await addDoc(collection(db,'surveys'), {ownerId:myUid,title:title.trim(),eventId,eventName,questions,active:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-  showToast('Form created — its share link was copied.');
-  await loadSurveys(myUid);
-  navigator.clipboard?.writeText(`${location.origin}/survey.html?formId=${ref.id}`).catch(()=>{});
+window.createSurveyForm = function() {
+  showToast('Survey form builder coming soon!');
 };
-
-async function loadSurveys(uid) {
-  const snap = await getDocs(query(collection(db,'surveys'),where('ownerId','==',uid)));
-  const forms = snap.docs.map(d=>({id:d.id,...d.data()}));
-  const responses = await getDocs(query(collection(db,'surveyResponses'),where('ownerId','==',uid)));
-  const byForm = {}; responses.forEach(d=>{const id=d.data().surveyId;byForm[id]=(byForm[id]||0)+1;});
-  const el=id=>document.getElementById(id);
-  if(el('surveyTotal')) el('surveyTotal').textContent=forms.length;
-  if(el('surveyResponses')) el('surveyResponses').textContent=responses.size;
-  if(el('surveyActive')) el('surveyActive').textContent=forms.filter(f=>f.active!==false).length;
-  if(el('surveyRate')) el('surveyRate').textContent=forms.length?'100%':'0%';
-  const list=el('surveyList'); if(!list || !forms.length) return;
-  list.innerHTML=forms.map(f=>{const link=`${location.origin}/survey.html?formId=${f.id}`;return `<div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:.75rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;"><div style="flex:1;min-width:180px;"><strong>${esc(f.title)}</strong><div style="font-size:.76rem;color:var(--muted);margin-top:.25rem;">${f.eventName?`Linked to: ${esc(f.eventName)}`:'Standalone form'} · ${byForm[f.id]||0} responses</div></div><button onclick="navigator.clipboard.writeText('${link}').then(()=>showToast('Share link copied!'))" style="padding:.45rem .7rem;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;font-weight:700;">Copy link</button><a href="${link}" target="_blank" style="padding:.45rem .7rem;border-radius:7px;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;">Open</a></div>`;}).join('');
-}
 
 // expose globals for file:// compatibility
 window.normStatus = normStatus;
@@ -3118,7 +2955,7 @@ window.renderIgRules = renderIgRules;
 
 async function loadInquiries(uid) {
   onSnapshot(
-    query(collection(db,'inquiries'), where('ownerId','==',uid), limit(50)),
+    query(collection(db,'inquiries'), where('ownerId','==',uid), orderBy('createdAt','desc'), limit(50)),
     snap => {
       const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
       const unread = rows.filter(r=>!r.read).length;
@@ -3184,103 +3021,45 @@ async function loadWhatsAppStats(uid) {
 }
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
-  try { await logout(); } catch {}
-  location.href = 'login.html';
+  await fetch('/api/auth/logout',{method:'POST',credentials:'include'});
+  try{ await signOut(auth); }catch{}
+  location.href='/login.html';
 });
 
 (async () => {
-  try {
-    const user = await getCurrentUser();
-    if (!user) return location.href = 'login.html';
-    myUid = user.uid;
-    window.myUid = user.uid;
+  const res = await fetch('/api/auth/me',{credentials:'include'});
+  if(!res.ok) return location.href='/login.html';
+  const {user} = await res.json();
+  myUid = user.uid;
+  localStorage.setItem('cw_uid', myUid);
 
-    const init = (user.name||'C').trim()[0].toUpperCase();
-    ['sideAvatar','topAvatar'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=init; });
-    const sidebarName = document.getElementById('sidebarName');
-    const sidebarRole = document.getElementById('sidebarRole');
-    const topName = document.getElementById('topName');
-    if(sidebarName) sidebarName.textContent = (user.name||'Client').split(' ')[0] + (user.name?.split(' ')[1] ? ' '+user.name.split(' ')[1][0]+'...' : '');
-    if(sidebarRole) sidebarRole.textContent = 'Owner';
-    if(topName) topName.textContent = 'User';
+  const init = (user.name||'C').trim()[0].toUpperCase();
+  ['sideAvatar','topAvatar'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=init; });
+  document.getElementById('sidebarName').textContent = (user.name||'Client').split(' ')[0] + (user.name?.split(' ')[1] ? ' '+user.name.split(' ')[1][0]+'...' : '');
+  document.getElementById('sidebarRole').textContent = 'Owner';
+  document.getElementById('topName').textContent = 'User';
 
-    const saved = (()=>{ try{ return localStorage.getItem('cwDashView')||'overview'; }catch{ return 'overview'; }})();
-    if(typeof window.switchView === 'function') window.switchView(saved);
+  // load events
+  onSnapshot(
+    query(collection(db,'events'), where('ownerId','==',myUid), orderBy('createdAt','desc'), limit(50)),
+    snap => {
+      allEvents = snap.docs.map(d=>({id:d.id,...d.data()}));
+      window.allEvents = allEvents;
+      renderEvents();
+      renderOverview();
+      populateIgEventDropdown();
+    }
+  );
 
-    // Query this lister's events at the database. Loading a limited global
-    // collection first meant recently created events could be omitted once the
-    // collection grew beyond that limit.
-    onSnapshot(
-      query(collection(db,'events'), where('ownerId','==',myUid)),
-      snap => {
-        try {
-          allEvents = snap.docs.map(d=>({id:d.id,...d.data()}))
-            .sort((a,b)=>{ const ta=a.createdAt?.seconds||0; const tb=b.createdAt?.seconds||0; return tb-ta; });
-          window.allEvents = allEvents;
-          renderEvents();
-          renderOverview();
-          populateIgEventDropdown();
-          watchEventBookings(allEvents, myUid);
-        } catch(e) { console.error('events snapshot error:', e); }
-      },
-      err => console.error('Unable to load lister events:', err)
-    );
+  loadProfile(myUid);
+  loadFinance(myUid);
+  loadAnalytics(myUid);
+  loadWhatsAppStats(myUid);
+  loadInquiries(myUid);
 
-    loadProfile(myUid);
-    loadSurveys(myUid);
-    loadFinance(myUid);
-    loadWhatsAppStats(myUid);
-    loadInquiries(myUid);
-  } catch(err) {
-    console.error('Dashboard boot error:', err);
-    document.body.innerHTML = `<div style="display:grid;place-items:center;min-height:100vh;font-family:Inter,sans-serif;background:#f8f9fa;">
-      <div style="background:#fff;border:1px solid #e9ecef;border-radius:16px;padding:2rem;max-width:480px;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:1rem;">⚠️</div>
-        <h2 style="font-size:1.1rem;font-weight:700;color:#1a1a2e;margin-bottom:.5rem;">Dashboard failed to load</h2>
-        <p style="font-size:.84rem;color:#868e96;margin-bottom:1.5rem;">${err.message}</p>
-        <a href="login.html" style="display:inline-block;padding:.6rem 1.5rem;background:#3b5bdb;color:#fff;border-radius:8px;font-weight:700;font-size:.88rem;">Back to Login</a>
-      </div>
-    </div>`;
-  }
+  const saved = (()=>{ try{ return localStorage.getItem('cwDashView')||'overview'; }catch{ return 'overview'; }})();
+  switchView(saved);
 })();
-
-// Mobile sidebar
-(function(){
-  const sidebar = document.querySelector('.sidebar');
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const sbOverlay = document.getElementById('sbOverlay');
-  function openSidebar(){ sidebar.classList.add('open'); sbOverlay.classList.add('open'); }
-  function closeSidebar(){ sidebar.classList.remove('open'); sbOverlay.classList.remove('open'); }
-  hamburgerBtn.addEventListener('click', openSidebar);
-  sbOverlay.addEventListener('click', closeSidebar);
-  document.querySelectorAll('.sb-item').forEach(item => item.addEventListener('click', closeSidebar));
-})();
-</script>
-<div class="sb-overlay" id="sbOverlay"></div>
-
-<!-- MOBILE BOTTOM NAV -->
-<nav class="mobile-bottom-nav" id="mobileBottomNav">
-  <button class="mbn-item active" data-view="overview" onclick="switchView('overview');setMbnActive(this)"><span class="mbn-icon">🏠</span>Home</button>
-  <button class="mbn-item" data-view="events" onclick="switchView('events');setMbnActive(this)"><span class="mbn-icon">🎪</span>Events</button>
-  <button class="mbn-item" data-view="sales" onclick="switchView('sales');setMbnActive(this)"><span class="mbn-icon">💳</span>Sales</button>
-  <button class="mbn-item" data-view="whatsapp" onclick="switchView('whatsapp');setMbnActive(this)"><span class="mbn-icon">💬</span>WhatsApp</button>
-  <button class="mbn-item" data-view="personal-info" onclick="switchView('personal-info');setMbnActive(this)"><span class="mbn-icon">👤</span>Profile</button>
-</nav>
-<script>
-function setMbnActive(el){
-  document.querySelectorAll('.mobile-bottom-nav .mbn-item').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-}
-// Sync bottom nav with sidebar nav
-const _origSwitchView = window.switchView;
-if(typeof switchView === 'function'){
-  window.switchView = function(name){
-    _origSwitchView(name);
-    document.querySelectorAll('.mobile-bottom-nav .mbn-item').forEach(b=>{
-      b.classList.toggle('active', b.dataset.view===name);
-    });
-  };
-}
 </script>
 </body>
 
@@ -3416,8 +3195,7 @@ function dmGoLive() {
   var eventId = eventSel ? eventSel.value : '';
   var eventName = (eventSel && eventSel.selectedOptions[0]) ? eventSel.selectedOptions[0].text : '';
   if(eventName.includes('Select an event')) eventName='';
-  var selectedEvent = (window.allEvents||[]).find(function(event){return event.id===eventId;});
-  var bookingLink = eventId ? ((location.hostname==='localhost'||location.hostname==='127.0.0.1'?location.origin:'https://srisanth588.github.io/CULTUREWAVE')+eventPublicPath(selectedEvent?.urlKey||selectedEvent?.name||eventName,eventId)) : '';
+  var bookingLink = eventId ? (location.origin+'/event-detail.html?eventId='+eventId) : '';
   var publicReply = document.getElementById('dmExtraPublicReply')?.checked||false;
   var collectEmail = document.getElementById('dmExtraEmail')?.checked||false;
   var collectPhone = document.getElementById('dmExtraPhone')?.checked||false;

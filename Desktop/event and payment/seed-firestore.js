@@ -44,8 +44,8 @@ const seedUsers = [
   {
     id: "user_admin_1",
     data: {
-      name: "CultureWave Admin",
-      email: "admin@culturewave.in",
+      name: "Cityvibe Admin",
+      email: "admin@cityvibe.com",
       phone: "+919999000003",
       role: "admin",
       emailVerified: true,

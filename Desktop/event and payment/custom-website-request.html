@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CultureWave | Request Custom Website</title>
-  <meta name="robots" content="noindex, nofollow"/>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -120,7 +119,7 @@
     .btn-primary { padding: 0.6rem 1.2rem; border-radius: 11px; border: 0; background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-weight: 800; font-size: 0.84rem; cursor: pointer; box-shadow: 0 3px 12px rgba(20,84,255,0.25); }
     .btn-success { padding: 0.6rem 1.2rem; border-radius: 11px; border: 0; background: linear-gradient(135deg, #10b981, #34d399); color: #fff; font-weight: 800; font-size: 0.84rem; cursor: pointer; box-shadow: 0 3px 12px rgba(16,185,129,0.25); }
 
-    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; max-height:calc(100vh - 2rem); max-height:calc(100dvh - 2rem); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
     @media (max-width: 600px) { .topbar-inner { padding: 0 0.8rem; } .layout { padding: 0.7rem; } .progress-wrap { display: none; } }
   </style>
 </head>
@@ -741,6 +740,12 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 firebase.initializeApp({
+  apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+  authDomain: "ogshootsluxe-36740.firebaseapp.com",
+  projectId: "ogshootsluxe-36740",
+  storageBucket: "ogshootsluxe-36740.firebasestorage.app",
+  messagingSenderId: "5471814825",
+  appId: "1:5471814825:web:07e84f2f88486da817d5b8",
 });
 const db = firebase.firestore();
 const auth = firebase.auth();
@@ -754,7 +759,7 @@ async function loadUser() {
   try {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (!res.ok) { window.location.href = '/login.html'; return; }
-    
+    const { user } = await res.json();
     uid = user.uid; userName = user.name || '';
     document.getElementById('topAvatar').textContent = (userName || 'U').trim().charAt(0).toUpperCase();
     if (user.email) document.getElementById('contactEmail').value = user.email;

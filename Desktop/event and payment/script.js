@@ -115,7 +115,7 @@ async function createOrder() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       amount: total * 100,
-      merchantName: "CultureWave",
+      merchantName: "cityvibe",
       upiId: "merchant@upi",
       receipt: `pp_${Date.now()}`,
       note: `Tickets for ${selectedEvent.name}`,
@@ -200,15 +200,13 @@ function showRoleHub(role) {
   roleHub.scrollIntoView({ behavior: "smooth" });
 }
 
-if (eventSelect) {
-  populateEvents();
-  updateTotals();
+populateEvents();
+updateTotals();
 
-  eventSelect.addEventListener("change", updateTotals);
-  ticketCount.addEventListener("input", updateTotals);
-}
+eventSelect.addEventListener("change", updateTotals);
+ticketCount.addEventListener("input", updateTotals);
 
-bookingForm?.addEventListener("submit", async (event) => {
+bookingForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const name = document.getElementById("fullName").value.trim() || "Guest";
   receiptName.textContent = name;
