@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080808" />
+  <title>Explore Venues in Hyderabad | CultureWave</title>
+  <meta name="description" content="Find Hyderabad's venues for live music, dining, celebrations and unforgettable nights out with CultureWave." />
+  <link rel="canonical" href="https://culturewave.in/venue.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root{color-scheme:dark;--gold:#d8b879;--ink:#080808;--muted:#a6a39d;}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ink);color:#f6f3ec;font-family:Manrope, sans-serif;padding-bottom:0}
+    a{color:inherit}
+    .topbar{background:rgba(8,8,8,.94);border-bottom:1px solid #24231f;backdrop-filter:blur(14px)}
+    .logo{color:#fff}.brand-sub{color:#8f8c85}.topnav a{color:#c0bdb6}
+    .venue-page{min-height:100vh}
+    .venue-hero{position:relative;isolation:isolate;min-height:450px;display:flex;align-items:center;overflow:hidden;background:#171510 url('culinary.jpg') center 48%/cover no-repeat;border-bottom:1px solid #292720}
+    .venue-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(8,8,8,.95),rgba(8,8,8,.75) 48%,rgba(8,8,8,.24)),linear-gradient(0deg,rgba(8,8,8,.55),transparent 70%)}
+    .hero-inner,.content{width:min(1220px,calc(100% - 48px));margin:0 auto}
+    .eyebrow{display:inline-flex;align-items:center;gap:.55rem;color:var(--gold);font-size:.7rem;font-weight:800;letter-spacing:.19em;text-transform:uppercase}
+    .eyebrow:before{content:"";width:25px;height:1px;background:var(--gold)}
+    h1,h2,h3,p{margin-top:0}
+    h1{max-width:720px;margin:.9rem 0 1rem;font:500 clamp(3rem,7vw,5.7rem)/.98 "Playfair Display",Georgia,serif;letter-spacing:-.045em}
+    h1 em{font-weight:500;color:var(--gold)}
+    .hero-copy{max-width:510px;color:#d0cdc5;line-height:1.75;font-size:.96rem;margin-bottom:1.65rem}
+    .search-form{display:flex;max-width:590px;gap:.55rem}
+    .search-form input{flex:1;min-width:0;padding:.95rem 1rem;border:1px solid #5b5549;border-radius:3px;background:rgba(15,14,12,.72);color:white;font:inherit;outline:none}
+    .search-form input:focus{border-color:var(--gold)}
+    .search-form button,.list-venue{border:0;border-radius:3px;background:var(--gold);color:#17130d;padding:0 1.25rem;font:800 .8rem Manrope,sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;transition:background .2s}
+    .search-form button:hover,.list-venue:hover{background:#ead19d}
+    .filter-bar{border-bottom:1px solid #24231f;background:#11110f}
+    .filter-inner{width:min(1220px,calc(100% - 48px));min-height:68px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .filters{display:flex;gap:.5rem;overflow:auto;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}
+    .filter{white-space:nowrap;border:1px solid #39372f;border-radius:3px;background:transparent;color:#b5b2aa;padding:.53rem .85rem;font:700 .72rem Manrope,sans-serif;cursor:pointer;transition:.2s}
+    .filter:hover,.filter.active{background:var(--gold);border-color:var(--gold);color:#17130d}
+    .result-count{flex:none;color:#89867f;font-size:.76rem}.result-count strong{color:#f3eee4}
+    .content{padding:3.1rem 0 5rem}
+    .section-heading{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1.35rem}
+    .section-heading h2{margin:.5rem 0 0;font:500 clamp(1.8rem,4vw,2.6rem)/1.1 "Playfair Display",Georgia,serif;letter-spacing:-.025em}
+    .section-heading p{margin:0;color:var(--muted);font-size:.8rem}
+    .venue-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.15rem}
+    .venue-card{min-width:0;background:#12120f;border:1px solid #302e27;border-radius:4px;overflow:hidden;transition:transform .22s,border-color .22s}
+    .venue-card:hover{transform:translateY(-4px);border-color:#8c744c}
+    .venue-image{height:205px;position:relative;background-size:cover;background-position:center}
+    .venue-image:after{content:"";position:absolute;inset:30% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+    .venue-image.one{background-image:url('music.jpg')}.venue-image.two{background-image:url('culinary.jpg')}.venue-image.three{background-image:url('party.jpg')}
+    .venue-image.four{background-image:url('workshop.jpg')}.venue-image.five{background-image:url('all.jpeg')}.venue-image.six{background-image:url('herosection.jpeg')}
+    .venue-label{position:absolute;z-index:1;left:.8rem;top:.8rem;padding:.34rem .55rem;background:rgba(9,9,8,.75);border:1px solid rgba(255,255,255,.18);color:#e9d5aa;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+    .venue-info{padding:1.05rem 1.1rem 1.15rem}
+    .venue-info h3{font:600 1.25rem "Playfair Display",Georgia,serif;margin:0 0 .42rem}
+    .venue-location{color:#aaa69e;font-size:.75rem;margin-bottom:.8rem}
+    .venue-meta{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #2b2923;padding-top:.75rem;color:#8e8b83;font-size:.7rem}
+    .venue-meta strong{color:var(--gold);font-weight:700}
+    .empty-state{grid-column:1/-1;text-align:center;padding:4rem 1rem;color:#a6a39d}
+    .list-cta{margin-top:2.5rem;padding:1.5rem 1.6rem;border:1px solid #514631;background:linear-gradient(110deg,#17150f,#11110f);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .list-cta h2{font:500 1.4rem "Playfair Display",Georgia,serif;margin:0 0 .3rem}.list-cta p{color:#a6a39d;font-size:.78rem;margin:0}
+    .list-venue{min-height:42px;white-space:nowrap}
+    @media(max-width:900px){.venue-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.filter-inner{align-items:flex-start;flex-direction:column;padding:1rem 0}.result-count{align-self:flex-end;margin-top:-.45rem}}
+    @media(max-width:600px){.venue-hero{min-height:470px}.hero-inner,.content,.filter-inner{width:calc(100% - 32px)}.venue-grid{grid-template-columns:1fr;gap:.8rem}.venue-image{height:220px}.search-form{flex-direction:column}.search-form button{height:48px}.section-heading{align-items:flex-start;flex-direction:column}.list-cta{align-items:flex-start;flex-direction:column}.list-venue{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="venue-page">
+    <header class="topbar">
+      <div class="nav-wrap">
+        <a class="brand-block" href="index.html" aria-label="CultureWave home"><span class="logo">CultureWave</span><span class="brand-sub">Discover your city</span></a>
+        <nav class="topnav" aria-label="Main navigation">
+          <a href="events.html">Events</a><a href="categories.html">Categories</a><a href="restaurants.html">Restaurants</a><a href="about-culturewave.html">About</a>
+        </nav>
+        <a class="nav-cta" href="login.html">Sign in</a>
+      </div>
+    </header>
+    <main>
+      <section class="venue-hero" aria-labelledby="page-title">
+        <div class="hero-inner">
+          <span class="eyebrow">Hyderabad · Find your place</span>
+          <h1 id="page-title">Good nights<br/>start with a <em>place.</em></h1>
+          <p class="hero-copy">Discover the spaces behind the city's best experiences, from intimate live music rooms to tables made for a long evening.</p>
+          <form class="search-form" id="venueSearch" role="search">
+            <input id="searchInput" type="search" placeholder="Search venues or neighbourhoods" aria-label="Search venues or neighbourhoods" />
+            <button type="submit">Find a venue <span aria-hidden="true">→</span></button>
+          </form>
+        </div>
+      </section>
+      <section class="filter-bar" aria-label="Venue filters">
+        <div class="filter-inner">
+          <div class="filters" role="group" aria-label="Filter by venue type">
+            <button class="filter active" data-filter="all" aria-pressed="true">All places</button>
+            <button class="filter" data-filter="music" aria-pressed="false">Live music</button>
+            <button class="filter" data-filter="dining" aria-pressed="false">Dining</button>
+            <button class="filter" data-filter="nightlife" aria-pressed="false">Nightlife</button>
+            <button class="filter" data-filter="community" aria-pressed="false">Community</button>
+          </div>
+          <div class="result-count" aria-live="polite"><strong id="resultNumber">6</strong> places to explore</div>
+        </div>
+      </section>
+      <section class="content" aria-labelledby="collection-title">
+        <div class="section-heading">
+          <div><span class="eyebrow">Curated for you</span><h2 id="collection-title">Places with a point of view</h2></div>
+          <p>Explore Hyderabad, one venue at a time.</p>
+        </div>
+        <div class="venue-grid" id="venueGrid">
+          <article class="venue-card" data-type="music" data-search="deccan sound room live music jubilee hills">
+            <div class="venue-image one"><span class="venue-label">Live music</span></div><div class="venue-info"><h3>Deccan Sound Room</h3><p class="venue-location">Jubilee Hills · Hyderabad</p><div class="venue-meta"><span>Intimate gigs &amp; listening sessions</span><strong>Explore →</strong></div></div>
+          </article>
+          <article class="venue-card" data-type="dining" data-search="the olive table dining banjara hills restaurant">
+            <div class="venue-image two"><span class="venue-label">Dining</span></div><div class="venue-info"><h3>The Olive Table</h3><p class="venue-location">Banjara Hills · Hyderabad</p><div class="venue-meta"><span>Seasonal plates &amp; good company</span><strong>Explore →</strong></div></div>
+          </article>
+          <article class="venue-card" data-type="nightlife" data-search="afterglow social club nightlife gachibowli">
+            <div class="venue-image three"><span class="venue-label">Nightlife</span></div><div class="venue-info"><h3>Afterglow Social Club</h3><p class="venue-location">Gachibowli · Hyderabad</p><div class="venue-meta"><span>Late sets, lively dance floor</span><strong>Explore →</strong></div></div>
+          </article>
+          <article class="venue-card" data-type="community" data-search="the courtyard studio community workshops madhapur">
+            <div class="venue-image four"><span class="venue-label">Community</span></div><div class="venue-info"><h3>The Courtyard Studio</h3><p class="venue-location">Madhapur · Hyderabad</p><div class="venue-meta"><span>Workshops, talks &amp; meetups</span><strong>Explore →</strong></div></div>
+          </article>
+          <article class="venue-card" data-type="dining" data-search="monsoon terrace dining rooftop kondapur">
+            <div class="venue-image five"><span class="venue-label">Dining</span></div><div class="venue-info"><h3>Monsoon Terrace</h3><p class="venue-location">Kondapur · Hyderabad</p><div class="venue-meta"><span>Open-air tables above the city</span><strong>Explore →</strong></div></div>
+          </article>
+          <article class="venue-card" data-type="music" data-search="blue note garden live music film nagar">
+            <div class="venue-image six"><span class="venue-label">Live music</span></div><div class="venue-info"><h3>Blue Note Garden</h3><p class="venue-location">Film Nagar · Hyderabad</p><div class="venue-meta"><span>Garden gigs under the stars</span><strong>Explore →</strong></div></div>
+          </article>
+          <div class="empty-state" id="emptyState" hidden>No venues match that search. Try another name or neighbourhood.</div>
+        </div>
+        <aside class="list-cta"><div><h2>Have a place people should know?</h2><p>Bring your venue to CultureWave and meet your next audience.</p></div><a class="list-venue" href="vendor-onboarding.html">List your venue <span aria-hidden="true">→</span></a></aside>
+      </section>
+    </main>
+  </div>
+  <script>
+    (()=>{
+      const cards=[...document.querySelectorAll('.venue-card')],buttons=[...document.querySelectorAll('.filter')];
+      const input=document.getElementById('searchInput'),count=document.getElementById('resultNumber'),empty=document.getElementById('emptyState');
+      let active='all';
+      function update(){const query=input.value.trim().toLowerCase();let visible=0;cards.forEach(card=>{const matchesType=active==='all'||card.dataset.type===active;const matchesText=!query||`${card.dataset.search} ${card.textContent}`.toLowerCase().includes(query);const show=matchesType&&matchesText;card.hidden=!show;if(show)visible++});count.textContent=visible;empty.hidden=visible!==0}
+      buttons.forEach(button=>button.addEventListener('click',()=>{active=button.dataset.filter;buttons.forEach(item=>{const selected=item===button;item.classList.toggle('active',selected);item.setAttribute('aria-pressed',String(selected))});update()}));
+      input.addEventListener('input',update);document.getElementById('venueSearch').addEventListener('submit',event=>{event.preventDefault();update()});
+    })();
+  </script>
+</body>
+</html>
