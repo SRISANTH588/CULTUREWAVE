@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CultureWave | Create Lister Account</title>
+  <meta name="robots" content="noindex, nofollow"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;font-family:Manrope,sans-serif;background:#05080f;color:#fff;}
+a{text-decoration:none;color:inherit;}
+button,input{font:inherit;cursor:pointer;border:0;background:none;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 10% 0%,rgba(18,66,197,.2) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 90% 100%,rgba(124,58,237,.14) 0%,transparent 55%);}
+
+.shell{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+@media(max-width:860px){.shell{grid-template-columns:1fr;}}
+
+/* LEFT */
+.left{position:relative;z-index:1;background:linear-gradient(145deg,#05080f 0%,#0a1428 40%,#0d1f4a 100%);display:flex;flex-direction:column;justify-content:space-between;padding:2.5rem 3rem;overflow:hidden;}
+.left::before{content:'';position:absolute;top:-100px;right:-100px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(47,107,255,.22) 0%,transparent 70%);pointer-events:none;}
+.left::after{content:'';position:absolute;bottom:-80px;left:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(18,66,197,.16) 0%,transparent 70%);pointer-events:none;}
+.left-logo{position:relative;z-index:1;}
+.left-logo-name{font-size:1.7rem;font-weight:900;letter-spacing:-.04em;color:#fff;}
+.left-logo-name span{background:linear-gradient(90deg,#7eb3ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.left-logo-sub{font-size:.62rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:.2rem;}
+.left-hero{position:relative;z-index:1;}
+.left-cat-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:.32rem .9rem;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:1rem;}
+.left-hero h1{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;letter-spacing:-.06em;line-height:1.05;color:#fff;margin-bottom:.8rem;}
+.left-hero h1 span{background:linear-gradient(135deg,#7eb3ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.left-hero p{font-size:.9rem;color:rgba(255,255,255,.45);line-height:1.7;max-width:360px;margin-bottom:2rem;}
+.left-features{display:flex;flex-direction:column;gap:.65rem;}
+.left-feat{display:flex;align-items:center;gap:.75rem;padding:.7rem .9rem;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);}
+.left-feat-icon{font-size:1.1rem;flex:none;}
+.left-feat-text{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.75);}
+.left-bottom{position:relative;z-index:1;}
+.left-login-note{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);}
+.left-login-note span{font-size:.8rem;color:rgba(255,255,255,.45);}
+.left-login-note a{font-size:.82rem;font-weight:800;color:#7eb3ff;padding:.35rem .85rem;border-radius:8px;background:rgba(126,179,255,.1);border:1px solid rgba(126,179,255,.2);transition:background .2s;}
+.left-login-note a:hover{background:rgba(126,179,255,.2);}
+@media(max-width:860px){.left{display:none;}}
+
+/* RIGHT */
+.right{position:relative;z-index:1;background:#f4f7ff;display:flex;align-items:center;justify-content:center;padding:2rem 1.5rem;}
+@media(max-width:860px){.right{min-height:100vh;background:linear-gradient(160deg,#05080f 0%,#0d1f4a 100%);padding:2rem 1.2rem;}}
+
+.card{width:min(440px,100%);background:#fff;border-radius:28px;padding:2.2rem 2rem;box-shadow:0 24px 60px rgba(18,66,197,.1),0 4px 16px rgba(0,0,0,.04);border:1px solid rgba(18,66,197,.08);}
+@media(max-width:860px){.card{background:rgba(255,255,255,.97);box-shadow:0 32px 80px rgba(0,0,0,.4);}}
+
+.card-cat-pill{display:inline-flex;align-items:center;gap:.4rem;background:#f0f5ff;border:1px solid #dce8ff;border-radius:999px;padding:.28rem .85rem;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#1242c5;margin-bottom:1rem;}
+.card-head h2{font-size:1.6rem;font-weight:900;letter-spacing:-.05em;color:#0a0f1e;margin-bottom:.25rem;}
+.card-head h2 span{color:#1242c5;}
+.card-head p{font-size:.84rem;color:#6b7280;margin-bottom:1.2rem;}
+
+.status{font-size:.8rem;min-height:1.1rem;text-align:center;padding:.38rem .6rem;border-radius:8px;color:#6b7280;margin-bottom:.5rem;}
+.status[data-k="success"]{background:#dcfce7;color:#166534;}
+.status[data-k="warning"]{background:#fef9c3;color:#854d0e;}
+.status[data-k="info"]{background:#eff6ff;color:#1e40af;}
+
+.form{display:flex;flex-direction:column;gap:.85rem;}
+.field{display:flex;flex-direction:column;gap:.35rem;}
+.field-label{font-size:.68rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#5f6f95;}
+.input-wrap{display:flex;align-items:center;gap:.55rem;padding:0 .9rem;min-height:50px;border-radius:13px;border:1.5px solid #dce4f5;background:#f7faff;transition:border-color .2s,box-shadow .2s;}
+.input-wrap:focus-within{border-color:#1242c5;background:#fff;box-shadow:0 0 0 3px rgba(18,66,197,.08);}
+.input-wrap input{flex:1;border:0;outline:0;background:transparent;color:#0a0f1e;font-size:.9rem;}
+.input-wrap input::placeholder{color:#b0bcd4;}
+.input-icon{font-size:.95rem;flex:none;}
+.wa-pre{font-size:.8rem;color:#6b7280;padding-right:.25rem;}
+.eye{color:#94a3b8;font-size:.82rem;padding:0;line-height:1;}
+#phoneRecaptcha:empty{display:none;}
+#phoneRecaptcha:not(:empty){display:flex;justify-content:center;min-height:78px;margin:.25rem 0 .4rem;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(18,66,197,.15),transparent);margin:.1rem 0 .4rem;}
+
+.submit-btn{width:100%;min-height:50px;border-radius:13px;background:linear-gradient(135deg,#2f6bff,#1242c5);color:#fff;font-size:.92rem;font-weight:800;box-shadow:0 8px 24px rgba(18,66,197,.3);transition:transform .15s,box-shadow .15s;letter-spacing:-.01em;}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(18,66,197,.4);}
+.submit-btn:active{transform:translateY(0);}
+
+.card-footer{margin-top:1.2rem;text-align:center;font-size:.82rem;color:#6b7280;}
+.card-footer a{color:#1242c5;font-weight:800;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="left">
+  <div class="left-logo">
+    <div class="left-logo-name">Culture<span>Wave</span></div>
+    <div class="left-logo-sub">by OGSHOOTS LUXE</div>
+  </div>
+  <div class="left-hero">
+    <div class="left-cat-badge" id="leftBadge">✦ New Lister</div>
+    <h1>Start listing<br/><span id="leftCatName">your events</span><br/>today.</h1>
+    <p>Create your free account and get access to your personalised dashboard, ticket sales, analytics and more.</p>
+    <div class="left-features">
+      <div class="left-feat"><span class="left-feat-icon">🎟</span><span class="left-feat-text">Sell tickets with UPI &amp; QR</span></div>
+      <div class="left-feat"><span class="left-feat-icon">📊</span><span class="left-feat-text">Real-time analytics &amp; revenue</span></div>
+      <div class="left-feat"><span class="left-feat-icon">🏦</span><span class="left-feat-text">Weekly bank payouts</span></div>
+    </div>
+  </div>
+  <div class="left-bottom">
+    <div class="left-login-note">
+      <span>Already have an account?</span>
+      <a href="login.html">Login →</a>
+    </div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="card">
+
+    <!-- STEP 1 -->
+    <div id="step1">
+      <div class="card-cat-pill" id="cardPill">✦ New Lister</div>
+      <div class="card-head">
+        <h2>Create your <span>account</span></h2>
+        <p>Enter your email and verify it to get started.</p>
+      </div>
+      <div class="status" id="st1"></div>
+      <div class="form">
+        <div class="field">
+          <span class="field-label">Email Address <span style="font-size:.6rem;color:#1242c5;font-weight:800;letter-spacing:.06em;">· EMAIL VERIFICATION REQUIRED</span></span>
+          <div class="input-wrap"><span class="input-icon">📧</span><input id="femail" type="email" placeholder="you@example.com" autocomplete="email"/><button class="eye" id="sendEmailOtp" type="button" style="white-space:nowrap;font-weight:800;color:#1242c5;">Send OTP</button></div>
+        </div>
+        <div id="emailOtpArea" class="field" style="display:none;">
+          <span class="field-label">Email verification code</span>
+          <div class="input-wrap"><span class="input-icon">🔐</span><input id="emailOtp" type="text" placeholder="6-digit code" maxlength="6" inputmode="numeric" autocomplete="one-time-code"/><button class="eye" id="verifyEmailOtp" type="button" style="white-space:nowrap;font-weight:800;color:#1242c5;">Verify</button></div>
+        </div>
+      </div>
+      <div class="card-footer">Already have an account? <a href="login.html">Login here</a></div>
+    </div>
+
+<script>
+var params=new URLSearchParams(location.search);
+var CAT  = params.get('category') || sessionStorage.getItem('cw_lister_cat') || '';
+var DASH = params.get('dash')     || sessionStorage.getItem('cw_lister_dash') || 'premium-client-dashboard.html';
+
+var CAT_LABELS={nightlife:'🌙 Nightlife',brunch:'🥂 Brunch & Bites',dining:'🍽 Fine Dining',workshops:'🎨 Workshops',experiences:'🌿 Experiences',music:'🎸 Live Music'};
+var CAT_NAMES={nightlife:'Nightlife Events',brunch:'Brunch & Bites',dining:'Fine Dining',workshops:'Workshops',experiences:'Experiences',music:'Live Music'};
+var label=CAT_LABELS[CAT]||'✦ New Lister';
+document.getElementById('leftBadge').textContent=label;
+document.getElementById('leftCatName').textContent=CAT_NAMES[CAT]||'your events';
+document.getElementById('cardPill').textContent=label;
+
+function setStatus(msg,k,id){var el=document.getElementById(id);el.textContent=msg;el.dataset.k=k||'';}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="module">
+const EMAILJS_SERVICE_ID='service_esppdwf';
+const EMAILJS_PUBLIC_KEY='PDb2vpOIeLkbZBBFP';
+const EMAILJS_OTP_TEMPLATE_ID='template_8ho2pwf';
+emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
+let otpRequestedEmail='',generatedEmailOtp='';
+document.getElementById('femail').addEventListener('input',function(){
+  const email=this.value.trim().toLowerCase();
+  if(otpRequestedEmail&&otpRequestedEmail!==email){otpRequestedEmail='';generatedEmailOtp='';document.getElementById('emailOtpArea').style.display='none';document.getElementById('emailOtp').value='';try{sessionStorage.removeItem('cw_lister_verified_email')}catch{}setStatus('Email changed. Request a new verification code.','warning','st1');}
+});
+document.getElementById('sendEmailOtp').addEventListener('click',async function(){
+  const email=document.getElementById('femail').value.trim().toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setStatus('Enter a valid email address first.','warning','st1');return;}
+  const button=this;button.disabled=true;button.textContent='Sending…';
+  try{
+    const randomBytes=new Uint32Array(1);crypto.getRandomValues(randomBytes);
+    generatedEmailOtp=String(100000+(randomBytes[0]%900000));
+    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_OTP_TEMPLATE_ID,{to_email:email,to_name:'New Lister',otp_code:generatedEmailOtp,reply_to:'support.culturewave@gmail.com'});
+    otpRequestedEmail=email;
+    document.getElementById('emailOtpArea').style.display='flex';
+    setStatus('Verification code sent. Check your inbox and spam folder.','success','st1');
+  }catch(error){console.error('Signup EmailJS OTP send failed:',error);setStatus('Could not send the code: '+(error.text||error.message||'Check your EmailJS template settings and try again.'),'warning','st1');}
+  finally{button.disabled=false;button.textContent='Send OTP';}
+});
+document.getElementById('verifyEmailOtp').addEventListener('click',async function(){
+  const code=document.getElementById('emailOtp').value.trim();
+  if(!/^\d{6}$/.test(code)){setStatus('Enter the 6-digit code from your email.','warning','st1');return;}
+  const email=document.getElementById('femail').value.trim().toLowerCase();
+  if(!otpRequestedEmail||otpRequestedEmail!==email){setStatus('Tap Send OTP first for this email address.','warning','st1');return;}
+  try{
+    if(code!==generatedEmailOtp){setStatus('That code is incorrect. Check your email and try again.','warning','st1');return;}
+    sessionStorage.setItem('cw_lister_verified_email',email);
+    sessionStorage.setItem('cw_lister_cat',CAT);
+    sessionStorage.setItem('cw_lister_dash',DASH);
+    setStatus('Email verified. Opening vendor onboarding…','success','st1');
+    const basePath=location.pathname.startsWith('/CULTUREWAVE/')?'/CULTUREWAVE/':'/';
+    window.location.assign(new URL(basePath+'vendor-onboarding.html',location.origin).href);
+  }catch(error){console.error('Could not save verified email:',error);setStatus('Email verified, but this browser could not continue. Please enable session storage and try again.','warning','st1');}
+});
+</script>
+</body>
+</html>
