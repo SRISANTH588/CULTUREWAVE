@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Explore Event Categories in Hyderabad | CultureWave</title>
+  <meta name="description" content="Browse CultureWave events by category, including music, food, parties, sports, workshops and community experiences in Hyderabad."/>
+  <link rel="canonical" href="https://culturewave.in/categories.html"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="CultureWave"/>
+  <meta property="og:title" content="Explore Event Categories in Hyderabad | CultureWave"/>
+  <meta property="og:description" content="Browse CultureWave events by category, including music, food, parties, sports, workshops and community experiences in Hyderabad."/>
+  <meta property="og:url" content="https://culturewave.in/categories.html"/>
+  <meta property="og:image" content="https://culturewave.in/herosection.jpeg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Explore Event Categories in Hyderabad | CultureWave"/>
+  <meta name="twitter:description" content="Browse CultureWave events by category, including music, food, parties, sports, workshops and community experiences in Hyderabad."/>
+  <meta name="twitter:image" content="https://culturewave.in/herosection.jpeg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    *{box-sizing:border-box;}
+    html,body{background:#000!important;color:#fff!important;}
+    body{padding-bottom:0;}
+
+    /* NAV */
+    .topbar{background:#000!important;border-bottom:1px solid #222!important;box-shadow:none!important;}
+    .logo{color:#fff!important;}.brand-sub{color:#888!important;}
+    .topnav a{color:#aaa!important;}.topnav a:hover{color:#fff!important;background:#111!important;}
+    .index-auth-actions{gap:.5rem;padding:.3rem;border:1px solid #333!important;border-radius:999px;background:#111!important;}
+    .index-auth-actions .nav-link{padding:.6rem .95rem;border:0;background:transparent;color:#aaa!important;font-size:.82rem;}
+    .index-auth-actions .nav-cta{margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff!important;color:#000!important;border-radius:999px;font-weight:800;}
+    @media(max-width:960px){
+      .hamburger{display:flex!important;visibility:visible!important;opacity:1!important;flex:none;align-items:center;justify-content:center;width:42px;height:42px;margin-left:.35rem;border:1px solid #333;border-radius:13px;background:#111;}
+      .hamburger span{display:block;background:#fff!important;}
+    }
+    .mobile-nav{background:#0a0a0a!important;border-left:1px solid #222!important;}
+    .mobile-nav>a{background:#111!important;border:1px solid #222!important;color:#fff!important;border-radius:14px;}
+    .mobile-nav-ctas{border-top:1px solid #222!important;}
+    .mobile-header-actions,.mobile-bottom-nav,.mobile-brand{display:none;}
+    @media(max-width:700px){
+      .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
+      .topbar .brand-block{display:none;}
+      .mobile-brand{display:flex;align-items:center;color:#fff!important;font-size:1rem;font-weight:900;letter-spacing:.06em;white-space:nowrap;}
+      .mobile-header-actions{display:flex;align-items:center;gap:.45rem;margin-left:auto;}
+      .mobile-bottom-nav{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:24;display:grid;grid-template-columns:repeat(4,1fr);gap:.25rem;padding:.55rem .35rem;border:1px solid #222;border-radius:999px;background:rgba(0,0,0,.94);box-shadow:0 12px 34px rgba(0,0,0,.8);backdrop-filter:blur(18px);}
+      .mobile-bottom-nav a{display:grid;place-items:center;gap:.2rem;padding:.35rem .15rem;border-radius:999px;color:#666;font-size:.68rem;font-weight:800;text-decoration:none;}
+      .mobile-bottom-nav a.active-tab{color:#fff;background:#1a1a1a;}
+      .mobile-bottom-nav a strong{font-size:.68rem;font-weight:800;line-height:1.1;}
+      .mobile-bottom-nav .nav-symbol{width:22px;height:22px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8;}
+    }
+
+    /* PAGE HEADER */
+    .cp-header{
+      padding:1.8rem 1.2rem 1.2rem;
+      background:#000;border-bottom:1px solid #1a1a1a;
+    }
+    .cp-back{
+      display:inline-flex;align-items:center;gap:.4rem;
+      color:rgba(255,255,255,.4);font-size:.78rem;font-weight:700;
+      text-decoration:none;margin-bottom:.7rem;transition:color .2s;
+    }
+    .cp-back:hover{color:#fff;}
+    .cp-header h1{
+      margin:0;font-size:clamp(1.8rem,5vw,2.8rem);
+      font-weight:900;letter-spacing:-.05em;color:#fff;line-height:1;
+    }
+
+    /* CATEGORY CARDS — same as index page */
+    .cp-chips-wrap{
+      background:#000;padding:1rem 1.2rem 1.2rem;
+      border-bottom:1px solid #1a1a1a;
+    }
+    .cp-chips{
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:.65rem;
+    }
+    @media(max-width:700px){
+      .cp-chips{grid-template-columns:repeat(3,1fr);gap:.4rem;}
+    }
+    .cp-chip{
+      position:relative;
+      height:120px;
+      border-radius:14px;
+      overflow:hidden;
+      display:flex;align-items:flex-start;
+      border:1.5px solid rgba(255,255,255,.18);
+      cursor:pointer;font-family:inherit;
+      transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;
+      padding:0;background:#111;
+    }
+    .cp-chip:hover{
+      transform:scale(1.04) translateY(-3px);
+      box-shadow:0 20px 48px rgba(0,0,0,.7);
+      border-color:rgba(255,255,255,.55);
+    }
+    .cp-chip.active{
+      border-color:#fff;
+      box-shadow:0 0 0 2px #fff;
+    }
+    .cp-chip-bg{
+      position:absolute;inset:0;
+      background-size:cover;background-position:center top;
+      transition:transform .4s ease;
+    }
+    .cp-chip:hover .cp-chip-bg{transform:scale(1.08);}
+    .cp-chip::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.1) 60%,transparent 100%);
+      z-index:1;
+    }
+    .cp-chip-label{
+      position:absolute;
+      top:.6rem;left:.65rem;
+      z-index:2;
+      font-size:.72rem;font-weight:900;
+      color:#fff;line-height:1.1;
+      letter-spacing:.05em;text-transform:uppercase;
+      text-shadow:0 2px 8px rgba(0,0,0,.6);
+    }
+    /* colours */
+    .cp-chip[data-cat="all"]     {background:#222;}
+    .cp-chip[data-cat="nightlife"]{background:#0e8fa8;}
+    .cp-chip[data-cat="dining"]  {background:#b71c1c;}
+    .cp-chip[data-cat="workshops"]{background:#b35a00;}
+    .cp-chip[data-cat="music"]   {background:#1b5e20;}
+    /* photos */
+    .cp-chip[data-cat="all"] .cp-chip-bg{background-image:url('all.jpeg');}
+    .cp-chip[data-cat="nightlife"] .cp-chip-bg{background-image:url('party.jpg');}
+    .cp-chip[data-cat="dining"] .cp-chip-bg   {background-image:url('culinary.jpg');}
+    .cp-chip[data-cat="workshops"] .cp-chip-bg{background-image:url('workshop.jpg');}
+    .cp-chip[data-cat="music"] .cp-chip-bg    {background-image:url('music.jpg');}
+    @media(max-width:700px){
+      .cp-chip{height:110px;border-radius:12px;}
+      .cp-chip-label{font-size:.62rem;}
+    }
+
+    /* SECTION LABEL */
+    .cp-section-head{
+      max-width:1240px;margin:0 auto;
+      padding:1.4rem 1.2rem .6rem;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .cp-section-title{font-size:1rem;font-weight:800;color:#fff;letter-spacing:-.02em;}
+    .cp-section-count{font-size:.75rem;color:rgba(255,255,255,.3);font-weight:700;}
+
+    /* INDEX-STYLE EVENT CARDS */
+    .cp-grid-wrap{max-width:1240px;margin:0 auto;padding:0 1.2rem 3rem;}
+    .cp-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:1rem;
+    }
+    .cp-card{
+      background:#111;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:22px;overflow:hidden;
+      cursor:pointer;text-decoration:none;display:flex;flex-direction:column;
+      transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+    }
+    .cp-card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 24px 56px rgba(0,0,0,.75);
+      border-color:rgba(255,255,255,.22);
+    }
+    .cp-banner{
+      position:relative;height:auto;aspect-ratio:4/5;
+      background-size:cover;background-position:center;overflow:hidden;
+    }
+    .cp-banner::after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.08) 55%,transparent 100%);
+      pointer-events:none;
+    }
+    .cp-promoted{
+      position:absolute;top:.65rem;left:.65rem;z-index:2;
+      background:rgba(255,255,255,.15);backdrop-filter:blur(8px);
+      color:#fff;font-size:.62rem;font-weight:800;
+      padding:.28rem .7rem;border-radius:999px;
+      letter-spacing:.06em;border:1px solid rgba(255,255,255,.2);
+      display:flex;align-items:center;gap:.3rem;
+    }
+    .cp-price-badge{
+      position:absolute;bottom:.6rem;right:.6rem;z-index:2;
+      padding:.22rem .65rem;border-radius:999px;
+      font-size:.62rem;font-weight:800;
+    }
+    .cp-price-free{background:#22c55e;color:#fff;}
+    .cp-price-paid{background:#ec4899;color:#fff;}
+    .cp-body{background:#111;padding:1rem 1.15rem 1.2rem;}
+    .cp-info{
+      display:flex;justify-content:space-between;gap:.4rem;
+      margin-bottom:.3rem;color:rgba(255,255,255,.38);font-size:.72rem;font-weight:700;
+    }
+    .cp-title{
+      font-size:1rem;font-weight:800;color:#fff;
+      line-height:1.3;letter-spacing:-.02em;margin:0 0 .25rem;
+    }
+    .cp-desc{
+      font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.5;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+      margin:0;
+    }
+    .cp-price-row{
+      display:flex;align-items:baseline;gap:.3rem;
+      margin-top:.6rem;padding-top:.6rem;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .cp-price-strong{color:#fff;font-size:1rem;font-weight:900;letter-spacing:-.02em;}
+    .cp-price-sub{color:rgba(255,255,255,.35);font-size:.75rem;}
+
+    /* EMPTY */
+    .cp-empty{
+      grid-column:1/-1;text-align:center;
+      padding:4rem 1rem;color:rgba(255,255,255,.25);
+    }
+    .cp-empty-icon{font-size:2.5rem;margin-bottom:.6rem;}
+    .cp-empty-msg{font-size:.88rem;font-weight:700;}
+
+    @media(max-width:900px){.cp-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:560px){
+      .cp-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;}
+      .cp-body{padding:.8rem .9rem .9rem;}
+      .cp-title{font-size:.88rem;}
+    }
+  </style>
+  <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="nav-wrap">
+    <a class="mobile-brand" href="index.html">CULTUREWAVE</a>
+    <div class="brand-block">
+      <div class="logo">CultureWave</div>
+      <div class="brand-sub">by OGSHOOTS LUXE</div>
+    </div>
+    <nav class="topnav">
+      <a href="events.html">Events</a>
+      <a href="restaurants.html">Restaurants</a>
+      <a href="features.html">For Organizers</a>
+      <a href="how-it-works.html">How it works</a>
+    </nav>
+    <div class="mobile-header-actions">
+      <button class="mobile-header-icon" type="button">⌕</button>
+    </div>
+    <div class="auth-actions index-auth-actions">
+      <a class="nav-link" href="login.html">Login</a>
+      <a class="nav-cta" href="login.html">Get Started</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <a href="events.html">Events</a>
+  <a href="restaurants.html">Restaurants</a>
+  <a href="features.html">For Organizers</a>
+  <a href="how-it-works.html">How it works</a>
+  <div class="mobile-nav-ctas">
+    <a class="nav-link" href="login.html">Login</a>
+    <a class="nav-cta" href="login.html">Get Started</a>
+  </div>
+</nav>
+
+<nav class="mobile-bottom-nav">
+  <a href="index.html"><svg class="nav-symbol" viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 20v-6h6v6"/></svg><strong>Home</strong></a>
+  <a href="events.html"><svg class="nav-symbol" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7 3v4M17 3v4M3.5 10h17"/></svg><strong>Events</strong></a>
+  <a href="categories.html" class="active-tab"><svg class="nav-symbol" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><strong>Categories</strong></a>
+  <a href="restaurants.html"><svg class="nav-symbol" viewBox="0 0 24 24"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M6 10v11M18 3v18M15 3v6c0 1.7 1.3 3 3 3"/></svg><strong>Dine</strong></a>
+</nav>
+
+<main>
+  <div class="cp-header">
+    <a class="cp-back" href="index.html">&#8592; Back to Home</a>
+    <h1 id="pageTitle">All Categories</h1>
+  </div>
+
+  <!-- 4 CHIPS ONLY -->
+  <div class="cp-chips-wrap">
+    <div class="cp-chips">
+      <button class="cp-chip active" data-cat="all">
+        <span class="cp-chip-label">All</span>
+      </button>
+      <button class="cp-chip" data-cat="nightlife">
+        <div class="cp-chip-bg"></div>
+        <span class="cp-chip-label">Nightlife</span>
+      </button>
+      <button class="cp-chip" data-cat="dining">
+        <div class="cp-chip-bg"></div>
+        <span class="cp-chip-label">Fine Dining</span>
+      </button>
+      <button class="cp-chip" data-cat="workshops">
+        <div class="cp-chip-bg"></div>
+        <span class="cp-chip-label">Workshops</span>
+      </button>
+      <button class="cp-chip" data-cat="music">
+        <div class="cp-chip-bg"></div>
+        <span class="cp-chip-label">Live Music</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="cp-section-head">
+    <div class="cp-section-title" id="sectionTitle">All Events</div>
+    <div class="cp-section-count" id="sectionCount"></div>
+  </div>
+
+  <div class="cp-grid-wrap">
+    <div class="cp-grid" id="cpGrid">
+      <div class="cp-empty"><div class="cp-empty-icon">⏳</div><div class="cp-empty-msg">Loading…</div></div>
+    </div>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  if(!firebase.apps.length){
+    firebase.initializeApp({
+      apiKey:"AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
+      authDomain:"ogshootsluxe-36740.firebaseapp.com",
+      projectId:"ogshootsluxe-36740",
+      storageBucket:"ogshootsluxe-36740.firebasestorage.app",
+      messagingSenderId:"5471814825",
+      appId:"1:5471814825:web:07e84f2f88486da817d5b8"
+    });
+  }
+  const db = firebase.firestore();
+
+  const CAT_MAP = {
+    nightlife:  ['party','parties','nightlife','club','celebrat'],
+    dining:     ['culinary','dining','food','gourmet','restaurant','chef'],
+    workshops:  ['workshop','class','learn','craft','skill','masterclass'],
+    music:      ['music','concert','gig','live','band','dj','acoustic']
+  };
+  const LABELS = {all:'All Events', nightlife:'Nightlife', dining:'Fine Dining', workshops:'Workshops', music:'Live Music'};
+  const BANNERS = ['linear-gradient(135deg,#0d2b6e,#1565c0)','linear-gradient(135deg,#6b1a3a,#b71c1c)','linear-gradient(135deg,#1a3a1a,#2e7d32)'];
+  function eventPublicPath(name,id=''){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}${id?`?eventId=${encodeURIComponent(id)}`:''}`;}
+
+  let allEvents = [], activeFilter = 'all';
+
+  function matchCat(d, cat){
+    if(cat==='all') return true;
+    const hay = [d.category||'',d.name||'',d.tags||'',d.description||''].join(' ').toLowerCase();
+    return (CAT_MAP[cat]||[]).some(k=>hay.includes(k));
+  }
+
+  function renderGrid(filter){
+    const grid = document.getElementById('cpGrid');
+    const filtered = filter==='all' ? allEvents : allEvents.filter(e=>matchCat(e.data,filter));
+    document.getElementById('sectionTitle').textContent = LABELS[filter]||'All Events';
+    document.getElementById('sectionCount').textContent = filtered.length ? `${filtered.length} event${filtered.length>1?'s':''}` : '';
+    grid.innerHTML = '';
+    if(!filtered.length){
+      grid.innerHTML = `<div class="cp-empty"><div class="cp-empty-icon">🔍</div><div class="cp-empty-msg">No events in this category yet.</div></div>`;
+      return;
+    }
+    filtered.forEach(({id,data:d},i)=>{
+      const img = d.cardImgUrl||d.coverUrl||'';
+      const price = d.tickets?.[0]?.price||d.price||0;
+      let dateLabel='';
+      if(d.startDate){try{const dt=d.startDate.toDate?d.startDate.toDate():new Date(String(d.startDate).slice(0,10)+'T00:00:00');dateLabel=dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});}catch(e){}}
+      const a = document.createElement('a');
+      a.className='cp-card';
+      a.href=eventPublicPath(d.urlKey||d.name,id);
+      a.innerHTML=`
+        <div class="cp-banner" style="${img?`background-image:url('${img}')`:BANNERS[i%BANNERS.length]}">
+          <span class="cp-promoted">♦ Promoted</span>
+          <span class="cp-price-badge ${price?'cp-price-paid':'cp-price-free'}">${price?'Paid':'Free'}</span>
+        </div>
+        <div class="cp-body">
+          <div class="cp-info"><span>▣ ${dateLabel||'Date TBA'}</span><span>⌖ ${d.city||'India'}</span></div>
+          <div class="cp-title">${d.name||'Untitled'}</div>
+          <p class="cp-desc">${d.summary||d.description||''}</p>
+          <div class="cp-price-row">
+            <span class="cp-price-strong">${price?`₹${Number(price).toLocaleString('en-IN')}`:'Free'}</span>
+            <span class="cp-price-sub">/ onward</span>
+          </div>
+        </div>`;
+      grid.appendChild(a);
+    });
+  }
+
+  async function loadEvents(){
+    try{
+      const snap = await db.collection('events').limit(200).get();
+      allEvents = snap.docs
+        .filter(doc=>{const s=String(doc.data().status||'').toLowerCase();return doc.data().publicListing!==false&&['published','live','active'].includes(s);})
+        .map(doc=>({id:doc.id,data:doc.data()}));
+      renderGrid(activeFilter);
+    }catch(e){
+      document.getElementById('cpGrid').innerHTML=`<div class="cp-empty"><div class="cp-empty-icon">⚠️</div><div class="cp-empty-msg">Failed to load events.</div></div>`;
+    }
+  }
+
+  document.querySelectorAll('.cp-chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.cp-chip').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter=btn.dataset.cat;
+      renderGrid(activeFilter);
+    });
+  });
+
+  // Auto-select from ?cat= param
+  const urlCat = new URLSearchParams(location.search).get('cat');
+  if(urlCat){
+    activeFilter = urlCat;
+    document.querySelectorAll('.cp-chip').forEach(b=>b.classList.toggle('active',b.dataset.cat===urlCat));
+    const chip = document.querySelector(`.cp-chip[data-cat="${urlCat}"]`);
+    if(chip) setTimeout(()=>chip.scrollIntoView({inline:'center',behavior:'smooth'}),100);
+  }
+
+  loadEvents();
+</script>
+<script>
+  const ham=document.getElementById('hamburger'),mNav=document.getElementById('mobileNav');
+  ham.addEventListener('click',()=>{const o=!mNav.classList.contains('open');ham.classList.toggle('open',o);mNav.classList.toggle('open',o);document.body.style.overflow=o?'hidden':'';});
+  mNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ham.classList.remove('open');mNav.classList.remove('open');document.body.style.overflow='';}));
+</script>
+  <script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
+</body>
+</html>

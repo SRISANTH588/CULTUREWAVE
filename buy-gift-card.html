@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Buy Gift Card | CultureWave</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#111;color:#f4f2f7;font-family:Inter,system-ui,sans-serif}.buy-page{min-height:100dvh;padding:0 1rem 7rem}.page-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.8rem;height:72px;margin:0 -1rem;padding:0 1rem;background:rgba(17,17,17,.96);backdrop-filter:blur(12px)}.back-btn,.history-btn{display:grid;place-items:center;height:46px;border:1px solid #37353d;border-radius:999px;background:#19181e;color:#fff;font:inherit}.back-btn{width:46px;font-size:1.8rem}.page-head h1{flex:1;margin:0;font-size:1rem;font-weight:700}.history-btn{padding:0 1rem;font-size:.85rem}.buy-hero{height:235px;position:relative;overflow:hidden;display:grid;place-items:center;margin:0 -1rem;background:radial-gradient(ellipse at 50% 0,#7b48ce 0,#381677 54%,#15131b 100%);text-align:center}.buy-hero:before,.buy-hero:after{content:'✦';position:absolute;color:#eee0ff;text-shadow:0 0 16px white}.buy-hero:before{left:19%;top:35%;font-size:1.2rem}.buy-hero:after{right:17%;bottom:24%;font-size:.8rem}.brand{position:relative;z-index:1}.brand-mark{font-size:1.65rem;font-weight:800;letter-spacing:-.035em}.brand-name{margin-top:.2rem;color:#d6baff;font-family:'Playfair Display',serif;font-size:3.2rem;letter-spacing:.02em}.categories{display:flex;gap:.55rem;overflow-x:auto;margin:1rem -1rem;padding:.25rem 1rem .7rem;scrollbar-width:none}.categories::-webkit-scrollbar,.amounts::-webkit-scrollbar{display:none}.category{flex:none;padding:.55rem .95rem;border:1px solid #3b3941;border-radius:999px;background:#242328;color:#aaa7b2;font:inherit}.category.active{border-color:#8e5cff;background:#231639;color:#e3d1ff}.carousel{position:relative;display:flex;align-items:center;justify-content:center;height:230px;overflow:hidden}.gift-card{display:grid;place-items:center;width:min(72vw,440px);height:190px;flex:none;position:relative;overflow:hidden;border:1px solid #7c54bd;border-radius:28px;background:radial-gradient(ellipse at 50% 45%,#4921a0,#241052 70%);box-shadow:0 18px 50px #0008;color:#dcbcff;transform:rotate(-2deg)}.gift-card:before,.gift-card:after{content:'';position:absolute;border:1px solid #d3a85e66}.gift-card:before{inset:12px 22px;border-radius:18px}.gift-card:after{left:18%;top:-25%;width:1px;height:150%;transform:rotate(-5deg);background:#d3a85e66}.gift-card .brand-mark{font-size:1.5rem}.gift-card small{font-size:.55rem;font-weight:800;letter-spacing:.2em}.card-glow{position:absolute;width:110px;height:110px;right:-28px;top:-25px;border-radius:50%;background:#ba83ff44;filter:blur(4px)}.dots{display:flex;justify-content:center;gap:.4rem;margin:-.2rem 0 1rem}.dots span{width:9px;height:9px;border-radius:99px;background:#555}.dots span.active{width:22px;background:#f0e9ff}.amount-box{padding:1.1rem;border:1px solid #29282e;border-radius:22px;background:#1d1d1f}.amount-box h2{margin:0 0 .75rem;font-size:1rem}.amount-display{display:flex;align-items:center;height:60px;padding:0 1rem;border:1px solid #343339;border-radius:16px;font-size:1.7rem;font-weight:800}.amount-display input{width:100%;border:0;outline:0;background:transparent;color:#fff;font:inherit}.amounts{display:flex;gap:.65rem;overflow-x:auto;margin:.8rem -.1rem 0;padding:.3rem 0;scrollbar-width:none}.amount-option{position:relative;min-width:100px;height:56px;border:1px solid #343339;border-radius:16px;background:#29282d;color:#fff;font:inherit;font-size:.95rem;font-weight:700}.amount-option.active{border-color:#5827cf;background:#4420a9}.amount-option small{position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:.2rem .8rem;border:1px solid #555;border-radius:999px;background:#333;color:#eee;font-size:.65rem;font-weight:500}.redeem-line{margin:1.5rem 0;color:#d2d0d6;font-size:.88rem}.redeem-line a{color:#d3b7ff;text-decoration:underline;text-underline-offset:3px}.message-label{display:block;margin:1.6rem 0 .65rem;color:#aaa7b2;font-weight:600}.message{width:100%;min-height:120px;padding:1rem;border:1px solid #424047;border-radius:16px;resize:vertical;background:#151518;color:#fff;font:inherit}.message::placeholder{color:#77747e}.more-title{margin:1.7rem 0 .7rem;font-size:1rem}.more-options{overflow:hidden;border:1px solid #343339;border-radius:18px;background:#1b1a1f}.more-options a{display:flex;align-items:center;gap:.8rem;min-height:58px;padding:0 .9rem;color:#f5f3f8;text-decoration:none}.more-options a+a{border-top:1px solid #343339}.proceed-dock{position:fixed;z-index:4;right:0;bottom:0;left:0;padding:1rem 1.1rem calc(env(safe-area-inset-bottom) + 1rem);background:linear-gradient(transparent,#111 20%)}.proceed{width:100%;height:58px;border:0;border-radius:999px;background:#f7f6f9;color:#16151a;font:inherit;font-weight:800}.notice{margin:.5rem 0 0;color:#d5baff;text-align:center;font-size:.8rem}
+    .gift-card[data-occasion="birthday"]{background:radial-gradient(ellipse at 50% 45%,#8a346a,#3d173d 72%)}.gift-card[data-occasion="anniversary"]{background:radial-gradient(ellipse at 50% 45%,#8d572b,#38251c 72%)}.gift-card[data-occasion="thank you"]{background:radial-gradient(ellipse at 50% 45%,#236b67,#153a40 72%)}.card-check{position:absolute;top:14px;right:15px;z-index:2;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#fff;color:#201333;font-size:1rem;font-weight:900}.history-overlay{position:fixed;z-index:20;inset:0;display:grid;align-items:end;background:#000a}.history-overlay[hidden]{display:none}.history-panel{width:100%;min-height:52vh;padding:1.1rem 1.1rem calc(env(safe-area-inset-bottom) + 1.2rem);border:1px solid #38363e;border-radius:24px 24px 0 0;background:#1b1a1f}.history-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}.history-head h2{margin:0;font-size:1.1rem}.history-close{width:40px;height:40px;border:1px solid #3c3a42;border-radius:50%;background:#27262c;color:#fff;font-size:1.5rem}.history-empty{display:grid;justify-items:center;gap:.7rem;padding:2.2rem 1rem;text-align:center;color:#a9a6b0}.history-icon{display:grid;place-items:center;width:58px;height:58px;border:1px solid #47434f;border-radius:50%;color:#c7a8ff;font-size:1.5rem}.history-empty h3{margin:.3rem 0 0;color:#f5f3f8;font-size:1rem}.history-empty p{max-width:280px;margin:0;font-size:.85rem;line-height:1.5}.history-empty a{margin-top:.4rem;color:#d3b7ff;font-size:.88rem;font-weight:700}
+    .history-panel{width:min(680px,100%);max-height:min(82dvh,760px);min-height:0;overflow:auto}.history-list{display:grid;gap:.75rem;max-height:calc(82dvh - 110px);overflow:auto;padding:.15rem .15rem .5rem}.history-item{display:grid;gap:.65rem;padding:1rem 1.05rem;border:1px solid #393640;border-radius:16px;background:linear-gradient(140deg,#25232b,#1d1c22)}.history-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem}.history-item-head strong{color:#f7f4fb;font-size:.95rem;line-height:1.4}.history-status{flex:none;padding:.3rem .55rem;border:1px solid #514267;border-radius:999px;background:#30223e;color:#d5bbff;font-size:.68rem;font-weight:800}.history-status.redeemed{border-color:#285741;background:#183328;color:#8fe0ae}.history-meta{margin:0;color:#aaa6b2;font-size:.78rem}.reveal-card{justify-self:start;min-height:40px;padding:.55rem .8rem;border:1px solid #59467a;border-radius:10px;background:#2a2038;color:#e6d5ff;font:inherit;font-size:.77rem;font-weight:750}.reveal-card:hover{background:#352448}.gift-credentials{margin:0;padding:.8rem;border-radius:10px;background:#111015;color:#c8c3cf;font-size:.8rem;line-height:1.8;overflow-wrap:anywhere}.gift-credentials strong{color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.06em}.gift-credentials[hidden]{display:none!important}@media(min-width:700px){.history-overlay{align-items:center;padding:2rem}.history-panel{border-radius:24px}.history-list{max-height:min(62vh,560px)}}
+    .gift-card{transition:background .25s ease,transform .25s ease,border-color .25s ease;cursor:grab;touch-action:pan-y}
+    .gift-card:active{cursor:grabbing}
+    .gift-card[data-design="night"]{background:radial-gradient(ellipse at 75% 30%,#3d5b9b,#101b3a 72%);border-color:#718ed0;color:#d6e2ff}
+    .gift-card[data-design="sunset"]{background:radial-gradient(ellipse at 70% 25%,#e88c55,#6a2c54 72%);border-color:#e6a276;color:#ffe4d6}
+    .gift-card[data-design="mint"]{background:radial-gradient(ellipse at 75% 25%,#43a99b,#124944 72%);border-color:#63c4b3;color:#d4fff3}
+    .gift-card[data-design="confetti"]{background:radial-gradient(ellipse at 70% 20%,#b34d9b,#53216f 72%);border-color:#d88bc8;color:#ffe1f6}
+    .carousel-control{position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:42px;height:42px;transform:translateY(-50%);border:1px solid #484450;border-radius:50%;background:#1d1b22;color:#fff;font:inherit;font-size:1.5rem;cursor:pointer}
+    .carousel-control:hover{border-color:#a982ff;background:#2b1a49}
+    .carousel-control.prev{left:max(1rem,calc(50% - 290px))}.carousel-control.next{right:max(1rem,calc(50% - 290px))}
+    .dots button{width:10px;height:10px;padding:0;border:0;border-radius:99px;background:#555;cursor:pointer;transition:width .2s,background .2s}
+    .dots button.active{width:24px;background:#f0e9ff}.dots button:focus-visible,.carousel-control:focus-visible{outline:2px solid #c7a8ff;outline-offset:3px}
+  </style>
+  <style>
+    /* Premium card treatment with a larger, responsive landscape preview. */
+    .carousel{height:370px;overflow:visible}
+    .gift-card{width:min(86vw,560px);height:auto;aspect-ratio:1.72;min-height:0;border:1px solid transparent;border-radius:30px;transform:rotate(-1deg);background:radial-gradient(ellipse at 78% 20%,#fff3 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#4921a0,#241052 72%) padding-box,linear-gradient(135deg,#fff0be,#a77d39 22%,#f3dc9b 48%,#5c438a 72%,#f3dca0) border-box;box-shadow:inset 0 1px 0 #fff5,inset 0 -18px 35px #08051066,0 28px 70px #000b,0 0 34px #8d5cff20;color:#f4e7ff}
+    .gift-card:before{inset:14px;border:1px solid #ead49a88;border-radius:21px;box-shadow:inset 0 0 28px #fff1}
+    .gift-card:after{left:17%;top:-20%;height:145%;width:2px;border:0;background:linear-gradient(180deg,transparent,#f5dfa088 18%,#fff3 50%,#b98d49aa 82%,transparent);transform:rotate(-5deg)}
+    .gift-card[data-design="night"]{background:radial-gradient(ellipse at 78% 20%,#b9d0ff44 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#294a88,#0a142f 72%) padding-box,linear-gradient(135deg,#fff0be,#8a6eaa 24%,#9db5e6 50%,#3c507e 74%,#f3dca0) border-box;border-color:transparent;color:#e4edff}
+    .gift-card[data-design="sunset"]{background:radial-gradient(ellipse at 78% 20%,#fff2d344 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#b76450,#55263d 72%) padding-box,linear-gradient(135deg,#fff0be,#bd8051 24%,#f3c090 50%,#75425b 74%,#f3dca0) border-box;border-color:transparent;color:#fff0df}
+    .gift-card[data-design="mint"]{background:radial-gradient(ellipse at 78% 20%,#c7fff344 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#277e75,#103d42 72%) padding-box,linear-gradient(135deg,#fff0be,#5d9f87 24%,#a5e4cb 50%,#315e60 74%,#f3dca0) border-box;border-color:transparent;color:#e0fff3}
+    .gift-card[data-design="confetti"]{background:radial-gradient(ellipse at 78% 20%,#ffd8f244 0,transparent 27%),radial-gradient(ellipse at 50% 45%,#9a438e,#431d65 72%) padding-box,linear-gradient(135deg,#fff0be,#aa68a0 24%,#efb4d5 50%,#69417d 74%,#f3dca0) border-box;border-color:transparent;color:#ffe8f6}
+    .gift-card .card-face{position:relative;z-index:1;display:grid;justify-items:center;gap:.7rem;padding:1.5rem 1rem;text-align:center}
+    .gift-card .brand-mark{font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.9rem,4vw,2.65rem);font-weight:600;letter-spacing:-.035em;text-shadow:0 2px 20px #fff4}
+    .card-kicker{font-size:.58rem;font-weight:700;letter-spacing:.24em;opacity:.76}
+    .gift-card small{font-size:.62rem;letter-spacing:.23em;opacity:.9}
+    .card-serial{position:absolute;right:9%;bottom:9%;z-index:1;font-size:.5rem;font-weight:700;letter-spacing:.2em;opacity:.62}
+    .card-glow{width:170px;height:170px;right:-45px;top:-65px;background:#fff4;filter:blur(15px)}
+    .card-check{top:22px;right:23px;width:30px;height:30px;box-shadow:0 2px 12px #0005}
+    .carousel-control.prev{left:max(1rem,calc(50% - 345px))}.carousel-control.next{right:max(1rem,calc(50% - 345px))}
+    @media(max-width:640px){.carousel{height:285px}.gift-card{width:min(90vw,480px);border-radius:24px}.gift-card:before{inset:10px;border-radius:17px}.gift-card .card-face{gap:.55rem;padding:1rem .7rem}.gift-card .brand-mark{font-size:clamp(1.8rem,8vw,2.3rem)}.card-kicker{font-size:.48rem;letter-spacing:.18em}.gift-card small{font-size:.5rem;letter-spacing:.15em}.card-serial{font-size:.42rem;right:8%;bottom:8%}.card-check{top:17px;right:18px}.carousel-control{width:36px;height:36px;font-size:1.3rem}.carousel-control.prev{left:0}.carousel-control.next{right:0}}
+    /* Occasion-led card artwork: readable type, restrained detail and stable sizing. */
+    .gift-card{isolation:isolate;transition:background .35s ease,transform .3s ease,box-shadow .3s ease}
+    .gift-card:hover{transform:translateY(-3px) rotate(0);box-shadow:inset 0 1px 0 #fff6,inset 0 -18px 35px #08051066,0 34px 80px #000c,0 0 42px #8d5cff30}
+    .gift-card:before{z-index:-1}
+    .gift-card:after{z-index:0;pointer-events:none}
+    .card-orbit{position:absolute;z-index:0;right:9%;bottom:-37%;width:47%;aspect-ratio:1;border:1px solid currentColor;border-radius:50%;opacity:.16;box-shadow:0 0 0 14px #ffffff08,0 0 0 30px #ffffff06}
+    .card-face{width:100%}
+    .gift-card[data-occasion="birthday"] .card-orbit{right:auto;left:-6%;bottom:-48%;width:60%;opacity:.2}
+    .gift-card[data-occasion="anniversary"] .card-orbit{right:12%;bottom:-60%;width:68%;opacity:.22}
+    .gift-card[data-occasion="thank you"] .card-orbit{right:-9%;bottom:-54%;width:62%;opacity:.18}
+    .gift-card[data-design="classic"] .card-orbit{border-style:dashed}
+    .gift-card[data-design="night"] .card-orbit{border-width:2px;box-shadow:0 0 0 12px #b9d0ff0b,0 0 0 26px #b9d0ff08}
+    .gift-card[data-design="sunset"] .card-orbit{border-style:dotted}
+    .gift-card[data-design="mint"] .card-orbit{width:55%;border-radius:42% 58% 60% 40%;transform:rotate(-25deg)}
+    .gift-card[data-design="confetti"] .card-orbit{width:52%;border-width:2px;transform:rotate(24deg)}
+    .gift-card[data-design="classic"] .card-face:after,.gift-card[data-design="night"] .card-face:after,.gift-card[data-design="sunset"] .card-face:after,.gift-card[data-design="mint"] .card-face:after,.gift-card[data-design="confetti"] .card-face:after{content:'✦';position:absolute;z-index:-1;left:12%;top:12%;font-size:1.2rem;opacity:.52;text-shadow:0 0 16px currentColor}
+    .gift-card[data-design="night"] .card-face:after{content:'✧';left:auto;right:15%;top:17%;font-size:1.7rem}
+    .gift-card[data-design="sunset"] .card-face:after{content:'◌';left:13%;top:auto;bottom:5%;font-size:2.4rem}
+    .gift-card[data-design="mint"] .card-face:after{content:'❋';left:auto;right:14%;top:12%;font-size:1.7rem}
+    .gift-card[data-design="confetti"] .card-face:after{content:'✳';left:12%;top:auto;bottom:6%;font-size:2rem}
+    .gift-card .card-kicker{display:flex;align-items:center;gap:.55rem}
+    .gift-card .card-kicker:before,.gift-card .card-kicker:after{content:'';width:22px;height:1px;background:currentColor;opacity:.5}
+    .gift-card .brand-mark{position:relative}
+    .gift-card .brand-mark:after{content:'GIFTING, REIMAGINED';display:block;margin-top:.45rem;font:700 .48rem/1 Inter,system-ui,sans-serif;letter-spacing:.25em;opacity:.62}
+    .gift-card .card-serial{padding:.42rem .65rem;border:1px solid currentColor;border-radius:999px;background:#0002;backdrop-filter:blur(6px)}
+    @media(max-width:640px){.carousel{height:270px;padding:0 2.5rem}.gift-card{width:min(100%,440px);transform:rotate(-.5deg)}.gift-card:hover{transform:translateY(-2px)}.gift-card .card-face{gap:.45rem}.gift-card .brand-mark:after{font-size:.4rem;margin-top:.35rem}.gift-card .card-serial{bottom:8%;font-size:.38rem;padding:.32rem .5rem}.card-orbit{right:7%;bottom:-48%;width:50%}.carousel-control.prev{left:.2rem}.carousel-control.next{right:.2rem}}
+    /* Refined card preview and amount picker. */
+    .buy-page{max-width:1440px;margin-inline:auto}
+    .buy-hero,.page-head,.categories{max-width:1440px;margin-inline:auto}
+    .carousel{height:340px;padding:0 3.5rem}
+    .gift-card{width:min(78vw,520px);border-radius:25px;transform:none;box-shadow:inset 0 1px 0 #fff5,inset 0 -14px 28px #08051055,0 20px 52px #0009,0 0 24px #8d5cff14}
+    .gift-card:after{inset:0;width:auto;height:auto;border:0;border-radius:inherit;background:linear-gradient(115deg,transparent 18%,#fff1 48%,transparent 67%);transform:none;opacity:.22}
+    .gift-card:before{inset:12px;border-radius:17px;border-color:currentColor;opacity:.32;box-shadow:inset 0 0 22px #fff1}
+    .gift-card .card-glow{width:130px;height:130px;right:-48px;top:-52px;background:#c7a4ff2b;filter:blur(18px)}
+    .gift-card:hover{transform:translateY(-3px);box-shadow:inset 0 1px 0 #fff6,inset 0 -14px 28px #08051055,0 26px 60px #000b,0 0 30px #8d5cff20}
+    .card-check{top:22px;right:23px;width:27px;height:27px;border:1px solid #ffffff55;background:#211736cc;color:#f4e9ff;box-shadow:0 4px 12px #0005}
+    .amount-box{width:min(100%,1100px);margin-inline:auto;padding:1.2rem 1.3rem;border-color:#37333f;background:radial-gradient(ellipse at 100% 0,#34214855,transparent 42%),linear-gradient(145deg,#201f23,#19181c);box-shadow:0 14px 36px #0003}
+    .amount-box h2{margin-bottom:.85rem;color:#f7f4fb;font-size:1.05rem;letter-spacing:-.02em}
+    .amount-display{height:62px;border-color:#44414b;background:#121115;transition:border-color .2s,box-shadow .2s}
+    .amount-display:focus-within{border-color:#a67aff;box-shadow:0 0 0 3px #9b68ff20}
+    .amounts{gap:.7rem;padding:.55rem .1rem .25rem}
+    .amount-option{min-width:112px;height:54px;border-color:#403d46;border-radius:14px;background:linear-gradient(145deg,#2b2930,#242328);transition:border-color .2s,transform .2s,background .2s}
+    .amount-option:hover{transform:translateY(-2px);border-color:#8d68c4}
+    .amount-option.active{border-color:#a985ff;background:linear-gradient(145deg,#5230a4,#352064);box-shadow:0 7px 18px #542fa533,inset 0 1px #ffffff20}
+    .amount-option small{top:-10px;border-color:#5f536f;background:#292630;color:#e8dbff;letter-spacing:.04em}
+    .redeem-line,.message-label,.message,.more-title,.more-options,#buyNotice{width:min(100%,1100px);margin-inline:auto}
+    .redeem-line{margin-top:1.35rem;margin-bottom:1.35rem}
+    .message-label{margin-top:1.4rem}
+    .message{display:block}
+    @media(max-width:640px){.carousel{height:258px;padding:0 2.25rem}.gift-card{width:100%;border-radius:21px}.gift-card:before{inset:9px;border-radius:14px}.gift-card .card-face{gap:.42rem;padding:.85rem .6rem}.gift-card .brand-mark{font-size:clamp(1.7rem,7.5vw,2.15rem)}.gift-card .brand-mark:after{font-size:.37rem;letter-spacing:.2em}.gift-card .card-kicker{font-size:.44rem}.gift-card small{font-size:.46rem}.gift-card .card-serial{right:7%;bottom:7%;font-size:.35rem;padding:.3rem .45rem}.card-check{top:15px;right:15px;width:24px;height:24px;font-size:.85rem}.amount-box{padding:1rem;border-radius:20px}.amount-display{height:58px;font-size:1.5rem}.amount-option{min-width:98px;height:50px;font-size:.86rem}.amounts{gap:.55rem}}
+  </style>
+</head>
+<body>
+  <main class="buy-page">
+    <header class="page-head"><button id="backButton" class="back-btn" aria-label="Back">‹</button><h1>Buy Gift Card</h1><button class="history-btn" id="historyButton">◴ &nbsp;History</button></header>
+    <section class="buy-hero"><div class="brand"><div class="brand-mark">CultureWave</div><div class="brand-name">GIFT CARD</div></div></section>
+    <nav class="categories" aria-label="Gift card occasion"><button class="category active" data-category="all" aria-pressed="true">All</button><button class="category" data-category="culturewave" aria-pressed="false">CultureWave</button><button class="category" data-category="birthday" aria-pressed="false">Birthday</button><button class="category" data-category="anniversary" aria-pressed="false">Anniversary</button><button class="category" data-category="thank you" aria-pressed="false">Thank you</button></nav>
+    <section class="carousel" id="giftCarousel" aria-label="Choose a gift card design">
+      <button class="carousel-control prev" type="button" aria-label="Previous gift card design">‹</button>
+      <div class="gift-card" id="giftCard" data-occasion="all" data-design="classic" tabindex="0" role="img" aria-label="Classic CultureWave gift card"><span class="card-glow"></span><span class="card-check" aria-label="Selected">✓</span><div class="card-face"><div class="brand-mark" id="giftCardBrand">CultureWave</div><span class="card-kicker">EXPERIENCES · DINING · CULTURE</span><small id="giftCardCaption">CULTUREWAVE GIFT CARD · CLASSIC</small></div><span class="card-serial">A GIFT, BEAUTIFULLY GIVEN</span></div>
+      <button class="carousel-control next" type="button" aria-label="Next gift card design">›</button>
+    </section>
+    <div class="dots" id="giftDesignDots" role="group" aria-label="Gift card designs">
+      <button class="active" type="button" data-design-index="0" aria-label="Classic design" aria-pressed="true"></button>
+      <button type="button" data-design-index="1" aria-label="Midnight design" aria-pressed="false"></button>
+      <button type="button" data-design-index="2" aria-label="Sunset design" aria-pressed="false"></button>
+      <button type="button" data-design-index="3" aria-label="Mint design" aria-pressed="false"></button>
+      <button type="button" data-design-index="4" aria-label="Confetti design" aria-pressed="false"></button>
+    </div>
+    <section class="amount-box"><h2>Choose amount</h2><label class="amount-display"><span>₹</span><input id="amountInput" aria-label="Gift card amount" inputmode="numeric" value="2000"></label><div class="amounts"><button class="amount-option">₹1,000</button><button class="amount-option active"><small>Popular</small>₹2,000</button><button class="amount-option">₹5,000</button><button class="amount-option">₹10,000</button></div><p id="giftCardLimitHint" style="margin:.7rem 0 0;color:#aaa7b2;font-size:.78rem">Loading current purchase limits…</p></section>
+    <p class="redeem-line">Already have a gift card? <a href="claim-gift-card.html">Redeem now</a></p>
+    <label class="message-label" for="customMessage">Add a custom message:</label><textarea class="message" id="customMessage" placeholder="Start typing here..."></textarea>
+    <h2 class="more-title">More options</h2><nav class="more-options"><a href="/gift-card-help.html" target="_top" aria-label="Open Gift Card Help"><span>▦</span><strong>Help</strong><span>›</span></a><a href="/gift-card-faq.html" target="_top"><span>ⓘ</span><strong>Gift Card FAQs</strong><span>›</span></a></nav>
+    <p id="buyNotice" class="notice" role="status"></p>
+  </main>
+  <footer class="proceed-dock"><button class="proceed" id="proceedButton">Proceed &nbsp;›</button></footer>
+  <div class="history-overlay" id="historyOverlay" hidden><section class="history-panel" role="dialog" aria-modal="true" aria-labelledby="historyTitle"><header class="history-head"><h2 id="historyTitle">Gift Card History</h2><button class="history-close" id="historyClose" aria-label="Close history">×</button></header><div id="historyContent" class="history-empty"><span class="history-icon">◷</span><h3>Sign in to view purchases</h3><p>Your CultureWave gift card orders will appear here.</p><a href="gift-card-faq.html">Gift Card FAQs</a></div></section></div>
+  <script type="module">
+    import {auth as giftAuth} from "./firebase.js";
+    /* Firebase initialization is shared with the login page. */
+    const giftApi="https://culturewave-razorpay.culturewaveindia.workers.dev";
+    const currentUser=async()=>{await giftAuth.authStateReady();return giftAuth.currentUser};
+    async function giftRequest(path,data){const user=await currentUser();if(!user)throw new Error('Please sign in to continue.');const token=await user.getIdToken(true);const response=await fetch(`${giftApi}/${path}`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(data||{})});const raw=await response.text();let result;try{result=JSON.parse(raw)}catch(_){throw new Error(path==='giftCardHistory'?'Gift card history could not be read right now. Your purchase may still be safe; please contact Gift Card Help.':'The payment service returned an unreadable response. Please try again.')}if(!response.ok||!result.success)throw new Error(result.error||'Could not complete request.');return result}
+    const defaultGiftCardLimits={minAmount:250,maxAmount:10000};
+    let giftCardLimits={...defaultGiftCardLimits};
+    function setGiftCardLimitHint(){const format=value=>Number(value).toLocaleString('en-IN');document.getElementById('giftCardLimitHint').textContent=`Choose an amount between ₹${format(giftCardLimits.minAmount)} and ₹${format(giftCardLimits.maxAmount)}.`}
+    async function loadGiftCardLimits(){try{const result=await giftRequest('giftCardLimits');const limits=result.giftCardSettings;if(Number.isSafeInteger(Number(limits?.minAmount))&&Number.isSafeInteger(Number(limits?.maxAmount))&&Number(limits.minAmount)>=1&&Number(limits.maxAmount)>Number(limits.minAmount)){giftCardLimits={minAmount:Number(limits.minAmount),maxAmount:Number(limits.maxAmount)}}}catch(error){console.warn('Could not load current gift card limits; checkout will confirm them.',error)}setGiftCardLimitHint()}
+    document.getElementById('backButton').addEventListener('click',()=>{if(parent!==window)parent.postMessage({type:'culturewave-menu-back'},location.origin);else history.back()});
+    const historyOverlay=document.getElementById('historyOverlay');
+    document.getElementById('historyButton').addEventListener('click',async()=>{historyOverlay.hidden=false;document.getElementById('historyClose').focus();const content=document.getElementById('historyContent');content.className='history-empty';content.innerHTML='<p>Loading your gift card history…</p>';try{const user=await currentUser();if(!user){content.innerHTML='<span class="history-icon">◷</span><h3>Sign in to view purchases</h3><p>Your CultureWave gift card orders will appear here.</p><a href="login.html?next=buy-gift-card.html">Sign in</a>';return}const {purchases}=await giftRequest('giftCardHistory');if(!purchases.length){content.innerHTML='<span class="history-icon">◷</span><h3>No gift card history yet</h3><p>Completed gift card orders will show up here.</p><a href="gift-card-faq.html">Gift Card FAQs</a>';return}const safe=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));content.className='history-list';content.innerHTML=purchases.map((item,index)=>{const status=item.status==='redeemed'?'Redeemed':'Purchased';const date=item.createdAt?new Date(item.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'Date unavailable';return `<article class="history-item"><div class="history-item-head"><strong>CultureWave Gift Card<br>₹${Number(item.amount).toLocaleString('en-IN')}</strong><span class="history-status ${item.status==='redeemed'?'redeemed':''}">${status}</span></div><p class="history-meta">Purchased ${date}</p><button type="button" class="reveal-card" data-index="${index}">View gift card code &amp; PIN</button><p class="gift-credentials" id="giftCredentials${index}" hidden>Code: <strong>${safe(item.code)}</strong><br>PIN: <strong>${safe(item.pin)}</strong></p></article>`}).join('');content.querySelectorAll('.reveal-card').forEach(button=>button.addEventListener('click',()=>{const card=content.querySelector(`#giftCredentials${button.dataset.index}`);card.hidden=!card.hidden;button.textContent=card.hidden?'View gift card code & PIN':'Hide code & PIN'}))}catch(error){const user=await currentUser().catch(()=>null);content.className='history-empty';if(!user){content.innerHTML='<span class="history-icon">◷</span><h3>Sign in to view purchases</h3><p>Your CultureWave gift card orders will appear here.</p><a href="login.html?next=buy-gift-card.html">Sign in</a>';return}content.innerHTML=`<span class="history-icon">!</span><h3>Could not load history</h3><p>${error.message.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}</p><a href="gift-card-help.html">Contact Gift Card Help</a><button type="button" id="historyRetry" class="history-close" style="width:auto;padding:0 1rem;font-size:.85rem">Try again</button>`;document.getElementById('historyRetry').addEventListener('click',()=>document.getElementById('historyButton').click())}});
+    document.getElementById('historyClose').addEventListener('click',()=>{historyOverlay.hidden=true;document.getElementById('historyButton').focus()});
+    historyOverlay.addEventListener('click',event=>{if(event.target===historyOverlay)historyOverlay.hidden=true});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!historyOverlay.hidden)historyOverlay.hidden=true});
+    const categoryCaptions={all:'CULTUREWAVE GIFT CARD',culturewave:'CULTUREWAVE GIFT CARD',birthday:'HAPPY BIRTHDAY',anniversary:'HAPPY ANNIVERSARY','thank you':'THANK YOU'};
+    const giftDesigns=[{id:'classic',label:'Classic'},{id:'night',label:'Midnight'},{id:'sunset',label:'Sunset'},{id:'mint',label:'Mint'},{id:'confetti',label:'Confetti'}];
+    const giftCard=document.getElementById('giftCard');
+    const giftDesignDots=[...document.querySelectorAll('[data-design-index]')];
+    let activeGiftDesign=0;
+    let activeGiftOccasion='all';
+    function selectGiftDesign(index){
+      activeGiftDesign=(index+giftDesigns.length)%giftDesigns.length;
+      const design=giftDesigns[activeGiftDesign];
+      giftCard.dataset.design=design.id;
+      giftCard.setAttribute('aria-label',`${design.label} ${categoryCaptions[activeGiftOccasion]||categoryCaptions.all} gift card`);
+      document.getElementById('giftCardBrand').textContent='CultureWave';
+      document.getElementById('giftCardCaption').textContent=`${categoryCaptions[activeGiftOccasion]||categoryCaptions.all} · ${design.label.toUpperCase()}`;
+      giftDesignDots.forEach((dot,dotIndex)=>{const active=dotIndex===activeGiftDesign;dot.classList.toggle('active',active);dot.setAttribute('aria-pressed',String(active))});
+    }
+    document.querySelectorAll('.category').forEach(button=>button.addEventListener('click',()=>{
+      document.querySelector('.category.active')?.classList.remove('active');button.classList.add('active');
+      document.querySelectorAll('.category').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+      activeGiftOccasion=button.dataset.category;
+      giftCard.dataset.occasion=activeGiftOccasion;
+      const occasionDesign={all:0,culturewave:0,birthday:1,anniversary:2,'thank you':3};
+      selectGiftDesign(occasionDesign[activeGiftOccasion]??0);
+    }));
+    giftDesignDots.forEach(dot=>dot.addEventListener('click',()=>selectGiftDesign(Number(dot.dataset.designIndex))));
+    document.querySelector('.carousel-control.prev').addEventListener('click',()=>selectGiftDesign(activeGiftDesign-1));
+    document.querySelector('.carousel-control.next').addEventListener('click',()=>selectGiftDesign(activeGiftDesign+1));
+    giftCard.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'){event.preventDefault();selectGiftDesign(activeGiftDesign-1)}else if(event.key==='ArrowRight'){event.preventDefault();selectGiftDesign(activeGiftDesign+1)}});
+    const giftCarousel=document.getElementById('giftCarousel');
+    let swipeStartX=null;
+    giftCarousel.addEventListener('pointerdown',event=>{if(event.pointerType!=='mouse'&&!event.target.closest('button'))swipeStartX=event.clientX});
+    giftCarousel.addEventListener('pointerup',event=>{if(swipeStartX===null)return;const delta=event.clientX-swipeStartX;swipeStartX=null;if(Math.abs(delta)>40)selectGiftDesign(activeGiftDesign+(delta<0?1:-1))});
+    document.querySelectorAll('.amount-option').forEach(button=>button.addEventListener('click',()=>{document.querySelector('.amount-option.active')?.classList.remove('active');button.classList.add('active');document.getElementById('amountInput').value=button.textContent.replace(/\D/g,'')}));
+    document.getElementById('proceedButton').addEventListener('click',async()=>{const notice=document.getElementById('buyNotice'),button=document.getElementById('proceedButton');button.disabled=true;notice.textContent='Preparing secure checkout…';try{const user=await currentUser();if(!user){location.href='login.html?next=buy-gift-card.html';return}const amount=Number(document.getElementById('amountInput').value);if(!Number.isSafeInteger(amount)||amount<giftCardLimits.minAmount||amount>giftCardLimits.maxAmount)throw new Error(`Gift card amount must be between ₹${giftCardLimits.minAmount.toLocaleString('en-IN')} and ₹${giftCardLimits.maxAmount.toLocaleString('en-IN')}.`);const draft={amount,occasion:document.querySelector('.category.active')?.dataset.category||'culturewave',design:giftDesigns[activeGiftDesign].id,message:document.getElementById('customMessage').value};sessionStorage.setItem('culturewaveGiftCardDraft',JSON.stringify(draft));location.href='gift-card-checkout.html'}catch(error){notice.textContent=error.message;button.disabled=false}});
+    loadGiftCardLimits();
+  </script>
+</body>
+</html>
