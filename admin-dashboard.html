@@ -999,9 +999,9 @@
       <p style="opacity:.82;">Customer details and payment outcome for every Razorpay checkout order.</p>
     </div>
     <div class="stats-grid">
-      <div class="stat-card blue"><div class="stat-label">Checkout attempts</div><div class="stat-value" id="checkoutAttemptCount">—</div></div>
-      <div class="stat-card green"><div class="stat-label">Payment done</div><div class="stat-value" id="checkoutPaidCount">—</div></div>
-      <div class="stat-card orange"><div class="stat-label">Not completed</div><div class="stat-value" id="checkoutUnpaidCount">—</div></div>
+      <div class="stat-card blue"><div class="stat-label">CHECKOUT ATTEMPTS</div><div class="stat-value" id="checkoutAttemptCount">—</div></div>
+      <div class="stat-card green"><div class="stat-label">PAYMENT DONE</div><div class="stat-value" id="checkoutPaidCount">—</div></div>
+      <div class="stat-card orange"><div class="stat-label">NOT COMPLETED</div><div class="stat-value" id="checkoutUnpaidCount">—</div></div>
     </div>
     <div class="filter-bar">
       <input id="checkoutAttemptSearch" placeholder="Search name, email, phone or event..." oninput="filterCheckoutAttempts()" />
@@ -2590,6 +2590,9 @@ onSnapshot(query(collection(db,'webinars'),orderBy('createdAt','desc'),limit(100
 
 onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200)), snap => {
   allPayments = snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>!p.archived);
+  // Payment records can arrive after their checkout order. Refresh the Pay Now
+  // counters whenever payments change so captured orders are counted as paid.
+  renderCheckoutAttempts();
   document.getElementById('refundPayment').innerHTML = allPayments.map(p=>`<option value="${p.id}">${esc(p.receipt||p.id)} — ${esc(p.status||'created')}</option>`).join('');
   renderPaymentsTable([...allPayments,...stallApplicationTransactions()]);
   renderRefundsTable(allPayments);
