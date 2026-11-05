@@ -3,16 +3,45 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#100e15">
   <title>Rewards | CultureWave</title>
   <style>
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#111;color:#f5f3f8;font-family:Inter,system-ui,sans-serif}.page{max-width:720px;margin:auto;padding:1rem 1rem 3rem}.head{display:flex;align-items:center;gap:1rem;height:62px}.back{width:44px;height:44px;border:1px solid #393740;border-radius:50%;background:#1b1a20;color:#fff;font-size:1.6rem}.hero{margin:1rem 0;padding:1.5rem;border:1px solid #563d76;border-radius:24px;background:radial-gradient(ellipse at 10% 0,#39205c,#201b29 75%)}.eyebrow{color:#c3a3ee;font-size:.8rem;font-weight:800;letter-spacing:.13em}.hero h1{margin:.55rem 0;font-size:1.8rem}.hero p{margin:0;color:#c5bfce;line-height:1.6}.panel{margin-top:1rem;overflow:hidden;border:1px solid #343239;border-radius:20px;background:#1c1b20}.item{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:72px;padding:1rem;color:inherit;text-decoration:none}.item+.item{border-top:1px solid #343239}.item strong{display:block}.item span{display:block;margin-top:.3rem;color:#a6a2ac;font-size:.83rem}.item b{font-size:1.2rem;color:#c5a4fa}
+    :root{color-scheme:dark;--ink:#f8f5fb;--muted:#aaa4b2;--line:rgba(255,255,255,.1);--gold:#f4d99a;--violet:#c6a5f7;--surface:#19171f}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -18%,#322145 0,transparent 48%),#100e15;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+    .page{max-width:760px;margin:auto;padding:1.1rem 1.25rem 4rem}.head{display:flex;align-items:center;gap:1rem;min-height:56px}.back{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);border-radius:50%;background:rgba(255,255,255,.035);color:#fff;font-size:1.7rem;line-height:1;cursor:pointer;transition:background .2s,transform .2s}.back:hover{background:rgba(255,255,255,.1);transform:translateX(-2px)}.head-label{color:#c7bdcf;font-size:.73rem;font-weight:750;letter-spacing:.16em;text-transform:uppercase}.head h1{margin:.12rem 0 0;font-size:1rem;font-weight:650;letter-spacing:.01em}
+    .hero{position:relative;isolation:isolate;overflow:hidden;margin:1.5rem 0 1.1rem;padding:clamp(1.5rem,6vw,2.4rem);border:1px solid rgba(244,217,154,.35);border-radius:28px;background:radial-gradient(ellipse at 90% 5%,rgba(255,226,161,.24),transparent 38%),radial-gradient(ellipse at 0 100%,rgba(137,82,187,.3),transparent 48%),linear-gradient(135deg,#292032 0%,#211b27 55%,#302338 100%);box-shadow:0 24px 70px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.08)}.hero:after{content:"✦";position:absolute;z-index:-1;right:8%;top:7%;color:rgba(255,227,170,.16);font-size:clamp(7rem,22vw,12rem);line-height:1;transform:rotate(12deg)}.hero-top{display:flex;align-items:center;gap:.6rem;color:var(--gold);font-size:.72rem;font-weight:800;letter-spacing:.16em}.seal{display:grid;place-items:center;width:27px;height:27px;border:1px solid rgba(244,217,154,.48);border-radius:50%;font-size:.88rem}.hero h2{max-width:480px;margin:1.35rem 0 .7rem;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.15rem,7vw,3.4rem);font-weight:500;letter-spacing:-.045em;line-height:1.02}.hero p{max-width:460px;margin:0;color:#d2cbd6;font-size:.95rem;line-height:1.7}.hero-foot{display:flex;align-items:center;gap:.6rem;margin-top:1.55rem;color:#e9d8ae;font-size:.79rem;font-weight:700}.hero-foot span:first-child{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:rgba(244,217,154,.13)}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin:1.8rem .1rem .75rem}.section-head h2{margin:0;font-size:1rem;font-weight:700;letter-spacing:.01em}.section-head p{margin:0;color:var(--muted);font-size:.76rem}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}.step{min-height:138px;padding:1rem;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018))}.step-num{display:grid;place-items:center;width:28px;height:28px;border:1px solid rgba(198,165,247,.35);border-radius:50%;color:var(--violet);font-size:.75rem;font-weight:800}.step strong{display:block;margin:.78rem 0 .35rem;font-size:.85rem}.step p{margin:0;color:var(--muted);font-size:.75rem;line-height:1.55}
+    .conversion{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:.8rem;padding:1rem 1.1rem;border:1px solid rgba(244,217,154,.18);border-radius:16px;background:rgba(244,217,154,.055)}.conversion-label{color:#cfc3a5;font-size:.78rem}.conversion-value{color:var(--gold);font-size:.93rem;font-weight:750;white-space:nowrap}
+    .links{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}.link-card{display:flex;align-items:center;gap:.9rem;min-height:86px;padding:1rem;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:inherit;text-decoration:none;transition:border-color .2s,transform .2s,background .2s}.link-card:hover{transform:translateY(-2px);border-color:rgba(198,165,247,.42);background:#201c27}.link-icon{display:grid;place-items:center;flex:0 0 42px;height:42px;border:1px solid rgba(198,165,247,.2);border-radius:14px;background:rgba(198,165,247,.09);color:var(--violet);font-size:1.1rem}.link-copy{flex:1}.link-copy strong{display:block;font-size:.84rem}.link-copy span{display:block;margin-top:.28rem;color:var(--muted);font-size:.72rem;line-height:1.4}.link-arrow{color:#877d91;font-size:1.25rem}
+    .fineprint{margin:1rem .1rem 0;color:#827b89;font-size:.7rem;line-height:1.55}
+    @media(max-width:520px){.page{padding:1rem 1rem 3rem}.hero{border-radius:23px}.steps{grid-template-columns:1fr;gap:.55rem}.step{display:grid;grid-template-columns:30px 1fr;column-gap:.65rem;min-height:auto;padding:.85rem}.step-num{grid-row:span 2}.step strong{margin:.05rem 0 .2rem}.step p{grid-column:2}.section-head{align-items:start;flex-direction:column;gap:.3rem}.links{grid-template-columns:1fr}.link-card{min-height:76px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
-<body><main class="page">
-  <header class="head"><button class="back" id="back" aria-label="Back">‹</button><h1>Rewards</h1></header>
-  <section class="hero"><div class="eyebrow">ONE CLUB REWARDS</div><h1>Spin after you book</h1><p>Every confirmed booking gives you one spin on the success page. Every 50th claimed booking reward wins 3,000 coins; other spins win 100, 300, 500 or 700 coins. Every 100 coins add ₹1 to your One Club balance.</p></section>
-  <section class="panel">
-    <a class="item" href="your-bookings.html"><div><strong>Your bookings</strong><span>Open a confirmed booking to check its reward.</span></div><b>›</b></a>
-    <a class="item" href="one-club.html"><div><strong>One Club balance</strong><span>See your balance and wallet activity.</span></div><b>›</b></a>
-  </section>
-</main><script>document.getElementById('back').onclick=()=>{if(parent!==window)parent.postMessage({type:'culturewave-menu-back'},location.origin);else history.back()};</script></body></html>
+<body>
+  <main class="page">
+    <header class="head"><button class="back" id="back" aria-label="Back">‹</button><div><div class="head-label">CultureWave</div><h1>Your rewards</h1></div></header>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-top"><span class="seal" aria-hidden="true">✦</span> ONE CLUB REWARDS</div>
+      <h2 id="hero-title">A little extra in every night out.</h2>
+      <p>Book experiences you love and earn a spin on the success page. Your next reward could bring a little more to your One Club balance.</p>
+      <div class="hero-foot"><span aria-hidden="true">↗</span><span>Every confirmed booking earns one spin</span></div>
+    </section>
+    <div class="section-head"><h2>How rewards work</h2><p>Three simple steps</p></div>
+    <section class="steps" aria-label="How rewards work">
+      <article class="step"><span class="step-num">01</span><strong>Book your experience</strong><p>Complete a booking on CultureWave.</p></article>
+      <article class="step"><span class="step-num">02</span><strong>Take your spin</strong><p>After booking, spin on the success page to reveal your coins.</p></article>
+      <article class="step"><span class="step-num">03</span><strong>Enjoy your balance</strong><p>Your reward adds value to your One Club balance.</p></article>
+    </section>
+    <div class="conversion"><span class="conversion-label">Your coins, converted</span><span class="conversion-value">100 coins&nbsp; = &nbsp;₹1</span></div>
+    <div class="section-head"><h2>Make it yours</h2><p>Explore your activity</p></div>
+    <nav class="links" aria-label="Rewards links">
+      <a class="link-card" href="your-bookings.html"><span class="link-icon" aria-hidden="true">◷</span><span class="link-copy"><strong>Your bookings</strong><span>Find a booking and check its reward.</span></span><span class="link-arrow" aria-hidden="true">›</span></a>
+      <a class="link-card" href="one-club.html"><span class="link-icon" aria-hidden="true">◇</span><span class="link-copy"><strong>One Club balance</strong><span>See your balance and wallet activity.</span></span><span class="link-arrow" aria-hidden="true">›</span></a>
+    </nav>
+    <p class="fineprint">Standard spins award 100, 300, 500 or 700 coins. Every 50th claimed booking reward awards 3,000 coins.</p>
+  </main>
+  <script>document.getElementById('back').onclick=()=>{if(parent!==window)parent.postMessage({type:'culturewave-menu-back'},location.origin);else history.back()};</script>
+</body>
+</html>
