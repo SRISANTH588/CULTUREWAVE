@@ -327,10 +327,10 @@
     #checkoutContactSheet,#removeTicketSheet{position:fixed!important;inset:0!important;z-index:1000!important;display:flex;align-items:flex-end;justify-content:center;padding:1rem;box-sizing:border-box;}
     #checkoutContactSheet[style*="display:none"],#removeTicketSheet[style*="display:none"]{display:none!important;}
     @media(min-width:769px){#checkoutContactSheet,#removeTicketSheet{padding:1.25rem 1.25rem 2rem;}}
-    #paymentOffersSheet{position:fixed!important;inset:0!important;z-index:1000!important;display:flex;align-items:center;justify-content:center;padding:1.25rem;background:rgba(5,7,12,.76);backdrop-filter:blur(8px);}
+    #paymentOffersSheet{position:fixed!important;inset:0!important;z-index:1000!important;display:flex;align-items:center;justify-content:center;padding:1.25rem;background:rgba(5,7,12,.76);backdrop-filter:blur(8px);box-sizing:border-box;}
     #paymentOffersSheet[style*="display:none"]{display:none!important;}
     .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:1.15rem 1.2rem calc(env(safe-area-inset-bottom) + 1.1rem);border:1px solid #393a3f;border-bottom:0;border-radius:24px 24px 0 0;background:#18191c;color:#f5f5f6;box-shadow:0 -15px 50px rgba(0,0,0,.4);}
-    #paymentOffersSheet .checkout-sheet{width:min(520px,100%);max-height:min(82vh,680px);overflow:auto;padding:1.5rem;border:1px solid #363a43;border-radius:22px;background:#17191e;color:#f5f5f6;box-shadow:0 24px 80px rgba(0,0,0,.55);}
+    #paymentOffersSheet .checkout-sheet{width:min(520px,100%);max-height:min(82vh,680px);overflow:auto;padding:1.5rem;border:1px solid #363a43;border-radius:22px;background:#17191e;color:#f5f5f6;box-shadow:0 24px 80px rgba(0,0,0,.55);box-sizing:border-box;overscroll-behavior:contain;}
     #checkoutContactSheet .checkout-sheet,#removeTicketSheet .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);border:1px solid #393a3f;border-radius:24px 24px 0 0;background:#18191c;color:#f5f5f6;box-shadow:0 -15px 50px rgba(0,0,0,.4);}
     .checkout-sheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.15rem;}
     .checkout-sheet-head h2{font-size:1rem;}
@@ -371,7 +371,7 @@
       .checkout-pay-total strong{color:#161719;font-size:.83rem;white-space:nowrap;}
       .checkout-pay-total small{color:#55565a;font-size:.62rem;}
       .bk-panel#panel3 .checkout-pay-action .bk-btn-next{width:auto!important;min-width:112px;height:46px!important;min-height:46px!important;padding:0 .75rem;border-radius:12px;background:#ff5a19!important;box-shadow:none!important;color:#fff!important;font-size:.78rem;font-weight:900;white-space:nowrap;}
-    .bk-panel#panel3 .bk-btn-next{grid-column:1/-1!important;width:100%!important;justify-self:stretch!important;}
+    .bk-panel#panel3 .bk-nav>.bk-btn-next{grid-column:1/-1!important;width:100%!important;justify-self:stretch!important;}
     .bk-panel#panel3 .checkout-pay-action .bk-btn-next{grid-column:auto!important;width:auto!important;justify-self:auto!important;}
     }
     @media(max-width:768px){
