@@ -865,23 +865,26 @@ function renderNightOffers(coupons){
   section.hidden = activeOffers.length === 0;
   if(!activeOffers.length) return;
 
+  let index = 0;
   const heading = document.createElement('h2');
   heading.textContent = 'Offers for you';
-  section.append(heading);
+  const card = document.createElement('article');
+  card.className = 'night-offer-card';
+  const brand = document.createElement('span');
+  brand.className = 'offer-brand';
+  brand.setAttribute('aria-hidden', 'true');
+  brand.innerHTML = '<svg viewBox="0 0 24 24" focusable="false"><path d="M20.59 13.41 11 3.83A2.8 2.8 0 0 0 9.02 3H4a1 1 0 0 0-1 1v5.02c0 .74.29 1.45.82 1.98l9.59 9.59a2.25 2.25 0 0 0 3.18 0l4-4a2.25 2.25 0 0 0 0-3.18ZM7.5 8A1.5 1.5 0 1 1 7.5 5a1.5 1.5 0 0 1 0 3Z"/></svg>';
+  const copy = document.createElement('span');
+  const title = document.createElement('strong');
+  const subtitle = document.createElement('small');
+  const counter = document.createElement('b');
+  copy.className = 'night-offer-copy';
+  copy.append(title, subtitle);
+  card.append(brand, copy, counter);
+  section.append(heading, card);
 
-  activeOffers.forEach(offer => {
-    const card = document.createElement('article');
-    card.className = 'night-offer-card';
-    const brand = document.createElement('span');
-    brand.className = 'offer-brand';
-    brand.setAttribute('aria-hidden', 'true');
-    brand.innerHTML = '<svg viewBox="0 0 24 24" focusable="false"><path d="M20.59 13.41 11 3.83A2.8 2.8 0 0 0 9.02 3H4a1 1 0 0 0-1 1v5.02c0 .74.29 1.45.82 1.98l9.59 9.59a2.25 2.25 0 0 0 3.18 0l4-4a2.25 2.25 0 0 0 0-3.18ZM7.5 8A1.5 1.5 0 1 1 7.5 5a1.5 1.5 0 0 1 0 3Z"/></svg>';
-    const copy = document.createElement('span');
-    const title = document.createElement('strong');
-    const subtitle = document.createElement('small');
-    copy.className = 'night-offer-copy';
-    copy.append(title, subtitle);
-    card.append(brand, copy);
+  const showOffer = () => {
+    const offer = activeOffers[index];
     const isPercent = ['percent', 'percentage'].includes(String(offer.type || '').toLowerCase());
     const amount = isPercent ? `${offer.value}%` : `₹${Number(offer.value).toLocaleString('en-IN')}`;
     title.textContent = `Get ${isPercent ? amount : `Flat ${amount}`} OFF`;
@@ -893,8 +896,17 @@ function renderNightOffers(coupons){
     ].filter(Boolean).join(' and ');
     const codeLabel = `Code ${String(offer.code).toUpperCase()}`;
     subtitle.textContent = eligibility ? `Valid on ${eligibility} · ${codeLabel}` : `Use ${String(offer.code).toUpperCase()} at checkout`;
-    section.append(card);
-  });
+    counter.textContent = `${index + 1}/${activeOffers.length}`;
+  };
+  showOffer();
+  if(activeOffers.length > 1) {
+    card.style.cursor = 'pointer';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    const nextOffer = () => { index = (index + 1) % activeOffers.length; showOffer(); };
+    card.addEventListener('click', nextOffer);
+    card.addEventListener('keydown', event => { if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); nextOffer(); } });
+  }
 }
 
 function renderNightArtists(artists){
