@@ -434,8 +434,6 @@ async function payWithOneClub(request, env) {
 }
 
 async function spinBookingReward(request, env) {
-  const user = await authenticatedUser(request, env);
-  if (!user) return json({ success: false, error: "Sign in to claim booking rewards." }, 401);
   const body = await request.json();
   const bookingId = clean(body.bookingId, 100);
   const action = clean(body.action, 16).toLowerCase();
@@ -462,31 +460,22 @@ async function spinBookingReward(request, env) {
     await patchFirestoreDocument(env, "bookings", bookingId, repairedBooking, token);
     booking = repairedBooking;
   }
-  const bookingEmail = clean(booking.customerEmail, 180).toLowerCase();
-  const ownsByAccount = booking.userId === user.uid;
-  const ownsByVerifiedEmail = user.emailVerified && bookingEmail && bookingEmail === user.email;
-  if (!ownsByAccount && !ownsByVerifiedEmail) {
-    return json({ success: false, error: "Sign in with the email used for this booking." }, 403);
-  }
-
+  const rewardUid = clean(booking.userId, 128) || `booking_${bookingId}`;
   const transactionId = `reward_${bookingId}`;
   const existing = await getFirestoreDocument(env, "oneClubTransactions", transactionId, token);
   if (existing) {
-    if (existing.uid !== user.uid) return json({ success: false, error: "This booking reward belongs to another account." }, 403);
-    return json({ success: true, alreadyClaimed: true, coins: Number(existing.coins), amount: Number(existing.amount), balance: Number((await getFirestoreDocument(env, "wallets", user.uid, token))?.balance || 0) });
+    return json({ success: true, alreadyClaimed: true, coins: Number(existing.coins), amount: Number(existing.amount), balance: Number((await getFirestoreDocument(env, "wallets", rewardUid, token))?.balance || 0) });
   }
   if (action === "status") return json({ success: true, alreadyClaimed: false });
 
-  const prizes = [100, 300, 500, 700, 3000];
+  const prizes = [100, 300, 500, 700];
   const counterId = "bookingRewardSpinCount";
   const counter = await getFirestoreDocument(env, "rewardCounters", counterId, token);
   const counterCount = Math.max(0, Math.floor(Number(counter?.count) || 0));
   const nextSpinCount = counterCount + 1;
-  const coins = nextSpinCount % 50 === 0
-    ? 3000
-    : prizes[Math.floor(Math.random() * (prizes.length - 1))];
+  const coins = prizes[Math.floor(Math.random() * prizes.length)];
   const amount = coins / 100;
-  const wallet = await getFirestoreDocument(env, "wallets", user.uid, token);
+  const wallet = await getFirestoreDocument(env, "wallets", rewardUid, token);
   const balance = Number(wallet?.balance || 0);
   const timestamp = new Date().toISOString();
   const writes = [
@@ -494,12 +483,12 @@ async function spinBookingReward(request, env) {
       count: firestoreValue(nextSpinCount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }),
     } }, updateMask: { fieldPaths: ["count", "updatedAt"] },
       ...(counter?.updateTime ? { currentDocument: { updateTime: counter.updateTime } } : { currentDocument: { exists: false } }) },
-    { update: { name: firestoreDocumentName(env, "wallets", user.uid), fields: {
+    { update: { name: firestoreDocumentName(env, "wallets", rewardUid), fields: {
       balance: firestoreValue(balance + amount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }),
     } }, updateMask: { fieldPaths: ["balance", "updatedAt"] },
       ...(wallet?.updateTime ? { currentDocument: { updateTime: wallet.updateTime } } : { currentDocument: { exists: false } }) },
     { update: { name: firestoreDocumentName(env, "oneClubTransactions", transactionId), fields: {
-      uid: firestoreValue(user.uid), amount: firestoreValue(amount), coins: firestoreValue(coins), type: firestoreValue("booking_reward"),
+      uid: firestoreValue(rewardUid), amount: firestoreValue(amount), coins: firestoreValue(coins), type: firestoreValue("booking_reward"),
       paymentId: firestoreValue(bookingId), bookingId: firestoreValue(bookingId), eventId: firestoreValue(clean(booking.eventId, 120)),
       eventName: firestoreValue(clean(booking.eventName, 200)), createdAt: firestoreValue({ __firestoreTimestamp: timestamp }),
     } }, currentDocument: { exists: false } },
@@ -507,8 +496,8 @@ async function spinBookingReward(request, env) {
   const response = await fetch(`${firestoreBase(env)}:commit`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ writes }) });
   if (response.ok) return json({ success: true, alreadyClaimed: false, coins, amount, balance: balance + amount });
   const committed = await getFirestoreDocument(env, "oneClubTransactions", transactionId, token);
-  if (committed?.uid === user.uid) {
-    return json({ success: true, alreadyClaimed: true, coins: Number(committed.coins), amount: Number(committed.amount), balance: Number((await getFirestoreDocument(env, "wallets", user.uid, token))?.balance || 0) });
+  if (committed?.uid === rewardUid) {
+    return json({ success: true, alreadyClaimed: true, coins: Number(committed.coins), amount: Number(committed.amount), balance: Number((await getFirestoreDocument(env, "wallets", rewardUid, token))?.balance || 0) });
   }
   const latestCounter = await getFirestoreDocument(env, "rewardCounters", counterId, token);
   if (latestCounter && Number(latestCounter.count) !== counterCount) {
