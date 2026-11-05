@@ -478,14 +478,22 @@ async function spinBookingReward(request, env) {
   if (action === "status") return json({ success: true, alreadyClaimed: false });
 
   const prizes = [100, 300, 500, 700, 3000];
-  const random = new Uint32Array(1);
-  crypto.getRandomValues(random);
-  const coins = prizes[Math.floor((random[0] / 0x100000000) * prizes.length)];
+  const counterId = "bookingRewardSpinCount";
+  const counter = await getFirestoreDocument(env, "rewardCounters", counterId, token);
+  const counterCount = Math.max(0, Math.floor(Number(counter?.count) || 0));
+  const nextSpinCount = counterCount + 1;
+  const coins = nextSpinCount % 50 === 0
+    ? 3000
+    : prizes[Math.floor(Math.random() * (prizes.length - 1))];
   const amount = coins / 100;
   const wallet = await getFirestoreDocument(env, "wallets", user.uid, token);
   const balance = Number(wallet?.balance || 0);
   const timestamp = new Date().toISOString();
   const writes = [
+    { update: { name: firestoreDocumentName(env, "rewardCounters", counterId), fields: {
+      count: firestoreValue(nextSpinCount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }),
+    } }, updateMask: { fieldPaths: ["count", "updatedAt"] },
+      ...(counter?.updateTime ? { currentDocument: { updateTime: counter.updateTime } } : { currentDocument: { exists: false } }) },
     { update: { name: firestoreDocumentName(env, "wallets", user.uid), fields: {
       balance: firestoreValue(balance + amount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }),
     } }, updateMask: { fieldPaths: ["balance", "updatedAt"] },
@@ -501,6 +509,10 @@ async function spinBookingReward(request, env) {
   const committed = await getFirestoreDocument(env, "oneClubTransactions", transactionId, token);
   if (committed?.uid === user.uid) {
     return json({ success: true, alreadyClaimed: true, coins: Number(committed.coins), amount: Number(committed.amount), balance: Number((await getFirestoreDocument(env, "wallets", user.uid, token))?.balance || 0) });
+  }
+  const latestCounter = await getFirestoreDocument(env, "rewardCounters", counterId, token);
+  if (latestCounter && Number(latestCounter.count) !== counterCount) {
+    return json({ success: false, error: "Another booking reward was claimed at the same time. Please spin again." }, 409);
   }
   return json({ success: false, error: "Could not add this reward to One Club. Please try again." }, 409);
 }
