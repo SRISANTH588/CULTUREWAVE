@@ -314,6 +314,18 @@ async function verifyPayment(request, env) {
     paidAt: { __firestoreTimestamp: new Date().toISOString() },
   };
   await patchFirestoreDocument(env, "payments", paymentId, paymentRecord, firestoreToken);
+  const bookingUser = await authenticatedUser(request, env);
+  const bookingRecord = {
+    ...paymentRecord,
+    status: "paid",
+    bookingId,
+    userId: bookingUser?.uid || "",
+    customerEmail: clean(order.notes?.customerEmail, 180).toLowerCase(),
+    customerPhone: clean(order.notes?.customerPhone, 32),
+    seats: tickets,
+    seatIds,
+  };
+  await patchFirestoreDocument(env, "bookings", bookingId, bookingRecord, firestoreToken);
   await patchFirestoreDocument(env, "razorpayOrders", orderId, { status: "captured", paymentId, capturedAt: { __firestoreTimestamp: new Date().toISOString() } }, firestoreToken);
   if (walletAmount > 0) {
     const wallet = await getFirestoreDocument(env, "wallets", walletUid, firestoreToken);
@@ -400,6 +412,13 @@ async function payWithOneClub(request, env) {
       customerPhone: firestoreValue(clean(body.customer?.phone, 32)), tickets: firestoreValue(tickets), seatIds: firestoreValue(seatIds),
       createdAt: firestoreValue({ __firestoreTimestamp: timestamp }), paidAt: firestoreValue({ __firestoreTimestamp: timestamp }),
     } }, currentDocument: { exists: false } },
+    { update: { name: firestoreDocumentName(env, "bookings", bookingId), fields: {
+      bookingId: firestoreValue(bookingId), eventId: firestoreValue(eventId), eventName: firestoreValue(clean(body.event?.name, 200)),
+      amount: firestoreValue(amount), status: firestoreValue("paid"), paymentId: firestoreValue(paymentId), paymentMethod: firestoreValue("One Club"),
+      customerName: firestoreValue(clean(body.customer?.name)), customerEmail: firestoreValue(clean(body.customer?.email, 180).toLowerCase()),
+      customerPhone: firestoreValue(clean(body.customer?.phone, 32)), userId: firestoreValue(user.uid), seats: firestoreValue(tickets), seatIds: firestoreValue(seatIds),
+      createdAt: firestoreValue({ __firestoreTimestamp: timestamp }), paidAt: firestoreValue({ __firestoreTimestamp: timestamp }),
+    } }, currentDocument: { exists: false } },
   ];
   const response = await fetch(`${firestoreBase(env)}:commit`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ writes }) });
   if (!response.ok) {
@@ -424,9 +443,24 @@ async function spinBookingReward(request, env) {
     return json({ success: false, error: "Booking details are invalid." }, 400);
   }
   const token = await firestoreAccessToken(env);
-  const booking = await getFirestoreDocument(env, "bookings", bookingId, token);
+  let booking = await getFirestoreDocument(env, "bookings", bookingId, token);
   if (!booking || !["confirmed", "paid", "success", "completed"].includes(String(booking.status || "").toLowerCase())) {
-    return json({ success: false, error: "A confirmed booking is required for this reward." }, 404);
+    const payment = await getFirestoreDocument(env, "payments", bookingId, token);
+    const paymentConfirmed = payment && ["paid", "captured", "confirmed", "success", "completed"].includes(String(payment.status || "").toLowerCase());
+    if (!paymentConfirmed || (payment.bookingId && payment.bookingId !== bookingId)) {
+      return json({ success: false, error: "A confirmed booking is required for this reward." }, 404);
+    }
+    // Older verified payments may predate server-side booking persistence. Repair
+    // the booking record from the authoritative payment document before reward checks.
+    const repairedBooking = {
+      ...payment,
+      bookingId,
+      status: "paid",
+      userId: payment.userId || "",
+      customerEmail: payment.customerEmail || "",
+    };
+    await patchFirestoreDocument(env, "bookings", bookingId, repairedBooking, token);
+    booking = repairedBooking;
   }
   const bookingEmail = clean(booking.customerEmail, 180).toLowerCase();
   const ownsByAccount = booking.userId === user.uid;
