@@ -323,10 +323,14 @@
     .checkout-invoice p[hidden]{display:none;}
     .checkout-invoice>small{display:block;margin-top:1rem;padding-top:.8rem;border-top:1px solid #37383c;color:#a4a5ab;font-size:.72rem;line-height:1.5;}
     .checkout-sheet-backdrop{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center;}
+    /* Keep contact and ticket dialogs viewport-fixed; panel overflow clips positioned descendants on desktop. */
+    #checkoutContactSheet,#removeTicketSheet{position:fixed!important;inset:0!important;z-index:1000!important;display:flex;align-items:flex-end;justify-content:center;padding:1rem;}
+    #checkoutContactSheet[style*="display:none"],#removeTicketSheet[style*="display:none"]{display:none!important;}
     #paymentOffersSheet{position:fixed!important;inset:0!important;z-index:1000!important;display:flex;align-items:flex-end;justify-content:center;padding:1rem;}
     #paymentOffersSheet[style*="display:none"]{display:none!important;}
     .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:1.15rem 1.2rem calc(env(safe-area-inset-bottom) + 1.1rem);border:1px solid #393a3f;border-bottom:0;border-radius:24px 24px 0 0;background:#18191c;color:#f5f5f6;box-shadow:0 -15px 50px rgba(0,0,0,.4);}
     #paymentOffersSheet .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:1.35rem 1.4rem calc(env(safe-area-inset-bottom) + 1.2rem);border:1px solid #393a3f;border-radius:24px;background:#18191c;color:#f5f5f6;box-shadow:0 20px 70px rgba(0,0,0,.55);}
+    #checkoutContactSheet .checkout-sheet,#removeTicketSheet .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);border:1px solid #393a3f;border-radius:24px;background:#18191c;color:#f5f5f6;box-shadow:0 20px 70px rgba(0,0,0,.55);}
     .checkout-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
     .checkout-sheet-head h2{font-size:1rem;}
     #paymentOffersTitle{margin:0;color:#f5f5f6;font-size:1.2rem;font-weight:800;}
