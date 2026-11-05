@@ -323,9 +323,19 @@
     .checkout-invoice p[hidden]{display:none;}
     .checkout-invoice>small{display:block;margin-top:1rem;padding-top:.8rem;border-top:1px solid #37383c;color:#a4a5ab;font-size:.72rem;line-height:1.5;}
     .checkout-sheet-backdrop{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center;}
+    #paymentOffersSheet{position:fixed!important;inset:0!important;z-index:1000!important;display:flex;align-items:flex-end;justify-content:center;padding:1rem;}
+    #paymentOffersSheet[style*="display:none"]{display:none!important;}
     .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:1.15rem 1.2rem calc(env(safe-area-inset-bottom) + 1.1rem);border:1px solid #393a3f;border-bottom:0;border-radius:24px 24px 0 0;background:#18191c;color:#f5f5f6;box-shadow:0 -15px 50px rgba(0,0,0,.4);}
+    #paymentOffersSheet .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:1.35rem 1.4rem calc(env(safe-area-inset-bottom) + 1.2rem);border:1px solid #393a3f;border-radius:24px;background:#18191c;color:#f5f5f6;box-shadow:0 20px 70px rgba(0,0,0,.55);}
     .checkout-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
     .checkout-sheet-head h2{font-size:1rem;}
+    #paymentOffersTitle{margin:0;color:#f5f5f6;font-size:1.2rem;font-weight:800;}
+    .payment-offers-intro{margin:0 0 1rem;color:#bfc1c8;font-size:.88rem;line-height:1.6;}
+    .payment-offer-card{padding:1rem 0;border-top:1px solid #383a40;}
+    .payment-offer-card h3{margin:0 0 .35rem;color:#f5f5f6;font-size:.95rem;}
+    .payment-offer-card p{margin:0;color:#bfc1c8;font-size:.84rem;line-height:1.55;}
+    .payment-offer-note{margin:.85rem 0 0;padding:.8rem .9rem;border-radius:12px;background:#22252b;color:#aeb2bc;font-size:.78rem;line-height:1.5;}
+    .payment-offers-empty{padding:.2rem 0 .3rem;color:#c4c6cc;font-size:.88rem;line-height:1.6;}
     .checkout-sheet-close{border:0;background:transparent;color:#ddd;font-size:1.6rem;}
     .checkout-sheet .bk-label{color:#babdc5;}
     .checkout-sheet .bk-input{background:#101114;border-color:#383a40;}
@@ -1095,12 +1105,16 @@ function expireCheckout(){
 }
 function closePaymentOffersSheet(){document.getElementById('paymentOffersSheet').style.display='none';}
 function showPaymentOfferInfo(){
-  const offers=evData.razorpayPaymentOffers||evData.paymentOffers||[];
+  const offers=Array.isArray(evData.razorpayPaymentOffers)?evData.razorpayPaymentOffers:Array.isArray(evData.paymentOffers)?evData.paymentOffers:[];
   const content=document.getElementById('paymentOffersContent');
   if(Array.isArray(offers)&&offers.length){
-    content.innerHTML=offers.map(offer=>`<article style="padding:.85rem 0;border-bottom:1px solid #383a40"><strong style="display:block;color:#f5f5f6">${escapeHtml(offer.title||offer.name||offer.display_text||'Payment offer')}</strong><span>${escapeHtml(offer.description||offer.desc||offer.terms||'')}</span></article>`).join('');
+    content.innerHTML=offers.map(offer=>{
+      const title=offer.title||offer.name||offer.display_text||offer.code||'Payment offer';
+      const details=[offer.description,offer.desc,offer.terms].filter(Boolean).join(' · ');
+      return `<article class="payment-offer-card"><h3>${escapeHtml(title)}</h3>${details?`<p>${escapeHtml(details)}</p>`:''}</article>`;
+    }).join('')+'<p class="payment-offer-note">Check the offer terms and minimum order value in Razorpay Checkout. Only offers eligible for your selected payment method can be applied.</p>';
   }else{
-    content.textContent='Razorpay applies payment offers based on your payment method, card or bank, and order amount. Choose “See eligible offers” to open Razorpay Checkout and view every offer currently available for this payment.';
+    content.innerHTML='<div class="payment-offers-empty">No payment offers are listed for this event yet. Choose <strong>See eligible offers</strong> to check the live offers available for your payment method in Razorpay Checkout.</div><p class="payment-offer-note">Bank, card, UPI and wallet offers can vary by payment method, minimum order value and offer terms.</p>';
   }
   document.getElementById('paymentOffersSheet').style.display='flex';
 }
