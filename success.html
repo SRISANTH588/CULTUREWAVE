@@ -568,9 +568,10 @@
         <div class="sc-reward-kicker">✦ One Club surprise</div>
         <h2 id="scRewardTitle">🎁 Your booking reward</h2>
         <p>Spin once for this booking. Coins go straight to your One Club balance.</p>
-        <div class="sc-reward-wheel-wrap"><span class="sc-reward-pointer" aria-hidden="true"></span><canvas class="sc-reward-wheel" id="rewardWheel" width="600" height="600" role="img" aria-label="Reward wheel with prizes of 100, 300, 500 or 700 coins"></canvas></div>
+        <div class="sc-reward-wheel-wrap"><span class="sc-reward-pointer" aria-hidden="true"></span><canvas class="sc-reward-wheel" id="rewardWheel" width="600" height="600" role="img" aria-label="Reward wheel with prizes of 100, 300, 500, 700 or 3,000 coins"></canvas></div>
         <button class="sc-reward-spin" id="spinRewardBtn" type="button">Spin the wheel</button>
         <p class="sc-reward-status" id="rewardStatus" role="status" aria-live="polite">A spin is available for this booking.</p>
+        <a id="rewardSignIn" href="login.html" style="display:none;color:#d7c6ff;font-weight:700">Sign in to claim booking rewards.</a>
         <div class="sc-reward-prize" id="rewardPrize"></div>
       </section>
       </div>
@@ -810,7 +811,7 @@
     const isRestaurant = bkType === "restaurant";
     const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
     const rewardsApi = "https://culturewave-razorpay.culturewaveindia.workers.dev";
-    const rewardCoins = [100, 300, 500, 700];
+    const rewardCoins = [100, 300, 500, 700, 3000];
     let rewardBusy = false;
     let rewardAudioContext;
 
@@ -867,14 +868,15 @@
       const context = canvas.getContext("2d"), center = canvas.width / 2, radius = center - 8;
       const colors = ["#7b5bc7", "#293b68", "#b76342", "#4c805e", "#a34c7e"];
       rewardCoins.forEach((coins, index) => {
-        const start = -Math.PI / 2 + index * Math.PI * 2 / rewardCoins.length;
-        const end = start + Math.PI * 2 / rewardCoins.length;
+        const sliceAngle = Math.PI * 2 / rewardCoins.length;
+        const start = -Math.PI / 2 + index * sliceAngle;
+        const end = start + sliceAngle;
         context.beginPath(); context.moveTo(center, center); context.arc(center, center, radius, start, end); context.closePath();
         context.fillStyle = colors[index]; context.fill(); context.lineWidth = 5; context.strokeStyle = "#211b2a"; context.stroke();
-        context.save(); context.translate(center, center); context.rotate(start + Math.PI / rewardCoins.length);
+        context.save(); context.translate(center, center); context.rotate(start + sliceAngle / 2);
         context.textAlign = "right"; context.textBaseline = "middle"; context.fillStyle = "#fff";
-        context.font = "800 30px Manrope, sans-serif"; context.shadowColor = "#0008"; context.shadowBlur = 3;
-        context.fillText(`${coins} coins`, radius - 28, 0); context.restore();
+        context.font = "800 27px Manrope, sans-serif"; context.shadowColor = "#0008"; context.shadowBlur = 3;
+        context.fillText(`${coins.toLocaleString("en-IN")} coins`, radius - 28, 0); context.restore();
       });
       context.beginPath(); context.arc(center, center, 49, 0, Math.PI * 2); context.fillStyle = "#f7f1ff"; context.fill();
       context.fillStyle = "#30213f"; context.textAlign = "center"; context.textBaseline = "middle"; context.font = "800 25px Manrope, sans-serif"; context.fillText("SPIN", center, center);
@@ -897,9 +899,26 @@
       if (!section || !isSuccess || !bookingId) return;
       openRewardPopup();
       const button = document.getElementById("spinRewardBtn"); button.disabled = true;
+      const signIn = document.getElementById("rewardSignIn");
+      const auth = window.firebase?.auth?.();
+      if (!auth) {
+        document.getElementById("rewardStatus").textContent = "Sign-in is temporarily unavailable. Please refresh and try again.";
+        return;
+      }
+      if (auth.authStateReady) await auth.authStateReady();
+      else await new Promise(resolve => auth.onAuthStateChanged(() => resolve(), () => resolve()));
+      const user = auth.currentUser;
+      if (!user) {
+        signIn.href = `login.html?next=${encodeURIComponent(location.pathname + location.search)}`;
+        signIn.style.display = "inline-block";
+        document.getElementById("rewardStatus").textContent = "Sign in to claim your booking reward.";
+        return;
+      }
+      signIn.style.display = "none";
       document.getElementById("rewardStatus").textContent = "Checking your booking reward…";
       try {
-        const response = await fetch(`${rewardsApi}/spinBookingReward`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ bookingId, action: "status" }) });
+        const idToken = await user.getIdToken();
+        const response = await fetch(`${rewardsApi}/spinBookingReward`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` }, body: JSON.stringify({ bookingId, action: "status" }) });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.error || "Could not check this booking reward.");
         if (result.alreadyClaimed) showRewardResult(result.coins, true);
@@ -922,14 +941,17 @@
       wheel.classList.remove("spinning"); void wheel.offsetWidth; wheel.classList.add("spinning");
       playRewardSpinSound();
       try {
-        const response = await fetch(`${rewardsApi}/spinBookingReward`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ bookingId, action: "spin" }) });
+        const user = window.firebase?.auth?.().currentUser;
+        if (!user) throw new Error("Sign in to claim your booking reward.");
+        const idToken = await user.getIdToken();
+        const response = await fetch(`${rewardsApi}/spinBookingReward`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` }, body: JSON.stringify({ bookingId, action: "spin" }) });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.error || "Could not add your reward.");
         const index = rewardCoins.indexOf(Number(result.coins));
         if (index < 0) throw new Error("The reward result was invalid. Please contact support.");
         // Prize slices are drawn clockwise from the pointer. A clockwise CSS
         // rotation brings the selected slice back under the fixed pointer.
-        const clockwiseTarget = currentRotation + 360 * 5 + (index + .5) * 72;
+        const clockwiseTarget = currentRotation + 360 * 5 + (index + .5) * (360 / rewardCoins.length);
         wheel.dataset.rotation = String(clockwiseTarget % 360);
         wheel.style.setProperty("--wheel-rotation", `${clockwiseTarget}deg`);
         window.setTimeout(() => showRewardResult(result.coins, result.alreadyClaimed), 4900);

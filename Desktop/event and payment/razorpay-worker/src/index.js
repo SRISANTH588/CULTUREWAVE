@@ -440,6 +440,8 @@ async function spinBookingReward(request, env) {
   if (!bookingId || !/^[a-zA-Z0-9_-]+$/.test(bookingId) || !["status", "spin"].includes(action)) {
     return json({ success: false, error: "Booking details are invalid." }, 400);
   }
+  const user = await authenticatedUser(request, env);
+  if (!user) return json({ success: false, error: "Sign in to claim your booking reward." }, 401);
   const token = await firestoreAccessToken(env);
   let booking = await getFirestoreDocument(env, "bookings", bookingId, token);
   if (!booking || !["confirmed", "paid", "success", "completed"].includes(String(booking.status || "").toLowerCase())) {
@@ -460,7 +462,15 @@ async function spinBookingReward(request, env) {
     await patchFirestoreDocument(env, "bookings", bookingId, repairedBooking, token);
     booking = repairedBooking;
   }
-  const rewardUid = clean(booking.userId, 128) || `booking_${bookingId}`;
+  const rewardUid = clean(booking.userId, 128);
+  if (rewardUid && rewardUid !== user.uid) return json({ success: false, error: "Sign in with the account used for this booking to claim its reward." }, 403);
+  if (!rewardUid && clean(booking.customerEmail, 180).toLowerCase() !== user.email) {
+    return json({ success: false, error: "Sign in with the email used for this booking to claim its reward." }, 403);
+  }
+  if (!rewardUid) {
+    booking.userId = user.uid;
+    await patchFirestoreDocument(env, "bookings", bookingId, { userId: user.uid }, token);
+  }
   const transactionId = `reward_${bookingId}`;
   const existing = await getFirestoreDocument(env, "oneClubTransactions", transactionId, token);
   if (existing) {
@@ -468,7 +478,7 @@ async function spinBookingReward(request, env) {
   }
   if (action === "status") return json({ success: true, alreadyClaimed: false });
 
-  const prizes = [100, 300, 500, 700];
+  const prizes = [100, 300, 500, 700, 3000];
   const counterId = "bookingRewardSpinCount";
   const counter = await getFirestoreDocument(env, "rewardCounters", counterId, token);
   const counterCount = Math.max(0, Math.floor(Number(counter?.count) || 0));
