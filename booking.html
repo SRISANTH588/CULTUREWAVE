@@ -350,7 +350,7 @@
     .checkout-sheet-actions{display:flex;gap:.65rem;margin-top:1.25rem;}
     .checkout-sheet-actions button{flex:1;min-height:46px;border:1px solid #44464d;border-radius:12px;background:#24262b;color:#f4f4f5;font-weight:800;}
     .checkout-sheet-actions button:last-child{border:0;background:#1dae79;color:#fff;}
-    /* Match the guest details editor to the mobile booking sheet on laptop screens. */
+    /* Keep the guest details editor as a bottom sheet on phones. */
     #checkoutContactSheet{align-items:flex-end;padding:0!important;background:rgba(5,7,12,.76);backdrop-filter:blur(8px);}
     #checkoutContactSheet .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:0 1.2rem calc(env(safe-area-inset-bottom) + 1.2rem);border:1px solid #303136;border-bottom:0;border-radius:28px 28px 0 0;background:#121315;color:#f4f4f5;box-shadow:0 -12px 40px rgba(0,0,0,.5);overscroll-behavior:contain;}
     #checkoutContactSheet .checkout-sheet-head{position:sticky;z-index:2;top:0;display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:.3rem;margin:0 -1.2rem 1.35rem;padding:.75rem 1.2rem;border-bottom:1px solid #303136;background:#121315;}
@@ -366,7 +366,11 @@
     #checkoutContactSheet .checkout-sheet-actions{display:grid;grid-template-columns:1fr;margin-top:1.5rem;}
     #checkoutContactSheet .checkout-sheet-actions button:first-child{display:none;}
     #checkoutContactSheet .checkout-sheet-actions button:last-child{min-height:52px;border:0;border-radius:13px;background:linear-gradient(135deg,#5946e8,#3f42cc);box-shadow:0 6px 14px rgba(75,67,218,.2);font-size:.92rem;}
-    @media(min-width:769px){#checkoutContactSheet{padding:1.25rem 1.25rem 0!important;}#checkoutContactSheet .checkout-sheet{width:min(560px,100%);}}
+    @media(min-width:769px){
+      #checkoutContactSheet{align-items:center;padding:1.25rem!important;}
+      #checkoutContactSheet .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);padding:1.35rem 1.4rem 1.2rem;border:1px solid #303136;border-radius:24px;background:#121315;box-shadow:0 24px 80px rgba(0,0,0,.55);}
+      #checkoutContactSheet .checkout-sheet-head{margin:0 -1.4rem 1.35rem;padding:.75rem 1.4rem;}
+    }
     .bk-panel#panel3 .checkout-remember{margin:0 1.2rem 1rem;padding:1rem 0;border-color:#393a3e;}
     .bk-panel#panel3 .bk-tc{margin:0 1.2rem 1rem;}
     .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:flex;justify-content:flex-end;align-items:center;gap:.7rem;margin:0;padding:.65rem 1.2rem calc(env(safe-area-inset-bottom) + .65rem);border-top:1px solid #38393d;background:#18191c;}
