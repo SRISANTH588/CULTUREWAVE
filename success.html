@@ -499,17 +499,23 @@
     .sc-details-grid > .sc-detail.has-poster .sc-ticket-poster{position:absolute;top:50%;right:.55rem;width:96px;height:142px;margin:0!important;transform:translateY(-50%);}
     .sc-ticket-codes{border-top:0!important;}
     .sc-ticket-map-icon{display:block;width:20px!important;height:20px!important;max-width:20px!important;flex:0 0 20px;margin-left:auto;color:#c6c9d0;}
-    .sc-reward{display:none;width:min(100%,560px);margin:0 0 1.5rem;padding:1.2rem;border:1px solid #3a3450;border-radius:22px;background:radial-gradient(circle at 50% 0,#35244d,#1d1b22 68%);text-align:center;color:#f8f4ff;}
-    .sc-reward h2{margin:0;font-size:1.2rem;}.sc-reward p{margin:.4rem 0 1rem;color:#b8b1c2;font-size:.85rem;line-height:1.5;}
-    .sc-reward-wheel-wrap{position:relative;width:min(76vw,300px);aspect-ratio:1;margin:0 auto 1rem;}
-    .sc-reward-wheel{width:100%;height:100%;border-radius:50%;filter:drop-shadow(0 10px 20px #0008);transform:rotate(0deg);}
-    .sc-reward-pointer{position:absolute;z-index:2;top:-5px;left:50%;width:0;height:0;transform:translateX(-50%);border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid #fff;filter:drop-shadow(0 3px 3px #0008);}
-    .sc-reward-spin{min-height:48px;padding:.75rem 1.3rem;border:0;border-radius:999px;background:linear-gradient(135deg,#c49aff,#8055d6);color:#fff;font:800 .9rem Manrope,sans-serif;cursor:pointer;}
+    .sc-reward-overlay{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:1rem;background:rgba(7,8,15,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+    .sc-reward-overlay.open{display:flex;animation:reward-overlay-in .28s ease both;}
+    .sc-reward{position:relative;display:block;width:min(100%,520px);max-height:min(92vh,850px);overflow:auto;padding:clamp(1.25rem,4vw,2rem);border:1px solid rgba(255,255,255,.2);border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.055) 46%),radial-gradient(ellipse at 50% -15%,rgba(197,157,255,.32),transparent 58%),rgba(20,18,30,.88);box-shadow:0 35px 100px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.22);text-align:center;color:#fff;backdrop-filter:blur(28px) saturate(145%);-webkit-backdrop-filter:blur(28px) saturate(145%);animation:reward-card-in .45s cubic-bezier(.2,.85,.25,1.15) both;}
+    .sc-reward-kicker{display:inline-flex;align-items:center;gap:.4rem;margin-bottom:.7rem;padding:.36rem .7rem;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.08);color:#e1cbff;font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;}
+    .sc-reward h2{margin:0;font-size:clamp(1.35rem,4vw,1.7rem);letter-spacing:-.04em;}.sc-reward p{margin:.55rem 0 1rem;color:rgba(240,235,249,.72);font-size:.86rem;line-height:1.5;}
+    .sc-reward-close{position:absolute;top:1rem;right:1rem;width:38px;height:38px;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:1.25rem;cursor:pointer;transition:background .2s,transform .2s;}.sc-reward-close:hover{background:rgba(255,255,255,.18);transform:rotate(90deg);}
+    .sc-reward-wheel-wrap{position:relative;width:min(70vw,310px);aspect-ratio:1;margin:1rem auto 1rem;padding:7px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:linear-gradient(135deg,#fff8,#ffffff12 40%,#c49aff66);box-shadow:0 0 0 7px rgba(255,255,255,.035),0 18px 44px rgba(0,0,0,.38),0 0 42px rgba(179,127,255,.18);}
+    .sc-reward-wheel{width:100%;height:100%;border:1px solid rgba(255,255,255,.5);border-radius:50%;filter:drop-shadow(0 8px 18px #0009);transform:rotate(0deg);}
+    .sc-reward-pointer{position:absolute;z-index:2;top:-8px;left:50%;width:28px;height:38px;transform:translateX(-50%);clip-path:polygon(50% 100%,0 0,100% 0);background:linear-gradient(90deg,#f2d69d,#fff6d6 48%,#c99850);filter:drop-shadow(0 4px 5px #000a);}
+    .sc-reward-spin{min-height:52px;padding:.8rem 1.7rem;border:1px solid rgba(255,255,255,.42);border-radius:999px;background:linear-gradient(115deg,#f4dca7,#c499ff 48%,#8055d6);box-shadow:0 10px 28px rgba(145,92,220,.3),inset 0 1px rgba(255,255,255,.7);color:#21162e;font:900 .92rem Manrope,sans-serif;letter-spacing:.01em;cursor:pointer;transition:transform .2s,box-shadow .2s;}.sc-reward-spin:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 34px rgba(145,92,220,.4),inset 0 1px rgba(255,255,255,.7);}
     .sc-reward-spin:disabled{opacity:.55;cursor:default;}.sc-reward-status{min-height:1.4em;margin:.75rem 0 0!important;color:#d7cae9!important;font-size:.8rem!important;}
     .sc-reward-prize{display:none;margin:.5rem 0 0;color:#7df0bb;font-size:1.1rem;font-weight:800;}
     @keyframes reward-wheel-spin{to{transform:rotate(var(--wheel-rotation));}}
     .sc-reward-wheel.spinning{animation:reward-wheel-spin 4.8s cubic-bezier(.12,.72,.18,1) forwards;}
-    @media(max-width:600px){.sc-reward{margin:0 auto 1.2rem;padding:1rem;border-radius:18px;}.sc-reward-wheel-wrap{width:min(76vw,285px);}}
+    @keyframes reward-overlay-in{from{opacity:0}to{opacity:1}}@keyframes reward-card-in{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @media(max-width:600px){.sc-reward-overlay{padding:.65rem;}.sc-reward{width:100%;max-height:94vh;padding:1.2rem 1rem 1.1rem;border-radius:24px;}.sc-reward-wheel-wrap{width:min(68vw,285px);}.sc-reward-close{top:.75rem;right:.75rem;width:34px;height:34px;}}
+    @media(prefers-reduced-motion:reduce){.sc-reward-overlay.open,.sc-reward{animation:none}.sc-reward-spin,.sc-reward-close{transition:none}}
   </style>
   <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
@@ -556,7 +562,10 @@
         <p id="scSubtitle">Your seat is reserved. Show the QR code at the venue entry.</p>
       </div>
 
-      <section class="sc-reward" id="scReward" aria-labelledby="scRewardTitle">
+      <div class="sc-reward-overlay" id="scRewardOverlay" aria-hidden="true">
+      <section class="sc-reward" id="scReward" role="dialog" aria-modal="true" aria-labelledby="scRewardTitle">
+        <button class="sc-reward-close" id="closeRewardPopup" type="button" aria-label="Close booking reward">×</button>
+        <div class="sc-reward-kicker">✦ One Club surprise</div>
         <h2 id="scRewardTitle">🎁 Your booking reward</h2>
         <p>Spin once for this booking. Coins go straight to your One Club balance.</p>
         <div class="sc-reward-wheel-wrap"><span class="sc-reward-pointer" aria-hidden="true"></span><canvas class="sc-reward-wheel" id="rewardWheel" width="600" height="600" role="img" aria-label="Reward wheel with prizes of 100, 300, 500, 700 and 3000 coins"></canvas></div>
@@ -564,6 +573,7 @@
         <p class="sc-reward-status" id="rewardStatus" role="status" aria-live="polite">Sign in with your booking email to claim your reward.</p>
         <div class="sc-reward-prize" id="rewardPrize"></div>
       </section>
+      </div>
 
       <!-- TICKET (shown only on success) -->
       <div class="sc-ticket" id="scTicket">
@@ -803,6 +813,31 @@
     const rewardCoins = [100, 300, 500, 700, 3000];
     let rewardBusy = false;
 
+    function closeRewardPopup() {
+      const overlay = document.getElementById("scRewardOverlay");
+      if (!overlay) return;
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function openRewardPopup() {
+      const overlay = document.getElementById("scRewardOverlay");
+      if (!overlay) return;
+      overlay.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      document.getElementById("closeRewardPopup")?.focus({ preventScroll: true });
+    }
+
+    document.getElementById("closeRewardPopup")?.addEventListener("click", closeRewardPopup);
+    document.getElementById("scRewardOverlay")?.addEventListener("click", event => {
+      if (event.target.id === "scRewardOverlay") closeRewardPopup();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeRewardPopup();
+    });
+
     function drawRewardWheel() {
       const canvas = document.getElementById("rewardWheel");
       if (!canvas) return;
@@ -837,7 +872,7 @@
     async function loadRewardStatus(user) {
       const section = document.getElementById("scReward");
       if (!section || !isSuccess || !bookingId) return;
-      section.style.display = "block";
+      openRewardPopup();
       if (!user) {
         document.getElementById("rewardStatus").innerHTML = `Sign in with your booking email to claim this reward. <a style="color:#caaeff" href="login.html?next=${encodeURIComponent(location.pathname + location.search)}">Sign in</a>`;
         document.getElementById("spinRewardBtn").disabled = true;
