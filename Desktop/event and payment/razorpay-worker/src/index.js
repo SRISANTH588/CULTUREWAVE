@@ -414,6 +414,63 @@ async function payWithOneClub(request, env) {
   return json({ success: true, balance: balance - amount, amount });
 }
 
+async function spinBookingReward(request, env) {
+  const user = await authenticatedUser(request, env);
+  if (!user) return json({ success: false, error: "Sign in to claim booking rewards." }, 401);
+  const body = await request.json();
+  const bookingId = clean(body.bookingId, 100);
+  const action = clean(body.action, 16).toLowerCase();
+  if (!bookingId || !/^[a-zA-Z0-9_-]+$/.test(bookingId) || !["status", "spin"].includes(action)) {
+    return json({ success: false, error: "Booking details are invalid." }, 400);
+  }
+  const token = await firestoreAccessToken(env);
+  const booking = await getFirestoreDocument(env, "bookings", bookingId, token);
+  if (!booking || !["confirmed", "paid", "success", "completed"].includes(String(booking.status || "").toLowerCase())) {
+    return json({ success: false, error: "A confirmed booking is required for this reward." }, 404);
+  }
+  const bookingEmail = clean(booking.customerEmail, 180).toLowerCase();
+  const ownsByAccount = booking.userId === user.uid;
+  const ownsByVerifiedEmail = user.emailVerified && bookingEmail && bookingEmail === user.email;
+  if (!ownsByAccount && !ownsByVerifiedEmail) {
+    return json({ success: false, error: "Sign in with the email used for this booking." }, 403);
+  }
+
+  const transactionId = `reward_${bookingId}`;
+  const existing = await getFirestoreDocument(env, "oneClubTransactions", transactionId, token);
+  if (existing) {
+    if (existing.uid !== user.uid) return json({ success: false, error: "This booking reward belongs to another account." }, 403);
+    return json({ success: true, alreadyClaimed: true, coins: Number(existing.coins), amount: Number(existing.amount), balance: Number((await getFirestoreDocument(env, "wallets", user.uid, token))?.balance || 0) });
+  }
+  if (action === "status") return json({ success: true, alreadyClaimed: false });
+
+  const prizes = [100, 300, 500, 700, 3000];
+  const random = new Uint32Array(1);
+  crypto.getRandomValues(random);
+  const coins = prizes[Math.floor((random[0] / 0x100000000) * prizes.length)];
+  const amount = coins / 100;
+  const wallet = await getFirestoreDocument(env, "wallets", user.uid, token);
+  const balance = Number(wallet?.balance || 0);
+  const timestamp = new Date().toISOString();
+  const writes = [
+    { update: { name: firestoreDocumentName(env, "wallets", user.uid), fields: {
+      balance: firestoreValue(balance + amount), updatedAt: firestoreValue({ __firestoreTimestamp: timestamp }),
+    } }, updateMask: { fieldPaths: ["balance", "updatedAt"] },
+      ...(wallet?.updateTime ? { currentDocument: { updateTime: wallet.updateTime } } : { currentDocument: { exists: false } }) },
+    { update: { name: firestoreDocumentName(env, "oneClubTransactions", transactionId), fields: {
+      uid: firestoreValue(user.uid), amount: firestoreValue(amount), coins: firestoreValue(coins), type: firestoreValue("booking_reward"),
+      paymentId: firestoreValue(bookingId), bookingId: firestoreValue(bookingId), eventId: firestoreValue(clean(booking.eventId, 120)),
+      eventName: firestoreValue(clean(booking.eventName, 200)), createdAt: firestoreValue({ __firestoreTimestamp: timestamp }),
+    } }, currentDocument: { exists: false } },
+  ];
+  const response = await fetch(`${firestoreBase(env)}:commit`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ writes }) });
+  if (response.ok) return json({ success: true, alreadyClaimed: false, coins, amount, balance: balance + amount });
+  const committed = await getFirestoreDocument(env, "oneClubTransactions", transactionId, token);
+  if (committed?.uid === user.uid) {
+    return json({ success: true, alreadyClaimed: true, coins: Number(committed.coins), amount: Number(committed.amount), balance: Number((await getFirestoreDocument(env, "wallets", user.uid, token))?.balance || 0) });
+  }
+  return json({ success: false, error: "Could not add this reward to One Club. Please try again." }, 409);
+}
+
 async function authenticatedUser(request, env) {
   const token = String(request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
   if (!token) return null;
@@ -436,7 +493,7 @@ async function authenticatedUser(request, env) {
     const result = await response.json().catch(() => ({}));
     const user = result.users?.[0];
     if (response.ok && user?.localId) {
-      return { uid: user.localId, email: clean(user.email, 180).toLowerCase() };
+      return { uid: user.localId, email: clean(user.email, 180).toLowerCase(), emailVerified: user.emailVerified === true };
     }
     const errorCode = String(result.error?.message || "").toUpperCase();
     if (errorCode === "INVALID_ID_TOKEN" || errorCode === "USER_DISABLED") continue;
@@ -602,7 +659,7 @@ async function getGiftCardHistory(request, env) {
       where: { fieldFilter: { field: { fieldPath: ownerField }, op: "EQUAL", value: { stringValue: user.uid } } }, limit: 50 } }) });
   const [purchaseResponse, transactionResponse] = await Promise.all([
     query("giftCardPurchases", ["ownerUid", "amount", "status", "code", "pin", "createdAt"]),
-    query("oneClubTransactions", ["uid", "amount", "type", "paymentId", "eventId", "eventName", "createdAt"], "uid"),
+    query("oneClubTransactions", ["uid", "amount", "coins", "type", "paymentId", "eventId", "eventName", "createdAt"], "uid"),
   ]);
   if (!purchaseResponse.ok) return json({ success: false, error: "Could not load gift card history." }, 502);
   let rows, transactionRows = [];
@@ -620,7 +677,7 @@ async function getGiftCardHistory(request, env) {
   const transactions = (transactionRows || []).filter(row => row.document).map(row => {
     const document = row.document, fields = decodeFirestoreFields(document.fields || {});
     return { id: document.name.split("/").pop(), amount: Number(fields.amount || 0), type: fields.type || "wallet_activity",
-      paymentId: fields.paymentId || "", eventId: fields.eventId || "", eventName: fields.eventName || "",
+      paymentId: fields.paymentId || "", eventId: fields.eventId || "", eventName: fields.eventName || "", coins: Number(fields.coins || 0),
       createdAt: fields.createdAt || null };
   });
   return json({ success: true, purchases, transactions });
@@ -847,6 +904,7 @@ export default {
       if (path === "/verifyGiftCardPayment") return await createGiftCard(request, env).then(response => withHeaders(response, headers));
       if (path === "/redeemGiftCard") return await redeemGiftCard(request, env).then(response => withHeaders(response, headers));
       if (path === "/oneClubBalance") return await getOneClub(request, env).then(response => withHeaders(response, headers));
+      if (path === "/spinBookingReward") return await spinBookingReward(request, env).then(response => withHeaders(response, headers));
       if (path === "/giftCardHistory") return await getGiftCardHistory(request, env).then(response => withHeaders(response, headers));
       if (path === "/adminOneClub") return await getAdminOneClub(request, env).then(response => withHeaders(response, headers));
       if (path === "/updateGiftCardSettings") return await updateGiftCardSettings(request, env).then(response => withHeaders(response, headers));

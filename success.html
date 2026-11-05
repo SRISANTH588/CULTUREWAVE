@@ -16,6 +16,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <style>
     body { background: #f4f8ff; }
 
@@ -498,6 +499,17 @@
     .sc-details-grid > .sc-detail.has-poster .sc-ticket-poster{position:absolute;top:50%;right:.55rem;width:96px;height:142px;margin:0!important;transform:translateY(-50%);}
     .sc-ticket-codes{border-top:0!important;}
     .sc-ticket-map-icon{display:block;width:20px!important;height:20px!important;max-width:20px!important;flex:0 0 20px;margin-left:auto;color:#c6c9d0;}
+    .sc-reward{display:none;width:min(100%,560px);margin:0 0 1.5rem;padding:1.2rem;border:1px solid #3a3450;border-radius:22px;background:radial-gradient(circle at 50% 0,#35244d,#1d1b22 68%);text-align:center;color:#f8f4ff;}
+    .sc-reward h2{margin:0;font-size:1.2rem;}.sc-reward p{margin:.4rem 0 1rem;color:#b8b1c2;font-size:.85rem;line-height:1.5;}
+    .sc-reward-wheel-wrap{position:relative;width:min(76vw,300px);aspect-ratio:1;margin:0 auto 1rem;}
+    .sc-reward-wheel{width:100%;height:100%;border-radius:50%;filter:drop-shadow(0 10px 20px #0008);transform:rotate(0deg);}
+    .sc-reward-pointer{position:absolute;z-index:2;top:-5px;left:50%;width:0;height:0;transform:translateX(-50%);border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid #fff;filter:drop-shadow(0 3px 3px #0008);}
+    .sc-reward-spin{min-height:48px;padding:.75rem 1.3rem;border:0;border-radius:999px;background:linear-gradient(135deg,#c49aff,#8055d6);color:#fff;font:800 .9rem Manrope,sans-serif;cursor:pointer;}
+    .sc-reward-spin:disabled{opacity:.55;cursor:default;}.sc-reward-status{min-height:1.4em;margin:.75rem 0 0!important;color:#d7cae9!important;font-size:.8rem!important;}
+    .sc-reward-prize{display:none;margin:.5rem 0 0;color:#7df0bb;font-size:1.1rem;font-weight:800;}
+    @keyframes reward-wheel-spin{to{transform:rotate(var(--wheel-rotation));}}
+    .sc-reward-wheel.spinning{animation:reward-wheel-spin 4.8s cubic-bezier(.12,.72,.18,1) forwards;}
+    @media(max-width:600px){.sc-reward{margin:0 auto 1.2rem;padding:1rem;border-radius:18px;}.sc-reward-wheel-wrap{width:min(76vw,285px);}}
   </style>
   <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
@@ -508,6 +520,7 @@
         <div class="logo">CultureWave</div>
         <div class="brand-sub">by OGSHOOTS LUXE</div>
       </div>
+
       <nav class="topnav">
         <a href="index.html">Home</a>
         <a href="events.html">Events</a>
@@ -542,6 +555,15 @@
         <h1 id="scTitle">Booking confirmed</h1>
         <p id="scSubtitle">Your seat is reserved. Show the QR code at the venue entry.</p>
       </div>
+
+      <section class="sc-reward" id="scReward" aria-labelledby="scRewardTitle">
+        <h2 id="scRewardTitle">🎁 Your booking reward</h2>
+        <p>Spin once for this booking. Coins go straight to your One Club balance.<br>100 coins = ₹1</p>
+        <div class="sc-reward-wheel-wrap"><span class="sc-reward-pointer" aria-hidden="true"></span><canvas class="sc-reward-wheel" id="rewardWheel" width="600" height="600" role="img" aria-label="Reward wheel with prizes of 100, 300, 500, 700 and 3000 coins"></canvas></div>
+        <button class="sc-reward-spin" id="spinRewardBtn" type="button">Spin the wheel</button>
+        <p class="sc-reward-status" id="rewardStatus" role="status" aria-live="polite">Sign in with your booking email to claim your reward.</p>
+        <div class="sc-reward-prize" id="rewardPrize"></div>
+      </section>
 
       <!-- TICKET (shown only on success) -->
       <div class="sc-ticket" id="scTicket">
@@ -777,6 +799,89 @@
     let mapLink = params.get("mapLink") || "";
     const isRestaurant = bkType === "restaurant";
     const isSuccess  = status === "confirmed" || status === "success" || bookingId !== "";
+    const rewardsApi = "https://culturewave-razorpay.culturewaveindia.workers.dev";
+    const rewardCoins = [100, 300, 500, 700, 3000];
+    let rewardBusy = false;
+
+    function drawRewardWheel() {
+      const canvas = document.getElementById("rewardWheel");
+      if (!canvas) return;
+      const context = canvas.getContext("2d"), center = canvas.width / 2, radius = center - 8;
+      const colors = ["#7b5bc7", "#293b68", "#b76342", "#4c805e", "#a34c7e"];
+      rewardCoins.forEach((coins, index) => {
+        const start = -Math.PI / 2 + index * Math.PI * 2 / rewardCoins.length;
+        const end = start + Math.PI * 2 / rewardCoins.length;
+        context.beginPath(); context.moveTo(center, center); context.arc(center, center, radius, start, end); context.closePath();
+        context.fillStyle = colors[index]; context.fill(); context.lineWidth = 5; context.strokeStyle = "#211b2a"; context.stroke();
+        context.save(); context.translate(center, center); context.rotate(start + Math.PI / rewardCoins.length);
+        context.textAlign = "right"; context.textBaseline = "middle"; context.fillStyle = "#fff";
+        context.font = "800 30px Manrope, sans-serif"; context.shadowColor = "#0008"; context.shadowBlur = 3;
+        context.fillText(`${coins} coins`, radius - 28, 0); context.restore();
+      });
+      context.beginPath(); context.arc(center, center, 49, 0, Math.PI * 2); context.fillStyle = "#f7f1ff"; context.fill();
+      context.fillStyle = "#30213f"; context.textAlign = "center"; context.textBaseline = "middle"; context.font = "800 25px Manrope, sans-serif"; context.fillText("SPIN", center, center);
+    }
+
+    function showRewardResult(coins, alreadyClaimed) {
+      const index = rewardCoins.indexOf(Number(coins));
+      if (index < 0) return;
+      const wheel = document.getElementById("rewardWheel");
+      wheel.classList.remove("spinning"); wheel.style.transform = `rotate(${360 - (index + .5) * 72}deg)`;
+      document.getElementById("rewardPrize").textContent = `You won ${coins.toLocaleString("en-IN")} coins · ₹${(coins / 100).toLocaleString("en-IN")} added to One Club`;
+      document.getElementById("rewardPrize").style.display = "block";
+      document.getElementById("rewardStatus").textContent = alreadyClaimed ? "This booking reward was already claimed." : "Added to your One Club balance.";
+      document.getElementById("spinRewardBtn").disabled = true;
+      document.getElementById("spinRewardBtn").textContent = "Reward claimed";
+    }
+
+    async function loadRewardStatus(user) {
+      const section = document.getElementById("scReward");
+      if (!section || !isSuccess || !bookingId) return;
+      section.style.display = "block";
+      if (!user) {
+        document.getElementById("rewardStatus").innerHTML = `Sign in with your booking email to claim this reward. <a style="color:#caaeff" href="login.html?next=${encodeURIComponent(location.pathname + location.search)}">Sign in</a>`;
+        document.getElementById("spinRewardBtn").disabled = true;
+        return;
+      }
+      const button = document.getElementById("spinRewardBtn"); button.disabled = true;
+      document.getElementById("rewardStatus").textContent = "Checking your booking reward…";
+      try {
+        const response = await fetch(`${rewardsApi}/spinBookingReward`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${await user.getIdToken()}` }, body: JSON.stringify({ bookingId, action: "status" }) });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || "Could not check this booking reward.");
+        if (result.alreadyClaimed) showRewardResult(result.coins, true);
+        else { document.getElementById("rewardStatus").textContent = "One spin is available for this booking."; button.disabled = false; }
+      } catch (error) {
+        document.getElementById("rewardStatus").textContent = error.message;
+        button.disabled = true;
+      }
+    }
+
+    async function spinBookingReward() {
+      if (rewardBusy) return;
+      const user = firebase.auth().currentUser;
+      if (!user) return;
+      rewardBusy = true;
+      const button = document.getElementById("spinRewardBtn"); button.disabled = true;
+      document.getElementById("rewardStatus").textContent = "Spinning…";
+      try {
+        const response = await fetch(`${rewardsApi}/spinBookingReward`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${await user.getIdToken()}` }, body: JSON.stringify({ bookingId, action: "spin" }) });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || "Could not add your reward.");
+        const index = rewardCoins.indexOf(Number(result.coins));
+        if (index < 0) throw new Error("The reward result was invalid. Please contact support.");
+        const wheel = document.getElementById("rewardWheel");
+        wheel.style.transform = "rotate(0deg)"; wheel.style.setProperty("--wheel-rotation", `${360 * 5 + 360 - (index + .5) * 72}deg`);
+        wheel.classList.remove("spinning"); void wheel.offsetWidth; wheel.classList.add("spinning");
+        window.setTimeout(() => showRewardResult(result.coins, result.alreadyClaimed), 4900);
+      } catch (error) {
+        document.getElementById("rewardStatus").textContent = error.message;
+        button.disabled = false;
+      } finally { rewardBusy = false; }
+    }
+    drawRewardWheel();
+    document.getElementById("spinRewardBtn")?.addEventListener("click", spinBookingReward);
+    if (window.firebase) firebase.auth().onAuthStateChanged(loadRewardStatus);
 
     const eventEmojis = {
       "HIMTEX 2026":"🏛️", "Nullcon Hyderabad 2026":"🔐",
