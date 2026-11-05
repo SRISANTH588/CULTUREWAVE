@@ -567,7 +567,7 @@
         <button class="sc-reward-close" id="closeRewardPopup" type="button" aria-label="Close booking reward">×</button>
         <div class="sc-reward-kicker">✦ One Club surprise</div>
         <h2 id="scRewardTitle">🎁 Your booking reward</h2>
-        <p>Spin once for this booking. Every 50 confirmed bookings unlocks 3,000 coins. Other spins win 100, 300, 500 or 700 coins. Coins go straight to your One Club balance.</p>
+        <p>Spin once for this booking. Coins go straight to your One Club balance.</p>
         <div class="sc-reward-wheel-wrap"><span class="sc-reward-pointer" aria-hidden="true"></span><canvas class="sc-reward-wheel" id="rewardWheel" width="600" height="600" role="img" aria-label="Reward wheel with prizes of 100, 300, 500, 700 and 3000 coins"></canvas></div>
         <button class="sc-reward-spin" id="spinRewardBtn" type="button">Spin the wheel</button>
         <p class="sc-reward-status" id="rewardStatus" role="status" aria-live="polite">Sign in with your booking email to claim your reward.</p>
@@ -812,6 +812,29 @@
     const rewardsApi = "https://culturewave-razorpay.culturewaveindia.workers.dev";
     const rewardCoins = [100, 300, 500, 700, 3000];
     let rewardBusy = false;
+    let rewardAudioContext;
+
+    function playRewardSpinSound() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        rewardAudioContext ||= new AudioContext();
+        if (rewardAudioContext.state === "suspended") rewardAudioContext.resume();
+        const startedAt = rewardAudioContext.currentTime;
+        for (let tick = 0; tick < 24; tick++) {
+          const oscillator = rewardAudioContext.createOscillator();
+          const gain = rewardAudioContext.createGain();
+          const at = startedAt + tick * (0.055 + tick * 0.004);
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(tick % 2 ? 920 : 1180, at);
+          gain.gain.setValueAtTime(0.0001, at);
+          gain.gain.exponentialRampToValueAtTime(0.055, at + 0.004);
+          gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.035);
+          oscillator.connect(gain); gain.connect(rewardAudioContext.destination);
+          oscillator.start(at); oscillator.stop(at + 0.04);
+        }
+      } catch (_) { /* Sound is optional when browser audio is unavailable. */ }
+    }
 
     function closeRewardPopup() {
       const overlay = document.getElementById("scRewardOverlay");
@@ -899,23 +922,27 @@
       rewardBusy = true;
       const button = document.getElementById("spinRewardBtn"); button.disabled = true;
       document.getElementById("rewardStatus").textContent = "Spinning…";
+      const wheel = document.getElementById("rewardWheel");
+      const currentRotation = Number(wheel.dataset.rotation || 0);
+      const previewRotation = currentRotation + 360 * 5 + 1440;
+      wheel.style.setProperty("--wheel-rotation", `${previewRotation}deg`);
+      wheel.classList.remove("spinning"); void wheel.offsetWidth; wheel.classList.add("spinning");
+      playRewardSpinSound();
       try {
         const response = await fetch(`${rewardsApi}/spinBookingReward`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${await user.getIdToken()}` }, body: JSON.stringify({ bookingId, action: "spin" }) });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.error || "Could not add your reward.");
         const index = rewardCoins.indexOf(Number(result.coins));
         if (index < 0) throw new Error("The reward result was invalid. Please contact support.");
-        const wheel = document.getElementById("rewardWheel");
         // Prize slices are drawn clockwise from the pointer. A clockwise CSS
         // rotation brings the selected slice back under the fixed pointer.
-        const currentRotation = Number(wheel.dataset.rotation || 0);
         const clockwiseTarget = currentRotation + 360 * 5 + (index + .5) * 72;
         wheel.dataset.rotation = String(clockwiseTarget % 360);
-        wheel.style.transform = `rotate(${currentRotation}deg)`;
         wheel.style.setProperty("--wheel-rotation", `${clockwiseTarget}deg`);
-        wheel.classList.remove("spinning"); void wheel.offsetWidth; wheel.classList.add("spinning");
         window.setTimeout(() => showRewardResult(result.coins, result.alreadyClaimed), 4900);
       } catch (error) {
+        wheel.classList.remove("spinning");
+        wheel.style.transform = `rotate(${currentRotation}deg)`;
         document.getElementById("rewardStatus").textContent = error.message;
         button.disabled = false;
       } finally { rewardBusy = false; }
