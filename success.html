@@ -516,7 +516,8 @@
     @keyframes reward-overlay-in{from{opacity:0}to{opacity:1}}@keyframes reward-card-in{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
     @media(max-width:600px){.sc-reward-overlay{padding:.65rem;}.sc-reward{width:100%;max-height:94vh;padding:1.2rem 1rem 1.1rem;border-radius:24px;}.sc-reward-wheel-wrap{width:min(68vw,285px);}.sc-reward-close{top:.75rem;right:.75rem;width:34px;height:34px;}}
     @media(prefers-reduced-motion:reduce){.sc-reward-overlay.open,.sc-reward{animation:none}.sc-reward-spin,.sc-reward-close{transition:none}}
-    /* Keep the post-ticket guidance aligned as a single, readable section. */
+    /* Keep the post-ticket guidance aligned as a single, readable section on laptops. */
+    @media (min-width:601px) {
     .sc-next-steps,.sc-remember,.sc-help,.sc-actions,.sc-feedback,.sc-wallet-actions{max-width:680px;width:100%;box-sizing:border-box;}
     .sc-next-steps{margin-top:2rem;}
     .sc-next-steps h2{margin-bottom:1.15rem;font-size:clamp(1.55rem,3vw,2rem);}
@@ -545,21 +546,6 @@
     .sc-btn-download{background:#35c985;box-shadow:none;}
     .sc-btn-share,.sc-btn-home{background:#242529;border:1px solid #3a3b41;color:#f2f2f4;box-shadow:none;}
     .sc-feedback{margin-top:1.1rem;}
-    @media(max-width:600px){
-      .sc-next-steps{margin-top:1.4rem;}
-      .sc-next-steps h2{font-size:1.4rem;}
-      .sc-next-panel{padding:.85rem 1rem;border-radius:18px;}
-      .sc-next-row{min-height:3rem;align-items:center;gap:.8rem;}
-      .sc-next-icon{width:1.8rem;height:1.8rem;}
-      .sc-next-row p{font-size:.86rem;}
-      .sc-remember{margin-top:1rem;}
-      .sc-remember summary{padding:.95rem 1rem;font-size:1rem;}
-      .sc-remember-list{padding:0 1rem 1rem 2.5rem;}
-      .sc-remember-list li{font-size:.83rem;line-height:1.55;}
-      .sc-help{margin-top:.85rem;}
-      .sc-actions{grid-template-columns:1fr 1fr;gap:.6rem;margin-top:1rem;}
-      .sc-actions .sc-btn{min-height:48px;font-size:.8rem;}
-      .sc-btn-home{grid-column:auto;display:flex;}
     }
   </style>
   <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
