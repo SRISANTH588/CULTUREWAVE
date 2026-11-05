@@ -171,7 +171,7 @@
         <a href="category-experiences.html"><span class="mobile-nav-icon">${navIcon('experiences')}</span><span>Experiences</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">Gift Cards</h2><div class="mobile-nav-card">
-        <a href="claim-gift-card.html"><span class="mobile-nav-icon">${navIcon('gift')}</span><span>Claim Gift Card</span><span class="mobile-nav-arrow">›</span></a>
+        <a href="claim-gift-card.html"><span class="mobile-nav-icon">${navIcon('rewards')}</span><span>Claim Gift Card</span><span class="mobile-nav-arrow">›</span></a>
         <a href="buy-gift-card.html"><span class="mobile-nav-icon">${navIcon('card')}</span><span>Buy Gift Card</span><span class="mobile-nav-arrow">›</span></a>
       </div></section>
       <section class="mobile-nav-group"><h2 class="mobile-nav-group-title">One Club</h2><div class="mobile-nav-card">
