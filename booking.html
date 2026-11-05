@@ -350,6 +350,23 @@
     .checkout-sheet-actions{display:flex;gap:.65rem;margin-top:1.25rem;}
     .checkout-sheet-actions button{flex:1;min-height:46px;border:1px solid #44464d;border-radius:12px;background:#24262b;color:#f4f4f5;font-weight:800;}
     .checkout-sheet-actions button:last-child{border:0;background:#1dae79;color:#fff;}
+    /* Match the guest details editor to the mobile booking sheet on laptop screens. */
+    #checkoutContactSheet{align-items:flex-end;padding:0!important;background:rgba(5,7,12,.76);backdrop-filter:blur(8px);}
+    #checkoutContactSheet .checkout-sheet{width:min(560px,100%);max-height:min(82vh,720px);overflow:auto;padding:0 1.2rem calc(env(safe-area-inset-bottom) + 1.2rem);border:1px solid #303136;border-bottom:0;border-radius:28px 28px 0 0;background:#121315;color:#f4f4f5;box-shadow:0 -12px 40px rgba(0,0,0,.5);overscroll-behavior:contain;}
+    #checkoutContactSheet .checkout-sheet-head{position:sticky;z-index:2;top:0;display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:.3rem;margin:0 -1.2rem 1.35rem;padding:.75rem 1.2rem;border-bottom:1px solid #303136;background:#121315;}
+    #checkoutContactTitle{margin:0;color:#f5f5f6;font-size:1.02rem;font-weight:650;text-align:center;}
+    #checkoutContactSheet .checkout-sheet-close{grid-column:3;grid-row:1;width:40px;height:40px;border:0;border-radius:0;background:transparent;color:#f4f4f5;font-size:1.8rem;}
+    #checkoutContactSheet .checkout-sheet-head::before{content:"‹";grid-column:1;grid-row:1;display:grid;place-items:center;width:40px;height:40px;color:#f4f4f5;font-size:1.8rem;line-height:1;}
+    #checkoutContactSheet .bk-field{gap:.45rem;margin:0 0 1.15rem;}
+    #checkoutContactSheet .bk-label{color:#aeb0b8;font-size:.78rem;letter-spacing:0;text-transform:none;}
+    #checkoutContactSheet .bk-input{height:56px;padding:0 .85rem;border:1px solid #36373b;border-radius:14px;background:#1d1e21;box-shadow:none;}
+    #checkoutContactSheet .bk-input:focus-within{border-color:#8974ff;box-shadow:0 0 0 3px rgba(137,116,255,.15);}
+    #checkoutContactSheet .bk-input input{color:#f4f4f5;font-size:1rem;}
+    #checkoutContactSheet .bk-input input::placeholder{color:#777980;}
+    #checkoutContactSheet .checkout-sheet-actions{display:grid;grid-template-columns:1fr;margin-top:1.5rem;}
+    #checkoutContactSheet .checkout-sheet-actions button:first-child{display:none;}
+    #checkoutContactSheet .checkout-sheet-actions button:last-child{min-height:52px;border:0;border-radius:13px;background:linear-gradient(135deg,#5946e8,#3f42cc);box-shadow:0 6px 14px rgba(75,67,218,.2);font-size:.92rem;}
+    @media(min-width:769px){#checkoutContactSheet{padding:1.25rem 1.25rem 0!important;}#checkoutContactSheet .checkout-sheet{width:min(560px,100%);}}
     .bk-panel#panel3 .checkout-remember{margin:0 1.2rem 1rem;padding:1rem 0;border-color:#393a3e;}
     .bk-panel#panel3 .bk-tc{margin:0 1.2rem 1rem;}
     .bk-panel#panel3 .bk-nav{position:fixed;z-index:35;left:0;right:0;bottom:0;display:flex;justify-content:flex-end;align-items:center;gap:.7rem;margin:0;padding:.65rem 1.2rem calc(env(safe-area-inset-bottom) + .65rem);border-top:1px solid #38393d;background:#18191c;}
