@@ -169,11 +169,12 @@
       body { background: #111113; color: #f7f6fa; }
       .topbar { display:none; }
       main { background:#111113; }
-      .rs-appbar { position:sticky; top:0; z-index:15; padding:1rem max(1rem,calc((100vw - 1180px)/2)); display:flex; align-items:center; gap:.85rem; color:#fff; background:linear-gradient(115deg,rgba(41,34,107,.96),rgba(20,19,42,.94)); border-bottom:1px solid rgba(255,255,255,.09); backdrop-filter:blur(18px); }
-      .rs-home-icon,.rs-profile { width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-size:1.25rem; }
-      .rs-app-title { flex:1;font-weight:800;font-size:1rem;line-height:1.25; }
-      .rs-app-title small { display:block;color:#c2bfd7;font-size:.78rem;font-weight:600;margin-top:.12rem; }
-      .rs-app-mark { width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#d5a4ff,#5829da 65%,#281364);border:1px solid #a88ce8;font-size:1.1rem; }
+      .rs-appbar { position:sticky; top:0; z-index:15; padding:.85rem max(1rem,calc((100vw - 1180px)/2)); display:flex; align-items:center; justify-content:space-between; gap:1rem; color:#fff; background:linear-gradient(115deg,rgba(41,34,107,.96),rgba(20,19,42,.94)); border-bottom:1px solid rgba(255,255,255,.09); backdrop-filter:blur(18px); }
+      .rs-brand { display:grid; gap:.08rem; }
+      .rs-brand-name { color:#fff; font-size:1.45rem; line-height:1.05; font-weight:850; letter-spacing:-.035em; }
+      .rs-brand-byline { color:#c2bfd7; font-size:.63rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+      .rs-menu-link { color:#fff; padding:.68rem 1rem; border:1px solid rgba(255,255,255,.22); border-radius:999px; font-size:.9rem; font-weight:800; }
+      .rs-menu-link:hover { background:rgba(255,255,255,.12); }
       .rs-filterbar { position:sticky;top:80px;z-index:14;display:flex;gap:.55rem;overflow-x:auto;padding:.7rem max(1rem,calc((100vw - 1180px)/2));background:rgba(24,24,28,.94);border-bottom:1px solid rgba(255,255,255,.08);scrollbar-width:none;backdrop-filter:blur(18px); }
       .rs-filterbar::-webkit-scrollbar {display:none}
       .rs-filter-control {white-space:nowrap;border:1px solid #44444c;border-radius:999px;background:#27272c;color:#f4f2f9;padding:.62rem .95rem;font-size:.82rem;font-weight:700;cursor:pointer}
@@ -322,9 +323,8 @@
       }
       /* Mobile dining page follows the compact app layout in the reference. */
       @media (max-width: 760px) {
-        .rs-appbar { min-height: 78px; padding: .85rem 1rem; }
-        .rs-home-icon,.rs-profile { width:44px;height:44px; }
-        .rs-app-mark { width:40px;height:40px; }
+        .rs-appbar { min-height: 70px; padding: .75rem 1rem; }
+        .rs-brand-name { font-size:1.25rem; }
         .rs-filterbar { top:74px; gap:.5rem; }
         .rs-filter-control { padding:.58rem .85rem; font-size:.8rem; }
         .rs-hero { min-height:0; padding:2rem 0 2.2rem; }
@@ -412,10 +412,11 @@
     </nav>
 
     <div class="rs-appbar">
-      <a class="rs-home-icon" href="index.html" aria-label="Home">⌂</a>
-      <div class="rs-app-title">Dining<small>Vijayawada <span aria-hidden="true">⌄</span></small></div>
-      <span class="rs-app-mark" aria-hidden="true">◉</span>
-      <a class="rs-profile" href="login.html" aria-label="Profile">●</a>
+      <a class="rs-brand" href="https://culturewave.in/index.html" aria-label="CultureWave home">
+        <span class="rs-brand-name">CultureWave</span>
+        <span class="rs-brand-byline">BY OGSHOOTS LUXE</span>
+      </a>
+      <a class="rs-menu-link" href="restaurants.html" aria-current="page">Restaurants</a>
     </div>
     <div class="rs-filterbar" aria-label="Dining filters">
       <button class="rs-filter-control" type="button" id="rsFilterToggle">☷ Filters <span>⌄</span></button>
@@ -589,15 +590,13 @@
       const ctaCard = document.getElementById('rsListCta');
       let activeFilter = 'all';
 
-      // The app layout places its compact filters beneath the campaign artwork.
+      // Keep the dining filters directly below the campaign hero at every viewport size.
       const rsFilterbar = document.querySelector('.rs-filterbar');
       const rsHero = document.querySelector('.rs-hero');
       function placeDiningFilters() {
-        if (window.matchMedia('(max-width: 760px)').matches) rsHero.after(rsFilterbar);
-        else document.querySelector('main').before(rsFilterbar);
+        rsHero.after(rsFilterbar);
       }
       placeDiningFilters();
-      window.addEventListener('resize', placeDiningFilters, { passive: true });
 
       function selectMood(filter) {
         activeFilter = filter;
