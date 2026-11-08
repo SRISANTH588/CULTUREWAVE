@@ -1170,6 +1170,17 @@
       <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Restaurants Page Manager</div>
       <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Manage the listings displayed on restaurants.html, including visibility and listing details.</div>
     </div>
+    <div class="card" style="padding:1.1rem 1.25rem;margin:0;">
+      <h3 style="margin:0 0 .35rem;color:var(--ink);">Dining page hero and offer</h3>
+      <p style="margin:0 0 .9rem;color:var(--muted);font-size:.8rem;">Update the banner on restaurants.html, including the Diwali note shown below the listings.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;align-items:end;">
+        <div class="field"><label for="restaurantHeroTitle">Hero title</label><input id="restaurantHeroTitle" maxlength="100" placeholder="DINING CARNIVAL"></div>
+        <div class="field"><label for="restaurantHeroOffer">Offer text</label><input id="restaurantHeroOffer" maxlength="250" placeholder="Extra ₹175 OFF on your first dining transaction"></div>
+        <div class="field"><label for="restaurantDiwaliTitle">Diwali note heading</label><input id="restaurantDiwaliTitle" maxlength="100" placeholder="In light of Diwali celebrations"></div>
+        <div class="field"><label for="restaurantDiwaliMessage">Diwali note message</label><input id="restaurantDiwaliMessage" maxlength="300" placeholder="Operational timings may vary at restaurants…"></div>
+        <button class="btn primary" id="restaurantHeroSave" type="button" onclick="saveRestaurantPageContent()">Save page content</button>
+      </div>
+    </div>
     <div class="filter-bar" style="background:#fff;border:1px solid #dfe7f7;border-radius:15px;padding:.85rem 1rem;box-shadow:0 9px 26px rgba(36,84,214,.06);margin-bottom:0;">
       <input id="restaurantAdminSearch" type="search" placeholder="Search name, area, or category…" oninput="filterRestaurantAdmin()" style="width:min(320px,100%);">
       <select id="restaurantAdminStatus" onchange="filterRestaurantAdmin()"><option value="">All statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="hidden">Hidden</option></select>
@@ -1632,6 +1643,8 @@ let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], a
 let oneClubAdminData=null,oneClubAdminLoading=false;
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allMarketingLeads=[];
 let allCheckoutAttempts=[];
+const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'Extra ₹175 OFF on your first dining transaction',diwaliTitle:'In light of Diwali celebrations',diwaliMessage:'Operational timings may vary at restaurants. Please contact the restaurant before visiting.'};
+let restaurantPageContent={...RESTAURANT_PAGE_CONTENT_DEFAULTS};
 let checkoutAttemptsLoaded=false;
 let allVendorApplications=[],activeVendorApplicationId=null;
 let allStallApplications=[],activeStallAdminEventId='';
@@ -2413,6 +2426,23 @@ function restaurantIsPublic(item) {
   const status = String(item.status || '').trim().toLowerCase();
   return item.publicListing !== false && ['published','live','active'].includes(status);
 }
+function fillRestaurantPageContentForm(content=restaurantPageContent) {
+  document.getElementById('restaurantHeroTitle').value=content.heroTitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.heroTitle;
+  document.getElementById('restaurantHeroOffer').value=content.heroOffer||RESTAURANT_PAGE_CONTENT_DEFAULTS.heroOffer;
+  document.getElementById('restaurantDiwaliTitle').value=content.diwaliTitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.diwaliTitle;
+  document.getElementById('restaurantDiwaliMessage').value=content.diwaliMessage||RESTAURANT_PAGE_CONTENT_DEFAULTS.diwaliMessage;
+}
+async function saveRestaurantPageContent() {
+  const button=document.getElementById('restaurantHeroSave');
+  const content={heroTitle:document.getElementById('restaurantHeroTitle').value.trim(),heroOffer:document.getElementById('restaurantHeroOffer').value.trim(),diwaliTitle:document.getElementById('restaurantDiwaliTitle').value.trim(),diwaliMessage:document.getElementById('restaurantDiwaliMessage').value.trim(),updatedAt:serverTimestamp()};
+  if(!content.heroTitle||!content.heroOffer||!content.diwaliTitle||!content.diwaliMessage){showToast('Please fill in all dining page content fields.','error');return;}
+  button.disabled=true;
+  try{await setDoc(doc(db,'siteContent','restaurantPage'),content,{merge:true});showToast('Dining page content saved.','success');}
+  catch(error){console.error('Could not save dining page content:',error);showToast(error.message||'Could not save dining page content.','error');}
+  finally{button.disabled=false;}
+}
+window.saveRestaurantPageContent=saveRestaurantPageContent;
+getDoc(doc(db,'siteContent','restaurantPage')).then(snap=>{if(snap.exists())restaurantPageContent={...RESTAURANT_PAGE_CONTENT_DEFAULTS,...snap.data()};fillRestaurantPageContentForm();}).catch(error=>{console.warn('Could not load dining page content:',error);fillRestaurantPageContentForm();});
 function renderRestaurantAdminTable(items = allRestaurants) {
   const tbody = document.getElementById('restaurantsTable');
   const count = document.getElementById('restaurantAdminCount');

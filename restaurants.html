@@ -155,6 +155,24 @@
       }
       .rs-list-cta a:hover { background: #b91c1c; }
 
+      /* Match the profile card shown in the index page's mobile menu. */
+      .mobile-profile-card {
+        display: grid; gap: 14px; margin: 0 0 1.25rem; padding: 16px;
+        border: 1px solid #39343f; border-radius: 20px;
+        background: linear-gradient(120deg,#291e3b,#1b1b20 78%); color: #fff;
+      }
+      .mobile-profile-main { display: grid; grid-template-columns: 100px minmax(0,1fr); align-items: center; gap: 14px; }
+      .mobile-profile-avatar {
+        display: grid; place-items: center; width: 100px; height: 100px;
+        box-sizing: border-box; border: 5px solid #b99cff; border-radius: 50%;
+        background: #333; box-shadow: inset 0 0 0 3px #25252a;
+      }
+      .mobile-profile-avatar svg { display: block; width: 72px; height: 72px; fill: none; stroke: #777; stroke-width: 2; }
+      .mobile-profile-info { display: grid; gap: 4px; min-width: 0; }
+      .mobile-profile-name { overflow: hidden; color: #fff; font-size: 1rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+      .mobile-profile-contact { color: #aaa; font-size: .8rem; }
+      .mobile-profile-progress { color: #c7afff; font-size: .8rem; }
+
       .rs-empty { grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: #9ca3af; }
       .rs-empty span { font-size: 3rem; display: block; margin-bottom: 0.8rem; }
 
@@ -210,7 +228,7 @@
       main { background:#111113; }
       .rs-appbar { display:none; }
       .rs-brand { display:grid; gap:.08rem; }
-      .rs-brand-name { color:#fff; font-size:1.45rem; line-height:1.05; font-weight:850; letter-spacing:-.035em; }
+      .rs-brand-name { color:#fff; font-size:1.6rem; line-height:1.05; font-weight:850; letter-spacing:-.035em; }
       .rs-brand-byline { color:#c2bfd7; font-size:.63rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
       .rs-menu-link { color:#fff; padding:.68rem 1rem; border:1px solid rgba(255,255,255,.22); border-radius:999px; font-size:.9rem; font-weight:800; }
       .rs-menu-link:hover { background:rgba(255,255,255,.12); }
@@ -224,8 +242,8 @@
       .rs-filter-control option {color:#111}
       .rs-hero {
         position: relative; isolation: isolate; overflow: hidden;
-        min-height: 360px; display: flex; align-items: center;
-        padding: 3rem 0; border: 0;
+        min-height: 300px; display: flex; align-items: center;
+        padding: 2rem 0; border: 0;
         background: radial-gradient(ellipse at 50% 115%,#5331a9 0,transparent 50%),linear-gradient(135deg,#091330,#191144 55%,#071329);
       }
       .rs-hero::before {
@@ -243,7 +261,7 @@
         max-width: 720px; margin-bottom: .75rem; color: #f7d47d;
         font-family: Georgia, 'Times New Roman', serif; font-weight: 800;
         text-align:center;margin-left:auto;margin-right:auto;text-shadow:0 4px 24px rgba(255,188,70,.25);
-        font-size: clamp(3rem, 7vw, 5.5rem); line-height: .92; letter-spacing: -.045em;
+        font-size: clamp(2.6rem, 5.5vw, 4.5rem); line-height: .92; letter-spacing: -.045em;
       }
       .rs-hero h1 span { color: #f5cc76; }
       .rs-hero p { max-width: 600px; color: rgba(255,255,255,.84); font-size: 1.02rem;text-align:center;margin-left:auto;margin-right:auto; }
@@ -305,7 +323,7 @@
         box-shadow: 0 8px 28px rgba(0,0,0,.18); transition: transform .25s, box-shadow .25s;
       }
       .rs-card:hover { transform: translateY(-3px); box-shadow: 0 18px 42px rgba(0,0,0,.3); }
-      .rs-banner { height: 215px; }
+      .rs-banner { height: 235px; }
       .rs-banner::after { background: linear-gradient(0deg, rgba(0,0,0,.5), transparent 72%); }
       .rs-tag, .rs-rating { border-radius: 999px; }
       .rs-tag { color: #fff; background: rgba(15,15,20,.62); border-color: rgba(255,255,255,.3); letter-spacing: .06em; }
@@ -332,9 +350,9 @@
         body {padding-bottom:76px}
         .rs-appbar {top:0;padding:.85rem 1rem}
         .rs-filterbar {top:72px;padding:.65rem 1rem}
-        .rs-hero { min-height: 300px; padding: 2.3rem 0 2.6rem; }
+        .rs-hero { min-height: 260px; padding: 1.8rem 0 2rem; }
         .rs-hero-inner {padding:0 1rem}
-        .rs-hero h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
+        .rs-hero h1 { font-size: clamp(2.35rem, 11vw, 3.5rem); }
         .rs-hero p{font-size:.88rem}
         .rs-search-row { flex-direction: row; }
         .rs-search-btn { padding-inline: 1rem; }
@@ -365,13 +383,13 @@
       /* Mobile dining page follows the compact app layout in the reference. */
       @media (max-width: 760px) {
         .rs-appbar { min-height: 70px; padding: .75rem 1rem; }
-        .rs-brand-name { font-size:1.25rem; }
+        .rs-brand-name { font-size:1.4rem; }
         .rs-filterbar { top:74px; gap:.5rem; }
         .rs-filter-control { padding:.58rem .85rem; font-size:.8rem; }
-        .rs-hero { min-height:0; padding:2rem 0 2.2rem; }
+        .rs-hero { min-height:0; padding:1.5rem 0 1.7rem; }
         .rs-hero-inner { position:relative; }
         .rs-location { margin-bottom:.8rem; font-size:.64rem; }
-        .rs-hero h1 { font-size:clamp(2.65rem,12vw,3.7rem); margin-bottom:.65rem; }
+        .rs-hero h1 { font-size:clamp(2.3rem,10.5vw,3.2rem); margin-bottom:.55rem; }
         .rs-hero p { margin-bottom:1.15rem; }
         .rs-search-row { margin-bottom:1rem; }
         .rs-search-row input { min-height:48px; border-radius:13px; padding:.7rem .9rem; }
@@ -394,12 +412,12 @@
         .rs-stats-inner { padding:.65rem 1rem; }
         .rs-section { padding:0 1rem 2rem; }
         .rs-grid { gap:.85rem; }
-        .rs-section .rs-card { display:grid; grid-template-columns:35% minmax(0,1fr); min-height:155px; border-radius:18px; }
-        .rs-section .rs-banner { height:100%; min-height:155px; }
+        .rs-section .rs-card { display:grid; grid-template-columns:38% minmax(0,1fr); min-height:170px; border-radius:18px; }
+        .rs-section .rs-banner { height:100%; min-height:170px; }
         .rs-section .rs-tag { top:.5rem;left:.5rem;padding:.2rem .45rem;font-size:.55rem;max-width:calc(100% - 1rem);overflow:hidden;text-overflow:ellipsis; }
         .rs-section .rs-rating { top:auto;right:.45rem;bottom:.45rem;font-size:.68rem; }
         .rs-section .rs-body { min-width:0; gap:.35rem; padding:.75rem .7rem; }
-        .rs-section .rs-body h3 { font-size:.94rem; }
+        .rs-section .rs-body h3 { font-size:1rem; }
         .rs-section .rs-venue,.rs-section .rs-desc { font-size:.72rem; }
         .rs-section .rs-desc { display:none; }
         .rs-section .rs-meta { gap:.25rem; }
@@ -414,6 +432,10 @@
         .rs-location { margin-bottom:1.25rem; }
         .rs-offer { min-height:190px; }
       }
+      /* Keep the desktop profile/menu circle closer to the restaurant brand. */
+      @media (min-width: 961px) {
+        .topbar .nav-wrap > .hamburger { margin-left:auto; margin-right:clamp(64px, 8vw, 128px); }
+      }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
@@ -425,10 +447,6 @@
           <div class="brand-sub">by OGSHOOTS LUXE</div>
         </div>
         <nav class="topnav">
-          <a href="index.html">Home</a>
-          <a href="events.html">Events</a>
-          <a href="restaurants.html">Restaurants</a>
-          <a href="how-it-works.html">How it works</a>
         </nav>
         <div class="auth-actions">
           <a class="nav-link" href="login.html">Login</a>
@@ -441,10 +459,9 @@
     </header>
 
     <nav class="mobile-nav" id="mobileNav">
-      <a href="index.html">Home</a>
-      <a href="events.html">Events</a>
-      <a href="restaurants.html">Restaurants</a>
-      <a href="how-it-works.html">How it works</a>
+      <div class="mobile-profile-card" aria-label="Your profile">
+        <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">0 / 4 steps done</span></span></span>
+      </div>
       <a href="customer-service.html">Customer Service</a>
       <div class="mobile-nav-ctas">
         <a class="nav-link" href="login.html">Login</a>
@@ -475,8 +492,8 @@
       <section class="rs-hero">
         <div class="rs-hero-inner">
           <div class="rs-location">CultureWave presents</div>
-          <h1>DINING<br><span>CARNIVAL</span></h1>
-          <p><strong>Extra ₹175 OFF</strong> on your first dining transaction</p>
+          <h1 id="rsHeroTitle">DINING<br><span>CARNIVAL</span></h1>
+          <p id="rsHeroOffer"><strong>Extra ₹175 OFF</strong> on your first dining transaction</p>
           <div class="rs-search-row">
             <input id="rsSearch" type="search" placeholder="Search restaurants, cuisine, area…" />
             <button class="rs-search-btn" type="button">Search</button>
@@ -508,7 +525,7 @@
           <button class="rs-mood" data-filter="pure-veg">Pure veg<span>🥗</span></button>
         </div>
         <h2>Disclaimer</h2>
-        <div class="rs-disclaimer"><strong>In light of Diwali celebrations</strong><p>Operational timings may vary at restaurants. Please contact the restaurant before visiting.</p></div>
+        <div class="rs-disclaimer"><strong id="rsDiwaliTitle">In light of Diwali celebrations</strong><p id="rsDiwaliMessage">Operational timings may vary at restaurants. Please contact the restaurant before visiting.</p></div>
         <div class="rs-all-title"><h2>In the limelight</h2><p>Popular around you</p></div>
         <div class="rs-featured" id="rsFeatured"></div>
         <div class="rs-all-title"><h2>All restaurants</h2><p>Reserve your table</p></div>
@@ -622,6 +639,24 @@
         appId: "1:5471814825:web:07e84f2f88486da817d5b8"
       });
       const _rsdb = firebase.firestore();
+      _rsdb.collection('siteContent').doc('restaurantPage').get().then(snapshot => {
+        if (!snapshot.exists) return;
+        const content = snapshot.data() || {};
+        if (content.heroTitle) {
+          const title = document.getElementById('rsHeroTitle');
+          title.textContent = content.heroTitle;
+          title.innerHTML = content.heroTitle.split(/\s+/).map((word,index)=>index===0?word:`<span>${word}</span>`).join('<br>');
+        }
+        if (content.heroOffer) {
+          const offer = document.getElementById('rsHeroOffer');
+          const parts = content.heroOffer.match(/^(Extra\s+₹[\d,]+\s+OFF)(.*)$/i);
+          offer.replaceChildren();
+          if (parts) { const strong=document.createElement('strong'); strong.textContent=parts[1]; offer.append(strong,document.createTextNode(parts[2])); }
+          else offer.textContent=content.heroOffer;
+        }
+        if (content.diwaliTitle) document.getElementById('rsDiwaliTitle').textContent=content.diwaliTitle;
+        if (content.diwaliMessage) document.getElementById('rsDiwaliMessage').textContent=content.diwaliMessage;
+      }).catch(error => console.warn('Dining page content:',error.message));
       const rsBanners = ['rs-banner-a','rs-banner-b','rs-banner-c','rs-banner-d','rs-banner-e','rs-banner-f'];
       let cards = [];
 
