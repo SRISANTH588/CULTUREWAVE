@@ -214,11 +214,12 @@
       .topbar .brand-block .brand-sub { color:#888!important; }
       .topbar .nav-wrap>.hamburger:focus-visible { outline:2px solid #b99cff;outline-offset:3px; }
       @media(max-width:960px){
-        .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
-        .topbar .brand-block{display:none;}
-        .topbar .mobile-brand{display:flex;align-items:center;color:#fff!important;font-size:1rem;font-weight:900;letter-spacing:.06em;white-space:nowrap;}
+        .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;justify-content:space-between;}
+        .topbar .brand-block{display:grid;position:static;left:auto;}
+        .topbar .brand-block .logo{font-size:1rem;line-height:1.15;font-weight:900;letter-spacing:.06em;white-space:nowrap;}
+        .topbar .brand-block .brand-sub{font-size:.58rem;letter-spacing:.08em;}
         .topbar .topnav,.topbar .auth-actions,.topbar .mobile-header-actions,.topbar .desktop-header-search{display:none!important;}
-        .topbar .nav-wrap>.hamburger{display:flex!important;visibility:visible;opacity:1;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;margin-left:.2rem;border:1px solid #333;border-radius:13px;background:#111;}
+        .topbar .nav-wrap>.hamburger{display:flex!important;visibility:visible;opacity:1;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;margin-left:auto;border:1px solid #333;border-radius:13px;background:#111;}
         .topbar .nav-wrap>.hamburger span{display:block;background:#fff!important;}
         .topbar .nav-wrap>.hamburger::after{display:none;content:none;}
         .topbar .nav-wrap>.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
@@ -435,6 +436,15 @@
       /* Keep the desktop profile/menu circle closer to the restaurant brand. */
       @media (min-width: 961px) {
         .topbar .nav-wrap > .hamburger { margin-left:auto; margin-right:clamp(64px, 8vw, 128px); }
+      }
+      @media (max-width: 760px) {
+        .rs-hero { width: 100%; margin-inline: 0; }
+        .rs-hero-inner { max-width: none; padding-inline: 0; }
+        .rs-search-row, .rs-chips { width: 100%; }
+        .rs-search-row { padding-inline: 1rem; }
+        .rs-chips { overflow-x: auto; flex-wrap: nowrap; padding: 0 1rem .3rem; scrollbar-width: none; }
+        .rs-chips::-webkit-scrollbar { display: none; }
+        .rs-chip { flex: 0 0 auto; }
       }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
