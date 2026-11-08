@@ -1171,11 +1171,16 @@
       <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Manage the listings displayed on restaurants.html, including visibility and listing details.</div>
     </div>
     <div class="card" style="padding:1.1rem 1.25rem;margin:0;">
-      <h3 style="margin:0 0 .35rem;color:var(--ink);">Dining page hero and offer</h3>
-      <p style="margin:0 0 .9rem;color:var(--muted);font-size:.8rem;">Update the banner on restaurants.html, including the Diwali note shown below the listings.</p>
+      <h3 style="margin:0 0 .35rem;color:var(--ink);">Dining page promotions</h3>
+      <p style="margin:0 0 .9rem;color:var(--muted);font-size:.8rem;">Update the hero offer, promotional cards, and Diwali note displayed on restaurants.html.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;align-items:end;">
         <div class="field"><label for="restaurantHeroTitle">Hero title</label><input id="restaurantHeroTitle" maxlength="100" placeholder="DINING CARNIVAL"></div>
         <div class="field"><label for="restaurantHeroOffer">Offer text</label><input id="restaurantHeroOffer" maxlength="250" placeholder="Extra ₹175 OFF on your first dining transaction"></div>
+        <div class="field"><label for="restaurantPromoHeading">Promotional section heading</label><input id="restaurantPromoHeading" maxlength="100" placeholder="Diwali offers for you"></div>
+        <div class="field"><label for="restaurantPromo1Title">Promotion 1 title</label><input id="restaurantPromo1Title" maxlength="80" placeholder="Vault Brewery"></div>
+        <div class="field"><label for="restaurantPromo1Description">Promotion 1 details</label><input id="restaurantPromo1Description" maxlength="180" placeholder="★ 4.8 · ₹1500 for two · Flat 25% OFF"></div>
+        <div class="field"><label for="restaurantPromo2Title">Promotion 2 title</label><input id="restaurantPromo2Title" maxlength="80" placeholder="Explore local dining"></div>
+        <div class="field"><label for="restaurantPromo2Description">Promotion 2 details</label><input id="restaurantPromo2Description" maxlength="180" placeholder="Special offers on your next table"></div>
         <div class="field"><label for="restaurantDiwaliTitle">Diwali note heading</label><input id="restaurantDiwaliTitle" maxlength="100" placeholder="In light of Diwali celebrations"></div>
         <div class="field"><label for="restaurantDiwaliMessage">Diwali note message</label><input id="restaurantDiwaliMessage" maxlength="300" placeholder="Operational timings may vary at restaurants…"></div>
         <button class="btn primary" id="restaurantHeroSave" type="button" onclick="saveRestaurantPageContent()">Save page content</button>
@@ -1643,7 +1648,7 @@ let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], a
 let oneClubAdminData=null,oneClubAdminLoading=false;
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allMarketingLeads=[];
 let allCheckoutAttempts=[];
-const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'Extra ₹175 OFF on your first dining transaction',diwaliTitle:'In light of Diwali celebrations',diwaliMessage:'Operational timings may vary at restaurants. Please contact the restaurant before visiting.'};
+const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'Extra ₹175 OFF on your first dining transaction',promoHeading:'Diwali offers for you',promo1Title:'Vault Brewery',promo1Description:'★ 4.8 · ₹1500 for two\nFlat 25% OFF',promo2Title:'Explore local dining',promo2Description:'Special offers on your next table',diwaliTitle:'In light of Diwali celebrations',diwaliMessage:'Operational timings may vary at restaurants. Please contact the restaurant before visiting.'};
 let restaurantPageContent={...RESTAURANT_PAGE_CONTENT_DEFAULTS};
 let checkoutAttemptsLoaded=false;
 let allVendorApplications=[],activeVendorApplicationId=null;
@@ -2429,12 +2434,17 @@ function restaurantIsPublic(item) {
 function fillRestaurantPageContentForm(content=restaurantPageContent) {
   document.getElementById('restaurantHeroTitle').value=content.heroTitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.heroTitle;
   document.getElementById('restaurantHeroOffer').value=content.heroOffer||RESTAURANT_PAGE_CONTENT_DEFAULTS.heroOffer;
+  document.getElementById('restaurantPromoHeading').value=content.promoHeading||RESTAURANT_PAGE_CONTENT_DEFAULTS.promoHeading;
+  document.getElementById('restaurantPromo1Title').value=content.promo1Title||RESTAURANT_PAGE_CONTENT_DEFAULTS.promo1Title;
+  document.getElementById('restaurantPromo1Description').value=content.promo1Description||RESTAURANT_PAGE_CONTENT_DEFAULTS.promo1Description;
+  document.getElementById('restaurantPromo2Title').value=content.promo2Title||RESTAURANT_PAGE_CONTENT_DEFAULTS.promo2Title;
+  document.getElementById('restaurantPromo2Description').value=content.promo2Description||RESTAURANT_PAGE_CONTENT_DEFAULTS.promo2Description;
   document.getElementById('restaurantDiwaliTitle').value=content.diwaliTitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.diwaliTitle;
   document.getElementById('restaurantDiwaliMessage').value=content.diwaliMessage||RESTAURANT_PAGE_CONTENT_DEFAULTS.diwaliMessage;
 }
 async function saveRestaurantPageContent() {
   const button=document.getElementById('restaurantHeroSave');
-  const content={heroTitle:document.getElementById('restaurantHeroTitle').value.trim(),heroOffer:document.getElementById('restaurantHeroOffer').value.trim(),diwaliTitle:document.getElementById('restaurantDiwaliTitle').value.trim(),diwaliMessage:document.getElementById('restaurantDiwaliMessage').value.trim(),updatedAt:serverTimestamp()};
+  const content={heroTitle:document.getElementById('restaurantHeroTitle').value.trim(),heroOffer:document.getElementById('restaurantHeroOffer').value.trim(),promoHeading:document.getElementById('restaurantPromoHeading').value.trim(),promo1Title:document.getElementById('restaurantPromo1Title').value.trim(),promo1Description:document.getElementById('restaurantPromo1Description').value.trim(),promo2Title:document.getElementById('restaurantPromo2Title').value.trim(),promo2Description:document.getElementById('restaurantPromo2Description').value.trim(),diwaliTitle:document.getElementById('restaurantDiwaliTitle').value.trim(),diwaliMessage:document.getElementById('restaurantDiwaliMessage').value.trim(),updatedAt:serverTimestamp()};
   if(!content.heroTitle||!content.heroOffer||!content.diwaliTitle||!content.diwaliMessage){showToast('Please fill in all dining page content fields.','error');return;}
   button.disabled=true;
   try{await setDoc(doc(db,'siteContent','restaurantPage'),content,{merge:true});showToast('Dining page content saved.','success');}

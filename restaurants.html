@@ -510,10 +510,10 @@
       </section>
 
       <div class="rs-content">
-        <h2>Diwali offers for you</h2>
+        <h2 id="rsPromoHeading">Diwali offers for you</h2>
         <div class="rs-offers">
-          <article class="rs-offer"><strong>Vault Brewery</strong><span>★ 4.8 · ₹1500 for two<br>Flat 25% OFF</span></article>
-          <article class="rs-offer"><strong>Explore local dining</strong><span>Special offers on your next table</span></article>
+          <article class="rs-offer"><strong id="rsPromo1Title">Vault Brewery</strong><span id="rsPromo1Description">★ 4.8 · ₹1500 for two<br>Flat 25% OFF</span></article>
+          <article class="rs-offer"><strong id="rsPromo2Title">Explore local dining</strong><span id="rsPromo2Description">Special offers on your next table</span></article>
         </div>
         <h2>What’s the mood?</h2>
         <div class="rs-moods">
@@ -654,6 +654,11 @@
           if (parts) { const strong=document.createElement('strong'); strong.textContent=parts[1]; offer.append(strong,document.createTextNode(parts[2])); }
           else offer.textContent=content.heroOffer;
         }
+        if (content.promoHeading) document.getElementById('rsPromoHeading').textContent=content.promoHeading;
+        if (content.promo1Title) document.getElementById('rsPromo1Title').textContent=content.promo1Title;
+        if (content.promo1Description) document.getElementById('rsPromo1Description').textContent=content.promo1Description;
+        if (content.promo2Title) document.getElementById('rsPromo2Title').textContent=content.promo2Title;
+        if (content.promo2Description) document.getElementById('rsPromo2Description').textContent=content.promo2Description;
         if (content.diwaliTitle) document.getElementById('rsDiwaliTitle').textContent=content.diwaliTitle;
         if (content.diwaliMessage) document.getElementById('rsDiwaliMessage').textContent=content.diwaliMessage;
       }).catch(error => console.warn('Dining page content:',error.message));
