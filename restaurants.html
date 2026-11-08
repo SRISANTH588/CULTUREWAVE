@@ -508,7 +508,7 @@
     <main>
       <section class="rs-hero">
         <div class="rs-hero-inner">
-          <h1 id="rsHeroTitle">DINING<br><span>CARNIVAL</span></h1>
+          <h1 id="rsHeroTitle">DINING<br><span>FOR EVERY MOOD</span></h1>
           <p id="rsHeroOffer"><strong>Extra ₹175 OFF</strong> on your first dining transaction</p>
           <div class="rs-search-row">
             <input id="rsSearch" type="search" placeholder="Search restaurants, cuisine, area…" />
@@ -533,12 +533,12 @@
         </div>
         <h2>What’s the mood?</h2>
         <div class="rs-moods">
-          <button class="rs-mood" data-filter="rooftop">Drink &amp; dine<span>🍹</span></button>
-          <button class="rs-mood" data-filter="cafe">Cozy cafes<span>☕</span></button>
-          <button class="rs-mood" data-filter="family">Family dining<span>🍛</span></button>
-          <button class="rs-mood" data-filter="pocket-friendly">Pocket friendly<span>🪙</span></button>
-          <button class="rs-mood" data-filter="outdoor">Outdoor dining<span>⛱️</span></button>
-          <button class="rs-mood" data-filter="pure-veg">Pure veg<span>🥗</span></button>
+          <a class="rs-mood" href="restaurant-drink-and-dine.html">Drink &amp; dine<span>🍹</span></a>
+          <a class="rs-mood" href="restaurant-cozy-cafes.html">Cozy cafes<span>☕</span></a>
+          <a class="rs-mood" href="restaurant-family-dining.html">Family dining<span>🍛</span></a>
+          <a class="rs-mood" href="restaurant-pocket-friendly.html">Pocket friendly<span>🪙</span></a>
+          <a class="rs-mood" href="restaurant-outdoor-dining.html">Outdoor dining<span>⛱️</span></a>
+          <a class="rs-mood" href="restaurant-pure-veg.html">Pure veg<span>🥗</span></a>
         </div>
         <h2>Disclaimer</h2>
         <div class="rs-disclaimer"><strong id="rsDiwaliTitle">In light of Diwali celebrations</strong><p id="rsDiwaliMessage">Operational timings may vary at restaurants. Please contact the restaurant before visiting.</p></div>
@@ -687,7 +687,7 @@
       const rsSort = document.getElementById('rsSort');
       const grid = document.getElementById('rsGrid');
       const ctaCard = document.getElementById('rsListCta');
-      let activeFilter = 'all';
+      let activeFilter = new URLSearchParams(location.search).get('filter') || 'all';
 
       // Keep the dining filters directly below the campaign hero at every viewport size.
       const rsFilterbar = document.querySelector('.rs-filterbar');
@@ -703,7 +703,9 @@
         filterAndRender();
         document.querySelector('.rs-section').scrollIntoView({behavior:'smooth',block:'start'});
       }
-      document.querySelectorAll('.rs-mood').forEach(button => button.addEventListener('click', () => selectMood(button.dataset.filter)));
+      if (activeFilter !== 'all') {
+        chips.forEach(c => c.classList.toggle('active', c.dataset.filter === activeFilter));
+      }
       document.getElementById('rsFilterToggle').addEventListener('click', () => {
         document.querySelector('.rs-chips').scrollIntoView({behavior:'smooth',block:'center'});
       });
