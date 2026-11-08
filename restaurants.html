@@ -438,8 +438,15 @@
         .topbar .nav-wrap > .hamburger { margin-left:auto; margin-right:clamp(64px, 8vw, 128px); }
       }
       @media (max-width: 760px) {
+        html, body { width:100%; max-width:100%; overflow-x:hidden; }
+        body > main, body > header, body > .rs-filterbar, body > .rs-stats, body > .rs-section { width:100%; max-width:none; margin-left:0; margin-right:0; }
+        .topbar .nav-wrap { width:100%; max-width:none; padding-left:1rem; padding-right:1rem; }
+        .topbar .brand-block .brand-sub { display:block!important; color:#aaa!important; font-size:.54rem; line-height:1.15; letter-spacing:.09em; }
         .rs-hero { width: 100%; margin-inline: 0; }
         .rs-hero-inner { max-width: none; padding-inline: 0; }
+        .rs-content { width:100%; max-width:none; margin-inline:0; }
+        .rs-stats-inner { width:100%; max-width:none; margin-inline:0; }
+        .rs-section { box-sizing:border-box; }
         .rs-search-row, .rs-chips { width: 100%; }
         .rs-search-row { padding-inline: 1rem; }
         .rs-chips { overflow-x: auto; flex-wrap: nowrap; padding: 0 1rem .3rem; scrollbar-width: none; }
