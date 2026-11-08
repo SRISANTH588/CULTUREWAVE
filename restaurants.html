@@ -320,6 +320,59 @@
         .rs-bottomnav a:first-child{background:rgba(255,255,255,.12);color:#fff}
         .rs-bottomnav b{font-size:1.12rem;font-weight:600}
       }
+      /* Mobile dining page follows the compact app layout in the reference. */
+      @media (max-width: 760px) {
+        .rs-appbar { min-height: 78px; padding: .85rem 1rem; }
+        .rs-home-icon,.rs-profile { width:44px;height:44px; }
+        .rs-app-mark { width:40px;height:40px; }
+        .rs-filterbar { top:74px; gap:.5rem; }
+        .rs-filter-control { padding:.58rem .85rem; font-size:.8rem; }
+        .rs-hero { min-height:0; padding:2rem 0 2.2rem; }
+        .rs-hero-inner { position:relative; }
+        .rs-location { margin-bottom:.8rem; font-size:.64rem; }
+        .rs-hero h1 { font-size:clamp(2.65rem,12vw,3.7rem); margin-bottom:.65rem; }
+        .rs-hero p { margin-bottom:1.15rem; }
+        .rs-search-row { margin-bottom:1rem; }
+        .rs-search-row input { min-height:48px; border-radius:13px; padding:.7rem .9rem; }
+        .rs-search-btn { border-radius:13px; }
+        .rs-content { padding:1.4rem 1rem 1.5rem; }
+        .rs-content h2 { margin-bottom:.9rem; }
+        .rs-offers { gap:.65rem; margin-bottom:2rem; }
+        .rs-offer { min-height:150px; background-position:center; }
+        .rs-moods { margin-bottom:2rem; }
+        .rs-mood { min-height:132px; border-radius:18px; }
+        .rs-mood:nth-child(1) span { font-size:2.35rem; }
+        .rs-mood:nth-child(2) span { font-size:2.3rem; }
+        .rs-disclaimer { position:relative; overflow:hidden; padding:1rem 1.1rem; }
+        .rs-disclaimer::after { content:'!'; position:absolute; right:1rem; bottom:-1rem; font-size:5rem; font-weight:900; color:rgba(255,255,255,.14); }
+        .rs-all-title { align-items:flex-end; margin-bottom:.9rem; }
+        .rs-all-title h2 { margin:0; }
+        .rs-featured { margin-bottom:2rem; }
+        .rs-featured .rs-card { min-width:78vw; max-width:78vw; flex-basis:78vw; }
+        .rs-featured .rs-banner { height:185px; }
+        .rs-stats-inner { padding:.65rem 1rem; }
+        .rs-section { padding:0 1rem 2rem; }
+        .rs-grid { gap:.85rem; }
+        .rs-section .rs-card { display:grid; grid-template-columns:35% minmax(0,1fr); min-height:155px; border-radius:18px; }
+        .rs-section .rs-banner { height:100%; min-height:155px; }
+        .rs-section .rs-tag { top:.5rem;left:.5rem;padding:.2rem .45rem;font-size:.55rem;max-width:calc(100% - 1rem);overflow:hidden;text-overflow:ellipsis; }
+        .rs-section .rs-rating { top:auto;right:.45rem;bottom:.45rem;font-size:.68rem; }
+        .rs-section .rs-body { min-width:0; gap:.35rem; padding:.75rem .7rem; }
+        .rs-section .rs-body h3 { font-size:.94rem; }
+        .rs-section .rs-venue,.rs-section .rs-desc { font-size:.72rem; }
+        .rs-section .rs-desc { display:none; }
+        .rs-section .rs-meta { gap:.25rem; }
+        .rs-section .rs-pill { padding:.15rem .4rem;font-size:.62rem; }
+        .rs-section .rs-footer { border:0;padding-top:.15rem;align-items:center;flex-direction:column;gap:.4rem; }
+        .rs-section .rs-footer>div:last-child { justify-content:flex-start!important; }
+        .rs-section .rs-book { padding:.42rem .65rem;font-size:.68rem;border-radius:9px; }
+        .rs-list-cta { grid-column:1/-1; }
+      }
+      @media (min-width: 761px) {
+        .rs-hero-inner { padding-top:.2rem; }
+        .rs-location { margin-bottom:1.25rem; }
+        .rs-offer { min-height:190px; }
+      }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
@@ -410,8 +463,8 @@
           <button class="rs-mood" data-filter="outdoor">Outdoor dining<span>⛱️</span></button>
           <button class="rs-mood" data-filter="pure-veg">Pure veg<span>🥗</span></button>
         </div>
-        <h2>Dining note</h2>
-        <div class="rs-disclaimer"><strong>Plan your visit</strong><p>Restaurant timings may vary. Please check availability with the restaurant before visiting.</p></div>
+        <h2>Disclaimer</h2>
+        <div class="rs-disclaimer"><strong>In light of Diwali celebrations</strong><p>Operational timings may vary at restaurants. Please contact the restaurant before visiting.</p></div>
         <div class="rs-all-title"><h2>In the limelight</h2><p>Popular around you</p></div>
         <div class="rs-featured" id="rsFeatured"></div>
         <div class="rs-all-title"><h2>All restaurants</h2><p>Reserve your table</p></div>
@@ -536,6 +589,16 @@
       const grid = document.getElementById('rsGrid');
       const ctaCard = document.getElementById('rsListCta');
       let activeFilter = 'all';
+
+      // The app layout places its compact filters beneath the campaign artwork.
+      const rsFilterbar = document.querySelector('.rs-filterbar');
+      const rsHero = document.querySelector('.rs-hero');
+      function placeDiningFilters() {
+        if (window.matchMedia('(max-width: 760px)').matches) rsHero.after(rsFilterbar);
+        else document.querySelector('main').before(rsFilterbar);
+      }
+      placeDiningFilters();
+      window.addEventListener('resize', placeDiningFilters, { passive: true });
 
       function selectMood(filter) {
         activeFilter = filter;
