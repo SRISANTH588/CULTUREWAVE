@@ -175,6 +175,8 @@
       .rs-brand-byline { color:#c2bfd7; font-size:.63rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
       .rs-menu-link { color:#fff; padding:.68rem 1rem; border:1px solid rgba(255,255,255,.22); border-radius:999px; font-size:.9rem; font-weight:800; }
       .rs-menu-link:hover { background:rgba(255,255,255,.12); }
+      .rs-appbar .hamburger { display:flex; align-items:center; justify-content:center; width:48px; height:48px; padding:.65rem; border:1px solid rgba(255,255,255,.22); border-radius:50%; background:rgba(255,255,255,.04); }
+      .rs-appbar .hamburger span { background:#fff; }
       .rs-filterbar { position:sticky;top:80px;z-index:14;display:flex;gap:.55rem;overflow-x:auto;padding:.7rem max(1rem,calc((100vw - 1180px)/2));background:rgba(24,24,28,.94);border-bottom:1px solid rgba(255,255,255,.08);scrollbar-width:none;backdrop-filter:blur(18px); }
       .rs-filterbar::-webkit-scrollbar {display:none}
       .rs-filter-control {white-space:nowrap;border:1px solid #44444c;border-radius:999px;background:#27272c;color:#f4f2f9;padding:.62rem .95rem;font-size:.82rem;font-weight:700;cursor:pointer}
@@ -416,7 +418,9 @@
         <span class="rs-brand-name">CultureWave</span>
         <span class="rs-brand-byline">BY OGSHOOTS LUXE</span>
       </a>
-      <a class="rs-menu-link" href="restaurants.html" aria-current="page">Restaurants</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+        <span></span><span></span><span></span>
+      </button>
     </div>
     <div class="rs-filterbar" aria-label="Dining filters">
       <button class="rs-filter-control" type="button" id="rsFilterToggle">☷ Filters <span>⌄</span></button>
@@ -726,11 +730,16 @@
       ham.addEventListener("click", () => {
         ham.classList.toggle("open");
         mNav.classList.toggle("open");
-        document.body.style.overflow = mNav.classList.contains("open") ? "hidden" : "";
+        const isOpen = mNav.classList.contains("open");
+        ham.setAttribute("aria-expanded", String(isOpen));
+        ham.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+        document.body.style.overflow = isOpen ? "hidden" : "";
       });
       mNav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
         ham.classList.remove("open");
         mNav.classList.remove("open");
+        ham.setAttribute("aria-expanded", "false");
+        ham.setAttribute("aria-label", "Open menu");
         document.body.style.overflow = "";
       }));
     </script>
