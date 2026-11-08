@@ -167,9 +167,48 @@
 
       /* Dining discovery and table booking */
       body { background: #111113; color: #f7f6fa; }
-      .topbar { display:none; }
+      .topbar { background:#000!important;border:0!important;box-shadow:none!important; }
+      .topbar .logo { color:#fff!important; }
+      .topbar .brand-sub { color:#888!important; }
+      .topbar .topnav a { color:#aaa!important; }
+      .topbar .topnav a:hover { background:#111!important;color:#fff!important; }
+      .topbar .nav-wrap { width:100%;max-width:1800px;min-height:100px;padding:.5rem 20px;gap:clamp(10px,1.4vw,24px); }
+      .topbar .brand-block { display:grid;flex:0 0 auto;position:relative;left:64px; }
+      .topbar .topnav { display:flex;position:relative;left:120px;flex:0 0 auto;justify-content:flex-start;gap:.35rem;white-space:nowrap; }
+      .topbar .topnav a { padding:.65rem .75rem;font-size:clamp(1.05rem,1.1vw,1.2rem); }
+      .topbar .auth-actions { gap:.5rem;padding:.3rem;border:1px solid #333;border-radius:999px;background:#111; }
+      .topbar .auth-actions .nav-link { padding:.6rem .95rem;border:0;background:transparent;color:#aaa;font-size:.82rem; }
+      .topbar .auth-actions .nav-cta { margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff;color:#000;border-radius:999px;font-weight:800; }
+      .topbar .nav-wrap>.hamburger { display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;margin-left:0;padding:0;border:0;border-radius:50%;background:#141418;color:#fff;box-shadow:none; }
+      .topbar .nav-wrap>.hamburger span { display:none; }
+      .topbar .nav-wrap>.hamburger::after { content:"U";color:#fff;font-size:1.05rem;font-weight:700;line-height:1; }
+      .topbar .mobile-brand,.topbar .mobile-header-actions,.topbar .desktop-header-search { display:none; }
+      .topbar .topnav a { color:#aaa!important; }
+      .topbar .nav-wrap>.hamburger::after { content:"U"; }
+      .topbar .nav-wrap>.hamburger { cursor:pointer; }
+      .topbar .nav-wrap { box-sizing:border-box; }
+      .topbar .brand-block { box-sizing:border-box; }
+      .topbar .topnav { box-sizing:border-box; }
+      .topbar .auth-actions { box-sizing:border-box; }
+      .topbar .nav-wrap>.hamburger { box-sizing:border-box; }
+      .topbar .nav-wrap { justify-content:initial; }
+      .topbar .brand-block .logo { color:#fff!important; }
+      .topbar .brand-block .brand-sub { color:#888!important; }
+      .topbar .nav-wrap>.hamburger:focus-visible { outline:2px solid #b99cff;outline-offset:3px; }
+      @media(max-width:960px){
+        .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;}
+        .topbar .brand-block{display:none;}
+        .topbar .mobile-brand{display:flex;align-items:center;color:#fff!important;font-size:1rem;font-weight:900;letter-spacing:.06em;white-space:nowrap;}
+        .topbar .topnav,.topbar .auth-actions,.topbar .mobile-header-actions,.topbar .desktop-header-search{display:none!important;}
+        .topbar .nav-wrap>.hamburger{display:flex!important;visibility:visible;opacity:1;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;margin-left:.2rem;border:1px solid #333;border-radius:13px;background:#111;}
+        .topbar .nav-wrap>.hamburger span{display:block;background:#fff!important;}
+        .topbar .nav-wrap>.hamburger::after{display:none;content:none;}
+        .topbar .nav-wrap>.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+        .topbar .nav-wrap>.hamburger.open span:nth-child(2){opacity:0;}
+        .topbar .nav-wrap>.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+      }
       main { background:#111113; }
-      .rs-appbar { position:sticky; top:0; z-index:15; padding:.85rem max(1rem,calc((100vw - 1180px)/2)); display:flex; align-items:center; justify-content:space-between; gap:1rem; color:#fff; background:linear-gradient(115deg,rgba(41,34,107,.96),rgba(20,19,42,.94)); border-bottom:1px solid rgba(255,255,255,.09); backdrop-filter:blur(18px); }
+      .rs-appbar { display:none; }
       .rs-brand { display:grid; gap:.08rem; }
       .rs-brand-name { color:#fff; font-size:1.45rem; line-height:1.05; font-weight:850; letter-spacing:-.035em; }
       .rs-brand-byline { color:#c2bfd7; font-size:.63rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
