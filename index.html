@@ -2092,7 +2092,7 @@
   </section>
 
   <!-- SCENE STEALERS -->
-  <section class="ss-section" data-site-section="home-weekend" hidden>
+  <section class="ss-section" data-site-section="home-weekend">
     <div class="ss-banner">
       <div class="ss-banner-text">
         <div class="ss-eyebrow">Scene Stealers</div>
@@ -2875,16 +2875,12 @@
           return pa - pb;
         })
         .slice(0, 12);
-      const hasValidCoupon = d => {
-        const couponSource = [d.coupons,d.discountCoupons,d.offers,d.couponCodes,d.promos]
-          .find(source => Array.isArray(source) && source.length) || [];
-        return couponSource.some(c => c && String(c.code||c.couponCode||c.promoCode||'').trim() && Number(c.value??c.discount??c.amount??c.off??0)>0);
-      };
-      const couponDocs = docs.filter(doc => hasValidCoupon(doc.data()));
-      if(!couponDocs.length){ section.hidden = true; return; }
       section.hidden = false;
       section.style.display = '';
-      couponDocs.forEach(doc => {
+      if (!docs.length) {
+        scroll.innerHTML = '<div style="padding:1.5rem 1.2rem;color:rgba(255,255,255,.65);font-size:.9rem;font-weight:700;">No upcoming events. Check back soon!</div>';
+      }
+      docs.forEach(doc => {
         const d = doc.data();
         const price = d.tickets?.[0]?.price || d.price || 0;
         const priceStr = price ? '\u20b9' + Number(price).toLocaleString('en-IN') : 'Free';
@@ -2966,7 +2962,18 @@
         scroll.addEventListener('touchstart', () => clearInterval(ssTimer), {passive:true});
         scroll.addEventListener('touchend', resetSsTimer, {passive:true});
       }
-    }catch(e){ console.warn('SceneStealer:', e.message); }
+    }catch(e){
+      console.warn('SceneStealer:', e.message);
+      const section = document.querySelector('.ss-section');
+      const scroll = document.getElementById('ssScroll');
+      if (section) {
+        section.hidden = false;
+        section.style.display = '';
+      }
+      if (scroll) {
+        scroll.innerHTML = '<div style="padding:1.5rem 1.2rem;color:rgba(255,255,255,.65);font-size:.9rem;font-weight:700;">Events could not load. Check back soon!</div>';
+      }
+    }
   })();
 </script>
 <script>
