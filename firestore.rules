@@ -440,10 +440,11 @@ service cloud.firestore {
           request.resource.data.applicationId == applicationId &&
           request.resource.data.fileId == fileId &&
           request.resource.data.applicantUid == request.auth.uid &&
-          request.resource.data.type in ['pan', 'aadhaar', 'Business registration', 'Address proof', 'Cancelled cheque', 'GST certificate', 'MSME / Udyam', 'Other'] &&
-          request.resource.data.contentType == 'image/jpeg' &&
+          request.resource.data.type in ['pan', 'aadhaar', 'fssai', 'gst', 'menu', 'business_registration', 'trade_license', 'address_proof', 'cancelled_cheque', 'msme', 'other', 'Business registration', 'Address proof', 'Cancelled cheque', 'GST certificate', 'MSME / Udyam', 'Other'] &&
+          request.resource.data.contentType in ['image/jpeg', 'application/pdf'] &&
           request.resource.data.dataUrl is string && request.resource.data.dataUrl.size() <= 560000 &&
-          request.resource.data.dataUrl.matches('^data:image/jpeg;base64,.*') &&
+          ((request.resource.data.contentType == 'image/jpeg' && request.resource.data.dataUrl.matches('^data:image/jpeg;base64,.*')) ||
+            (request.resource.data.contentType == 'application/pdf' && request.resource.data.dataUrl.matches('^data:application/pdf;base64,.*'))) &&
           request.resource.data.size is int && request.resource.data.size <= 450000 &&
           request.resource.data.uploadedAt == request.time &&
           getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.applicantUid == request.auth.uid &&
