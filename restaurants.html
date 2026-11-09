@@ -388,7 +388,9 @@
         .rs-brand-name { font-size:1.4rem; }
         .rs-filterbar { top:74px; gap:.5rem; }
         .rs-filter-control { padding:.58rem .85rem; font-size:.8rem; }
-        .rs-hero { min-height:0; padding:1.5rem 0 1.7rem; }
+        /* Keep admin-selected hero artwork on phones. The shorthand `background`
+           used here previously replaced the inline image set from Firestore. */
+        .rs-hero { min-height:0; padding:1.5rem 0 1.7rem; background-color:#091330; background-image:radial-gradient(ellipse at 50% 115%,#5331a9 0,transparent 50%),linear-gradient(135deg,#091330,#191144 55%,#071329); background-size:cover; background-position:center; }
         .rs-hero-inner { position:relative; }
         .rs-location { margin-bottom:.8rem; font-size:.64rem; }
         .rs-hero h1 { font-size:clamp(2.3rem,10.5vw,3.2rem); margin-bottom:.55rem; }
