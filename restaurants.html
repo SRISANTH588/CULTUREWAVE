@@ -21,6 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <style>
+      [hidden] { display: none !important; }
       body { background: #fff; }
 
       .rs-hero {
@@ -658,6 +659,26 @@
       _rsdb.collection('siteContent').doc('restaurantPage').get().then(snapshot => {
         if (!snapshot.exists) return;
         const content = snapshot.data() || {};
+        const visibility = content.visibility || {};
+        const setVisible = (selector, key) => { const el=document.querySelector(selector); if(el) el.hidden=visibility[key]===false; };
+        setVisible('.rs-filterbar','filterbar'); setVisible('.rs-hero','hero'); setVisible('.rs-stats','stats'); setVisible('.rs-section','listings'); setVisible('.site-footer','footer');
+        const promoHeading=document.getElementById('rsPromoHeading');
+        const promoCards=[...document.querySelectorAll('.rs-offer')];
+        const promoVisible=visibility.promotions!==false;
+        if(promoHeading)promoHeading.hidden=!promoVisible;
+        promoCards.forEach((el,index)=>el.hidden=!promoVisible||visibility['promo'+(index+1)]===false);
+        if(promoCards.length&&promoCards.every(el=>el.hidden)&&promoHeading)promoHeading.hidden=true;
+        const moods=document.querySelector('.rs-moods');
+        const moodHeading=moods?.previousElementSibling;
+        if(moods){moods.hidden=visibility.moods===false;if(moodHeading)moodHeading.hidden=visibility.moods===false;}
+        const disclaimer=document.querySelector('.rs-disclaimer');
+        if(disclaimer){disclaimer.hidden=visibility.disclaimer===false;const heading=disclaimer.previousElementSibling;if(heading)heading.hidden=visibility.disclaimer===false;}
+        const featured=document.getElementById('rsFeatured');
+        if(featured){featured.hidden=visibility.featured===false;const heading=featured.previousElementSibling;if(heading)heading.hidden=visibility.featured===false;}
+        const listCta=document.getElementById('rsListCta'); if(listCta)listCta.hidden=visibility.listCta===false;
+        const sectionTitles=[...document.querySelectorAll('.rs-all-title')];
+        if(visibility.featured===false&&sectionTitles[0])sectionTitles[0].hidden=true;
+        if(visibility.listings===false&&sectionTitles[1])sectionTitles[1].hidden=true;
         if (content.heroTitle) {
           const title = document.getElementById('rsHeroTitle');
           title.textContent = content.heroTitle;
