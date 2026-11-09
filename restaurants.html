@@ -506,6 +506,20 @@
         .rs-search-row { padding-inline: 0; }
         .rs-chips { padding-inline: 0; }
       }
+      /* Let the mobile category and filter strips span the viewport. */
+      @media (max-width: 600px) {
+        .rs-chips,
+        .rs-filterbar {
+          width: 100vw;
+          max-width: none;
+          margin-inline: calc(50% - 50vw);
+          padding-left: 1rem;
+          padding-right: 1rem;
+          box-sizing: border-box;
+        }
+        .rs-filterbar { gap: .5rem; }
+        .rs-chips { padding-bottom: .3rem; }
+      }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
