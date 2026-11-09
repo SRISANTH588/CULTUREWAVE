@@ -656,7 +656,7 @@
         appId: "1:5471814825:web:07e84f2f88486da817d5b8"
       });
       const _rsdb = firebase.firestore();
-      _rsdb.collection('siteContent').doc('restaurantPage').get().then(snapshot => {
+      const applyRestaurantPageContent = snapshot => {
         if (!snapshot.exists) return;
         const content = snapshot.data() || {};
         const visibility = content.visibility || {};
@@ -705,7 +705,18 @@
         const allTitles=document.querySelectorAll('.rs-all-title');
         [['featuredTitle',allTitles[0]?.querySelector('h2')],['featuredSubtitle',allTitles[0]?.querySelector('p')],['allTitle',allTitles[1]?.querySelector('h2')],['allSubtitle',allTitles[1]?.querySelector('p')],['moodHeading',document.querySelector('.rs-moods')?.previousElementSibling]].forEach(([key,el])=>{if(content[key]&&el)el.textContent=content[key];});
         if (Array.isArray(content.moods)) document.querySelectorAll('.rs-mood').forEach((el,index)=>{if(content.moods[index])el.firstChild.textContent=content.moods[index];});
-      }).catch(error => console.warn('Dining page content:',error.message));
+      };
+      // Keep this page in sync with edits from the admin manager on every device.
+      // Prefer a server read so an older mobile Firestore cache cannot win over
+      // recently saved page content; the snapshot listener handles later edits.
+      const restaurantPageRef = _rsdb.collection('siteContent').doc('restaurantPage');
+      restaurantPageRef.get({source:'server'})
+        .then(applyRestaurantPageContent)
+        .catch(error => {
+          console.warn('Could not load current dining page content from server:',error.message);
+          return restaurantPageRef.get().then(applyRestaurantPageContent);
+        });
+      restaurantPageRef.onSnapshot(applyRestaurantPageContent,error => console.warn('Dining page content updates:',error.message));
       const rsBanners = ['rs-banner-a','rs-banner-b','rs-banner-c','rs-banner-d','rs-banner-e','rs-banner-f'];
       let cards = [];
 
