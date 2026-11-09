@@ -524,6 +524,32 @@
         .rs-filter-control select { max-width: 82px; }
         .rs-chips { padding-bottom: .3rem; }
       }
+      /* Keep all dining filter controls visible on one row on phones. */
+      @media (max-width: 600px) {
+        .rs-filterbar {
+          gap: .2rem;
+          overflow-x: hidden;
+          justify-content: space-between;
+          padding-left: .35rem;
+          padding-right: .35rem;
+        }
+        .rs-filter-control {
+          flex: 0 1 auto;
+          min-width: 0;
+          padding: .38rem .3rem;
+          font-size: clamp(.52rem, 2.35vw, .68rem);
+          letter-spacing: -.025em;
+        }
+        .rs-filter-control.primary {
+          display: flex;
+          align-items: center;
+        }
+        .rs-filter-control select {
+          width: 3.5rem;
+          max-width: 3.5rem;
+          min-width: 0;
+        }
+      }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
@@ -786,7 +812,13 @@
           console.warn('Could not load current dining page content from server:',error.message);
           return restaurantPageRef.get().then(applyRestaurantPageContent);
         });
-      restaurantPageRef.onSnapshot(applyRestaurantPageContent,error => console.warn('Dining page content updates:',error.message));
+      // Mobile browsers may retain an older Firestore cache for this page. A
+      // cache-only snapshot can arrive after the server read and overwrite the
+      // fresh content, so apply live snapshots only after server confirmation.
+      restaurantPageRef.onSnapshot({includeMetadataChanges:true},snapshot => {
+        if (snapshot.metadata?.fromCache) return;
+        applyRestaurantPageContent(snapshot);
+      },error => console.warn('Dining page content updates:',error.message));
       const rsBanners = ['rs-banner-a','rs-banner-b','rs-banner-c','rs-banner-d','rs-banner-e','rs-banner-f'];
       let cards = [];
 
