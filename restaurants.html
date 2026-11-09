@@ -524,31 +524,37 @@
         .rs-filter-control select { max-width: 82px; }
         .rs-chips { padding-bottom: .3rem; }
       }
-      /* Keep all dining filter controls visible on one row on phones. */
-      @media (max-width: 600px) {
-        .rs-filterbar {
-          gap: .2rem;
-          overflow-x: hidden;
-          justify-content: space-between;
-          padding-left: .35rem;
-          padding-right: .35rem;
+      /* Desktop dining layout: align the header and discovery controls to one grid. */
+      @media (min-width: 961px) {
+        .topbar .nav-wrap {
+          width: min(100% - 3rem, 1320px); min-height: 84px; margin-inline: auto;
+          padding: .75rem 0; justify-content: space-between; gap: 2rem;
         }
-        .rs-filter-control {
-          flex: 0 1 auto;
-          min-width: 0;
-          padding: .38rem .3rem;
-          font-size: clamp(.52rem, 2.35vw, .68rem);
-          letter-spacing: -.025em;
-        }
-        .rs-filter-control.primary {
-          display: flex;
-          align-items: center;
-        }
-        .rs-filter-control select {
-          width: 3.5rem;
-          max-width: 3.5rem;
-          min-width: 0;
-        }
+        .topbar .brand-block, .topbar .topnav, .topbar .nav-wrap > .hamburger { position: static; left: auto; margin: 0; }
+        .topbar .topnav { flex: 1 1 auto; }
+        .topbar .auth-actions { margin-left: auto; }
+        .topbar .nav-wrap > .hamburger { flex: 0 0 44px; width: 44px; height: 44px; }
+        .rs-hero { min-height: 390px; padding: 3.25rem 0 2.8rem; }
+        .rs-hero-inner { max-width: 1240px; padding: 0 2rem; }
+        .rs-hero h1 { max-width: 900px; font-size: clamp(4rem, 6.5vw, 5.5rem); }
+        .rs-hero p { margin-bottom: 1.5rem; font-size: 1.08rem; }
+        .rs-search-row { max-width: 780px; margin-bottom: 1.35rem; }
+        .rs-search-row input { min-height: 58px; padding-inline: 1.2rem; font-size: 1rem; }
+        .rs-search-btn { min-width: 132px; font-size: .98rem; }
+        .rs-chips { justify-content: center; gap: .65rem; }
+        .rs-chip { padding: .58rem 1.1rem; font-size: .84rem; }
+        .rs-filterbar { position: relative; top: auto; justify-content: center; padding: .85rem 2rem; }
+        .rs-filter-control { padding: .72rem 1.05rem; font-size: .88rem; }
+        .rs-content { max-width: 1320px; padding: 2.1rem 2rem 0; }
+        .rs-content h2 { margin-bottom: 1.1rem; font-size: 1.55rem; }
+        .rs-offers { gap: 1.2rem; margin-bottom: 2.7rem; }
+        .rs-offer { min-height: 220px; padding: 1.4rem; border-radius: 20px; }
+        .rs-offer strong { font-size: 1.2rem; }
+        .rs-offer span { font-size: .94rem; }
+        .rs-moods { gap: 1rem; }
+        .rs-mood { min-height: 170px; padding: 1.25rem; }
+        .rs-stats-inner { padding: 1rem 2rem; }
+        .rs-section { max-width: 1320px; padding: 1.8rem 2rem 4rem; }
       }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
