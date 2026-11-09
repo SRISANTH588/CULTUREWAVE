@@ -358,8 +358,8 @@
         .rs-hero p{font-size:.88rem}
         .rs-search-row { flex-direction: row; }
         .rs-search-btn { padding-inline: 1rem; }
-        .rs-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:.3rem;scrollbar-width:none}
-        .rs-chip{white-space:nowrap}
+        .rs-chips{flex-wrap:nowrap;overflow-x:hidden;padding-bottom:.3rem;scrollbar-width:none;gap:.3rem}
+        .rs-chip{flex:1 1 auto;min-width:0;padding:.42rem .35rem;font-size:clamp(.58rem,2.25vw,.72rem);white-space:nowrap}
         .rs-stats-inner{padding:.8rem 1rem}
         .rs-sort{display:none}
         .rs-content{padding:0 1rem 2.5rem}
@@ -450,9 +450,9 @@
         .rs-section { box-sizing:border-box; }
         .rs-search-row, .rs-chips { width: 100%; }
         .rs-search-row { padding-inline: 1rem; }
-        .rs-chips { overflow-x: auto; flex-wrap: nowrap; padding: 0 1rem .3rem; scrollbar-width: none; }
+        .rs-chips { overflow-x: hidden; flex-wrap: nowrap; padding: 0 1rem .3rem; scrollbar-width: none; gap:.3rem; }
         .rs-chips::-webkit-scrollbar { display: none; }
-        .rs-chip { flex: 0 0 auto; }
+        .rs-chip { flex: 1 1 auto; min-width:0; padding:.42rem .35rem; font-size:clamp(.58rem,2.25vw,.72rem); white-space:nowrap; }
       }
       /* Full-bleed mobile layout: remove page-level side gutters. */
       @media (max-width: 600px) {
