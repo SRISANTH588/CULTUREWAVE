@@ -454,6 +454,16 @@
         .rs-chips::-webkit-scrollbar { display: none; }
         .rs-chip { flex: 0 0 auto; }
       }
+      /* Full-width mobile layout with a consistent, compact interior gutter. */
+      @media (max-width: 600px) {
+        .rs-hero-inner { padding-inline: 1rem; }
+        .rs-content { box-sizing:border-box; padding:1.25rem 1rem 1.5rem; }
+        .rs-section { box-sizing:border-box; padding:0 1rem 2rem; }
+        .rs-stats-inner { box-sizing:border-box; padding-inline:1rem; }
+        .rs-section .rs-card { grid-template-columns:36% minmax(0,1fr); }
+        .rs-section .rs-body { padding:.7rem .65rem; }
+        .rs-section .rs-footer { align-items:flex-start; }
+      }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
