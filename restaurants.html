@@ -475,6 +475,23 @@
         .rs-section .rs-footer { align-items:flex-start; }
         .topbar .nav-wrap { padding-left:1rem; padding-right:1rem; }
       }
+      /* Keep the campaign hero compact and inset on narrow screens. */
+      @media (max-width: 600px) {
+        .rs-hero {
+          min-height: 0;
+          padding: 1.6rem 0 1.4rem;
+          align-items: flex-start;
+        }
+        .rs-hero-inner { padding-inline: 1rem; }
+        .rs-hero h1 {
+          font-size: clamp(2.25rem, 10vw, 3rem);
+          line-height: .95;
+          margin-bottom: .65rem;
+        }
+        .rs-hero p { margin-bottom: 1rem; }
+        .rs-search-row { padding-inline: 0; }
+        .rs-chips { padding-inline: 0; }
+      }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
