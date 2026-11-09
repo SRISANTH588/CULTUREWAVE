@@ -1168,21 +1168,38 @@
     <div style="background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#3b82f6 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;">
       <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">👑 Premium Content</div>
       <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Restaurants Page Manager</div>
-      <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Manage the listings displayed on restaurants.html, including visibility and listing details.</div>
+      <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Edit each section of restaurants.html. Saved changes appear on desktop and mobile.</div>
     </div>
     <div class="card" style="padding:1.1rem 1.25rem;margin:0;">
-      <h3 style="margin:0 0 .35rem;color:var(--ink);">Dining page promotions</h3>
-      <p style="margin:0 0 .9rem;color:var(--muted);font-size:.8rem;">Update the hero offer, promotional cards, and Diwali note displayed on restaurants.html.</p>
+      <h3 style="margin:0 0 .35rem;color:var(--ink);">Hero section</h3>
+      <p style="margin:0 0 .9rem;color:var(--muted);font-size:.8rem;">Edit the title, offer, search prompt, and background image.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;align-items:end;">
         <div class="field"><label for="restaurantHeroTitle">Hero title</label><input id="restaurantHeroTitle" maxlength="100" placeholder="DINING CARNIVAL"></div>
         <div class="field"><label for="restaurantHeroOffer">Offer text</label><input id="restaurantHeroOffer" maxlength="250" placeholder="Extra ₹175 OFF on your first dining transaction"></div>
+        <div class="field"><label for="restaurantSearchPlaceholder">Search placeholder</label><input id="restaurantSearchPlaceholder" maxlength="100"></div>
+        <div class="field"><label for="restaurantHeroImage">Hero background image</label><input id="restaurantHeroImage" type="file" accept="image/*"><img id="restaurantHeroImagePreview" alt="Current hero" style="display:none;width:100%;height:90px;object-fit:cover;border-radius:10px;margin-top:.4rem"></div>
+        <div class="field"><label for="restaurantFeaturedTitle">Featured section title</label><input id="restaurantFeaturedTitle" maxlength="100"></div>
+        <div class="field"><label for="restaurantFeaturedSubtitle">Featured subtitle</label><input id="restaurantFeaturedSubtitle" maxlength="100"></div>
+        <div class="field"><label for="restaurantAllTitle">Restaurant list title</label><input id="restaurantAllTitle" maxlength="100"></div>
+        <div class="field"><label for="restaurantAllSubtitle">Restaurant list subtitle</label><input id="restaurantAllSubtitle" maxlength="100"></div>
+      </div>
+      <h3 style="margin:1rem 0 .35rem;color:var(--ink);">Promotion cards</h3>
+      <p style="margin:0 0 .9rem;color:var(--muted);font-size:.8rem;">Each promotion supports its own image.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;align-items:end;">
         <div class="field"><label for="restaurantPromoHeading">Promotional section heading</label><input id="restaurantPromoHeading" maxlength="100" placeholder="Diwali offers for you"></div>
         <div class="field"><label for="restaurantPromo1Title">Promotion 1 title</label><input id="restaurantPromo1Title" maxlength="80" placeholder="Vault Brewery"></div>
         <div class="field"><label for="restaurantPromo1Description">Promotion 1 details</label><input id="restaurantPromo1Description" maxlength="180" placeholder="★ 4.8 · ₹1500 for two · Flat 25% OFF"></div>
+        <div class="field"><label for="restaurantPromo1Image">Promotion 1 image</label><input id="restaurantPromo1Image" type="file" accept="image/*"><img id="restaurantPromo1ImagePreview" alt="Promotion 1" style="display:none;width:100%;height:90px;object-fit:cover;border-radius:10px;margin-top:.4rem"></div>
         <div class="field"><label for="restaurantPromo2Title">Promotion 2 title</label><input id="restaurantPromo2Title" maxlength="80" placeholder="Explore local dining"></div>
         <div class="field"><label for="restaurantPromo2Description">Promotion 2 details</label><input id="restaurantPromo2Description" maxlength="180" placeholder="Special offers on your next table"></div>
+        <div class="field"><label for="restaurantPromo2Image">Promotion 2 image</label><input id="restaurantPromo2Image" type="file" accept="image/*"><img id="restaurantPromo2ImagePreview" alt="Promotion 2" style="display:none;width:100%;height:90px;object-fit:cover;border-radius:10px;margin-top:.4rem"></div>
+      </div>
+      <h3 style="margin:1rem 0 .35rem;color:var(--ink);">Disclaimer and dining moods</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;align-items:end;">
         <div class="field"><label for="restaurantDiwaliTitle">Diwali note heading</label><input id="restaurantDiwaliTitle" maxlength="100" placeholder="In light of Diwali celebrations"></div>
         <div class="field"><label for="restaurantDiwaliMessage">Diwali note message</label><input id="restaurantDiwaliMessage" maxlength="300" placeholder="Operational timings may vary at restaurants…"></div>
+        <div class="field"><label for="restaurantMoodHeading">Dining moods heading</label><input id="restaurantMoodHeading" maxlength="100"></div>
+        <div class="field"><label for="restaurantMoods">Mood labels (comma separated)</label><input id="restaurantMoods" maxlength="300" placeholder="Drink & dine, Cozy cafes, Family dining, Pocket friendly, Outdoor dining, Pure veg"></div>
         <button class="btn primary" id="restaurantHeroSave" type="button" onclick="saveRestaurantPageContent()">Save page content</button>
       </div>
     </div>
@@ -1630,6 +1647,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="imagekit.js"></script>
 <div class="modal-overlay" id="listerEmailModal"><div class="modal modal-lg"><h3>✉ Send signup and agreement request</h3><div id="listerEmailFields"></div><div class="modal-actions"><button class="btn" onclick="closeModal('listerEmailModal')">Cancel</button><button class="btn primary" id="sendListerEmail">Send Email</button></div></div></div>
 <div class="modal-overlay" id="listerRejectModal"><div class="modal"><h3>Reject application</h3><p style="color:var(--muted);font-size:.85rem">The applicant will receive this reason. No account will be created.</p><textarea id="listerRejectReason" rows="5" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:.7rem;margin-top:.6rem" placeholder="Reason for rejection / action required"></textarea><div class="modal-actions"><button class="btn" onclick="closeModal('listerRejectModal')">Cancel</button><button class="btn" id="confirmListerReject" style="background:#b42318;color:#fff">Reject Application</button></div></div></div>
 <div class="modal-overlay" id="listerApproveModal"><div class="modal"><h3>Approve lister</h3><p style="color:var(--muted);font-size:.85rem">This approves the signed application and sends an account activation email through EmailJS. The lister follows the link to set up their account.</p><div class="modal-actions"><button class="btn" onclick="closeModal('listerApproveModal')">Cancel</button><button class="btn" id="confirmListerApprove" style="background:#138451;color:#fff">Approve Lister</button></div></div></div>
@@ -1648,7 +1666,7 @@ let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], a
 let oneClubAdminData=null,oneClubAdminLoading=false;
 let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allMarketingLeads=[];
 let allCheckoutAttempts=[];
-const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'Extra ₹175 OFF on your first dining transaction',promoHeading:'Diwali offers for you',promo1Title:'Vault Brewery',promo1Description:'★ 4.8 · ₹1500 for two\nFlat 25% OFF',promo2Title:'Explore local dining',promo2Description:'Special offers on your next table',diwaliTitle:'In light of Diwali celebrations',diwaliMessage:'Operational timings may vary at restaurants. Please contact the restaurant before visiting.'};
+const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'Extra ₹175 OFF on your first dining transaction',searchPlaceholder:'Search restaurants, cuisine, area…',heroImage:'',promoHeading:'Diwali offers for you',promo1Title:'Vault Brewery',promo1Description:'★ 4.8 · ₹1500 for two\nFlat 25% OFF',promo1Image:'',promo2Title:'Explore local dining',promo2Description:'Special offers on your next table',promo2Image:'',featuredTitle:'In the limelight',featuredSubtitle:'Popular around you',allTitle:'All restaurants',allSubtitle:'Reserve your table',moodHeading:'What’s the mood?',moods:['Drink & dine','Cozy cafes','Family dining','Pocket friendly','Outdoor dining','Pure veg'],diwaliTitle:'In light of Diwali celebrations',diwaliMessage:'Operational timings may vary at restaurants. Please contact the restaurant before visiting.'};
 let restaurantPageContent={...RESTAURANT_PAGE_CONTENT_DEFAULTS};
 let checkoutAttemptsLoaded=false;
 let allVendorApplications=[],activeVendorApplicationId=null;
@@ -2441,13 +2459,28 @@ function fillRestaurantPageContentForm(content=restaurantPageContent) {
   document.getElementById('restaurantPromo2Description').value=content.promo2Description||RESTAURANT_PAGE_CONTENT_DEFAULTS.promo2Description;
   document.getElementById('restaurantDiwaliTitle').value=content.diwaliTitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.diwaliTitle;
   document.getElementById('restaurantDiwaliMessage').value=content.diwaliMessage||RESTAURANT_PAGE_CONTENT_DEFAULTS.diwaliMessage;
+  document.getElementById('restaurantSearchPlaceholder').value=content.searchPlaceholder||RESTAURANT_PAGE_CONTENT_DEFAULTS.searchPlaceholder;
+  document.getElementById('restaurantFeaturedTitle').value=content.featuredTitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.featuredTitle;
+  document.getElementById('restaurantFeaturedSubtitle').value=content.featuredSubtitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.featuredSubtitle;
+  document.getElementById('restaurantAllTitle').value=content.allTitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.allTitle;
+  document.getElementById('restaurantAllSubtitle').value=content.allSubtitle||RESTAURANT_PAGE_CONTENT_DEFAULTS.allSubtitle;
+  document.getElementById('restaurantMoodHeading').value=content.moodHeading||RESTAURANT_PAGE_CONTENT_DEFAULTS.moodHeading;
+  document.getElementById('restaurantMoods').value=(content.moods||RESTAURANT_PAGE_CONTENT_DEFAULTS.moods).join(', ');
+  [['heroImage','restaurantHeroImagePreview'],['promo1Image','restaurantPromo1ImagePreview'],['promo2Image','restaurantPromo2ImagePreview']].forEach(([key,id])=>{const img=document.getElementById(id);img.src=content[key]||'';img.style.display=content[key]?'block':'none';});
 }
 async function saveRestaurantPageContent() {
   const button=document.getElementById('restaurantHeroSave');
-  const content={heroTitle:document.getElementById('restaurantHeroTitle').value.trim(),heroOffer:document.getElementById('restaurantHeroOffer').value.trim(),promoHeading:document.getElementById('restaurantPromoHeading').value.trim(),promo1Title:document.getElementById('restaurantPromo1Title').value.trim(),promo1Description:document.getElementById('restaurantPromo1Description').value.trim(),promo2Title:document.getElementById('restaurantPromo2Title').value.trim(),promo2Description:document.getElementById('restaurantPromo2Description').value.trim(),diwaliTitle:document.getElementById('restaurantDiwaliTitle').value.trim(),diwaliMessage:document.getElementById('restaurantDiwaliMessage').value.trim(),updatedAt:serverTimestamp()};
+  const content={heroTitle:document.getElementById('restaurantHeroTitle').value.trim(),heroOffer:document.getElementById('restaurantHeroOffer').value.trim(),searchPlaceholder:document.getElementById('restaurantSearchPlaceholder').value.trim(),promoHeading:document.getElementById('restaurantPromoHeading').value.trim(),promo1Title:document.getElementById('restaurantPromo1Title').value.trim(),promo1Description:document.getElementById('restaurantPromo1Description').value.trim(),promo2Title:document.getElementById('restaurantPromo2Title').value.trim(),promo2Description:document.getElementById('restaurantPromo2Description').value.trim(),featuredTitle:document.getElementById('restaurantFeaturedTitle').value.trim(),featuredSubtitle:document.getElementById('restaurantFeaturedSubtitle').value.trim(),allTitle:document.getElementById('restaurantAllTitle').value.trim(),allSubtitle:document.getElementById('restaurantAllSubtitle').value.trim(),moodHeading:document.getElementById('restaurantMoodHeading').value.trim(),moods:document.getElementById('restaurantMoods').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,6),diwaliTitle:document.getElementById('restaurantDiwaliTitle').value.trim(),diwaliMessage:document.getElementById('restaurantDiwaliMessage').value.trim(),updatedAt:serverTimestamp()};
   if(!content.heroTitle||!content.heroOffer||!content.diwaliTitle||!content.diwaliMessage){showToast('Please fill in all dining page content fields.','error');return;}
   button.disabled=true;
-  try{await setDoc(doc(db,'siteContent','restaurantPage'),content,{merge:true});showToast('Dining page content saved.','success');}
+  try{
+    for(const [key,inputId] of [['heroImage','restaurantHeroImage'],['promo1Image','restaurantPromo1Image'],['promo2Image','restaurantPromo2Image']]){
+      const file=document.getElementById(inputId).files[0];
+      if(file){const status=button.textContent;button.textContent='Uploading images…';content[key]=await uploadImageToImageKit(file,'/restaurant-page');document.getElementById(inputId+'Preview').src=content[key];document.getElementById(inputId+'Preview').style.display='block';document.getElementById(inputId).value='';button.textContent=status;}
+      else content[key]=restaurantPageContent[key]||'';
+    }
+    await setDoc(doc(db,'siteContent','restaurantPage'),content,{merge:true});restaurantPageContent={...restaurantPageContent,...content};showToast('Dining page content saved.','success');
+  }
   catch(error){console.error('Could not save dining page content:',error);showToast(error.message||'Could not save dining page content.','error');}
   finally{button.disabled=false;}
 }

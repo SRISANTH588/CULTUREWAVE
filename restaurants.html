@@ -677,6 +677,13 @@
         if (content.promo2Description) document.getElementById('rsPromo2Description').textContent=content.promo2Description;
         if (content.diwaliTitle) document.getElementById('rsDiwaliTitle').textContent=content.diwaliTitle;
         if (content.diwaliMessage) document.getElementById('rsDiwaliMessage').textContent=content.diwaliMessage;
+        if (content.searchPlaceholder) document.getElementById('rsSearch').placeholder=content.searchPlaceholder;
+        if (content.heroImage) { const hero=document.querySelector('.rs-hero');hero.style.backgroundImage=`linear-gradient(90deg,rgba(14,18,30,.78),rgba(14,18,30,.18)),url("${content.heroImage.replace(/["\\]/g,'')}")`;hero.style.backgroundSize='cover';hero.style.backgroundPosition='center'; }
+        if (content.promo1Image) {const el=document.querySelector('.rs-offer:nth-child(1)');el.style.backgroundImage=`linear-gradient(0deg,rgba(14,18,30,.72),rgba(14,18,30,.08)),url("${content.promo1Image.replace(/["\\]/g,'')}")`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.color='#fff';}
+        if (content.promo2Image) {const el=document.querySelector('.rs-offer:nth-child(2)');el.style.backgroundImage=`linear-gradient(0deg,rgba(14,18,30,.72),rgba(14,18,30,.08)),url("${content.promo2Image.replace(/["\\]/g,'')}")`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.color='#fff';}
+        const allTitles=document.querySelectorAll('.rs-all-title');
+        [['featuredTitle',allTitles[0]?.querySelector('h2')],['featuredSubtitle',allTitles[0]?.querySelector('p')],['allTitle',allTitles[1]?.querySelector('h2')],['allSubtitle',allTitles[1]?.querySelector('p')],['moodHeading',document.querySelector('.rs-moods')?.previousElementSibling]].forEach(([key,el])=>{if(content[key]&&el)el.textContent=content[key];});
+        if (Array.isArray(content.moods)) document.querySelectorAll('.rs-mood').forEach((el,index)=>{if(content.moods[index])el.firstChild.textContent=content.moods[index];});
       }).catch(error => console.warn('Dining page content:',error.message));
       const rsBanners = ['rs-banner-a','rs-banner-b','rs-banner-c','rs-banner-d','rs-banner-e','rs-banner-f'];
       let cards = [];
