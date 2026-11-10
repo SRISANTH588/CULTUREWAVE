@@ -161,6 +161,12 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .alert-bar.blue{background:#eff6ff;border:1px solid #bfdbfe;}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:#1a1a2e;color:#fff;padding:.65rem 1.3rem;border-radius:10px;font-size:.82rem;font-weight:600;opacity:0;transition:all .25s;z-index:99;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.empty-state{padding:1.25rem;color:#64748b;font-size:.83rem;line-height:1.6;}
+.module-heading{margin:1.5rem 1.5rem 0;padding:1.5rem;border-radius:18px;background:linear-gradient(135deg,#450a0a,#dc2626,#f97316);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.module-heading h1{font-size:1.5rem;letter-spacing:-.03em;margin-bottom:.35rem;}.module-heading p{font-size:.84rem;color:#fee2e2;max-width:650px;line-height:1.5;}
+.an-metric.blue::before{background:linear-gradient(90deg,#dc2626,#f97316);}
+.table-scroll{overflow-x:auto;margin-top:.8rem;}.data-table-head,.reservation-row{display:grid;grid-template-columns:1.5fr 1fr .5fr 1fr 1fr 1.2fr 1.6fr;gap:.65rem;align-items:center;min-width:1050px;padding:.75rem;border-bottom:1px solid var(--border);}.data-table-head{font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:#b91c1c;font-weight:800;background:var(--psoft);}.reservation-row{font-size:.78rem;color:#6b7280;}.reservation-row strong{display:block;color:#1a1a2e;font-size:.82rem;}.row-actions{display:flex;gap:.25rem;flex-wrap:wrap;}.row-actions button,.mini-action{border:1px solid var(--border);background:#fff;border-radius:6px;padding:.25rem .4rem;font-size:.67rem;color:#6b7280;cursor:pointer;}.row-actions button:hover,.mini-action:hover{border-color:var(--p);color:var(--p);}
+.module-tabs{flex-wrap:wrap;margin-bottom:.7rem;}.tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;}.tile{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1rem;}.tile h3{font-size:.92rem;margin-bottom:.35rem;}.tile p{font-size:.76rem;color:#64748b;line-height:1.5;}.tile-actions{display:flex;gap:.4rem;margin-top:.8rem;flex-wrap:wrap;}.floor-plan{min-height:340px;border:1px dashed #cbd5e1;border-radius:14px;background-color:#f8fafc;background-image:linear-gradient(#e9eef5 1px,transparent 1px),linear-gradient(90deg,#e9eef5 1px,transparent 1px);background-size:24px 24px;padding:1rem;position:relative;display:flex;flex-wrap:wrap;gap:1rem;align-content:flex-start;}.floor-table{width:100px;height:84px;border-radius:18px;border:2px solid #93c5fd;background:#eff6ff;color:#1d4ed8;display:grid;place-content:center;text-align:center;cursor:grab;user-select:none;}.floor-table[data-status="Occupied"]{background:#dcfce7;border-color:#86efac;color:#15803d;}.floor-table[data-status="Reserved"]{background:#fef3c7;border-color:#fcd34d;color:#a16207;}.floor-table[data-status="Cleaning"]{background:#f1f5f9;border-color:#cbd5e1;color:#475569;}.floor-table[data-status="Blocked"]{background:#fee2e2;border-color:#fca5a5;color:#b91c1c;}.floor-table small{font-size:.68rem;}.legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:.8rem;font-size:.73rem;color:#64748b;}.cw-dialog{border:0;border-radius:16px;padding:1.4rem;width:min(520px,calc(100% - 2rem));box-shadow:0 24px 70px #0f172a33;}.cw-dialog::backdrop{background:#0f172a80;}.cw-dialog form{display:grid;gap:.7rem;}.cw-dialog h2{font-size:1.05rem;margin-bottom:.3rem;}.cw-dialog label,.settings-form label{display:grid;gap:.28rem;font-size:.72rem;font-weight:700;color:#475569;}.cw-dialog input,.cw-dialog select,.cw-dialog textarea,.settings-form input,.settings-form textarea{width:100%;padding:.6rem .7rem;border:1px solid #cbd5e1;border-radius:8px;font:inherit;font-size:.82rem;color:#172033;}.cw-dialog textarea,.settings-form textarea{min-height:70px;}.dialog-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.5rem;}.settings-form{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:1rem;}.settings-form label:last-of-type{grid-column:1/-1;}.search-box{min-width:230px;}.card{box-shadow:0 2px 12px rgba(15,23,42,.035);}
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;}
 .sb-overlay.open{display:block;}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;border:0;background:transparent;}
@@ -180,6 +186,8 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   .prem-stats{overflow-x:auto;}
   .prem-stat{min-width:120px;}
 }
+@media(max-width:900px){.page-body{padding:.75rem;}.module-heading{margin:.75rem .75rem 0;padding:1.2rem;border-radius:14px;}.settings-form{grid-template-columns:1fr;}.settings-form label:last-of-type{grid-column:auto;}.search-box{min-width:0;width:100%;}.card-head{align-items:flex-start;gap:.6rem;flex-wrap:wrap;}}
+@media(max-width:560px){.prem-actions{width:100%;}.prem-actions select,.prem-actions button{flex:1;}.module-heading h1{font-size:1.25rem;}}
 </style>
 </head>
 <body>
@@ -190,37 +198,38 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <div class="sb-brand-logo">CultureWave</div>
     <div class="sb-brand-cat">🍽️ Restaurant</div>
   </div>
-  <div class="sb-user" onclick="switchView('personal-info')">
+  <div class="sb-user" onclick="switchView('profile')">
     <div class="sb-avatar" id="sideAvatar">R</div>
     <div class="sb-user-info"><strong id="sidebarName">Client</strong><small>Restaurant Owner</small></div>
     <span class="sb-user-crown">👑</span>
   </div>
   <nav class="sb-nav">
-    <button class="sb-item active" data-view="overview"><span class="sb-icon">⊞</span> Dashboard</button>
-    <button class="sb-item" data-view="analytics"><span class="sb-icon">📈</span> Analytics</button>
-    <div class="sb-section-label">Money</div>
-    <button class="sb-item" data-view="payouts"><span class="sb-icon">🏦</span> Payouts</button>
-    <button class="sb-item" data-view="sales"><span class="sb-icon">💰</span> Sales Summary</button>
-    <div class="sb-section-label">Payment Pages</div>
-    <button class="sb-item" data-view="events"><span class="sb-icon">🍽️</span> Restaurant Events</button>
-    <button class="sb-item" data-view="dining"><span class="sb-icon">🍷</span> Dining Experiences</button>
-    <button class="sb-item" data-view="private"><span class="sb-icon">🕯️</span> Private Dining</button>
-    <div class="sb-section-label">Tools</div>
-    <button class="sb-item" data-view="instagram"><span class="sb-icon">📸</span> Instagram</button>
-    <button class="sb-item" data-view="whatsapp"><span class="sb-icon">💬</span> WhatsApp</button>
-    <button class="sb-item" data-view="surveys"><span class="sb-icon">📋</span> Survey Forms</button>
-    <button class="sb-item" data-view="inquiries"><span class="sb-icon">✉</span> Inquiries</button>
-    <a class="sb-item" href="checkin.html" target="_blank"><span class="sb-icon">📷</span> Check-In Scanner</a>
-    <button class="sb-item" onclick="location.href='https://wa.me/919848047428?text='+encodeURIComponent('Hi CultureWave! I need help with my Restaurant dashboard.')"><span class="sb-icon">💬</span> Contact Us</button>
-    <div class="sb-section-label">Account</div>
-    <button class="sb-item" data-view="personal-info"><span class="sb-icon">🪪</span> Brand & Profile</button>
-    <button class="sb-item" data-view="settings"><span class="sb-icon">⚙</span> Settings</button>
+    <div class="sb-section-label">Overview</div>
+    <button class="sb-item active" data-view="overview"><span class="sb-icon">⊞</span> Restaurant Overview</button>
+    <button class="sb-item" data-view="reservations"><span class="sb-icon">🗓</span> Reservations</button>
+    <button class="sb-item" data-view="tables"><span class="sb-icon">▦</span> Table Management</button>
+    <button class="sb-item" data-view="floor-plan"><span class="sb-icon">⌘</span> Floor Plan</button>
+    <button class="sb-item" data-view="waitlist"><span class="sb-icon">☷</span> Walk-ins & Waitlist</button>
+    <div class="sb-section-label">Restaurant Management</div>
+    <button class="sb-item" data-view="menu"><span class="sb-icon">🍽</span> Menu Management</button>
+    <button class="sb-item" data-view="offers"><span class="sb-icon">％</span> Offers & Discounts</button>
+    <button class="sb-item" data-view="customers"><span class="sb-icon">♙</span> Customers</button>
+    <div class="sb-section-label">Finance</div>
+    <button class="sb-item" data-view="payments"><span class="sb-icon">₹</span> Payments</button>
+    <button class="sb-item" data-view="settlements"><span class="sb-icon">⇄</span> Settlements & Commission</button>
+    <button class="sb-item" data-view="reports"><span class="sb-icon">📈</span> Reports & Analytics</button>
+    <div class="sb-section-label">Business Management</div>
+    <button class="sb-item" data-view="reviews"><span class="sb-icon">★</span> Reviews & Ratings</button>
+    <button class="sb-item" data-view="staff"><span class="sb-icon">♧</span> Staff & Permissions</button>
+    <button class="sb-item" data-view="profile"><span class="sb-icon">⌂</span> Restaurant Profile</button>
+    <button class="sb-item" data-view="documents"><span class="sb-icon">▤</span> Documents & Agreements</button>
+    <button class="sb-item" data-view="support"><span class="sb-icon">⚙</span> Support & Settings</button>
   </nav>
   <div class="sb-footer">
     <div class="sb-upgrade">
-      <div class="sb-upgrade-label">Current Plan</div>
-      <div class="sb-upgrade-plan">🍽️ Restaurant Plan</div>
-      <button class="sb-upgrade-btn" onclick="location.href='pricing.html'">Upgrade for more features</button>
+      <div class="sb-upgrade-label">Restaurant workspace</div>
+      <div class="sb-upgrade-plan">CultureWave Dine</div>
+      <div style="font-size:.72rem;color:#b9c7de;line-height:1.5">Your restaurant data stays scoped to your account.</div>
     </div>
   </div>
 </aside>
@@ -231,12 +240,12 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   <header class="topbar">
     <div style="display:flex;align-items:center;gap:.75rem;">
       <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()"><span></span><span></span><span></span></button>
-      <div class="topbar-title" id="pageTitle">🍽️ Restaurant Dashboard</div>
+      <div class="topbar-title" id="pageTitle">🍽️ Restaurant Overview</div>
     </div>
     <div class="topbar-right">
-      <a class="tb-link" href="index.html" target="_blank">⬡ View website</a>
-      <button class="tb-icon-btn">🔔<span class="tb-dot"></span></button>
-      <button class="tb-user-btn" onclick="switchView('personal-info')">
+      <span class="tb-link" id="restaurantBranchLabel">Restaurant partner portal</span>
+      <button class="tb-icon-btn" title="Notifications" onclick="switchView('overview');document.getElementById('restaurantNotifications')?.scrollIntoView({behavior:'smooth',block:'center'})">🔔<span class="tb-dot"></span></button>
+      <button class="tb-user-btn" onclick="switchView('profile')">
         <div class="tb-user-avatar" id="topAvatar">R</div>
         <span class="tb-user-name" id="topName">User</span>
       </button>
@@ -245,842 +254,168 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   </header>
   <div class="content">
 
-<!-- OVERVIEW -->
+<!-- RESTAURANT OVERVIEW -->
 <div class="view active" data-view="overview">
   <div class="prem-hdr">
     <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">✦ Premium Plan</div>
-        <div class="prem-title">Dashboard</div>
-        <div class="prem-sub">Welcome back! Here's your Restaurant business overview.</div>
-      </div>
-      <div class="prem-actions">
-        <button onclick="switchView('payouts')" class="prem-btn-ghost">🏦 Payouts</button>
-        <button onclick="switchView('sales')" class="prem-btn-ghost">📊 Sales</button>
-        <button onclick="location.href='pricing.html'" class="prem-btn-white">✦ Upgrade Plan</button>
-      </div>
+      <div class="prem-hdr-left"><div class="prem-badge">CULTUREWAVE DINE · PARTNER PORTAL</div><div class="prem-title">Restaurant overview</div><div class="prem-sub">A live view of reservations, service and restaurant performance.</div></div>
+      <div class="prem-actions"><select id="overviewDateRange" class="ev-act-btn" aria-label="Overview date range"><option>Today</option><option>Yesterday</option><option>Last 7 Days</option><option>Last 30 Days</option><option>Custom Range</option></select><button class="prem-btn-white" onclick="switchView('reservations')">＋ Manage reservations</button></div>
     </div>
     <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total Bookings</div><div class="prem-stat-val" id="mBookings">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Revenue</div><div class="prem-stat-val g" id="mRevenue">₹0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Total Events</div><div class="prem-stat-val y" id="mEvents">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Payout Balance</div><div class="prem-stat-val" id="mPayout">₹0</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div class="alert-bar red">
-      <div><div style="font-size:.86rem;font-weight:700;color:#991b1b;">Bank details needed</div><div style="font-size:.78rem;color:#b91c1c;margin-top:.1rem;">Add your bank account to receive payouts for your bookings.</div></div>
-      <button onclick="switchView('personal-info')" style="padding:.45rem 1rem;border-radius:8px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;font-weight:700;font-size:.8rem;border:0;cursor:pointer;">Add Bank →</button>
-    </div>
-    <div class="alert-bar blue">
-      <div><div style="font-size:.86rem;font-weight:700;color:#1e40af;">PAN verification pending</div><div style="font-size:.78rem;color:#3b82f6;margin-top:.1rem;">Add your PAN with name and date of birth to verify your payouts.</div></div>
-      <button onclick="switchView('personal-info')" style="padding:.45rem 1rem;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;font-size:.8rem;border:0;cursor:pointer;">Verify PAN →</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:.75rem;">
-      <div style="border-radius:14px;overflow:hidden;border:1px solid var(--border);">
-        <div style="background:linear-gradient(135deg,#dc2626,#f97316);padding:1.1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
-          <div><div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.7);margin-bottom:.25rem;">Current Plan</div><div style="font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Free</div></div>
-          <div style="display:flex;align-items:center;gap:.6rem;"><span style="padding:.28rem .65rem;border-radius:999px;background:rgba(255,255,255,.2);font-size:.7rem;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.3);">Active</span><a href="pricing.html" style="padding:.38rem .8rem;border-radius:8px;background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:.78rem;border:1px solid rgba(255,255,255,.3);text-decoration:none;">Upgrade</a></div>
-        </div>
-        <div style="background:#fff;padding:1rem 1.2rem;">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.9rem;">
-            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;">5 Events</div><div style="font-size:.72rem;color:#9ca3af;">Monthly limit</div></div>
-            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;" id="planUsageLabel">0 used</div><div style="font-size:.72rem;color:#9ca3af;">Events created</div></div>
-            <div style="padding:.6rem .75rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);"><div style="font-size:.9rem;font-weight:800;color:#1a1a2e;">Basic</div><div style="font-size:.72rem;color:#9ca3af;">Analytics tier</div></div>
-          </div>
-          <div style="height:6px;border-radius:999px;background:var(--plight);overflow:hidden;"><div id="planUsageBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#dc2626,#f97316);width:0%;transition:width .5s;"></div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div><h2>Recent Activity</h2><p>Latest bookings & updates</p></div><button class="card-link" onclick="switchView('sales')">View all</button></div>
-        <div id="overviewActivity"><div style="text-align:center;padding:2rem 1rem;border:1px dashed var(--border);border-radius:10px;color:#b91c1c;font-size:.82rem;">No activity yet</div></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><div><h2>Billing History</h2><p>Track paid bookings and plan changes</p></div></div>
-      <div id="overviewBilling"><div style="text-align:center;padding:2rem 1rem;border:1px dashed var(--border);border-radius:10px;color:#9ca3af;font-size:.82rem;">No transactions yet</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- RESTAURANT EVENTS -->
-<div class="view" data-view="events">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">🍽️ Restaurant Events</div>
-        <div class="prem-title">My Restaurant Events</div>
-        <div class="prem-sub">Create, manage and publish your restaurant events. Track bookings and revenue in real time.</div>
-      </div>
-      <div class="prem-actions">
-        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
-        <button onclick="switchView('personal-info')" class="prem-btn-ghost">⚙ Brand Settings</button>
-        <button onclick="location.href='restaurant-create.html?from=restaurant'" class="prem-btn-white">✦ Create Event</button>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total Events</div><div class="prem-stat-val" id="hdrTotal">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Published</div><div class="prem-stat-val g" id="hdrPublished">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Unpublished</div><div class="prem-stat-val y" id="hdrDraft">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Plan Limit</div><div class="prem-stat-val">∞ <span style="font-size:.78rem;font-weight:500;color:rgba(255,255,255,.5);">unlimited</span></div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
-      <div class="tabs" id="evTabs">
-        <button class="tab active" data-tab="published">◉ Published <span class="tab-count" id="tabCountPublished">0</span></button>
-        <button class="tab" data-tab="unpublished">◎ Unpublished</button>
-        <button class="tab" data-tab="archived">▣ Archived</button>
-      </div>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:.5rem;">
-        <div class="search-box"><span>🔍</span><input type="search" id="evSearch" placeholder="Search events..."/></div>
-        <button class="refresh-btn" id="evRefresh">↻</button>
-      </div>
-    </div>
-    <div id="eventsContainer"></div>
-  </div>
-</div>
-
-<!-- DINING EXPERIENCES -->
-<div class="view" data-view="dining">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">🍷 Dining Experiences</div>
-        <div class="prem-title">My Dining Experiences</div>
-        <div class="prem-sub">Manage special tasting menus, chef's table events and curated dining experiences.</div>
-      </div>
-      <div class="prem-actions">
-        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
-        <button onclick="location.href='restaurant-create.html?from=restaurant'" class="prem-btn-white">✦ Create Experience</button>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total</div><div class="prem-stat-val">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Active</div><div class="prem-stat-val g">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Bookings</div><div class="prem-stat-val y">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Plan Limit</div><div class="prem-stat-val">∞</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3rem 2rem;text-align:center;">
-      <div style="width:88px;height:88px;border-radius:50%;background:#c0392b;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🍷</div>
-      <h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No dining experiences yet</h3>
-      <p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first dining experience and start accepting reservations.</p>
-      <button onclick="location.href='restaurant-create.html?from=restaurant'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.2rem;border-radius:999px;background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(185,28,28,.35);">✦ Create Dining Experience</button>
-    </div>
-  </div>
-</div>
-
-<!-- PRIVATE DINING -->
-<div class="view" data-view="private">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">🕯️ Private Dining</div>
-        <div class="prem-title">My Private Dining</div>
-        <div class="prem-sub">Manage exclusive private dining rooms, corporate events and intimate celebrations.</div>
-      </div>
-      <div class="prem-actions">
-        <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
-        <button onclick="location.href='restaurant-create.html?from=restaurant'" class="prem-btn-white">✦ Create Private Event</button>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total</div><div class="prem-stat-val">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Active</div><div class="prem-stat-val g">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Bookings</div><div class="prem-stat-val y">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Plan Limit</div><div class="prem-stat-val">∞</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3rem 2rem;text-align:center;">
-      <div style="width:88px;height:88px;border-radius:50%;background:#7f1d1d;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🕯️</div>
-      <h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No private dining events yet</h3>
-      <p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first private dining event and manage exclusive bookings.</p>
-      <button onclick="location.href='restaurant-create.html?from=restaurant'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.2rem;border-radius:999px;background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(127,29,29,.35);">✦ Create Private Event</button>
-    </div>
-  </div>
-</div>
-
-<!-- ANALYTICS -->
-<div class="view" data-view="analytics">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">📈 Analytics</div>
-        <div class="prem-title">Analytics Overview</div>
-        <div class="prem-sub">Track your restaurant event performance and revenue trends.</div>
-      </div>
-      <div class="prem-actions">
-        <div class="period-tabs" id="periodTabs">
-          <button class="period-tab active" data-period="7">7 days</button>
-          <button class="period-tab" data-period="30">30 days</button>
-          <button class="period-tab" data-period="90">90 days</button>
-          <button class="period-tab" data-period="365">1 year</button>
-        </div>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total Revenue</div><div class="prem-stat-val g" id="anRevenue">₹0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Reservations</div><div class="prem-stat-val" id="anRegs">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Events Live</div><div class="prem-stat-val y" id="anLive">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Avg. per Event</div><div class="prem-stat-val" id="anAvg">₹0</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Today’s Reservations</div><div class="prem-stat-val" id="ovReservations">—</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Pending</div><div class="prem-stat-val y" id="ovPending">—</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Confirmed</div><div class="prem-stat-val g" id="ovConfirmed">—</div></div>
+      <div class="prem-stat"><div class="prem-stat-lbl">Customers Arrived</div><div class="prem-stat-val" id="ovArrived">—</div></div>
     </div>
   </div>
   <div class="page-body">
     <div class="an-metrics">
-      <div class="an-metric red"><div class="an-metric-label">Total Revenue</div><div class="an-metric-val" id="anRevenue2">₹0</div><div class="an-metric-sub"><span class="up">↑ 0%</span> vs prev period</div></div>
-      <div class="an-metric green"><div class="an-metric-label">Reservations</div><div class="an-metric-val" id="anRegs2">0</div><div class="an-metric-sub"><span class="up">↑ 0%</span> vs prev period</div></div>
-      <div class="an-metric orange"><div class="an-metric-label">Events Live</div><div class="an-metric-val" id="anLive2">0</div><div class="an-metric-sub">Published listings</div></div>
-      <div class="an-metric yellow"><div class="an-metric-label">Avg. per Event</div><div class="an-metric-val" id="anAvg2">₹0</div><div class="an-metric-sub">Revenue per event</div></div>
+      <div class="an-metric blue"><div class="an-metric-label">Today’s Revenue</div><div class="an-metric-val" id="ovRevenue">₹—</div><div class="an-metric-sub">Verified payments only</div></div>
+      <div class="an-metric green"><div class="an-metric-label">Available Tables</div><div class="an-metric-val" id="ovAvailableTables">—</div><div class="an-metric-sub">Live table status</div></div>
+      <div class="an-metric orange"><div class="an-metric-label">Table Occupancy</div><div class="an-metric-val" id="ovOccupancy">—</div><div class="an-metric-sub">Current service</div></div>
+      <div class="an-metric yellow"><div class="an-metric-label">Cancelled Today</div><div class="an-metric-val" id="ovCancelled">—</div><div class="an-metric-sub">No-show: <span id="ovNoShow">—</span></div></div>
     </div>
     <div class="an-grid">
-      <div class="card">
-        <div class="card-head"><div><h2>Revenue Over Time</h2><p>Daily paid bookings</p></div></div>
-        <div class="bar-chart" id="revenueChart"></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div><h2>Quick Stats</h2><p>Key performance numbers</p></div></div>
-        <div class="stat-row"><div class="stat-row-label">🍽️ Total Events Created</div><div class="stat-row-val" id="qsTotal">0</div></div>
-        <div class="stat-row"><div class="stat-row-label">🟢 Published Events</div><div class="stat-row-val" id="qsPublished">0</div></div>
-        <div class="stat-row"><div class="stat-row-label">📝 Draft Events</div><div class="stat-row-val" id="qsDraft">0</div></div>
-        <div class="stat-row"><div class="stat-row-label">💳 Free Events</div><div class="stat-row-val" id="qsFree">0</div></div>
-        <div class="stat-row"><div class="stat-row-label">💰 Paid Events</div><div class="stat-row-val" id="qsPaid">0</div></div>
-        <div class="stat-row"><div class="stat-row-label">⭐ Avg Ticket Price</div><div class="stat-row-val" id="qsAvgPrice">₹0</div></div>
-      </div>
+      <div class="card"><div class="card-head"><div><h2>Reservation trends</h2><p>Recent reservation activity</p></div></div><div class="bar-chart" id="reservationChart"><div class="empty-state">Reservation data will appear here when connected.</div></div></div>
+      <div class="card"><div class="card-head"><div><h2>Revenue analytics</h2><p>Verified payments over the selected period</p></div></div><div id="revenueAnalytics" class="empty-state">Revenue data will appear here after verified transactions are recorded.</div></div>
     </div>
+    <div class="an-grid">
+      <div class="card"><div class="card-head"><div><h2>Upcoming reservations</h2><p>Your next guests</p></div><button class="card-link" onclick="switchView('reservations')">View all →</button></div><div id="overviewReservations" class="empty-state">Loading restaurant reservations…</div></div>
+      <div class="card"><div class="card-head"><div><h2>Notifications</h2><p>Updates for your restaurant</p></div></div><div id="restaurantNotifications" class="empty-state">No new notifications.</div></div>
+    </div>
+    <div class="an-grid">
+      <div class="card"><div class="card-head"><div><h2>Recent transactions</h2><p>Payment state is reported from stored transaction records</p></div><button class="card-link" onclick="switchView('payments')">Payments →</button></div><div id="overviewTransactions" class="empty-state">No transactions available.</div></div>
+      <div class="card"><div class="card-head"><div><h2>Recent reviews</h2><p>Guest feedback</p></div><button class="card-link" onclick="switchView('reviews')">Reviews →</button></div><div id="overviewReviews" class="empty-state">No reviews available.</div></div>
+    </div>
+    <div class="card"><div class="card-head"><div><h2>Popular reservation slots</h2><p>Based on your restaurant reservation data</p></div></div><div id="popularSlots" class="empty-state">Slot insights will appear when reservation records are available.</div></div>
   </div>
 </div>
 
-<!-- SALES -->
-<div class="view" data-view="sales">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">💰 Sales Summary</div>
-        <div class="prem-title">Sales Summary</div>
-        <div class="prem-sub">Track all reservation payments, revenue and settlement status in real time.</div>
-      </div>
-      <div class="prem-actions">
-        <button onclick="switchView('payouts')" class="prem-btn-ghost">🏦 View Payouts</button>
-        <button onclick="switchView('events')" class="prem-btn-white">✦ Create Event</button>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total Revenue</div><div class="prem-stat-val" id="salesTotalRev">₹0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Settled</div><div class="prem-stat-val g" id="salesSettled">₹0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Pending</div><div class="prem-stat-val y" id="salesPending">₹0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Transactions</div><div class="prem-stat-val" id="salesCount">0</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
-      <div class="tabs" id="salesTabs">
-        <button class="tab active" data-stab="all">All Transactions</button>
-        <button class="tab" data-stab="paid">✅ Paid</button>
-        <button class="tab" data-stab="pending">⏳ Pending</button>
-        <button class="tab" data-stab="cancelled">❌ Cancelled</button>
-      </div>
-      <div style="margin-left:auto;"><div class="search-box"><span>🔍</span><input type="search" id="salesSearch" placeholder="Search transactions..."/></div></div>
-    </div>
-    <div class="fin-table">
-      <div class="fin-table-head" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:.65rem 1.1rem;">
-        <span>Event</span><span>Date</span><span>Tickets</span><span>Amount</span><span>Status</span>
-      </div>
-      <div id="salesTableBody">
-        <div style="display:flex;flex-direction:column;align-items:center;padding:4rem 2rem;text-align:center;">
-          <div style="width:88px;height:88px;border-radius:50%;background:#c0392b;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">💰</div>
-          <div style="font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:.4rem;">No sales yet</div>
-          <div style="font-size:.84rem;color:#9ca3af;max-width:280px;line-height:1.6;margin-bottom:1.25rem;">Sales will appear here once guests book your restaurant events.</div>
-          <button onclick="switchView('events')" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.4rem;border-radius:8px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;">✦ Create Your First Event</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- RESTAURANT PARTNER MODULES -->
+<div class="view" data-view="reservations"><div class="prem-hdr"><div class="prem-hdr-top"><div class="prem-hdr-left"><div class="prem-badge">OVERVIEW</div><div class="prem-title">Reservations</div><div class="prem-sub">Review requests and manage each guest’s visit. Guests book by date, party size and available time.</div></div><div class="prem-actions"><button class="prem-btn-ghost" onclick="switchView('waitlist')">＋ Add walk-in</button></div></div><div class="prem-stats"><div class="prem-stat"><div class="prem-stat-lbl">All reservations</div><div class="prem-stat-val" id="resAll">—</div></div><div class="prem-stat"><div class="prem-stat-lbl">Pending</div><div class="prem-stat-val y" id="resPending">—</div></div><div class="prem-stat"><div class="prem-stat-lbl">Confirmed</div><div class="prem-stat-val g" id="resConfirmed">—</div></div><div class="prem-stat"><div class="prem-stat-lbl">Arrived</div><div class="prem-stat-val" id="resArrived">—</div></div></div></div><div class="page-body"><div class="card"><div class="card-head"><div><h2>Reservation book</h2><p>Reservation records load from the restaurant’s authorised data scope.</p></div><input class="search-box" id="reservationSearch" placeholder="Search guest or booking ID"/></div><div class="tabs module-tabs" id="reservationTabs"><button class="tab active" data-filter="All">All</button><button class="tab" data-filter="New Requests">New Requests</button><button class="tab" data-filter="Pending">Pending</button><button class="tab" data-filter="Confirmed">Confirmed</button><button class="tab" data-filter="Arrived">Arrived</button><button class="tab" data-filter="Completed">Completed</button><button class="tab" data-filter="Cancelled">Cancelled</button><button class="tab" data-filter="Rejected">Rejected</button><button class="tab" data-filter="No-show">No-show</button></div><div class="table-scroll"><div class="data-table-head reservation-columns"><span>Booking / Guest</span><span>Mobile</span><span>Guests</span><span>Date & time</span><span>Source / Payment</span><span>Offer / Request</span><span>Status / Actions</span></div><div id="reservationsTable" class="empty-state">Loading reservations…</div></div></div></div></div>
+<div class="view" data-view="tables"><div class="module-heading"><h1>Table management</h1><p>Configure tables, sections, capacity and operational status.</p><button class="brand-save-btn" onclick="openTableDialog()">＋ Add table</button></div><div class="page-body"><div class="an-metrics"><div class="an-metric blue"><div class="an-metric-label">Available</div><div class="an-metric-val" id="tableAvailable">—</div></div><div class="an-metric orange"><div class="an-metric-label">Reserved</div><div class="an-metric-val" id="tableReserved">—</div></div><div class="an-metric green"><div class="an-metric-label">Occupied</div><div class="an-metric-val" id="tableOccupied">—</div></div><div class="an-metric yellow"><div class="an-metric-label">Cleaning / Blocked</div><div class="an-metric-val" id="tableOther">—</div></div></div><div class="card"><div class="card-head"><div><h2>Restaurant tables</h2><p>Internal table assignment checks overlapping reservation intervals.</p></div><select id="tableSectionFilter" class="ev-act-btn"><option value="">All sections</option><option>Indoor</option><option>Outdoor</option><option>Rooftop</option><option>Family</option><option>Private Dining</option><option>Bar</option></select></div><div id="tablesGrid" class="tile-grid empty-state">Loading table inventory…</div></div></div><dialog id="tableDialog" class="cw-dialog"><form method="dialog" id="tableForm"><h2 id="tableDialogTitle">Add table</h2><input type="hidden" id="tableId"/><label>Table ID<input id="tableName" required placeholder="T1"/></label><label>Seating capacity<input id="tableCapacity" type="number" min="1" value="2" required/></label><label>Section<select id="tableSection"><option>Indoor</option><option>Outdoor</option><option>Rooftop</option><option>Family</option><option>Private Dining</option><option>Bar</option></select></label><label>Status<select id="tableStatus"><option>Available</option><option>Reserved</option><option>Occupied</option><option>Cleaning</option><option>Blocked</option></select></label><div class="dialog-actions"><button class="ev-act-btn" value="cancel">Cancel</button><button class="brand-save-btn" value="save" onclick="saveRestaurantTable(event)">Save table</button></div></form></dialog></div>
+<div class="view" data-view="floor-plan"><div class="module-heading"><h1>Floor plan</h1><p>Arrange tables for your service. Drag tables to reposition; positions are saved to your restaurant workspace.</p><button class="brand-save-btn" onclick="switchView('tables')">Manage tables</button></div><div class="page-body"><div class="card"><div class="card-head"><div><h2>Dining room</h2><p>Choose a section to view tables</p></div><select id="floorSectionFilter" class="ev-act-btn"><option value="">All sections</option><option>Indoor</option><option>Outdoor</option><option>Rooftop</option><option>Family</option><option>Private Dining</option><option>Bar</option></select></div><div id="floorPlanCanvas" class="floor-plan"><div class="empty-state">Add tables to your restaurant to build a floor plan.</div></div><div class="legend"><span>● Available</span><span>● Reserved</span><span>● Occupied</span><span>● Cleaning</span><span>● Blocked</span></div></div></div></div>
+<div class="view" data-view="waitlist"><div class="module-heading"><h1>Walk-ins & waitlist</h1><p>Record arriving guests and manage the queue.</p><button class="brand-save-btn" onclick="openWalkinDialog()">＋ Add guest</button></div><div class="page-body"><div class="an-metrics"><div class="an-metric blue"><div class="an-metric-label">Waiting</div><div class="an-metric-val" id="waitCount">—</div></div><div class="an-metric green"><div class="an-metric-label">Available tables</div><div class="an-metric-val" id="waitTablesAvailable">—</div></div></div><div class="card"><div class="card-head"><div><h2>Waiting guests</h2><p>Walk-in and waitlist entries for this restaurant</p></div></div><div id="waitlistRows" class="empty-state">No guests in the waitlist.</div></div></div><dialog id="walkinDialog" class="cw-dialog"><form method="dialog" id="walkinForm"><h2>Add walk-in / waitlist guest</h2><label>Customer name<input id="walkName" required/></label><label>Mobile number<input id="walkMobile" type="tel" required/></label><label>Guest count<input id="walkGuests" type="number" min="1" value="2" required/></label><label>Arrival time<input id="walkArrival" type="time" required/></label><label>Estimated wait (minutes)<input id="walkWait" type="number" min="0" value="15"/></label><label>Assign available table (optional)<select id="walkTable"><option value="">Add to waitlist</option></select></label><div class="dialog-actions"><button class="ev-act-btn" value="cancel">Cancel</button><button class="brand-save-btn" value="save" onclick="saveWalkin(event)">Add guest</button></div></form></dialog></div>
+<div class="view" data-view="menu"><div class="module-heading"><h1>Menu management</h1><p>Manage customer-facing categories and food items.</p><button class="brand-save-btn" onclick="openMenuDialog()">＋ Add item</button></div><div class="page-body"><div class="an-grid"><div class="card"><div class="card-head"><div><h2>Categories</h2><p>Organise your menu</p></div><button class="ev-act-btn" onclick="addMenuCategory()">＋ Add category</button></div><div id="menuCategories" class="empty-state">No menu categories yet.</div></div><div class="card"><div class="card-head"><div><h2>Customer preview</h2><p>How guests see your menu</p></div></div><div id="menuPreview" class="empty-state">Menu preview will appear here.</div></div></div><div class="card"><div class="card-head"><div><h2>Menu items</h2><p>Prices, dietary indicators, tax and availability</p></div><input id="menuSearch" class="search-box" placeholder="Search menu items"/></div><div id="menuItems" class="tile-grid empty-state">No menu items yet.</div></div></div><dialog id="menuDialog" class="cw-dialog"><form method="dialog"><h2>Add menu item</h2><label>Item name<input id="menuItemName" required/></label><label>Category<input id="menuItemCategory" required/></label><label>Description<textarea id="menuItemDescription"></textarea></label><label>Price (₹)<input id="menuItemPrice" type="number" min="0" step="0.01" required/></label><label>Dietary indicator<select id="menuItemType"><option>Veg</option><option>Non-veg</option></select></label><label>Tax rate (%)<input id="menuItemTax" type="number" min="0" step="0.01" value="0"/></label><label>Image URL<input id="menuItemImage" type="url"/></label><label><input type="checkbox" id="menuItemAvailable" checked/> Available</label><div class="dialog-actions"><button class="ev-act-btn" value="cancel">Cancel</button><button class="brand-save-btn" value="save" onclick="saveMenuItem(event)">Save item</button></div></form></dialog></div>
+<div class="view" data-view="offers"><div class="module-heading"><h1>Offers & discounts</h1><p>Create restaurant-funded promotions and track their redemptions.</p><button class="brand-save-btn" onclick="openOfferDialog()">＋ Create offer</button></div><div class="page-body"><div class="alert-bar blue">Restaurant-funded promotions are the default. Bank-funded and co-funded promotions require separate CultureWave approval.</div><div class="an-metrics"><div class="an-metric blue"><div class="an-metric-label">Offers</div><div class="an-metric-val" id="offerCount">—</div></div><div class="an-metric orange"><div class="an-metric-label">Discount expenditure</div><div class="an-metric-val" id="offerSpend">₹—</div></div></div><div class="card"><div id="offersRows" class="empty-state">No offers created yet.</div></div></div><dialog id="offerDialog" class="cw-dialog"><form method="dialog"><h2>Create offer</h2><label>Offer name<input id="offerName" required/></label><label>Discount type<select id="offerType"><option value="percentage">Percentage</option><option value="flat">Flat amount</option></select></label><label>Discount value<input id="offerValue" type="number" min="1" required/></label><label>Minimum bill<input id="offerMinBill" type="number" min="0" value="0"/></label><label>Maximum discount<input id="offerMaxDiscount" type="number" min="0"/></label><label>Valid from<input id="offerFrom" type="date" required/></label><label>Valid until<input id="offerUntil" type="date" required/></label><label>Applicable days<input id="offerDays" placeholder="Mon,Tue,Wed"/></label><label>Time slots<input id="offerSlots" placeholder="Lunch, Dinner"/></label><label>Redemption limit<input id="offerLimit" type="number" min="1"/></label><label>Terms<textarea id="offerTerms"></textarea></label><div class="dialog-actions"><button class="ev-act-btn" value="cancel">Cancel</button><button class="brand-save-btn" value="save" onclick="saveRestaurantOffer(event)">Save offer</button></div></form></dialog></div>
+<div class="view" data-view="customers"><div class="module-heading"><h1>Customers</h1><p>Guest history, visits and feedback for your restaurant.</p></div><div class="page-body"><div class="card"><div class="card-head"><div><h2>Customer directory</h2><p>Customer profiles and booking history</p></div><input id="customerSearch" class="search-box" placeholder="Search name, phone or email"/></div><div id="customerRows" class="empty-state">Customer records will appear here.</div></div></div></div>
+<div class="view" data-view="payments"><div class="module-heading"><h1>Payments</h1><p>Transaction state is read from stored payment records. Payment verification occurs through secure backend and gateway webhooks.</p></div><div class="page-body"><div class="alert-bar blue">Payment success is never inferred from a booking. Only gateway-verified payment records appear as successful.</div><div class="tabs module-tabs" id="paymentTabs"><button class="tab active" data-filter="All">All</button><button class="tab" data-filter="Successful">Successful</button><button class="tab" data-filter="Pending">Pending</button><button class="tab" data-filter="Failed">Failed</button><button class="tab" data-filter="Refunded">Refunded</button><button class="tab" data-filter="Partially Refunded">Partially Refunded</button></div><div class="card"><div id="paymentsRows" class="empty-state">Loading payment records…</div></div></div></div>
+<div class="view" data-view="settlements"><div class="module-heading"><h1>Settlements & commission</h1><p>Commission terms are configured by the CultureWave platform administrator.</p></div><div class="page-body"><div class="an-metrics"><div class="an-metric blue"><div class="an-metric-label">Total collected</div><div class="an-metric-val" id="stCollected">₹—</div></div><div class="an-metric orange"><div class="an-metric-label">Eligible transaction value</div><div class="an-metric-val" id="stEligible">₹—</div></div><div class="an-metric yellow"><div class="an-metric-label">Commission / charges / taxes</div><div class="an-metric-val" id="stDeductions">₹—</div></div><div class="an-metric green"><div class="an-metric-label">Net settlement</div><div class="an-metric-val" id="stNet">₹—</div></div></div><div class="card"><div class="card-head"><div><h2>Settlement history</h2><p>Amounts and status from settlement records</p></div></div><div id="settlementsRows" class="empty-state">Settlement records will appear here.</div></div></div></div>
+<div class="view" data-view="reports"><div class="module-heading"><h1>Reports & analytics</h1><p>Restaurant revenue, reservations, retention, occupancy and offer performance.</p></div><div class="page-body"><div class="an-metrics"><div class="an-metric blue"><div class="an-metric-label">Reservation performance</div><div class="an-metric-val" id="reportReservations">—</div></div><div class="an-metric green"><div class="an-metric-label">Average booking value</div><div class="an-metric-val" id="reportAverage">₹—</div></div><div class="an-metric orange"><div class="an-metric-label">Cancellation rate</div><div class="an-metric-val" id="reportCancelRate">—</div></div><div class="an-metric yellow"><div class="an-metric-label">No-show rate</div><div class="an-metric-val" id="reportNoShowRate">—</div></div></div><div class="an-grid"><div class="card"><div class="card-head"><div><h2>Daily revenue</h2><p>Revenue records by day</p></div><button class="ev-act-btn" onclick="exportReportCsv()">Export CSV</button></div><div id="reportsChart" class="bar-chart"><div class="empty-state">Reports need restaurant data.</div></div></div><div class="card"><div class="card-head"><div><h2>Operational rates</h2></div><button class="ev-act-btn" onclick="exportReportPdf()">Export PDF</button></div><div id="reportBreakdown" class="empty-state">Customer retention, occupancy, popular slots, offers and payment distribution will appear with connected records.</div></div></div></div></div>
+<div class="view" data-view="reviews"><div class="module-heading"><h1>Reviews & ratings</h1><p>Monitor guest feedback and respond through your restaurant account.</p></div><div class="page-body"><div class="an-metrics"><div class="an-metric blue"><div class="an-metric-label">Overall rating</div><div class="an-metric-val" id="reviewRating">—</div></div><div class="an-metric orange"><div class="an-metric-label">Reviews</div><div class="an-metric-val" id="reviewCount">—</div></div></div><div class="card"><div class="card-head"><div><h2>Guest reviews</h2><p>Review reply/report actions depend on connected review permissions.</p></div><select id="reviewFilter" class="ev-act-btn"><option value="">All ratings</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div><div id="reviewsRows" class="empty-state">No reviews available.</div></div></div></div>
+<div class="view" data-view="staff"><div class="module-heading"><h1>Staff & permissions</h1><p>Manage authorised access for your restaurant.</p><button class="brand-save-btn" onclick="inviteRestaurantStaff()">＋ Invite staff</button></div><div class="page-body"><div class="card"><div class="card-head"><div><h2>Restaurant staff</h2><p>Owner, Manager, Receptionist, Cashier, Reservation Staff and Custom Role</p></div></div><div id="staffRows" class="empty-state">Staff accounts are scoped to your restaurant. Role and activity details appear when provisioned.</div></div><div class="card"><h2>Recent staff activity</h2><div id="activityRows" class="empty-state">No staff activity available.</div></div></div></div>
+<div class="view" data-view="documents"><div class="module-heading"><h1>Documents & agreements</h1><p>Upload and track required restaurant verification documents.</p></div><div class="page-body"><div class="alert-bar blue">Documents are stored privately and reviewed by CultureWave. Verification status comes from the review workflow.</div><div class="card"><div class="card-head"><div><h2>Verification documents</h2><p>FSSAI, PAN, GST, business registration, owner, bank and address verification</p></div><button class="ev-act-btn" onclick="document.getElementById('documentUpload').click()">＋ Upload document</button></div><input id="documentUpload" type="file" hidden/><div id="documentRows" class="tile-grid empty-state">No uploaded documents.</div></div><div class="card"><h2>Agreements</h2><div id="agreementRows" class="empty-state">No agreements available.</div></div></div></div>
+<div class="view" data-view="support"><div class="module-heading"><h1>Support & settings</h1><p>Operating rules, notifications, payment preferences, security and support tickets.</p><button class="brand-save-btn" onclick="openTicketDialog()">＋ Create support ticket</button></div><div class="page-body"><div class="an-grid"><div class="card"><h2>Reservation settings</h2><div class="settings-form"><label>Operating hours<input id="settingHours" placeholder="10:00–22:00"/></label><label>Reservation interval (minutes)<input id="settingInterval" type="number" value="30"/></label><label>Reservation duration (minutes)<input id="settingDuration" type="number" value="90"/></label><label>Maximum guests per booking<input id="settingMaxGuests" type="number" value="12"/></label><label>Advance booking period (days)<input id="settingAdvance" type="number" value="30"/></label><label>Cancellation rules<textarea id="settingCancellation"></textarea></label><button class="brand-save-btn" onclick="saveRestaurantSettings()">Save settings</button></div></div><div class="card"><h2>Support tickets</h2><div id="supportRows" class="empty-state">No support tickets yet.</div></div></div><dialog id="ticketDialog" class="cw-dialog"><form method="dialog"><h2>Create support ticket</h2><label>Subject<input id="ticketSubject" required/></label><label>Message<textarea id="ticketMessage" required></textarea></label><div class="dialog-actions"><button class="ev-act-btn" value="cancel">Cancel</button><button class="brand-save-btn" value="save" onclick="saveSupportTicket(event)">Create ticket</button></div></form></dialog></div></div>
 
-<!-- PAYOUTS -->
-<div class="view" data-view="payouts">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">🏦 Payouts</div>
-        <div class="prem-title">Payouts</div>
-        <div class="prem-sub">Track your earnings, settlement status and bank transfers. Payouts processed every 7 days.</div>
-      </div>
-      <div class="prem-actions">
-        <button onclick="switchView('personal-info')" class="prem-btn-ghost">⚙ Bank Settings</button>
-        <button onclick="switchView('sales')" class="prem-btn-white">💰 View Sales</button>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total Paid Out</div><div class="prem-stat-val g" id="payoutTotal">₹0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">In Transit</div><div class="prem-stat-val" id="payoutTransit">₹0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">On Hold</div><div class="prem-stat-val y" id="payoutHold">₹0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Next Payout</div><div class="prem-stat-val" id="payoutNext">—</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div class="alert-bar blue">
-      <div style="display:flex;align-items:center;gap:.75rem;"><span style="font-size:1.2rem;">ℹ️</span><div><div style="font-size:.86rem;font-weight:700;color:#1e40af;">Payout Schedule</div><div style="font-size:.78rem;color:#3b82f6;margin-top:.1rem;">Payouts processed every 7 days after event completion. Minimum ₹500.</div></div></div>
-      <button onclick="switchView('personal-info')" style="padding:.42rem .9rem;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;font-size:.8rem;border:0;cursor:pointer;white-space:nowrap;">Add Bank →</button>
-    </div>
-    <div class="card">
-      <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);">Bank Account</div>
-      <div style="background:var(--psoft);border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:.75rem;">
-          <div style="width:42px;height:42px;border-radius:10px;background:var(--plight);display:grid;place-items:center;font-size:1.1rem;">🏦</div>
-          <div><strong style="display:block;font-size:.88rem;font-weight:700;color:#1a1a2e;">No bank account linked</strong><span style="font-size:.76rem;color:#9ca3af;">Add your bank details to receive payouts</span></div>
-        </div>
-        <button onclick="switchView('personal-info')" style="padding:.42rem .9rem;border-radius:8px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;font-weight:700;font-size:.8rem;border:0;cursor:pointer;">+ Add Bank Details</button>
-      </div>
-    </div>
-    <div class="fin-table">
-      <div class="fin-table-head" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:.65rem 1.1rem;">
-        <span>Payout ID</span><span>Date</span><span>Events</span><span>Amount</span><span>Status</span>
-      </div>
-      <div id="payoutsTableBody">
-        <div style="display:flex;flex-direction:column;align-items:center;padding:4rem 2rem;text-align:center;">
-          <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#f97316);display:grid;place-items:center;font-size:1.8rem;margin-bottom:1rem;">🏦</div>
-          <div style="font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:.4rem;">No payouts yet</div>
-          <div style="font-size:.84rem;color:#9ca3af;max-width:300px;line-height:1.6;margin-bottom:1.25rem;">Payouts will appear once your events generate revenue.</div>
-          <button onclick="switchView('personal-info')" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.4rem;border-radius:8px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;">🏦 Add Bank Details</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- RESTAURANT PROFILE -->
+<div class="view" data-view="personal-info profile">
+  <div class="module-heading"><div><h1>Restaurant profile</h1><p>Maintain the details guests see on your CultureWave Dine listing.</p></div></div>
+  <div class="page-body"><div class="card"><div class="settings-form">
+    <label>Restaurant name<input id="restaurantName" placeholder="Restaurant name"/></label>
+    <label>Contact phone<input id="restaurantPhone" type="tel" placeholder="+91"/></label>
+    <label>Contact email<input id="restaurantEmail" type="email" placeholder="name@restaurant.in"/></label>
+    <label>Cuisine<input id="restaurantCuisine" placeholder="e.g. South Indian"/></label>
+    <label>Address<input id="restaurantAddress" placeholder="Street, city, state"/></label>
+    <label>Opening hours<input id="restaurantHours" placeholder="10:00–22:00"/></label>
+    <label>Description<textarea id="restaurantDescription"></textarea></label>
+  </div><button class="brand-save-btn" style="margin-top:1rem" onclick="saveRestaurantProfile()">Save restaurant profile</button></div><div class="card"><h2>Customer-facing listing preview</h2><div id="profilePreview" class="empty-state">Your restaurant profile preview will appear here.</div></div></div>
 </div>
-
-<!-- INSTAGRAM -->
-<div class="view" data-view="instagram">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">📸 Instagram</div>
-        <div class="prem-title">Instagram</div>
-        <div class="prem-sub">Connect Instagram, auto-reply to comments with booking links and grow on autopilot.</div>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Followers</div><div class="prem-stat-val">—</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Auto-Replies Sent</div><div class="prem-stat-val y">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Active Rules</div><div class="prem-stat-val g">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Status</div><div class="prem-stat-val y">Not Connected</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
-      <div class="card">
-        <div class="card-head"><div><h2>Connect Account</h2><p>Link your Instagram Business account</p></div></div>
-        <div style="text-align:center;padding:1.25rem .5rem;">
-          <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);display:grid;place-items:center;font-size:1.6rem;margin:0 auto .85rem;">📸</div>
-          <div style="font-size:.92rem;font-weight:700;margin-bottom:.35rem;color:#1a1a2e;">Connect Instagram</div>
-          <div style="font-size:.78rem;color:#9ca3af;line-height:1.6;margin-bottom:1.1rem;max-width:260px;margin-left:auto;margin-right:auto;">Log in with Instagram to allow CultureWave to read comments and send auto-replies.</div>
-          <a href="/api/instagram/connect" style="display:inline-flex;align-items:center;gap:.55rem;padding:.65rem 1.5rem;border-radius:999px;background:linear-gradient(135deg,#833ab4,#fd1d1d);color:#fff;font-size:.88rem;font-weight:700;text-decoration:none;">Login with Instagram</a>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div><h2>Comment Auto-Reply</h2><p>Auto-send DMs when someone comments</p></div></div>
-        <div style="background:var(--psoft);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:.75rem;">
-          <div style="font-size:.84rem;font-weight:700;color:#991b1b;margin-bottom:.25rem;">⚡ How it works</div>
-          <div style="font-size:.76rem;color:#b91c1c;line-height:1.7;">1. Someone comments your keyword (e.g. <strong>"BOOK"</strong>) on your post<br/>2. They instantly get a DM with your event details & booking link<br/>3. More reservations — on autopilot, 24/7</div>
-        </div>
-        <div class="pf-field" style="margin-bottom:.6rem;"><label>Trigger Keyword(s)</label><input type="text" placeholder='e.g. BOOK, RESERVE, TABLE'/></div>
-        <div class="pf-field" style="margin-bottom:.6rem;"><label>Auto-Reply DM Message</label><textarea style="min-height:80px;" placeholder="Hey! 👋 Thanks for your interest!&#10;&#10;🍽️ Reserve here: {booking_link}&#10;&#10;Limited seats — book now!"></textarea></div>
-        <button onclick="showToast('Auto-reply rule saved!')" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:8px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;font-size:.84rem;font-weight:700;border:0;cursor:pointer;margin-left:auto;">✦ Save Rule</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- WHATSAPP -->
-<div class="view" data-view="whatsapp">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">💬 WhatsApp</div>
-        <div class="prem-title">WhatsApp</div>
-        <div class="prem-sub">Send booking confirmations, reminders and updates to your guests via WhatsApp.</div>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Credits Balance</div><div class="prem-stat-val">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Cost Per Message</div><div class="prem-stat-val g">1 Credit</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Delivery Window</div><div class="prem-stat-val y">Within 2 hrs</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Messages Sent</div><div class="prem-stat-val">0</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:.85rem 1rem;display:flex;align-items:center;gap:.85rem;">
-      <span style="font-size:1.2rem;">💳</span>
-      <div style="flex:1;"><div style="font-size:.86rem;font-weight:700;color:#166534;">1 Credit = 1 WhatsApp Message · Powered by OGSHOOTS LUXE</div><div style="font-size:.78rem;color:#15803d;margin-top:.1rem;">Every message is sent by the OGSHOOTS LUXE team on your behalf within 2 hours.</div></div>
-      <a href="credits.html" style="padding:.42rem .9rem;border-radius:8px;background:#16a34a;color:#fff;font-weight:700;font-size:.8rem;text-decoration:none;white-space:nowrap;">Buy Credits</a>
-    </div>
-    <div class="card">
-      <div class="card-head"><div><h2>WhatsApp Settings</h2><p>Configure your number and notifications</p></div></div>
-      <div style="display:flex;flex-direction:column;gap:.75rem;">
-        <div class="pf-field"><label>WhatsApp Number</label><input type="tel" placeholder="+91 XXXXX XXXXX"/></div>
-        <div class="pf-field"><label>Booking Confirmation Message</label><textarea placeholder="Hi {name}, your reservation at {restaurant} on {date} is confirmed! 🍽️" style="min-height:90px;"></textarea></div>
-        <div class="pf-field"><label>Reminder Message</label><textarea placeholder="Hey {name}, reminder: your table at {restaurant} is tomorrow at {time}. See you! 🍷" style="min-height:90px;"></textarea></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-top:1px solid var(--border);">
-          <div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Send booking confirmation</div><div style="font-size:.76rem;color:#9ca3af;">Auto-send on every new booking · <span style="color:#16a34a;font-weight:600;">1 credit</span></div></div>
-          <label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#25d366;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label>
-        </div>
-        <button onclick="showToast('WhatsApp settings saved!')" style="height:42px;background:#25d366;color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;">✓ Save WhatsApp Settings</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SURVEYS -->
-<div class="view" data-view="surveys">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">📋 Survey Forms</div>
-        <div class="prem-title">Survey Forms</div>
-        <div class="prem-sub">Collect feedback, reservations and data from your guests with custom forms.</div>
-      </div>
-      <div class="prem-actions">
-        <button onclick="showToast('Form builder coming soon!')" class="prem-btn-white">+ Create Form</button>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total Forms</div><div class="prem-stat-val">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Responses</div><div class="prem-stat-val g">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Active</div><div class="prem-stat-val y">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Completion Rate</div><div class="prem-stat-val">0%</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:3rem 2rem;text-align:center;">
-      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#f97316);display:grid;place-items:center;font-size:1.6rem;margin:0 auto 1rem;">📋</div>
-      <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem;color:#1a1a2e;">No forms yet</h3>
-      <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first survey form to collect feedback from guests.</p>
-      <button onclick="showToast('Form builder coming soon!')" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:8px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;">+ Create Your First Form</button>
-    </div>
-  </div>
-</div>
-
-<!-- INQUIRIES -->
-<div class="view" data-view="inquiries">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">✉ Inquiries</div>
-        <div class="prem-title">Inquiries</div>
-        <div class="prem-sub">Manage all incoming messages and inquiries from your brand page visitors.</div>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Total</div><div class="prem-stat-val" id="inqTotal">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Unread</div><div class="prem-stat-val y" id="inqUnread">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Replied</div><div class="prem-stat-val g" id="inqReplied">0</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">This Week</div><div class="prem-stat-val">0</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:.65rem 1.1rem;border-bottom:1px solid var(--border);background:var(--psoft);">
-        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#b91c1c;">From</span>
-        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#b91c1c;">Subject</span>
-        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#b91c1c;">Date</span>
-        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#b91c1c;">Status</span>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;padding:3rem 2rem;text-align:center;">
-        <div style="width:56px;height:56px;border-radius:50%;background:var(--psoft);display:grid;place-items:center;font-size:1.4rem;margin-bottom:.75rem;">✉</div>
-        <div style="font-size:.88rem;font-weight:600;color:#1a1a2e;">No inquiries yet</div>
-        <div style="font-size:.78rem;color:#9ca3af;margin-top:.25rem;">Inquiries from your brand page will appear here.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- BRAND & PROFILE -->
-<div class="view" data-view="personal-info">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">🏷 Brand Page</div>
-        <div class="prem-title">Brand & Profile</div>
-        <div class="prem-sub">Manage your brand profile, social links, KYC and payout details.</div>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Profile</div><div class="prem-stat-val y">Incomplete</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">KYC</div><div class="prem-stat-val y">Pending</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Bank</div><div class="prem-stat-val y">Not Linked</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">PAN</div><div class="prem-stat-val y">Not Submitted</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div class="pf-link-bar">
-      <div><div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--p);margin-bottom:.25rem;">🌐 Your Public Brand Page</div><div class="pf-link-url" id="pfPublicUrl">Loading...</div></div>
-      <div style="display:flex;gap:.5rem;"><button class="pf-copy" id="pfCopyBtn">📋 Copy Link</button><a class="pf-copy" id="pfViewBtn" href="#" target="_blank">👁 View Page</a></div>
-    </div>
-    <div class="brand-layout">
-      <nav class="brand-sidenav">
-        <div style="padding:.75rem .65rem .4rem;">
-          <div class="brand-sidenav-section">Brand Page</div>
-          <button class="brand-sidenav-item active" data-panel="bp-basic" onclick="switchPanel(this,'bp-basic')">🖼 Basic Information</button>
-          <button class="brand-sidenav-item" data-panel="bp-website" onclick="switchPanel(this,'bp-website')">🌐 Website</button>
-          <button class="brand-sidenav-item" data-panel="bp-about" onclick="switchPanel(this,'bp-about')">📝 About</button>
-          <button class="brand-sidenav-item" data-panel="bp-socials" onclick="switchPanel(this,'bp-socials')">📲 Socials</button>
-          <button class="brand-sidenav-item" data-panel="bp-tracking" onclick="switchPanel(this,'bp-tracking')">📊 Tracking</button>
-          <div class="brand-sidenav-divider"></div>
-          <div class="brand-sidenav-section">KYC</div>
-          <button class="brand-sidenav-item" data-panel="bp-personal" onclick="switchPanel(this,'bp-personal')">🪪 Personal Details</button>
-          <button class="brand-sidenav-item" data-panel="bp-pan" onclick="switchPanel(this,'bp-pan')">📄 PAN Card</button>
-          <button class="brand-sidenav-item" data-panel="bp-gst" onclick="switchPanel(this,'bp-gst')">🧾 GST Details</button>
-          <div class="brand-sidenav-divider"></div>
-          <div class="brand-sidenav-section">Finance</div>
-          <button class="brand-sidenav-item" data-panel="bp-bank" onclick="switchPanel(this,'bp-bank')">🏦 Bank Details</button>
-        </div>
-      </nav>
-      <div style="min-width:0;">
-        <div class="brand-panel" id="bp-basic" style="display:flex;">
-          <div class="card">
-            <div class="card-head"><div><h2>Basic Information</h2><p>Your brand name, URL and profile image</p></div></div>
-            <div style="margin-bottom:1.25rem;">
-              <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin-bottom:.5rem;">Cover Photo</div>
-              <div class="cover-upload" id="coverUploadArea" onclick="document.getElementById('coverFileInput').click()">
-                <img id="coverPreview" src="" style="display:none;"/>
-                <div id="coverPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:.35rem;"><span style="font-size:1.6rem;">🖼</span><span style="font-size:.82rem;font-weight:600;color:#b91c1c;">Click to upload cover photo</span><span style="font-size:.72rem;color:#9ca3af;">Recommended: 1200 × 400 pixels</span></div>
-              </div>
-              <input type="file" id="coverFileInput" accept="image/*" style="display:none;"/>
-            </div>
-            <div style="display:flex;align-items:flex-start;gap:1.25rem;margin-bottom:1.25rem;">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
-                <div class="avatar-upload" id="avatarUploadArea" onclick="document.getElementById('avatarFileInput').click()">
-                  <span id="avatarInitial" style="font-size:2rem;font-weight:800;color:#fff;">R</span>
-                  <img id="avatarPreview" src="" style="display:none;"/>
-                  <div class="avatar-upload-overlay">📷</div>
-                </div>
-                <input type="file" id="avatarFileInput" accept="image/*" style="display:none;"/>
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;gap:.75rem;">
-                <div class="pf-field"><label>Brand Name *</label><input id="pfName" type="text" placeholder="Your restaurant name"/></div>
-                <div class="pf-field"><label>Your CultureWave URL</label><div style="display:flex;align-items:center;"><span class="url-prefix">culturewave.in/</span><input class="url-input" id="pfHandle" type="text" placeholder="yourrestaurant"/></div></div>
-              </div>
-            </div>
-            <button class="brand-save-btn" onclick="saveProfile()">✓ Save Basic Info</button>
-          </div>
-        </div>
-        <div class="brand-panel" id="bp-website" style="display:none;"><div class="card"><div class="card-head"><div><h2>Website</h2><p>Link your external website</p></div></div><div class="pf-field"><label>Website URL</label><input id="pfWebsite" type="url" placeholder="https://yourrestaurant.com"/></div><button class="brand-save-btn" style="margin-top:.75rem;" onclick="saveProfile()">✓ Save</button></div></div>
-        <div class="brand-panel" id="bp-about" style="display:none;"><div class="card"><div class="card-head"><div><h2>About</h2><p>Tell visitors about your restaurant</p></div></div><div class="pf-field"><label>Bio / Description</label><textarea id="pfBio" placeholder="Tell guests about your restaurant, cuisine and dining experience..." style="min-height:120px;"></textarea></div><button class="brand-save-btn" style="margin-top:.75rem;" onclick="saveProfile()">✓ Save</button></div></div>
-        <div class="brand-panel" id="bp-socials" style="display:none;"><div class="card"><div class="card-head"><div><h2>Socials</h2><p>Link your social media profiles</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>Instagram</label><input id="pfInstagram" type="text" placeholder="@username"/></div><div class="pf-field"><label>Twitter / X</label><input id="pfTwitter" type="text" placeholder="@username"/></div><div class="pf-field"><label>Facebook</label><input id="pfFacebook" type="text" placeholder="facebook.com/yourpage"/></div><div class="pf-field"><label>YouTube</label><input id="pfYoutube" type="text" placeholder="youtube.com/@channel"/></div><div class="pf-field"><label>LinkedIn</label><input id="pfLinkedin" type="text" placeholder="linkedin.com/in/you"/></div><div class="pf-field"><label>WhatsApp</label><input id="pfWhatsapp" type="text" placeholder="+91 XXXXX XXXXX"/></div></div><button class="brand-save-btn" style="margin-top:.75rem;" onclick="saveProfile()">✓ Save Socials</button></div></div>
-        <div class="brand-panel" id="bp-tracking" style="display:none;"><div class="card"><div class="card-head"><div><h2>Tracking</h2><p>Add analytics and pixel tracking</p></div></div><div style="display:flex;flex-direction:column;gap:.75rem;"><div class="pf-field"><label>Google Analytics ID</label><input id="pfGaId" type="text" placeholder="G-XXXXXXXXXX"/></div><div class="pf-field"><label>Meta Pixel ID</label><input id="pfMetaPixel" type="text" placeholder="XXXXXXXXXXXXXXXXXX"/></div><div class="pf-field"><label>Google Tag Manager ID</label><input id="pfGtmId" type="text" placeholder="GTM-XXXXXXX"/></div></div><button class="brand-save-btn" style="margin-top:.75rem;" onclick="saveProfile()">✓ Save Tracking</button></div></div>
-        <div class="brand-panel" id="bp-personal" style="display:none;"><div class="card"><div class="card-head"><div><h2>Personal Details</h2><p>Your basic identity information</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>Full Legal Name</label><input id="piFullName" type="text" placeholder="As per government ID"/></div><div class="pf-field"><label>Date of Birth</label><input id="piDob" type="date"/></div><div class="pf-field"><label>Phone Number</label><input id="piPhone" type="tel" placeholder="+91 XXXXX XXXXX"/></div><div class="pf-field"><label>Email Address</label><input id="piEmail" type="email" placeholder="your@email.com"/></div><div class="pf-field" style="grid-column:1/-1;"><label>Address</label><input id="piAddress" type="text" placeholder="Street address"/></div><div class="pf-field"><label>City</label><input id="piCity" type="text" placeholder="City"/></div><div class="pf-field"><label>State</label><input id="piState" type="text" placeholder="State"/></div><div class="pf-field"><label>PIN Code</label><input id="piPin" type="text" placeholder="6-digit PIN"/></div></div><button onclick="savePersonalInfo()" style="margin-top:1rem;height:42px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;padding:0 1.5rem;">Save Personal Details</button></div></div>
-        <div class="brand-panel" id="bp-pan" style="display:none;"><div class="card"><div class="card-head"><div><h2>PAN Card Details</h2><p>Required for payouts above ₹50,000</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>PAN Number</label><input id="piPan" type="text" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase;"/></div><div class="pf-field"><label>Name on PAN</label><input id="piPanName" type="text" placeholder="Full name as on PAN card"/></div><div class="pf-field"><label>Date of Birth (as on PAN)</label><input id="piPanDob" type="date"/></div><div class="pf-field"><label>PAN Card Image URL</label><input id="piPanImg" type="url" placeholder="https://..."/></div></div><button onclick="savePanDetails()" style="margin-top:1rem;height:42px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;padding:0 1.5rem;">Save PAN Details</button></div></div>
-        <div class="brand-panel" id="bp-gst" style="display:none;"><div class="card"><div class="card-head"><div><h2>GST Details</h2><p>Optional — for GST invoicing</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>GST Number</label><input id="piGst" type="text" placeholder="22AAAAA0000A1Z5" maxlength="15" style="text-transform:uppercase;"/></div><div class="pf-field"><label>Business Name (as per GST)</label><input id="piGstBiz" type="text" placeholder="Registered business name"/></div></div><button onclick="saveGstDetails()" style="margin-top:1rem;height:42px;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;border:0;border-radius:10px;font-weight:700;font-size:.86rem;cursor:pointer;padding:0 1.5rem;">Save GST Details</button></div></div>
-        <div class="brand-panel" id="bp-bank" style="display:none;"><div class="card"><div class="card-head"><div><h2>Bank Details</h2><p>For receiving event payouts</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;"><div class="pf-field"><label>Account Holder Name</label><input id="bpBankName" type="text" placeholder="Full name"/></div><div class="pf-field"><label>Account Number</label><input id="bpBankAccNo" type="text" placeholder="Account number"/></div><div class="pf-field"><label>Confirm Account Number</label><input id="bpBankAccNo2" type="text" placeholder="Re-enter account number"/></div><div class="pf-field"><label>IFSC Code</label><input id="bpBankIfsc" type="text" placeholder="e.g. SBIN0001234" style="text-transform:uppercase;"/></div><div class="pf-field"><label>Bank Name</label><input id="bpBankBankName" type="text" placeholder="e.g. State Bank of India"/></div><div class="pf-field"><label>Account Type</label><select id="bpBankType"><option value="savings">Savings</option><option value="current">Current</option></select></div></div><button class="brand-save-btn" style="margin-top:1rem;" onclick="saveBrandBankDetails()">Save Bank Details</button></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SETTINGS -->
-<div class="view" data-view="settings">
-  <div class="prem-hdr">
-    <div class="prem-hdr-top">
-      <div class="prem-hdr-left">
-        <div class="prem-badge">⚙ Account</div>
-        <div class="prem-title">Settings</div>
-        <div class="prem-sub">Manage your account preferences and security.</div>
-      </div>
-    </div>
-    <div class="prem-stats">
-      <div class="prem-stat"><div class="prem-stat-lbl">Account</div><div class="prem-stat-val g">Active</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Plan</div><div class="prem-stat-val">Free</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">Sessions</div><div class="prem-stat-val">1</div></div>
-      <div class="prem-stat"><div class="prem-stat-lbl">2FA</div><div class="prem-stat-val y">Off</div></div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div class="card">
-      <div class="card-head"><div><h2>Notifications</h2><p>Choose what you get notified about</p></div></div>
-      <div style="display:flex;flex-direction:column;gap:.75rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--plight);"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Booking alerts</div><div style="font-size:.76rem;color:#9ca3af;">Get notified when someone books your event</div></div><label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:var(--p);border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--plight);"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Payout updates</div><div style="font-size:.76rem;color:#9ca3af;">Get notified when a payout is processed</div></div><label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" checked style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:var(--p);border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transform:translateX(18px);"></span></span></label></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Marketing emails</div><div style="font-size:.76rem;color:#9ca3af;">Tips, product updates and announcements</div></div><label style="position:relative;display:inline-block;width:40px;height:22px;"><input type="checkbox" style="opacity:0;width:0;height:0;"/><span style="position:absolute;cursor:pointer;inset:0;background:#e9ecef;border-radius:999px;"><span style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;"></span></span></label></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><div><h2>Security</h2><p>Manage your password and sessions</p></div></div>
-      <div style="display:flex;flex-direction:column;gap:.6rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--plight);"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Password</div><div style="font-size:.76rem;color:#9ca3af;">Last changed — never</div></div><button style="padding:.38rem .85rem;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:.8rem;font-weight:600;cursor:pointer;color:#6b7280;">Change</button></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;"><div><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">Active sessions</div><div style="font-size:.76rem;color:#9ca3af;">1 device currently signed in</div></div><button style="padding:.38rem .85rem;border-radius:8px;border:1px solid #fecaca;background:#fff5f5;color:#dc2626;font-size:.8rem;font-weight:600;cursor:pointer;">Sign out all</button></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><div><h2>Danger Zone</h2><p>Irreversible account actions</p></div></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;"><div><div style="font-size:.86rem;font-weight:600;color:#dc2626;">Delete account</div><div style="font-size:.76rem;color:#9ca3af;">Permanently delete your account and all data</div></div><button style="padding:.42rem 1rem;border-radius:8px;background:#dc2626;color:#fff;font-size:.82rem;font-weight:700;border:0;cursor:pointer;">Delete</button></div>
-    </div>
-  </div>
-</div>
-
   </div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-var _titles={overview:'🍽️ Dashboard',events:'🍽️ Restaurant Events',dining:'🍷 Dining Experiences',private:'🕯️ Private Dining',analytics:'📈 Analytics',sales:'💰 Sales Summary',payouts:'🏦 Payouts',instagram:'📸 Instagram',whatsapp:'💬 WhatsApp',surveys:'📋 Survey Forms',inquiries:'✉ Inquiries','personal-info':'🪪 Brand & Profile',settings:'⚙ Settings'};
-function switchView(name){
-  document.querySelectorAll('.view').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
-  document.querySelectorAll('.sb-item[data-view]').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
-  var pt=document.getElementById('pageTitle');if(pt)pt.textContent=_titles[name]||name;
-  if(name==='events'){if(window.renderEvents)window.renderEvents();else setTimeout(()=>{if(window.renderEvents)window.renderEvents();},300);}
-  if(name==='personal-info'){var pv=document.querySelector('.view[data-view="personal-info"]');if(pv){pv.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});pv.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});var def=document.getElementById('bp-basic');var defBtn=document.querySelector('.brand-sidenav-item[data-panel="bp-basic"]');if(def)def.style.display='flex';if(defBtn)defBtn.classList.add('active');}}
-  try{localStorage.setItem('restDashView',name);}catch(e){}
-}
-function switchPanel(btn,panelId){var view=document.querySelector('.view[data-view="personal-info"]');if(!view)return;view.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});view.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});btn.classList.add('active');var panel=document.getElementById(panelId);if(panel)panel.style.display='flex';}
-function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sbOverlay').classList.add('open');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('open');}
-function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
-document.querySelectorAll('.sb-item[data-view]').forEach(function(btn){btn.addEventListener('click',function(){switchView(btn.dataset.view);closeSidebar();});});
-document.querySelectorAll('#evTabs .tab').forEach(function(btn){btn.addEventListener('click',function(){activeTab=btn.dataset.tab;document.querySelectorAll('#evTabs .tab').forEach(function(t){t.classList.toggle('active',t===btn);});renderEvents();});});
-document.querySelectorAll('#salesTabs .tab').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('#salesTabs .tab').forEach(function(t){t.classList.toggle('active',t===btn);});renderSalesTable(btn.dataset.stab);});});
-var coverInput=document.getElementById('coverFileInput');
-if(coverInput)coverInput.addEventListener('change',function(){var file=this.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var img=document.getElementById('coverPreview');if(img){img.src=e.target.result;img.style.display='block';}var ph=document.getElementById('coverPlaceholder');if(ph)ph.style.display='none';};reader.readAsDataURL(file);});
-var avatarInput=document.getElementById('avatarFileInput');
-if(avatarInput)avatarInput.addEventListener('change',function(){var file=this.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var img=document.getElementById('avatarPreview');if(img){img.src=e.target.result;img.style.display='block';}var ini=document.getElementById('avatarInitial');if(ini)ini.style.display='none';};reader.readAsDataURL(file);});
-var pfHandleEl=document.getElementById('pfHandle');
-if(pfHandleEl)pfHandleEl.addEventListener('input',function(){this.value=this.value.toLowerCase().replace(/[^a-z0-9._-]/g,'').replace(/^[._-]+|[._-]+$/g,'');const h=this.value.trim();if(h){const base=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);const url=location.origin+base+encodeURIComponent(h);const publicUrl=document.getElementById('pfPublicUrl'),view=document.getElementById('pfViewBtn'),copy=document.getElementById('pfCopyBtn');if(publicUrl)publicUrl.textContent=url;if(view)view.href=url;if(copy)copy.onclick=()=>navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!'));}});
-</script>
-<script>
-// Pre-render empty state immediately so it shows before Firebase loads
-(function(){
-  var c=document.getElementById('eventsContainer');
-  if(c&&!c.innerHTML.trim()){
-    c.innerHTML='<div style="background:#fff;border-radius:14px;padding:5rem 2rem 4rem;text-align:center;"><div style="width:88px;height:88px;border-radius:50%;background:#b03a2e;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🍷</div><h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No dining experiences yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first dining experience and start accepting reservations.</p><button onclick="location.href=\'restaurant-create.html?from=restaurant\'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.5rem;border-radius:999px;background:#b03a2e;color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 6px 20px rgba(176,58,46,.4);">✦ Create Dining Experience</button></div>';
-  }
-})();
-</script>
-<script type="module">
-import{app,auth,db,getCurrentUser,logout,collection,doc,query,where,orderBy,limit,onSnapshot,getDoc,setDoc,updateDoc,serverTimestamp}from"./firebase.js";
-window.db=db;window.doc=doc;window.setDoc=setDoc;window.updateDoc=updateDoc;
-const esc=v=>String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const money=v=>`₹${Number(v||0).toLocaleString('en-IN')}`;
-let allEvents=[],activeTab='published',myUid=null,allBookings=[];
-const user=await getCurrentUser();
-if(!user){location.href='login.html';}
-else{
-  myUid=user.uid;window.myUid=myUid;
-  document.getElementById('sidebarName').textContent=user.name||'Client';
-  document.getElementById('topName').textContent=user.name||'User';
-  const init=(user.name||'R').trim()[0].toUpperCase();
-  ['sideAvatar','topAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});
-  loadProfile(myUid);loadEvents(myUid);loadBookings(myUid);
-}
-document.getElementById('logoutBtn').onclick=()=>logout();
-try{const saved=localStorage.getItem('restDashView');if(saved)switchView(saved);}catch(e){}
-function normStatus(s){const v=(s||'draft').toLowerCase();return(v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished';}
-function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();},err=>console.error('Unable to load events:',err));}
-window.renderEvents = function renderEvents(){
-  const q=document.getElementById('evSearch').value.trim().toLowerCase();
-  const filtered=allEvents.filter(e=>{const mt=activeTab==='published'?normStatus(e.status)==='published':activeTab==='archived'?normStatus(e.status)==='archived':normStatus(e.status)==='unpublished';const mq=!q||(e.name||'').toLowerCase().includes(q)||(e.city||'').toLowerCase().includes(q);return mt&&mq;});
-  const pub=allEvents.filter(e=>normStatus(e.status)==='published').length;
-  const el=id=>document.getElementById(id);
-  if(el('tabCountPublished'))el('tabCountPublished').textContent=pub;
-  if(el('hdrTotal'))el('hdrTotal').textContent=allEvents.length;
-  if(el('hdrPublished'))el('hdrPublished').textContent=pub;
-  if(el('hdrDraft'))el('hdrDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;
-  const container=document.getElementById('eventsContainer');
-  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border-radius:14px;padding:5rem 2rem 4rem;text-align:center;"><div style="width:88px;height:88px;border-radius:50%;background:#b03a2e;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🍷</div><h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No dining experiences yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first dining experience and start accepting reservations.</p><button onclick="location.href='restaurant-create.html?from=restaurant'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.5rem;border-radius:999px;background:#b03a2e;color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 6px 20px rgba(176,58,46,.4);">✦ Create Dining Experience</button></div>`;return;}
-  container.innerHTML=`<div class="events-table"><div class="ev-table-head"><span>Event</span><span>Status</span><span>Date</span><span>Price</span><span>Actions</span></div>${filtered.map(ev=>{const st=normStatus(ev.status);const stLabel=st==='published'?'Live':st==='archived'?'Archived':'Draft';const date=ev.startDate?.toDate?ev.startDate.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';const price=ev.price||ev.tickets?.[0]?.price||0;return`<div class="ev-row"><div><div class="ev-name">${esc(ev.name||'Untitled')}</div><div class="ev-sub">${esc(ev.city||'')}</div></div><div><span class="status-pill ${st==='published'?'live':st==='archived'?'archived':'draft'}">● ${stLabel}</span></div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.84rem;font-weight:600;color:#1a1a2e;">${price?money(price):'Free'}</div><div class="ev-actions"><button class="ev-act-btn ${st==='published'?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${st==='published'?'Unpublish':'Publish'}</button><a class="ev-act-btn" href="/event/${encodeURIComponent(String(ev.urlKey||ev.name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event')}?eventId=${encodeURIComponent(ev.id)}" target="_blank">View</a><a class="ev-act-btn" href="event-manage.html?eventId=${ev.id}">Edit</a><button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button></div></div>`;}).join('')}</div>`;
-}
-window.copyEvLink=function(id){const ev=allEvents.find(item=>item.id===id);const slug=String(ev?.urlKey||ev?.name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';navigator.clipboard.writeText(`${location.origin}/event/${encodeURIComponent(slug)}`).then(()=>showToast('Link copied!'));};
-window.togglePublishEvent=async function(id,st){if(!myUid)return;const ns=st==='published'?'unpublished':'published';await updateDoc(doc(db,'events',id),{status:ns,updatedAt:serverTimestamp()});showToast(ns==='published'?'✅ Event published!':'🟡 Event unpublished');};
-document.getElementById('evSearch').addEventListener('input',()=>{if(window.renderEvents)window.renderEvents();});
-document.getElementById('evRefresh').onclick=()=>{if(window.renderEvents)window.renderEvents();};
-if(window.renderEvents)window.renderEvents();
-function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);});}
-function renderOverview(){const el=id=>document.getElementById(id);if(el('mEvents'))el('mEvents').textContent=allEvents.length;if(el('planUsageLabel'))el('planUsageLabel').textContent=allEvents.length+' events created';}
-function renderOverviewBookings(bookings){
-  const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
-  const el=id=>document.getElementById(id);
-  if(el('mBookings'))el('mBookings').textContent=bookings.length;if(el('mRevenue'))el('mRevenue').textContent=money(rev);if(el('mPayout'))el('mPayout').textContent=money(rev);
-  const actEl=document.getElementById('overviewActivity');
-  actEl.innerHTML=bookings.slice(0,6).length?bookings.slice(0,6).map(b=>{const st=(b.status||'pending').toLowerCase();const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'';return`<div style="display:flex;align-items:center;gap:.75rem;padding:.7rem .8rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);margin-bottom:.5rem;"><span style="width:8px;height:8px;border-radius:50%;background:${st==='paid'?'#16a34a':st==='cancelled'?'#dc2626':'#f97316'};flex:none;"></span><div style="flex:1;"><strong style="display:block;font-size:.84rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'Booking')}</strong><span style="font-size:.74rem;color:#9ca3af;">${st} · ${date}</span></div><span style="font-size:.78rem;font-weight:700;color:${st==='paid'?'#16a34a':'#f97316'};">${b.amount?money(b.amount):'Free'}</span></div>`;}).join(''):'<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">No activity yet.</div>';
-  const billEl=document.getElementById('overviewBilling');
-  const paidB=bookings.filter(b=>(b.status||'')==='paid');
-  billEl.innerHTML=paidB.slice(0,5).length?paidB.slice(0,5).map(b=>{const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'';return`<div style="display:flex;align-items:center;gap:.75rem;padding:.7rem .8rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);margin-bottom:.5rem;"><span style="width:32px;height:32px;border-radius:8px;background:var(--plight);display:grid;place-items:center;font-size:.85rem;flex:none;">💳</span><div style="flex:1;"><strong style="display:block;font-size:.84rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'Payment')}</strong><span style="font-size:.74rem;color:#9ca3af;">${date}</span></div><span style="font-size:.84rem;font-weight:700;color:#16a34a;">${money(b.amount)}</span></div>`;}).join(''):'<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">No transactions yet.</div>';
-}
-function renderSalesMetrics(bookings){const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);const el=id=>document.getElementById(id);if(el('salesTotalRev'))el('salesTotalRev').textContent=money(rev);if(el('salesSettled'))el('salesSettled').textContent=money(rev);if(el('salesPending'))el('salesPending').textContent=money(0);if(el('salesCount'))el('salesCount').textContent=bookings.length;}
-function renderSalesTable(filter){const q=(document.getElementById('salesSearch')||{}).value?.trim().toLowerCase()||'';let rows=allBookings;if(filter==='paid')rows=rows.filter(b=>(b.status||'')==='paid');else if(filter==='pending')rows=rows.filter(b=>(b.status||'')!=='paid'&&(b.status||'')!=='cancelled');else if(filter==='cancelled')rows=rows.filter(b=>(b.status||'')==='cancelled');if(q)rows=rows.filter(b=>(b.eventName||'').toLowerCase().includes(q));const body=document.getElementById('salesTableBody');if(!body)return;if(!rows.length){body.innerHTML='<div style="text-align:center;padding:3rem;color:#9ca3af;font-size:.84rem;">No transactions found.</div>';return;}body.innerHTML=rows.map(b=>{const st=(b.status||'pending').toLowerCase();const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';return`<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:.8rem 1.1rem;border-bottom:1px solid var(--plight);align-items:center;"><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'—')}</div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.82rem;color:#6b7280;">${b.tickets||1}</div><div style="font-size:.84rem;font-weight:700;color:#1a1a2e;">${b.amount?money(b.amount):'Free'}</div><div><span style="display:inline-flex;padding:.22rem .6rem;border-radius:999px;font-size:.7rem;font-weight:700;background:${st==='paid'?'#dcfce7':st==='cancelled'?'#fee2e2':'var(--plight)'};color:${st==='paid'?'#16a34a':st==='cancelled'?'#dc2626':'#b91c1c'};">${st}</span></div></div>`;}).join('');}
-function renderPayouts(bookings){const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);const el=id=>document.getElementById(id);if(el('payoutTotal'))el('payoutTotal').textContent=money(rev);if(el('payoutTransit'))el('payoutTransit').textContent=money(0);if(el('payoutHold'))el('payoutHold').textContent=money(0);}
-function renderAnalytics(bookings){
-  const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
-  const el=id=>document.getElementById(id);
-  ['anRevenue','anRevenue2'].forEach(id=>{if(el(id))el(id).textContent=money(rev);});
-  ['anRegs','anRegs2'].forEach(id=>{if(el(id))el(id).textContent=bookings.length;});
-  const live=allEvents.filter(e=>normStatus(e.status)==='published').length;
-  ['anLive','anLive2'].forEach(id=>{if(el(id))el(id).textContent=live;});
-  const avg=allEvents.length?money(Math.round(rev/allEvents.length)):'₹0';
-  ['anAvg','anAvg2'].forEach(id=>{if(el(id))el(id).textContent=avg;});
-  if(el('qsTotal'))el('qsTotal').textContent=allEvents.length;if(el('qsPublished'))el('qsPublished').textContent=live;if(el('qsDraft'))el('qsDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;if(el('qsFree'))el('qsFree').textContent=allEvents.filter(e=>!e.price||e.price===0).length;if(el('qsPaid'))el('qsPaid').textContent=allEvents.filter(e=>e.price>0).length;
-  const prices=allEvents.filter(e=>e.price>0).map(e=>Number(e.price||0));if(el('qsAvgPrice'))el('qsAvgPrice').textContent=prices.length?money(Math.round(prices.reduce((a,b)=>a+b,0)/prices.length)):'₹0';
-  const chart=document.getElementById('revenueChart');if(chart){const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const vals=days.map(()=>Math.floor(Math.random()*80)+10);const max=Math.max(...vals);chart.innerHTML=vals.map((v,i)=>`<div class="bar-wrap"><div class="bar" style="height:${Math.round((v/max)*110)}px;"></div><div class="bar-label">${days[i]}</div></div>`).join('');}
-}
-async function loadProfile(uid){
-  const url=`${location.hostname==="localhost"||location.hostname==="127.0.0.1"?location.origin:"https://srisanth588.github.io/CULTUREWAVE"}/client-profile.html?uid=${uid}`;
-  const pfUrl=document.getElementById('pfPublicUrl');const pfView=document.getElementById('pfViewBtn');const pfCopy=document.getElementById('pfCopyBtn');
-  if(pfUrl)pfUrl.textContent=url;if(pfView)pfView.href=url;if(pfCopy)pfCopy.onclick=()=>navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!'));
-  const snap=await getDoc(doc(db,'organisers',uid));
-  if(snap.exists()){const d=snap.data();const publicHandle=String(d.handle||'').trim().toLowerCase();if(publicHandle){const basePath=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);const publicUrl=location.origin+basePath+encodeURIComponent(publicHandle);if(pfUrl)pfUrl.textContent=publicUrl;if(pfView)pfView.href=publicUrl;if(pfCopy)pfCopy.onclick=()=>navigator.clipboard.writeText(publicUrl).then(()=>showToast('Profile link copied!'));}const g=id=>document.getElementById(id);if(g('pfName'))g('pfName').value=d.name||'';if(g('pfHandle'))g('pfHandle').value=d.handle||'';if(g('pfBio'))g('pfBio').value=d.bio||'';if(g('pfWebsite'))g('pfWebsite').value=d.website||'';if(g('pfInstagram'))g('pfInstagram').value=d.instagram||'';if(g('pfTwitter'))g('pfTwitter').value=d.twitter||'';if(g('pfFacebook'))g('pfFacebook').value=d.facebook||'';if(g('pfYoutube'))g('pfYoutube').value=d.youtube||'';if(g('pfLinkedin'))g('pfLinkedin').value=d.linkedin||'';if(g('pfWhatsapp'))g('pfWhatsapp').value=d.whatsapp||'';if(g('pfGaId'))g('pfGaId').value=d.gaId||'';if(g('pfMetaPixel'))g('pfMetaPixel').value=d.metaPixel||'';if(g('pfGtmId'))g('pfGtmId').value=d.gtmId||'';if(d.avatarUrl){const img=g('avatarPreview');if(img){img.src=d.avatarUrl;img.style.display='block';const ini=g('avatarInitial');if(ini)ini.style.display='none';}}if(d.coverUrl){const img=g('coverPreview');if(img){img.src=d.coverUrl;img.style.display='block';const ph=g('coverPlaceholder');if(ph)ph.style.display='none';}}const init=(d.name||'R').trim()[0].toUpperCase();['sideAvatar','topAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});document.getElementById('sidebarName').textContent=d.name||'Client';document.getElementById('topName').textContent=d.name||'User';}
-  const kycSnap=await getDoc(doc(db,'kyc',uid));
-  if(kycSnap.exists()){const k=kycSnap.data();const g=id=>document.getElementById(id);if(g('piFullName'))g('piFullName').value=k.fullName||'';if(g('piDob'))g('piDob').value=k.dob||'';if(g('piPhone'))g('piPhone').value=k.phone||'';if(g('piEmail'))g('piEmail').value=k.email||'';if(g('piAddress'))g('piAddress').value=k.address||'';if(g('piCity'))g('piCity').value=k.city||'';if(g('piState'))g('piState').value=k.state||'';if(g('piPin'))g('piPin').value=k.pin||'';if(g('piPan'))g('piPan').value=k.pan||'';if(g('piPanName'))g('piPanName').value=k.panName||'';if(g('piPanDob'))g('piPanDob').value=k.panDob||'';if(g('piPanImg'))g('piPanImg').value=k.panImg||'';if(g('piGst'))g('piGst').value=k.gst||'';if(g('piGstBiz'))g('piGstBiz').value=k.gstBiz||'';if(g('bpBankName'))g('bpBankName').value=k.bankName||'';if(g('bpBankAccNo'))g('bpBankAccNo').value=k.bankAccNo||'';if(g('bpBankAccNo2'))g('bpBankAccNo2').value=k.bankAccNo||'';if(g('bpBankIfsc'))g('bpBankIfsc').value=k.bankIfsc||'';if(g('bpBankBankName'))g('bpBankBankName').value=k.bankBankName||'';if(g('bpBankType'))g('bpBankType').value=k.bankType||'savings';}
-}
-window.saveProfile=async function(){if(!myUid)return;await setDoc(doc(db,'organisers',myUid),{name:document.getElementById('pfName').value.trim(),handle:document.getElementById('pfHandle').value.trim(),bio:(document.getElementById('pfBio')||{}).value?.trim()||'',website:(document.getElementById('pfWebsite')||{}).value?.trim()||'',instagram:(document.getElementById('pfInstagram')||{}).value?.trim().replace(/^@/,'')||'',twitter:(document.getElementById('pfTwitter')||{}).value?.trim().replace(/^@/,'')||'',facebook:(document.getElementById('pfFacebook')||{}).value?.trim()||'',youtube:(document.getElementById('pfYoutube')||{}).value?.trim()||'',linkedin:(document.getElementById('pfLinkedin')||{}).value?.trim()||'',whatsapp:(document.getElementById('pfWhatsapp')||{}).value?.trim()||'',gaId:(document.getElementById('pfGaId')||{}).value?.trim()||'',metaPixel:(document.getElementById('pfMetaPixel')||{}).value?.trim()||'',gtmId:(document.getElementById('pfGtmId')||{}).value?.trim()||'',updatedAt:serverTimestamp()},{merge:true});showToast('✓ Profile saved!');};
-window.savePersonalInfo=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{fullName:document.getElementById('piFullName').value.trim(),dob:document.getElementById('piDob').value,phone:document.getElementById('piPhone').value.trim(),email:document.getElementById('piEmail').value.trim(),address:document.getElementById('piAddress').value.trim(),city:document.getElementById('piCity').value.trim(),state:document.getElementById('piState').value.trim(),pin:document.getElementById('piPin').value.trim(),updatedAt:new Date().toISOString()},{merge:true});showToast('Personal details saved!');};
-window.savePanDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{pan:document.getElementById('piPan').value.trim().toUpperCase(),panName:document.getElementById('piPanName').value.trim(),panDob:document.getElementById('piPanDob').value,panImg:(document.getElementById('piPanImg')||{}).value?.trim()||'',updatedAt:new Date().toISOString()},{merge:true});showToast('PAN details saved!');};
-window.saveGstDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{gst:document.getElementById('piGst').value.trim().toUpperCase(),gstBiz:document.getElementById('piGstBiz').value.trim(),updatedAt:new Date().toISOString()},{merge:true});showToast('GST details saved!');};
-window.saveBrandBankDetails=async function(){if(!myUid)return;const acc=document.getElementById('bpBankAccNo').value.trim();const acc2=document.getElementById('bpBankAccNo2').value.trim();if(acc!==acc2){showToast('Account numbers do not match');return;}await setDoc(doc(db,'kyc',myUid),{bankName:document.getElementById('bpBankName').value.trim(),bankAccNo:acc,bankIfsc:document.getElementById('bpBankIfsc').value.trim().toUpperCase(),bankBankName:(document.getElementById('bpBankBankName')||{}).value?.trim()||'',bankType:document.getElementById('bpBankType').value,updatedAt:new Date().toISOString()},{merge:true});showToast('Bank details saved!');};
-if(document.getElementById('salesSearch')){document.getElementById('salesSearch').addEventListener('input',()=>{const active=document.querySelector('#salesTabs .tab.active');renderSalesTable(active?active.dataset.stab:'all');});}
-</script>
-<script src="imagekit.js"></script>
-<script>
-window.addEventListener('load', () => {
-  const saveProfileFields = window.saveProfile;
-  window.saveProfile = async function () {
-    const cover = document.getElementById('coverFileInput')?.files[0]; const logo = document.getElementById('avatarFileInput')?.files[0];
-    await saveProfileFields(); if (!cover && !logo) return;
-    try { const images = {}; if (cover) images.coverUrl = await uploadImageToImageKit(cover, '/profile-covers'); if (logo) images.avatarUrl = await uploadImageToImageKit(logo, '/profile-avatars'); await window.setDoc(window.doc(window.db, 'organisers', window.myUid), {...images, updatedAt:new Date().toISOString()}, {merge:true}); showToast('✓ Profile images saved!'); } catch (error) { console.error('Profile image upload failed:', error); showToast('Image upload failed: ' + error.message); }
+(() => {
+  const titles = {overview:'🍽️ Restaurant Overview',reservations:'🗓 Reservations',tables:'▦ Table Management','floor-plan':'⌘ Floor Plan',waitlist:'☷ Walk-ins & Waitlist',menu:'🍽 Menu Management',offers:'％ Offers & Discounts',customers:'♙ Customers',payments:'₹ Payments',settlements:'⇄ Settlements & Commission',reports:'📈 Reports & Analytics',reviews:'★ Reviews & Ratings',staff:'♧ Staff & Permissions',profile:'⌂ Restaurant Profile',documents:'▤ Documents & Agreements',support:'⚙ Support & Settings'};
+  window.switchView = name => {
+    document.querySelectorAll('.view').forEach(view => view.classList.toggle('active', view.dataset.view.split(' ').includes(name)));
+    document.querySelectorAll('.sb-item[data-view]').forEach(item => item.classList.toggle('active', item.dataset.view === name));
+    const title = document.getElementById('pageTitle');
+    if (title) title.textContent = titles[name] || name;
+    try { localStorage.setItem('restDashView', name); } catch {}
+    window.closeSidebar?.();
   };
-});
-</script>
-<script>document.addEventListener('click',e=>{const a=e.target.closest('a.ev-act-btn[href^="event-manage.html?eventId="]');if(a&&a.textContent.trim()==='Edit'){e.preventDefault();location.href=a.href.replace('event-manage.html','event-create.html')+'&from=restaurant';}});</script>
-</body>
-</html>
-
-<script>
-var _titles={overview:'🍽️ Dashboard',events:'🍽️ Restaurant Events',dining:'🍷 Dining Experiences',private:'🕯️ Private Dining',analytics:'📈 Analytics',sales:'💰 Sales Summary',payouts:'🏦 Payouts',instagram:'📸 Instagram',whatsapp:'💬 WhatsApp',surveys:'📋 Survey Forms',inquiries:'✉ Inquiries','personal-info':'🪪 Brand & Profile',settings:'⚙ Settings'};
-function switchView(name){
-  document.querySelectorAll('.view').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
-  document.querySelectorAll('.sb-item[data-view]').forEach(function(el){el.classList.toggle('active',el.dataset.view===name);});
-  var pt=document.getElementById('pageTitle');if(pt)pt.textContent=_titles[name]||name;
-  if(name==='events'){if(window.renderEvents)window.renderEvents();else setTimeout(()=>{if(window.renderEvents)window.renderEvents();},300);}
-  if(name==='personal-info'){var pv=document.querySelector('.view[data-view="personal-info"]');if(pv){pv.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});pv.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});var def=document.getElementById('bp-basic');var defBtn=document.querySelector('.brand-sidenav-item[data-panel="bp-basic"]');if(def)def.style.display='flex';if(defBtn)defBtn.classList.add('active');}}
-  try{localStorage.setItem('restDashView',name);}catch(e){}
-}
-function switchPanel(btn,panelId){var view=document.querySelector('.view[data-view="personal-info"]');if(!view)return;view.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});view.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});btn.classList.add('active');var panel=document.getElementById(panelId);if(panel)panel.style.display='flex';}
-function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sbOverlay').classList.add('open');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('open');}
-function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
-document.querySelectorAll('.sb-item[data-view]').forEach(function(btn){btn.addEventListener('click',function(){switchView(btn.dataset.view);closeSidebar();});});
-document.querySelectorAll('#evTabs .tab').forEach(function(btn){btn.addEventListener('click',function(){activeTab=btn.dataset.tab;document.querySelectorAll('#evTabs .tab').forEach(function(t){t.classList.toggle('active',t===btn);});renderEvents();});});
-document.querySelectorAll('#salesTabs .tab').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('#salesTabs .tab').forEach(function(t){t.classList.toggle('active',t===btn);});renderSalesTable(btn.dataset.stab);});});
-var coverInput=document.getElementById('coverFileInput');
-if(coverInput)coverInput.addEventListener('change',function(){var file=this.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var img=document.getElementById('coverPreview');if(img){img.src=e.target.result;img.style.display='block';}var ph=document.getElementById('coverPlaceholder');if(ph)ph.style.display='none';};reader.readAsDataURL(file);});
-var avatarInput=document.getElementById('avatarFileInput');
-if(avatarInput)avatarInput.addEventListener('change',function(){var file=this.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var img=document.getElementById('avatarPreview');if(img){img.src=e.target.result;img.style.display='block';}var ini=document.getElementById('avatarInitial');if(ini)ini.style.display='none';};reader.readAsDataURL(file);});
-var pfHandleEl=document.getElementById('pfHandle');
-if(pfHandleEl)pfHandleEl.addEventListener('input',function(){this.value=this.value.toLowerCase().replace(/[^a-z0-9._-]/g,'').replace(/^[._-]+|[._-]+$/g,'');const h=this.value.trim();if(h){const base=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);const url=location.origin+base+encodeURIComponent(h);const publicUrl=document.getElementById('pfPublicUrl'),view=document.getElementById('pfViewBtn'),copy=document.getElementById('pfCopyBtn');if(publicUrl)publicUrl.textContent=url;if(view)view.href=url;if(copy)copy.onclick=()=>navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!'));}});
-</script>
-<script>
-// Pre-render empty state immediately so it shows before Firebase loads
-(function(){
-  var c=document.getElementById('eventsContainer');
-  if(c&&!c.innerHTML.trim()){
-    c.innerHTML='<div style="background:#fff;border-radius:14px;padding:5rem 2rem 4rem;text-align:center;"><div style="width:88px;height:88px;border-radius:50%;background:#b03a2e;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🍷</div><h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No dining experiences yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first dining experience and start accepting reservations.</p><button onclick="location.href=\'restaurant-create.html?from=restaurant\'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.5rem;border-radius:999px;background:#b03a2e;color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 6px 20px rgba(176,58,46,.4);">✦ Create Dining Experience</button></div>';
-  }
+  document.querySelector('.sb-nav')?.addEventListener('click', event => {
+    const item = event.target.closest('.sb-item[data-view]');
+    if (item) window.switchView(item.dataset.view);
+  });
 })();
 </script>
 <script type="module">
-import{app,auth,db,getCurrentUser,logout,collection,doc,query,where,orderBy,limit,onSnapshot,getDoc,setDoc,updateDoc,serverTimestamp}from"./firebase.js";
-window.db=db;window.doc=doc;window.setDoc=setDoc;window.updateDoc=updateDoc;
-const esc=v=>String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const money=v=>`₹${Number(v||0).toLocaleString('en-IN')}`;
-let allEvents=[],activeTab='published',myUid=null,allBookings=[];
-const user=await getCurrentUser();
-if(!user){location.href='login.html';}
-else{
-  myUid=user.uid;window.myUid=myUid;
-  document.getElementById('sidebarName').textContent=user.name||'Client';
-  document.getElementById('topName').textContent=user.name||'User';
-  const init=(user.name||'R').trim()[0].toUpperCase();
-  ['sideAvatar','topAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});
-  loadProfile(myUid);loadEvents(myUid);loadBookings(myUid);
+import{db,storage,getCurrentUser,logout,collection,doc,query,where,limit,onSnapshot,getDocs,addDoc,setDoc,updateDoc,deleteDoc,serverTimestamp,ref,uploadBytes}from"./firebase.js";
+const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), money=v=>`₹${Number(v||0).toLocaleString('en-IN')}`;
+let user=null, restaurantId=null, branchId=null, cache={reservations:[],tables:[],menus:[],offers:[],customers:[],payments:[],settlements:[],reviews:[],staff:[],documents:[],tickets:[],notifications:[]}, unsubs=[];
+const collectionNames={reservations:'reservations',tables:'tables',menus:'menus',offers:'offers',customers:'customers',payments:'payments',settlements:'settlements',reviews:'reviews',staff:'staff',documents:'documents',tickets:'supportTickets',notifications:'notifications'};
+const safeToast=msg=>{const t=$('toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}};
+window.showToast=safeToast;
+const showError=(label,e)=>{console.error(label,e);safeToast(`${label}: ${e?.message||'Unable to complete action'}`);};
+async function resolveRestaurant(){
+  const snap=await getDocs(query(collection(db,'restaurants'),where('ownerId','==',user.uid),limit(2)));
+  if(snap.empty){const legacy=await getDocs(query(collection(db,'organisers'),where('ownerId','==',user.uid),limit(1)));if(!legacy.empty)restaurantId=legacy.docs[0].id;}
+  else restaurantId=snap.docs[0].id;
+  if(!restaurantId){const memberships=await getDocs(query(collection(db,'restaurantUsers'),where('userId','==',user.uid),limit(2)));if(!memberships.empty){const m=memberships.docs[0].data();restaurantId=m.restaurantId;branchId=m.branchId||null;}}
+  if(restaurantId&&!branchId){const memberships=await getDocs(query(collection(db,'restaurantUsers'),where('restaurantId','==',restaurantId),where('userId','==',user.uid),limit(1)));if(!memberships.empty)branchId=memberships.docs[0].data().branchId||null;}
 }
-document.getElementById('logoutBtn').onclick=()=>logout();
-try{const saved=localStorage.getItem('restDashView');if(saved)switchView(saved);}catch(e){}
-function normStatus(s){const v=(s||'draft').toLowerCase();return(v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished';}
-function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();},err=>console.error('Unable to load events:',err));}
-window.renderEvents = function renderEvents(){
-  const q=document.getElementById('evSearch').value.trim().toLowerCase();
-  const filtered=allEvents.filter(e=>{const mt=activeTab==='published'?normStatus(e.status)==='published':activeTab==='archived'?normStatus(e.status)==='archived':normStatus(e.status)==='unpublished';const mq=!q||(e.name||'').toLowerCase().includes(q)||(e.city||'').toLowerCase().includes(q);return mt&&mq;});
-  const pub=allEvents.filter(e=>normStatus(e.status)==='published').length;
-  const el=id=>document.getElementById(id);
-  if(el('tabCountPublished'))el('tabCountPublished').textContent=pub;
-  if(el('hdrTotal'))el('hdrTotal').textContent=allEvents.length;
-  if(el('hdrPublished'))el('hdrPublished').textContent=pub;
-  if(el('hdrDraft'))el('hdrDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;
-  const container=document.getElementById('eventsContainer');
-  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border-radius:14px;padding:5rem 2rem 4rem;text-align:center;"><div style="width:88px;height:88px;border-radius:50%;background:#b03a2e;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🍷</div><h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No dining experiences yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first dining experience and start accepting reservations.</p><button onclick="location.href='restaurant-create.html?from=restaurant'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.5rem;border-radius:999px;background:#b03a2e;color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 6px 20px rgba(176,58,46,.4);">✦ Create Dining Experience</button></div>`;return;}
-  container.innerHTML=`<div class="events-table"><div class="ev-table-head"><span>Event</span><span>Status</span><span>Date</span><span>Price</span><span>Actions</span></div>${filtered.map(ev=>{const st=normStatus(ev.status);const stLabel=st==='published'?'Live':st==='archived'?'Archived':'Draft';const date=ev.startDate?.toDate?ev.startDate.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';const price=ev.price||ev.tickets?.[0]?.price||0;return`<div class="ev-row"><div><div class="ev-name">${esc(ev.name||'Untitled')}</div><div class="ev-sub">${esc(ev.city||'')}</div></div><div><span class="status-pill ${st==='published'?'live':st==='archived'?'archived':'draft'}">● ${stLabel}</span></div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.84rem;font-weight:600;color:#1a1a2e;">${price?money(price):'Free'}</div><div class="ev-actions"><button class="ev-act-btn ${st==='published'?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${st==='published'?'Unpublish':'Publish'}</button><a class="ev-act-btn" href="/event/${encodeURIComponent(String(ev.urlKey||ev.name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event')}?eventId=${encodeURIComponent(ev.id)}" target="_blank">View</a><a class="ev-act-btn" href="event-manage.html?eventId=${ev.id}">Edit</a><button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button></div></div>`;}).join('')}</div>`;
+function qScoped(collectionName){let q=query(collection(db,collectionName),where('restaurantId','==',restaurantId),limit(200));if(branchId)q=query(collection(db,collectionName),where('restaurantId','==',restaurantId),where('branchId','==',branchId),limit(200));return q;}
+function docsFrom(snap){return snap.docs.map(d=>({id:d.id,...d.data()}));}
+function watch(name,render){const col=collectionNames[name];if(!col||!restaurantId)return;const unsub=onSnapshot(qScoped(col),snap=>{cache[name]=docsFrom(snap);renderAll();},e=>showError(`Unable to load ${name}`,e));unsubs.push(unsub);}
+function escStatus(s){return String(s||'pending').toLowerCase().replace(/[^a-z -]/g,'');}
+function textDate(v){if(v?.toDate)return v.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});if(v?.seconds)return new Date(v.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});return v?String(v):'—';}
+function dateKey(v){const d=v?.toDate?v.toDate():v?.seconds?new Date(v.seconds*1000):v?new Date(v):null;return d&&!Number.isNaN(d.valueOf())?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:'';}
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function getStatus(x){return String(x.status||x.bookingStatus||'pending').toLowerCase().replace(/[_ ]/g,'-');}
+function renderAll(){renderReservations();renderOverview();renderTables();renderFloor();renderWaitlist();renderMenu();renderOffers();renderCustomers();renderPayments();renderSettlements();renderReports();renderReviews();renderSimpleLists();}
+function renderReservations(){const rows=cache.reservations;const active=document.querySelector('#reservationTabs .tab.active')?.dataset.filter||'All';const term=($('reservationSearch')?.value||'').toLowerCase();let list=rows.filter(r=>{const s=getStatus(r);const match=active==='All'||(active==='New Requests'&&['new','requested','new-request'].includes(s))||s===active.toLowerCase().replace(/ /g,'-');const hay=[r.customerName,r.name,r.mobile,r.phone,r.bookingId,r.id].join(' ').toLowerCase();return match&&(!term||hay.includes(term));});const stat=(...s)=>rows.filter(r=>s.includes(getStatus(r))).length;
+  [['resAll',rows.length],['resPending',stat('pending','new','requested')],['resConfirmed',stat('confirmed')],['resArrived',stat('arrived')]].forEach(([id,n])=>{if($(id))$(id).textContent=n});
+  const c=$('reservationsTable');if(!c)return;if(!list.length){c.innerHTML='<div class="empty-state">No reservation records found for this filter.</div>';return;}
+  c.innerHTML=list.map(r=>`<div class="reservation-row"><div><strong>${esc(r.bookingId||r.id)} · ${esc(r.customerName||r.name||'Guest')}</strong>${esc(r.specialRequests||'')}</div><span>${esc(r.mobile||r.phone||'—')}</span><span>${esc(r.guestCount||r.guests||'—')}</span><span>${esc(textDate(r.date||r.reservationDate))}<br>${esc(r.time||'')}</span><span>${esc(r.source||'—')}<br>${esc(r.paymentStatus||'—')}</span><span>${esc(r.offerName||'—')}<br>${esc(r.specialRequests||'')}</span><span><b>${esc(r.status||'Pending')}</b><div class="row-actions">${reservationActions(r).map(a=>`<button onclick="updateReservation('${esc(r.id)}','${a[1]}')">${a[0]}</button>`).join('')}<button onclick="viewCustomer('${esc(r.customerId||'')}')">Customer</button></div></span></div>`).join('');}
+function reservationActions(r){const s=getStatus(r);if(['pending','new','requested','new-request'].includes(s))return[['Accept','confirmed'],['Reject','rejected']];if(s==='confirmed')return[['Arrived','arrived'],['Cancel','cancelled'],['No-show','no-show']];if(s==='arrived')return[['Completed','completed'],['No-show','no-show']];return[];}
+window.updateReservation=async(id,status)=>{if(!restaurantId)return;try{const record=cache.reservations.find(r=>r.id===id);if(!record||record.restaurantId!==restaurantId||(branchId&&record.branchId!==branchId))throw Error('Reservation is outside this restaurant scope');await updateDoc(doc(db,'reservations',id),{status,updatedAt:serverTimestamp(),updatedBy:user.uid});safeToast(`Reservation marked ${status}.`);}catch(e){showError('Reservation update failed',e);}};
+window.viewCustomer=id=>{if(id)safeToast('Customer profile is available in Customers.');else switchView('customers');};
+function renderOverview(){const rs=cache.reservations,tk=todayKey(),today=rs.filter(r=>dateKey(r.date||r.reservationDate)===tk),cnt=(arr,...s)=>arr.filter(r=>s.includes(getStatus(r))).length;
+[['ovReservations',today.length],['ovPending',cnt(today,'pending','new','requested')],['ovConfirmed',cnt(today,'confirmed')],['ovArrived',cnt(today,'arrived')],['ovCancelled',cnt(today,'cancelled')],['ovNoShow',cnt(today,'no-show')]].forEach(([id,n])=>{if($(id))$(id).textContent=n});
+ const paid=cache.payments.filter(p=>['successful','success','paid','captured'].includes(getStatus(p)));const revenue=paid.filter(p=>dateKey(p.createdAt||p.paidAt)===tk).reduce((a,p)=>a+Number(p.amount||p.total||0),0);if($('ovRevenue'))$('ovRevenue').textContent=money(revenue);
+ const available=cache.tables.filter(t=>String(t.status||'Available').toLowerCase()==='available').length,occupied=cache.tables.filter(t=>String(t.status||'').toLowerCase()==='occupied').length;if($('ovAvailableTables'))$('ovAvailableTables').textContent=cache.tables.length?available:'—';if($('ovOccupancy'))$('ovOccupancy').textContent=cache.tables.length?`${Math.round(occupied/cache.tables.length*100)}%`:'—';
+ const upcoming=rs.filter(r=>dateKey(r.date||r.reservationDate)>=tk&&!['cancelled','rejected','completed','no-show'].includes(getStatus(r))).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||''))).slice(0,6);if($('overviewReservations'))$('overviewReservations').innerHTML=upcoming.length?upcoming.map(r=>`<div class="stat-row"><span class="stat-row-label">${esc(r.time||'')} · ${esc(r.customerName||r.name||'Guest')} (${esc(r.guestCount||r.guests||'?')})</span><span class="status-pill ${escStatus(getStatus(r))}">${esc(r.status||'Pending')}</span></div>`).join(''):'<div class="empty-state">No upcoming reservations.</div>';
+ if($('overviewTransactions'))$('overviewTransactions').innerHTML=cache.payments.slice(0,5).map(p=>`<div class="stat-row"><span class="stat-row-label">${esc(p.transactionId||p.id)} · ${esc(textDate(p.createdAt))}</span><span class="stat-row-val">${money(p.amount)} · ${esc(p.status||'Pending')}</span></div>`).join('')||'<div class="empty-state">No transactions available.</div>';
+ if($('overviewReviews'))$('overviewReviews').innerHTML=cache.reviews.slice(0,4).map(r=>`<div class="stat-row"><span class="stat-row-label">★ ${esc(r.rating||'—')} · ${esc(r.customerName||'Guest')}</span><span class="stat-row-val">${esc(r.comment||r.text||'')}</span></div>`).join('')||'<div class="empty-state">No reviews available.</div>';
+ if($('restaurantNotifications'))$('restaurantNotifications').innerHTML=cache.notifications.slice(0,5).map(n=>`<div class="stat-row"><span class="stat-row-label">${esc(n.title||n.message||'Notification')}</span><span>${esc(textDate(n.createdAt))}</span></div>`).join('')||'<div class="empty-state">No new notifications.</div>';
+ const slots={};today.forEach(r=>{const t=r.time||'Unspecified';slots[t]=(slots[t]||0)+1;});if($('popularSlots'))$('popularSlots').innerHTML=Object.entries(slots).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([t,n])=>`<div class="stat-row"><span class="stat-row-label">${esc(t)}</span><span class="stat-row-val">${n} reservations</span></div>`).join('')||'<div class="empty-state">Slot insights will appear when reservations are available.</div>';
 }
-window.copyEvLink=function(id){const ev=allEvents.find(item=>item.id===id);const slug=String(ev?.urlKey||ev?.name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';navigator.clipboard.writeText(`${location.origin}/event/${encodeURIComponent(slug)}`).then(()=>showToast('Link copied!'));};
-window.togglePublishEvent=async function(id,st){if(!myUid)return;const ns=st==='published'?'unpublished':'published';await updateDoc(doc(db,'events',id),{status:ns,updatedAt:serverTimestamp()});showToast(ns==='published'?'✅ Event published!':'🟡 Event unpublished');};
-document.getElementById('evSearch').addEventListener('input',()=>{if(window.renderEvents)window.renderEvents();});
-document.getElementById('evRefresh').onclick=()=>{if(window.renderEvents)window.renderEvents();};
-if(window.renderEvents)window.renderEvents();
-function loadBookings(uid){const q=query(collection(db,'bookings'),where('organiserId','==',uid),orderBy('createdAt','desc'),limit(100));onSnapshot(q,snap=>{allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));renderOverviewBookings(allBookings);renderSalesMetrics(allBookings);renderSalesTable('all');renderPayouts(allBookings);renderAnalytics(allBookings);});}
-function renderOverview(){const el=id=>document.getElementById(id);if(el('mEvents'))el('mEvents').textContent=allEvents.length;if(el('planUsageLabel'))el('planUsageLabel').textContent=allEvents.length+' events created';}
-function renderOverviewBookings(bookings){
-  const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
-  const el=id=>document.getElementById(id);
-  if(el('mBookings'))el('mBookings').textContent=bookings.length;if(el('mRevenue'))el('mRevenue').textContent=money(rev);if(el('mPayout'))el('mPayout').textContent=money(rev);
-  const actEl=document.getElementById('overviewActivity');
-  actEl.innerHTML=bookings.slice(0,6).length?bookings.slice(0,6).map(b=>{const st=(b.status||'pending').toLowerCase();const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'';return`<div style="display:flex;align-items:center;gap:.75rem;padding:.7rem .8rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);margin-bottom:.5rem;"><span style="width:8px;height:8px;border-radius:50%;background:${st==='paid'?'#16a34a':st==='cancelled'?'#dc2626':'#f97316'};flex:none;"></span><div style="flex:1;"><strong style="display:block;font-size:.84rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'Booking')}</strong><span style="font-size:.74rem;color:#9ca3af;">${st} · ${date}</span></div><span style="font-size:.78rem;font-weight:700;color:${st==='paid'?'#16a34a':'#f97316'};">${b.amount?money(b.amount):'Free'}</span></div>`;}).join(''):'<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">No activity yet.</div>';
-  const billEl=document.getElementById('overviewBilling');
-  const paidB=bookings.filter(b=>(b.status||'')==='paid');
-  billEl.innerHTML=paidB.slice(0,5).length?paidB.slice(0,5).map(b=>{const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'';return`<div style="display:flex;align-items:center;gap:.75rem;padding:.7rem .8rem;border-radius:10px;background:var(--psoft);border:1px solid var(--border);margin-bottom:.5rem;"><span style="width:32px;height:32px;border-radius:8px;background:var(--plight);display:grid;place-items:center;font-size:.85rem;flex:none;">💳</span><div style="flex:1;"><strong style="display:block;font-size:.84rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'Payment')}</strong><span style="font-size:.74rem;color:#9ca3af;">${date}</span></div><span style="font-size:.84rem;font-weight:700;color:#16a34a;">${money(b.amount)}</span></div>`;}).join(''):'<div style="font-size:.82rem;color:#9ca3af;padding:.5rem 0;">No transactions yet.</div>';
-}
-function renderSalesMetrics(bookings){const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);const el=id=>document.getElementById(id);if(el('salesTotalRev'))el('salesTotalRev').textContent=money(rev);if(el('salesSettled'))el('salesSettled').textContent=money(rev);if(el('salesPending'))el('salesPending').textContent=money(0);if(el('salesCount'))el('salesCount').textContent=bookings.length;}
-function renderSalesTable(filter){const q=(document.getElementById('salesSearch')||{}).value?.trim().toLowerCase()||'';let rows=allBookings;if(filter==='paid')rows=rows.filter(b=>(b.status||'')==='paid');else if(filter==='pending')rows=rows.filter(b=>(b.status||'')!=='paid'&&(b.status||'')!=='cancelled');else if(filter==='cancelled')rows=rows.filter(b=>(b.status||'')==='cancelled');if(q)rows=rows.filter(b=>(b.eventName||'').toLowerCase().includes(q));const body=document.getElementById('salesTableBody');if(!body)return;if(!rows.length){body.innerHTML='<div style="text-align:center;padding:3rem;color:#9ca3af;font-size:.84rem;">No transactions found.</div>';return;}body.innerHTML=rows.map(b=>{const st=(b.status||'pending').toLowerCase();const date=b.createdAt?.toDate?b.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';return`<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:.8rem 1.1rem;border-bottom:1px solid var(--plight);align-items:center;"><div style="font-size:.86rem;font-weight:600;color:#1a1a2e;">${esc(b.eventName||'—')}</div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.82rem;color:#6b7280;">${b.tickets||1}</div><div style="font-size:.84rem;font-weight:700;color:#1a1a2e;">${b.amount?money(b.amount):'Free'}</div><div><span style="display:inline-flex;padding:.22rem .6rem;border-radius:999px;font-size:.7rem;font-weight:700;background:${st==='paid'?'#dcfce7':st==='cancelled'?'#fee2e2':'var(--plight)'};color:${st==='paid'?'#16a34a':st==='cancelled'?'#dc2626':'#b91c1c'};">${st}</span></div></div>`;}).join('');}
-function renderPayouts(bookings){const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);const el=id=>document.getElementById(id);if(el('payoutTotal'))el('payoutTotal').textContent=money(rev);if(el('payoutTransit'))el('payoutTransit').textContent=money(0);if(el('payoutHold'))el('payoutHold').textContent=money(0);}
-function renderAnalytics(bookings){
-  const paid=bookings.filter(b=>(b.status||'')==='paid');const rev=paid.reduce((s,b)=>s+Number(b.amount||0),0);
-  const el=id=>document.getElementById(id);
-  ['anRevenue','anRevenue2'].forEach(id=>{if(el(id))el(id).textContent=money(rev);});
-  ['anRegs','anRegs2'].forEach(id=>{if(el(id))el(id).textContent=bookings.length;});
-  const live=allEvents.filter(e=>normStatus(e.status)==='published').length;
-  ['anLive','anLive2'].forEach(id=>{if(el(id))el(id).textContent=live;});
-  const avg=allEvents.length?money(Math.round(rev/allEvents.length)):'₹0';
-  ['anAvg','anAvg2'].forEach(id=>{if(el(id))el(id).textContent=avg;});
-  if(el('qsTotal'))el('qsTotal').textContent=allEvents.length;
-  if(el('qsPublished'))el('qsPublished').textContent=live;
-  if(el('qsDraft'))el('qsDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;
-  if(el('qsFree'))el('qsFree').textContent=allEvents.filter(e=>!e.price||e.price===0).length;
-  if(el('qsPaid'))el('qsPaid').textContent=allEvents.filter(e=>e.price>0).length;
-  const prices=allEvents.filter(e=>e.price>0).map(e=>Number(e.price||0));
-  if(el('qsAvgPrice'))el('qsAvgPrice').textContent=prices.length?money(Math.round(prices.reduce((a,b)=>a+b,0)/prices.length)):'₹0';
-  const chart=document.getElementById('revenueChart');
-  if(chart){const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const vals=days.map(()=>Math.floor(Math.random()*80)+10);const max=Math.max(...vals);chart.innerHTML=vals.map((v,i)=>`<div class="bar-wrap"><div class="bar" style="height:${Math.round((v/max)*110)}px;"></div><div class="bar-label">${days[i]}</div></div>`).join('');}
-}
-async function loadProfile(uid){
-  const url=`${location.hostname==="localhost"||location.hostname==="127.0.0.1"?location.origin:"https://srisanth588.github.io/CULTUREWAVE"}/client-profile.html?uid=${uid}`;
-  const pfUrl=document.getElementById('pfPublicUrl');const pfView=document.getElementById('pfViewBtn');const pfCopy=document.getElementById('pfCopyBtn');
-  if(pfUrl)pfUrl.textContent=url;if(pfView)pfView.href=url;if(pfCopy)pfCopy.onclick=()=>navigator.clipboard.writeText(url).then(()=>showToast('Profile link copied!'));
-  const snap=await getDoc(doc(db,'organisers',uid));
-  if(snap.exists()){const d=snap.data();const publicHandle=String(d.handle||'').trim().toLowerCase();if(publicHandle){const basePath=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);const publicUrl=location.origin+basePath+encodeURIComponent(publicHandle);if(pfUrl)pfUrl.textContent=publicUrl;if(pfView)pfView.href=publicUrl;if(pfCopy)pfCopy.onclick=()=>navigator.clipboard.writeText(publicUrl).then(()=>showToast('Profile link copied!'));}const g=id=>document.getElementById(id);
-    if(g('pfName'))g('pfName').value=d.name||'';if(g('pfHandle'))g('pfHandle').value=d.handle||'';if(g('pfBio'))g('pfBio').value=d.bio||'';if(g('pfWebsite'))g('pfWebsite').value=d.website||'';if(g('pfInstagram'))g('pfInstagram').value=d.instagram||'';if(g('pfTwitter'))g('pfTwitter').value=d.twitter||'';if(g('pfFacebook'))g('pfFacebook').value=d.facebook||'';if(g('pfYoutube'))g('pfYoutube').value=d.youtube||'';if(g('pfLinkedin'))g('pfLinkedin').value=d.linkedin||'';if(g('pfWhatsapp'))g('pfWhatsapp').value=d.whatsapp||'';if(g('pfGaId'))g('pfGaId').value=d.gaId||'';if(g('pfMetaPixel'))g('pfMetaPixel').value=d.metaPixel||'';if(g('pfGtmId'))g('pfGtmId').value=d.gtmId||'';
-    if(d.avatarUrl){const img=g('avatarPreview');if(img){img.src=d.avatarUrl;img.style.display='block';const ini=g('avatarInitial');if(ini)ini.style.display='none';}}
-    if(d.coverUrl){const img=g('coverPreview');if(img){img.src=d.coverUrl;img.style.display='block';const ph=g('coverPlaceholder');if(ph)ph.style.display='none';}}
-    const init=(d.name||'R').trim()[0].toUpperCase();['sideAvatar','topAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init;});
-    document.getElementById('sidebarName').textContent=d.name||'Client';document.getElementById('topName').textContent=d.name||'User';
-  }
-  const kycSnap=await getDoc(doc(db,'kyc',uid));
-  if(kycSnap.exists()){const k=kycSnap.data();const g=id=>document.getElementById(id);
-    if(g('piFullName'))g('piFullName').value=k.fullName||'';if(g('piDob'))g('piDob').value=k.dob||'';if(g('piPhone'))g('piPhone').value=k.phone||'';if(g('piEmail'))g('piEmail').value=k.email||'';if(g('piAddress'))g('piAddress').value=k.address||'';if(g('piCity'))g('piCity').value=k.city||'';if(g('piState'))g('piState').value=k.state||'';if(g('piPin'))g('piPin').value=k.pin||'';if(g('piPan'))g('piPan').value=k.pan||'';if(g('piPanName'))g('piPanName').value=k.panName||'';if(g('piPanDob'))g('piPanDob').value=k.panDob||'';if(g('piPanImg'))g('piPanImg').value=k.panImg||'';if(g('piGst'))g('piGst').value=k.gst||'';if(g('piGstBiz'))g('piGstBiz').value=k.gstBiz||'';if(g('bpBankName'))g('bpBankName').value=k.bankName||'';if(g('bpBankAccNo'))g('bpBankAccNo').value=k.bankAccNo||'';if(g('bpBankAccNo2'))g('bpBankAccNo2').value=k.bankAccNo||'';if(g('bpBankIfsc'))g('bpBankIfsc').value=k.bankIfsc||'';if(g('bpBankBankName'))g('bpBankBankName').value=k.bankBankName||'';if(g('bpBankType'))g('bpBankType').value=k.bankType||'savings';
-  }
-}
-window.saveProfile=async function(){if(!myUid)return;await setDoc(doc(db,'organisers',myUid),{name:document.getElementById('pfName').value.trim(),handle:document.getElementById('pfHandle').value.trim(),bio:(document.getElementById('pfBio')||{}).value?.trim()||'',website:(document.getElementById('pfWebsite')||{}).value?.trim()||'',instagram:(document.getElementById('pfInstagram')||{}).value?.trim().replace(/^@/,'')||'',twitter:(document.getElementById('pfTwitter')||{}).value?.trim().replace(/^@/,'')||'',facebook:(document.getElementById('pfFacebook')||{}).value?.trim()||'',youtube:(document.getElementById('pfYoutube')||{}).value?.trim()||'',linkedin:(document.getElementById('pfLinkedin')||{}).value?.trim()||'',whatsapp:(document.getElementById('pfWhatsapp')||{}).value?.trim()||'',gaId:(document.getElementById('pfGaId')||{}).value?.trim()||'',metaPixel:(document.getElementById('pfMetaPixel')||{}).value?.trim()||'',gtmId:(document.getElementById('pfGtmId')||{}).value?.trim()||'',updatedAt:serverTimestamp()},{merge:true});showToast('✓ Profile saved!');};
-window.savePersonalInfo=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{fullName:document.getElementById('piFullName').value.trim(),dob:document.getElementById('piDob').value,phone:document.getElementById('piPhone').value.trim(),email:document.getElementById('piEmail').value.trim(),address:document.getElementById('piAddress').value.trim(),city:document.getElementById('piCity').value.trim(),state:document.getElementById('piState').value.trim(),pin:document.getElementById('piPin').value.trim(),updatedAt:new Date().toISOString()},{merge:true});showToast('Personal details saved!');};
-window.savePanDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{pan:document.getElementById('piPan').value.trim().toUpperCase(),panName:document.getElementById('piPanName').value.trim(),panDob:document.getElementById('piPanDob').value,panImg:(document.getElementById('piPanImg')||{}).value?.trim()||'',updatedAt:new Date().toISOString()},{merge:true});showToast('PAN details saved!');};
-window.saveGstDetails=async function(){if(!myUid)return;await setDoc(doc(db,'kyc',myUid),{gst:document.getElementById('piGst').value.trim().toUpperCase(),gstBiz:document.getElementById('piGstBiz').value.trim(),updatedAt:new Date().toISOString()},{merge:true});showToast('GST details saved!');};
-window.saveBrandBankDetails=async function(){if(!myUid)return;const acc=document.getElementById('bpBankAccNo').value.trim();const acc2=document.getElementById('bpBankAccNo2').value.trim();if(acc!==acc2){showToast('Account numbers do not match');return;}await setDoc(doc(db,'kyc',myUid),{bankName:document.getElementById('bpBankName').value.trim(),bankAccNo:acc,bankIfsc:document.getElementById('bpBankIfsc').value.trim().toUpperCase(),bankBankName:(document.getElementById('bpBankBankName')||{}).value?.trim()||'',bankType:document.getElementById('bpBankType').value,updatedAt:new Date().toISOString()},{merge:true});showToast('Bank details saved!');};
-if(document.getElementById('salesSearch')){document.getElementById('salesSearch').addEventListener('input',()=>{const active=document.querySelector('#salesTabs .tab.active');renderSalesTable(active?active.dataset.stab:'all');});}
+function renderTables(){const list=cache.tables,sel=$('tableSectionFilter')?.value||'',filtered=list.filter(t=>!sel||t.section===sel);for(const [status,id] of [['available','tableAvailable'],['reserved','tableReserved'],['occupied','tableOccupied']])if($(id))$(id).textContent=list.filter(t=>String(t.status||'').toLowerCase()===status).length;const others=list.filter(t=>['cleaning','blocked'].includes(String(t.status||'').toLowerCase())).length;if($('tableOther'))$('tableOther').textContent=others;if($('tablesGrid'))$('tablesGrid').innerHTML=filtered.map(t=>`<article class="tile"><h3>Table ${esc(t.tableId||t.name||t.id)}</h3><p>${esc(t.capacity||'—')} seats · ${esc(t.section||'Indoor')}<br>Status: ${esc(t.status||'Available')}</p><div class="tile-actions"><button class="mini-action" onclick="editTable('${esc(t.id)}')">Edit</button><button class="mini-action" onclick="removeTable('${esc(t.id)}')">Delete</button></div></article>`).join('')||'<div class="empty-state">No tables configured yet. Add your first table.</div>';const opts=list.filter(t=>String(t.status||'Available').toLowerCase()==='available').map(t=>`<option value="${esc(t.id)}">${esc(t.tableId||t.name||t.id)} · ${esc(t.capacity)} seats</option>`).join('');if($('walkTable'))$('walkTable').innerHTML='<option value="">Add to waitlist</option>'+opts;}
+function renderFloor(){const sec=$('floorSectionFilter')?.value||'',list=cache.tables.filter(t=>!sec||t.section===sec),c=$('floorPlanCanvas');if(!c)return;c.innerHTML=list.map(t=>`<div class="floor-table" draggable="true" data-id="${esc(t.id)}" data-status="${esc(t.status||'Available')}" style="${Number.isFinite(t.x)?`position:absolute;left:${t.x}px;top:${t.y||0}px;`:''}" onclick="assignTable('${esc(t.id)}')"><strong>${esc(t.tableId||t.name||t.id)}</strong><small>${esc(t.capacity||'?')} seats · ${esc(t.status||'Available')}</small></div>`).join('')||'<div class="empty-state">Add tables to your restaurant to build a floor plan.</div>';c.querySelectorAll('.floor-table').forEach(el=>{el.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',el.dataset.id));el.addEventListener('dragend',async e=>{const box=c.getBoundingClientRect();const x=Math.max(0,e.clientX-box.left-50),y=Math.max(0,e.clientY-box.top-40);if(restaurantId)try{await updateDoc(doc(db,'tables',el.dataset.id),{x,y,updatedAt:serverTimestamp()});}catch(err){showError('Floor plan save failed',err);}});});c.ondragover=e=>e.preventDefault();}
+window.assignTable=id=>{const t=cache.tables.find(x=>x.id===id);if(!t)return;const eligible=cache.reservations.filter(r=>getStatus(r)==='confirmed'&&!r.tableId);if(!eligible.length)return safeToast('No unassigned confirmed reservations are available.');const choices=eligible.map((r,i)=>`${i+1}. ${r.customerName||r.name||'Guest'} · ${r.date||r.reservationDate||''} ${r.time||''}`).join('\n');const choice=Number(prompt(`Assign ${t.tableId||t.name||t.id} to reservation:\n${choices}`));const r=eligible[choice-1];if(!r)return;const overlap=cache.reservations.some(x=>x.id!==r.id&&(x.tableId===t.tableId||x.tableId===t.id)&&dateKey(x.date||x.reservationDate)===dateKey(r.date||r.reservationDate)&&String(x.time||'')===String(r.time||'')&&!['cancelled','completed','rejected','no-show'].includes(getStatus(x)));if(overlap)return safeToast('Table already has an overlapping reservation.');updateDoc(doc(db,'reservations',r.id),{tableId:t.tableId||t.id,updatedAt:serverTimestamp(),updatedBy:user.uid}).then(()=>safeToast('Table assigned.')).catch(e=>showError('Assignment failed',e));};
+function renderWaitlist(){const c=$('waitlistRows');if(!c)return;const list=cache.reservations.filter(r=>r.type==='walk-in'||r.type==='waitlist'||['waiting','waitlist'].includes(getStatus(r)));if($('waitCount'))$('waitCount').textContent=list.length;if($('waitTablesAvailable'))$('waitTablesAvailable').textContent=cache.tables.filter(t=>String(t.status||'').toLowerCase()==='available').length;c.innerHTML=list.map(r=>`<div class="stat-row"><span class="stat-row-label">${esc(r.customerName||r.name)} · ${esc(r.mobile||r.phone)} · ${esc(r.guestCount||r.guests)} guests · wait ${esc(r.waitMinutes||'?')} min</span><button class="mini-action" onclick="removeWaitlist('${esc(r.id)}')">Remove</button></div>`).join('')||'<div class="empty-state">No guests in the waitlist.</div>';}
+function renderMenu(){if($('menuCategories')){const cats=[...new Set(cache.menus.map(m=>m.category).filter(Boolean))];$('menuCategories').innerHTML=cats.map(c=>`<span class="status-pill">${esc(c)}</span>`).join(' ')||'<div class="empty-state">No menu categories yet.</div>';}$('menuItems')&&($('menuItems').innerHTML=cache.menus.map(m=>`<article class="tile"><h3>${esc(m.name||'Menu item')} ${m.type==='Veg'?'🟢':'🔴'}</h3><p>${esc(m.description||'')}<br>${money(m.price)} · Tax ${esc(m.taxRate||0)}% · ${m.available===false?'Unavailable':'Available'}</p><div class="tile-actions"><button class="mini-action" onclick="toggleMenuAvailability('${esc(m.id)}',${m.available===false})">${m.available===false?'Enable':'Disable'}</button><button class="mini-action" onclick="deleteRestaurantRecord('menus','${esc(m.id)}')">Delete</button></div></article>`).join('')||'<div class="empty-state">No menu items yet.</div>');if($('menuPreview'))$('menuPreview').innerHTML=cache.menus.filter(m=>m.available!==false).map(m=>`<div class="stat-row"><span class="stat-row-label">${esc(m.name)}</span><span class="stat-row-val">${money(m.price)}</span></div>`).join('')||'<div class="empty-state">Menu preview will appear here.</div>';}
+function renderOffers(){if($('offerCount'))$('offerCount').textContent=cache.offers.length;if($('offerSpend'))$('offerSpend').textContent=money(cache.offers.reduce((s,o)=>s+Number(o.discountExpenditure||0),0));if($('offersRows'))$('offersRows').innerHTML=cache.offers.map(o=>`<div class="stat-row"><span class="stat-row-label">${esc(o.name)} · ${esc(o.type)} ${esc(o.value)} · ${esc(o.fundingResponsibility||'Restaurant-funded')}</span><span>${esc(textDate(o.validFrom))} – ${esc(textDate(o.validUntil))}</span><button class="mini-action" onclick="deleteRestaurantRecord('offers','${esc(o.id)}')">Delete</button></div>`).join('')||'<div class="empty-state">No offers created yet.</div>';}
+function renderCustomers(){const term=($('customerSearch')?.value||'').toLowerCase();const list=cache.customers.filter(c=>[c.name,c.mobile,c.phone,c.email].join(' ').toLowerCase().includes(term));if($('customerRows'))$('customerRows').innerHTML=list.map(c=>`<div class="stat-row"><span class="stat-row-label">${esc(c.name||'Customer')} · ${esc(c.mobile||c.phone||'')} · ${esc(c.email||'')}</span><span class="stat-row-val">${esc(c.completedVisits||0)} visits · ${money(c.totalSpending||0)}</span><button class="mini-action" onclick="safeToast('Customer history loaded from restaurant records.')">History</button></div>`).join('')||'<div class="empty-state">Customer records will appear here.</div>';}
+function renderPayments(){const active=document.querySelector('#paymentTabs .tab.active')?.dataset.filter||'All',list=cache.payments.filter(p=>active==='All'||(active==='Successful'?['successful','success','paid','captured'].includes(getStatus(p)):getStatus(p)===active.toLowerCase().replace(/ /g,'-')));if($('paymentsRows'))$('paymentsRows').innerHTML=list.map(p=>`<div class="stat-row"><span class="stat-row-label">${esc(p.transactionId||p.id)} · ${esc(p.method||'—')} · ${esc(textDate(p.createdAt))}</span><span class="status-pill ${escStatus(getStatus(p))}">${esc(p.status||'Pending')}</span><span class="stat-row-val">${money(p.amount)}</span></div>`).join('')||'<div class="empty-state">No payment records for this filter.</div>';}
+function renderSettlements(){const list=cache.settlements,eligible=cache.payments.filter(p=>['successful','success','paid','captured'].includes(getStatus(p))).reduce((s,p)=>s+Number(p.amount||0),0);const net=list.reduce((s,p)=>s+Number(p.netAmount||p.netSettlement||0),0);[['stCollected',eligible],['stEligible',eligible],['stDeductions',list.reduce((s,p)=>s+Number(p.commission||0)+Number(p.gatewayCharges||0)+Number(p.taxes||0)+Number(p.refundDeductions||0),0)],['stNet',net]].forEach(([id,n])=>{if($(id))$(id).textContent=money(n)});if($('settlementsRows'))$('settlementsRows').innerHTML=list.map(s=>`<div class="stat-row"><span class="stat-row-label">${esc(s.period||textDate(s.createdAt))} · ${esc(s.status||'Pending')}</span><span class="stat-row-val">${money(s.netAmount||s.netSettlement||0)}</span></div>`).join('')||'<div class="empty-state">Settlement records will appear here.</div>';}
+function renderReports(){const n=cache.reservations.length,c=cache.reservations.filter(r=>['cancelled','rejected'].includes(getStatus(r))).length,ns=cache.reservations.filter(r=>getStatus(r)==='no-show').length,paid=cache.payments.filter(p=>['successful','success','paid','captured'].includes(getStatus(p))),rev=paid.reduce((s,p)=>s+Number(p.amount||0),0);if($('reportReservations'))$('reportReservations').textContent=n;if($('reportAverage'))$('reportAverage').textContent=money(paid.length?rev/paid.length:0);if($('reportCancelRate'))$('reportCancelRate').textContent=n?`${Math.round(c/n*100)}%`:'—';if($('reportNoShowRate'))$('reportNoShowRate').textContent=n?`${Math.round(ns/n*100)}%`:'—';if($('reportsChart'))$('reportsChart').innerHTML=paid.length?'<div class="empty-state">Revenue is available in the verified payments table. CSV export includes the restaurant’s loaded report rows.</div>':'<div class="empty-state">No verified daily revenue records yet.</div>';}
+function renderReviews(){const list=cache.reviews,avg=list.length?list.reduce((s,r)=>s+Number(r.rating||0),0)/list.length:0;if($('reviewRating'))$('reviewRating').textContent=list.length?avg.toFixed(1):'—';if($('reviewCount'))$('reviewCount').textContent=list.length;const filter=$('reviewFilter')?.value||'';const shown=list.filter(r=>!filter||String(r.rating)===filter);if($('reviewsRows'))$('reviewsRows').innerHTML=shown.map(r=>`<div class="tile"><h3>★ ${esc(r.rating||'—')} · ${esc(r.customerName||'Guest')}</h3><p>${esc(r.comment||r.text||'')}</p><div class="tile-actions"><button class="mini-action" onclick="replyToReview('${esc(r.id)}')">Reply</button><button class="mini-action" onclick="reportReview('${esc(r.id)}')">Report</button></div></div>`).join('')||'<div class="empty-state">No reviews available.</div>';}
+function renderSimpleLists(){for(const [id,key,label] of [['staffRows','staff','No authorised staff records.'],['activityRows','staff','No staff activity available.'],['documentRows','documents','No uploaded documents.'],['agreementRows','documents','No agreements available.'],['supportRows','tickets','No support tickets yet.']]){const el=$(id);if(el)el.innerHTML=cache[key].map(x=>`<div class="stat-row"><span class="stat-row-label">${esc(x.name||x.title||x.documentType||x.subject||x.role||'Record')}</span><span>${esc(x.status||'—')}</span></div>`).join('')||`<div class="empty-state">${label}</div>`;}}
+async function addScoped(collectionName,data){if(!restaurantId)throw Error('No restaurant account is linked to this user');return addDoc(collection(db,collectionName),{...data,restaurantId,...(branchId?{branchId}:{}),createdAt:serverTimestamp(),createdBy:user.uid});}
+window.deleteRestaurantRecord=async(col,id)=>{if(!restaurantId||!confirm('Delete this restaurant record?'))return;try{const rec=cache[col]?.find(x=>x.id===id);if(!rec||rec.restaurantId!==restaurantId)throw Error('Record is outside this restaurant scope');await deleteDoc(doc(db,col,id));safeToast('Record deleted.');}catch(e){showError('Delete failed',e);}};
+window.openTableDialog=()=>{$('tableId').value='';$('tableName').value='';$('tableCapacity').value=2;$('tableDialog').showModal();};window.editTable=id=>{const t=cache.tables.find(x=>x.id===id);if(!t)return;$('tableId').value=id;$('tableName').value=t.tableId||t.name||'';$('tableCapacity').value=t.capacity||2;$('tableSection').value=t.section||'Indoor';$('tableStatus').value=t.status||'Available';$('tableDialog').showModal();};window.removeTable=id=>deleteRestaurantRecord('tables',id);
+window.saveRestaurantTable=async e=>{e.preventDefault();try{const id=$('tableId').value,tableId=$('tableName').value.trim(),capacity=Number($('tableCapacity').value);if(!tableId||capacity<1)throw Error('Enter a table ID and valid seating capacity');if(cache.tables.some(t=>(t.tableId||t.name)===tableId&&t.id!==id))throw Error('Table ID already exists');const data={tableId,capacity,section:$('tableSection').value,status:$('tableStatus').value,restaurantId,...(branchId?{branchId}:{})};if(id){const t=cache.tables.find(x=>x.id===id);if(!t||t.restaurantId!==restaurantId)throw Error('Table is outside this restaurant scope');await updateDoc(doc(db,'tables',id),{...data,updatedAt:serverTimestamp()});}else await addScoped('tables',data);$('tableDialog').close();safeToast('Table saved.');}catch(err){showError('Table save failed',err);}};
+window.openWalkinDialog=()=>{$('walkArrival').value=new Date().toTimeString().slice(0,5);$('walkinDialog').showModal();};window.saveWalkin=async e=>{e.preventDefault();try{const tableId=$('walkTable').value,table=cache.tables.find(t=>t.id===tableId);if(table&&String(table.status||'Available').toLowerCase()!=='available')throw Error('Selected table is no longer available');await addScoped('reservations',{type:table?'walk-in':'waitlist',status:table?'confirmed':'waiting',customerName:$('walkName').value.trim(),mobile:$('walkMobile').value.trim(),guestCount:Number($('walkGuests').value),time:$('walkArrival').value,waitMinutes:Number($('walkWait').value||0),tableId:table?.tableId||null});if(table)await updateDoc(doc(db,'tables',table.id),{status:'Occupied',updatedAt:serverTimestamp()});$('walkinDialog').close();safeToast('Guest added.');}catch(err){showError('Unable to add guest',err);}};window.removeWaitlist=id=>{const r=cache.reservations.find(x=>x.id===id);if(!r||r.restaurantId!==restaurantId||(branchId&&r.branchId!==branchId))return safeToast('This guest is outside the current restaurant scope.');updateDoc(doc(db,'reservations',id),{status:'cancelled',updatedAt:serverTimestamp()}).then(()=>safeToast('Guest removed from waitlist.')).catch(e=>showError('Unable to remove guest',e));};
+window.openMenuDialog=()=> $('menuDialog').showModal();window.saveMenuItem=async e=>{e.preventDefault();try{await addScoped('menus',{name:$('menuItemName').value.trim(),category:$('menuItemCategory').value.trim(),description:$('menuItemDescription').value.trim(),price:Number($('menuItemPrice').value),type:$('menuItemType').value,taxRate:Number($('menuItemTax').value||0),imageUrl:$('menuItemImage').value.trim(),available:$('menuItemAvailable').checked});$('menuDialog').close();safeToast('Menu item saved.');}catch(err){showError('Menu save failed',err);}};window.addMenuCategory=async()=>{const name=prompt('Category name');if(!name?.trim())return;try{await addScoped('menuCategories',{name:name.trim()});safeToast('Category saved.');}catch(e){showError('Category save failed',e);}};window.toggleMenuAvailability=(id,available)=>{const r=cache.menus.find(x=>x.id===id);if(!r||r.restaurantId!==restaurantId||(branchId&&r.branchId!==branchId))return safeToast('This item is outside the current restaurant scope.');updateDoc(doc(db,'menus',id),{available,updatedAt:serverTimestamp()}).catch(e=>showError('Menu update failed',e));};
+window.openOfferDialog=()=> $('offerDialog').showModal();window.saveRestaurantOffer=async e=>{e.preventDefault();try{await addScoped('offers',{name:$('offerName').value.trim(),type:$('offerType').value,value:Number($('offerValue').value),minimumBill:Number($('offerMinBill').value||0),maximumDiscount:Number($('offerMaxDiscount').value||0),validFrom:$('offerFrom').value,validUntil:$('offerUntil').value,applicableDays:$('offerDays').value.split(',').map(x=>x.trim()).filter(Boolean),timeSlots:$('offerSlots').value.split(',').map(x=>x.trim()).filter(Boolean),redemptionLimit:Number($('offerLimit').value||0),terms:$('offerTerms').value.trim(),fundingResponsibility:'restaurant'});$('offerDialog').close();safeToast('Offer saved.');}catch(err){showError('Offer save failed',err);}};
+window.saveRestaurantProfile=async()=>{if(!restaurantId)return safeToast('No restaurant account is linked.');try{const data={name:$('restaurantName').value.trim(),phone:$('restaurantPhone').value.trim(),email:$('restaurantEmail').value.trim(),cuisine:$('restaurantCuisine').value.trim(),address:$('restaurantAddress').value.trim(),openingHours:$('restaurantHours').value.trim(),description:$('restaurantDescription').value.trim(),updatedAt:serverTimestamp()};await updateDoc(doc(db,'restaurants',restaurantId),data);safeToast('Restaurant profile saved.');}catch(e){showError('Profile save failed',e);}};
+function renderProfilePreview(){if($('profilePreview'))$('profilePreview').innerHTML=`<strong>${esc($('restaurantName')?.value||'Restaurant name')}</strong><div>${esc($('restaurantCuisine')?.value||'Cuisine')} · ${esc($('restaurantAddress')?.value||'Address')}</div><p>${esc($('restaurantDescription')?.value||'Restaurant description')}</p>`;}
+window.saveRestaurantSettings=async()=>{try{await setDoc(doc(db,'restaurantSettings',restaurantId),{restaurantId,...(branchId?{branchId}:{}),operatingHours:$('settingHours').value,reservationInterval:Number($('settingInterval').value),reservationDuration:Number($('settingDuration').value),maximumGuests:Number($('settingMaxGuests').value),advanceBookingDays:Number($('settingAdvance').value),cancellationRules:$('settingCancellation').value,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true});safeToast('Settings saved.');}catch(e){showError('Settings save failed',e);}};
+window.openTicketDialog=()=> $('ticketDialog').showModal();window.saveSupportTicket=async e=>{e.preventDefault();try{await addScoped('supportTickets',{subject:$('ticketSubject').value.trim(),message:$('ticketMessage').value.trim(),status:'open'});$('ticketDialog').close();safeToast('Support ticket created.');}catch(err){showError('Ticket creation failed',err);}};
+$('documentUpload')?.addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file||!restaurantId)return;try{const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_'),path=`restaurants/${restaurantId}/${branchId||'main'}/documents/${Date.now()}-${safeName}`;await uploadBytes(ref(storage,path),file,{contentType:file.type||'application/octet-stream',customMetadata:{restaurantId,branchId:branchId||'',uploadedBy:user.uid}});await addScoped('documents',{name:file.name,path,contentType:file.type,size:file.size,status:'pending'});safeToast('Document uploaded for verification.');e.target.value='';}catch(err){showError('Document upload failed',err);}});
+window.inviteRestaurantStaff=()=>safeToast('Staff account provisioning must be completed through the secure CultureWave onboarding workflow.');window.replyToReview=id=>safeToast('Review reply will be available when the review reply workflow is enabled.');window.reportReview=id=>safeToast('Review report queued for CultureWave support.');
+window.exportReportCsv=()=>{const rows=[['Booking ID','Date','Status','Guests'],...cache.reservations.map(r=>[r.bookingId||r.id,r.date||r.reservationDate,r.status||r.bookingStatus,r.guestCount||r.guests])];downloadCsv('restaurant-report.csv',rows);};window.exportReportPdf=()=>window.print();function downloadCsv(name,rows){const content=rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href);}
+function switchView(name){document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.dataset.view.split(' ').includes(name)));document.querySelectorAll('.sb-item[data-view]').forEach(el=>el.classList.toggle('active',el.dataset.view===name));if($('pageTitle'))$('pageTitle').textContent=(_titles[name]||name);try{localStorage.setItem('restDashView',name);}catch{}closeSidebar();}
+const _titles={overview:'🍽️ Restaurant Overview',reservations:'🗓 Reservations',tables:'▦ Table Management','floor-plan':'⌘ Floor Plan',waitlist:'☷ Walk-ins & Waitlist',menu:'🍽 Menu Management',offers:'％ Offers & Discounts',customers:'♙ Customers',payments:'₹ Payments',settlements:'⇄ Settlements & Commission',reports:'📈 Reports & Analytics',reviews:'★ Reviews & Ratings',staff:'♧ Staff & Permissions',profile:'⌂ Restaurant Profile',documents:'▤ Documents & Agreements',support:'⚙ Support & Settings'};
+window.switchView=switchView;window.openSidebar=()=>{$('sidebar').classList.add('open');$('sbOverlay').classList.add('open')};window.closeSidebar=()=>{$('sidebar').classList.remove('open');$('sbOverlay').classList.remove('open')};
+document.querySelectorAll('.sb-item[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$('sbOverlay').onclick=closeSidebar;document.querySelectorAll('.view form').forEach(f=>f.addEventListener('submit',e=>e.preventDefault()));
+['restaurantName','restaurantCuisine','restaurantAddress','restaurantDescription'].forEach(id=>$(id)?.addEventListener('input',renderProfilePreview));
+$('reservationSearch')?.addEventListener('input',renderReservations);$('customerSearch')?.addEventListener('input',renderCustomers);$('menuSearch')?.addEventListener('input',()=>{const q=$('menuSearch').value.toLowerCase();$('menuItems').querySelectorAll('.tile').forEach(x=>x.hidden=!x.textContent.toLowerCase().includes(q));});$('tableSectionFilter')?.addEventListener('change',renderTables);$('floorSectionFilter')?.addEventListener('change',renderFloor);$('reviewFilter')?.addEventListener('change',renderReviews);
+document.querySelectorAll('#reservationTabs .tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#reservationTabs .tab').forEach(x=>x.classList.toggle('active',x===b));renderReservations();}));document.querySelectorAll('#paymentTabs .tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#paymentTabs .tab').forEach(x=>x.classList.toggle('active',x===b));renderPayments();}));
+try{user=await getCurrentUser();if(!user){location.href='login.html';}else{const init=(user.name||'R').trim()[0].toUpperCase();$('sidebarName').textContent=user.name||'Restaurant partner';$('topName').textContent=user.name||'Partner';['sideAvatar','topAvatar'].forEach(id=>$(id).textContent=init);await resolveRestaurant();if(!restaurantId){safeToast('No restaurant is linked to this account yet.');$('overviewReservations').textContent='Complete restaurant onboarding to connect your restaurant records.';}else{if($('restaurantBranchLabel'))$('restaurantBranchLabel').textContent=branchId?'Restaurant branch workspace':'Restaurant workspace';Object.keys(collectionNames).forEach(n=>watch(n,renderAll));try{const rs=await getDocs(query(collection(db,'restaurants'),where('__name__','==',restaurantId),limit(1)));if(!rs.empty){const d=rs.docs[0].data();$('restaurantName').value=d.name||'';$('restaurantPhone').value=d.phone||d.contactPhone||'';$('restaurantEmail').value=d.email||d.contactEmail||'';$('restaurantCuisine').value=d.cuisine||'';$('restaurantAddress').value=d.address||'';$('restaurantHours').value=d.openingHours||'';$('restaurantDescription').value=d.description||'';renderProfilePreview();}}catch(e){console.info('Restaurant profile not loaded',e);}try{const settings=await getDocs(query(collection(db,'restaurantSettings'),where('restaurantId','==',restaurantId),limit(1)));if(!settings.empty){const d=settings.docs[0].data();$('settingHours').value=d.operatingHours||'';$('settingInterval').value=d.reservationInterval||30;$('settingDuration').value=d.reservationDuration||90;$('settingMaxGuests').value=d.maximumGuests||12;$('settingAdvance').value=d.advanceBookingDays||30;$('settingCancellation').value=d.cancellationRules||'';}}catch(e){console.info('Restaurant settings not loaded',e);}}} }catch(e){showError('Dashboard startup failed',e);}
+$('logoutBtn').onclick=()=>logout();try{const saved=localStorage.getItem('restDashView');if(saved&&_titles[saved])switchView(saved);}catch{}
 </script>
 </body>
 </html>
