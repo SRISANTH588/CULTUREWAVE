@@ -1191,7 +1191,7 @@
       }
 
       // QR code — encode booking verification data
-      const qrData = JSON.stringify({ id: bookingId, event: eventName, amount, date: dateStr, issuer: "CultureWave", type: bkType });
+      const qrData = JSON.stringify({ id: bookingId, bookingId, ...(isRestaurant ? { reservationId: params.get("reservationId") || bookingId } : {}), event: eventName, amount, date: dateStr, issuer: "CultureWave", type: bkType });
       try {
         QRCode.toCanvas(document.getElementById("qrCanvas"), qrData, {
           width: 175, margin: 1,
