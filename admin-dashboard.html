@@ -481,6 +481,46 @@
     .btn:not(.primary):not(.success):not(.danger):hover{background:#fff1f4;border-color:#ffb5c1;color:#e91e49;}
     @media(max-width:768px){.sidebar{background:#fff;border-right:1px solid var(--cw-line);}.topbar{height:62px;padding:0 .9rem}.view{padding:1rem}.sb-brand-row:before{font-size:1.25rem}.view>div:first-child[style*="linear-gradient"]{min-height:160px!important;padding:1.55rem 1.4rem!important}}
   </style>
+  <style id="restaurant-dashboard-format">
+    :root{
+      --blue:#dc2626;--blue-2:#f97316;--blue-light:#fff1f2;--blue-soft:#fecaca;
+      --border:#fecaca;--muted:#6b7280;--text:#1a1a2e;--bg:#fff9f7;
+      --sidebar:250px;--sb-bg:#fff;--sb-border:#fecaca;
+    }
+    body{background:var(--bg);color:var(--text);}
+    .sidebar{width:var(--sidebar);background:#fff;border-right:1px solid var(--border);box-shadow:none;}
+    .sb-brand{padding:1.2rem 1rem 1rem;border-bottom:1px solid var(--border);}
+    .sb-logo,.sb-avatar{background:linear-gradient(135deg,#dc2626,#f97316);box-shadow:0 2px 8px rgba(220,38,38,.2);}
+    .sb-badge{background:var(--blue-light);border-color:var(--border);color:#b91c1c;}
+    .sb-section-label{color:#f97316;padding:.8rem .9rem .3rem;font-size:.63rem;letter-spacing:.1em;}
+    .sb-item{color:#6b7280;font-weight:500;}
+    .sb-item:hover{background:#fff8f5;color:#dc2626;}
+    .sb-item.active{background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;box-shadow:none;}
+    .sb-bottom{border-color:var(--border);}
+    .sb-user-row{background:#fff8f5;}
+    .main{background:var(--bg);}
+    .topbar{height:auto;min-height:60px;padding:.75rem 1.5rem;border-color:var(--border);box-shadow:none;}
+    .page-title{font-size:1rem;color:var(--text);}
+    .tb-btn.primary{background:linear-gradient(135deg,#dc2626,#f97316);box-shadow:0 3px 10px rgba(220,38,38,.2);}
+    .tb-btn:hover,.notif-btn:hover{background:#fff1f2;color:#dc2626;border-color:var(--border);}
+    .notif-btn{border-color:var(--border);}
+    .notif-dot{background:#f97316;}
+    .tb-search{background:#fff;border-color:var(--border);}
+    .view{gap:1rem;padding:1.25rem 1.5rem;}
+    .card,.stat-card{border-color:var(--border);border-radius:14px;box-shadow:none;}
+    .data-table th{background:#fff8f5;border-color:var(--border);}
+    .data-table td{border-color:#fff1f2;}
+    .data-table tr:hover td{background:#fff8f5;}
+    .field input:focus,.field select:focus,.field textarea:focus,.filter-bar input:focus{border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.1);}
+    .btn:not(.success):not(.danger):hover{background:#fff1f2;border-color:#fecaca;color:#dc2626;}
+    .btn.primary{background:linear-gradient(135deg,#dc2626,#f97316);box-shadow:0 3px 10px rgba(220,38,38,.2);}
+    .sb-overlay{background:rgba(26,26,46,.45);}
+    @media(max-width:768px){
+      .sidebar{width:260px;border-right:1px solid var(--border);}
+      .topbar{height:64px;padding:0 1rem;}
+      .view{padding:1rem;}
+    }
+  </style>
 </head>
 <body>
 
@@ -523,7 +563,12 @@
   <nav class="sb-nav">
     <button class="sb-item" data-view="webinars"><span class="si-icon">🎙️</span> Webinars</button>
     <button class="sb-item" data-view="tours"><span class="si-icon">🗺️</span> Tours & Adventures</button>
-    <button class="sb-item" data-view="restaurants"><span class="si-icon">🍽️</span> Dining & Restaurants</button>
+  </nav>
+
+  <div class="sb-section-label">✦ Restaurant</div>
+  <nav class="sb-nav">
+    <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantListings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
+    <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantPageContent"><span class="si-icon">🖼️</span> Page Content</button>
   </nav>
 
   <div class="sb-section-label">✦ System</div>
@@ -1175,7 +1220,7 @@
       <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Restaurants Page Manager</div>
       <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Edit each section of restaurants.html. Saved changes appear on desktop and mobile.</div>
     </div>
-    <div class="card" style="padding:1.1rem 1.25rem;margin:0;">
+    <div class="card" id="restaurantPageContent" style="padding:1.1rem 1.25rem;margin:0;scroll-margin-top:1rem;">
       <h3 style="margin:0 0 .35rem;color:var(--ink);">Hero section</h3>
       <p style="margin:0 0 .9rem;color:var(--muted);font-size:.8rem;">Edit the title, offer, search prompt, and background image.</p>
       <div class="restaurant-content-grid">
@@ -1225,7 +1270,7 @@
         <button class="btn primary" id="restaurantHeroSave" type="button" onclick="saveRestaurantPageContent()">Save page content</button>
       </div>
     </div>
-    <div class="filter-bar" style="background:#fff;border:1px solid #dfe7f7;border-radius:15px;padding:.85rem 1rem;box-shadow:0 9px 26px rgba(36,84,214,.06);margin-bottom:0;">
+    <div class="filter-bar" id="restaurantListings" style="background:#fff;border:1px solid #dfe7f7;border-radius:15px;padding:.85rem 1rem;box-shadow:0 9px 26px rgba(36,84,214,.06);margin-bottom:0;scroll-margin-top:1rem;">
       <input id="restaurantAdminSearch" type="search" placeholder="Search name, area, or category…" oninput="filterRestaurantAdmin()" style="width:min(320px,100%);">
       <select id="restaurantAdminStatus" onchange="filterRestaurantAdmin()"><option value="">All statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="hidden">Hidden</option></select>
       <span id="restaurantAdminCount" style="font-size:.76rem;color:var(--muted);margin-left:auto;">0 restaurants</span>
@@ -1761,7 +1806,10 @@ window.showView = function(name) {
   if(name==='activity') renderActivityLog();
   if(name==='whatsapp') { syncWABookings(); filterWA(); }
 };
-document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
+document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventListener('click', () => {
+  showView(btn.dataset.view);
+  if (btn.dataset.scrollTarget) document.getElementById(btn.dataset.scrollTarget)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}));
 
 async function loadOneClubAdminData(force=false){
   if(oneClubAdminLoading||(!force&&oneClubAdminData))return;
