@@ -94,7 +94,7 @@
     const $=id=>document.getElementById(id);
     const verifiedEmail=(()=>{try{return sessionStorage.getItem('cw_lister_verified_email')||''}catch{return ''}})();
     const hasVerifiedEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(verifiedEmail);
-    if(!hasVerifiedEmail){$('stepOne').style.display='none';$('stepTwo').style.display='none';$('application').insertAdjacentHTML('afterbegin','<section class="card" style="text-align:center;margin-bottom:18px"><h2>Verify your email to begin</h2><p class="sub" style="margin-top:10px">Start on the signup page and verify your email address before opening restaurant onboarding.</p><a class="button" style="display:inline-flex;align-items:center;margin-top:12px" href="signup-lister.html">Verify email</a></section>')}
+    if(!hasVerifiedEmail){$('stepOne').style.display='none';$('stepTwo').style.display='none';$('application').insertAdjacentHTML('afterbegin','<section class="card" style="text-align:center;margin-bottom:18px"><h2>Verify your email to begin</h2><p class="sub" style="margin-top:10px">Start on the signup page and verify your email address before opening restaurant onboarding.</p><a class="button" style="display:inline-flex;align-items:center;margin-top:12px" href="signup-lister.html?returnTo=restaurant-onboarding.html">Verify email</a></section>')}
     if(hasVerifiedEmail){$('contactEmail').value=verifiedEmail;$('contactEmail').readOnly=true}
     function notice(id,message){const e=$(id);e.textContent=message;e.className='notice show error'}
     function clearNotice(id){$(id).textContent='';$(id).className='notice'}

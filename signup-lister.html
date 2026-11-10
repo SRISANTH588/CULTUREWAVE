@@ -135,6 +135,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 var params=new URLSearchParams(location.search);
 var CAT  = params.get('category') || sessionStorage.getItem('cw_lister_cat') || '';
 var DASH = params.get('dash')     || sessionStorage.getItem('cw_lister_dash') || 'premium-client-dashboard.html';
+var RETURN_TO = (()=>{const requested=params.get('returnTo')||sessionStorage.getItem('cw_lister_return_to')||'';const allowed=new Set(['restaurant-onboarding.html','vendor-onboarding.html']);return allowed.has(requested)?requested:'vendor-onboarding.html'})();
 
 var CAT_LABELS={nightlife:'🌙 Nightlife',brunch:'🥂 Brunch & Bites',dining:'🍽 Fine Dining',workshops:'🎨 Workshops',experiences:'🌿 Experiences',music:'🎸 Live Music'};
 var CAT_NAMES={nightlife:'Nightlife Events',brunch:'Brunch & Bites',dining:'Fine Dining',workshops:'Workshops',experiences:'Experiences',music:'Live Music'};
@@ -180,9 +181,10 @@ document.getElementById('verifyEmailOtp').addEventListener('click',async functio
     sessionStorage.setItem('cw_lister_verified_email',email);
     sessionStorage.setItem('cw_lister_cat',CAT);
     sessionStorage.setItem('cw_lister_dash',DASH);
+    sessionStorage.setItem('cw_lister_return_to',RETURN_TO);
     setStatus('Email verified. Opening vendor onboarding…','success','st1');
     const basePath=location.pathname.startsWith('/CULTUREWAVE/')?'/CULTUREWAVE/':'/';
-    window.location.assign(new URL(basePath+'vendor-onboarding.html',location.origin).href);
+    window.location.assign(new URL(basePath+RETURN_TO,location.origin).href);
   }catch(error){console.error('Could not save verified email:',error);setStatus('Email verified, but this browser could not continue. Please enable session storage and try again.','warning','st1');}
 });
 </script>
