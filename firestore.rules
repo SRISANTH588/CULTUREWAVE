@@ -370,7 +370,7 @@ service cloud.firestore {
           'applicationId', 'email', 'emailVerified', 'applicantUid', 'name', 'contact',
           'vendor', 'business', 'address', 'listing', 'bank', 'identity', 'consent',
           'documents', 'documentIds', 'status', 'agreementStatus', 'userId',
-          'preferredCategory', 'preferredDashboard',
+          'preferredCategory', 'preferredDashboard', 'policyAcceptances',
           'submittedAt', 'createdAt', 'updatedAt', 'consentAt'
         ]) &&
         (!('preferredCategory' in request.resource.data.keys()) ||
@@ -440,7 +440,7 @@ service cloud.firestore {
           request.resource.data.applicationId == applicationId &&
           request.resource.data.fileId == fileId &&
           request.resource.data.applicantUid == request.auth.uid &&
-          request.resource.data.type in ['pan', 'aadhaar', 'fssai', 'gst', 'menu', 'business_registration', 'trade_license', 'address_proof', 'cancelled_cheque', 'msme', 'other', 'Business registration / incorporation', 'Shop establishment / trade license', 'Restaurant address proof', 'Business registration', 'Address proof', 'Cancelled cheque', 'GST certificate', 'MSME / Udyam', 'Other'] &&
+          request.resource.data.type in ['pan', 'aadhaar', 'fssai', 'gst', 'menu', 'business_registration', 'trade_license', 'address_proof', 'cancelled_cheque', 'msme', 'partnership_agreement', 'commission_agreement', 'discount_funding_agreement', 'settlement_agreement', 'other', 'Business registration / incorporation', 'Shop establishment / trade license', 'Restaurant address proof', 'Business registration', 'Address proof', 'Cancelled cheque', 'GST certificate', 'MSME / Udyam', 'Other'] &&
           request.resource.data.contentType in ['image/jpeg', 'application/pdf'] &&
           request.resource.data.dataUrl is string && request.resource.data.dataUrl.size() <= 560000 &&
           ((request.resource.data.contentType == 'image/jpeg' && request.resource.data.dataUrl.matches('^data:image/jpeg;base64,.*')) ||
@@ -449,7 +449,8 @@ service cloud.firestore {
           request.resource.data.uploadedAt == request.time &&
           getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.applicantUid == request.auth.uid &&
           getAfter(/databases/$(database)/documents/vendorOnboarding/$(applicationId)).data.documentIds.hasAny([fileId]);
-        allow update, delete: if isAdmin();
+        allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['verificationStatus', 'reviewNote', 'verificationHistory']);
+        allow delete: if isAdmin();
       }
 
       match /activity/{activityId} {
@@ -646,6 +647,33 @@ service cloud.firestore {
         request.resource.data.ownerId == request.auth.uid;
       allow update, delete: if request.auth != null &&
         (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    // Restaurant floor plans and reservations are scoped to their restaurant.
+    // Admins can review records across restaurants; partners can only access
+    // records belonging to a restaurant they own.
+    function ownsRestaurant(restaurantId) {
+      return request.auth != null && restaurantId is string &&
+        exists(/databases/$(database)/documents/restaurants/$(restaurantId)) &&
+        get(/databases/$(database)/documents/restaurants/$(restaurantId)).data.ownerId == request.auth.uid;
+    }
+
+    match /tables/{id} {
+      allow read: if isAdmin() || ownsRestaurant(resource.data.restaurantId);
+      allow create: if request.resource.data.restaurantId is string &&
+        (isAdmin() || ownsRestaurant(request.resource.data.restaurantId));
+      allow update: if (isAdmin() || ownsRestaurant(resource.data.restaurantId)) &&
+        request.resource.data.restaurantId == resource.data.restaurantId;
+      allow delete: if isAdmin() || ownsRestaurant(resource.data.restaurantId);
+    }
+
+    match /reservations/{id} {
+      allow read: if isAdmin() || ownsRestaurant(resource.data.restaurantId);
+      allow create: if request.resource.data.restaurantId is string &&
+        (isAdmin() || ownsRestaurant(request.resource.data.restaurantId));
+      allow update: if (isAdmin() || ownsRestaurant(resource.data.restaurantId)) &&
+        request.resource.data.restaurantId == resource.data.restaurantId;
+      allow delete: if isAdmin() || ownsRestaurant(resource.data.restaurantId);
     }
 
     match /foodOrders/{id} {
