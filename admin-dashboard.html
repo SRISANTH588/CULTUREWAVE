@@ -222,6 +222,8 @@
       .stats-grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
       .topbar{padding:0 1rem;}
       .view{padding:1rem;}
+      .table-seating-layout{grid-template-columns:1fr!important;}
+      .table-seating-floor{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
     }
     @media(max-width:460px){.stats-grid{grid-template-columns:1fr}.topbar-right .tb-search{display:none}.topbar-right .tb-btn:not(.primary){display:none}}
 
@@ -576,6 +578,7 @@
   <nav class="sb-nav">
     <button class="sb-item" data-view="restaurant-overview"><span class="si-icon">📊</span> Restaurant Overview</button>
     <button class="sb-item" data-view="restaurant-reservations"><span class="si-icon">🗓️</span> Reservations</button>
+    <button class="sb-item" data-view="table-seating"><span class="si-icon">🪑</span> Table & Seating</button>
     <button class="sb-item" data-view="restaurant-complaints"><span class="si-icon">⚑</span> Complaints</button>
     <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="listings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
@@ -1003,6 +1006,59 @@
       <span id="adminReservationCount" style="font-size:.76rem;color:var(--muted);margin-left:auto;">0 reservations</span>
     </div>
     <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:1100px;"><thead><tr><th>Booking / Customer</th><th>Restaurant / Branch</th><th>Date & time</th><th>Guests</th><th>Status / response</th><th>Complaint</th><th>History / actions</th></tr></thead><tbody id="adminRestaurantReservationsTable"><tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">Loading reservations…</td></tr></tbody></table></div></div>
+  </div>
+
+  <div class="view" data-view="table-seating">
+    <div style="background:linear-gradient(135deg,#143d36,#16745c 58%,#36b37e);border-radius:20px;padding:1.5rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.78;margin-bottom:.55rem;">Restaurant operations · Admin oversight</div>
+      <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">Table &amp; Seating Management</div>
+      <div style="font-size:.88rem;opacity:.85;margin-top:.3rem;">Monitor seating inventory and reservation pressure. Restaurant managers own their floor plan; CultureWave Admin can review configuration and provide support.</div>
+    </div>
+    <div class="card" style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+      <label for="seatingRestaurantSelect" style="font-size:.76rem;font-weight:800;color:var(--muted);">RESTAURANT</label>
+      <select id="seatingRestaurantSelect" style="min-width:240px;border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;background:#fff;">
+        <option>Olive &amp; Thyme · Indiranagar</option><option>The Terrace Room · Koramangala</option><option>Juniper House · Whitefield</option>
+      </select>
+      <span style="margin-left:auto;font-size:.74rem;color:var(--muted);">Configuration last synced 12 min ago</span>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));">
+      <div class="stat-card blue"><div class="stat-label">Total tables</div><div class="stat-value">24</div><div class="stat-sub">Across 2 seating areas</div></div>
+      <div class="stat-card green"><div class="stat-label">Seating capacity</div><div class="stat-value">96</div><div class="stat-sub">Indoor 68 · Outdoor 28</div></div>
+      <div class="stat-card orange"><div class="stat-label">Currently occupied</div><div class="stat-value">15</div><div class="stat-sub">6 available · 3 reserved</div></div>
+      <div class="stat-card red"><div class="stat-label">Overbooking alerts</div><div class="stat-value">1</div><div class="stat-sub">Dinner · 8:00 PM slot</div></div>
+    </div>
+    <div class="grid-2 table-seating-layout" style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.8fr);gap:1rem;align-items:start;">
+      <div class="card">
+        <div class="section-header"><div><h2>Floor plan overview</h2><p>Restaurant managers maintain the live layout and table assignments.</p></div><span class="sb-badge">Manager controlled</span></div>
+        <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin:0 0 1rem;font-size:.72rem;color:var(--muted);"><span>🟢 Available</span><span>🔴 Occupied</span><span>🟠 Reserved</span><span>⚫ Blocked</span></div>
+        <div class="table-seating-floor" style="display:grid;grid-template-columns:repeat(6,minmax(54px,1fr));gap:.65rem;">
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T01<br>2 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fca5a5;background:#fef2f2;color:#991b1b;">T02<br>4 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fdba74;background:#fff7ed;color:#9a3412;">T03<br>4 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T04<br>2 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#cbd5e1;background:#f1f5f9;color:#475569;">T05<br>Blocked</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fca5a5;background:#fef2f2;color:#991b1b;">T06<br>6 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fdba74;background:#fff7ed;color:#9a3412;">T07<br>4 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T08<br>2 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fca5a5;background:#fef2f2;color:#991b1b;">T09<br>4 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T10<br>4 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fdba74;background:#fff7ed;color:#9a3412;">T11<br>2 seats</button>
+          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T12<br>4 seats</button>
+        </div>
+        <div style="margin-top:1rem;padding:.75rem .9rem;background:#f8fafc;border-radius:10px;color:var(--muted);font-size:.74rem;">Showing 12 of 24 tables · Layout preview supplied by the restaurant</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="card"><div class="card-head"><h2>Seating configuration</h2><p>Platform view of manager submitted settings</p></div>
+          <div class="detail-row"><span class="dr-label">Indoor</span><span class="dr-val">17 tables · 68 seats</span></div><div class="detail-row"><span class="dr-label">Outdoor</span><span class="dr-val">7 tables · 28 seats</span></div><div class="detail-row"><span class="dr-label">Table sizes</span><span class="dr-val">2, 4 and 6 seats</span></div><div class="detail-row"><span class="dr-label">Floor plan</span><span class="dr-val">Updated by restaurant manager</span></div>
+          <button class="btn" style="margin-top:.85rem;" onclick="showToast('Support request noted for this restaurant')">Request manager update</button>
+        </div>
+        <div class="card"><div class="card-head"><h2>Reservation slot capacity</h2><p>Capacity reported for each booking window</p></div>
+          <div class="detail-row"><span class="dr-label">7:00 PM</span><span class="dr-val">18 / 24 covers</span></div><div class="detail-row"><span class="dr-label">7:30 PM</span><span class="dr-val">21 / 24 covers</span></div><div class="detail-row"><span class="dr-label">8:00 PM</span><span class="dr-val" style="color:var(--red);font-weight:800;">26 / 24 covers · Overbooked</span></div>
+          <div style="margin-top:.85rem;padding:.75rem;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;color:#9a3412;font-size:.74rem;"><strong>⚠ Overbooking alert</strong><br>8:00 PM is 2 covers above the restaurant’s slot limit. Contact the manager to resolve.</div>
+        </div>
+        <div class="card"><div class="card-head"><h2>Admin support controls</h2><p>Use for exceptional operational support.</p></div><div class="btn-row"><button class="btn" onclick="showToast('Manager notified about the overbooking alert')">Notify manager</button><button class="btn" onclick="showToast('Table blocking support action recorded')">Record table block</button></div><p style="font-size:.7rem;color:var(--muted);margin-top:.75rem;">Admin actions are support escalations. Managers control actual table availability and floor plan changes.</p></div>
+      </div>
+    </div>
   </div>
 
   <div class="view" data-view="restaurant-complaints">
