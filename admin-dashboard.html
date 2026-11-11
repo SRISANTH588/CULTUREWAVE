@@ -576,6 +576,7 @@
   <nav class="sb-nav">
     <button class="sb-item" data-view="restaurant-overview"><span class="si-icon">📊</span> Restaurant Overview</button>
     <button class="sb-item" data-view="restaurant-reservations"><span class="si-icon">🗓️</span> Reservations</button>
+    <button class="sb-item" data-view="restaurant-complaints"><span class="si-icon">⚑</span> Complaints</button>
     <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="listings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="content"><span class="si-icon">🖼️</span> Page Content</button>
@@ -1002,6 +1003,23 @@
       <span id="adminReservationCount" style="font-size:.76rem;color:var(--muted);margin-left:auto;">0 reservations</span>
     </div>
     <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:1100px;"><thead><tr><th>Booking / Customer</th><th>Restaurant / Branch</th><th>Date & time</th><th>Guests</th><th>Status / response</th><th>Complaint</th><th>History / actions</th></tr></thead><tbody id="adminRestaurantReservationsTable"><tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">Loading reservations…</td></tr></tbody></table></div></div>
+  </div>
+
+  <div class="view" data-view="restaurant-complaints">
+    <div style="background:linear-gradient(135deg,#590a25 0%,#ad103d 52%,#f3264f 100%);border-radius:20px;padding:1.5rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.78;margin-bottom:.55rem;">Restaurant operations</div>
+      <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">Reservation Complaints</div>
+      <div style="font-size:.88rem;opacity:.85;margin-top:.3rem;">Review complaints already recorded on restaurant reservations.</div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));">
+      <div class="stat-card orange"><div class="stat-label">Recorded complaints</div><div class="stat-value" id="adminComplaintTotal">0</div></div>
+      <div class="stat-card blue"><div class="stat-label">Reservations with complaints</div><div class="stat-value" id="adminComplaintReservations">0</div></div>
+    </div>
+    <div class="card" style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center;">
+      <input id="adminComplaintSearch" type="search" placeholder="Search complaint, booking, guest or restaurant" oninput="renderAdminRestaurantComplaints()" style="flex:1;min-width:230px;border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;">
+      <span id="adminComplaintCount" style="font-size:.76rem;color:var(--muted);margin-left:auto;">0 complaints</span>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:1000px;"><thead><tr><th>Booking / Customer</th><th>Restaurant / Branch</th><th>Date & time</th><th>Guests</th><th>Reservation status</th><th>Complaint</th></tr></thead><tbody id="adminRestaurantComplaintsTable"><tr><td colspan="6" style="padding:1.4rem;color:var(--muted);">Loading complaints…</td></tr></tbody></table></div></div>
   </div>
 
   <div class="view" data-view="restaurant-partners">
@@ -1922,7 +1940,7 @@ window.updateTicketRequestStatus = async function(id, status) {
 const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', marketing:'Marketing', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
-  'restaurant-onboarding':'Restaurant Onboarding', 'restaurant-overview':'Restaurant Management Overview', 'restaurant-reservations':'Restaurant Reservations',
+  'restaurant-onboarding':'Restaurant Onboarding', 'restaurant-overview':'Restaurant Management Overview', 'restaurant-reservations':'Restaurant Reservations', 'restaurant-complaints':'Restaurant Complaints',
   campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
   'ads-manager':'Ads Manager',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
@@ -1941,6 +1959,7 @@ window.showView = function(name) {
   if(name==='restaurant-onboarding') renderRestaurantOnboarding();
   if(name==='restaurant-overview') renderRestaurantOverview();
   if(name==='restaurant-reservations') renderAdminRestaurantReservations();
+  if(name==='restaurant-complaints') renderAdminRestaurantComplaints();
   if(name==='restaurant-partners') renderRestaurantPartners();
   if(name==='credits') renderCreditsView();
   if(name==='one-club'||name==='gift-cards') loadOneClubAdminData();
@@ -2053,6 +2072,7 @@ function renderRestaurantOverview(){
 }
 const adminReservationStatus=r=>String(r.status||r.bookingStatus||'pending').toLowerCase().replaceAll('_','-');
 const adminReservationDate=r=>{const value=r.date||r.reservationDate||r.bookingDate||'';if(value?.toDate)return value.toDate().toISOString().slice(0,10);if(value instanceof Date)return value.toISOString().slice(0,10);return String(value).slice(0,10);};
+const adminReservationComplaint=r=>{const value=r.complaint??r.complaintText??r.customerComplaint??'';if(typeof value==='string')return value.trim();if(value&&typeof value==='object')return String(value.text??value.message??value.description??'').trim();return '';};
 function renderAdminRestaurantReservations(){
   const body=document.getElementById('adminRestaurantReservationsTable');if(!body)return;
   const rows=allRestaurantReservations;
@@ -2067,6 +2087,17 @@ function renderAdminRestaurantReservations(){
   if(!match.length){body.innerHTML='<tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">No reservations match these filters.</td></tr>';return;}
   body.innerHTML=match.sort((a,b)=>adminReservationDate(b).localeCompare(adminReservationDate(a))).map(r=>{const s=adminReservationStatus(r),badge=['confirmed','completed','arrived'].includes(s)?'green':['rejected','cancelled','no-show'].includes(s)?'red':'orange',id=esc(r.id),statusOptions=['pending','confirmed','rejected','cancelled','arrived','completed','no-show'];const acceptance=r.acceptedAt||r.confirmedAt||r.updatedAt,created=r.createdAt||r.requestedAt,elapsed=acceptance&&created?Math.max(0,Math.round((new Date(acceptance.toDate?acceptance.toDate():acceptance)-new Date(created.toDate?created.toDate():created))/60000)):null;const history=[created?`Created ${fmtDate(created)}`:'',acceptance?`Accepted ${fmtDate(acceptance)}${elapsed!==null?` · ${elapsed} min`:''}`:'',r.arrivedAt?`Checked in ${fmtDate(r.arrivedAt)}`:'',r.completedAt?`Completed ${fmtDate(r.completedAt)}`:'',r.noShowAt?`No-show ${fmtDate(r.noShowAt)}`:''].filter(Boolean).join(' · ')||'No history timestamps stored';const complaint=r.complaint||r.complaintText||r.customerComplaint||'';return `<tr><td><strong>${esc(r.bookingId||r.reservationId||r.id)}</strong><div>${esc(r.customerName||r.name||'Guest')}</div><div style="font-size:.72rem;color:var(--muted)">${esc(r.customerEmail||r.email||r.phone||r.mobile||'')}</div></td><td><strong>${esc(r.restaurantName||r.restaurant||r.restaurantId||'Restaurant')}</strong><div style="font-size:.72rem;color:var(--muted)">${esc(r.branchName||r.branchId||'Main branch')}</div></td><td>${esc(adminReservationDate(r)||'—')}<div style="font-size:.72rem;color:var(--muted)">${esc(r.time||'—')}</div></td><td>${esc(r.guestCount??r.guests??r.partySize??'—')}</td><td><span class="badge ${badge}">${esc(s.replaceAll('-',' '))}</span>${elapsed!==null?`<div style="font-size:.7rem;color:var(--muted);margin-top:.3rem">Response: ${elapsed} min</div>`:''}</td><td>${complaint?esc(complaint):'<span style="color:var(--muted)">—</span>'}</td><td><div style="font-size:.7rem;color:var(--muted);margin-bottom:.35rem">${esc(history)}</div><select aria-label="Change reservation status" onchange="adminSetRestaurantReservationStatus('${id}',this.value)" style="max-width:150px;border:1px solid var(--border);border-radius:8px;padding:.35rem;background:white">${statusOptions.map(x=>`<option value="${x}" ${x===s?'selected':''}>${x.replaceAll('-',' ')}</option>`).join('')}</select> <button class="btn sm" onclick="adminEditRestaurantReservation('${id}')">Edit details</button></td></tr>`;}).join('');
 }
+function renderAdminRestaurantComplaints(){
+  const body=document.getElementById('adminRestaurantComplaintsTable');if(!body)return;
+  const rows=allRestaurantReservations.filter(r=>adminReservationComplaint(r));
+  const term=(document.getElementById('adminComplaintSearch')?.value||'').trim().toLowerCase();
+  const match=rows.filter(r=>[adminReservationComplaint(r),r.id,r.bookingId,r.reservationId,r.restaurantName,r.restaurant,r.restaurantId,r.branchName,r.customerName,r.name,r.customerEmail,r.email,r.phone,r.mobile].join(' ').toLowerCase().includes(term));
+  [['adminComplaintTotal',rows.length],['adminComplaintReservations',rows.length]].forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=value.toLocaleString('en-IN');});
+  const count=document.getElementById('adminComplaintCount');if(count)count.textContent=`${match.length} complaint${match.length===1?'':'s'}`;
+  if(!match.length){body.innerHTML=`<tr><td colspan="6" style="padding:1.4rem;color:var(--muted);">${rows.length?'No complaints match your search.':'No recorded reservation complaints.'}</td></tr>`;return;}
+  body.innerHTML=match.sort((a,b)=>adminReservationDate(b).localeCompare(adminReservationDate(a))).map(r=>`<tr><td><strong>${esc(r.bookingId||r.reservationId||r.id)}</strong><div>${esc(r.customerName||r.name||'Guest')}</div><div style="font-size:.72rem;color:var(--muted)">${esc(r.customerEmail||r.email||r.phone||r.mobile||'')}</div></td><td><strong>${esc(r.restaurantName||r.restaurant||r.restaurantId||'Restaurant')}</strong><div style="font-size:.72rem;color:var(--muted)">${esc(r.branchName||r.branchId||'Main branch')}</div></td><td>${esc(adminReservationDate(r)||'—')}<div style="font-size:.72rem;color:var(--muted)">${esc(r.time||'—')}</div></td><td>${esc(r.guestCount??r.guests??r.partySize??'—')}</td><td><span class="badge ${['confirmed','completed','arrived'].includes(adminReservationStatus(r))?'green':['rejected','cancelled','no-show'].includes(adminReservationStatus(r))?'red':'orange'}">${esc(adminReservationStatus(r).replaceAll('-',' '))}</span></td><td>${esc(adminReservationComplaint(r))}</td></tr>`).join('');
+}
+window.renderAdminRestaurantComplaints=renderAdminRestaurantComplaints;
 window.renderAdminRestaurantReservations=renderAdminRestaurantReservations;
 window.adminSetRestaurantReservationStatus=async function(id,status){try{const current=allRestaurantReservations.find(r=>r.id===id);if(!current)throw new Error('Reservation not found.');const now=serverTimestamp(),updates={status,updatedAt:now,updatedBy:auth.currentUser?.uid||'admin'};if(status==='confirmed'&&!current.acceptedAt&&!current.confirmedAt)updates.acceptedAt=now;if(status==='arrived')updates.arrivedAt=now;if(status==='completed')updates.completedAt=now;if(status==='no-show')updates.noShowAt=now;await updateDoc(doc(db,'reservations',id),updates);showToast(`Reservation marked ${status.replaceAll('-',' ')}.`, 'success');}catch(error){showToast(error.message||'Could not update reservation.','error');renderAdminRestaurantReservations();}};
 window.adminEditRestaurantReservation=async function(id){const r=allRestaurantReservations.find(x=>x.id===id);if(!r)return;const date=prompt('Reservation date (YYYY-MM-DD)',adminReservationDate(r));if(date===null)return;const time=prompt('Reservation time',r.time||'');if(time===null)return;const guests=prompt('Number of guests',r.guestCount??r.guests??r.partySize??'');if(guests===null)return;const count=Number(guests);if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isInteger(count)||count<1){showToast('Enter a valid date and a guest count of at least 1.','error');return;}try{await updateDoc(doc(db,'reservations',id),{date,time,guestCount:count,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||'admin'});showToast('Reservation details updated.','success');}catch(error){showToast(error.message||'Could not edit reservation.','error');}};
@@ -3150,6 +3181,7 @@ onSnapshot(query(collection(db,'reservations'),limit(1000)), snap => {
   allRestaurantReservations=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.restaurantId);
   renderRestaurantOverview();
   renderAdminRestaurantReservations();
+  renderAdminRestaurantComplaints();
 }, error => {
   console.error('Could not load restaurant reservations:',error.code,error.message);
   const el=document.getElementById('restaurantOverviewReservations');if(el)el.textContent='—';
