@@ -1018,7 +1018,15 @@
       <div class="stat-card green"><div class="stat-label">Total reservations</div><div class="stat-value" id="restaurantOverviewReservations">—</div><div class="stat-sub">Restaurant bookings recorded</div></div>
       <div class="stat-card purple"><div class="stat-label">Platform earnings</div><div class="stat-value" id="restaurantOverviewEarnings">—</div><div class="stat-sub">Recorded restaurant payments</div></div>
     </div>
-    <div class="card" style="font-size:.78rem;color:var(--muted);">Metrics update automatically as restaurant partners, applications, bookings and payments change in Firebase.</div>
+    <div class="card">
+      <div style="display:flex;gap:.75rem;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:1rem">
+        <div><h2 style="margin:0">Restaurant performance</h2><p style="margin:.3rem 0 0;color:var(--muted);font-size:.78rem">Booking and payment data grouped by restaurant. Revenue and commission use recorded payment fields.</p></div>
+        <input id="restaurantPerformanceSearch" oninput="renderRestaurantOverview()" placeholder="Search restaurant" style="border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;min-width:220px">
+      </div>
+      <div class="table-wrap" style="overflow:auto"><table class="data-table" style="min-width:1600px"><thead><tr><th>Restaurant</th><th>Reservations</th><th>Confirmed</th><th>Completed</th><th>Cancellation</th><th>No-show</th><th>Avg guests</th><th>Booking revenue</th><th>Avg rating</th><th>Offer redemptions</th><th>Repeat customers</th><th>Popular slots</th><th>Commission earned</th></tr></thead><tbody id="restaurantPerformanceTable"><tr><td colspan="13" style="padding:1.2rem;color:var(--muted)">Loading restaurant data…</td></tr></tbody></table></div>
+      <p style="margin:.7rem 0 0;color:var(--muted);font-size:.72rem">Cancellation and no-show rates are calculated from all reservations. Repeat customers counts distinct guests with more than one reservation. Ratings use restaurant listing ratings when review records are unavailable.</p>
+    </div>
+    <div class="card" style="font-size:.78rem;color:var(--muted);">Metrics update automatically as restaurant partners, applications, bookings and payments change in Firebase. A dash means that source data is not recorded.</div>
   </div>
 
   <div class="view" data-view="restaurant-reservations">
@@ -1052,45 +1060,27 @@
     </div>
     <div class="card" style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
       <label for="seatingRestaurantSelect" style="font-size:.76rem;font-weight:800;color:var(--muted);">RESTAURANT</label>
-      <select id="seatingRestaurantSelect" style="min-width:240px;border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;background:#fff;">
-        <option>Olive &amp; Thyme · Indiranagar</option><option>The Terrace Room · Koramangala</option><option>Juniper House · Whitefield</option>
-      </select>
-      <span style="margin-left:auto;font-size:.74rem;color:var(--muted);">Configuration last synced 12 min ago</span>
+      <select id="seatingRestaurantSelect" onchange="renderAdminTableSeating()" style="min-width:240px;border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;background:#fff;"><option value="">Loading restaurants…</option></select>
+      <span id="seatingSyncStatus" style="margin-left:auto;font-size:.74rem;color:var(--muted);">Connecting to Firebase…</span>
     </div>
     <div class="stats-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));">
-      <div class="stat-card blue"><div class="stat-label">Total tables</div><div class="stat-value">24</div><div class="stat-sub">Across 2 seating areas</div></div>
-      <div class="stat-card green"><div class="stat-label">Seating capacity</div><div class="stat-value">96</div><div class="stat-sub">Indoor 68 · Outdoor 28</div></div>
-      <div class="stat-card orange"><div class="stat-label">Currently occupied</div><div class="stat-value">15</div><div class="stat-sub">6 available · 3 reserved</div></div>
-      <div class="stat-card red"><div class="stat-label">Overbooking alerts</div><div class="stat-value">1</div><div class="stat-sub">Dinner · 8:00 PM slot</div></div>
+      <div class="stat-card blue"><div class="stat-label">Total tables</div><div class="stat-value" id="seatingTotalTables">—</div><div class="stat-sub" id="seatingAreas">Waiting for data</div></div>
+      <div class="stat-card green"><div class="stat-label">Seating capacity</div><div class="stat-value" id="seatingCapacity">—</div><div class="stat-sub" id="seatingSectionCapacity">Waiting for data</div></div>
+      <div class="stat-card orange"><div class="stat-label">Currently occupied</div><div class="stat-value" id="seatingOccupied">—</div><div class="stat-sub" id="seatingAvailability">Waiting for data</div></div>
+      <div class="stat-card red"><div class="stat-label">Overbooking alerts</div><div class="stat-value" id="seatingOverbooked">—</div><div class="stat-sub">Based on active reservations and table capacity</div></div>
     </div>
     <div class="grid-2 table-seating-layout" style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.8fr);gap:1rem;align-items:start;">
       <div class="card">
         <div class="section-header"><div><h2>Floor plan overview</h2><p>Restaurant managers maintain the live layout and table assignments.</p></div><span class="sb-badge">Manager controlled</span></div>
         <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin:0 0 1rem;font-size:.72rem;color:var(--muted);"><span>🟢 Available</span><span>🔴 Occupied</span><span>🟠 Reserved</span><span>⚫ Blocked</span></div>
-        <div class="table-seating-floor" style="display:grid;grid-template-columns:repeat(6,minmax(54px,1fr));gap:.65rem;">
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T01<br>2 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fca5a5;background:#fef2f2;color:#991b1b;">T02<br>4 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fdba74;background:#fff7ed;color:#9a3412;">T03<br>4 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T04<br>2 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#cbd5e1;background:#f1f5f9;color:#475569;">T05<br>Blocked</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fca5a5;background:#fef2f2;color:#991b1b;">T06<br>6 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fdba74;background:#fff7ed;color:#9a3412;">T07<br>4 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T08<br>2 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fca5a5;background:#fef2f2;color:#991b1b;">T09<br>4 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T10<br>4 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#fdba74;background:#fff7ed;color:#9a3412;">T11<br>2 seats</button>
-          <button class="btn" style="justify-content:center;min-height:64px;border-color:#86efac;background:#f0fdf4;color:#166534;">T12<br>4 seats</button>
-        </div>
-        <div style="margin-top:1rem;padding:.75rem .9rem;background:#f8fafc;border-radius:10px;color:var(--muted);font-size:.74rem;">Showing 12 of 24 tables · Layout preview supplied by the restaurant</div>
+        <div id="adminSeatingFloor" class="table-seating-floor" style="display:grid;grid-template-columns:repeat(6,minmax(54px,1fr));gap:.65rem;"><div style="color:var(--muted);grid-column:1/-1">Loading tables from Firebase…</div></div>
+        <div id="adminSeatingFloorNote" style="margin-top:1rem;padding:.75rem .9rem;background:#f8fafc;border-radius:10px;color:var(--muted);font-size:.74rem;">Waiting for table data.</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:1rem;">
-        <div class="card"><div class="card-head"><h2>Seating configuration</h2><p>Platform view of manager submitted settings</p></div>
-          <div class="detail-row"><span class="dr-label">Indoor</span><span class="dr-val">17 tables · 68 seats</span></div><div class="detail-row"><span class="dr-label">Outdoor</span><span class="dr-val">7 tables · 28 seats</span></div><div class="detail-row"><span class="dr-label">Table sizes</span><span class="dr-val">2, 4 and 6 seats</span></div><div class="detail-row"><span class="dr-label">Floor plan</span><span class="dr-val">Updated by restaurant manager</span></div>
+        <div class="card"><div class="card-head"><h2>Seating configuration</h2><p>Live configuration from restaurant table records</p></div><div id="adminSeatingConfig"><div class="detail-row"><span class="dr-label">Configuration</span><span class="dr-val">Waiting for data</span></div></div>
           <button class="btn" style="margin-top:.85rem;" onclick="showToast('Support request noted for this restaurant')">Request manager update</button>
         </div>
-        <div class="card"><div class="card-head"><h2>Reservation slot capacity</h2><p>Capacity reported for each booking window</p></div>
-          <div class="detail-row"><span class="dr-label">7:00 PM</span><span class="dr-val">18 / 24 covers</span></div><div class="detail-row"><span class="dr-label">7:30 PM</span><span class="dr-val">21 / 24 covers</span></div><div class="detail-row"><span class="dr-label">8:00 PM</span><span class="dr-val" style="color:var(--red);font-weight:800;">26 / 24 covers · Overbooked</span></div>
-          <div style="margin-top:.85rem;padding:.75rem;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;color:#9a3412;font-size:.74rem;"><strong>⚠ Overbooking alert</strong><br>8:00 PM is 2 covers above the restaurant’s slot limit. Contact the manager to resolve.</div>
+        <div class="card"><div class="card-head"><h2>Reservation slot capacity</h2><p>Active reservations grouped by date and time</p></div><div id="adminSeatingSlots"><div class="detail-row"><span class="dr-label">Reservations</span><span class="dr-val">Waiting for data</span></div></div>
         </div>
         <div class="card"><div class="card-head"><h2>Admin support controls</h2><p>Use for exceptional operational support.</p></div><div class="btn-row"><button class="btn" onclick="showToast('Manager notified about the overbooking alert')">Notify manager</button><button class="btn" onclick="showToast('Table blocking support action recorded')">Record table block</button></div><p style="font-size:.7rem;color:var(--muted);margin-top:.75rem;">Admin actions are support escalations. Managers control actual table availability and floor plan changes.</p></div>
       </div>
@@ -2038,7 +2028,7 @@ import { app, auth, db, getCurrentUser, logout,
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
 let oneClubAdminData=null,oneClubAdminLoading=false;
-let allWebinars=[], allTours=[], allRestaurants=[], allRestaurantOffers=[], allBookingsCol=[], allRestaurantReservations=[], allMarketingLeads=[];
+let allWebinars=[], allTours=[], allRestaurants=[], allRestaurantOffers=[], allBookingsCol=[], allRestaurantReservations=[], allRestaurantTables=[], allMarketingLeads=[];
 let allCheckoutAttempts=[];
 const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'Extra ₹175 OFF on your first dining transaction',searchPlaceholder:'Search restaurants, cuisine, area…',heroImage:'',promoHeading:'Diwali offers for you',promo1Title:'Vault Brewery',promo1Description:'★ 4.8 · ₹1500 for two\nFlat 25% OFF',promo1Image:'',promo2Title:'Explore local dining',promo2Description:'Special offers on your next table',promo2Image:'',featuredTitle:'In the limelight',featuredSubtitle:'Popular around you',allTitle:'All restaurants',allSubtitle:'Reserve your table',moodHeading:'What’s the mood?',moods:['Drink & dine','Cozy cafes','Family dining','Pocket friendly','Outdoor dining','Pure veg'],diwaliTitle:'In light of Diwali celebrations',diwaliMessage:'Operational timings may vary at restaurants. Please contact the restaurant before visiting.',visibility:{}};
 let restaurantPageContent={...RESTAURANT_PAGE_CONTENT_DEFAULTS};
@@ -2051,6 +2041,22 @@ let allStallApplications=[],activeStallAdminEventId='';
 const esc = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const money = v => '₹'+Number(v||0).toLocaleString('en-IN');
 const fmtDate = ts => { if(!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); };
+const seatingRestaurantName=r=>r.name||r.restaurantName||r.businessName||r.title||r.id;
+function renderAdminTableSeating(){
+  const select=document.getElementById('seatingRestaurantSelect');if(!select)return;
+  const restaurants=allRestaurants.filter(r=>!['rejected','deleted'].includes(String(r.status||'').toLowerCase()));
+  const previous=select.value;select.innerHTML=restaurants.length?restaurants.map(r=>`<option value="${esc(r.id)}">${esc(seatingRestaurantName(r))}${r.area||r.city?` · ${esc([r.area,r.city].filter(Boolean).join(', '))}`:''}</option>`).join(''):'<option value="">No restaurants found</option>';
+  if(restaurants.some(r=>r.id===previous))select.value=previous;
+  const rid=select.value,restaurant=restaurants.find(r=>r.id===rid),tables=allRestaurantTables.filter(t=>t.restaurantId===rid),reservations=allRestaurantReservations.filter(r=>r.restaurantId===rid),active=reservations.filter(r=>!['cancelled','rejected','completed','no-show'].includes(adminReservationStatus(r)));
+  const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  const count=tables.length,capacity=tables.reduce((n,t)=>n+Number(t.capacity||0),0),occupied=tables.filter(t=>['occupied'].includes(String(t.status||'').toLowerCase())).length,reserved=tables.filter(t=>['reserved'].includes(String(t.status||'').toLowerCase())).length,available=tables.filter(t=>['available',''].includes(String(t.status||'available').toLowerCase())).length;
+  put('seatingTotalTables',count.toLocaleString('en-IN'));put('seatingAreas',`${new Set(tables.map(t=>t.section||'Indoor')).size} seating areas`);put('seatingCapacity',capacity.toLocaleString('en-IN'));put('seatingSectionCapacity',[...new Set(tables.map(t=>t.section||'Indoor'))].sort().map(s=>`${s}: ${tables.filter(t=>(t.section||'Indoor')===s).reduce((n,t)=>n+Number(t.capacity||0),0)}`).join(' · ')||'No seating sections recorded');put('seatingOccupied',occupied.toLocaleString('en-IN'));put('seatingAvailability',`${available} available · ${reserved} reserved`);
+  const floor=document.getElementById('adminSeatingFloor');if(floor)floor.innerHTML=tables.length?tables.map(t=>{const s=String(t.status||'Available').toLowerCase(),style=s==='occupied'?'border-color:#fca5a5;background:#fef2f2;color:#991b1b':s==='reserved'?'border-color:#fdba74;background:#fff7ed;color:#9a3412':['blocked','cleaning'].includes(s)?'border-color:#cbd5e1;background:#f1f5f9;color:#475569':'border-color:#86efac;background:#f0fdf4;color:#166534';return `<div class="btn" style="justify-content:center;min-height:64px;${style}"><strong>${esc(t.tableId||t.name||t.id)}</strong><br>${esc(t.capacity||0)} seats · ${esc(t.status||'Available')}</div>`}).join(''):'<div style="color:var(--muted);grid-column:1/-1;padding:.8rem">No table records are configured for this restaurant.</div>';
+  put('adminSeatingFloorNote',`${count} table records · ${capacity} seats total`);
+  const config=document.getElementById('adminSeatingConfig');if(config){const sections=[...new Set(tables.map(t=>t.section||'Indoor'))];config.innerHTML=sections.length?sections.map(s=>`<div class="detail-row"><span class="dr-label">${esc(s)}</span><span class="dr-val">${tables.filter(t=>(t.section||'Indoor')===s).length} tables · ${tables.filter(t=>(t.section||'Indoor')===s).reduce((n,t)=>n+Number(t.capacity||0),0)} seats</span></div>`).join('')+`<div class="detail-row"><span class="dr-label">Table sizes</span><span class="dr-val">${[...new Set(tables.map(t=>Number(t.capacity||0)).filter(Boolean))].sort((a,b)=>a-b).join(', ')||'—'} seats</span></div>`:'<div class="detail-row"><span class="dr-label">Configuration</span><span class="dr-val">No tables recorded</span></div>';}
+  const groups=new Map();active.forEach(r=>{const key=`${adminReservationDate(r)||'Date not set'}|${r.time||'Time not set'}`;const g=groups.get(key)||{covers:0,count:0};g.covers+=Number(r.guestCount??r.guests??r.partySize??0);g.count++;groups.set(key,g);});const slots=[...groups.entries()].sort((a,b)=>a[0].localeCompare(b[0]));put('seatingOverbooked',slots.filter(([,g])=>count>0&&g.count>count).length.toLocaleString('en-IN'));const slotEl=document.getElementById('adminSeatingSlots');if(slotEl)slotEl.innerHTML=slots.length?slots.slice(0,12).map(([key,g])=>{const [date,time]=key.split('|'),over=count>0&&g.count>count;return `<div class="detail-row"><span class="dr-label">${esc(date)} · ${esc(time)}</span><span class="dr-val"${over?' style="color:var(--red);font-weight:800"':''}>${g.covers} covers · ${g.count} reservations${over?' · Above table count':''}</span></div>`}).join(''):'<div class="detail-row"><span class="dr-label">Reservations</span><span class="dr-val">No active reservations recorded</span></div>';
+  const status=document.getElementById('seatingSyncStatus');if(status)status.textContent=restaurant?`Live Firebase data · ${tables.length} tables · ${reservations.length} reservations`:'Select a restaurant to view its table data';
+}
 const EMAILJS_SERVICE_ID='service_wvzjnnx', EMAILJS_PUBLIC_KEY='JXh4QRP2kafFxlPQo';
 const oneClubAdminApi='https://culturewave-razorpay.culturewaveindia.workers.dev/adminOneClub';
 const giftCardSettingsApi='https://culturewave-razorpay.culturewaveindia.workers.dev/updateGiftCardSettings';
@@ -2257,6 +2263,33 @@ function renderRestaurantOverview(){
   const earnings=restaurantPayments.reduce((sum,p)=>sum+Number(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0),0);
   const values={restaurantOverviewTotal:partners.length,restaurantOverviewPending:pending,restaurantOverviewReservations:bookings.length,restaurantOverviewEarnings:money(earnings)};
   for(const [id,value] of Object.entries(values)){const el=document.getElementById(id);if(el)el.textContent=typeof value==='number'?value.toLocaleString('en-IN'):value;}
+  const body=document.getElementById('restaurantPerformanceTable');if(!body)return;
+  const text=(document.getElementById('restaurantPerformanceSearch')?.value||'').trim().toLowerCase();
+  const keyOf=x=>String(x.restaurantId||x.restaurantID||x.venueId||x.restaurantName||x.restaurant||'').trim();
+  const norm=x=>String(x||'').trim().toLowerCase();
+  const successfulPayment=p=>['paid','captured','success','successful','completed'].includes(norm(p.status||p.paymentStatus));
+  const metricRestaurants=[...allRestaurants];
+  const byId=new Map(metricRestaurants.map(r=>[r.id,r]));
+  const ids=new Set([...bookings.map(keyOf),...restaurantPayments.map(keyOf)].filter(Boolean));
+  ids.forEach(id=>{if(!byId.has(id)&&!metricRestaurants.some(r=>norm(r.name)===norm(id)))metricRestaurants.push({id,name:id});});
+  const bookingFor=id=>bookings.filter(r=>keyOf(r)===id||(!r.restaurantId&&!r.restaurantID&&norm(r.restaurantName||r.restaurant)===norm(commissionRestaurantName(id))));
+  const paymentFor=id=>restaurantPayments.filter(p=>keyOf(p)===id||(!p.restaurantId&&!p.restaurantID&&norm(p.restaurantName)===norm(commissionRestaurantName(id))));
+  const guestKey=r=>norm(r.customerId||r.userId||r.customerUid||r.customerEmail||r.email||r.phone||r.mobile||r.customerName||r.name);
+  const rows=metricRestaurants.map(r=>{
+    const rid=r.id,rs=bookingFor(rid),ps=paymentFor(rid),statuses=rs.map(adminReservationStatus),cancelled=statuses.filter(s=>['cancelled','canceled'].includes(s)).length,noShow=statuses.filter(s=>['no-show','noshow'].includes(s)).length;
+    const confirmed=statuses.filter(s=>['confirmed','arrived','completed'].includes(s)).length,completed=statuses.filter(s=>s==='completed').length;
+    const guestCounts=rs.map(x=>Number(x.guestCount??x.guests??x.partySize)).filter(n=>Number.isFinite(n)&&n>0),guestAvg=guestCounts.length?guestCounts.reduce((a,b)=>a+b,0)/guestCounts.length:null;
+    const paid=ps.filter(successfulPayment),revenue=paid.reduce((n,p)=>n+Number(p.amount??p.totalAmount??p.grossAmount??0),0),commission=ps.reduce((n,p)=>n+Number(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0),0);
+    const codes=new Set(allRestaurantOffers.filter(o=>o.restaurantId===rid).map(o=>norm(o.code)).filter(Boolean));
+    const redeemed=rs.filter(x=>[x.couponCode,x.couponApplied,x.offerCode,x.promoCode].some(c=>norm(c)&&codes.has(norm(c))||norm(c))).length;
+    const customers=new Map();rs.forEach(x=>{const key=guestKey(x);if(key)customers.set(key,(customers.get(key)||0)+1);});const repeat=[...customers.values()].filter(n=>n>1).length;
+    const slots={};rs.forEach(x=>{const slot=String(x.time||x.bookingTime||x.slot||'').trim();if(slot)slots[slot]=(slots[slot]||0)+1;});const popular=Object.entries(slots).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([t,n])=>`${t} (${n})`).join(', ')||'—';
+    const rating=Number(r.rating||r.averageRating||r.avgRating||0);
+    const name=r.name||r.restaurantName||r.businessName||commissionRestaurantName(rid);
+    return {id:rid,name,rs,confirmed,completed,cancelled,noShow,guestAvg,revenue,commission,redeemed,repeat,popular,rating};
+  }).filter(x=>!text||norm(x.name).includes(text)||norm(x.id).includes(text)).sort((a,b)=>b.rs.length-a.rs.length||a.name.localeCompare(b.name));
+  if(!rows.length){body.innerHTML='<tr><td colspan="13" style="padding:1.2rem;color:var(--muted)">No restaurants match this search.</td></tr>';return;}
+  body.innerHTML=rows.map(x=>`<tr><td><strong>${esc(x.name)}</strong></td><td>${x.rs.length.toLocaleString('en-IN')}</td><td>${x.confirmed.toLocaleString('en-IN')}</td><td>${x.completed.toLocaleString('en-IN')}</td><td>${x.rs.length?`${(x.cancelled/x.rs.length*100).toFixed(1)}%`:'—'}</td><td>${x.rs.length?`${(x.noShow/x.rs.length*100).toFixed(1)}%`:'—'}</td><td>${x.guestAvg===null?'—':x.guestAvg.toFixed(1)}</td><td>${money(x.revenue)}</td><td>${x.rating?x.rating.toFixed(1):'—'}</td><td>${x.redeemed.toLocaleString('en-IN')}</td><td>${x.repeat.toLocaleString('en-IN')}</td><td>${esc(x.popular)}</td><td>${money(x.commission)}</td></tr>`).join('');
 }
 const commissionRestaurantName = id => {
   const restaurant=allRestaurants.find(r=>r.id===id);
@@ -3412,6 +3445,7 @@ onSnapshot(query(collection(db,'reservations'),limit(1000)), snap => {
   renderRestaurantOverview();
   renderAdminRestaurantReservations();
   renderAdminRestaurantComplaints();
+  renderAdminTableSeating();
 }, error => {
   console.error('Could not load restaurant reservations:',error.code,error.message);
   const el=document.getElementById('restaurantOverviewReservations');if(el)el.textContent='—';
@@ -3476,7 +3510,12 @@ onSnapshot(query(collection(db,'restaurants'),orderBy('createdAt','desc'),limit(
   renderRestaurantAdminTable();
   renderRestaurantOffers();
   renderCommissionManagement();
+  renderAdminTableSeating();
 });
+onSnapshot(query(collection(db,'tables'),limit(2000)),snap=>{
+  allRestaurantTables=snap.docs.map(d=>({id:d.id,...d.data()})).filter(t=>t.restaurantId);
+  renderAdminTableSeating();
+},error=>{console.error('Could not load restaurant tables:',error.code,error.message);const status=document.getElementById('seatingSyncStatus');if(status)status.textContent='Could not load Firebase table data';const floor=document.getElementById('adminSeatingFloor');if(floor)floor.innerHTML=`<div style="color:var(--red);grid-column:1/-1">Table data unavailable: ${esc(error.message)}</div>`;});
 onSnapshot(query(collection(db,'restaurantOffers'),orderBy('createdAt','desc'),limit(300)),snap=>{
   allRestaurantOffers=snap.docs.map(d=>({id:d.id,...d.data()}));
   renderRestaurantOffers();
