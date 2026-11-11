@@ -575,6 +575,7 @@
   <div class="sb-section-label">✦ Restaurant</div>
   <nav class="sb-nav">
     <button class="sb-item" data-view="restaurant-overview"><span class="si-icon">📊</span> Restaurant Overview</button>
+    <button class="sb-item" data-view="restaurant-reservations"><span class="si-icon">🗓️</span> Reservations</button>
     <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="listings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="content"><span class="si-icon">🖼️</span> Page Content</button>
@@ -978,6 +979,29 @@
       <div class="stat-card purple"><div class="stat-label">Platform earnings</div><div class="stat-value" id="restaurantOverviewEarnings">—</div><div class="stat-sub">Recorded restaurant payments</div></div>
     </div>
     <div class="card" style="font-size:.78rem;color:var(--muted);">Metrics update automatically as restaurant partners, applications, bookings and payments change in Firebase.</div>
+  </div>
+
+  <div class="view" data-view="restaurant-reservations">
+    <div style="background:linear-gradient(135deg,#143d36,#16745c 58%,#36b37e);border-radius:20px;padding:1.5rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.78;margin-bottom:.55rem;">Restaurant operations</div>
+      <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">Reservation Management</div>
+      <div style="font-size:.88rem;opacity:.85;margin-top:.3rem;">Search reservation history, track guest visits and manage booking status. Guests choose party size, date and time; restaurants allocate tables internally.</div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));">
+      <div class="stat-card blue"><div class="stat-label">All reservations</div><div class="stat-value" id="adminReservationTotal">0</div></div>
+      <div class="stat-card orange"><div class="stat-label">Awaiting response</div><div class="stat-value" id="adminReservationPending">0</div></div>
+      <div class="stat-card green"><div class="stat-label">Completed visits</div><div class="stat-value" id="adminReservationCompleted">0</div></div>
+      <div class="stat-card purple"><div class="stat-label">No-shows</div><div class="stat-value" id="adminReservationNoShow">0</div></div>
+    </div>
+    <div class="card" style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center;">
+      <input id="adminReservationSearch" type="search" placeholder="Search booking ID, restaurant or customer" oninput="renderAdminRestaurantReservations()" style="flex:1;min-width:230px;border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;">
+      <input id="adminReservationDate" type="date" aria-label="Filter by reservation date" onchange="renderAdminRestaurantReservations()" style="border:1px solid var(--border);border-radius:9px;padding:.6rem;">
+      <select id="adminReservationTime" aria-label="Filter by time" onchange="renderAdminRestaurantReservations()" style="border:1px solid var(--border);border-radius:9px;padding:.6rem;background:#fff"><option value="">All times</option></select>
+      <select id="adminReservationBranch" aria-label="Filter by branch" onchange="renderAdminRestaurantReservations()" style="border:1px solid var(--border);border-radius:9px;padding:.6rem;background:#fff"><option value="">All branches</option></select>
+      <select id="adminReservationStatus" aria-label="Filter by status" onchange="renderAdminRestaurantReservations()" style="border:1px solid var(--border);border-radius:9px;padding:.6rem;background:#fff"><option value="">All statuses</option><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option><option value="arrived">Checked in</option><option value="completed">Completed</option><option value="no-show">No-show</option></select>
+      <span id="adminReservationCount" style="font-size:.76rem;color:var(--muted);margin-left:auto;">0 reservations</span>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:1100px;"><thead><tr><th>Booking / Customer</th><th>Restaurant / Branch</th><th>Date & time</th><th>Guests</th><th>Status / response</th><th>Complaint</th><th>History / actions</th></tr></thead><tbody id="adminRestaurantReservationsTable"><tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">Loading reservations…</td></tr></tbody></table></div></div>
   </div>
 
   <div class="view" data-view="restaurant-partners">
@@ -1898,7 +1922,7 @@ window.updateTicketRequestStatus = async function(id, status) {
 const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', marketing:'Marketing', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
-  'restaurant-onboarding':'Restaurant Onboarding', 'restaurant-overview':'Restaurant Management Overview',
+  'restaurant-onboarding':'Restaurant Onboarding', 'restaurant-overview':'Restaurant Management Overview', 'restaurant-reservations':'Restaurant Reservations',
   campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
   'ads-manager':'Ads Manager',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
@@ -1916,6 +1940,7 @@ window.showView = function(name) {
   if(name==='new-listers') renderNewListers();
   if(name==='restaurant-onboarding') renderRestaurantOnboarding();
   if(name==='restaurant-overview') renderRestaurantOverview();
+  if(name==='restaurant-reservations') renderAdminRestaurantReservations();
   if(name==='restaurant-partners') renderRestaurantPartners();
   if(name==='credits') renderCreditsView();
   if(name==='one-club'||name==='gift-cards') loadOneClubAdminData();
@@ -2026,6 +2051,25 @@ function renderRestaurantOverview(){
   const values={restaurantOverviewTotal:partners.length,restaurantOverviewPending:pending,restaurantOverviewReservations:bookings.length,restaurantOverviewEarnings:money(earnings)};
   for(const [id,value] of Object.entries(values)){const el=document.getElementById(id);if(el)el.textContent=typeof value==='number'?value.toLocaleString('en-IN'):value;}
 }
+const adminReservationStatus=r=>String(r.status||r.bookingStatus||'pending').toLowerCase().replaceAll('_','-');
+const adminReservationDate=r=>{const value=r.date||r.reservationDate||r.bookingDate||'';if(value?.toDate)return value.toDate().toISOString().slice(0,10);if(value instanceof Date)return value.toISOString().slice(0,10);return String(value).slice(0,10);};
+function renderAdminRestaurantReservations(){
+  const body=document.getElementById('adminRestaurantReservationsTable');if(!body)return;
+  const rows=allRestaurantReservations;
+  const selectOptions=(id,label,key)=>{const el=document.getElementById(id);if(!el)return;const selected=el.value;const values=[...new Set(rows.map(r=>String(r[key]||'').trim()).filter(Boolean))].sort();el.innerHTML=`<option value="">${label}</option>`+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(values.includes(selected))el.value=selected;};
+  selectOptions('adminReservationTime','All times','time');selectOptions('adminReservationBranch','All branches','branchName');
+  const term=(document.getElementById('adminReservationSearch')?.value||'').trim().toLowerCase();
+  const date=document.getElementById('adminReservationDate')?.value||'',time=document.getElementById('adminReservationTime')?.value||'',branch=document.getElementById('adminReservationBranch')?.value||'',status=document.getElementById('adminReservationStatus')?.value||'';
+  const match=rows.filter(r=>{const hay=[r.id,r.bookingId,r.reservationId,r.restaurantName,r.restaurant,r.customerName,r.name,r.customerEmail,r.email,r.phone,r.mobile].join(' ').toLowerCase();return(!term||hay.includes(term))&&(!date||adminReservationDate(r)===date)&&(!time||String(r.time||'')===time)&&(!branch||String(r.branchName||'')===branch)&&(!status||adminReservationStatus(r)===status);});
+  const pending=rows.filter(r=>['pending','new','requested','new-request'].includes(adminReservationStatus(r))).length,completed=rows.filter(r=>adminReservationStatus(r)==='completed').length,noShow=rows.filter(r=>adminReservationStatus(r)==='no-show').length;
+  [['adminReservationTotal',rows.length],['adminReservationPending',pending],['adminReservationCompleted',completed],['adminReservationNoShow',noShow]].forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=value.toLocaleString('en-IN');});
+  const count=document.getElementById('adminReservationCount');if(count)count.textContent=`${match.length} reservation${match.length===1?'':'s'}`;
+  if(!match.length){body.innerHTML='<tr><td colspan="7" style="padding:1.4rem;color:var(--muted);">No reservations match these filters.</td></tr>';return;}
+  body.innerHTML=match.sort((a,b)=>adminReservationDate(b).localeCompare(adminReservationDate(a))).map(r=>{const s=adminReservationStatus(r),badge=['confirmed','completed','arrived'].includes(s)?'green':['rejected','cancelled','no-show'].includes(s)?'red':'orange',id=esc(r.id),statusOptions=['pending','confirmed','rejected','cancelled','arrived','completed','no-show'];const acceptance=r.acceptedAt||r.confirmedAt||r.updatedAt,created=r.createdAt||r.requestedAt,elapsed=acceptance&&created?Math.max(0,Math.round((new Date(acceptance.toDate?acceptance.toDate():acceptance)-new Date(created.toDate?created.toDate():created))/60000)):null;const history=[created?`Created ${fmtDate(created)}`:'',acceptance?`Accepted ${fmtDate(acceptance)}${elapsed!==null?` · ${elapsed} min`:''}`:'',r.arrivedAt?`Checked in ${fmtDate(r.arrivedAt)}`:'',r.completedAt?`Completed ${fmtDate(r.completedAt)}`:'',r.noShowAt?`No-show ${fmtDate(r.noShowAt)}`:''].filter(Boolean).join(' · ')||'No history timestamps stored';const complaint=r.complaint||r.complaintText||r.customerComplaint||'';return `<tr><td><strong>${esc(r.bookingId||r.reservationId||r.id)}</strong><div>${esc(r.customerName||r.name||'Guest')}</div><div style="font-size:.72rem;color:var(--muted)">${esc(r.customerEmail||r.email||r.phone||r.mobile||'')}</div></td><td><strong>${esc(r.restaurantName||r.restaurant||r.restaurantId||'Restaurant')}</strong><div style="font-size:.72rem;color:var(--muted)">${esc(r.branchName||r.branchId||'Main branch')}</div></td><td>${esc(adminReservationDate(r)||'—')}<div style="font-size:.72rem;color:var(--muted)">${esc(r.time||'—')}</div></td><td>${esc(r.guestCount??r.guests??r.partySize??'—')}</td><td><span class="badge ${badge}">${esc(s.replaceAll('-',' '))}</span>${elapsed!==null?`<div style="font-size:.7rem;color:var(--muted);margin-top:.3rem">Response: ${elapsed} min</div>`:''}</td><td>${complaint?esc(complaint):'<span style="color:var(--muted)">—</span>'}</td><td><div style="font-size:.7rem;color:var(--muted);margin-bottom:.35rem">${esc(history)}</div><select aria-label="Change reservation status" onchange="adminSetRestaurantReservationStatus('${id}',this.value)" style="max-width:150px;border:1px solid var(--border);border-radius:8px;padding:.35rem;background:white">${statusOptions.map(x=>`<option value="${x}" ${x===s?'selected':''}>${x.replaceAll('-',' ')}</option>`).join('')}</select> <button class="btn sm" onclick="adminEditRestaurantReservation('${id}')">Edit details</button></td></tr>`;}).join('');
+}
+window.renderAdminRestaurantReservations=renderAdminRestaurantReservations;
+window.adminSetRestaurantReservationStatus=async function(id,status){try{const current=allRestaurantReservations.find(r=>r.id===id);if(!current)throw new Error('Reservation not found.');const now=serverTimestamp(),updates={status,updatedAt:now,updatedBy:auth.currentUser?.uid||'admin'};if(status==='confirmed'&&!current.acceptedAt&&!current.confirmedAt)updates.acceptedAt=now;if(status==='arrived')updates.arrivedAt=now;if(status==='completed')updates.completedAt=now;if(status==='no-show')updates.noShowAt=now;await updateDoc(doc(db,'reservations',id),updates);showToast(`Reservation marked ${status.replaceAll('-',' ')}.`, 'success');}catch(error){showToast(error.message||'Could not update reservation.','error');renderAdminRestaurantReservations();}};
+window.adminEditRestaurantReservation=async function(id){const r=allRestaurantReservations.find(x=>x.id===id);if(!r)return;const date=prompt('Reservation date (YYYY-MM-DD)',adminReservationDate(r));if(date===null)return;const time=prompt('Reservation time',r.time||'');if(time===null)return;const guests=prompt('Number of guests',r.guestCount??r.guests??r.partySize??'');if(guests===null)return;const count=Number(guests);if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isInteger(count)||count<1){showToast('Enter a valid date and a guest count of at least 1.','error');return;}try{await updateDoc(doc(db,'reservations',id),{date,time,guestCount:count,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||'admin'});showToast('Reservation details updated.','success');}catch(error){showToast(error.message||'Could not edit reservation.','error');}};
 const restaurantPartnerStatus = application => {
   const raw=String(application.restaurantStatus||application.business?.status||application.listing?.status||application.status||'pending').toLowerCase();
   if(['suspended','blocked'].includes(raw))return 'suspended';
@@ -3105,6 +3149,7 @@ onSnapshot(query(collection(db,'bookings'),orderBy('createdAt','desc'),limit(500
 onSnapshot(query(collection(db,'reservations'),limit(1000)), snap => {
   allRestaurantReservations=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.restaurantId);
   renderRestaurantOverview();
+  renderAdminRestaurantReservations();
 }, error => {
   console.error('Could not load restaurant reservations:',error.code,error.message);
   const el=document.getElementById('restaurantOverviewReservations');if(el)el.textContent='—';
