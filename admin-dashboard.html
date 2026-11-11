@@ -557,6 +557,14 @@
     <button class="sb-item" data-view="marketing"><span class="si-icon">📣</span> Marketing</button>
   </nav>
 
+  <div class="sb-section-label">✦ Restaurant</div>
+  <nav class="sb-nav">
+    <button class="sb-item" data-view="restaurant-overview"><span class="si-icon">📊</span> Restaurant Overview</button>
+    <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
+    <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantListings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
+    <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantPageContent"><span class="si-icon">🖼️</span> Page Content</button>
+  </nav>
+
   <div class="sb-section-label">✦ People & Listings</div>
   <nav class="sb-nav">
     <button class="sb-item" data-view="users"><span class="si-icon">👥</span> Members <span class="si-badge" id="badgeUsers">8</span></button>
@@ -591,13 +599,6 @@
   <nav class="sb-nav">
     <button class="sb-item" data-view="webinars"><span class="si-icon">🎙️</span> Webinars</button>
     <button class="sb-item" data-view="tours"><span class="si-icon">🗺️</span> Tours & Adventures</button>
-  </nav>
-
-  <div class="sb-section-label">✦ Restaurant</div>
-  <nav class="sb-nav">
-    <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
-    <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantListings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
-    <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantPageContent"><span class="si-icon">🖼️</span> Page Content</button>
   </nav>
 
   <div class="sb-section-label">✦ System</div>
@@ -947,6 +948,21 @@
       <span id="restaurantOnboardingCount" style="font-size:.76rem;color:var(--muted)">0 submissions</span>
     </div>
     <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:850px;"><thead><tr><th>Application ID</th><th>Applicant / Email</th><th>Restaurant</th><th>Phone</th><th>City</th><th>Submitted</th><th>Status</th><th>Documents</th><th>Actions</th></tr></thead><tbody id="restaurantOnboardingTable"><tr><td colspan="9" style="padding:1.4rem;color:var(--muted);">Loading submissions…</td></tr></tbody></table></div></div>
+  </div>
+
+  <div class="view" data-view="restaurant-overview">
+    <div style="background:linear-gradient(135deg,#143d36,#16745c 58%,#36b37e);border-radius:20px;padding:1.5rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.78;margin-bottom:.55rem;">Core module</div>
+      <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">Restaurant Management Overview</div>
+      <div style="font-size:.88rem;opacity:.85;margin-top:.3rem;">Live restaurant, approval, reservation and earnings metrics from Firebase.</div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));">
+      <div class="stat-card blue"><div class="stat-label">Total restaurants</div><div class="stat-value" id="restaurantOverviewTotal">—</div><div class="stat-sub">Registered restaurant partners</div></div>
+      <div class="stat-card orange"><div class="stat-label">Pending approvals</div><div class="stat-value" id="restaurantOverviewPending">—</div><div class="stat-sub">Applications awaiting a decision</div></div>
+      <div class="stat-card green"><div class="stat-label">Total reservations</div><div class="stat-value" id="restaurantOverviewReservations">—</div><div class="stat-sub">Restaurant bookings recorded</div></div>
+      <div class="stat-card purple"><div class="stat-label">Platform earnings</div><div class="stat-value" id="restaurantOverviewEarnings">—</div><div class="stat-sub">Recorded restaurant payments</div></div>
+    </div>
+    <div class="card" style="font-size:.78rem;color:var(--muted);">Metrics update automatically as restaurant partners, applications, bookings and payments change in Firebase.</div>
   </div>
 
   <div class="view" data-view="restaurant-partners">
@@ -1802,7 +1818,7 @@ import { app, auth, db, getCurrentUser, logout,
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
 let oneClubAdminData=null,oneClubAdminLoading=false;
-let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allMarketingLeads=[];
+let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allRestaurantReservations=[], allMarketingLeads=[];
 let allCheckoutAttempts=[];
 const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'Extra ₹175 OFF on your first dining transaction',searchPlaceholder:'Search restaurants, cuisine, area…',heroImage:'',promoHeading:'Diwali offers for you',promo1Title:'Vault Brewery',promo1Description:'★ 4.8 · ₹1500 for two\nFlat 25% OFF',promo1Image:'',promo2Title:'Explore local dining',promo2Description:'Special offers on your next table',promo2Image:'',featuredTitle:'In the limelight',featuredSubtitle:'Popular around you',allTitle:'All restaurants',allSubtitle:'Reserve your table',moodHeading:'What’s the mood?',moods:['Drink & dine','Cozy cafes','Family dining','Pocket friendly','Outdoor dining','Pure veg'],diwaliTitle:'In light of Diwali celebrations',diwaliMessage:'Operational timings may vary at restaurants. Please contact the restaurant before visiting.',visibility:{}};
 let restaurantPageContent={...RESTAURANT_PAGE_CONTENT_DEFAULTS};
@@ -1858,7 +1874,7 @@ window.updateTicketRequestStatus = async function(id, status) {
 const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', marketing:'Marketing', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
-  'restaurant-onboarding':'Restaurant Onboarding',
+  'restaurant-onboarding':'Restaurant Onboarding', 'restaurant-overview':'Restaurant Management Overview',
   campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
   'ads-manager':'Ads Manager',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
@@ -1874,6 +1890,7 @@ window.showView = function(name) {
   if(name==='ads-manager') renderAdsManager();
   if(name==='new-listers') renderNewListers();
   if(name==='restaurant-onboarding') renderRestaurantOnboarding();
+  if(name==='restaurant-overview') renderRestaurantOverview();
   if(name==='restaurant-partners') renderRestaurantPartners();
   if(name==='credits') renderCreditsView();
   if(name==='one-club'||name==='gift-cards') loadOneClubAdminData();
@@ -1959,6 +1976,15 @@ function renderRestaurantOnboarding(){
   if(!rows.length){tbody.innerHTML='<tr><td colspan="9" style="padding:1.4rem;color:var(--muted);">No matching restaurant submissions.</td></tr>';return;}
   tbody.innerHTML=rows.map(a=>{const status=a.status||'NEW',badge=status==='APPROVED'?'green':status==='REJECTED'?'red':status==='SIGNED'?'blue':'orange';return `<tr><td><strong>${esc(a.applicationId||a.id)}</strong></td><td><strong>${esc(a.contact?.applicantName||a.name||a.contact?.name||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.email||a.contact?.email||'')}</div></td><td><strong>${esc(a.business?.restaurantName||a.vendor?.registeredName||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.business?.cuisine||'')}</div></td><td>${esc(a.contact?.phone||'—')}</td><td>${esc(a.address?.city||a.vendor?.city||'—')}</td><td>${fmtDate(a.submittedAt||a.createdAt)}</td><td><span class="badge ${badge}">${esc(status.replaceAll('_',' '))}</span></td><td>${(a.documents||[]).length} file(s)</td><td><button class="btn sm primary" data-review-id="${esc(a.id)}">Open</button></td></tr>`;}).join('');
   tbody.querySelectorAll('[data-review-id]').forEach(btn=>btn.addEventListener('click',()=>openVendorApplication(btn.dataset.reviewId)));
+}
+function renderRestaurantOverview(){
+  const partners=allVendorApplications.filter(a=>a.preferredCategory==='dining'||a.preferredDashboard==='dashboard-restaurant.html');
+  const pending=partners.filter(a=>!['APPROVED','REJECTED'].includes(String(a.status||'NEW').toUpperCase())).length;
+  const bookings=allRestaurantReservations;
+  const restaurantPayments=allPayments.filter(p=>p.restaurantId||String(p.bookingType||p.type||'').toLowerCase().includes('restaurant'));
+  const earnings=restaurantPayments.reduce((sum,p)=>sum+Number(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0),0);
+  const values={restaurantOverviewTotal:partners.length,restaurantOverviewPending:pending,restaurantOverviewReservations:bookings.length,restaurantOverviewEarnings:money(earnings)};
+  for(const [id,value] of Object.entries(values)){const el=document.getElementById(id);if(el)el.textContent=typeof value==='number'?value.toLocaleString('en-IN'):value;}
 }
 const restaurantPartnerStatus = application => {
   const raw=String(application.restaurantStatus||application.business?.status||application.listing?.status||application.status||'pending').toLowerCase();
@@ -2929,6 +2955,7 @@ onSnapshot(query(collection(db,'vendorOnboarding'),orderBy('submittedAt','desc')
   const restaurantBadge=document.getElementById('badgeRestaurantOnboarding');if(restaurantBadge)restaurantBadge.textContent=restaurantPending;
   renderNewListers();
   renderRestaurantOnboarding();
+  renderRestaurantOverview();
   const openId=activeVendorApplicationId,oldApp=previous.get(openId),newApp=allVendorApplications.find(a=>a.id===openId),openModals=document.querySelectorAll('.modal-overlay.open');
   if(openId&&oldApp&&newApp&&openModals.length===1&&openModals[0].id==='vendorAppModal'&&(oldApp.status!==newApp.status||oldApp.agreementStatus!==newApp.agreementStatus||oldApp.signedAgreement?.path!==newApp.signedAgreement?.path))window.openVendorApplication(openId);
 }, error => {
@@ -3006,6 +3033,7 @@ onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200
   syncWABookings();
   updateStats();
   renderMarketing();
+  renderRestaurantOverview();
 });
 
 onSnapshot(query(collection(db,'razorpayOrders'),limit(500)), snap => {
@@ -3031,6 +3059,14 @@ onSnapshot(query(collection(db,'bookings'),orderBy('createdAt','desc'),limit(500
   allBookingsCol = snap.docs.map(d=>({id:d.id,...d.data()}));
   syncWABookings();
   renderMarketing();
+  renderRestaurantOverview();
+});
+onSnapshot(query(collection(db,'reservations'),limit(1000)), snap => {
+  allRestaurantReservations=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.restaurantId);
+  renderRestaurantOverview();
+}, error => {
+  console.error('Could not load restaurant reservations:',error.code,error.message);
+  const el=document.getElementById('restaurantOverviewReservations');if(el)el.textContent='—';
 });
 
 onSnapshot(query(collection(db,'campaigns'),orderBy('createdAt','desc'),limit(100)), snap => {
