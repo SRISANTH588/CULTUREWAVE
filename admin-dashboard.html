@@ -561,8 +561,8 @@
   <nav class="sb-nav">
     <button class="sb-item" data-view="restaurant-overview"><span class="si-icon">📊</span> Restaurant Overview</button>
     <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
-    <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantListings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
-    <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantPageContent"><span class="si-icon">🖼️</span> Page Content</button>
+    <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="listings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
+    <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="content"><span class="si-icon">🖼️</span> Page Content</button>
   </nav>
 
   <div class="sb-section-label">✦ People & Listings</div>
@@ -1307,7 +1307,8 @@
       <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Restaurants Page Manager</div>
       <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.25rem;">Edit each section of restaurants.html. Saved changes appear on desktop and mobile.</div>
     </div>
-    <div class="card" id="restaurantPageContent" style="padding:1.1rem 1.25rem;margin:0;scroll-margin-top:1rem;">
+    <div id="restaurantPageContent" data-restaurant-panel="content" style="display:none">
+    <div class="card" style="padding:1.1rem 1.25rem;margin:0;">
       <h3 style="margin:0 0 .35rem;color:var(--ink);">Hero section</h3>
       <p style="margin:0 0 .9rem;color:var(--muted);font-size:.8rem;">Edit the title, offer, search prompt, and background image.</p>
       <div class="restaurant-content-grid">
@@ -1357,11 +1358,14 @@
         <button class="btn primary" id="restaurantHeroSave" type="button" onclick="saveRestaurantPageContent()">Save page content</button>
       </div>
     </div>
-    <div class="filter-bar" id="restaurantListings" style="background:#fff;border:1px solid #dfe7f7;border-radius:15px;padding:.85rem 1rem;box-shadow:0 9px 26px rgba(36,84,214,.06);margin-bottom:0;scroll-margin-top:1rem;">
+    </div>
+    <div data-restaurant-panel="listings">
+    <div class="filter-bar" id="restaurantListings" style="background:#fff;border:1px solid #dfe7f7;border-radius:15px;padding:.85rem 1rem;box-shadow:0 9px 26px rgba(36,84,214,.06);margin-bottom:0;">
       <input id="restaurantAdminSearch" type="search" placeholder="Search name, area, or category…" oninput="filterRestaurantAdmin()" style="width:min(320px,100%);">
       <select id="restaurantAdminStatus" onchange="filterRestaurantAdmin()"><option value="">All statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="hidden">Hidden</option></select>
       <span id="restaurantAdminCount" style="font-size:.76rem;color:var(--muted);margin-left:auto;">0 restaurants</span>
       <a class="btn sm" href="restaurants.html" target="_blank" rel="noopener">Preview restaurants.html ↗</a>
+    </div>
     </div>
     <div class="card" style="padding:0;">
       <div class="table-wrap" style="border:0;border-radius:16px;">
@@ -1884,6 +1888,7 @@ window.showView = function(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===name));
   document.querySelectorAll('.sb-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view===name));
   document.getElementById('pageTitle').textContent = viewTitles[name] || name;
+  if(name==='restaurants') setRestaurantAdminTab(window.restaurantAdminTab || 'listings');
   if(name==='analytics') renderAnalytics();
   if(name==='checkout-attempts') renderCheckoutAttempts();
   if(name==='marketing') renderMarketing();
@@ -1899,8 +1904,18 @@ window.showView = function(name) {
 };
 document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventListener('click', () => {
   showView(btn.dataset.view);
-  if (btn.dataset.scrollTarget) document.getElementById(btn.dataset.scrollTarget)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (btn.dataset.restaurantTab) setRestaurantAdminTab(btn.dataset.restaurantTab);
 }));
+
+window.setRestaurantAdminTab = function(tab) {
+  window.restaurantAdminTab = tab === 'content' ? 'content' : 'listings';
+  document.querySelectorAll('[data-restaurant-panel]').forEach(panel => {
+    panel.style.display = panel.dataset.restaurantPanel === window.restaurantAdminTab ? '' : 'none';
+  });
+  document.querySelectorAll('.restaurant-subitem').forEach(button => {
+    button.classList.toggle('active', button.dataset.restaurantTab === window.restaurantAdminTab);
+  });
+};
 
 async function loadOneClubAdminData(force=false){
   if(oneClubAdminLoading||(!force&&oneClubAdminData))return;
