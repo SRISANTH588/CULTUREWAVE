@@ -220,6 +220,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <span class="sb-icon">&#9993;</span>
     <span><span style="display:block;">Invitations</span><span class="sb-sub">Issue guest tickets</span></span>
   </button>
+  <button class="sb-item" data-panel="seating" onclick="switchPanel(this,'seating')">
+    <span class="sb-icon">&#129681;</span>
+    <span><span style="display:block;">Table &amp; Seating</span><span class="sb-sub">Manage your venue layout</span></span>
+  </button>
   <button class="sb-item" data-panel="reminders" onclick="switchPanel(this,'reminders')">
     <span class="sb-icon">&#128276;</span>
     <span><span style="display:block;">Reminders</span><span class="sb-sub">Configure customer reminders</span></span>
@@ -738,6 +742,30 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 </div>
 
 <!-- SETTINGS PANEL -->
+<div class="panel" id="panel-seating">
+  <div class="card">
+    <div class="card-head"><div><h2>Table &amp; Seating</h2><p>Seating plan saved with this event in Firebase</p></div></div>
+    <div style="display:flex;gap:.5rem;margin-bottom:1rem;">
+      <button type="button" class="tb-btn" id="manageSeatingBuilderTab" onclick="setManageSeatingMode('builder')">Build layout</button>
+      <button type="button" class="tb-btn" id="manageSeatingImageTab" onclick="setManageSeatingMode('image')">Plan image</button>
+    </div>
+    <div id="manageSeatingBuilder">
+      <div class="pf-form">
+        <div class="pf-row"><div class="pf-field"><label>Plan title</label><input id="manageSeatingTitle" maxlength="80" placeholder="Venue Seating Plan"/></div><div class="pf-field"><label>Stage / focal point</label><input id="manageSeatingStage" maxlength="40" placeholder="STAGE"/></div></div>
+        <div id="manageSeatingRows" style="display:flex;flex-direction:column;gap:.55rem;"></div>
+        <button type="button" class="tb-btn" onclick="addManageSeatingRow()">+ Add seating row</button>
+      </div>
+      <div style="margin-top:1rem;"><strong style="font-size:.82rem;">Preview</strong><div id="manageSeatingPreview" style="margin-top:.5rem;border:1px solid var(--border);border-radius:10px;padding:.8rem;overflow:auto;"></div></div>
+    </div>
+    <div id="manageSeatingImage" style="display:none;">
+      <div class="pf-field"><label>Plan image URL</label><input id="manageSeatingUrl" type="url" placeholder="https://..." oninput="renderManageSeatingImage()"/></div>
+      <div id="manageSeatingImagePreview" style="margin-top:.75rem;"></div>
+    </div>
+  </div>
+  <button class="save-btn" onclick="saveManageSeating()">Save Table &amp; Seating</button>
+</div>
+
+<!-- SETTINGS PANEL -->
 <div class="panel" id="panel-settings">
   <div class="card">
     <div class="card-head"><div><h2>Event Settings</h2><p>Visibility, access and registration options</p></div></div>
@@ -963,6 +991,7 @@ const eventId = params.get('eventId');
 if(!eventId){document.body.innerHTML='<div style="padding:3rem;text-align:center;">No event ID. <a href="premium-client-dashboard.html">Go back</a></div>';}
 
 let eventData=null, allBookings=[], allBookingDocs=[], allPaymentBookingDocs=[], anPeriod=30, hasPremiumPages=false;
+let manageSeatingMode='builder', manageSeatingLayout={title:'Venue Seating Plan',stage:'STAGE',rows:[],sections:[]};
 function publicEventPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
 
 function switchPanel(btn,panelId){
@@ -1092,8 +1121,53 @@ async function loadEvent(){
   const planStatus=String(accountData.subscriptionStatus||accountData.planStatus||'active').toLowerCase();
   hasPremiumPages=['pro','premium','business','growth'].includes(plan) && !['cancelled','expired','inactive'].includes(planStatus);
   applyPremiumPagesAccess();
-  renderEventMeta();prefillDetails();prefillSettings();prefillTickets();loadBookings();loadWaitlist();
+  renderEventMeta();prefillDetails();prefillSettings();prefillTickets();prefillManageSeating();loadBookings();loadWaitlist();
 }
+
+function prefillManageSeating(){
+  const d=eventData||{};
+  manageSeatingLayout=d.seatingPlan&&typeof d.seatingPlan==='object'?JSON.parse(JSON.stringify(d.seatingPlan)):{title:'Venue Seating Plan',stage:'STAGE',rows:[],sections:[]};
+  manageSeatingLayout.rows=Array.isArray(manageSeatingLayout.rows)?manageSeatingLayout.rows:[];
+  manageSeatingLayout.sections=Array.isArray(manageSeatingLayout.sections)?manageSeatingLayout.sections:[];
+  document.getElementById('manageSeatingTitle').value=manageSeatingLayout.title||'Venue Seating Plan';
+  document.getElementById('manageSeatingStage').value=manageSeatingLayout.stage||'STAGE';
+  document.getElementById('manageSeatingUrl').value=d.seatingPlanUrl||'';
+  manageSeatingMode=d.seatingPlanMode==='image'||(d.seatingPlanUrl&&!d.seatingPlan)?'image':'builder';
+  setManageSeatingMode(manageSeatingMode);renderManageSeating();renderManageSeatingImage();
+}
+window.setManageSeatingMode=function(mode){
+  manageSeatingMode=mode==='image'?'image':'builder';
+  document.getElementById('manageSeatingBuilder').style.display=manageSeatingMode==='builder'?'':'none';
+  document.getElementById('manageSeatingImage').style.display=manageSeatingMode==='image'?'':'none';
+  for(const [id,active] of [['manageSeatingBuilderTab',manageSeatingMode==='builder'],['manageSeatingImageTab',manageSeatingMode==='image']]){
+    const button=document.getElementById(id);button.style.borderColor=active?'var(--blue)':'var(--border)';button.style.background=active?'var(--blue-light)':'#fff';
+  }
+};
+function renderManageSeating(){
+  const host=document.getElementById('manageSeatingRows');
+  host.innerHTML=manageSeatingLayout.rows.map((row,index)=>`<div style="display:grid;grid-template-columns:70px minmax(90px,1fr) minmax(80px,.7fr) 100px 40px;gap:.4rem;align-items:end;border:1px solid var(--border);border-radius:9px;padding:.55rem;">
+    <div class="pf-field"><label>Label</label><input maxlength="8" value="${esc(row.label||'')}" onchange="updateManageSeatingRow(${index},'label',this.value)"/></div>
+    <div class="pf-field"><label>Ticket type</label><input maxlength="40" value="${esc(row.ticketType||'')}" placeholder="General Admission" onchange="updateManageSeatingRow(${index},'ticketType',this.value)"/></div>
+    <div class="pf-field"><label>Seats</label><input type="number" min="1" max="100" value="${Math.max(1,Math.min(100,Number(row.seats)||1))}" onchange="updateManageSeatingRow(${index},'seats',this.value)"/></div>
+    <div class="pf-field"><label>Style</label><select onchange="updateManageSeatingRow(${index},'seatStyle',this.value)"><option value="seat" ${row.seatStyle!=='sofa'?'selected':''}>Chair</option><option value="sofa" ${row.seatStyle==='sofa'?'selected':''}>Sofa</option></select></div>
+    <button type="button" class="tb-btn" aria-label="Remove row" onclick="removeManageSeatingRow(${index})">×</button></div>`).join('')||'<div style="padding:.9rem;color:var(--muted);font-size:.84rem;">No rows yet. Add a row to build your seating plan.</div>';
+  const preview=document.getElementById('manageSeatingPreview');
+  preview.innerHTML=`<div style="text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.12em;color:#fff;background:#2563eb;border-radius:8px;padding:.55rem;margin-bottom:.8rem;">${esc(manageSeatingLayout.stage||'STAGE')}</div>`+(manageSeatingLayout.rows.map(row=>{const count=Math.max(1,Math.min(100,Number(row.seats)||1));const sofa=row.seatStyle==='sofa';return `<div style="margin:.55rem 0;"><div style="font-size:.67rem;color:#64748b;margin-bottom:.25rem;">${esc(row.ticketType||'General Admission')}</div><div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;"><strong style="width:20px;">${esc(row.label||'')}</strong>${Array.from({length:count},(_,i)=>`<span style="padding:.3rem .4rem;border-radius:${sofa?'10px':'5px'};background:${sofa?'#fce7f3':'#e8efff'};color:${sofa?'#be185d':'#1242c5'};font-size:.62rem;font-weight:700;">${sofa?'Sofa ':''}${esc(row.label||'')}${i+1}</span>`).join('')}</div></div>`}).join('')||'<div style="color:var(--muted);text-align:center;padding:1rem;">Add a row to preview the plan.</div>');
+}
+window.updateManageSeatingRow=function(index,key,value){const row=manageSeatingLayout.rows[index];if(!row)return;row[key]=key==='seats'?Math.max(1,Math.min(100,Number(value)||1)):String(value).trim().slice(0,40);renderManageSeating();};
+window.addManageSeatingRow=function(){const label=String.fromCharCode(65+manageSeatingLayout.rows.length%26);manageSeatingLayout.rows.push({label,seats:8,ticketType:'',seatStyle:'seat'});renderManageSeating();};
+window.removeManageSeatingRow=function(index){manageSeatingLayout.rows.splice(index,1);renderManageSeating();};
+window.renderManageSeatingImage=function(){const url=document.getElementById('manageSeatingUrl').value.trim(),host=document.getElementById('manageSeatingImagePreview');host.innerHTML=url?`<img src="${esc(url)}" alt="Seating plan preview" style="display:block;max-width:100%;max-height:380px;object-fit:contain;border-radius:10px;" onerror="this.alt='Could not load seating plan image'"/>`:'<p style="color:var(--muted);font-size:.84rem;">No seating plan image URL added.</p>';};
+window.saveManageSeating=async function(){
+  if(!eventId||!eventData)return;
+  manageSeatingLayout.title=document.getElementById('manageSeatingTitle').value.trim().slice(0,80)||'Venue Seating Plan';
+  manageSeatingLayout.stage=document.getElementById('manageSeatingStage').value.trim().slice(0,40)||'STAGE';
+  const url=document.getElementById('manageSeatingUrl').value.trim();
+  const builderHasContent=manageSeatingLayout.rows.length>0||manageSeatingLayout.sections.length>0;
+  const payload={seatingPlanMode:manageSeatingMode,seatingPlanUrl:manageSeatingMode==='image'?url:'',seatingPlan:manageSeatingMode==='builder'&&builderHasContent?manageSeatingLayout:firebase.firestore.FieldValue.delete(),updatedAt:serverTimestamp()};
+  try{await db.collection('events').doc(eventId).update(payload);eventData={...eventData,...(manageSeatingMode==='builder'?{seatingPlan:builderHasContent?manageSeatingLayout:null,seatingPlanUrl:''}:{seatingPlanUrl:url,seatingPlan:null}),seatingPlanMode:manageSeatingMode};showToast('Table & seating saved to Firebase');}
+  catch(error){console.error('Failed to save seating plan',error);showToast('Could not save seating plan. Please try again.');}
+};
 
 function loadWaitlist(){
   const rows=document.getElementById('waitlistRows');
