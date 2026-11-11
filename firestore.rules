@@ -729,9 +729,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Restaurant operations audit trail is admin-only and append-only from the client.
+    match /restaurantAdminAuditLogs/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly(['action', 'targetType', 'targetId', 'details', 'actorUid', 'actorEmail', 'createdAt']) &&
+        request.resource.data.action is string && request.resource.data.targetType is string &&
+        request.resource.data.targetId is string && request.resource.data.details is map &&
+        request.resource.data.actorUid == request.auth.uid && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
     // Admin-only collections — only authenticated users (admin check done in app)
     match /adminLogs/{id} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
     }
 
     // Partner support tickets, communication history, and internal notes are admin-only.
