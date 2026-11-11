@@ -547,6 +547,7 @@
     <button class="sb-item" data-view="users"><span class="si-icon">👥</span> Members <span class="si-badge" id="badgeUsers">0</span></button>
     <button class="sb-item" data-view="events"><span class="si-icon">🎪</span> Live Events <span class="si-badge green" id="badgeEvents">0</span></button>
     <button class="sb-item" data-view="new-listers"><span class="si-icon">🧾</span> New Lister <span class="si-badge orange" id="badgeNewListers">0</span></button>
+    <button class="sb-item" data-view="restaurant-onboarding"><span class="si-icon">🍽️</span> Restaurant Onboarding <span class="si-badge orange" id="badgeRestaurantOnboarding">0</span></button>
     <button class="sb-item" data-view="stalls"><span class="si-icon">🏪</span> Event Stalls</button>
     <button class="sb-item" data-view="campaigns"><span class="si-icon">🚀</span> Campaigns <span class="si-badge orange" id="badgeCampaigns">0</span></button>
     <button class="sb-item" data-view="ads-manager"><span class="si-icon">📢</span> Ads Manager <span class="si-badge orange" id="badgeAds">0</span></button>
@@ -904,6 +905,20 @@
         </table>
       </div>
     </div>
+  </div>
+
+  <div class="view" data-view="restaurant-onboarding">
+    <div style="background:linear-gradient(135deg,#17427c,#2454d6 58%,#6d8ff0);border-radius:20px;padding:1.5rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.78;margin-bottom:.55rem;">Restaurant partner onboarding</div>
+      <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">Restaurant Submissions</div>
+      <div style="font-size:.88rem;opacity:.8;margin-top:.3rem;">Review restaurant applications, verification documents and status.</div>
+    </div>
+    <div class="card" style="padding:.8rem 1rem;display:flex;gap:.65rem;flex-wrap:wrap;align-items:center;">
+      <input id="restaurantOnboardingSearch" placeholder="Search application, restaurant, contact or email" oninput="renderRestaurantOnboarding()" style="flex:1;min-width:220px;border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;">
+      <select id="restaurantOnboardingStatus" onchange="renderRestaurantOnboarding()" style="border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;background:white"><option value="">All statuses</option><option>NEW</option><option>UNDER_REVIEW</option><option>SIGNUP_REQUEST_SENT</option><option>AWAITING_SIGNATURE</option><option>SIGNED</option><option>APPROVED</option><option>REJECTED</option></select>
+      <span id="restaurantOnboardingCount" style="font-size:.76rem;color:var(--muted)">0 submissions</span>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:850px;"><thead><tr><th>Application ID</th><th>Applicant / Email</th><th>Restaurant</th><th>Phone</th><th>City</th><th>Submitted</th><th>Status</th><th>Documents</th><th>Actions</th></tr></thead><tbody id="restaurantOnboardingTable"><tr><td colspan="9" style="padding:1.4rem;color:var(--muted);">Loading submissions…</td></tr></tbody></table></div></div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -1787,6 +1802,7 @@ window.updateTicketRequestStatus = async function(id, status) {
 const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', marketing:'Marketing', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
+  'restaurant-onboarding':'Restaurant Onboarding',
   campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
   'ads-manager':'Ads Manager',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
@@ -1801,6 +1817,7 @@ window.showView = function(name) {
   if(name==='marketing') renderMarketing();
   if(name==='ads-manager') renderAdsManager();
   if(name==='new-listers') renderNewListers();
+  if(name==='restaurant-onboarding') renderRestaurantOnboarding();
   if(name==='credits') renderCreditsView();
   if(name==='one-club'||name==='gift-cards') loadOneClubAdminData();
   if(name==='activity') renderActivityLog();
@@ -1875,6 +1892,16 @@ function renderNewListers(){
   }).join('');
   tbody.querySelectorAll('[data-review-id]').forEach(btn=>btn.addEventListener('click',()=>openVendorApplication(btn.dataset.reviewId)));
   tbody.querySelectorAll('.vendor-doc-action').forEach(btn=>btn.addEventListener('click',()=>adminDocumentAction(btn.dataset.applicationId,btn.dataset.path,'SIGNED_VENDOR_AGREEMENT.pdf','preview')));
+}
+function renderRestaurantOnboarding(){
+  const tbody=document.getElementById('restaurantOnboardingTable');if(!tbody)return;
+  const applications=allVendorApplications.filter(a=>a.preferredCategory==='dining'||a.preferredDashboard==='dashboard-restaurant.html');
+  const term=(document.getElementById('restaurantOnboardingSearch')?.value||'').trim().toLowerCase(),filter=document.getElementById('restaurantOnboardingStatus')?.value||'';
+  const rows=applications.filter(a=>(!filter||a.status===filter)&&(!term||[a.applicationId,a.name,a.email,a.vendor?.registeredName,a.contact?.name,a.contact?.email,a.contact?.phone,a.business?.restaurantName,a.address?.city,a.vendor?.city].some(v=>String(v||'').toLowerCase().includes(term))));
+  const count=document.getElementById('restaurantOnboardingCount');if(count)count.textContent=`${rows.length} submission${rows.length===1?'':'s'}`;
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="9" style="padding:1.4rem;color:var(--muted);">No matching restaurant submissions.</td></tr>';return;}
+  tbody.innerHTML=rows.map(a=>{const status=a.status||'NEW',badge=status==='APPROVED'?'green':status==='REJECTED'?'red':status==='SIGNED'?'blue':'orange';return `<tr><td><strong>${esc(a.applicationId||a.id)}</strong></td><td><strong>${esc(a.contact?.applicantName||a.name||a.contact?.name||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.email||a.contact?.email||'')}</div></td><td><strong>${esc(a.business?.restaurantName||a.vendor?.registeredName||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.business?.cuisine||'')}</div></td><td>${esc(a.contact?.phone||'—')}</td><td>${esc(a.address?.city||a.vendor?.city||'—')}</td><td>${fmtDate(a.submittedAt||a.createdAt)}</td><td><span class="badge ${badge}">${esc(status.replaceAll('_',' '))}</span></td><td>${(a.documents||[]).length} file(s)</td><td><button class="btn sm primary" data-review-id="${esc(a.id)}">Open</button></td></tr>`;}).join('');
+  tbody.querySelectorAll('[data-review-id]').forEach(btn=>btn.addEventListener('click',()=>openVendorApplication(btn.dataset.reviewId)));
 }
 function detailSection(title,rows){return `<section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px;"><strong style="display:block;margin-bottom:.65rem;color:var(--blue);">${title}</strong><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.65rem;">${rows.map(([label,value])=>`<div><small style="display:block;color:var(--muted);margin-bottom:.2rem;">${label}</small><strong style="font-size:.82rem;overflow-wrap:anywhere;">${esc(value||'—')}</strong></div>`).join('')}</div></section>`;}
 window.openVendorApplication=function(id){
@@ -2809,7 +2836,11 @@ onSnapshot(query(collection(db,'vendorOnboarding'),orderBy('submittedAt','desc')
   allVendorApplications=snap.docs.map(d=>({id:d.id,...d.data()}));
   const pending=allVendorApplications.filter(a=>!['APPROVED','REJECTED'].includes(a.status)).length;
   document.getElementById('badgeNewListers').textContent=pending;
+  const restaurantApplications=allVendorApplications.filter(a=>a.preferredCategory==='dining'||a.preferredDashboard==='dashboard-restaurant.html');
+  const restaurantPending=restaurantApplications.filter(a=>!['APPROVED','REJECTED'].includes(a.status)).length;
+  const restaurantBadge=document.getElementById('badgeRestaurantOnboarding');if(restaurantBadge)restaurantBadge.textContent=restaurantPending;
   renderNewListers();
+  renderRestaurantOnboarding();
   const openId=activeVendorApplicationId,oldApp=previous.get(openId),newApp=allVendorApplications.find(a=>a.id===openId),openModals=document.querySelectorAll('.modal-overlay.open');
   if(openId&&oldApp&&newApp&&openModals.length===1&&openModals[0].id==='vendorAppModal'&&(oldApp.status!==newApp.status||oldApp.agreementStatus!==newApp.agreementStatus||oldApp.signedAgreement?.path!==newApp.signedAgreement?.path))window.openVendorApplication(openId);
 }, error => {
