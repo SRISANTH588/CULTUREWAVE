@@ -581,6 +581,7 @@
     <button class="sb-item" data-view="table-seating"><span class="si-icon">🪑</span> Table & Seating</button>
     <button class="sb-item" data-view="restaurant-complaints"><span class="si-icon">⚑</span> Complaints</button>
     <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
+    <button class="sb-item" data-view="commission-management"><span class="si-icon">％</span> Commission & Pricing</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="listings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="content"><span class="si-icon">🖼️</span> Page Content</button>
   </nav>
@@ -968,6 +969,39 @@
       <span id="restaurantOnboardingCount" style="font-size:.76rem;color:var(--muted)">0 submissions</span>
     </div>
     <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:850px;"><thead><tr><th>Application ID</th><th>Applicant / Email</th><th>Restaurant</th><th>Phone</th><th>City</th><th>Submitted</th><th>Status</th><th>Documents</th><th>Actions</th></tr></thead><tbody id="restaurantOnboardingTable"><tr><td colspan="9" style="padding:1.4rem;color:var(--muted);">Loading submissions…</td></tr></tbody></table></div></div>
+  </div>
+
+  <div class="view" data-view="commission-management">
+    <div style="background:linear-gradient(135deg,#29235f,#5146c8 58%,#9b8cff);border-radius:20px;padding:1.5rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.78;margin-bottom:.55rem;">Restaurant revenue controls</div>
+      <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">Commission & Pricing</div>
+      <div style="font-size:.88rem;opacity:.85;margin-top:.3rem;">Set restaurant and branch rates, date windows, booking rules and promotions. Signed agreement terms stay linked to each rule.</div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));">
+      <div class="stat-card blue"><div class="stat-label">Active rules</div><div class="stat-value" id="commissionActiveCount">0</div><div class="stat-sub">Currently effective</div></div>
+      <div class="stat-card green"><div class="stat-label">Commission recorded</div><div class="stat-value" id="commissionRecorded">₹0</div><div class="stat-sub">From restaurant payments</div></div>
+      <div class="stat-card purple"><div class="stat-label">Agreement linked</div><div class="stat-value" id="commissionAgreementCount">0</div><div class="stat-sub">Rules tied to signed terms</div></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 .8rem">Create commission rule</h3>
+      <div class="restaurant-content-grid">
+        <div class="field"><label for="commissionRestaurant">Restaurant</label><select id="commissionRestaurant" required><option value="">Choose restaurant</option></select></div>
+        <div class="field"><label for="commissionBranch">Branch (optional)</label><input id="commissionBranch" maxlength="120" placeholder="All branches if blank"></div>
+        <div class="field"><label for="commissionBookingType">Booking type</label><select id="commissionBookingType"><option value="all">All booking types</option><option value="reservation">Reservation</option><option value="prepaid">Prepaid dining</option><option value="event">Restaurant event</option><option value="walk-in">Walk-in</option></select></div>
+        <div class="field"><label for="commissionFeeType">Fee type</label><select id="commissionFeeType"><option value="percentage">Percentage</option><option value="fixed">Fixed fee per booking</option></select></div>
+        <div class="field"><label for="commissionAmount">Rate / fee</label><input id="commissionAmount" type="number" min="0" step="0.01" required placeholder="e.g. 12.5"></div>
+        <div class="field"><label for="commissionCurrency">Currency (fixed fee)</label><select id="commissionCurrency"><option value="INR">INR (₹)</option></select></div>
+        <div class="field"><label for="commissionStart">Effective from</label><input id="commissionStart" type="date" required></div>
+        <div class="field"><label for="commissionEnd">Effective to (optional)</label><input id="commissionEnd" type="date"></div>
+        <div class="field"><label for="commissionAgreement">Signed agreement</label><select id="commissionAgreement"><option value="">No agreement linked</option></select></div>
+        <div class="field"><label for="commissionPromoName">Promotion name (optional)</label><input id="commissionPromoName" maxlength="100" placeholder="Launch offer"></div>
+        <div class="field"><label for="commissionPromoEnd">Promotion ends (optional)</label><input id="commissionPromoEnd" type="date"></div>
+        <div class="field"><label for="commissionRuleNote">Internal note</label><input id="commissionRuleNote" maxlength="300" placeholder="Commercial context"></div>
+      </div>
+      <button class="btn primary" id="commissionSave" type="button" onclick="saveCommissionRule()">Save commission rule</button>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden"><div style="padding:1rem 1.2rem"><h3 style="margin:0">Commission rules & history</h3><p style="margin:.3rem 0 0;color:var(--muted);font-size:.78rem">Each edit creates a dated history record; previous terms remain available.</p></div><div class="table-wrap" style="overflow:auto"><table class="data-table" style="min-width:1100px"><thead><tr><th>Restaurant / branch</th><th>Booking type</th><th>Commission</th><th>Effective dates</th><th>Promotion</th><th>Agreement</th><th>Status</th><th>Actions</th></tr></thead><tbody id="commissionRulesTable"><tr><td colspan="8">Loading commission rules…</td></tr></tbody></table></div></div>
+    <div class="card" style="padding:0;overflow:hidden"><div style="padding:1rem 1.2rem;display:flex;justify-content:space-between;gap:.8rem;align-items:center;flex-wrap:wrap"><div><h3 style="margin:0">Commission report</h3><p style="margin:.3rem 0 0;color:var(--muted);font-size:.78rem">Recorded amounts from restaurant payments. Export the current report as CSV.</p></div><button class="btn sm" onclick="exportCommissionReport()">Export CSV</button></div><div class="table-wrap" style="overflow:auto"><table class="data-table" style="min-width:850px"><thead><tr><th>Restaurant</th><th>Booking / payment</th><th>Booking date</th><th>Gross amount</th><th>Commission recorded</th><th>Status</th></tr></thead><tbody id="commissionReportTable"></tbody></table></div></div>
   </div>
 
   <div class="view" data-view="restaurant-overview">
@@ -1946,6 +1980,7 @@ const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'E
 let restaurantPageContent={...RESTAURANT_PAGE_CONTENT_DEFAULTS};
 let checkoutAttemptsLoaded=false;
 let allVendorApplications=[],activeVendorApplicationId=null;
+let allCommissionRules=[];
 let allStallApplications=[],activeStallAdminEventId='';
 
 // ── HELPERS ──
@@ -1997,6 +2032,7 @@ const viewTitles = {
   overview:'Dashboard', analytics:'Analytics & Insights', marketing:'Marketing', users:'Member Management', events:'Live Events', stalls:'Event Stalls',
   'new-listers':'New Lister',
   'restaurant-onboarding':'Restaurant Onboarding', 'restaurant-overview':'Restaurant Management Overview', 'restaurant-reservations':'Restaurant Reservations', 'restaurant-complaints':'Restaurant Complaints',
+  'commission-management':'Commission & Pricing',
   campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
   'ads-manager':'Ads Manager',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
@@ -2017,6 +2053,7 @@ window.showView = function(name) {
   if(name==='restaurant-reservations') renderAdminRestaurantReservations();
   if(name==='restaurant-complaints') renderAdminRestaurantComplaints();
   if(name==='restaurant-partners') renderRestaurantPartners();
+  if(name==='commission-management') renderCommissionManagement();
   if(name==='credits') renderCreditsView();
   if(name==='one-club'||name==='gift-cards') loadOneClubAdminData();
   if(name==='activity') renderActivityLog();
@@ -2126,6 +2163,42 @@ function renderRestaurantOverview(){
   const values={restaurantOverviewTotal:partners.length,restaurantOverviewPending:pending,restaurantOverviewReservations:bookings.length,restaurantOverviewEarnings:money(earnings)};
   for(const [id,value] of Object.entries(values)){const el=document.getElementById(id);if(el)el.textContent=typeof value==='number'?value.toLocaleString('en-IN'):value;}
 }
+const commissionRestaurantName = id => {
+  const restaurant=allRestaurants.find(r=>r.id===id);
+  return restaurant?.name||restaurant?.restaurantName||restaurant?.businessName||id||'Restaurant';
+};
+function commissionIsActive(rule){
+  if(rule.active===false)return false;
+  const now=new Date(),today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  return (!rule.effectiveFrom||rule.effectiveFrom<=today)&&(!rule.effectiveTo||rule.effectiveTo>=today);
+}
+function renderCommissionManagement(){
+  const select=document.getElementById('commissionRestaurant');
+  if(select){const selected=select.value;select.innerHTML='<option value="">Choose restaurant</option>'+allRestaurants.map(r=>`<option value="${esc(r.id)}">${esc(commissionRestaurantName(r.id))}</option>`).join('');if(allRestaurants.some(r=>r.id===selected))select.value=selected;}
+  const agreement=document.getElementById('commissionAgreement');
+  if(agreement){const selected=agreement.value;const apps=allVendorApplications.filter(a=>(a.preferredCategory==='dining'||a.preferredDashboard==='dashboard-restaurant.html')&&(a.status==='SIGNED'||a.agreementStatus==='SIGNED'||a.signedAgreement));agreement.innerHTML='<option value="">No agreement linked</option>'+apps.map(a=>`<option value="${esc(a.id)}">${esc(a.business?.restaurantName||a.vendor?.registeredName||a.applicationId||a.id)} · ${esc(a.applicationId||a.id)}</option>`).join('');if(apps.some(a=>a.id===selected))agreement.value=selected;}
+  const rulesBody=document.getElementById('commissionRulesTable');
+  if(rulesBody){const sorted=[...allCommissionRules].sort((a,b)=>String(b.effectiveFrom||'').localeCompare(String(a.effectiveFrom||'')));rulesBody.innerHTML=sorted.length?sorted.map(r=>{const fee=r.feeType==='percentage'?`${Number(r.amount)}%`:`${money(r.amount)} / booking`,status=commissionIsActive(r)?'Active':r.active===false?'Paused':'Scheduled / expired';return `<tr><td><strong>${esc(commissionRestaurantName(r.restaurantId))}</strong><div style="font-size:.72rem;color:var(--muted)">${esc(r.branchName||'All branches')}</div></td><td>${esc(r.bookingType||'all')}</td><td>${fee}</td><td>${esc(r.effectiveFrom||'—')} – ${esc(r.effectiveTo||'Ongoing')}</td><td>${esc(r.promotionName||'—')}${r.promotionEnd?`<div style="font-size:.72rem;color:var(--muted)">Until ${esc(r.promotionEnd)}</div>`:''}</td><td>${r.agreementId?`<strong>Linked</strong><div style="font-size:.72rem;color:var(--muted)">${esc(r.agreementApplicationId||r.agreementId)}</div>`:'—'}</td><td><span class="badge ${commissionIsActive(r)?'green':'orange'}">${status}</span></td><td><button class="btn sm" onclick="editCommissionRule('${esc(r.id)}')">Edit / history</button><button class="btn sm" onclick="toggleCommissionRule('${esc(r.id)}')">${r.active===false?'Activate':'Pause'}</button></td></tr>`;}).join(''):'<tr><td colspan="8" style="padding:1.2rem;color:var(--muted)">No commission rules yet.</td></tr>';}
+  const active=allCommissionRules.filter(commissionIsActive).length;
+  const activeEl=document.getElementById('commissionActiveCount');if(activeEl)activeEl.textContent=active.toLocaleString('en-IN');
+  const signed=allCommissionRules.filter(r=>r.agreementId).length,agreementEl=document.getElementById('commissionAgreementCount');if(agreementEl)agreementEl.textContent=signed.toLocaleString('en-IN');
+  const paymentRows=allPayments.filter(p=>p.restaurantId||String(p.bookingType||p.type||'').toLowerCase().includes('restaurant'));
+  const recorded=paymentRows.reduce((sum,p)=>sum+Number(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0),0);
+  const recordedEl=document.getElementById('commissionRecorded');if(recordedEl)recordedEl.textContent=money(recorded);
+  const report=document.getElementById('commissionReportTable');if(report){report.innerHTML=paymentRows.length?[...paymentRows].sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||''))).map(p=>`<tr><td>${esc(p.restaurantName||commissionRestaurantName(p.restaurantId))}</td><td>${esc(p.bookingId||p.receipt||p.paymentId||p.id)}</td><td>${fmtDate(p.createdAt)}</td><td>${money(p.amount)}</td><td>${money(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0)}</td><td>${esc(p.status||'—')}</td></tr>`).join(''):'<tr><td colspan="6" style="padding:1.2rem;color:var(--muted)">No restaurant payment records available.</td></tr>';}
+}
+window.saveCommissionRule=async function(){
+  const restaurantId=document.getElementById('commissionRestaurant').value,feeType=document.getElementById('commissionFeeType').value,amount=Number(document.getElementById('commissionAmount').value),from=document.getElementById('commissionStart').value,to=document.getElementById('commissionEnd').value,promoEnd=document.getElementById('commissionPromoEnd').value;
+  if(!restaurantId||!from||!Number.isFinite(amount)||amount<=0||(feeType==='percentage'&&amount>100)|| (to&&to<from)){showToast('Choose a restaurant, valid rate, and valid effective dates.','error');return;}
+  if(promoEnd&&promoEnd<from){showToast('Promotion end date must be on or after the effective date.','error');return;}
+  const agreementId=document.getElementById('commissionAgreement').value,application=allVendorApplications.find(a=>a.id===agreementId),rule={restaurantId,restaurantName:commissionRestaurantName(restaurantId),branchName:document.getElementById('commissionBranch').value.trim(),bookingType:document.getElementById('commissionBookingType').value,feeType,amount,currency:'INR',effectiveFrom:from,effectiveTo:to||null,promotionName:document.getElementById('commissionPromoName').value.trim(),promotionEnd:promoEnd||null,agreementId:agreementId||null,agreementApplicationId:application?.applicationId||application?.id||null,agreementPath:application?.signedAgreement?.path||null,agreementServiceFeePercent:application?.signedAgreement?.serviceFeePercent??application?.serviceFeePercent??null,note:document.getElementById('commissionRuleNote').value.trim(),active:true,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||''};
+  const button=document.getElementById('commissionSave');button.disabled=true;
+  try{const ref=await addDoc(collection(db,'restaurantCommissionRules'),{...rule,createdAt:serverTimestamp(),createdBy:auth.currentUser?.uid||''});await addDoc(collection(db,'restaurantCommissionRules',ref.id,'history'),{...rule,action:'created',recordedAt:serverTimestamp(),recordedBy:auth.currentUser?.uid||''});document.getElementById('commissionAmount').value='';document.getElementById('commissionBranch').value='';document.getElementById('commissionPromoName').value='';document.getElementById('commissionPromoEnd').value='';document.getElementById('commissionRuleNote').value='';showToast('Commission rule saved with history and agreement link.','success');}
+  catch(error){showToast(error.message||'Could not save commission rule.','error');}finally{button.disabled=false;}
+};
+window.editCommissionRule=async function(id){const r=allCommissionRules.find(item=>item.id===id);if(!r)return;const history=await getDocs(query(collection(db,'restaurantCommissionRules',id,'history'),orderBy('recordedAt','desc'),limit(50))).catch(()=>null);const summary=history?.docs.map(d=>{const h=d.data();return `${fmtDate(h.recordedAt)} · ${h.action||'updated'} · ${h.feeType==='percentage'?`${h.amount}%`:`${money(h.amount)} fixed`} · ${h.bookingType||'all'}${h.note?` · ${h.note}`:''}`}).join('\n')||'No history entries found.';const next=prompt(`Commission history (newest first):\n${summary}\n\nEnter a new rate / fee to add a superseding rule, or cancel:`,String(r.amount));if(next===null)return;const value=Number(next);if(!Number.isFinite(value)||value<=0||(r.feeType==='percentage'&&value>100)){showToast('Enter a valid commission amount.','error');return;}const revised={...r,amount:value,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||''};delete revised.id;try{const ref=await addDoc(collection(db,'restaurantCommissionRules'),{...revised,createdAt:serverTimestamp(),createdBy:auth.currentUser?.uid||'',supersedesRuleId:id});await addDoc(collection(db,'restaurantCommissionRules',ref.id,'history'),{...revised,action:'created as revision',supersedesRuleId:id,recordedAt:serverTimestamp(),recordedBy:auth.currentUser?.uid||''});await updateDoc(doc(db,'restaurantCommissionRules',id),{active:false,supersededBy:ref.id,updatedAt:serverTimestamp()});await addDoc(collection(db,'restaurantCommissionRules',id,'history'),{...r,action:'superseded',supersededBy:ref.id,recordedAt:serverTimestamp(),recordedBy:auth.currentUser?.uid||''});showToast('New rule saved; prior rule preserved in history.','success');}catch(error){showToast(error.message||'Could not revise commission rule.','error');}};
+window.toggleCommissionRule=async function(id){const r=allCommissionRules.find(item=>item.id===id);if(!r)return;const active=r.active===false;try{await updateDoc(doc(db,'restaurantCommissionRules',id),{active,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||''});await addDoc(collection(db,'restaurantCommissionRules',id,'history'),{...r,action:active?'activated':'paused',recordedAt:serverTimestamp(),recordedBy:auth.currentUser?.uid||''});showToast(active?'Commission rule activated.':'Commission rule paused.','success')}catch(error){showToast(error.message||'Could not update rule.','error')}};
+window.exportCommissionReport=function(){const rows=allPayments.filter(p=>p.restaurantId||String(p.bookingType||p.type||'').toLowerCase().includes('restaurant'));const columns=['restaurant','booking_or_payment','date','gross_amount','commission_recorded','status'];const csv=[columns,...rows.map(p=>[p.restaurantName||commissionRestaurantName(p.restaurantId),p.bookingId||p.receipt||p.paymentId||p.id,fmtDate(p.createdAt),Number(p.amount||0),Number(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0),p.status||''])].map(row=>row.map(value=>'"'+String(value??'').replaceAll('"','""')+'"').join(',')).join('\r\n');const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));link.download='culturewave-commission-report.csv';link.click();URL.revokeObjectURL(link.href);};
 const adminReservationStatus=r=>String(r.status||r.bookingStatus||'pending').toLowerCase().replaceAll('_','-');
 const adminReservationDate=r=>{const value=r.date||r.reservationDate||r.bookingDate||'';if(value?.toDate)return value.toDate().toISOString().slice(0,10);if(value instanceof Date)return value.toISOString().slice(0,10);return String(value).slice(0,10);};
 const adminReservationComplaint=r=>{const value=r.complaint??r.complaintText??r.customerComplaint??'';if(typeof value==='string')return value.trim();if(value&&typeof value==='object')return String(value.text??value.message??value.description??'').trim();return '';};
@@ -3128,6 +3201,7 @@ onSnapshot(query(collection(db,'vendorOnboarding'),orderBy('submittedAt','desc')
   renderNewListers();
   renderRestaurantOnboarding();
   renderRestaurantOverview();
+  renderCommissionManagement();
   const openId=activeVendorApplicationId,oldApp=previous.get(openId),newApp=allVendorApplications.find(a=>a.id===openId),openModals=document.querySelectorAll('.modal-overlay.open');
   if(openId&&oldApp&&newApp&&openModals.length===1&&openModals[0].id==='vendorAppModal'&&(oldApp.status!==newApp.status||oldApp.agreementStatus!==newApp.agreementStatus||oldApp.signedAgreement?.path!==newApp.signedAgreement?.path))window.openVendorApplication(openId);
 }, error => {
@@ -3206,6 +3280,7 @@ onSnapshot(query(collection(db,'payments'),orderBy('createdAt','desc'),limit(200
   updateStats();
   renderMarketing();
   renderRestaurantOverview();
+  renderCommissionManagement();
 });
 
 onSnapshot(query(collection(db,'razorpayOrders'),limit(500)), snap => {
@@ -3300,6 +3375,14 @@ onSnapshot(query(collection(db,'tours'),orderBy('createdAt','desc'),limit(100)),
 onSnapshot(query(collection(db,'restaurants'),orderBy('createdAt','desc'),limit(100)), snap => {
   allRestaurants = snap.docs.map(d=>({id:d.id,collection:'restaurants',...d.data()}));
   renderRestaurantAdminTable();
+  renderCommissionManagement();
+});
+onSnapshot(query(collection(db,'restaurantCommissionRules'),orderBy('createdAt','desc'),limit(500)), snap => {
+  allCommissionRules=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderCommissionManagement();
+}, error => {
+  console.warn('Commission rules snapshot error:',error);
+  const body=document.getElementById('commissionRulesTable');if(body)body.innerHTML=`<tr><td colspan="8">Could not load commission rules: ${esc(error.message)}</td></tr>`;
 });
 
 // ── MODAL SAVE HANDLERS ──
