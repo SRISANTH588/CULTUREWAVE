@@ -582,8 +582,10 @@
     <button class="sb-item" data-view="restaurant-complaints"><span class="si-icon">⚑</span> Complaints</button>
     <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
     <button class="sb-item" data-view="commission-management"><span class="si-icon">％</span> Commission & Pricing</button>
+    <button class="sb-item" data-view="restaurant-settlements"><span class="si-icon">💸</span> Payments & Settlements</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="listings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="content"><span class="si-icon">🖼️</span> Page Content</button>
+    <button class="sb-item restaurant-subitem" data-view="restaurants" data-restaurant-tab="offers"><span class="si-icon">🏷️</span> Offers & Discounts</button>
   </nav>
 
   <div class="sb-section-label">✦ People & Listings</div>
@@ -1276,6 +1278,28 @@
     </div>
   </div>
 
+  <div class="view" data-view="restaurant-settlements">
+    <div style="background:linear-gradient(135deg,#123b35,#18856c 58%,#38b790);border-radius:20px;padding:1.4rem 1.7rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8">Restaurant finance</div>
+      <h1 style="font-size:1.7rem;margin:.3rem 0">Payments and settlements</h1>
+      <p style="opacity:.85">Restaurant bookings, transaction status, deductions, refunds and recorded payouts in one place.</p>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card blue"><div class="stat-label">Restaurant records</div><div class="stat-value" id="settlementCount">0</div><div class="stat-sub">Online and pay-at-restaurant</div></div>
+      <div class="stat-card green"><div class="stat-label">Successful gross</div><div class="stat-value" id="settlementGross">₹0</div><div class="stat-sub">Successful / paid transactions</div></div>
+      <div class="stat-card orange"><div class="stat-label">Pending</div><div class="stat-value" id="settlementPending">0</div><div class="stat-sub">Awaiting payment or settlement</div></div>
+      <div class="stat-card purple"><div class="stat-label">Recorded payouts</div><div class="stat-value" id="settlementPayouts">₹0</div><div class="stat-sub">From payout records</div></div>
+    </div>
+    <div class="filter-bar">
+      <select id="settlementRestaurantFilter" onchange="renderRestaurantSettlements()"><option value="">All restaurants</option></select>
+      <select id="settlementStatusFilter" onchange="renderRestaurantSettlements()"><option value="">All statuses</option><option value="paid">Successful</option><option value="pending">Pending</option><option value="failed">Failed</option><option value="refunded">Refunded</option></select>
+      <input id="settlementSearch" placeholder="Search booking, receipt or restaurant" oninput="renderRestaurantSettlements()">
+      <button class="btn sm" onclick="exportRestaurantSettlement('statement')">Download statement CSV</button>
+      <button class="btn sm primary" onclick="exportRestaurantSettlement('invoice')">Download invoices CSV</button>
+    </div>
+    <div class="card" style="padding:0"><div class="table-wrap"><table class="data-table" style="min-width:1300px"><thead><tr><th>Restaurant</th><th>Booking / receipt</th><th>Booking type</th><th>Method</th><th>Gross</th><th>Commission</th><th>Gateway fee</th><th>Refund</th><th>Net / payout</th><th>Payout date</th><th>Status</th></tr></thead><tbody id="restaurantSettlementsTable"></tbody></table></div></div>
+  </div>
+
   <div class="view" data-view="checkout-attempts">
     <div style="background:linear-gradient(135deg,#590a25 0%,#ad103d 47%,#f3264f 100%);border-radius:22px;padding:1.5rem 1.8rem;color:#fff;">
       <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8;">Checkout activity</div>
@@ -1526,6 +1550,46 @@
         </table>
       </div>
     </div>
+    </div>
+    <div data-restaurant-panel="offers" style="display:none">
+      <div style="background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#3b82f6 100%);border-radius:20px;padding:1.25rem 1.75rem;margin-bottom:.25rem;">
+        <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.22rem .7rem;font-size:.63rem;font-weight:800;color:#fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">🏷️ Offers &amp; Discounts</div>
+        <div style="font-size:1.75rem;font-weight:800;color:#fff;letter-spacing:-.04em;">Restaurant Offers</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.78);margin-top:.25rem;">Create platform offers, approve restaurant submissions, and track coupon use and funding.</div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card blue"><div class="stat-icon">🏷️</div><div class="stat-label">Active offers</div><div class="stat-value" id="restaurantOfferActiveCount">0</div></div>
+        <div class="stat-card orange"><div class="stat-icon">⏳</div><div class="stat-label">Pending approval</div><div class="stat-value" id="restaurantOfferPendingCount">0</div></div>
+        <div class="stat-card green"><div class="stat-icon">🎟️</div><div class="stat-label">Coupon uses</div><div class="stat-value" id="restaurantOfferUsageCount">0</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header"><div><h2>Create an offer</h2><p>Restaurant-funded is the default. Bank-funded or co-funded offers require a documented separate funding arrangement.</p></div></div>
+        <form id="restaurantOfferForm">
+          <input id="restaurantOfferId" type="hidden">
+          <div class="restaurant-content-grid">
+            <div class="field"><label for="restaurantOfferRestaurant">Restaurant *</label><select id="restaurantOfferRestaurant" required><option value="">Choose restaurant</option></select></div>
+            <div class="field"><label for="restaurantOfferTitle">Offer title *</label><input id="restaurantOfferTitle" maxlength="100" required placeholder="Weekday dining offer"></div>
+            <div class="field"><label for="restaurantOfferCode">Coupon code *</label><input id="restaurantOfferCode" maxlength="32" required placeholder="DINE20"></div>
+            <div class="field"><label for="restaurantOfferType">Discount type *</label><select id="restaurantOfferType"><option value="percent">Percentage</option><option value="flat">Flat amount</option></select></div>
+            <div class="field"><label for="restaurantOfferValue">Discount value *</label><input id="restaurantOfferValue" type="number" min="1" step="0.01" required></div>
+            <div class="field"><label for="restaurantOfferMinimum">Minimum bill (₹)</label><input id="restaurantOfferMinimum" type="number" min="0" step="1" value="0"></div>
+            <div class="field"><label for="restaurantOfferMaximum">Maximum discount (₹)</label><input id="restaurantOfferMaximum" type="number" min="0" step="1" placeholder="No cap"></div>
+            <div class="field"><label for="restaurantOfferStart">Start date *</label><input id="restaurantOfferStart" type="date" required></div>
+            <div class="field"><label for="restaurantOfferEnd">End date *</label><input id="restaurantOfferEnd" type="date" required></div>
+            <div class="field"><label for="restaurantOfferUsageLimit">Total usage limit</label><input id="restaurantOfferUsageLimit" type="number" min="1" step="1" placeholder="Unlimited"></div>
+            <div class="field"><label for="restaurantOfferPerUser">Uses per customer</label><input id="restaurantOfferPerUser" type="number" min="1" step="1" value="1"></div>
+            <div class="field"><label for="restaurantOfferFunding">Discount funding source</label><select id="restaurantOfferFunding"><option value="restaurant">Restaurant-funded (default)</option><option value="bank">Bank-funded</option><option value="co_funded">Co-funded</option></select></div>
+            <div class="field" id="restaurantOfferFundingArrangementField" style="display:none;grid-column:1/-1"><label for="restaurantOfferFundingArrangement">Separate funding arrangement reference *</label><input id="restaurantOfferFundingArrangement" maxlength="250" placeholder="Agreement or approval reference and split"></div>
+            <div class="field" style="grid-column:1/-1"><label>Eligible days</label><div style="display:flex;gap:.75rem;flex-wrap:wrap;padding:.4rem 0">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,i)=>`<label style="display:flex;align-items:center;gap:.3rem;font-size:.78rem;font-weight:600"><input type="checkbox" class="restaurant-offer-day" value="${i+1}" checked> ${day}</label>`).join('')}</div></div>
+            <div class="field"><label for="restaurantOfferTimeStart">Eligible from</label><input id="restaurantOfferTimeStart" type="time"></div>
+            <div class="field"><label for="restaurantOfferTimeEnd">Eligible until</label><input id="restaurantOfferTimeEnd" type="time"></div>
+          </div>
+          <div class="btn-row" style="margin-top:1rem"><button class="btn primary" id="restaurantOfferSave" type="submit">Create offer</button><button class="btn" id="restaurantOfferCancel" type="button" style="display:none">Cancel edit</button></div>
+        </form>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap" style="border:0;border-radius:16px"><table class="data-table"><thead><tr><th>Offer</th><th>Restaurant</th><th>Discount</th><th>Window / eligibility</th><th>Funding</th><th>Usage</th><th>Status</th><th>Actions</th></tr></thead><tbody id="restaurantOffersTable"></tbody></table></div>
+      </div>
     </div>
   </div>
 
@@ -1974,7 +2038,7 @@ import { app, auth, db, getCurrentUser, logout,
 // ── STATE ──
 let allUsers=[], allEvents=[], allPayments=[], allCampaigns=[], allWebReqs=[], allWallets=[], allTicketRequests=[];
 let oneClubAdminData=null,oneClubAdminLoading=false;
-let allWebinars=[], allTours=[], allRestaurants=[], allBookingsCol=[], allRestaurantReservations=[], allMarketingLeads=[];
+let allWebinars=[], allTours=[], allRestaurants=[], allRestaurantOffers=[], allBookingsCol=[], allRestaurantReservations=[], allMarketingLeads=[];
 let allCheckoutAttempts=[];
 const RESTAURANT_PAGE_CONTENT_DEFAULTS={heroTitle:'DINING CARNIVAL',heroOffer:'Extra ₹175 OFF on your first dining transaction',searchPlaceholder:'Search restaurants, cuisine, area…',heroImage:'',promoHeading:'Diwali offers for you',promo1Title:'Vault Brewery',promo1Description:'★ 4.8 · ₹1500 for two\nFlat 25% OFF',promo1Image:'',promo2Title:'Explore local dining',promo2Description:'Special offers on your next table',promo2Image:'',featuredTitle:'In the limelight',featuredSubtitle:'Popular around you',allTitle:'All restaurants',allSubtitle:'Reserve your table',moodHeading:'What’s the mood?',moods:['Drink & dine','Cozy cafes','Family dining','Pocket friendly','Outdoor dining','Pure veg'],diwaliTitle:'In light of Diwali celebrations',diwaliMessage:'Operational timings may vary at restaurants. Please contact the restaurant before visiting.',visibility:{}};
 let restaurantPageContent={...RESTAURANT_PAGE_CONTENT_DEFAULTS};
@@ -2065,7 +2129,7 @@ document.querySelectorAll('.sb-item[data-view]').forEach(btn => btn.addEventList
 }));
 
 window.setRestaurantAdminTab = function(tab) {
-  window.restaurantAdminTab = tab === 'content' ? 'content' : 'listings';
+  window.restaurantAdminTab = ['content','offers'].includes(tab) ? tab : 'listings';
   document.querySelectorAll('[data-restaurant-panel]').forEach(panel => {
     panel.style.display = panel.dataset.restaurantPanel === window.restaurantAdminTab ? '' : 'none';
   });
@@ -2073,6 +2137,37 @@ window.setRestaurantAdminTab = function(tab) {
     button.classList.toggle('active', button.dataset.restaurantTab === window.restaurantAdminTab);
   });
 };
+
+const restaurantOfferForm=document.getElementById('restaurantOfferForm');
+const restaurantOfferFunding=document.getElementById('restaurantOfferFunding');
+restaurantOfferFunding?.addEventListener('change',()=>{document.getElementById('restaurantOfferFundingArrangementField').style.display=restaurantOfferFunding.value==='restaurant'?'none':'';});
+function resetRestaurantOfferForm(){
+  restaurantOfferForm?.reset();
+  document.getElementById('restaurantOfferId').value='';
+  document.getElementById('restaurantOfferMinimum').value='0';
+  document.getElementById('restaurantOfferPerUser').value='1';
+  document.querySelectorAll('.restaurant-offer-day').forEach(input=>input.checked=true);
+  document.getElementById('restaurantOfferFundingArrangementField').style.display='none';
+  document.getElementById('restaurantOfferSave').textContent='Create offer';
+  document.getElementById('restaurantOfferCancel').style.display='none';
+}
+function renderRestaurantOffers(){
+  const select=document.getElementById('restaurantOfferRestaurant');
+  if(select){const selected=select.value;select.innerHTML='<option value="">Choose restaurant</option>'+allRestaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name||r.id)}</option>`).join('');if(allRestaurants.some(r=>r.id===selected))select.value=selected;}
+  const rows=allRestaurantOffers.map(o=>({...o,usageCount:Math.max(Number(o.usageCount||0),allRestaurantReservations.filter(r=>r.couponCode===o.code||r.couponApplied===o.code||r.offerCode===o.code).length)}));
+  const pending=rows.filter(o=>(o.status||'pending')==='pending').length;
+  const active=rows.filter(o=>o.status==='approved'&&new Date(`${o.endDate||''}T23:59:59`)>=new Date()).length;
+  document.getElementById('restaurantOfferActiveCount').textContent=active;
+  document.getElementById('restaurantOfferPendingCount').textContent=pending;
+  document.getElementById('restaurantOfferUsageCount').textContent=rows.reduce((n,o)=>n+Number(o.usageCount||0),0);
+  const tbody=document.getElementById('restaurantOffersTable');if(!tbody)return;
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="es-icon">🏷️</div><strong>No restaurant offers yet</strong><p>Create an offer above or wait for a restaurant submission.</p></div></td></tr>';return;}
+  tbody.innerHTML=rows.map(o=>{const restaurant=allRestaurants.find(r=>r.id===o.restaurantId);const status=o.status||'pending';const amount=o.type==='percent'?`${Number(o.value)}%`:`₹${Number(o.value).toLocaleString('en-IN')}`;const days=(o.eligibleDays||[]).map(d=>['','Mon','Tue','Wed','Thu','Fri','Sat','Sun'][Number(d)]||'').filter(Boolean).join(', ')||'All days';const times=[o.startTime,o.endTime].filter(Boolean).join('–')||'Any time';return `<tr><td><strong>${esc(o.title||o.code||'Offer')}</strong><div style="font-size:.72rem;color:var(--muted)">${esc(o.code||'')}</div></td><td>${esc(restaurant?.name||o.restaurantName||o.restaurantId||'—')}</td><td>${amount}${o.minBill?`<div style="font-size:.7rem;color:var(--muted)">Min ₹${Number(o.minBill).toLocaleString('en-IN')}${o.maxDiscount?` · max ₹${Number(o.maxDiscount).toLocaleString('en-IN')}`:''}</div>`:''}</td><td>${esc(o.startDate||'—')} → ${esc(o.endDate||'—')}<div style="font-size:.7rem;color:var(--muted)">${esc(days)} · ${esc(times)}</div></td><td>${esc((o.fundingSource||'restaurant').replace('_',' '))}${o.fundingArrangement?`<div style="font-size:.7rem;color:var(--muted)">${esc(o.fundingArrangement)}</div>`:''}</td><td>${Number(o.usageCount||0)}${o.usageLimit?` / ${Number(o.usageLimit)}`:' / ∞'}<div style="font-size:.7rem;color:var(--muted)">${Number(o.perUserLimit||1)} per customer</div></td><td><span class="badge ${status==='approved'?'green':status==='rejected'?'red':'orange'}">${esc(status)}</span></td><td><div class="btn-row">${status==='pending'?`<button class="btn sm success" onclick="reviewRestaurantOffer('${esc(o.id)}','approved')">Approve</button><button class="btn sm danger" onclick="reviewRestaurantOffer('${esc(o.id)}','rejected')">Reject</button>`:`<button class="btn sm" onclick="editRestaurantOffer('${esc(o.id)}')">Edit</button>`}</div></td></tr>`;}).join('');
+}
+window.reviewRestaurantOffer=async function(id,status){try{await updateDoc(doc(db,'restaurantOffers',id),{status,reviewedAt:serverTimestamp(),reviewedBy:auth.currentUser?.uid||'admin',updatedAt:serverTimestamp()});showToast(`Offer ${status}.`,'success');}catch(error){showToast(error.message||'Could not update offer.','error');}};
+window.editRestaurantOffer=function(id){const o=allRestaurantOffers.find(x=>x.id===id);if(!o)return;document.getElementById('restaurantOfferId').value=id;document.getElementById('restaurantOfferRestaurant').value=o.restaurantId||'';document.getElementById('restaurantOfferTitle').value=o.title||'';document.getElementById('restaurantOfferCode').value=o.code||'';document.getElementById('restaurantOfferType').value=o.type==='flat'?'flat':'percent';document.getElementById('restaurantOfferValue').value=o.value??'';document.getElementById('restaurantOfferMinimum').value=o.minBill??0;document.getElementById('restaurantOfferMaximum').value=o.maxDiscount??'';document.getElementById('restaurantOfferStart').value=o.startDate||'';document.getElementById('restaurantOfferEnd').value=o.endDate||'';document.getElementById('restaurantOfferUsageLimit').value=o.usageLimit??'';document.getElementById('restaurantOfferPerUser').value=o.perUserLimit??1;document.getElementById('restaurantOfferFunding').value=o.fundingSource||'restaurant';document.getElementById('restaurantOfferFundingArrangement').value=o.fundingArrangement||'';document.getElementById('restaurantOfferFundingArrangementField').style.display=o.fundingSource&&o.fundingSource!=='restaurant'?'':'none';document.getElementById('restaurantOfferTimeStart').value=o.startTime||'';document.getElementById('restaurantOfferTimeEnd').value=o.endTime||'';document.querySelectorAll('.restaurant-offer-day').forEach(input=>input.checked=(o.eligibleDays||[1,2,3,4,5,6,7]).includes(Number(input.value)));document.getElementById('restaurantOfferSave').textContent='Save changes';document.getElementById('restaurantOfferCancel').style.display='';};
+restaurantOfferForm?.addEventListener('submit',async e=>{e.preventDefault();const id=document.getElementById('restaurantOfferId').value;const restaurantId=document.getElementById('restaurantOfferRestaurant').value;const title=document.getElementById('restaurantOfferTitle').value.trim();const code=document.getElementById('restaurantOfferCode').value.trim().toUpperCase();const type=document.getElementById('restaurantOfferType').value;const value=Number(document.getElementById('restaurantOfferValue').value);const startDate=document.getElementById('restaurantOfferStart').value,endDate=document.getElementById('restaurantOfferEnd').value;const fundingSource=document.getElementById('restaurantOfferFunding').value;const fundingArrangement=document.getElementById('restaurantOfferFundingArrangement').value.trim();if(!restaurantId||!title||!code||!value||!startDate||!endDate)return showToast('Complete all required offer fields.','error');if(new Date(endDate)<new Date(startDate))return showToast('End date must be on or after the start date.','error');if(type==='percent'&&value>100)return showToast('Percentage discount cannot exceed 100%.','error');if(fundingSource!=='restaurant'&&!fundingArrangement)return showToast('Add the separate funding arrangement reference before saving.','error');const offer={restaurantId,restaurantName:allRestaurants.find(r=>r.id===restaurantId)?.name||'',title,code,type,value,minBill:Number(document.getElementById('restaurantOfferMinimum').value||0),maxDiscount:Number(document.getElementById('restaurantOfferMaximum').value||0)||null,startDate,endDate,usageLimit:Number(document.getElementById('restaurantOfferUsageLimit').value||0)||null,perUserLimit:Number(document.getElementById('restaurantOfferPerUser').value||1),eligibleDays:[...document.querySelectorAll('.restaurant-offer-day:checked')].map(x=>Number(x.value)),startTime:document.getElementById('restaurantOfferTimeStart').value||'',endTime:document.getElementById('restaurantOfferTimeEnd').value||'',fundingSource,fundingArrangement:fundingSource==='restaurant'?'':fundingArrangement,source:'admin',status:'approved',updatedAt:serverTimestamp()};const button=document.getElementById('restaurantOfferSave');button.disabled=true;try{if(id)await updateDoc(doc(db,'restaurantOffers',id),offer);else await addDoc(collection(db,'restaurantOffers'),{...offer,usageCount:0,createdAt:serverTimestamp(),createdBy:auth.currentUser?.uid||'admin'});resetRestaurantOfferForm();showToast(id?'Offer updated.':'Offer created and approved.','success');}catch(error){showToast(error.message||'Could not save offer.','error');}finally{button.disabled=false;}});
+document.getElementById('restaurantOfferCancel')?.addEventListener('click',resetRestaurantOfferForm);
 
 async function loadOneClubAdminData(force=false){
   if(oneClubAdminLoading||(!force&&oneClubAdminData))return;
@@ -2199,6 +2294,10 @@ window.saveCommissionRule=async function(){
 window.editCommissionRule=async function(id){const r=allCommissionRules.find(item=>item.id===id);if(!r)return;const history=await getDocs(query(collection(db,'restaurantCommissionRules',id,'history'),orderBy('recordedAt','desc'),limit(50))).catch(()=>null);const summary=history?.docs.map(d=>{const h=d.data();return `${fmtDate(h.recordedAt)} · ${h.action||'updated'} · ${h.feeType==='percentage'?`${h.amount}%`:`${money(h.amount)} fixed`} · ${h.bookingType||'all'}${h.note?` · ${h.note}`:''}`}).join('\n')||'No history entries found.';const next=prompt(`Commission history (newest first):\n${summary}\n\nEnter a new rate / fee to add a superseding rule, or cancel:`,String(r.amount));if(next===null)return;const value=Number(next);if(!Number.isFinite(value)||value<=0||(r.feeType==='percentage'&&value>100)){showToast('Enter a valid commission amount.','error');return;}const revised={...r,amount:value,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||''};delete revised.id;try{const ref=await addDoc(collection(db,'restaurantCommissionRules'),{...revised,createdAt:serverTimestamp(),createdBy:auth.currentUser?.uid||'',supersedesRuleId:id});await addDoc(collection(db,'restaurantCommissionRules',ref.id,'history'),{...revised,action:'created as revision',supersedesRuleId:id,recordedAt:serverTimestamp(),recordedBy:auth.currentUser?.uid||''});await updateDoc(doc(db,'restaurantCommissionRules',id),{active:false,supersededBy:ref.id,updatedAt:serverTimestamp()});await addDoc(collection(db,'restaurantCommissionRules',id,'history'),{...r,action:'superseded',supersededBy:ref.id,recordedAt:serverTimestamp(),recordedBy:auth.currentUser?.uid||''});showToast('New rule saved; prior rule preserved in history.','success');}catch(error){showToast(error.message||'Could not revise commission rule.','error');}};
 window.toggleCommissionRule=async function(id){const r=allCommissionRules.find(item=>item.id===id);if(!r)return;const active=r.active===false;try{await updateDoc(doc(db,'restaurantCommissionRules',id),{active,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||''});await addDoc(collection(db,'restaurantCommissionRules',id,'history'),{...r,action:active?'activated':'paused',recordedAt:serverTimestamp(),recordedBy:auth.currentUser?.uid||''});showToast(active?'Commission rule activated.':'Commission rule paused.','success')}catch(error){showToast(error.message||'Could not update rule.','error')}};
 window.exportCommissionReport=function(){const rows=allPayments.filter(p=>p.restaurantId||String(p.bookingType||p.type||'').toLowerCase().includes('restaurant'));const columns=['restaurant','booking_or_payment','date','gross_amount','commission_recorded','status'];const csv=[columns,...rows.map(p=>[p.restaurantName||commissionRestaurantName(p.restaurantId),p.bookingId||p.receipt||p.paymentId||p.id,fmtDate(p.createdAt),Number(p.amount||0),Number(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0),p.status||''])].map(row=>row.map(value=>'"'+String(value??'').replaceAll('"','""')+'"').join(',')).join('\r\n');const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));link.download='culturewave-commission-report.csv';link.click();URL.revokeObjectURL(link.href);};
+function restaurantSettlementRows(){return allPayments.filter(p=>p.restaurantId||String(p.bookingType||p.type||p.serviceType||'').toLowerCase().includes('restaurant')||p.restaurantName);}
+function settlementStatus(p){const s=String(p.status||'pending').toLowerCase();if(['paid','captured','success','successful','completed'].includes(s))return 'paid';if(['failed','declined','cancelled','canceled'].includes(s))return 'failed';if(['refunded','refund_pending','partially_refunded'].includes(s))return 'refunded';return 'pending';}
+window.renderRestaurantSettlements=function(){const rows=restaurantSettlementRows();const select=document.getElementById('settlementRestaurantFilter');if(!select)return;const selected=select.value;const restaurants=[...new Set(rows.map(p=>p.restaurantId||p.restaurantName).filter(Boolean))];select.innerHTML='<option value="">All restaurants</option>'+restaurants.map(id=>`<option value="${esc(id)}">${esc(commissionRestaurantName(id))}</option>`).join('');if(restaurants.includes(selected))select.value=selected;const status=document.getElementById('settlementStatusFilter').value,term=document.getElementById('settlementSearch').value.trim().toLowerCase();const filtered=rows.filter(p=>{const rid=p.restaurantId||p.restaurantName||'';const hay=[rid,commissionRestaurantName(rid),p.bookingId,p.receipt,p.paymentId,p.id,p.customerName].join(' ').toLowerCase();return(!selected||rid===selected)&&(!status||settlementStatus(p)===status)&&(!term||hay.includes(term));});const paid=rows.filter(p=>settlementStatus(p)==='paid');document.getElementById('settlementCount').textContent=rows.length.toLocaleString('en-IN');document.getElementById('settlementGross').textContent=money(paid.reduce((n,p)=>n+Number(p.amount||0),0));document.getElementById('settlementPending').textContent=rows.filter(p=>settlementStatus(p)==='pending').length.toLocaleString('en-IN');document.getElementById('settlementPayouts').textContent=money(rows.reduce((n,p)=>n+Number(p.payoutAmount??p.settlementAmount??0),0));const body=document.getElementById('restaurantSettlementsTable');body.innerHTML=filtered.length?filtered.map(p=>{const commission=Number(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0),gateway=Number(p.gatewayFee??p.paymentGatewayFee??p.processingFee??0),refund=Number(p.refundAmount??p.refundedAmount??0),net=Number(p.payoutAmount??p.settlementAmount??(Number(p.amount||0)-commission-gateway-refund));const rid=p.restaurantId||p.restaurantName||'';return `<tr><td><strong>${esc(p.restaurantName||commissionRestaurantName(rid))}</strong><div style="font-size:.7rem;color:var(--muted)">${esc(rid||'Restaurant')}</div></td><td>${esc(p.bookingId||p.receipt||p.paymentId||p.id)}</td><td>${esc(p.bookingType||p.type||'Online booking')}</td><td>${esc(p.paymentMethod||p.method||'—')}</td><td>${money(p.amount)}</td><td>${money(commission)}</td><td>${money(gateway)}</td><td>${money(refund)}</td><td>${money(net)}</td><td>${esc(fmtDate(p.payoutDate||p.settledAt||p.settlementDate))}</td><td><span class="badge ${settlementStatus(p)==='paid'?'green':settlementStatus(p)==='failed'?'red':settlementStatus(p)==='refunded'?'blue':'orange'}">${esc(p.status||'pending')}</span></td></tr>`}).join(''):'<tr><td colspan="11" style="padding:1.2rem;color:var(--muted)">No restaurant payment records match these filters. Records are sourced from payments containing restaurant identifiers.</td></tr>';};
+window.exportRestaurantSettlement=function(kind){const rows=restaurantSettlementRows().filter(p=>{const f=document.getElementById('settlementRestaurantFilter').value;return !f||(p.restaurantId||p.restaurantName||'')===f});const columns=['restaurant','restaurant_id','booking_or_receipt','booking_type','payment_method','gross_amount','commission','gateway_fee','refund_amount','net_or_payout','payout_date','status','transaction_date'];const csv=[columns,...rows.map(p=>[p.restaurantName||commissionRestaurantName(p.restaurantId),p.restaurantId||'',p.bookingId||p.receipt||p.paymentId||p.id,p.bookingType||p.type||'Online booking',p.paymentMethod||p.method||'',Number(p.amount||0),Number(p.platformFee??p.platformEarnings??p.commission??p.commissionAmount??0),Number(p.gatewayFee??p.paymentGatewayFee??p.processingFee??0),Number(p.refundAmount??p.refundedAmount??0),Number(p.payoutAmount??p.settlementAmount??0),fmtDate(p.payoutDate||p.settledAt||p.settlementDate),p.status||'pending',fmtDate(p.createdAt)])].map(row=>row.map(value=>'"'+String(value??'').replaceAll('"','""')+'"').join(',')).join('\r\n');const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));link.download=`culturewave-restaurant-${kind}s-${new Date().toISOString().slice(0,10)}.csv`;link.click();URL.revokeObjectURL(link.href);};
 const adminReservationStatus=r=>String(r.status||r.bookingStatus||'pending').toLowerCase().replaceAll('_','-');
 const adminReservationDate=r=>{const value=r.date||r.reservationDate||r.bookingDate||'';if(value?.toDate)return value.toDate().toISOString().slice(0,10);if(value instanceof Date)return value.toISOString().slice(0,10);return String(value).slice(0,10);};
 const adminReservationComplaint=r=>{const value=r.complaint??r.complaintText??r.customerComplaint??'';if(typeof value==='string')return value.trim();if(value&&typeof value==='object')return String(value.text??value.message??value.description??'').trim();return '';};
@@ -3375,8 +3474,13 @@ onSnapshot(query(collection(db,'tours'),orderBy('createdAt','desc'),limit(100)),
 onSnapshot(query(collection(db,'restaurants'),orderBy('createdAt','desc'),limit(100)), snap => {
   allRestaurants = snap.docs.map(d=>({id:d.id,collection:'restaurants',...d.data()}));
   renderRestaurantAdminTable();
+  renderRestaurantOffers();
   renderCommissionManagement();
 });
+onSnapshot(query(collection(db,'restaurantOffers'),orderBy('createdAt','desc'),limit(300)),snap=>{
+  allRestaurantOffers=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderRestaurantOffers();
+},error=>{console.warn('Restaurant offers snapshot error:',error);const tbody=document.getElementById('restaurantOffersTable');if(tbody)tbody.innerHTML=`<tr><td colspan="8">Could not load offers: ${esc(error.message)}</td></tr>`;});
 onSnapshot(query(collection(db,'restaurantCommissionRules'),orderBy('createdAt','desc'),limit(500)), snap => {
   allCommissionRules=snap.docs.map(d=>({id:d.id,...d.data()}));
   renderCommissionManagement();
