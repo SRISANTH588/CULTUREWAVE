@@ -440,7 +440,7 @@ service cloud.firestore {
           request.resource.data.applicationId == applicationId &&
           request.resource.data.fileId == fileId &&
           request.resource.data.applicantUid == request.auth.uid &&
-          request.resource.data.type in ['pan', 'aadhaar', 'fssai', 'gst', 'menu', 'business_registration', 'trade_license', 'address_proof', 'cancelled_cheque', 'msme', 'other', 'Business registration', 'Address proof', 'Cancelled cheque', 'GST certificate', 'MSME / Udyam', 'Other'] &&
+          request.resource.data.type in ['pan', 'aadhaar', 'fssai', 'gst', 'menu', 'business_registration', 'trade_license', 'address_proof', 'cancelled_cheque', 'msme', 'other', 'Business registration / incorporation', 'Shop establishment / trade license', 'Restaurant address proof', 'Business registration', 'Address proof', 'Cancelled cheque', 'GST certificate', 'MSME / Udyam', 'Other'] &&
           request.resource.data.contentType in ['image/jpeg', 'application/pdf'] &&
           request.resource.data.dataUrl is string && request.resource.data.dataUrl.size() <= 560000 &&
           ((request.resource.data.contentType == 'image/jpeg' && request.resource.data.dataUrl.matches('^data:image/jpeg;base64,.*')) ||
@@ -642,7 +642,10 @@ service cloud.firestore {
 
     match /restaurants/{id} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create: if request.auth != null &&
+        request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid || isAdmin());
     }
 
     match /foodOrders/{id} {
