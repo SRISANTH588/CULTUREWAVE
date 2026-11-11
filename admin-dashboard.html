@@ -580,6 +580,7 @@
 
   <div class="sb-section-label">✦ Restaurant</div>
   <nav class="sb-nav">
+    <button class="sb-item" data-view="restaurant-partners"><span class="si-icon">🤝</span> All Restaurant Partners</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantListings"><span class="si-icon">🍽️</span> Restaurant Listings</button>
     <button class="sb-item restaurant-subitem" data-view="restaurants" data-scroll-target="restaurantPageContent"><span class="si-icon">🖼️</span> Page Content</button>
   </nav>
@@ -931,6 +932,34 @@
       <span id="restaurantOnboardingCount" style="font-size:.76rem;color:var(--muted)">0 submissions</span>
     </div>
     <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:850px;"><thead><tr><th>Application ID</th><th>Applicant / Email</th><th>Restaurant</th><th>Phone</th><th>City</th><th>Submitted</th><th>Status</th><th>Documents</th><th>Actions</th></tr></thead><tbody id="restaurantOnboardingTable"><tr><td colspan="9" style="padding:1.4rem;color:var(--muted);">Loading submissions…</td></tr></tbody></table></div></div>
+  </div>
+
+  <div class="view" data-view="restaurant-partners">
+    <div style="background:linear-gradient(135deg,#590a25 0%,#ad103d 52%,#f3264f 100%);border-radius:20px;padding:1.5rem 2rem;color:#fff;">
+      <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.78;margin-bottom:.55rem;">Restaurant operations</div>
+      <div style="font-size:2rem;font-weight:800;letter-spacing:-.04em;">All Restaurant Partners</div>
+      <div style="font-size:.88rem;opacity:.85;margin-top:.3rem;">Find restaurant partners and review their information, verification and operating status.</div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));">
+      <div class="stat-card blue"><div class="stat-label">Partners</div><div class="stat-value" id="restaurantPartnerTotal">0</div></div>
+      <div class="stat-card green"><div class="stat-label">Active</div><div class="stat-value" id="restaurantPartnerActive">0</div></div>
+      <div class="stat-card orange"><div class="stat-label">Verification pending</div><div class="stat-value" id="restaurantPartnerPending">0</div></div>
+      <div class="stat-card purple"><div class="stat-label">Cities</div><div class="stat-value" id="restaurantPartnerCities">0</div></div>
+    </div>
+    <div class="card" style="padding:.8rem 1rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
+      <input id="restaurantPartnerSearch" type="search" placeholder="Search restaurant, owner, phone or email" oninput="filterRestaurantPartners()" style="flex:1;min-width:220px;border:1px solid var(--border);border-radius:9px;padding:.65rem .8rem;">
+      <select id="restaurantPartnerCity" onchange="filterRestaurantPartners()" aria-label="Filter by city"><option value="">All cities</option></select>
+      <select id="restaurantPartnerArea" onchange="filterRestaurantPartners()" aria-label="Filter by area"><option value="">All areas</option></select>
+      <select id="restaurantPartnerCuisine" onchange="filterRestaurantPartners()" aria-label="Filter by cuisine"><option value="">All cuisines</option></select>
+      <select id="restaurantPartnerStatus" onchange="filterRestaurantPartners()" aria-label="Filter by status"><option value="">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option><option value="pending">Pending verification</option></select>
+      <label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:700;color:var(--muted);">Registered from <input id="restaurantPartnerDateFrom" type="date" onchange="filterRestaurantPartners()" style="border:1px solid var(--border);border-radius:9px;padding:.55rem .6rem;"></label>
+      <label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:700;color:var(--muted);">to <input id="restaurantPartnerDateTo" type="date" onchange="filterRestaurantPartners()" style="border:1px solid var(--border);border-radius:9px;padding:.55rem .6rem;"></label>
+      <span id="restaurantPartnerCount" style="font-size:.76rem;color:var(--muted);margin-left:auto;">0 partners</span>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="table-wrap" style="border:0;border-radius:16px;overflow:auto;"><table class="data-table" style="min-width:1050px;">
+      <thead><tr><th>Restaurant partner</th><th>Owner details</th><th>Contact details</th><th>City / area</th><th>Cuisine</th><th>Branches</th><th>Registered</th><th>Status</th><th>Admin controls</th></tr></thead>
+      <tbody id="restaurantPartnersTable"><tr><td colspan="9" style="padding:1.4rem;color:var(--muted);">Loading restaurant partners…</td></tr></tbody>
+    </table></div></div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -1818,7 +1847,7 @@ const viewTitles = {
   campaigns:'Campaigns', payments:'Transactions', 'one-club':'One Club', 'gift-cards':'Gift Cards', refunds:'Refunds',
   'ads-manager':'Ads Manager',
   'website-requests':'Web Requests', webinars:'Webinars', tours:'Tours & Adventures',
-  restaurants:'Dining & Restaurants', credits:'Credits & Wallets', activity:'Activity Log', 'site-visibility':'Content Visibility', settings:'Platform Settings', 'checkout-attempts':'Pay Now Activity'
+  restaurants:'Dining & Restaurants', 'restaurant-partners':'All Restaurant Partners', credits:'Credits & Wallets', activity:'Activity Log', 'site-visibility':'Content Visibility', settings:'Platform Settings', 'checkout-attempts':'Pay Now Activity'
 };
 window.showView = function(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===name));
@@ -1830,6 +1859,7 @@ window.showView = function(name) {
   if(name==='ads-manager') renderAdsManager();
   if(name==='new-listers') renderNewListers();
   if(name==='restaurant-onboarding') renderRestaurantOnboarding();
+  if(name==='restaurant-partners') renderRestaurantPartners();
   if(name==='credits') renderCreditsView();
   if(name==='one-club'||name==='gift-cards') loadOneClubAdminData();
   if(name==='activity') renderActivityLog();
@@ -1915,6 +1945,36 @@ function renderRestaurantOnboarding(){
   tbody.innerHTML=rows.map(a=>{const status=a.status||'NEW',badge=status==='APPROVED'?'green':status==='REJECTED'?'red':status==='SIGNED'?'blue':'orange';return `<tr><td><strong>${esc(a.applicationId||a.id)}</strong></td><td><strong>${esc(a.contact?.applicantName||a.name||a.contact?.name||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.email||a.contact?.email||'')}</div></td><td><strong>${esc(a.business?.restaurantName||a.vendor?.registeredName||'—')}</strong><div style="font-size:.72rem;color:var(--muted);">${esc(a.business?.cuisine||'')}</div></td><td>${esc(a.contact?.phone||'—')}</td><td>${esc(a.address?.city||a.vendor?.city||'—')}</td><td>${fmtDate(a.submittedAt||a.createdAt)}</td><td><span class="badge ${badge}">${esc(status.replaceAll('_',' '))}</span></td><td>${(a.documents||[]).length} file(s)</td><td><button class="btn sm primary" data-review-id="${esc(a.id)}">Open</button></td></tr>`;}).join('');
   tbody.querySelectorAll('[data-review-id]').forEach(btn=>btn.addEventListener('click',()=>openVendorApplication(btn.dataset.reviewId)));
 }
+const restaurantPartnerStatus = application => {
+  const raw=String(application.restaurantStatus||application.business?.status||application.listing?.status||application.status||'pending').toLowerCase();
+  if(['suspended','blocked'].includes(raw))return 'suspended';
+  if(['inactive','deactivated','disabled'].includes(raw))return 'inactive';
+  if(['active','live','published'].includes(raw))return 'active';
+  return application.status==='APPROVED'?'active':'pending';
+};
+const restaurantPartnerCity = a => a.address?.city||a.business?.city||a.vendor?.city||'';
+const restaurantPartnerArea = a => a.address?.area||a.address?.line2||a.business?.area||'';
+const restaurantPartnerCuisine = a => a.business?.cuisine||a.listing?.cuisine||a.listing?.category||a.vendor?.category||'';
+function renderRestaurantPartners(){
+  const partners=allVendorApplications.filter(a=>a.preferredCategory==='dining'||a.preferredDashboard==='dashboard-restaurant.html');
+  const setOptions=(id,values,label)=>{const select=document.getElementById(id);if(!select)return;const current=select.value;const unique=[...new Set(values.map(v=>String(v||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));select.innerHTML=`<option value="">All ${label}</option>${unique.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}`;if(unique.includes(current))select.value=current;};
+  setOptions('restaurantPartnerCity',partners.map(restaurantPartnerCity),'cities');
+  setOptions('restaurantPartnerArea',partners.map(restaurantPartnerArea),'areas');
+  setOptions('restaurantPartnerCuisine',partners.map(restaurantPartnerCuisine),'cuisines');
+  document.getElementById('restaurantPartnerTotal').textContent=partners.length;
+  document.getElementById('restaurantPartnerActive').textContent=partners.filter(a=>restaurantPartnerStatus(a)==='active').length;
+  document.getElementById('restaurantPartnerPending').textContent=partners.filter(a=>restaurantPartnerStatus(a)==='pending').length;
+  document.getElementById('restaurantPartnerCities').textContent=new Set(partners.map(restaurantPartnerCity).filter(Boolean)).size;
+  filterRestaurantPartners();
+}
+window.filterRestaurantPartners=function(){
+  const partners=allVendorApplications.filter(a=>a.preferredCategory==='dining'||a.preferredDashboard==='dashboard-restaurant.html');
+  const q=(document.getElementById('restaurantPartnerSearch')?.value||'').trim().toLowerCase(),city=document.getElementById('restaurantPartnerCity')?.value||'',area=document.getElementById('restaurantPartnerArea')?.value||'',cuisine=document.getElementById('restaurantPartnerCuisine')?.value||'',status=document.getElementById('restaurantPartnerStatus')?.value||'',from=document.getElementById('restaurantPartnerDateFrom')?.value||'',to=document.getElementById('restaurantPartnerDateTo')?.value||'';
+  const rows=partners.filter(a=>{const restaurant=a.business?.restaurantName||a.vendor?.registeredName||a.listing?.name||a.name||'',owner=a.contact?.applicantName||a.name||a.contact?.name||'',email=a.email||a.contact?.email||'',phone=a.contact?.phone||'',created=a.submittedAt||a.createdAt,date=created?.toDate?created.toDate():created?new Date(created):null,dateKey=date&&!Number.isNaN(date.getTime())?date.toISOString().slice(0,10):'';return(!q||[restaurant,owner,email,phone,a.applicationId].some(v=>String(v||'').toLowerCase().includes(q)))&&(!city||restaurantPartnerCity(a)===city)&&(!area||restaurantPartnerArea(a)===area)&&(!cuisine||restaurantPartnerCuisine(a)===cuisine)&&(!status||restaurantPartnerStatus(a)===status)&&(!from||(dateKey&&dateKey>=from))&&(!to||(dateKey&&dateKey<=to));});
+  const tbody=document.getElementById('restaurantPartnersTable'),count=document.getElementById('restaurantPartnerCount');if(!tbody)return;if(count)count.textContent=`${rows.length} partner${rows.length===1?'':'s'}`;
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="9"><div class="empty-state"><div class="es-icon">🤝</div><strong>No restaurant partners found</strong><p>Adjust your search or filters, or review restaurant onboarding submissions.</p></div></td></tr>';return;}
+  tbody.innerHTML=rows.map(a=>{const statusValue=restaurantPartnerStatus(a),badge=statusValue==='active'?'green':statusValue==='suspended'?'red':statusValue==='inactive'?'gray':'orange',name=a.business?.restaurantName||a.vendor?.registeredName||a.listing?.name||a.name||'Restaurant',owner=a.contact?.applicantName||a.name||a.contact?.name||'—',contactName=a.contact?.name||owner,phone=a.contact?.phone||'—',email=a.email||a.contact?.email||'—',branches=Array.isArray(a.branches)?a.branches.length:(a.business?.branches||a.vendor?.branches||'—'),registered=fmtDate(a.submittedAt||a.createdAt);return `<tr><td><strong>${esc(name)}</strong><div style="font-size:.7rem;color:var(--muted);margin-top:.15rem">${esc(a.applicationId||a.id)}</div></td><td><strong>${esc(owner)}</strong><div style="font-size:.72rem;color:var(--muted);margin-top:.15rem">Owner</div></td><td><strong>${esc(contactName)}</strong><div style="font-size:.72rem;color:var(--muted);margin-top:.15rem">${esc(phone)} · ${esc(email)}</div></td><td>${esc([restaurantPartnerCity(a),restaurantPartnerArea(a)].filter(Boolean).join(' · ')||'—')}</td><td>${esc(restaurantPartnerCuisine(a)||'—')}</td><td>${esc(branches)}</td><td>${esc(registered)}</td><td><span class="badge ${badge}">${esc(statusValue.replaceAll('_',' '))}</span></td><td><div class="btn-row"><button class="btn sm primary" onclick="openVendorApplication('${esc(a.id)}')">View and edit</button><button class="btn sm" onclick="showView('restaurants');document.getElementById('restaurantAdminSearch').value='${esc(name)}';filterRestaurantAdmin()">Listing</button></div></td></tr>`;}).join('');
+};
 function detailSection(title,rows){return `<section style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:12px;"><strong style="display:block;margin-bottom:.65rem;color:var(--blue);">${title}</strong><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.65rem;">${rows.map(([label,value])=>`<div><small style="display:block;color:var(--muted);margin-bottom:.2rem;">${label}</small><strong style="font-size:.82rem;overflow-wrap:anywhere;">${esc(value||'—')}</strong></div>`).join('')}</div></section>`;}
 window.openVendorApplication=function(id){
   const a=allVendorApplications.find(x=>x.id===id);if(!a)return;
@@ -2849,6 +2909,7 @@ onSnapshot(query(collection(db,'vendorOnboarding'),orderBy('submittedAt','desc')
   const pending=allVendorApplications.filter(a=>!['APPROVED','REJECTED'].includes(a.status)).length;
   document.getElementById('badgeNewListers').textContent=pending;
   const restaurantApplications=allVendorApplications.filter(a=>a.preferredCategory==='dining'||a.preferredDashboard==='dashboard-restaurant.html');
+  renderRestaurantPartners();
   const restaurantPending=restaurantApplications.filter(a=>!['APPROVED','REJECTED'].includes(a.status)).length;
   const restaurantBadge=document.getElementById('badgeRestaurantOnboarding');if(restaurantBadge)restaurantBadge.textContent=restaurantPending;
   renderNewListers();
