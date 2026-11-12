@@ -39,6 +39,8 @@
       image.alt = 'Profile photo';
       image.loading = 'lazy';
       image.referrerPolicy = 'no-referrer';
+      image.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      avatar.style.position = 'relative';
       avatar.appendChild(image);
     }
     if (placeholder) placeholder.style.setProperty('display', 'none', 'important');
