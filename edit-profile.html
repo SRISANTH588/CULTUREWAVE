@@ -109,7 +109,7 @@
       const steps=[nameInput.value.trim(),phoneInput.value,emailInput.value,birthdayInput.value].filter(Boolean).length;
       stepCount.textContent=`${steps} / 4 steps done`;
     }
-    function markChanged(){updateProgress();saveButton.disabled=currentValues()===initialValues;}
+    function markChanged(){updateProgress();saveButton.disabled=currentValues()===initialValues;saveButton.textContent='Update profile';}
     document.getElementById('backButton').addEventListener('click',()=>{
       if(window.parent!==window)window.parent.postMessage({type:'culturewave-menu-back'},location.origin);
       else if(history.length>1)history.back();
@@ -156,7 +156,7 @@
           return;
         }
         let photoURL=currentUser.photoURL||profileData.photoURL||profileData.photoUrl||profileData.profilePhotoURL||profileData.avatarUrl||'';
-        if(selectedPhoto){statusEl.textContent='Uploading your profile photo…';const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);await withTimeout(ref.put(selectedPhoto),'Photo upload');photoURL=await withTimeout(ref.getDownloadURL(),'Photo upload');}
+        if(selectedPhoto){statusEl.textContent='Uploading your profile photo…';const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);photoURL=await withTimeout((async()=>{await ref.put(selectedPhoto);return ref.getDownloadURL();})(),'Photo upload');}
         const updates={name,email,phone,whatsapp:profileData.whatsapp||phone,birthday,dob:birthday,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photoURL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
         if(!profileExists)updates.role='customer';
         statusEl.textContent='Saving your profile…';
@@ -165,8 +165,9 @@
         updateProgress();
         if(window.parent!==window)window.parent.postMessage({type:'culturewave-profile-updated',profile:{name,phone:phoneInput.value,birthday,steps:stepCount.textContent,photoURL}},location.origin);
         currentUser.updateProfile({displayName:name,photoURL:photoURL||null}).catch(error=>console.warn('Could not refresh Firebase Auth profile details:',error));
+        saveButton.textContent='Update profile';
         window.setTimeout(()=>{statusEl.textContent='';},2500);
-      }catch(error){statusEl.textContent=error.message||'Could not update your profile. Please try again.';saveButton.disabled=false;}
+      }catch(error){statusEl.textContent=error.message||'Could not update your profile. Please try again.';saveButton.textContent='Retry';saveButton.disabled=false;}
     });
   </script>
 </body>
