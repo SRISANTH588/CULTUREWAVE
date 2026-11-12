@@ -82,11 +82,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="imagekit.js"></script>
   <script>
     const firebaseConfig={apiKey:'AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI',authDomain:'ogshootsluxe-36740.firebaseapp.com',projectId:'ogshootsluxe-36740',storageBucket:'ogshootsluxe-36740.firebasestorage.app',messagingSenderId:'5471814825',appId:'1:5471814825:web:07e84f2f88486da817d5b8'};
     if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-    const auth=firebase.auth(),db=firebase.firestore();
+    const auth=firebase.auth(),db=firebase.firestore(),storage=null;
     const form=document.getElementById('profileForm'),saveButton=document.getElementById('saveButton');
     const nameInput=document.getElementById('nameInput'),phoneInput=document.getElementById('phoneInput'),emailInput=document.getElementById('emailInput');
     const birthdayInput=document.getElementById('birthdayInput'),birthdayNote=document.getElementById('birthdayNote'),genderInput=document.getElementById('genderInput');
@@ -158,17 +158,7 @@
         let photoURL=currentUser.photoURL||profileData.photoURL||profileData.photoUrl||profileData.profilePhotoURL||profileData.avatarUrl||'';
         if(selectedPhoto){
           statusEl.textContent='Uploading your profile photo…';
-          try{
-            const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);
-            photoURL=await withTimeout((async()=>{await ref.put(selectedPhoto,{contentType:selectedPhoto.type||'image/jpeg'});return ref.getDownloadURL();})(),'Photo upload');
-          }catch(uploadError){
-            console.error('Profile photo upload failed:',uploadError);
-            const code=uploadError.code||'';
-            if(code==='storage/unauthorized')throw new Error('Your profile photo could not be uploaded because Storage access was denied. Please try again later.');
-            if(code==='storage/bucket-not-found'||code==='storage/project-not-found'||code==='storage/no-default-bucket')throw new Error('Profile photos are temporarily unavailable because Firebase Storage is not set up for this project. You can still update the rest of your profile.');
-            if(code==='storage/cors-error'||code==='storage/retry-limit-exceeded'||code==='storage/unknown')throw new Error('Your profile photo could not be uploaded. Firebase Storage is unavailable; please try again later.');
-            throw uploadError;
-          }
+          photoURL=await withTimeout(uploadToCloudinary(selectedPhoto,'/profile-avatars'),'Photo upload',20000);
         }
         const updates={name,email,phone,whatsapp:profileData.whatsapp||phone,birthday,dob:birthday,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photoURL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
         if(!profileExists)updates.role='customer';
