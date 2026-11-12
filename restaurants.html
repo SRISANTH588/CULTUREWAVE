@@ -198,9 +198,11 @@
       .topbar .auth-actions { gap:.5rem;padding:.3rem;border:1px solid #333;border-radius:999px;background:#111; }
       .topbar .auth-actions .nav-link { padding:.6rem .95rem;border:0;background:transparent;color:#aaa;font-size:.82rem; }
       .topbar .auth-actions .nav-cta { margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff;color:#000;border-radius:999px;font-weight:800; }
-      .topbar .nav-wrap>.hamburger { display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;margin-left:0;padding:0;border:0;border-radius:50%;background:#141418;color:#fff;box-shadow:none; }
+      .topbar .nav-wrap>.hamburger { display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;margin-left:0;padding:0;border:0;border-radius:50%;background:#141418;color:#fff;box-shadow:none;overflow:hidden;background-size:cover;background-position:center; }
       .topbar .nav-wrap>.hamburger span { display:none; }
       .topbar .nav-wrap>.hamburger::after { content:attr(data-initial);color:#fff;font-size:1.05rem;font-weight:700;line-height:1; }
+      .topbar .nav-wrap>.hamburger.has-profile-photo { background-image:var(--profile-avatar-image); }
+      .topbar .nav-wrap>.hamburger.has-profile-photo::after { content:none; }
       .topbar .mobile-brand,.topbar .mobile-header-actions,.topbar .desktop-header-search { display:none; }
       .topbar .topnav a { color:#aaa!important; }
       .topbar .nav-wrap { box-sizing:border-box; }
@@ -531,7 +533,9 @@
         .topbar .brand-block, .topbar .topnav, .topbar .nav-wrap > .hamburger { position: static; left: auto; margin: 0; }
         .topbar .topnav { flex: 1 1 auto; }
         .topbar .auth-actions { margin-left: auto; }
-        .topbar .nav-wrap > .hamburger { flex: 0 0 44px; width: 44px; height: 44px; }
+        .topbar .nav-wrap > .hamburger { flex: 0 0 44px; width: 44px; height: 44px; overflow:hidden; background-size:cover; background-position:center; }
+        .topbar .nav-wrap > .hamburger.has-profile-photo { background-image:var(--profile-avatar-image); }
+        .topbar .nav-wrap > .hamburger.has-profile-photo::after { content:none; }
         .rs-hero { min-height: 390px; padding: 3.25rem 0 2.8rem; }
         .rs-hero-inner { max-width: 1240px; padding: 0 2rem; }
         .rs-hero h1 { max-width: 900px; font-size: clamp(4rem, 6.5vw, 5.5rem); }
