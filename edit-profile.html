@@ -94,6 +94,10 @@
     const photoPreview=document.getElementById('photoPreview'),stepCount=document.getElementById('stepCount'),statusEl=document.getElementById('status');
     let currentUser=null,profileData={},profileExists=false,selectedPhoto=null,initialValues='';
     const valueOf=(...values)=>values.find(value=>value!==undefined&&value!==null&&String(value).trim()!=='')||'';
+    const withTimeout=(promise,label,timeout=20000)=>new Promise((resolve,reject)=>{
+      const timer=setTimeout(()=>reject(new Error(`${label} is taking longer than expected. Check your connection and try again.`)),timeout);
+      Promise.resolve(promise).then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});
+    });
     const dateValue=value=>{
       if(!value)return '';
       if(value.toDate)value=value.toDate();
@@ -152,14 +156,15 @@
           return;
         }
         let photoURL=currentUser.photoURL||profileData.photoURL||profileData.photoUrl||profileData.profilePhotoURL||profileData.avatarUrl||'';
-        if(selectedPhoto){const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);await ref.put(selectedPhoto);photoURL=await ref.getDownloadURL();}
+        if(selectedPhoto){statusEl.textContent='Uploading your profile photo…';const ref=firebase.storage().ref(`users/${currentUser.uid}/profile/avatar`);await withTimeout(ref.put(selectedPhoto),'Photo upload');photoURL=await withTimeout(ref.getDownloadURL(),'Photo upload');}
         const updates={name,email,phone,whatsapp:profileData.whatsapp||phone,birthday,dob:birthday,gender:genderInput.value,anniversary:anniversaryInput.value,state:stateInput.value,photoURL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
         if(!profileExists)updates.role='customer';
-        await db.collection('users').doc(currentUser.uid).set(updates,{merge:true});
-        await currentUser.updateProfile({displayName:name,photoURL:photoURL||null});
+        statusEl.textContent='Saving your profile…';
+        await withTimeout(db.collection('users').doc(currentUser.uid).set(updates,{merge:true}),'Profile save');
         profileData={...profileData,...updates};profileExists=true;initialValues=currentValues();statusEl.textContent='Profile updated successfully';
         updateProgress();
         if(window.parent!==window)window.parent.postMessage({type:'culturewave-profile-updated',profile:{name,phone:phoneInput.value,birthday,steps:stepCount.textContent,photoURL}},location.origin);
+        currentUser.updateProfile({displayName:name,photoURL:photoURL||null}).catch(error=>console.warn('Could not refresh Firebase Auth profile details:',error));
         window.setTimeout(()=>{statusEl.textContent='';},2500);
       }catch(error){statusEl.textContent=error.message||'Could not update your profile. Please try again.';saveButton.disabled=false;}
     });
