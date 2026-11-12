@@ -767,21 +767,7 @@
       }
       loadFirestoreEvents();
     </script>
-    <script>
-      const ham = document.getElementById('hamburger');
-      const mNav = document.getElementById('mobileNav');
-      ham.addEventListener('click', () => {
-        ham.classList.toggle('open');
-        mNav.classList.toggle('open');
-        document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
-      });
-      mNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        ham.classList.remove('open');
-        mNav.classList.remove('open');
-        document.body.style.overflow = '';
-      }));
-</script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="auth-nav.js?v=avatar-fix-20261112"></script>
 </body>
 </html>
