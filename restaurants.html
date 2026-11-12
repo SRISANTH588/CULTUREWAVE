@@ -420,9 +420,8 @@
         .rs-location { margin-bottom:1.25rem; }
         .rs-offer { min-height:190px; }
       }
-      /* Keep the desktop profile/menu circle closer to the restaurant brand. */
       @media (min-width: 961px) {
-        .topbar .nav-wrap > .hamburger { margin-left: auto; }
+        .topbar .nav-wrap > .hamburger { margin-left: auto; margin-right: clamp(24px, 3vw, 48px); }
       }
       @media (max-width: 760px) {
         html, body { width:100%; max-width:100%; overflow-x:hidden; }
@@ -546,7 +545,7 @@
   <body>
     <header class="topbar">
       <div class="nav-wrap">
-        <a class="mobile-brand" href="index.html">CULTUREWAVE</a>
+        <a class="mobile-brand" href="index.html" style="display:none!important">CULTUREWAVE</a>
         <div class="brand-block">
           <div class="logo">CultureWave</div>
           <div class="brand-sub">by OGSHOOTS LUXE</div>
