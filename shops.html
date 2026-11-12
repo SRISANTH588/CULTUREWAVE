@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    *{box-sizing:border-box}:root{--accent:#8a6a38;--accent-soft:#f2eadc;--page:#f8f7f4;--ink:#24231f;--muted:#77756f;--line:#e9e6df;--surface:#fff}body{background:var(--page);color:var(--ink);font-family:Manrope,sans-serif}.topbar{background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.nav-wrap{display:flex;align-items:center;gap:1.2rem}.topnav{margin-left:auto}.auth-actions{margin-left:0}
+    *{box-sizing:border-box}:root{--accent:#8a6a38;--accent-soft:#f2eadc;--page:#f8f7f4;--ink:#24231f;--muted:#77756f;--line:#e9e6df;--surface:#fff}body{background:var(--page);color:var(--ink);font-family:Manrope,sans-serif}.nav-wrap{display:flex;align-items:center;gap:1.2rem}.topnav{margin-left:auto}.auth-actions{margin-left:0}
     .shop-hero{position:relative;overflow:hidden;padding:clamp(3.5rem,7vw,6rem) 1.4rem 4.4rem;background:radial-gradient(ellipse at 83% 8%,color-mix(in srgb,var(--accent) 17%,transparent),transparent 36%),linear-gradient(120deg,#fff 10%,#f5f3ee 100%);border-bottom:1px solid var(--line)}
     .hero-inner,.shop-content{width:min(1160px,100%);margin:0 auto}.hero-inner{position:relative;display:grid;grid-template-columns:1.02fr .98fr;align-items:center;gap:3rem}.eyebrow{color:var(--accent);font-size:.72rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
     .shop-hero h1{max-width:760px;margin:.8rem 0 1rem;font:800 clamp(3.4rem,6.5vw,6rem)/.94 'Playfair Display',serif;letter-spacing:-.055em;color:#25241f}.shop-hero h1 em{color:var(--accent);font-weight:700}.shop-hero p{max-width:490px;color:#706e68;font-size:1rem;line-height:1.8;margin:0}
@@ -32,23 +32,16 @@
     /* Keep the shops page light even when the shared site theme is dark. */
     html:has(body .shop-hero),body:has(.shop-hero){background:var(--page)!important;color:var(--ink)!important;color-scheme:light}
     body:has(.shop-hero){min-height:100vh}
-    body:has(.shop-hero) .topbar{background:rgba(255,255,255,.94)!important;border-bottom:1px solid var(--line)!important}
-    body:has(.shop-hero) .logo,body:has(.shop-hero) .brand-sub{color:var(--ink)!important}
-    body:has(.shop-hero) .topnav a,body:has(.shop-hero) .nav-link{color:#625f58!important}
-    body:has(.shop-hero) .nav-cta{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
-    body:has(.shop-hero) .hamburger span{background:var(--ink)!important}
+    body:has(.shop-hero) .topbar{background:rgba(255,255,255,.94)!important;border-bottom:1px solid #e9e6df!important;box-shadow:0 8px 30px rgba(15,42,96,.06)!important}
+    body:has(.shop-hero) .topbar .logo{color:#24231f!important}
+    body:has(.shop-hero) .topbar .brand-sub{color:#8a6a38!important}
+    body:has(.shop-hero) .topbar .topnav a,body:has(.shop-hero) .topbar .nav-link{color:#77756f!important}
+    body:has(.shop-hero) .topbar .topnav a:hover,body:has(.shop-hero) .topbar .nav-link:hover{background:#f2eadc!important;color:#8a6a38!important}
+    body:has(.shop-hero) .topbar .hamburger span{background:#24231f!important}
+    /* Let the shared stylesheet control the site navigation colors. */
     body:has(.shop-hero) .site-footer,body:has(.shop-hero) footer{background:#fff!important;border-top:1px solid var(--line)!important}
     body:has(.shop-hero) .site-footer p,body:has(.shop-hero) .site-footer small,body:has(.shop-hero) .site-footer a{color:#77746e!important}
     body:has(.shop-hero) .site-footer .footer-logo{color:var(--ink)!important}
-    body:has(.shop-hero) .mobile-nav{background:#fff!important;border-color:var(--line)!important;box-shadow:-24px 0 60px rgba(41,37,31,.16)!important}
-    body:has(.shop-hero) .mobile-nav > a{background:#faf9f6!important;border-color:var(--line)!important;color:var(--ink)!important}
-    body:has(.shop-hero) .mobile-nav > a::before{background:var(--accent-soft)!important;color:var(--accent)!important}
-    body:has(.shop-hero) .mobile-nav > a::after{color:#77746e!important}
-    body:has(.shop-hero) .mobile-nav-card{background:#fff!important;border-color:var(--line)!important}
-    body:has(.shop-hero) .mobile-nav-card > a{border-color:var(--line)!important}
-    body:has(.shop-hero) .mobile-nav-icon,body:has(.shop-hero) .mobile-nav-arrow{color:var(--accent)!important}
-    body:has(.shop-hero) .mobile-nav-close,body:has(.shop-hero) #mobileNav .mobile-nav-view-back,body:has(.shop-hero) #mobileNav .mobile-nav-view-close{border-color:var(--line)!important;background:#fff!important;color:var(--accent)!important}
-    body:has(.shop-hero) .mobile-nav-ctas{border-color:var(--line)!important}
     html:has(body .shop-hero),body:has(.shop-hero){background:var(--page)!important}
     /* Premium neighborhood market refresh */
     .shop-hero{padding:clamp(3rem,6vw,5.5rem) 1.5rem 3.5rem;background:linear-gradient(115deg,#f4f1e9 0%,#fbfaf7 53%,#e9e2d4 100%);border:0}
