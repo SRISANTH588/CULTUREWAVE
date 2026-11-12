@@ -421,7 +421,7 @@
         .rs-offer { min-height:190px; }
       }
       @media (min-width: 961px) {
-        .topbar .nav-wrap > .hamburger { margin-left: auto; margin-right: clamp(24px, 3vw, 48px); }
+        .topbar .nav-wrap > .hamburger { margin-right: 0; }
       }
       @media (max-width: 760px) {
         html, body { width:100%; max-width:100%; overflow-x:hidden; }
@@ -516,7 +516,10 @@
         .topbar .brand-block, .topbar .topnav, .topbar .nav-wrap > .hamburger { position: static; left: auto; margin: 0; }
         .topbar .topnav { flex: 1 1 auto; }
         .topbar .auth-actions { margin-left: auto; display:flex!important; }
-        .topbar .nav-wrap > .hamburger { flex: 0 0 44px; width: 44px; height: 44px; }
+        .topbar .nav-wrap > .hamburger { flex: 0 0 44px; width: 44px; height: 44px; order: 2; margin-left: 1.5rem; }
+        .topbar .brand-block { order: 1; }
+        .topbar .topnav { order: 3; }
+        .topbar .auth-actions { order: 4; }
         .rs-hero { min-height: 390px; padding: 3.25rem 0 2.8rem; }
         .rs-hero-inner { max-width: 1240px; padding: 0 2rem; }
         .rs-hero h1 { max-width: 900px; font-size: clamp(4rem, 6.5vw, 5.5rem); }
