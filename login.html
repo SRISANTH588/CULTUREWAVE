@@ -762,23 +762,11 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="module">
-      import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-      import { dashboardForAccount } from "./dashboard-routing.js";
-      import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm";
-
-      const _app = getApps().length ? getApps()[0] : initializeApp({
-        apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
-        authDomain: "ogshootsluxe-36740.firebaseapp.com",
-        projectId: "ogshootsluxe-36740",
-        storageBucket: "ogshootsluxe-36740.firebasestorage.app",
-        messagingSenderId: "5471814825",
-        appId: "1:5471814825:web:07e84f2f88486da817d5b8"
-      });
-      const auth = getAuth(_app);
-      const db = getFirestore(_app);
+      import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail,
+        GoogleAuthProvider, signInWithPopup, updateProfile,
+        doc, setDoc, getDoc, collection, query, where, getDocs, onSnapshot } from "./firebase.js";
 
       emailjs.init({ publicKey: 'PDb2vpOIeLkbZBBFP' });
 
@@ -792,32 +780,23 @@
         document.getElementById('statBookings').textContent = formatLoginCount(loginStats.bookings);
         document.getElementById('statSat').textContent = '100%';
       }
-      function updateLoginStats(events) {
-        loginStats.events = events.length;
-        loginStats.bookings = events.reduce((total, event) => {
+      onSnapshot(query(collection(db, 'events'), where('status', 'in', ['published', 'live', 'active'])), snap => {
+        const publicEvents = snap.docs.filter(doc => doc.data().publicListing !== false);
+        loginStats.events = publicEvents.length;
+        // Event totals are public aggregates; attendee/booking documents remain private.
+        loginStats.bookings = publicEvents.reduce((total, doc) => {
+          const event = doc.data();
           const ticketBookings = Array.isArray(event.tickets)
             ? event.tickets.reduce((count, ticket) => count + (Number(ticket.booked || ticket.soldCount) || 0), 0)
             : 0;
           return total + Math.max(0, Number(event.totalBooked) || 0, ticketBookings);
         }, 0);
         renderLoginStats();
-      }
-      function readLoginStatSnapshot(snap) {
-        const rows = snap.docs.map(eventDoc => eventDoc.data());
-        updateLoginStats(rows.filter(event => event.publicListing !== false));
-      }
-      async function loadLoginStats() {
-        try {
-          const snap = await getDocs(collection(db, 'events'));
-          readLoginStatSnapshot(snap);
-        } catch (error) {
-          console.warn('Could not load login event stats.', error);
-          loginStats.events = null;
-          loginStats.bookings = null;
-          renderLoginStats();
-        }
-      }
-      loadLoginStats();
+      }, () => {
+        loginStats.events = null;
+        loginStats.bookings = null;
+        renderLoginStats();
+      });
 
       const authTabs = document.querySelectorAll("[data-auth-tab]");
       const authForms = document.querySelectorAll("[data-auth-form]");
@@ -845,48 +824,46 @@
       function toFirebaseEmail(input) {
         const value = input.trim().toLowerCase();
         if (value.includes("@")) return value;
-        if (value === "srisanth") return "srisanth@culturewave.in";
+        if (value === "srisanth") return "srisanth@cityvibe.local";
         return `${value}@culturewave.in`;
       }
 
       async function getUserData(uid) {
         try {
-          // A Firestore profile read can remain pending while the client is
-          // offline or reconnecting. Authentication has already succeeded at
-          // this point, so don't leave the customer stranded on the login page.
-          const snap = await Promise.race([
-            getDoc(doc(db, "users", uid)),
-            new Promise((_, reject) => setTimeout(() => reject(new Error("Profile lookup timed out")), 4000))
-          ]);
+          const snap = await getDoc(doc(db, "users", uid));
           if (snap.exists()) return snap.data();
         } catch {}
         return {};
       }
 
       async function redirect(uid) {
-        // Start a hard fallback first: a stuck profile lookup must never strand a
-        // successfully authenticated user on this form.
-        const fallback = window.setTimeout(() => {
-          window.location.replace('customer-dashboard.html');
-        }, 5000);
         const data = await getUserData(uid);
         // Return customers to the page where they requested sign-in. The
         // destination must be a same-site relative URL to prevent open redirects.
         const next = new URLSearchParams(location.search).get('next');
         const role = data.role || 'customer';
-        if (role === 'admin') { clearTimeout(fallback); window.location.replace('admin-dashboard.html'); return; }
-        const accountDashboard = dashboardForAccount(data);
-        if (accountDashboard) { clearTimeout(fallback); window.location.replace(accountDashboard); return; }
+        if (role === 'admin') { window.location.href = 'admin-dashboard.html'; return; }
+        if (role === 'lister') {
+          const dashboards = {nightlife:'dashboard-nightlife.html',brunch:'dashboard-brunch.html',dining:'dashboard-restaurant.html',workshops:'dashboard-workshops.html',experiences:'dashboard-experiences.html',music:'dashboard-livemusic.html'};
+          const aliases = {party:'nightlife',parties:'nightlife','fine dining':'dining',restaurant:'dining','live music':'music',experience:'experiences'};
+          const categoryKey = String(data.preferredCategory || '').trim().toLowerCase();
+          const category = aliases[categoryKey] || categoryKey;
+          const validDashboards = new Set([...Object.values(dashboards),'premium-client-dashboard.html']);
+          const dashboard = data.dashboard && data.dashboard !== 'premium-client-dashboard.html' && validDashboards.has(data.dashboard)
+            ? data.dashboard
+            : dashboards[category] || (validDashboards.has(data.dashboard) ? data.dashboard : 'premium-client-dashboard.html');
+          window.location.href = dashboard;
+          return;
+        }
+        if (role === 'client') { window.location.href = 'premium-client-dashboard.html'; return; }
         if (next && !next.startsWith('//') && !/^[a-z][a-z0-9+.-]*:/i.test(next)) {
           const destination = new URL(next, window.location.origin);
           if (destination.origin === window.location.origin) {
-            clearTimeout(fallback);
-            window.location.replace(destination.href);
+            window.location.href = destination.href;
             return;
           }
         }
-        clearTimeout(fallback);
-        window.location.replace('customer-dashboard.html');
+        window.location.href = 'customer-dashboard.html';
       }
 
       let loginOtpGenerated = '';
@@ -995,20 +972,16 @@
         const email = toFirebaseEmail(loginPhone.value.trim());
         const password = loginPassword.value;
         if (!email || !password) { setStatus("Enter your username and password.", "warning"); return; }
-        const submitButton = e.submitter || e.currentTarget.querySelector('button[type="submit"]');
-        if (submitButton) submitButton.disabled = true;
         setStatus("Signing in...", "info");
         try {
           const { user } = await signInWithEmailAndPassword(auth, email, password);
           setStatus("Welcome back! Redirecting...", "success");
-          await redirect(user.uid);
+          redirect(user.uid);
         } catch (err) {
           const msg = ["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found"].includes(err.code)
           ? "We could not sign you in. Check your username or email and password, or select Forgot password."
             : err.message;
           setStatus(msg, "warning");
-        } finally {
-          if (submitButton) submitButton.disabled = false;
         }
       });
 
@@ -1033,7 +1006,7 @@
             createdAt: Date.now()
           });
           setStatus('Account created! Redirecting…', 'success');
-          await redirect(user.uid);
+          redirect(user.uid);
         } catch(err) {
           const msg = err.code === 'auth/email-already-in-use' ? 'Account already exists. Try logging in.' : err.message;
           setStatus(msg, 'warning');
@@ -1068,7 +1041,7 @@
           console.warn('Google sign-in succeeded, but customer profile could not be read or created:', profileError);
         }
         setStatus("Signed in! Redirecting...", "success");
-        await redirect(user.uid);
+        redirect(user.uid);
       });
 
       setMode("login");
