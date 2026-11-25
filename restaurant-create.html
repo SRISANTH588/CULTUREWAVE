@@ -732,7 +732,7 @@
         </div>
       </div>
       <div class="step-actions">
-        <a class="btn-ghost" href="dashboard-restaurant.html">← Back to Restaurant</a>
+        <a class="btn-ghost" href="vendordashboard.html">← Back to Restaurant</a>
         <button class="btn-primary" onclick="goStep(1)">Next: Location →</button>
       </div>
     </div>
@@ -1841,6 +1841,7 @@ See you soon! &#127860;</textarea>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script>
 firebase.initializeApp({
   apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
@@ -1853,6 +1854,7 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 const auth = firebase.auth();
+const storage = firebase.storage();
 function serverTimestamp() { return firebase.firestore.FieldValue.serverTimestamp(); }
 function collection(db, name) { return db.collection(name); }
 async function addDoc(ref, data) { return await ref.add(data); }
@@ -2054,6 +2056,7 @@ window.handleCardImgDrop = function(e) {
 };
 
 // ── MEDIA: Cover ──
+let coverImageData = '';
 function showCoverPreview(src) {
   const img = document.getElementById('coverPreview');
   const placeholder = document.getElementById('coverPlaceholder');
@@ -2071,15 +2074,15 @@ function showCoverPreview(src) {
 window.loadCoverFile = function(input) {
   const file = input.files[0]; if (!file) return;
   const r = new FileReader();
-  r.onload = e => { document.getElementById('coverUrl').value = ''; showCoverPreview(e.target.result); updateProgress(); };
+  r.onload = e => { coverImageData=e.target.result;document.getElementById('coverUrl').value = ''; showCoverPreview(e.target.result); updateProgress(); };
   r.readAsDataURL(file);
 };
 window.syncCoverUrl = function() {
-  showCoverPreview(document.getElementById('coverUrl').value);
+  coverImageData='';showCoverPreview(document.getElementById('coverUrl').value);
   updateProgress();
 };
 window.removeCover = function() {
-  document.getElementById('coverUrl').value = '';
+  coverImageData='';document.getElementById('coverUrl').value = '';
   document.getElementById('coverInput').value = '';
   showCoverPreview('');
   updateProgress();
@@ -2090,12 +2093,13 @@ window.handleCoverDrop = function(e) {
   const file = e.dataTransfer.files[0];
   if (!file || !file.type.startsWith('image/')) return;
   const r = new FileReader();
-  r.onload = ev => { showCoverPreview(ev.target.result); updateProgress(); };
+  r.onload = ev => { coverImageData=ev.target.result;document.getElementById('coverUrl').value='';showCoverPreview(ev.target.result); updateProgress(); };
   r.readAsDataURL(file);
 };
 
 // ── MEDIA: Gallery ──
 let galleryImages = [];
+async function uploadRestaurantMedia(dataUrl,uid,index){const response=await fetch(dataUrl);const blob=await response.blob();const fileRef=storage.ref(`restaurants/${uid}/media/${Date.now()}-${index}-${crypto.randomUUID()}.jpg`);await fileRef.put(blob,{contentType:blob.type||'image/jpeg'});return await fileRef.getDownloadURL()}
 window.loadGalleryFiles = function(input) {
   const files = Array.from(input.files).slice(0, 10 - galleryImages.length);
   let done = 0;
@@ -2372,6 +2376,9 @@ async function saveEvent(status) {
   if (!uid) { await loadUser(); }
   if (!uid) { alert("Please sign in to save."); return; }
 
+  let savedCoverUrl=document.getElementById('coverUrl').value.trim(),savedGallery=[];
+  try{if(coverImageData)savedCoverUrl=await uploadRestaurantMedia(coverImageData,uid,'cover');savedGallery=await Promise.all(galleryImages.map((image,index)=>uploadRestaurantMedia(image,uid,index)));}catch(error){alert('Could not upload restaurant photos: '+error.message);return;}
+
   const rsvpToggles = {};
   document.querySelectorAll('.toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
@@ -2411,7 +2418,8 @@ async function saveEvent(status) {
     ownerWAEnabled: document.getElementById('ownerWAEnabled').classList.contains('on'),
     ownerWATemplate: document.getElementById('ownerWATemplate').value.trim(),
     guestWATemplate: document.getElementById('guestWATemplate').value.trim(),
-    coverUrl: document.getElementById('coverUrl').value.trim(),
+    coverUrl: savedCoverUrl,
+    galleryImages: savedGallery,
     videoUrl: document.getElementById('videoUrl').value.trim(),
     rsvpFields: rsvpToggles,
     tickets, coupons, faqs, eventDates,
@@ -2434,7 +2442,7 @@ async function saveEvent(status) {
     btn.textContent = 'Saving...';
     btn.disabled = true;
     await addDoc(collection(db, 'restaurants'), payload);
-    window.location.href = 'dashboard-restaurant.html';
+    window.location.href = 'vendordashboard.html';
   } catch (err) {
     alert('Error saving restaurant: ' + err.message);
     document.getElementById('publishBtn').textContent = 'Publish Listing';

@@ -2380,7 +2380,7 @@ async function saveEvent(status) {
     btn.disabled = true;
     const created=await addDoc(collection(db, 'events'), payload);
     if(inviteAccessConfig.inviteOnly){btn.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
-    window.location.href = 'premium-client-dashboard.html';
+    window.location.href = 'vendordashboard.html';
   } catch (err) {
     alert('Error saving event: ' + err.message);
     document.getElementById('publishBtn').textContent = 'Publish Trip';

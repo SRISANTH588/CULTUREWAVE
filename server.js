@@ -908,7 +908,7 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
 <div style="font-size:2.5rem;margin-bottom:.75rem">📸</div>
 <h2>Instagram App Not Configured</h2>
 <p>Set the <strong>INSTAGRAM_APP_ID</strong> and <strong>INSTAGRAM_APP_SECRET</strong> environment variables to enable Instagram OAuth.</p>
-<a href="/premium-client-dashboard.html">Go Back</a>
+<a href="/vendordashboard.html">Go Back</a>
 </div></body></html>`;
       return send(res, 200, html, { "Content-Type": "text/html; charset=utf-8" });
     }
@@ -922,10 +922,10 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
     const state = url.searchParams.get("state");
     const error = url.searchParams.get("error");
     if (error) {
-      return send(res, 302, "", { Location: "/premium-client-dashboard.html?ig_error=" + encodeURIComponent(error) });
+      return send(res, 302, "", { Location: "/vendordashboard.html?ig_error=" + encodeURIComponent(error) });
     }
     if (!code || !state) {
-      return send(res, 302, "", { Location: "/premium-client-dashboard.html?ig_error=missing_code" });
+      return send(res, 302, "", { Location: "/vendordashboard.html?ig_error=missing_code" });
     }
     try {
       const stateData = JSON.parse(Buffer.from(state, "base64url").toString());
@@ -970,9 +970,9 @@ a{display:inline-block;padding:.6rem 1.4rem;border-radius:8px;background:#833ab4
           updatedAt: new Date().toISOString()
         }, { merge: true });
       }
-      return send(res, 302, "", { Location: "/premium-client-dashboard.html?ig_connected=1&ig_user=" + encodeURIComponent(igUsername || "") });
+      return send(res, 302, "", { Location: "/vendordashboard.html?ig_connected=1&ig_user=" + encodeURIComponent(igUsername || "") });
     } catch (err) {
-      return send(res, 302, "", { Location: "/premium-client-dashboard.html?ig_error=" + encodeURIComponent(err.message) });
+      return send(res, 302, "", { Location: "/vendordashboard.html?ig_error=" + encodeURIComponent(err.message) });
     }
   }
 

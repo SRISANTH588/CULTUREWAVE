@@ -356,7 +356,7 @@
       </div>
 
       <div class="step-actions">
-        <a class="btn-ghost" href="premium-client-dashboard.html">← Back to Campaigns</a>
+        <a class="btn-ghost" href="vendordashboard.html">← Back to Campaigns</a>
         <button class="btn-primary" onclick="goStep(1)">Next: Platforms →</button>
       </div>
     </div>
@@ -1287,7 +1287,7 @@ async function saveCampaign(status) {
     payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
     payload.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
     await db.collection('campaigns').add(payload);
-    window.location.href = 'premium-client-dashboard.html';
+    window.location.href = 'vendordashboard.html';
   } catch (err) {
     alert('Error saving campaign: ' + err.message);
     document.getElementById('publishBtn').textContent = 'Launch Campaign'; document.getElementById('publishBtn').disabled = false;

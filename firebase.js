@@ -1,7 +1,7 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile, RecaptchaVerifier, signInWithPhoneNumber, EmailAuthProvider, linkWithCredential } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getBytes, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getBytes, deleteObject, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBCgNQy8EJLg7E-SA1cMePGetWLOR7WWMI",
@@ -41,6 +41,17 @@ async function getCurrentUser() {
       email: user.email,
       name: data.name || user.displayName || user.email,
       role: data.role || "client",
+      roles: Array.isArray(data.roles) ? data.roles : [],
+      accountType: data.accountType || "",
+      dashboard: data.dashboard || "",
+      preferredDashboard: data.preferredDashboard || "",
+      preferredCategory: data.preferredCategory || "",
+      onboardingApplicationId: data.onboardingApplicationId || "",
+      shopId: data.shopId || "",
+      storeId: data.storeId || "",
+      shopOnboardingApplicationId: data.shopOnboardingApplicationId || "",
+      restaurantId: data.restaurantId || "",
+      restaurantOnboardingApplicationId: data.restaurantOnboardingApplicationId || "",
       plan: data.plan || data.subscriptionPlan || "free",
       subscriptionStatus: data.subscriptionStatus || data.planStatus || "active",
       photoURL: user.photoURL || null,
@@ -77,7 +88,7 @@ export {
   signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification,
   GoogleAuthProvider, signInWithPopup, updateProfile,
   RecaptchaVerifier, signInWithPhoneNumber, EmailAuthProvider, linkWithCredential, onAuthStateChanged,
-  ref, uploadBytes, getBytes, deleteObject,
-  doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
+  ref, uploadBytes, getBytes, deleteObject, getDownloadURL,
+  doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, deleteField,
   collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp
 };

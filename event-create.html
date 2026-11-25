@@ -197,6 +197,9 @@
     .field-count { font-size: 0.72rem; color: var(--muted); text-align: right; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+    .time-picker { display:flex; align-items:center; gap:.3rem; }
+    .field .time-picker select { min-width:0; flex:1; padding:.72rem .28rem; text-align:center; background:#fff; }
+    .time-picker-separator { color:var(--muted); font-weight:800; }
 
     /* TICKET ROW */
     .ticket-row {
@@ -614,46 +617,41 @@
       </button>
       <button class="step-btn" data-step="5">
         <span class="step-num">6</span>
-        <div class="step-info"><strong>Ticket Design</strong><span>Style & branding</span></div>
+        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="6">
         <span class="step-num">7</span>
-        <div class="step-info"><strong>Media</strong><span>Cover image & gallery</span></div>
+        <div class="step-info"><strong>RSVP Form</strong><span>Attendee fields</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="7">
         <span class="step-num">8</span>
-        <div class="step-info"><strong>RSVP Form</strong><span>Attendee fields</span></div>
+        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="8">
         <span class="step-num">9</span>
-        <div class="step-info"><strong>Coupons</strong><span>Discount codes</span></div>
+        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="9">
         <span class="step-num">10</span>
-        <div class="step-info"><strong>FAQs</strong><span>Common questions</span></div>
+        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="10">
         <span class="step-num">11</span>
-        <div class="step-info"><strong>Additional Info</strong><span>T&C, refund & notes</span></div>
+        <div class="step-info"><strong>Invite Only</strong><span>Access control & guests</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="11">
         <span class="step-num">12</span>
-        <div class="step-info"><strong>Invite Only</strong><span>Access control & guests</span></div>
+        <div class="step-info"><strong>Sold Out</strong><span>Mark & manage sold out</span></div>
         <span class="step-check"></span>
       </button>
       <button class="step-btn" data-step="12">
         <span class="step-num">13</span>
-        <div class="step-info"><strong>Sold Out</strong><span>Mark & manage sold out</span></div>
-        <span class="step-check"></span>
-      </button>
-      <button class="step-btn" data-step="13">
-        <span class="step-num">14</span>
         <div class="step-info"><strong>Settings</strong><span>Access & preferences</span></div>
         <span class="step-check"></span>
       </button>
@@ -960,12 +958,12 @@
       </div>
       <div class="step-actions">
         <button class="btn-ghost" onclick="goStep(3)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(5)">Next: Ticket Design &#8594;</button>
+        <button class="btn-primary" onclick="goStep(5)">Next: Media &#8594;</button>
       </div>
     </div>
 
     <!-- STEP 6: TICKET DESIGN -->
-    <div class="step-panel" data-panel="5">
+    <div class="step-panel" data-panel="ticket-design-removed" aria-hidden="true" style="display:none;">
 
       <!-- 3-step process header -->
       <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:none;padding:1.2rem 1.3rem;">
@@ -1236,8 +1234,8 @@
       </div>
     </div>
 
-    <!-- STEP 7: MEDIA -->
-    <div class="step-panel" data-panel="6">
+    <!-- STEP 6: MEDIA -->
+    <div class="step-panel" data-panel="5">
 
       <!-- Card Image -->
       <div class="card">
@@ -1401,13 +1399,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(5)">← Back</button>
-        <button class="btn-primary" onclick="goStep(7)">Next: RSVP Form →</button>
+        <button class="btn-ghost" onclick="goStep(4)">← Back</button>
+        <button class="btn-primary" onclick="goStep(6)">Next: RSVP Form →</button>
       </div>
     </div>
 
     <!-- STEP 7: RSVP -->
-    <div class="step-panel" data-panel="7">
+    <div class="step-panel" data-panel="6">
 
       <div style="display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:start;">
 
@@ -1542,13 +1540,13 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(6)">&#8592; Back</button>
-        <button class="btn-primary" onclick="goStep(8)">Next: Coupons &#8594;</button>
+        <button class="btn-ghost" onclick="goStep(5)">&#8592; Back</button>
+        <button class="btn-primary" onclick="goStep(7)">Next: Coupons &#8594;</button>
       </div>
     </div>
 
     <!-- STEP 8: COUPONS -->
-    <div class="step-panel" data-panel="8">
+    <div class="step-panel" data-panel="7">
       <div class="card">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
           <div><h2>Discount Coupons</h2><p>Create promo codes for your event</p></div>
@@ -1561,13 +1559,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(7)">← Back</button>
-        <button class="btn-primary" onclick="goStep(9)">Next: FAQs →</button>
+        <button class="btn-ghost" onclick="goStep(6)">← Back</button>
+        <button class="btn-primary" onclick="goStep(8)">Next: FAQs →</button>
       </div>
     </div>
 
     <!-- STEP 9: FAQS -->
-    <div class="step-panel" data-panel="9">
+    <div class="step-panel" data-panel="8">
       <div class="card">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
           <div><h2>Frequently Asked Questions</h2><p>Help attendees with common queries</p></div>
@@ -1580,13 +1578,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
-        <button class="btn-primary" onclick="goStep(10)">Next: Additional Info →</button>
+        <button class="btn-ghost" onclick="goStep(7)">← Back</button>
+        <button class="btn-primary" onclick="goStep(9)">Next: Additional Info →</button>
       </div>
     </div>
 
     <!-- STEP 10: ADDITIONAL INFO -->
-    <div class="step-panel" data-panel="10">
+    <div class="step-panel" data-panel="9">
       <div class="card">
         <div class="card-head"><h2>Terms & Conditions</h2><p>Legal terms attendees must agree to</p></div>
         <div class="field">
@@ -1619,13 +1617,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
-        <button class="btn-primary" onclick="goStep(11)">Next: Invite Only →</button>
+        <button class="btn-ghost" onclick="goStep(8)">← Back</button>
+        <button class="btn-primary" onclick="goStep(10)">Next: Invite Only →</button>
       </div>
     </div>
 
     <!-- STEP 11: INVITE ONLY -->
-    <div class="step-panel" data-panel="11">
+    <div class="step-panel" data-panel="10">
       <div class="card">
         <div class="card-head"><h2>Invite Only Access</h2><p>Restrict who can register for this event</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1656,13 +1654,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(10)">← Back</button>
-        <button class="btn-primary" onclick="goStep(12)">Next: Sold Out →</button>
+        <button class="btn-ghost" onclick="goStep(9)">← Back</button>
+        <button class="btn-primary" onclick="goStep(11)">Next: Sold Out →</button>
       </div>
     </div>
 
     <!-- STEP 12: SOLD OUT -->
-    <div class="step-panel" data-panel="12">
+    <div class="step-panel" data-panel="11">
       <div class="card">
         <div class="card-head"><h2>Sold Out Status</h2><p>Mark this event as sold out or manage overflow</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1699,13 +1697,13 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(11)">← Back</button>
-        <button class="btn-primary" onclick="goStep(13)">Next: Settings →</button>
+        <button class="btn-ghost" onclick="goStep(10)">← Back</button>
+        <button class="btn-primary" onclick="goStep(12)">Next: Settings →</button>
       </div>
     </div>
 
     <!-- STEP 13: SETTINGS -->
-    <div class="step-panel" data-panel="13">
+    <div class="step-panel" data-panel="12">
       <div class="card">
         <div class="card-head"><h2>Visibility & Display</h2><p>Control how your event appears publicly</p></div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -1728,7 +1726,7 @@
         </div>
       </div>
       <div class="step-actions">
-        <button class="btn-ghost" onclick="goStep(12)">← Back</button>
+        <button class="btn-ghost" onclick="goStep(11)">← Back</button>
         <button class="btn-success" id="createEventBtn">🚀 Create Event</button>
       </div>
     </div>
@@ -1741,14 +1739,14 @@
 <!-- ADD DATE MODAL -->
 <div class="modal-overlay" id="addDateModal">
   <div class="modal">
-    <h3>Add Event Date</h3>
+    <h3 id="dateModalTitle">Add Event Date</h3>
     <div style="display:flex;flex-direction:column;gap:0.65rem;">
       <div class="field"><label for="newDate">Date <span class="req">*</span></label><input id="newDate" type="date" /></div>
       <div class="field"><label for="newDateLabel">Label (optional)</label><input id="newDateLabel" type="text" placeholder="e.g. Day 1, Opening Night" /></div>
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeAddDateModal()">Cancel</button>
-      <button class="btn-primary" onclick="addDate()">Add Date</button>
+      <button class="btn-primary" id="dateModalSave" onclick="addDate()">Add Date</button>
     </div>
   </div>
 </div>
@@ -1756,19 +1754,19 @@
 <!-- ADD SLOT MODAL -->
 <div class="modal-overlay" id="addSlotModal">
   <div class="modal">
-    <h3>Add Time Slot</h3>
+    <h3 id="slotModalTitle">Add Time Slot</h3>
     <input type="hidden" id="slotDateIdx" />
     <div style="display:flex;flex-direction:column;gap:0.65rem;">
       <div class="field"><label for="slotName">Slot Name <span class="req">*</span></label><input id="slotName" type="text" placeholder="e.g. Morning Batch, Evening Session" /></div>
       <div class="grid-2">
-        <div class="field"><label for="slotStart">Start Time</label><input id="slotStart" type="time" /></div>
-        <div class="field"><label for="slotEnd">End Time</label><input id="slotEnd" type="time" /></div>
+        <div class="field"><label for="slotStartHour">Start Time</label><div class="time-picker"><select id="slotStartHour" aria-label="Start time hour"><option value="">HH</option></select><span class="time-picker-separator">:</span><select id="slotStartMinute" aria-label="Start time minute"><option value="">MM</option></select><select id="slotStartPeriod" aria-label="Start time AM or PM"><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select></div><input id="slotStart" type="hidden" /></div>
+        <div class="field"><label for="slotEndHour">End Time</label><div class="time-picker"><select id="slotEndHour" aria-label="End time hour"><option value="">HH</option></select><span class="time-picker-separator">:</span><select id="slotEndMinute" aria-label="End time minute"><option value="">MM</option></select><select id="slotEndPeriod" aria-label="End time AM or PM"><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select></div><input id="slotEnd" type="hidden" /></div>
       </div>
       <div class="field"><label for="slotCap">Capacity for this slot</label><input id="slotCap" type="number" min="1" placeholder="Leave blank to use default" /></div>
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeAddSlotModal()">Cancel</button>
-      <button class="btn-primary" onclick="addSlot()">Add Slot</button>
+      <button class="btn-primary" id="slotModalSave" onclick="addSlot()">Add Slot</button>
     </div>
   </div>
 </div>
@@ -1798,7 +1796,7 @@
 <!-- TICKET MODAL -->
 <div class="modal-overlay" id="ticketModal">
   <div class="modal" style="width:min(560px,100%);">
-    <h3>Add Ticket Type</h3>
+    <h3 id="ticketModalTitle">Add Ticket Type</h3>
     <div style="display:flex;flex-direction:column;gap:0.65rem;">
       <div class="field"><label for="tName">Ticket Name <span class="req">*</span></label><input id="tName" type="text" placeholder="e.g. General Admission, VIP" /></div>
       <div class="field"><label for="tDesc">Description</label><input id="tDesc" type="text" placeholder="What's included?" /></div>
@@ -1829,7 +1827,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeTicketModal()">Cancel</button>
-      <button class="btn-primary" onclick="addTicket()">Add Ticket</button>
+      <button class="btn-primary" id="ticketModalSave" onclick="addTicket()">Add Ticket</button>
     </div>
   </div>
 </div>
@@ -2222,9 +2220,15 @@ loadUser();
     if (g('onlinePlatform') && d.onlinePlatform) g('onlinePlatform').value = d.onlinePlatform;
     // schedule
     if (Array.isArray(d.eventDates) && d.eventDates.length) {
-      eventDates = d.eventDates;
-      renderDateCards();
+      eventDates = d.eventDates.map(item => ({
+        ...item,
+        slots: (Array.isArray(item.slots) ? item.slots : (Array.isArray(item.timeSlots) ? item.timeSlots : []))
+          .map(slot => ({ ...slot, start: slot.start || slot.startTime || '', end: slot.end || slot.endTime || '' }))
+      }));
+    } else if (d.startDate || d.date) {
+      eventDates = [{ date: d.startDate || d.date, label: '', slots: [] }];
     }
+    renderDateCards();
     set('capacity', d.capacity || '');
     set('eventDuration', d.duration || '');
     if (g('regDeadline')) set('regDeadline', d.regDeadline || '');
@@ -2236,9 +2240,10 @@ loadUser();
     }
     if (Array.isArray(d.coupons)) { coupons = d.coupons; renderCoupons(); }
     if (Array.isArray(d.faqs)) { faqs = d.faqs; renderFaqs(); }
-    if (d.ticketMode) { ticketMode = d.ticketMode; setTicketMode(d.ticketMode); }
-    if (d.ticketDeliveryMode) { ticketDeliveryMode = d.ticketDeliveryMode; setTicketDelivery(d.ticketDeliveryMode); }
     if (d.perDateTickets) perDateTickets = d.perDateTickets;
+    if (d.ticketMode) { ticketMode = d.ticketMode; setTicketMode(d.ticketMode); }
+    if (ticketMode === 'perdate') renderPerDateTicketCards();
+    if (d.ticketDeliveryMode) { ticketDeliveryMode = d.ticketDeliveryMode; setTicketDelivery(d.ticketDeliveryMode); }
     if (Array.isArray(d.artists)) { artists = d.artists; renderArtists(); }
     if (Array.isArray(d.galleryImages)) { galleryImages = d.galleryImages; renderGallery(); }
     // images
@@ -2350,7 +2355,7 @@ function hasRequiredEventDetails() {
 }
 
 window.goStep = function(n) {
-  if (currentStep === 6 && n > 6 && !hasRequiredEventDetails()) {
+  if (currentStep === 5 && n > 5 && !hasRequiredEventDetails()) {
     alert('Please complete all required Event Details before continuing.');
     return;
   }
@@ -2683,6 +2688,7 @@ window.uploadPromoVideo = async function(input) {
 let ticketMode = 'shared'; // 'shared' | 'perdate'
 let perDateTickets = {}; // { dateStr: [tickets] }
 let activePerDateIdx = null;
+let editingTicketIndex = null;
 
 window.setTicketMode = function(mode) {
   ticketMode = mode;
@@ -2724,7 +2730,10 @@ function renderPerDateTicketCards() {
             <div><div class="tr-name">${t.name}</div>${t.desc ? `<div style="font-size:0.74rem;color:var(--muted);">${t.desc}</div>` : ''}${t.bulk ? `<div style="font-size:0.72rem;color:#065f46;font-weight:700;">&#128101; Group: ${t.bulk.minPersons}${t.bulk.maxPersons ? '\u2013'+t.bulk.maxPersons : '+'} persons @ &#8377;${t.bulk.pricePerPerson}/person</div>` : ''}</div>
             <span class="tr-price">${t.bulk && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + (Number(t.bulk.pricePerPerson)*Number(t.bulk.minPersons)).toLocaleString('en-IN') + ' group' : Number(t.price) === 0 ? 'Free' : '&#8377;' + Number(t.price).toLocaleString('en-IN')}</span>
             <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
-            <button class="tr-del" onclick="removePerDateTicket('${d.date}',${ti})">&#10005;</button>
+            <div style="display:flex;gap:.3rem;align-items:center;">
+              <button type="button" class="btn-ghost" style="font-size:.68rem;padding:.25rem .45rem;" onclick="openTicketModal(${ti},${di})">Edit</button>
+              <button class="tr-del" onclick="removePerDateTicket('${d.date}',${ti})">&#10005;</button>
+            </div>
           </div>`).join('') : `<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.82rem;border:1px dashed var(--border);border-radius:10px;">No tickets for this date yet</div>`}
       </div>
     </div>`;
@@ -2732,8 +2741,7 @@ function renderPerDateTicketCards() {
 }
 
 window.openPerDateTicketModal = (di) => {
-  activePerDateIdx = di;
-  document.getElementById('ticketModal').classList.add('open');
+  openTicketModal(null, di);
 };
 window.removePerDateTicket = (dateStr, ti) => {
   perDateTickets[dateStr].splice(ti, 1);
@@ -2765,7 +2773,37 @@ window.updateBulkPreview = function() {
   preview.textContent = `Group of ${min}${maxStr} persons → ₹${price}/person (min total ₹${total.toLocaleString('en-IN')})`;
 };
 
-window.openTicketModal = () => { activePerDateIdx = null; document.getElementById('ticketModal').classList.add('open'); };
+window.openTicketModal = (ticketIndex = null, dateIndex = null) => {
+  activePerDateIdx = Number.isInteger(dateIndex) ? dateIndex : null;
+  editingTicketIndex = Number.isInteger(ticketIndex) ? ticketIndex : null;
+  ['tName','tPrice','tQty','tDesc','tGroupMin','tGroupMax','tGroupPrice'].forEach(id => {
+    const field = document.getElementById(id);
+    if (field) field.value = id === 'tPrice' ? '0' : '';
+  });
+  const bulkToggle = document.getElementById('toggleBulk');
+  bulkToggle.classList.remove('on');
+  document.getElementById('singleTicketGrid').appendChild(document.getElementById('ticketStockField'));
+  document.getElementById('bulkSection').style.display = 'none';
+  document.getElementById('bulkPreview').textContent = '';
+  const source = activePerDateIdx === null ? tickets : (perDateTickets[eventDates[activePerDateIdx]?.date] || []);
+  const ticket = editingTicketIndex === null ? null : source[editingTicketIndex];
+  if (ticket) {
+    document.getElementById('tName').value = ticket.name || '';
+    document.getElementById('tDesc').value = ticket.desc || '';
+    document.getElementById('tPrice').value = ticket.price ?? 0;
+    document.getElementById('tQty').value = ticket.qty || '';
+    if (ticket.bulk) {
+      document.getElementById('tGroupMin').value = ticket.bulk.minPersons || '';
+      document.getElementById('tGroupMax').value = ticket.bulk.maxPersons || '';
+      document.getElementById('tGroupPrice').value = ticket.bulk.pricePerPerson || '';
+      toggleBulkSection();
+      updateBulkPreview();
+    }
+  }
+  document.getElementById('ticketModalTitle').textContent = ticket ? 'Edit Ticket Type' : 'Add Ticket Type';
+  document.getElementById('ticketModalSave').textContent = ticket ? 'Save Changes' : 'Add Ticket';
+  document.getElementById('ticketModal').classList.add('open');
+};
 window.closeTicketModal = () => {
   document.getElementById('ticketModal').classList.remove('open');
   ['tName','tPrice','tQty','tDesc','tGroupMin','tGroupMax','tGroupPrice'].forEach(id => {
@@ -2778,6 +2816,9 @@ window.closeTicketModal = () => {
   document.getElementById('bulkSection').style.display = 'none';
   document.getElementById('bulkPreview').textContent = '';
   activePerDateIdx = null;
+  editingTicketIndex = null;
+  document.getElementById('ticketModalTitle').textContent = 'Add Ticket Type';
+  document.getElementById('ticketModalSave').textContent = 'Add Ticket';
 };
 window.addTicket = () => {
   const name = document.getElementById('tName').value.trim();
@@ -2801,10 +2842,12 @@ window.addTicket = () => {
   if (activePerDateIdx !== null) {
     const dateStr = eventDates[activePerDateIdx].date;
     if (!perDateTickets[dateStr]) perDateTickets[dateStr] = [];
-    perDateTickets[dateStr].push(ticket);
+    if (editingTicketIndex !== null && perDateTickets[dateStr][editingTicketIndex]) perDateTickets[dateStr][editingTicketIndex] = ticket;
+    else perDateTickets[dateStr].push(ticket);
     renderPerDateTicketCards();
   } else {
-    tickets.push(ticket);
+    if (editingTicketIndex !== null && tickets[editingTicketIndex]) tickets[editingTicketIndex] = ticket;
+    else tickets.push(ticket);
     renderTickets();
     updateProgress();
   }
@@ -2826,6 +2869,7 @@ function renderTickets() {
       </div>
       <span class="tr-price">${t.bulk && Number(t.bulk.pricePerPerson) > 0 ? '&#8377;' + (Number(t.bulk.pricePerPerson)*Number(t.bulk.minPersons)).toLocaleString('en-IN') + ' group' : t.price === 0 ? 'Free' : '&#8377;' + t.price.toLocaleString('en-IN')}</span>
       <span class="tr-qty">${t.qty ? t.qty + ' seats' : 'Unlimited'}</span>
+      <button type="button" class="btn-ghost" style="font-size:.72rem;padding:.3rem .55rem;" onclick="openTicketModal(${i})">Edit</button>
       <button class="tr-del" onclick="removeTicket(${i})">&#10005;</button>
     </div>`).join('');
 }
@@ -2953,7 +2997,7 @@ async function saveEvent(status) {
     return;
   }
   if (status === 'published' && !hasRequiredEventDetails()) {
-    goStep(6);
+    goStep(5);
     alert('Please complete all required Event Details before publishing.');
     return;
   }
@@ -3108,14 +3152,7 @@ async function saveEvent(status) {
       const created=await addDoc(collection(db, 'events'), payload);
       if(inviteAccessConfig.inviteOnly){saveStage='saving private-event access';saveButton.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
       localStorage.removeItem(getLocalDraftKey());
-      const fromParam = new URLSearchParams(location.search).get('from');
-      const dashboardBySource = {
-        nightlife: 'dashboard-nightlife.html',
-        livemusic: 'dashboard-livemusic.html',
-        workshops: 'dashboard-workshops.html',
-        experiences: 'dashboard-experiences.html'
-      };
-      window.location.href = dashboardBySource[fromParam] || 'dashboard-brunch.html';
+      window.location.href = 'vendordashboard.html';
     }
   } catch (err) {
     console.error('Event save failed:', err);
@@ -3133,6 +3170,8 @@ document.getElementById('createEventBtn').addEventListener('click', () => saveEv
 
 // ── SCHEDULE ──
 let eventDates = [];
+let editingDateIndex = null;
+let editingSlotIndex = null;
 
 function fmtDate(v) {
   if (!v) return '';
@@ -3158,7 +3197,10 @@ function renderDateCards() {
           <strong>${d.label || fmtDate(d.date)}</strong>
           <span>${fmtDate(d.date)} &middot; ${d.slots.length} slot${d.slots.length !== 1 ? 's' : ''}</span>
         </div>
-        <button class="tr-del" onclick="removeDate(${di})">&#10005;</button>
+        <div style="display:flex;gap:.35rem;align-items:center;">
+          <button type="button" class="btn-ghost" style="font-size:.72rem;padding:.3rem .55rem;" onclick="openAddDateModal(${di})">Edit</button>
+          <button class="tr-del" onclick="removeDate(${di})">&#10005;</button>
+        </div>
       </div>
       <div class="date-card-body">
         ${d.slots.length ? d.slots.map((s, si) => `
@@ -3166,7 +3208,10 @@ function renderDateCards() {
             <span class="slot-name">${s.name}</span>
             <span class="slot-time">${s.start ? fmtTime(s.start) : ''} ${s.end ? '&ndash; ' + fmtTime(s.end) : ''}</span>
             <span class="slot-cap">${s.capacity ? s.capacity + ' seats' : 'Default cap'}</span>
-            <button class="tr-del" onclick="removeSlot(${di},${si})">&#10005;</button>
+            <div style="display:flex;gap:.3rem;align-items:center;">
+              <button type="button" class="btn-ghost" style="font-size:.68rem;padding:.25rem .45rem;" onclick="openAddSlotModal(${di},${si})">Edit Time</button>
+              <button class="tr-del" onclick="removeSlot(${di},${si})">&#10005;</button>
+            </div>
           </div>`).join('') : '<p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">No time slots yet &mdash; add at least one slot for customers to choose.</p>'}
         <button class="add-slot-btn" onclick="openAddSlotModal(${di})">+ Add Time Slot</button>
       </div>
@@ -3176,39 +3221,115 @@ function renderDateCards() {
   updateProgress();
 }
 
-window.openAddDateModal = () => {
-  document.getElementById('newDate').value = '';
-  document.getElementById('newDateLabel').value = '';
+window.openAddDateModal = (dateIndex = null) => {
+  editingDateIndex = Number.isInteger(dateIndex) ? dateIndex : null;
+  const date = editingDateIndex === null ? null : eventDates[editingDateIndex];
+  document.getElementById('newDate').value = date?.date || '';
+  document.getElementById('newDateLabel').value = date?.label || '';
+  document.getElementById('dateModalTitle').textContent = date ? 'Edit Event Date' : 'Add Event Date';
+  document.getElementById('dateModalSave').textContent = date ? 'Save Changes' : 'Add Date';
   document.getElementById('addDateModal').classList.add('open');
 };
-window.closeAddDateModal = () => document.getElementById('addDateModal').classList.remove('open');
+window.closeAddDateModal = () => {
+  document.getElementById('addDateModal').classList.remove('open');
+  editingDateIndex = null;
+};
 window.addDate = () => {
   const date = document.getElementById('newDate').value;
   if (!date) { alert('Please select a date.'); return; }
-  if (eventDates.find(d => d.date === date)) { alert('This date is already added.'); return; }
-  eventDates.push({ date, label: document.getElementById('newDateLabel').value.trim(), slots: [] });
+  if (eventDates.some((d, index) => d.date === date && index !== editingDateIndex)) { alert('This date is already added.'); return; }
+  const label = document.getElementById('newDateLabel').value.trim();
+  if (editingDateIndex !== null && eventDates[editingDateIndex]) {
+    const oldDate = eventDates[editingDateIndex].date;
+    eventDates[editingDateIndex] = { ...eventDates[editingDateIndex], date, label };
+    if (oldDate !== date && perDateTickets[oldDate]) {
+      perDateTickets[date] = perDateTickets[oldDate];
+      delete perDateTickets[oldDate];
+    }
+  } else {
+    eventDates.push({ date, label, slots: [] });
+  }
   eventDates.sort((a, b) => a.date.localeCompare(b.date));
   renderDateCards();
   closeAddDateModal();
 };
-window.removeDate = i => { eventDates.splice(i, 1); renderDateCards(); };
+window.removeDate = i => {
+  const removed = eventDates.splice(i, 1)[0];
+  if (removed?.date) delete perDateTickets[removed.date];
+  renderDateCards();
+  if (ticketMode === 'perdate') renderPerDateTicketCards();
+};
 
-window.openAddSlotModal = (di) => {
+window.openAddSlotModal = (di, slotIndex = null) => {
+  editingSlotIndex = Number.isInteger(slotIndex) ? slotIndex : null;
   document.getElementById('slotDateIdx').value = di;
-  ['slotName','slotStart','slotEnd','slotCap'].forEach(id => document.getElementById(id).value = '');
+  const slot = editingSlotIndex === null ? null : eventDates[di]?.slots?.[editingSlotIndex];
+  document.getElementById('slotName').value = slot?.name || '';
+  setSlotTimeValue('slotStart', slot?.start || slot?.startTime || '');
+  setSlotTimeValue('slotEnd', slot?.end || slot?.endTime || '');
+  document.getElementById('slotCap').value = slot?.capacity || '';
+  document.getElementById('slotModalTitle').textContent = slot ? 'Edit Time Slot' : 'Add Time Slot';
+  document.getElementById('slotModalSave').textContent = slot ? 'Save Changes' : 'Add Slot';
   document.getElementById('addSlotModal').classList.add('open');
 };
-window.closeAddSlotModal = () => document.getElementById('addSlotModal').classList.remove('open');
+window.closeAddSlotModal = () => {
+  document.getElementById('addSlotModal').classList.remove('open');
+  editingSlotIndex = null;
+};
+function initSlotTimePickers() {
+  ['slotStart', 'slotEnd'].forEach(prefix => {
+    const hour = document.getElementById(prefix + 'Hour');
+    const minute = document.getElementById(prefix + 'Minute');
+    for (let value = 1; value <= 12; value++) hour.insertAdjacentHTML('beforeend', `<option value="${value}">${String(value).padStart(2, '0')}</option>`);
+    for (let value = 0; value < 60; value++) minute.insertAdjacentHTML('beforeend', `<option value="${String(value).padStart(2, '0')}">${String(value).padStart(2, '0')}</option>`);
+    [hour, minute, document.getElementById(prefix + 'Period')].forEach(select => select.addEventListener('change', () => getSlotTimeValue(prefix)));
+  });
+}
+function setSlotTimeValue(prefix, value) {
+  const match = String(value || '').match(/^(\d{1,2}):(\d{2})/);
+  const input = document.getElementById(prefix);
+  const hourSelect = document.getElementById(prefix + 'Hour');
+  const minuteSelect = document.getElementById(prefix + 'Minute');
+  const periodSelect = document.getElementById(prefix + 'Period');
+  if (!match || Number(match[1]) > 23 || Number(match[2]) > 59) {
+    hourSelect.value = ''; minuteSelect.value = ''; periodSelect.value = '';
+    if (input) input.value = '';
+    return;
+  }
+  const hour24 = Number(match[1]);
+  hourSelect.value = String(hour24 % 12 || 12);
+  minuteSelect.value = match[2];
+  periodSelect.value = hour24 < 12 ? 'AM' : 'PM';
+  if (input) input.value = `${String(hour24).padStart(2, '0')}:${match[2]}`;
+}
+function getSlotTimeValue(prefix) {
+  const hour = document.getElementById(prefix + 'Hour').value;
+  const minute = document.getElementById(prefix + 'Minute').value;
+  const period = document.getElementById(prefix + 'Period').value;
+  const input = document.getElementById(prefix);
+  if (!hour || !minute || !period) {
+    if (input) input.value = '';
+    return '';
+  }
+  const hour24 = (Number(hour) % 12) + (period === 'PM' ? 12 : 0);
+  const value = `${String(hour24).padStart(2, '0')}:${minute}`;
+  if (input) input.value = value;
+  return value;
+}
+initSlotTimePickers();
 window.addSlot = () => {
   const name = document.getElementById('slotName').value.trim();
   if (!name) { alert('Slot name is required.'); return; }
   const di = +document.getElementById('slotDateIdx').value;
-  eventDates[di].slots.push({
+  const slot = {
     name,
-    start: document.getElementById('slotStart').value,
-    end: document.getElementById('slotEnd').value,
+    start: getSlotTimeValue('slotStart'),
+    end: getSlotTimeValue('slotEnd'),
     capacity: Number(document.getElementById('slotCap').value || 0),
-  });
+  };
+  if (!Array.isArray(eventDates[di].slots)) eventDates[di].slots = [];
+  if (editingSlotIndex !== null && eventDates[di].slots[editingSlotIndex]) eventDates[di].slots[editingSlotIndex] = slot;
+  else eventDates[di].slots.push(slot);
   renderDateCards();
   closeAddSlotModal();
 };
@@ -3498,10 +3619,10 @@ window.renderRsvpPreview = function() {
   html += rsvpPreviewFieldHtml('&#128100;', 'Full Name', 'text', 'Enter your full name', true);
   html += rsvpPreviewFieldHtml('&#9993;&#65039;', 'Email Address', 'email', 'your@email.com', true);
 
-  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="7"] .toggle[data-field].on');
+  const onOpt = document.querySelectorAll('#rsvpPreviewFields ~ * .toggle[data-field].on, .step-panel[data-panel="6"] .toggle[data-field].on');
   // collect active optional fields from toggles in the RSVP panel
   const activeOpt = [];
-  document.querySelectorAll('.step-panel[data-panel="7"] .toggle[data-field]').forEach(t => {
+  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
     if (t.classList.contains('on')) activeOpt.push(t.dataset.field);
   });
   if (activeOpt.length) {
@@ -3580,7 +3701,7 @@ function renderRsvpCQs() {
 window.rsvpCreate = async function() {
   const btn = event.target; btn.textContent = 'Saving...';
   const rsvpToggles = {};
-  document.querySelectorAll('.step-panel[data-panel="7"] .toggle[data-field]').forEach(t => {
+  document.querySelectorAll('.step-panel[data-panel="6"] .toggle[data-field]').forEach(t => {
     rsvpToggles[t.dataset.field] = t.classList.contains('on');
   });
   const payload = {

@@ -881,12 +881,14 @@ if(pfHandleEl)pfHandleEl.addEventListener('input',function(){this.value=this.val
 </script>
 <script type="module">
 import{app,auth,db,getCurrentUser,logout,collection,doc,query,where,orderBy,limit,onSnapshot,getDoc,setDoc,updateDoc,serverTimestamp}from"./firebase.js";
+import{redirectToAccountDashboard}from"./dashboard-routing.js";
 window.db=db;window.doc=doc;window.setDoc=setDoc;window.updateDoc=updateDoc;
 const esc=v=>String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const money=v=>`₹${Number(v||0).toLocaleString('en-IN')}`;
 let allEvents=[],activeTab='published',myUid=null,allBookings=[];
 const user=await getCurrentUser();
 if(!user){location.href='login.html';}
+else if(redirectToAccountDashboard(user)){}
 else{
   myUid=user.uid;window.myUid=myUid;
   document.getElementById('sidebarName').textContent=user.name||'Client';

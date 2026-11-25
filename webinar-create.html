@@ -732,7 +732,7 @@
         </div>
       </div>
       <div class="step-actions">
-        <a class="btn-ghost" href="premium-client-dashboard.html">← Back to Webinars</a>
+        <a class="btn-ghost" href="vendordashboard.html">← Back to Webinars</a>
         <button class="btn-primary" onclick="goStep(1)">Next: Location →</button>
       </div>
     </div>
@@ -2467,7 +2467,7 @@ async function saveEvent(status) {
     btn.disabled = true;
     const created=await addDoc(collection(db, 'events'), payload);
     if(inviteAccessConfig.inviteOnly){btn.textContent='Finishing invite setup…';await saveEventInviteAccess(created.id,uid,inviteAccessConfig);}
-    window.location.href = 'premium-client-dashboard.html';
+    window.location.href = 'vendordashboard.html';
   } catch (err) {
     alert('Error saving event: ' + err.message);
     document.getElementById('publishBtn').textContent = 'Publish Webinar';

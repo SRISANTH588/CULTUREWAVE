@@ -67,11 +67,12 @@ async function loadAgreement(){
     const tokenSnapshot=await getDoc(tokenRef);if(!tokenSnapshot.exists())throw new Error('This agreement link is expired or invalid. Ask CultureWave to resend it.');
     const tokenData=tokenSnapshot.data(),expiresAt=tokenData.expiresAt?.toDate?.()||new Date(tokenData.expiresAt);
     if(!tokenData.used&&expiresAt.getTime()<Date.now())throw new Error('This signing link has expired. Ask CultureWave to resend it.');
-    agreement={applicationId:tokenData.applicationId,email:tokenData.email,name:tokenData.name,businessName:tokenData.businessName,address:tokenData.address,fee:tokenData.fee,text:tokenData.agreementText};
-    if(!agreement.applicationId||!Number.isFinite(Number(agreement.fee))||!agreement.text)throw new Error('This signing link is incomplete. Ask CultureWave to resend it.');
+    agreement={applicationId:tokenData.applicationId,email:tokenData.email,name:tokenData.name,businessName:tokenData.businessName,address:tokenData.address,fee:tokenData.fee,text:tokenData.agreementText,restaurant:Boolean(tokenData.restaurant)};
+    if(!agreement.applicationId||!agreement.text)throw new Error('This signing link is incomplete. Ask CultureWave to resend it.');
     signedRecordRef=doc(signingDb,'vendorOnboarding',agreement.applicationId,'signedAgreement','final');
     const address=agreement.address||'';
-    $('applicationDetails').innerHTML=[['Application ID',agreement.applicationId],['Applicant name',agreement.name],['Business name',agreement.businessName],['Email',agreement.email],['Registered address',address],['Agreed service fee',`${agreement.fee}%`]].map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
+    const detailRows=[['Application ID',agreement.applicationId],['Applicant name',agreement.name],['Business name',agreement.businessName],['Email',agreement.email],['Registered address',address]];if(Number.isFinite(Number(agreement.fee)))detailRows.push(['Agreed service fee',`${agreement.fee}%`]);
+    $('applicationDetails').innerHTML=detailRows.map(([k,v])=>`<div class="detail"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
     $('signerName').value=agreement.name||'';$('signerAddress').value=address;
     $('emailAddress').value=agreement.email||'';
     const indiaToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());$('signingDate').value=indiaToday;$('signingDate').max=indiaToday;
@@ -82,7 +83,7 @@ async function loadAgreement(){
 function renderAgreementPreview(){
   if(!agreement)return;const signerName=$('signerName').value.trim(),signerAddress=$('signerAddress').value.trim(),signerEmail=$('emailAddress').value.trim(),date=$('signingDate').value;
   const dateText=date?new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'long',year:'numeric'}).format(new Date(`${date}T12:00:00+05:30`)):'________________';
-  const values={SERVICE_FEE_PERCENT:String(agreement.fee),MERCHANT_NAME:signerName||'________________',BUSINESS_NAME:agreement.businessName||'________________',REGISTERED_ADDRESS:signerAddress||'________________',MERCHANT_EMAIL:signerEmail||'________________',SIGNING_DATE:dateText};
+  const values={SERVICE_FEE_PERCENT:Number.isFinite(Number(agreement.fee))?String(agreement.fee):'',MERCHANT_NAME:signerName||'________________',BUSINESS_NAME:agreement.businessName||'________________',REGISTERED_ADDRESS:signerAddress||'________________',MERCHANT_EMAIL:signerEmail||'________________',SIGNING_DATE:dateText};
   $('agreementTerms').textContent=(agreement.text||CULTUREWAVE_AGREEMENT).replace(/\{\{([A-Z_]+)\}\}/g,(marker,key)=>values[key]??marker);
   $('previewSignerName').textContent=signerName||'—';$('previewBusinessName').textContent=agreement.businessName||'—';$('previewSignerAddress').textContent=signerAddress||'—';$('previewSignerEmail').textContent=signerEmail||'—';$('previewSigningDate').textContent=dateText==='________________'?'—':dateText;
   $('agreementSignaturePreview').hidden=!hasInk;$('signaturePlaceholder').hidden=hasInk;if(hasInk)$('agreementSignaturePreview').src=$('signature').toDataURL('image/png');
@@ -131,17 +132,17 @@ $('submitSignature').onclick=async()=>{
   try{
     const signature=$('signature').toDataURL('image/png'),signerEmail=$('emailAddress').value.trim(),signerName=$('signerName').value.trim(),signerAddress=$('signerAddress').value.trim(),signingDate=$('signingDate').value,todayIndia=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
     if(!/^\d{4}-\d{2}-\d{2}$/.test(signingDate)||signingDate>todayIndia)throw new Error('Choose a valid signing date that is not in the future.');
-    const values={SERVICE_FEE_PERCENT:String(agreement.fee),MERCHANT_NAME:signerName,BUSINESS_NAME:agreement.businessName||'',REGISTERED_ADDRESS:signerAddress,MERCHANT_EMAIL:signerEmail,SIGNING_DATE:formatAgreementDate(signingDate)};
+    const values={SERVICE_FEE_PERCENT:Number.isFinite(Number(agreement.fee))?String(agreement.fee):'',MERCHANT_NAME:signerName,BUSINESS_NAME:agreement.businessName||'',REGISTERED_ADDRESS:signerAddress,MERCHANT_EMAIL:signerEmail,SIGNING_DATE:formatAgreementDate(signingDate)};
     const signedAgreementText=(agreement.text||CULTUREWAVE_AGREEMENT).replace(/\{\{([A-Z_]+)\}\}/g,(marker,key)=>values[key]??marker);
-    signedPdfDataUrl=await buildSignedAgreementPdf(signedAgreementText,signature,{applicationId:agreement.applicationId,signerName,signerAddress,signerEmail,businessName:agreement.businessName||'',signingDate,fee:agreement.fee});
+    signedPdfDataUrl=await buildSignedAgreementPdf(signedAgreementText,signature,{applicationId:agreement.applicationId,signerName,signerAddress,signerEmail,businessName:agreement.businessName||'',signingDate,fee:Number.isFinite(Number(agreement.fee))?agreement.fee:''});
     const pdfBytes=Math.floor((signedPdfDataUrl.length-`data:application/pdf;base64,`.length)*.75),signerUid=signingAuth.currentUser.uid;
     await runTransaction(signingDb,async transaction=>{
       const latestToken=await transaction.get(tokenRef);if(!latestToken.exists()||latestToken.data().used||latestToken.data().expiresAt.toDate().getTime()<Date.now())throw new Error('This agreement has already been signed or expired. Refresh to view the saved PDF.');
-      transaction.set(signedRecordRef,{applicationId:agreement.applicationId,tokenHash,signerUid,signerName,signerAddress,signerEmail,signingDate,serviceFeePercent:Number(agreement.fee),dataUrl:signedPdfDataUrl,signatureDataUrl:signature,contentType:'application/pdf',size:pdfBytes,createdAt:serverTimestamp()});
+      transaction.set(signedRecordRef,{applicationId:agreement.applicationId,tokenHash,signerUid,signerName,signerAddress,signerEmail,signingDate,...(Number.isFinite(Number(agreement.fee))?{serviceFeePercent:Number(agreement.fee)}:{}),dataUrl:signedPdfDataUrl,signatureDataUrl:signature,contentType:'application/pdf',size:pdfBytes,createdAt:serverTimestamp()});
       transaction.update(tokenRef,{used:true,signerUid,signedAgreementId:'final',signedAt:serverTimestamp()});
       transaction.update(doc(signingDb,'vendorOnboarding',agreement.applicationId),{status:'SIGNED',agreementStatus:'SIGNED',signedAgreement:{path:'firestore-signed:final',name:'SIGNED_VENDOR_AGREEMENT.pdf',tokenHash,signerName,signerAddress,signingDate,signerEmail,signedAt:serverTimestamp()},updatedAt:serverTimestamp()});
     });await showSigned();
-    const message=`Vendor agreement signed and saved.\nApplication: ${agreement.applicationId}\nSigner: ${signerName}\nEmail: ${signerEmail}\nDate: ${signingDate}\nThe signed agreement PDF is attached and also available in Admin Dashboard > Vendor Applications.`;
+    const message=`${agreement.restaurant?'Restaurant':'Vendor'} agreement signed and saved.\nApplication: ${agreement.applicationId}\nSigner: ${signerName}\nEmail: ${signerEmail}\nDate: ${signingDate}\nThe signed agreement PDF is available in Admin Dashboard > ${agreement.restaurant?'Restaurant Onboarding':'Vendor Applications'}.`;
     try{if(!EMAILJS_SIGNATURE_TEMPLATE_ID.startsWith('REPLACE_')&&EMAILJS_SIGNATURE_TEMPLATE_ID!=='template_caj3zqw')await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_SIGNATURE_TEMPLATE_ID,{to_email:'support.culturewave@gmail.com',to_name:'CultureWave Vendor Onboarding',name:signerName,subject:`Signed agreement · ${agreement.applicationId}`,message,message_html:esc(message).replace(/\n/g,'<br>'),applicationId:agreement.applicationId,signerName,signerAddress,signingDate,signerEmail,serviceFeePercent:agreement.fee,signed_pdf:signedPdfDataUrl,reply_to:signerEmail});}
     catch{ $('signedMeta').textContent+=` · Admin email notification could not be sent; the PDF is saved in the dashboard.` }
   }catch(error){const locked=error.code==='permission-denied'||error.code==='failed-precondition'||/already signed|already used/i.test(error.message||'');notice(locked?'This agreement has already been signed or expired. Refresh to view the saved PDF.':error.message||'Could not save the signed agreement. Check your connection and try again.');button.disabled=false;button.textContent='Sign and submit agreement'}

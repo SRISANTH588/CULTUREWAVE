@@ -252,7 +252,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div class="topbar-title" id="pageTitle">🎵 Live Music Dashboard</div>
     </div>
     <div class="topbar-right">
-      <a class="tb-link" href="Home.html" target="_blank">⬡ View website</a>
+      <a class="tb-link" href="index.html" target="_blank">⬡ View website</a>
       <button class="tb-icon-btn">🔔<span class="tb-dot"></span></button>
       <button class="tb-user-btn" onclick="switchView('personal-info')">
         <div class="tb-user-avatar" id="topAvatar">M</div>
@@ -333,7 +333,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div class="prem-actions">
         <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
         <button onclick="switchView('personal-info')" class="prem-btn-ghost">⚙ Brand Settings</button>
-        <button onclick="location.href='event-create.html?from=livemusic'" id="createEvBtn" class="prem-btn-white">✦ Create Event</button>
+        <button onclick="location.href='event-create.html'" id="createEvBtn" class="prem-btn-white">✦ Create Event</button>
       </div>
     </div>
     <div class="prem-stats">
@@ -370,7 +370,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       </div>
       <div class="prem-actions">
         <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
-        <button onclick="location.href='event-create.html?from=livemusic'" class="prem-btn-white">✦ Create Concert</button>
+        <button onclick="location.href='event-create.html'" class="prem-btn-white">✦ Create Concert</button>
       </div>
     </div>
     <div class="prem-stats">
@@ -385,7 +385,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e11d48,#f43f5e);display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem;">🎸</div>
       <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem;color:#1a1a2e;">No live concerts yet</h3>
       <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first live concert and start selling tickets.</p>
-      <button onclick="location.href='event-create.html?from=livemusic'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#e11d48,#f43f5e);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(225,29,72,.3);">✦ Create Live Concert</button>
+      <button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#e11d48,#f43f5e);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(225,29,72,.3);">✦ Create Live Concert</button>
     </div>
   </div>
 </div>
@@ -401,7 +401,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       </div>
       <div class="prem-actions">
         <button onclick="location.href='client-profile.html?uid='+(window.myUid||'')" class="prem-btn-ghost">⬡ View Profile</button>
-        <button onclick="location.href='event-create.html?from=livemusic'" class="prem-btn-white">✦ Create Open Mic Night</button>
+        <button onclick="location.href='event-create.html'" class="prem-btn-white">✦ Create Open Mic Night</button>
       </div>
     </div>
     <div class="prem-stats">
@@ -416,7 +416,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
       <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#be123c,#e11d48);display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem;">🎤</div>
       <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem;color:#1a1a2e;">No open mic nights yet</h3>
       <p style="font-size:.84rem;color:#9ca3af;max-width:300px;margin:0 auto 1.25rem;line-height:1.6;">Create your first open mic night and manage bookings.</p>
-      <button onclick="location.href='event-create.html?from=livemusic'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#be123c,#e11d48);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(190,18,60,.3);">✦ Create Open Mic Night</button>
+      <button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#be123c,#e11d48);color:#fff;font-size:.86rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 2px 8px rgba(190,18,60,.3);">✦ Create Open Mic Night</button>
     </div>
   </div>
 </div>
@@ -929,7 +929,7 @@ function switchView(name){
   if(name==='events'){renderEvents();}
   if(name==='customer-info'&&window.renderCustomerInfoPanel){window.renderCustomerInfoPanel();}
   if(name==='personal-info'){var pv=document.querySelector('.view[data-view="personal-info"]');if(pv){pv.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});pv.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});var def=document.getElementById('bp-basic');var defBtn=document.querySelector('.brand-sidenav-item[data-panel="bp-basic"]');if(def)def.style.display='flex';if(defBtn)defBtn.classList.add('active');}}
-  try{localStorage.setItem('livemusicDashView',name);}catch(e){}
+  try{localStorage.setItem('eventListerDashView',name);}catch(e){}
 }
 function switchPanel(btn,panelId){var view=document.querySelector('.view[data-view="personal-info"]');if(!view)return;view.querySelectorAll('.brand-sidenav-item[data-panel]').forEach(function(b){b.classList.remove('active');});view.querySelectorAll('.brand-panel').forEach(function(p){p.style.display='none';});btn.classList.add('active');var panel=document.getElementById(panelId);if(panel)panel.style.display='flex';}
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sbOverlay').classList.add('open');}
@@ -947,12 +947,14 @@ if(pfHandleEl)pfHandleEl.addEventListener('input',function(){this.value=this.val
 </script>
 <script type="module">
 import{app,auth,db,getCurrentUser,logout,collection,doc,query,where,orderBy,limit,onSnapshot,getDoc,setDoc,updateDoc,deleteDoc,serverTimestamp}from"./firebase.js";
+import{redirectToAccountDashboard}from"./dashboard-routing.js";
 window.db=db;window.doc=doc;window.setDoc=setDoc;window.updateDoc=updateDoc;
 const esc=v=>String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const money=v=>`₹${Number(v||0).toLocaleString('en-IN')}`;
 let allEvents=[],activeTab='published',myUid=null,allBookings=[],allPlaylists=[],playlistDraftSongs=[],editingPlaylistSong=-1;
 const user=await getCurrentUser();
 if(!user){location.href='login.html';}
+else if(redirectToAccountDashboard(user)){}
 else{
   myUid=user.uid;window.myUid=myUid;
   const customerInfoLink=document.getElementById('customerInfoSidebarLink');
@@ -982,7 +984,7 @@ function renderPlan(user){
   if(upgradeLink) upgradeLink.style.display=paid?'none':'';
 }
 document.getElementById('logoutBtn').onclick=()=>logout();
-try{const saved=localStorage.getItem('livemusicDashView');if(saved)switchView(saved);}catch(e){}
+try{const saved=localStorage.getItem('eventListerDashView');if(saved)switchView(saved);}catch(e){}
 function normStatus(s){const v=(s||'draft').toLowerCase();return(v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished';}
 function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();renderCustomerInfoPanel();},err=>console.error('Unable to load events:',err));}
 function playlistEventName(id){const ev=allEvents.find(e=>e.id===id);return ev?.name||'Default playlist';}
@@ -1008,8 +1010,8 @@ function renderEvents(){
   if(el('hdrPublished'))el('hdrPublished').textContent=pub;
   if(el('hdrDraft'))el('hdrDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;
   const container=document.getElementById('eventsContainer');
-  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border-radius:14px;padding:5rem 2rem 4rem;text-align:center;"><div style="width:88px;height:88px;border-radius:50%;background:#c47a2b;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🎵</div><h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No music events yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first music event and start selling tickets.</p><button onclick="location.href='event-create.html?from=livemusic'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.2rem;border-radius:999px;background:linear-gradient(135deg,#be123c,#e11d48);color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(190,18,60,.35);">✦ Create Music Event</button></div>`;return;}
-  container.innerHTML=`<div class="events-table"><div class="ev-table-head"><span>Event</span><span>Status</span><span>Date</span><span>Price</span><span>Actions</span></div>${filtered.map(ev=>{const st=normStatus(ev.status);const stLabel=st==='published'?'Live':st==='archived'?'Archived':'Draft';const rawDate=ev.startDate||ev.eventDates?.[0]?.date;const parsedDate=rawDate?.toDate?rawDate.toDate():rawDate?new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(rawDate))?String(rawDate)+'T12:00:00':rawDate):null;const date=parsedDate&&!Number.isNaN(parsedDate.getTime())?parsedDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';const price=ev.price||ev.tickets?.[0]?.price||0;return`<div class="ev-row"><div><div class="ev-name">${esc(ev.name||'Untitled')}</div><div class="ev-sub">${esc(ev.city||'')}</div></div><div><span class="status-pill ${st==='published'?'live':st==='archived'?'archived':'draft'}">● ${stLabel}</span></div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.84rem;font-weight:600;color:#1a1a2e;">${price?money(price):'Free'}</div><div class="ev-actions"><button class="ev-act-btn ${st==='published'?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${st==='published'?'Unpublish':'Publish'}</button><a class="ev-act-btn" href="/event/${encodeURIComponent(String(ev.urlKey||ev.name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event')}?eventId=${encodeURIComponent(ev.id)}" target="_blank">View</a><a class="ev-act-btn" href="event-create.html?eventId=${ev.id}&from=livemusic">Edit</a><a class="ev-act-btn primary" href="event-manage.html?eventId=${ev.id}">Manage</a><button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button></div></div>`;}).join('')}</div>`;
+  if(!filtered.length){container.innerHTML=`<div style="background:#fff;border-radius:14px;padding:5rem 2rem 4rem;text-align:center;"><div style="width:88px;height:88px;border-radius:50%;background:#c47a2b;display:grid;place-items:center;font-size:2.2rem;margin:0 auto 1.5rem;">🎵</div><h3 style="font-size:1.05rem;font-weight:800;color:#1a1a2e;margin-bottom:.5rem;">No music events yet</h3><p style="font-size:.88rem;color:#9ca3af;max-width:280px;margin:0 auto 1.75rem;line-height:1.65;">Create your first music event and start selling tickets.</p><button onclick="location.href='event-create.html'" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 2.2rem;border-radius:999px;background:linear-gradient(135deg,#be123c,#e11d48);color:#fff;font-size:.92rem;font-weight:700;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(190,18,60,.35);">✦ Create Music Event</button></div>`;return;}
+  container.innerHTML=`<div class="events-table"><div class="ev-table-head"><span>Event</span><span>Status</span><span>Date</span><span>Price</span><span>Actions</span></div>${filtered.map(ev=>{const st=normStatus(ev.status);const stLabel=st==='published'?'Live':st==='archived'?'Archived':'Draft';const rawDate=ev.startDate||ev.eventDates?.[0]?.date;const parsedDate=rawDate?.toDate?rawDate.toDate():rawDate?new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(rawDate))?String(rawDate)+'T12:00:00':rawDate):null;const date=parsedDate&&!Number.isNaN(parsedDate.getTime())?parsedDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';const price=ev.price||ev.tickets?.[0]?.price||0;return`<div class="ev-row"><div><div class="ev-name">${esc(ev.name||'Untitled')}</div><div class="ev-sub">${esc(ev.city||'')}</div></div><div><span class="status-pill ${st==='published'?'live':st==='archived'?'archived':'draft'}">● ${stLabel}</span></div><div style="font-size:.82rem;color:#6b7280;">${date}</div><div style="font-size:.84rem;font-weight:600;color:#1a1a2e;">${price?money(price):'Free'}</div><div class="ev-actions"><button class="ev-act-btn ${st==='published'?'':'primary'}" onclick="togglePublishEvent('${ev.id}','${st}')">${st==='published'?'Unpublish':'Publish'}</button><a class="ev-act-btn" href="/event/${encodeURIComponent(String(ev.urlKey||ev.name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event')}?eventId=${encodeURIComponent(ev.id)}" target="_blank">View</a><a class="ev-act-btn" href="event-create.html?eventId=${ev.id}">Edit</a><a class="ev-act-btn primary" href="event-manage.html?eventId=${ev.id}">Manage</a><button class="ev-act-btn" onclick="copyEvLink('${ev.id}')">Share</button></div></div>`;}).join('')}</div>`;
 }
 window.setLiveMusicEventTab=function(tab){
   if(!['published','unpublished','archived'].includes(tab))return;
@@ -1018,7 +1020,7 @@ window.setLiveMusicEventTab=function(tab){
 };
 window.copyEvLink=function(id){const ev=allEvents.find(item=>item.id===id);const slug=String(ev?.urlKey||ev?.name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';navigator.clipboard.writeText(`${location.origin}/event/${encodeURIComponent(slug)}`).then(()=>showToast('Link copied!'));};
 window.togglePublishEvent=async function(id,st){if(!myUid)return;const ns=st==='published'?'unpublished':'published';await updateDoc(doc(db,'events',id),{status:ns,updatedAt:serverTimestamp()});showToast(ns==='published'?'✅ Event published!':'🟡 Event unpublished');};
-const createEvBtn=document.getElementById("createEvBtn");if(createEvBtn)createEvBtn.onclick=()=>location.href="event-create.html?from=livemusic";
+const createEvBtn=document.getElementById("createEvBtn");if(createEvBtn)createEvBtn.onclick=()=>location.href="event-create.html";
 document.getElementById('evSearch').addEventListener('input',renderEvents);
 document.getElementById('evRefresh').onclick=()=>renderEvents();
 renderEvents();

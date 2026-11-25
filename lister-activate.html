@@ -11,12 +11,11 @@
   <main class="card"><div class="brand">CultureWave</div><h1>Activate your lister account</h1><p>Use the email address that received this approval link. If you already have a customer account with this email, sign in with its current password to add lister access. You can reset the password below if you want to choose a new password for this account.</p><label class="field">Email address<input id="email" type="email" autocomplete="email" required></label><label class="field"><span id="passwordLabel">Create a password</span><input id="password" type="password" autocomplete="new-password" minlength="8" required></label><label class="field" id="confirmPasswordField">Confirm password<input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></label><button id="activate" class="button" type="button">Create account and activate</button><button id="resetPassword" class="button secondary" type="button" hidden>Reset existing account password</button><div id="status" class="status" role="status" aria-live="polite"></div></main>
   <script type="module">
     import { auth, db } from './firebase.js';
+    import { dashboardForAccount } from './dashboard-routing.js';
     import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInAnonymously, signInWithEmailAndPassword, reload } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
     import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     const paramsFromLink=(()=>{const queue=[location.href],seen=new Set(),state={};while(queue.length&&seen.size<12){const raw=queue.shift();if(!raw||seen.has(raw))continue;seen.add(raw);try{const url=new URL(raw,location.origin);for(const key of ['activation','applicationId'])if(!state[key]&&url.searchParams.has(key))state[key]=url.searchParams.get(key);for(const key of ['continueUrl','continueURL','link','deep_link_id']){const nested=url.searchParams.get(key);if(nested)queue.push(nested)}}catch{}}return state})();
     const emailInput=document.getElementById('email'),button=document.getElementById('activate'),resetButton=document.getElementById('resetPassword'),passwordLabel=document.getElementById('passwordLabel'),confirmPasswordField=document.getElementById('confirmPasswordField'),status=document.getElementById('status');let existingAccountMode=false;
-    const dashboardByCategory={nightlife:'dashboard-nightlife.html',brunch:'dashboard-brunch.html',dining:'dashboard-restaurant.html',workshops:'dashboard-workshops.html',experiences:'dashboard-experiences.html',music:'dashboard-livemusic.html'};
-    const allowedDashboards=new Set([...Object.values(dashboardByCategory),'premium-client-dashboard.html']);
     const normalizeCategory=value=>{const key=String(value||'').trim().toLowerCase();const aliases={'party':'nightlife','parties':'nightlife','fine dining':'dining','restaurant':'dining','live music':'music','experience':'experiences'};return aliases[key]||key};
     const say=(message,ok=false)=>{status.textContent=message;status.className='status show'+(ok?' ok':'')};
     emailInput.value='';
@@ -33,9 +32,9 @@
         if(expiresAt.getTime()<Date.now())throw new Error('This activation link has expired. Ask CultureWave to send a new one.');
         const userRef=doc(db,'users',uid),organiserRef=doc(db,'organisers',uid),applicationRef=doc(db,'vendorOnboarding',token.applicationId),userSnapshot=await getDoc(userRef);
         if(userSnapshot.exists()&&!['client','customer','lister'].includes(userSnapshot.data().role))throw new Error('This email already has a different account type. Contact CultureWave support.');
-        const category=normalizeCategory(token.preferredCategory),dashboard=dashboardByCategory[category]||(allowedDashboards.has(token.preferredDashboard)?token.preferredDashboard:'premium-client-dashboard.html');
+        const category=normalizeCategory(token.preferredCategory),dashboard=token.preferredDashboard==='dashboard-restaurant.html'?'dashboard-restaurant.html':'vendordashboard.html';
         const existingRoles=userSnapshot.exists()?(Array.isArray(userSnapshot.data().roles)?userSnapshot.data().roles:[userSnapshot.data().role||'client']):[];
-        const profile={uid,name:token.name||email,email,phone:token.phone||'',role:'lister',roles:[...new Set([...existingRoles,'lister'])],dashboard,preferredCategory:category||'',status:'active',emailVerified:emailVerified===true,onboardingApplicationId:token.applicationId,activationTokenHash:tokenHash};
+        const profile={uid,name:token.name||email,email,phone:token.phone||'',role:'lister',roles:[...new Set([...existingRoles,'lister'])],accountType:dashboard==='dashboard-restaurant.html'?'restaurant':'vendor',dashboard,preferredDashboard:dashboard,preferredCategory:category||'',status:'active',emailVerified:emailVerified===true,onboardingApplicationId:token.applicationId,activationTokenHash:tokenHash};
         step='saving your lister profile';
         await setDoc(userRef,{...(userSnapshot.exists()?userSnapshot.data():{}),...profile,...(userSnapshot.exists()?{updatedAt:serverTimestamp()}:{createdAt:serverTimestamp()})},{merge:true});
         step='saving your organiser profile';
@@ -53,8 +52,9 @@
       await reload(user);
       await user.getIdToken(true);
       await activate(user.uid,user.email||email,user.emailVerified);
-      const userSnapshot=await getDoc(doc(db,'users',user.uid)),profile=userSnapshot.exists()?userSnapshot.data():{},destination=allowedDashboards.has(profile.dashboard)?profile.dashboard:dashboardByCategory[normalizeCategory(profile.preferredCategory)]||'premium-client-dashboard.html';
-      say('Your lister account is active. Opening your dashboard…',true);button.textContent='Account activated';setTimeout(()=>location.assign(destination),900);
+      const profileSnapshot=await getDoc(doc(db,'users',user.uid)),profile=profileSnapshot.exists()?profileSnapshot.data():{};
+      const destination=dashboardForAccount(profile)||'vendordashboard.html';
+      say('Your account is active. Opening your dashboard…',true);button.textContent='Account activated';setTimeout(()=>location.assign(destination),900);
     }
     auth.authStateReady().then(()=>{const user=auth.currentUser;if(user?.email)emailInput.value=user.email}).catch(error=>console.error('Could not restore the sign-in session:',error));
     button.addEventListener('click',async()=>{

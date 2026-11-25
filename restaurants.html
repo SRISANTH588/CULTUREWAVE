@@ -21,6 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <style>
+      [hidden] { display: none !important; }
       body { background: #fff; }
 
       .rs-hero {
@@ -155,6 +156,24 @@
       }
       .rs-list-cta a:hover { background: #b91c1c; }
 
+      /* Match the profile card shown in the index page's mobile menu. */
+      .mobile-profile-card {
+        display: grid; gap: 14px; margin: 0 0 1.25rem; padding: 16px;
+        border: 1px solid #39343f; border-radius: 20px;
+        background: linear-gradient(120deg,#291e3b,#1b1b20 78%); color: #fff;
+      }
+      .mobile-profile-main { display: grid; grid-template-columns: 100px minmax(0,1fr); align-items: center; gap: 14px; }
+      .mobile-profile-avatar {
+        display: grid; place-items: center; width: 100px; height: 100px;
+        box-sizing: border-box; overflow: hidden; border: 5px solid #b99cff; border-radius: 50%;
+        background: #333; box-shadow: inset 0 0 0 3px #25252a;
+      }
+      .mobile-profile-avatar svg { display: block; width: 72px; height: 72px; fill: none; stroke: #777; stroke-width: 2; }
+      .mobile-profile-info { display: grid; gap: 4px; min-width: 0; }
+      .mobile-profile-name { overflow: hidden; color: #fff; font-size: 1rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+      .mobile-profile-contact { color: #aaa; font-size: .8rem; }
+      .mobile-profile-progress { color: #c7afff; font-size: .8rem; }
+
       .rs-empty { grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: #9ca3af; }
       .rs-empty span { font-size: 3rem; display: block; margin-bottom: 0.8rem; }
 
@@ -167,13 +186,40 @@
 
       /* Dining discovery and table booking */
       body { background: #111113; color: #f7f6fa; }
-      .topbar { display:none; }
       main { background:#111113; }
-      .rs-appbar { position:sticky; top:0; z-index:15; padding:1rem max(1rem,calc((100vw - 1180px)/2)); display:flex; align-items:center; gap:.85rem; color:#fff; background:linear-gradient(115deg,rgba(41,34,107,.96),rgba(20,19,42,.94)); border-bottom:1px solid rgba(255,255,255,.09); backdrop-filter:blur(18px); }
-      .rs-home-icon,.rs-profile { width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-size:1.25rem; }
-      .rs-app-title { flex:1;font-weight:800;font-size:1rem;line-height:1.25; }
-      .rs-app-title small { display:block;color:#c2bfd7;font-size:.78rem;font-weight:600;margin-top:.12rem; }
-      .rs-app-mark { width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#d5a4ff,#5829da 65%,#281364);border:1px solid #a88ce8;font-size:1.1rem; }
+      .rs-appbar { display:none; }
+
+      /* ── TOPBAR (matches index.html) ── */
+      .topbar{background:#000!important;border-bottom:0!important;box-shadow:none!important;}
+      .topbar .logo{color:#fff!important;}
+      .topbar .brand-sub{color:#888!important;}
+      .topbar .topnav a{color:#aaa!important;}
+      .topbar .topnav a:hover{color:#fff!important;background:#111!important;}
+      .topbar .auth-actions{gap:.5rem;padding:.3rem;border:1px solid #333!important;border-radius:999px;background:#111!important;}
+      .topbar .auth-actions .nav-link{padding:.6rem .95rem;border:0;background:transparent;color:#aaa!important;font-size:.82rem;}
+      .topbar .auth-actions .nav-link:hover{background:#222!important;color:#fff!important;}
+      .topbar .auth-actions .nav-cta{margin-left:0;padding:.65rem 1.1rem;font-size:.82rem;background:#fff!important;color:#000!important;border-radius:999px;font-weight:800;}
+      @media(min-width:961px){
+        .topbar{background:#000!important;border:0!important;box-shadow:none!important;}
+        .topbar .nav-wrap{width:100%!important;max-width:1800px!important;min-height:100px!important;padding:.5rem 20px!important;gap:clamp(10px,1.4vw,24px)!important;}
+        .topbar .brand-block{display:grid!important;flex:0 0 auto!important;position:relative!important;left:64px!important;}
+        .topbar .topnav{display:flex!important;position:relative!important;left:120px!important;flex:0 0 auto!important;justify-content:flex-start!important;gap:.35rem!important;white-space:nowrap!important;}
+        .topbar .topnav a{padding:.65rem .75rem!important;font-size:clamp(1.05rem,1.1vw,1.2rem)!important;}
+        .topbar .mobile-header-actions{display:none!important;}
+      }
+      @media(max-width:960px){
+        .topbar .nav-wrap{min-height:66px;padding:.7rem 1rem;gap:.35rem;justify-content:space-between;}
+        .topbar .brand-block{display:grid;position:static;left:auto;}
+        .topbar .brand-block .logo{font-size:1rem;line-height:1.15;font-weight:900;letter-spacing:.06em;white-space:nowrap;}
+        .topbar .brand-block .brand-sub{font-size:.58rem;letter-spacing:.08em;}
+        .topbar .topnav,.topbar .auth-actions,.topbar .mobile-header-actions,.topbar .desktop-header-search{display:none!important;}
+        .topbar .nav-wrap>.hamburger{display:flex!important;visibility:visible;opacity:1;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;margin-left:auto;border:1px solid #333;border-radius:13px;background:#111;}
+        .topbar .nav-wrap>.hamburger span{display:block;background:#fff!important;}
+        .topbar .nav-wrap>.hamburger::after{display:none!important;content:none!important;}
+        .topbar .nav-wrap>.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+        .topbar .nav-wrap>.hamburger.open span:nth-child(2){opacity:0;}
+        .topbar .nav-wrap>.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+      }
       .rs-filterbar { position:sticky;top:80px;z-index:14;display:flex;gap:.55rem;overflow-x:auto;padding:.7rem max(1rem,calc((100vw - 1180px)/2));background:rgba(24,24,28,.94);border-bottom:1px solid rgba(255,255,255,.08);scrollbar-width:none;backdrop-filter:blur(18px); }
       .rs-filterbar::-webkit-scrollbar {display:none}
       .rs-filter-control {white-space:nowrap;border:1px solid #44444c;border-radius:999px;background:#27272c;color:#f4f2f9;padding:.62rem .95rem;font-size:.82rem;font-weight:700;cursor:pointer}
@@ -182,8 +228,8 @@
       .rs-filter-control option {color:#111}
       .rs-hero {
         position: relative; isolation: isolate; overflow: hidden;
-        min-height: 360px; display: flex; align-items: center;
-        padding: 3rem 0; border: 0;
+        min-height: 300px; display: flex; align-items: center;
+        padding: 2rem 0; border: 0;
         background: radial-gradient(ellipse at 50% 115%,#5331a9 0,transparent 50%),linear-gradient(135deg,#091330,#191144 55%,#071329);
       }
       .rs-hero::before {
@@ -201,7 +247,7 @@
         max-width: 720px; margin-bottom: .75rem; color: #f7d47d;
         font-family: Georgia, 'Times New Roman', serif; font-weight: 800;
         text-align:center;margin-left:auto;margin-right:auto;text-shadow:0 4px 24px rgba(255,188,70,.25);
-        font-size: clamp(3rem, 7vw, 5.5rem); line-height: .92; letter-spacing: -.045em;
+        font-size: clamp(2.6rem, 5.5vw, 4.5rem); line-height: .92; letter-spacing: -.045em;
       }
       .rs-hero h1 span { color: #f5cc76; }
       .rs-hero p { max-width: 600px; color: rgba(255,255,255,.84); font-size: 1.02rem;text-align:center;margin-left:auto;margin-right:auto; }
@@ -239,6 +285,43 @@
         color: #fff; background: #242428;
       }
       .rs-section { max-width: 1320px; padding-top: 2rem; }
+      /* Polished category tiles for the dining mood selector. */
+      .rs-moods { gap: 1rem; }
+      .rs-mood {
+        position: relative;
+        min-height: 164px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 22px;
+        padding: 1.15rem;
+        background: linear-gradient(145deg, #252229 0%, #17171b 78%);
+        box-shadow: 0 12px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.08);
+        color: #fff;
+        text-decoration: none;
+        transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      }
+      .rs-mood::before {
+        content: "";
+        position: absolute;
+        width: 130px;
+        height: 130px;
+        right: -42px;
+        bottom: -55px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(131,93,185,.3), transparent 70%);
+        pointer-events: none;
+      }
+      .rs-mood:hover {
+        transform: translateY(-4px);
+        border-color: rgba(190,157,255,.45);
+        box-shadow: 0 17px 34px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.1);
+      }
+      .rs-mood span { position: relative; z-index: 1; font-size: 2.5rem; filter: drop-shadow(0 7px 9px rgba(0,0,0,.3)); }
+      @media (max-width: 760px) {
+        .rs-moods { grid-template-columns: repeat(2, minmax(0,1fr)); gap: .75rem; }
+        .rs-mood { min-height: 116px; padding: .9rem; border-radius: 18px; font-size: .9rem; }
+        .rs-mood span { font-size: 2.1rem; }
+      }
       .rs-content {max-width:1320px;margin:0 auto;padding:2rem 1.4rem 0}
       .rs-content h2 {font-size:1.45rem;letter-spacing:-.04em;margin:0 0 1rem;color:#f6f4fa}
       .rs-offers {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:0 0 2.6rem}
@@ -263,7 +346,7 @@
         box-shadow: 0 8px 28px rgba(0,0,0,.18); transition: transform .25s, box-shadow .25s;
       }
       .rs-card:hover { transform: translateY(-3px); box-shadow: 0 18px 42px rgba(0,0,0,.3); }
-      .rs-banner { height: 215px; }
+      .rs-banner { height: 235px; }
       .rs-banner::after { background: linear-gradient(0deg, rgba(0,0,0,.5), transparent 72%); }
       .rs-tag, .rs-rating { border-radius: 999px; }
       .rs-tag { color: #fff; background: rgba(15,15,20,.62); border-color: rgba(255,255,255,.3); letter-spacing: .06em; }
@@ -290,14 +373,14 @@
         body {padding-bottom:76px}
         .rs-appbar {top:0;padding:.85rem 1rem}
         .rs-filterbar {top:72px;padding:.65rem 1rem}
-        .rs-hero { min-height: 300px; padding: 2.3rem 0 2.6rem; }
+        .rs-hero { min-height: 260px; padding: 1.8rem 0 2rem; }
         .rs-hero-inner {padding:0 1rem}
-        .rs-hero h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
+        .rs-hero h1 { font-size: clamp(2.35rem, 11vw, 3.5rem); }
         .rs-hero p{font-size:.88rem}
         .rs-search-row { flex-direction: row; }
         .rs-search-btn { padding-inline: 1rem; }
-        .rs-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:.3rem;scrollbar-width:none}
-        .rs-chip{white-space:nowrap}
+        .rs-chips{flex-wrap:nowrap;overflow-x:hidden;padding-bottom:.3rem;scrollbar-width:none;gap:.3rem}
+        .rs-chip{flex:1 1 auto;min-width:0;padding:.42rem .35rem;font-size:clamp(.58rem,2.25vw,.72rem);white-space:nowrap}
         .rs-stats-inner{padding:.8rem 1rem}
         .rs-sort{display:none}
         .rs-content{padding:0 1rem 2.5rem}
@@ -320,50 +403,248 @@
         .rs-bottomnav a:first-child{background:rgba(255,255,255,.12);color:#fff}
         .rs-bottomnav b{font-size:1.12rem;font-weight:600}
       }
+      /* Mobile dining page follows the compact app layout in the reference. */
+      @media (max-width: 760px) {
+        .rs-appbar { min-height: 70px; padding: .75rem 1rem; }
+        .rs-brand-name { font-size:1.4rem; }
+        .rs-filterbar { top:74px; gap:.5rem; }
+        .rs-filter-control { padding:.58rem .85rem; font-size:.8rem; }
+        /* Keep admin-selected hero artwork on phones. The shorthand `background`
+           used here previously replaced the inline image set from Firestore. */
+        .rs-hero { min-height:0; padding:1.5rem 0 1.7rem; background-color:#091330; background-image:radial-gradient(ellipse at 50% 115%,#5331a9 0,transparent 50%),linear-gradient(135deg,#091330,#191144 55%,#071329); background-size:cover; background-position:center; }
+        .rs-hero-inner { position:relative; }
+        .rs-location { margin-bottom:.8rem; font-size:.64rem; }
+        .rs-hero h1 { font-size:clamp(2.3rem,10.5vw,3.2rem); margin-bottom:.55rem; }
+        .rs-hero p { margin-bottom:1.15rem; }
+        .rs-search-row { margin-bottom:1rem; }
+        .rs-search-row input { min-height:48px; border-radius:13px; padding:.7rem .9rem; }
+        .rs-search-btn { border-radius:13px; }
+        .rs-content { padding:1.4rem 1rem 1.5rem; }
+        .rs-content h2 { margin-bottom:.9rem; }
+        .rs-offers { gap:.65rem; margin-bottom:2rem; }
+        .rs-offer { min-height:150px; background-position:center; }
+        .rs-moods { margin-bottom:2rem; }
+        .rs-mood { min-height:132px; border-radius:18px; }
+        .rs-mood:nth-child(1) span { font-size:2.35rem; }
+        .rs-mood:nth-child(2) span { font-size:2.3rem; }
+        .rs-disclaimer { position:relative; overflow:hidden; padding:1rem 1.1rem; }
+        .rs-disclaimer::after { content:'!'; position:absolute; right:1rem; bottom:-1rem; font-size:5rem; font-weight:900; color:rgba(255,255,255,.14); }
+        .rs-all-title { align-items:flex-end; margin-bottom:.9rem; }
+        .rs-all-title h2 { margin:0; }
+        .rs-featured { margin-bottom:2rem; }
+        .rs-featured .rs-card { min-width:78vw; max-width:78vw; flex-basis:78vw; }
+        .rs-featured .rs-banner { height:185px; }
+        .rs-stats-inner { padding:.65rem 1rem; }
+        .rs-section { padding:0 1rem 2rem; }
+        .rs-grid { gap:.85rem; }
+        .rs-section .rs-card { display:grid; grid-template-columns:38% minmax(0,1fr); min-height:170px; border-radius:18px; }
+        .rs-section .rs-banner { height:100%; min-height:170px; }
+        .rs-section .rs-tag { top:.5rem;left:.5rem;padding:.2rem .45rem;font-size:.55rem;max-width:calc(100% - 1rem);overflow:hidden;text-overflow:ellipsis; }
+        .rs-section .rs-rating { top:auto;right:.45rem;bottom:.45rem;font-size:.68rem; }
+        .rs-section .rs-body { min-width:0; gap:.35rem; padding:.75rem .7rem; }
+        .rs-section .rs-body h3 { font-size:1rem; }
+        .rs-section .rs-venue,.rs-section .rs-desc { font-size:.72rem; }
+        .rs-section .rs-desc { display:none; }
+        .rs-section .rs-meta { gap:.25rem; }
+        .rs-section .rs-pill { padding:.15rem .4rem;font-size:.62rem; }
+        .rs-section .rs-footer { border:0;padding-top:.15rem;align-items:center;flex-direction:column;gap:.4rem; }
+        .rs-section .rs-footer>div:last-child { justify-content:flex-start!important; }
+        .rs-section .rs-book { padding:.42rem .65rem;font-size:.68rem;border-radius:9px; }
+        .rs-list-cta { grid-column:1/-1; }
+      }
+      @media (min-width: 761px) {
+        .rs-hero-inner { padding-top:.2rem; }
+        .rs-location { margin-bottom:1.25rem; }
+        .rs-offer { min-height:190px; }
+      }
+      @media (min-width: 961px) {
+        .topbar .nav-wrap > .hamburger { margin-right: 0; }
+      }
+      @media (max-width: 760px) {
+        html, body { width:100%; max-width:100%; overflow-x:hidden; }
+        body > main, body > header, body > .rs-filterbar, body > .rs-stats, body > .rs-section { width:100%; max-width:none; margin-left:0; margin-right:0; }
+        .topbar .nav-wrap { width:100%; max-width:none; padding-left:1rem; padding-right:1rem; }
+        .topbar .brand-block .brand-sub { display:block!important; color:#aaa!important; font-size:.54rem; line-height:1.15; letter-spacing:.09em; }
+        .rs-hero { width: 100%; margin-inline: 0; }
+        .rs-hero-inner { max-width: none; padding-inline: 0; }
+        .rs-content { width:100%; max-width:none; margin-inline:0; }
+        .rs-stats-inner { width:100%; max-width:none; margin-inline:0; }
+        .rs-section { box-sizing:border-box; }
+        .rs-search-row, .rs-chips { width: 100%; }
+        .rs-search-row { padding-inline: 1rem; }
+        .rs-chips { overflow-x: hidden; flex-wrap: nowrap; padding: 0 1rem .3rem; scrollbar-width: none; gap:.3rem; }
+        .rs-chips::-webkit-scrollbar { display: none; }
+        .rs-chip { flex: 1 1 auto; min-width:0; padding:.42rem .35rem; font-size:clamp(.58rem,2.25vw,.72rem); white-space:nowrap; }
+      }
+      /* Full-bleed mobile layout: remove page-level side gutters. */
+      @media (max-width: 600px) {
+        .rs-hero-inner,
+        .rs-content,
+        .rs-section,
+        .rs-stats-inner,
+        .rs-search-row,
+        .rs-chips,
+        .rs-filterbar {
+          box-sizing:border-box;
+          padding-left:0;
+          padding-right:0;
+        }
+        .rs-content { padding-top:1.25rem; padding-bottom:1.5rem; }
+        .rs-section { padding-bottom:2rem; }
+        .rs-search-row { gap:.55rem; }
+        .rs-section .rs-card { grid-template-columns:36% minmax(0,1fr); }
+        .rs-section .rs-body { padding:.7rem .65rem; }
+        .rs-section .rs-footer { align-items:flex-start; }
+        .topbar .nav-wrap { padding-left:1rem; padding-right:1rem; }
+      }
+      /* Keep the campaign hero full bleed on narrow screens. */
+      @media (max-width: 600px) {
+        .rs-hero {
+          width: 100vw;
+          max-width: none;
+          margin-inline: calc(50% - 50vw);
+          min-height: 0;
+          padding: 1.6rem 0 1.4rem;
+          align-items: flex-start;
+          background: radial-gradient(ellipse 150% 80% at 50% 100%,#5331a9 0,transparent 72%),linear-gradient(135deg,#091330,#191144 55%,#071329);
+        }
+        .rs-hero::before {
+          background: radial-gradient(ellipse 150% 80% at 50% 100%,rgba(157,107,255,.3),transparent 72%),linear-gradient(0deg,rgba(5,9,26,.4),transparent 60%);
+        }
+        .rs-hero::after {
+          width: min(110vw, 620px);
+          height: min(110vw, 620px);
+          bottom: auto;
+          top: 100%;
+          transform: translate(-50%, -36%);
+        }
+        .rs-hero-inner { padding-inline: 1rem; }
+        .rs-hero h1 {
+          font-size: clamp(2.25rem, 10vw, 3rem);
+          line-height: .95;
+          margin-bottom: .65rem;
+        }
+        .rs-hero p { margin-bottom: 1rem; }
+        .rs-search-row { padding-inline: 0; }
+        .rs-chips { padding-inline: 0; }
+      }
+      /* Let the mobile category and filter strips span the viewport. */
+      @media (max-width: 600px) {
+        .rs-chips,
+        .rs-filterbar {
+          width: 100vw;
+          max-width: none;
+          margin-inline: calc(50% - 50vw);
+          padding-left: 1rem;
+          padding-right: 1rem;
+          box-sizing: border-box;
+        }
+        .rs-filterbar { gap: .5rem; }
+        .rs-filter-control { padding: .42rem .62rem; font-size: .72rem; }
+        .rs-filter-control select { max-width: 82px; }
+        .rs-chips { padding-bottom: .3rem; }
+      }
+      /* Desktop dining layout: align the header and discovery controls to one grid. */
+      @media (min-width: 961px) {
+        .topbar .nav-wrap {
+          width: min(100% - 3rem, 1320px); min-height: 84px; margin-inline: auto;
+          padding: .75rem 0; justify-content: space-between; gap: 2rem;
+        }
+        .topbar .brand-block, .topbar .topnav, .topbar .nav-wrap > .hamburger { position: static; left: auto; margin: 0; }
+        .topbar .topnav { flex: 1 1 auto; }
+        .topbar .auth-actions { margin-left: auto; display:flex!important; }
+        .topbar .nav-wrap > .hamburger { flex: 0 0 44px; width: 44px; height: 44px; order: 2; margin-left: 1.5rem; }
+        .topbar .brand-block { order: 1; }
+        .topbar .topnav { order: 3; }
+        .topbar .auth-actions { order: 4; }
+        .rs-hero { min-height: 390px; padding: 3.25rem 0 2.8rem; }
+        .rs-hero-inner { max-width: 1240px; padding: 0 2rem; }
+        .rs-hero h1 { max-width: 900px; font-size: clamp(4rem, 6.5vw, 5.5rem); }
+        .rs-hero p { margin-bottom: 1.5rem; font-size: 1.08rem; }
+        .rs-search-row { max-width: 780px; margin-bottom: 1.35rem; }
+        .rs-search-row input { min-height: 58px; padding-inline: 1.2rem; font-size: 1rem; }
+        .rs-search-btn { min-width: 132px; font-size: .98rem; }
+        .rs-chips { justify-content: center; gap: .65rem; }
+        .rs-chip { padding: .58rem 1.1rem; font-size: .84rem; }
+        .rs-filterbar { position: relative; top: auto; justify-content: center; padding: .85rem 2rem; }
+        .rs-filter-control { padding: .72rem 1.05rem; font-size: .88rem; }
+        .rs-content { max-width: 1320px; padding: 2.1rem 2rem 0; }
+        .rs-content h2 { margin-bottom: 1.1rem; font-size: 1.55rem; }
+        .rs-offers { gap: 1.2rem; margin-bottom: 2.7rem; }
+        .rs-offer { min-height: 220px; padding: 1.4rem; border-radius: 20px; }
+        .rs-offer strong { font-size: 1.2rem; }
+        .rs-offer span { font-size: .94rem; }
+        .rs-moods { gap: 1rem; }
+        .rs-mood { min-height: 170px; padding: 1.25rem; }
+        .rs-stats-inner { padding: 1rem 2rem; }
+        .rs-section { max-width: 1320px; padding: 1.8rem 2rem 4rem; }
+      }
+      /* Premium mood tiles; kept last so page-specific mobile rules don't flatten them. */
+      .rs-content .rs-moods { gap: 1rem; }
+      .rs-content .rs-mood {
+        position: relative;
+        min-height: 164px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 22px;
+        padding: 1.15rem;
+        background: linear-gradient(145deg, #29252e 0%, #17171b 78%);
+        box-shadow: 0 12px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.08);
+        color: #fff;
+        text-decoration: none;
+        transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      }
+      .rs-content .rs-mood::before {
+        content: ""; position: absolute; width: 140px; height: 140px;
+        right: -48px; bottom: -62px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(131,93,185,.34), transparent 70%);
+        pointer-events: none;
+      }
+      .rs-content .rs-mood:hover {
+        transform: translateY(-4px); border-color: rgba(190,157,255,.48);
+        box-shadow: 0 18px 36px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.1);
+      }
+      .rs-content .rs-mood span {
+        position: relative; z-index: 1; font-size: 3.5rem;
+        filter: drop-shadow(0 7px 9px rgba(0,0,0,.34));
+      }
+      @media (max-width: 760px) {
+        .rs-content .rs-moods { grid-template-columns: repeat(3, minmax(0,1fr)); gap: .55rem; }
+        .rs-content .rs-mood { min-height: 108px; padding: .7rem .55rem; border-radius: 16px; font-size: .78rem; }
+        .rs-content .rs-mood span { font-size: 2.65rem; }
+      }
     </style>
     <link rel="stylesheet" href="hamburger-white.css?v=hamburger-white-20261022"/>
 </head>
   <body>
     <header class="topbar">
       <div class="nav-wrap">
+        <a class="mobile-brand" href="index.html" style="display:none!important">CULTUREWAVE</a>
         <div class="brand-block">
           <div class="logo">CultureWave</div>
           <div class="brand-sub">by OGSHOOTS LUXE</div>
         </div>
         <nav class="topnav">
-          <a href="index.html">Home</a>
-          <a href="events.html">Events</a>
-          <a href="restaurants.html">Restaurants</a>
-          <a href="how-it-works.html">How it works</a>
         </nav>
         <div class="auth-actions">
           <a class="nav-link" href="login.html">Login</a>
           <a class="nav-cta" href="restaurant-create.html">List Restaurant</a>
         </div>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
+        <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
     </header>
 
     <nav class="mobile-nav" id="mobileNav">
-      <a href="index.html">Home</a>
-      <a href="events.html">Events</a>
-      <a href="restaurants.html">Restaurants</a>
-      <a href="how-it-works.html">How it works</a>
-      <a href="customer-service.html">Customer Service</a>
-      <div class="mobile-nav-ctas">
-        <a class="nav-link" href="login.html">Login</a>
-        <a class="nav-cta" href="restaurant-create.html">List Restaurant</a>
+      <div class="mobile-nav-head"><button class="mobile-nav-close" type="button" aria-label="Close menu">&#8249;</button><span>Profile</span></div>
+      <div class="mobile-profile-card" role="group">
+        <span class="mobile-profile-main"><span class="mobile-profile-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"/><path d="M12 57c1-12 9-19 20-19s19 7 20 19"/></svg></span><span class="mobile-profile-info"><strong class="mobile-profile-name">CultureWave member</strong><span class="mobile-profile-contact"></span><span class="mobile-profile-progress">Complete your profile</span></span></span>
+        <span class="mobile-profile-divider"></span>
+        <span class="mobile-profile-prompt"><span>Complete your profile, so we can surprise you on your special days!</span><a class="mobile-profile-arrow" href="edit-profile.html" aria-label="Edit profile">→</a></span>
       </div>
     </nav>
 
-    <div class="rs-appbar">
-      <a class="rs-home-icon" href="index.html" aria-label="Home">⌂</a>
-      <div class="rs-app-title">Dining<small>Vijayawada <span aria-hidden="true">⌄</span></small></div>
-      <span class="rs-app-mark" aria-hidden="true">◉</span>
-      <a class="rs-profile" href="login.html" aria-label="Profile">●</a>
-    </div>
     <div class="rs-filterbar" aria-label="Dining filters">
       <button class="rs-filter-control" type="button" id="rsFilterToggle">☷ Filters <span>⌄</span></button>
       <label class="rs-filter-control primary">Date, time &amp; guests
@@ -377,9 +658,8 @@
     <main>
       <section class="rs-hero">
         <div class="rs-hero-inner">
-          <div class="rs-location">CultureWave presents</div>
-          <h1>DINING<br><span>CARNIVAL</span></h1>
-          <p><strong>Extra ₹175 OFF</strong> on your first dining transaction</p>
+          <h1 id="rsHeroTitle">DINING<br><span>FOR EVERY MOOD</span></h1>
+          <p id="rsHeroOffer"><strong>Extra ₹175 OFF</strong> on your first dining transaction</p>
           <div class="rs-search-row">
             <input id="rsSearch" type="search" placeholder="Search restaurants, cuisine, area…" />
             <button class="rs-search-btn" type="button">Search</button>
@@ -396,22 +676,22 @@
       </section>
 
       <div class="rs-content">
-        <h2>Diwali offers for you</h2>
+        <h2 id="rsPromoHeading">Diwali offers for you</h2>
         <div class="rs-offers">
-          <article class="rs-offer"><strong>Vault Brewery</strong><span>★ 4.8 · ₹1500 for two<br>Flat 25% OFF</span></article>
-          <article class="rs-offer"><strong>Explore local dining</strong><span>Special offers on your next table</span></article>
+          <article class="rs-offer"><strong id="rsPromo1Title">Vault Brewery</strong><span id="rsPromo1Description">★ 4.8 · ₹1500 for two<br>Flat 25% OFF</span></article>
+          <article class="rs-offer"><strong id="rsPromo2Title">Explore local dining</strong><span id="rsPromo2Description">Special offers on your next table</span></article>
         </div>
         <h2>What’s the mood?</h2>
         <div class="rs-moods">
-          <button class="rs-mood" data-filter="rooftop">Drink &amp; dine<span>🍹</span></button>
-          <button class="rs-mood" data-filter="cafe">Cozy cafes<span>☕</span></button>
-          <button class="rs-mood" data-filter="family">Family dining<span>🍛</span></button>
-          <button class="rs-mood" data-filter="pocket-friendly">Pocket friendly<span>🪙</span></button>
-          <button class="rs-mood" data-filter="outdoor">Outdoor dining<span>⛱️</span></button>
-          <button class="rs-mood" data-filter="pure-veg">Pure veg<span>🥗</span></button>
+          <a class="rs-mood" href="restaurant-drink-and-dine.html">Drink &amp; dine<span>🍹</span></a>
+          <a class="rs-mood" href="restaurant-cozy-cafes.html">Cozy cafes<span>☕</span></a>
+          <a class="rs-mood" href="restaurant-family-dining.html">Family dining<span>🍛</span></a>
+          <a class="rs-mood" href="restaurant-pocket-friendly.html">Pocket friendly<span>🪙</span></a>
+          <a class="rs-mood" href="restaurant-outdoor-dining.html">Outdoor dining<span>⛱️</span></a>
+          <a class="rs-mood" href="restaurant-pure-veg.html">Pure veg<span>🥗</span></a>
         </div>
-        <h2>Dining note</h2>
-        <div class="rs-disclaimer"><strong>Plan your visit</strong><p>Restaurant timings may vary. Please check availability with the restaurant before visiting.</p></div>
+        <h2>Disclaimer</h2>
+        <div class="rs-disclaimer"><strong id="rsDiwaliTitle">In light of Diwali celebrations</strong><p id="rsDiwaliMessage">Operational timings may vary at restaurants. Please contact the restaurant before visiting.</p></div>
         <div class="rs-all-title"><h2>In the limelight</h2><p>Popular around you</p></div>
         <div class="rs-featured" id="rsFeatured"></div>
         <div class="rs-all-title"><h2>All restaurants</h2><p>Reserve your table</p></div>
@@ -433,7 +713,6 @@
 
       <section class="rs-section">
         <div class="rs-grid" id="rsGrid">
-          <div class="rs-empty" id="rsEmpty" style="display:none;"><span>🔍</span>No restaurants found.</div>
           <div class="rs-list-cta" id="rsListCta">
             <span>🍴</span>
             <h3>List Your Restaurant</h3>
@@ -526,6 +805,73 @@
         appId: "1:5471814825:web:07e84f2f88486da817d5b8"
       });
       const _rsdb = firebase.firestore();
+      const applyRestaurantPageContent = snapshot => {
+        if (!snapshot.exists) return;
+        const content = snapshot.data() || {};
+        const visibility = content.visibility || {};
+        const setVisible = (selector, key) => { const el=document.querySelector(selector); if(el) el.hidden=visibility[key]===false; };
+        setVisible('.rs-filterbar','filterbar'); setVisible('.rs-hero','hero'); setVisible('.rs-stats','stats'); setVisible('.rs-section','listings'); setVisible('.site-footer','footer');
+        const promoHeading=document.getElementById('rsPromoHeading');
+        const promoCards=[...document.querySelectorAll('.rs-offer')];
+        const promoVisible=visibility.promotions!==false;
+        if(promoHeading)promoHeading.hidden=!promoVisible;
+        promoCards.forEach((el,index)=>el.hidden=!promoVisible||visibility['promo'+(index+1)]===false);
+        if(promoCards.length&&promoCards.every(el=>el.hidden)&&promoHeading)promoHeading.hidden=true;
+        const moods=document.querySelector('.rs-moods');
+        const moodHeading=moods?.previousElementSibling;
+        if(moods){moods.hidden=visibility.moods===false;if(moodHeading)moodHeading.hidden=visibility.moods===false;}
+        const disclaimer=document.querySelector('.rs-disclaimer');
+        if(disclaimer){disclaimer.hidden=visibility.disclaimer===false;const heading=disclaimer.previousElementSibling;if(heading)heading.hidden=visibility.disclaimer===false;}
+        const featured=document.getElementById('rsFeatured');
+        if(featured){featured.hidden=visibility.featured===false;const heading=featured.previousElementSibling;if(heading)heading.hidden=visibility.featured===false;}
+        const listCta=document.getElementById('rsListCta'); if(listCta)listCta.hidden=visibility.listCta===false;
+        const sectionTitles=[...document.querySelectorAll('.rs-all-title')];
+        if(visibility.featured===false&&sectionTitles[0])sectionTitles[0].hidden=true;
+        if(visibility.listings===false&&sectionTitles[1])sectionTitles[1].hidden=true;
+        if (content.heroTitle) {
+          const title = document.getElementById('rsHeroTitle');
+          title.textContent = content.heroTitle;
+          title.innerHTML = content.heroTitle.split(/\s+/).map((word,index)=>index===0?word:`<span>${word}</span>`).join('<br>');
+        }
+        if (content.heroOffer) {
+          const offer = document.getElementById('rsHeroOffer');
+          const parts = content.heroOffer.match(/^(Extra\s+₹[\d,]+\s+OFF)(.*)$/i);
+          offer.replaceChildren();
+          if (parts) { const strong=document.createElement('strong'); strong.textContent=parts[1]; offer.append(strong,document.createTextNode(parts[2])); }
+          else offer.textContent=content.heroOffer;
+        }
+        if (content.promoHeading) document.getElementById('rsPromoHeading').textContent=content.promoHeading;
+        if (content.promo1Title) document.getElementById('rsPromo1Title').textContent=content.promo1Title;
+        if (content.promo1Description) document.getElementById('rsPromo1Description').textContent=content.promo1Description;
+        if (content.promo2Title) document.getElementById('rsPromo2Title').textContent=content.promo2Title;
+        if (content.promo2Description) document.getElementById('rsPromo2Description').textContent=content.promo2Description;
+        if (content.diwaliTitle) document.getElementById('rsDiwaliTitle').textContent=content.diwaliTitle;
+        if (content.diwaliMessage) document.getElementById('rsDiwaliMessage').textContent=content.diwaliMessage;
+        if (content.searchPlaceholder) document.getElementById('rsSearch').placeholder=content.searchPlaceholder;
+        if (content.heroImage) { const hero=document.querySelector('.rs-hero');hero.style.backgroundImage=`linear-gradient(90deg,rgba(14,18,30,.78),rgba(14,18,30,.18)),url("${content.heroImage.replace(/["\\]/g,'')}")`;hero.style.backgroundSize='cover';hero.style.backgroundPosition='center'; }
+        if (content.promo1Image) {const el=document.querySelector('.rs-offer:nth-child(1)');el.style.backgroundImage=`linear-gradient(0deg,rgba(14,18,30,.72),rgba(14,18,30,.08)),url("${content.promo1Image.replace(/["\\]/g,'')}")`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.color='#fff';}
+        if (content.promo2Image) {const el=document.querySelector('.rs-offer:nth-child(2)');el.style.backgroundImage=`linear-gradient(0deg,rgba(14,18,30,.72),rgba(14,18,30,.08)),url("${content.promo2Image.replace(/["\\]/g,'')}")`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.color='#fff';}
+        const allTitles=document.querySelectorAll('.rs-all-title');
+        [['featuredTitle',allTitles[0]?.querySelector('h2')],['featuredSubtitle',allTitles[0]?.querySelector('p')],['allTitle',allTitles[1]?.querySelector('h2')],['allSubtitle',allTitles[1]?.querySelector('p')],['moodHeading',document.querySelector('.rs-moods')?.previousElementSibling]].forEach(([key,el])=>{if(content[key]&&el)el.textContent=content[key];});
+        if (Array.isArray(content.moods)) document.querySelectorAll('.rs-mood').forEach((el,index)=>{if(content.moods[index])el.firstChild.textContent=content.moods[index];});
+      };
+      // Keep this page in sync with edits from the admin manager on every device.
+      // Prefer a server read so an older mobile Firestore cache cannot win over
+      // recently saved page content; the snapshot listener handles later edits.
+      const restaurantPageRef = _rsdb.collection('siteContent').doc('restaurantPage');
+      restaurantPageRef.get({source:'server'})
+        .then(applyRestaurantPageContent)
+        .catch(error => {
+          console.warn('Could not load current dining page content from server:',error.message);
+          return restaurantPageRef.get().then(applyRestaurantPageContent);
+        });
+      // Mobile browsers may retain an older Firestore cache for this page. A
+      // cache-only snapshot can arrive after the server read and overwrite the
+      // fresh content, so apply live snapshots only after server confirmation.
+      restaurantPageRef.onSnapshot({includeMetadataChanges:true},snapshot => {
+        if (snapshot.metadata?.fromCache) return;
+        applyRestaurantPageContent(snapshot);
+      },error => console.warn('Dining page content updates:',error.message));
       const rsBanners = ['rs-banner-a','rs-banner-b','rs-banner-c','rs-banner-d','rs-banner-e','rs-banner-f'];
       let cards = [];
 
@@ -535,7 +881,15 @@
       const rsSort = document.getElementById('rsSort');
       const grid = document.getElementById('rsGrid');
       const ctaCard = document.getElementById('rsListCta');
-      let activeFilter = 'all';
+      let activeFilter = new URLSearchParams(location.search).get('filter') || 'all';
+
+      // Keep the dining filters directly below the campaign hero at every viewport size.
+      const rsFilterbar = document.querySelector('.rs-filterbar');
+      const rsHero = document.querySelector('.rs-hero');
+      function placeDiningFilters() {
+        rsHero.after(rsFilterbar);
+      }
+      placeDiningFilters();
 
       function selectMood(filter) {
         activeFilter = filter;
@@ -543,7 +897,9 @@
         filterAndRender();
         document.querySelector('.rs-section').scrollIntoView({behavior:'smooth',block:'start'});
       }
-      document.querySelectorAll('.rs-mood').forEach(button => button.addEventListener('click', () => selectMood(button.dataset.filter)));
+      if (activeFilter !== 'all') {
+        chips.forEach(c => c.classList.toggle('active', c.dataset.filter === activeFilter));
+      }
       document.getElementById('rsFilterToggle').addEventListener('click', () => {
         document.querySelector('.rs-chips').scrollIntoView({behavior:'smooth',block:'center'});
       });
@@ -628,6 +984,7 @@
                 <div class="rs-footer">
                   <div class="rs-price">${priceStr}</div>
                   <div style="display:flex;gap:.45rem;flex-wrap:wrap;justify-content:flex-end;">
+                    <a class="rs-book" href="restaurant.html?id=${encodeURIComponent(id)}">View restaurant</a>
                     <a class="rs-book" href="booking.html?type=restaurant&name=${encodeURIComponent(d.name||'')}&venue=${encodeURIComponent((d.area||d.city||''))}&price=${price}">Reserve Table</a>
                     ${(Array.isArray(d.menuItems)&&d.menuItems.length)?`<a class="rs-book" href="food-order.html?restaurantId=${encodeURIComponent(id)}">Order Food</a>`:''}
                   </div>
@@ -659,20 +1016,6 @@
       }
       loadRestaurants();
     </script>
-    <script>
-      const ham = document.getElementById("hamburger");
-      const mNav = document.getElementById("mobileNav");
-      ham.addEventListener("click", () => {
-        ham.classList.toggle("open");
-        mNav.classList.toggle("open");
-        document.body.style.overflow = mNav.classList.contains("open") ? "hidden" : "";
-      });
-      mNav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
-        ham.classList.remove("open");
-        mNav.classList.remove("open");
-        document.body.style.overflow = "";
-      }));
-    </script>
-    <script src="auth-nav.js?v=menu-svg-icons-20261023"></script>
+    <script src="auth-nav.js?v=avatar-fix-20261112-2"></script>
 </body>
 </html>
