@@ -134,8 +134,8 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 /* EVENT DETAILS FORM */
 .pf-form{display:flex;flex-direction:column;gap:.75rem;}
 .pf-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
-.affiliate-form{grid-template-columns:minmax(0,1fr) auto;align-items:end;}
-.affiliate-form .save-btn{align-self:end;height:48px;min-height:0;min-width:150px;padding:0 1rem;}
+.affiliate-form{grid-template-columns:minmax(0,1fr) auto;align-items:start;}
+.affiliate-form .save-btn{align-self:start;height:48px;min-height:48px;min-width:150px;padding:0 1rem;margin-top:1.13rem;}
 .affiliate-hero{position:relative;overflow:hidden;background:radial-gradient(ellipse at 95% 0%,rgba(76,110,245,.12),transparent 38%),linear-gradient(135deg,#fff 0%,#fbfcff 100%);border-color:#dbe4ff;}
 .affiliate-hero:after{content:'↗';position:absolute;right:1.4rem;top:1.15rem;width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#eef2ff;color:var(--blue);font-size:1.35rem;font-weight:800;}
 .affiliate-hero .card-head{padding-right:3.2rem;margin-bottom:1.15rem;}
@@ -148,6 +148,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .affiliate-form .save-btn{min-height:48px;border-radius:9px;box-shadow:0 5px 12px rgba(59,91,219,.18);transition:transform .15s,box-shadow .15s,background .15s;}
 .affiliate-form .save-btn:hover{transform:translateY(-1px);box-shadow:0 7px 16px rgba(59,91,219,.24);}
 .affiliate-form .save-btn:disabled{opacity:.65;cursor:wait;transform:none;}
+.affiliate-form .affiliate-hint{grid-column:1/-1;margin-top:-.35rem;}
 .affiliate-hint{font-size:.72rem;color:var(--muted);margin-top:.15rem;}
 .affiliate-status{font-size:.78rem;color:var(--red);min-height:1.1em;margin-top:.65rem;}
 .affiliate-status.success{color:var(--green);}
@@ -195,7 +196,8 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   .stat-grid{grid-template-columns:1fr;}
   .an-grid-4,.an-grid-2{grid-template-columns:1fr 1fr;}
   .pf-row{grid-template-columns:1fr;}
-  .affiliate-form{grid-template-columns:1fr;}
+  .affiliate-form{grid-template-columns:minmax(0,1fr) auto;}
+  .affiliate-form .save-btn{min-width:0;padding:0 .8rem;}
   .invitation-row{grid-template-columns:1fr 1fr!important;}
   .topbar{padding:.6rem .9rem;}
 }
