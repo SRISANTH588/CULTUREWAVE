@@ -136,6 +136,24 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .pf-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
 .affiliate-form{grid-template-columns:minmax(0,1fr) minmax(180px,240px);align-items:end;}
 .affiliate-form .save-btn{align-self:stretch;height:auto;min-height:42px;}
+.affiliate-hero{position:relative;overflow:hidden;background:radial-gradient(ellipse at 95% 0%,rgba(76,110,245,.12),transparent 38%),linear-gradient(135deg,#fff 0%,#fbfcff 100%);border-color:#dbe4ff;}
+.affiliate-hero:after{content:'↗';position:absolute;right:1.4rem;top:1.15rem;width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#eef2ff;color:var(--blue);font-size:1.35rem;font-weight:800;}
+.affiliate-hero .card-head{padding-right:3.2rem;margin-bottom:1.15rem;}
+.affiliate-hero .card-head h2{font-size:1.05rem;letter-spacing:-.025em;}
+.affiliate-hero .card-head p{font-size:.8rem;line-height:1.5;}
+.affiliate-form .pf-field{gap:.45rem;}
+.affiliate-form .pf-field label{font-size:.68rem;letter-spacing:.08em;}
+.affiliate-form .pf-field input{height:48px;padding:.7rem .9rem;border-color:#d8deea;background:#fff;transition:border-color .15s,box-shadow .15s;}
+.affiliate-form .pf-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,91,219,.12);}
+.affiliate-form .save-btn{min-height:48px;border-radius:9px;box-shadow:0 5px 12px rgba(59,91,219,.18);transition:transform .15s,box-shadow .15s,background .15s;}
+.affiliate-form .save-btn:hover{transform:translateY(-1px);box-shadow:0 7px 16px rgba(59,91,219,.24);}
+.affiliate-form .save-btn:disabled{opacity:.65;cursor:wait;transform:none;}
+.affiliate-hint{font-size:.72rem;color:var(--muted);margin-top:.15rem;}
+.affiliate-status{font-size:.78rem;color:var(--red);min-height:1.1em;margin-top:.65rem;}
+.affiliate-table-card .card-head{margin-bottom:1rem;}
+.affiliate-table-card .bk-table th{padding:.7rem .85rem;background:#fbfcfe;}
+.affiliate-table-card .bk-table td{padding:.9rem .85rem;}
+.affiliate-empty{padding:2.4rem 1rem!important;text-align:center;color:var(--muted);}
 .pf-field{display:flex;flex-direction:column;gap:.3rem;}
 .pf-field label{font-size:.7rem;font-weight:700;color:#495057;text-transform:uppercase;letter-spacing:.05em;}
 .pf-field input,.pf-field textarea,.pf-field select{padding:.6rem .8rem;border-radius:8px;border:1px solid var(--border);font:inherit;font-size:.86rem;color:var(--text);outline:none;}
@@ -330,14 +348,15 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 
 <!-- CHECK-IN PANEL -->
 <div class="panel" id="panel-affiliates">
-  <div class="card">
+  <div class="card affiliate-hero">
     <div class="card-head"><div><h2>Create affiliate link</h2><p>Give each promoter a unique link and track confirmed ticket sales.</p></div></div>
     <form id="affiliateForm" class="pf-row affiliate-form">
-      <div class="pf-field"><label for="affiliateName">Affiliate name</label><input id="affiliateName" maxlength="60" required placeholder="e.g. Maya Sharma"/></div>
-      <button class="save-btn" type="submit">Create link</button>
+      <div class="pf-field"><label for="affiliateName">Promoter name</label><input id="affiliateName" maxlength="60" required autocomplete="off" placeholder="e.g. Maya Sharma"/><span class="affiliate-hint">We’ll create a unique booking link to share with this promoter.</span></div>
+      <button class="save-btn" type="submit"><span aria-hidden="true">＋</span> Create link</button>
     </form>
+    <p class="affiliate-status" id="affiliateStatus" role="status" aria-live="polite"></p>
   </div>
-  <div class="card">
+  <div class="card affiliate-table-card">
     <div class="card-head"><div><h2>Affiliate performance</h2><p>Tickets are counted from confirmed or paid bookings attributed to each link.</p></div></div>
     <div style="overflow-x:auto;"><table class="bk-table"><thead><tr><th>Affiliate</th><th>Link</th><th>Tickets sold</th><th>Bookings</th><th></th></tr></thead><tbody id="affiliateTableBody"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);">Loading affiliates…</td></tr></tbody></table></div>
   </div>
@@ -1275,7 +1294,7 @@ function loadBookings(){
 }
 
 function affiliateUrl(affiliate){
-  const url=new URL('booking.html',location.href);url.searchParams.set('eventId',eventId);url.searchParams.set('affiliate',affiliate.code);return url.href;
+  const url=new URL('/booking.html',location.origin);url.searchParams.set('eventId',eventId);url.searchParams.set('affiliate',affiliate.code);return url.href;
 }
 function affiliateBookingStats(affiliate){
   const bookings=allBookingDocs.filter(b=>b.affiliateCode===affiliate.code&&!isInvitationBooking(b)&&['confirmed','paid','success','completed'].includes(String(b.status||'').toLowerCase()));
@@ -1283,17 +1302,28 @@ function affiliateBookingStats(affiliate){
 }
 function renderAffiliates(){
   const body=document.getElementById('affiliateTableBody');if(!body)return;
-  if(!affiliateDocs.length){body.innerHTML='<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);">No affiliate links yet. Create one above.</td></tr>';return;}
+  if(!affiliateDocs.length){body.innerHTML='<tr><td colspan="5" class="affiliate-empty">No affiliate links yet. Create your first promoter link above.</td></tr>';return;}
   body.innerHTML=affiliateDocs.map(a=>{const stats=affiliateBookingStats(a),url=affiliateUrl(a);return `<tr><td><strong>${esc(a.name)}</strong></td><td><input aria-label="Affiliate booking link" readonly value="${esc(url)}" style="width:min(420px,45vw);padding:.45rem .55rem;border:1px solid var(--border);border-radius:7px;font:inherit;font-size:.76rem;"></td><td><strong>${stats.tickets}</strong></td><td>${stats.bookings}</td><td><button class="tb-btn" type="button" onclick="copyAffiliateLink('${a.code}')">Copy link</button></td></tr>`;}).join('');
 }
-window.copyAffiliateLink=function(code){const affiliate=affiliateDocs.find(a=>a.code===code);if(!affiliate)return;const url=affiliateUrl(affiliate);navigator.clipboard?.writeText(url).then(()=>showToast('Affiliate link copied!')).catch(()=>prompt('Copy affiliate link:',url));};
+window.copyAffiliateLink=async function(code){const affiliate=affiliateDocs.find(a=>a.code===code);if(!affiliate)return;const url=affiliateUrl(affiliate);try{if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');await navigator.clipboard.writeText(url);showToast('Affiliate link copied!');}catch(error){prompt('Copy affiliate link:',url);}};
 document.getElementById('affiliateForm')?.addEventListener('submit',async event=>{
-  event.preventDefault();if(!user||!eventData||eventData.ownerId!==user.uid){showToast('Only the event organiser can create affiliate links');return;}
-  const name=document.getElementById('affiliateName').value.trim();if(!name)return;
-  const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;
-  try{const ref=db.collection('eventAffiliates').doc();await ref.set({eventId,ownerId:user.uid,name,code:ref.id,createdAt:serverTimestamp()});document.getElementById('affiliateName').value='';showToast('Affiliate link created');}
-  catch(error){console.error('Could not create affiliate link:',error);showToast('Could not create affiliate link. Check Firestore rules.');}
-  finally{button.disabled=false;}
+  event.preventDefault();
+  const status=document.getElementById('affiliateStatus');
+  const currentUser=auth.currentUser;
+  if(!currentUser||!eventData||eventData.ownerId!==currentUser.uid){const message='Only the event organiser can create affiliate links.';if(status)status.textContent=message;showToast(message);return;}
+  const input=document.getElementById('affiliateName'),name=input.value.trim();
+  if(!name){input.focus();return;}
+  const button=event.currentTarget.querySelector('button[type="submit"]'),original=button.innerHTML;
+  button.disabled=true;button.textContent='Creating…';if(status)status.textContent='';
+  try{
+    const ref=db.collection('eventAffiliates').doc();
+    await ref.set({eventId,ownerId:currentUser.uid,name,code:ref.id,createdAt:serverTimestamp()});
+    input.value='';if(status){status.style.color='var(--green)';status.textContent=`Link for ${name} created. Use Copy link below to share it.`;setTimeout(()=>{status.style.color='';},2500);}showToast('Affiliate link created');
+  }catch(error){
+    console.error('Could not create affiliate link:',error);
+    const reason=error?.code==='permission-denied'?'Firestore denied this write. Confirm the deployed eventAffiliates rules allow the signed-in event owner to create records.':error?.code==='unavailable'?'Could not reach Firestore. Check your connection and try again.':`Could not create link${error?.message?`: ${error.message}`:''}`;
+    if(status)status.textContent=reason;showToast('Could not create affiliate link');
+  }finally{button.disabled=false;button.innerHTML=original;}
 });
 
 function syncManagedBookings(){
