@@ -2059,6 +2059,14 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="eventVendorPaymentModal">
+  <div class="modal modal-lg">
+    <h3 id="eventVendorPaymentTitle">Vendor payment details</h3>
+    <div id="eventVendorPaymentDetail"></div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('eventVendorPaymentModal')">Close</button></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="restaurantEditModal">
   <div class="modal modal-lg">
     <h3>🍽️ Edit restaurant listing</h3>
@@ -2956,6 +2964,7 @@ function renderEventsTable(events) {
     <td style="font-size:.76rem;color:var(--muted);">${fmtDate(e.createdAt)}</td>
     <td><div class="btn-row">
       <button class="btn sm" onclick="editEvent('${e.id}')">Edit</button>
+      <button class="btn sm primary" onclick="openEventVendorPayment('${e.id}')">Vendor payment</button>
       <button class="btn sm" onclick="toggleEventStatus('${e.id}','${e.status}')">${e.status==='published'?'Unpublish':'Publish'}</button>
       <button class="btn sm danger" onclick="deleteEvent('${e.id}')">Delete</button>
     </div></td>
@@ -2971,6 +2980,15 @@ window.filterEvents = function() {
     const matchCat = !cat||(e.category||'').toLowerCase()===cat.toLowerCase();
     return matchQ&&matchSt&&matchCat;
   }));
+};
+window.openEventVendorPayment=function(eventId){
+  const event=allEvents.find(item=>item.id===eventId);if(!event)return;
+  const ownerId=event.ownerId||event.organiserId||event.organizerId||event.userId||'';
+  const vendor=allVendorApplications.find(item=>item.userId===ownerId&&String(item.status||'').toUpperCase()==='APPROVED');
+  const details=document.getElementById('eventVendorPaymentDetail');
+  if(!vendor){details.innerHTML=`<div style="padding:1rem;border:1px solid var(--border);border-radius:12px;background:#f8fafc"><strong>No approved vendor account is linked to this event.</strong><p style="margin:.5rem 0 0;color:var(--muted);font-size:.85rem">Event owner ID: ${esc(ownerId||'Not available')}. Check the event owner and approved vendor application in New Lister.</p></div>`;}
+  else{const bank=vendor.bank||{},account=String(bank.accountNumber||''),masked=account?`•••• ${esc(account.slice(-4))}`:'Not provided';details.innerHTML=`<div style="padding:1rem;border:1px solid var(--border);border-radius:12px;background:#f8fafc"><div style="font-size:1.05rem;font-weight:800">${esc(vendor.vendor?.registeredName||vendor.name||'Vendor')}</div><div style="color:var(--muted);font-size:.82rem;margin:.25rem 0 1rem">${esc(event.name||'Event')} · ${esc(vendor.contact?.name||vendor.name||'')} · ${esc(vendor.contact?.phone||'')}</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.85rem"><div><small>Beneficiary</small><div><strong>${esc(bank.beneficiaryName||'—')}</strong></div></div><div><small>Account number</small><div><strong id="eventVendorAccountNumber">${masked}</strong></div></div><div><small>IFSC</small><div><strong>${esc(bank.ifsc||'—')}</strong></div></div><div><small>Account type</small><div><strong>${esc(bank.accountType||'—')}</strong></div></div></div><div style="display:flex;gap:.5rem;margin-top:1rem"><button class="btn sm" id="revealEventVendorAccount" ${account?'':'disabled'}>Reveal account number</button><button class="btn sm primary" id="copyEventVendorAccount" ${account?'':'disabled'}>Copy account number</button><button class="btn sm" onclick="openVendorApplication('${esc(vendor.id)}')">View vendor application</button></div><p style="margin:.8rem 0 0;color:var(--muted);font-size:.75rem">Use these details to arrange the vendor transfer after event settlement. The dashboard does not initiate a bank transfer.</p></div>`;const reveal=document.getElementById('revealEventVendorAccount');reveal?.addEventListener('click',()=>{const target=document.getElementById('eventVendorAccountNumber');target.textContent=account;reveal.disabled=true;});document.getElementById('copyEventVendorAccount')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(account);showToast('Vendor account number copied.','success')}catch{showToast('Could not copy account number.','error')}});}
+  document.getElementById('eventVendorPaymentTitle').textContent=`Vendor payment · ${event.name||'Event'}`;openModal('eventVendorPaymentModal');
 };
 window.editEvent = function(id) {
   const e = allEvents.find(x=>x.id===id); if(!e) return;
