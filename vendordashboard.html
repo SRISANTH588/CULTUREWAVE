@@ -22,12 +22,13 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .sb-brand{padding:1.2rem 1rem 1rem;border-bottom:1px solid var(--border);}
 .sb-brand-logo{font-size:1.4rem;font-weight:800;color:var(--p);letter-spacing:-.04em;font-style:italic;}
 .sb-brand-cat{font-size:.68rem;font-weight:700;color:var(--p2);letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem;}
-.sb-user{margin:.75rem .65rem .5rem;padding:.65rem .75rem;border-radius:12px;background:var(--psoft);border:1px solid var(--border);display:flex;align-items:center;gap:.6rem;cursor:pointer;}
+.sb-user{margin:.75rem .65rem .5rem;padding:.65rem .75rem;border-radius:12px;background:var(--psoft);border:1px solid var(--border);display:flex;align-items:center;gap:.6rem;cursor:pointer;min-width:0;}
 .sb-user:hover{background:var(--plight);}
 .sb-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#3b5bdb,#4c6ef5);display:grid;place-items:center;font-weight:700;font-size:.9rem;color:#fff;flex:none;}
-.sb-user-info strong{display:block;font-size:.84rem;font-weight:700;color:#1a1a2e;}
+.sb-user-info{flex:1;min-width:0;overflow:hidden;}
+.sb-user-info strong{display:block;font-size:.84rem;font-weight:700;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sb-user-info small{font-size:.72rem;color:var(--p);}
-.sb-user-crown{margin-left:auto;}
+.sb-user-crown{flex:none;margin-left:auto;}
 .sb-nav{flex:1;padding:.5rem .65rem;display:flex;flex-direction:column;gap:.05rem;}
 .sb-section-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#748ffc;padding:.8rem .4rem .3rem;}
 .sb-item{display:flex;align-items:center;gap:.6rem;padding:.58rem .75rem;border-radius:10px;font-size:.84rem;font-weight:500;color:#6b7280;cursor:pointer;transition:background .12s,color .12s;width:100%;text-align:left;}
@@ -988,7 +989,7 @@ function renderPlan(user){
 try{const saved=localStorage.getItem('livemusicDashView');if(saved)switchView(saved);}catch(e){}
 function normStatus(s){const v=(s||'draft').toLowerCase();return(v==='published'||v==='live'||v==='active')?'published':v==='archived'?'archived':'unpublished';}
 function showDashboardLoadError(id,message,error){console.error(message,error);const el=document.getElementById(id);if(el)el.innerHTML=`<div style="padding:1rem;color:#b42318;background:#fff1f0;border:1px solid #ffccc7;border-radius:10px;">${esc(message)}${error?.code?` (${esc(error.code)})`:''}. Refresh the page or contact support if this continues.</div>`;}
-function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();renderCustomerInfoPanel();},err=>showDashboardLoadError('eventsContainer','Could not load your events',err));}
+function loadEvents(uid){const q=query(collection(db,'events'),where('ownerId','==',uid));onSnapshot(q,snap=>{allEvents=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));renderEvents();renderOverview();renderAnalytics(allBookings);renderCustomerInfoPanel();},err=>showDashboardLoadError('eventsContainer','Could not load your events',err));}
 function playlistEventName(id){const ev=allEvents.find(e=>e.id===id);return ev?.name||'Default playlist';}
 function fillPlaylistEvents(){const select=document.getElementById('playlistEvent');if(!select)return;const selected=select.value;select.innerHTML='<option value="">Default for all verified guests</option>'+allEvents.map(e=>`<option value="${e.id}">${esc(e.name||'Untitled event')}</option>`).join('');select.value=selected;}
 document.getElementById('playlistEvent').addEventListener('change',function(){this.dataset.touched='true';const eventId=this.value||null;const existing=allPlaylists.find(p=>eventId?p.eventId===eventId:p.isDefault||!p.eventId);this.dataset.editId=existing?.id||'';const preview=document.getElementById('guestPlaylistPreviewLink');if(preview)preview.href=existing?`guest-playlist.html?playlistId=${encodeURIComponent(existing.id)}`:eventId?`guest-playlist.html?eventId=${encodeURIComponent(eventId)}`:'guest-playlist.html';playlistDraftSongs=existing&&Array.isArray(existing.songs)?existing.songs.map(song=>({...song})):[];clearPlaylistSongFields();renderPlaylistDraftSongs();});
@@ -1154,6 +1155,15 @@ function analyticsChange(current,previous){
   }
   return el;
 }
+function eventTicketPrices(event){
+  const prices=[];
+  const add=value=>{const price=Number(value);if(Number.isFinite(price)&&price>0)prices.push(price);};
+  add(event.price);
+  if(Array.isArray(event.tickets))event.tickets.forEach(ticket=>add(ticket?.price));
+  if(Array.isArray(event.ticketTypes))event.ticketTypes.forEach(ticket=>add(ticket?.price));
+  if(Array.isArray(event.seatingPlan?.sections))event.seatingPlan.sections.forEach(section=>add(section?.price));
+  return prices;
+}
 function renderAnalytics(bookings){
   const el=id=>document.getElementById(id);
   const days=Math.max(1,Number(analyticsPeriod)||7);
@@ -1179,8 +1189,11 @@ function renderAnalytics(bookings){
   ['anLive','anLive2'].forEach(id=>{if(el(id))el(id).textContent=live;});
   const avg=allEvents.length?money(Math.round(revenue/allEvents.length)):'₹0';
   ['anAvg','anAvg2'].forEach(id=>{if(el(id))el(id).textContent=avg;});
-  if(el('qsTotal'))el('qsTotal').textContent=allEvents.length;if(el('qsPublished'))el('qsPublished').textContent=live;if(el('qsDraft'))el('qsDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;if(el('qsFree'))el('qsFree').textContent=allEvents.filter(e=>!e.price||e.price===0).length;if(el('qsPaid'))el('qsPaid').textContent=allEvents.filter(e=>e.price>0).length;
-  const prices=allEvents.filter(e=>e.price>0).map(e=>Number(e.price||0));if(el('qsAvgPrice'))el('qsAvgPrice').textContent=prices.length?money(Math.round(prices.reduce((a,b)=>a+b,0)/prices.length)):'₹0';
+  const eventPrices=allEvents.map(event=>eventTicketPrices(event));
+  const paidEventCount=eventPrices.filter(prices=>prices.length>0).length;
+  const prices=eventPrices.flat();
+  if(el('qsTotal'))el('qsTotal').textContent=allEvents.length;if(el('qsPublished'))el('qsPublished').textContent=live;if(el('qsDraft'))el('qsDraft').textContent=allEvents.filter(e=>normStatus(e.status)==='unpublished').length;if(el('qsFree'))el('qsFree').textContent=allEvents.length-paidEventCount;if(el('qsPaid'))el('qsPaid').textContent=paidEventCount;
+  if(el('qsAvgPrice'))el('qsAvgPrice').textContent=prices.length?money(Math.round(prices.reduce((a,b)=>a+b,0)/prices.length)):'₹0';
 
   const chart=el('revenueChart');
   const chartSubtitle=el('analyticsChartSubtitle');
