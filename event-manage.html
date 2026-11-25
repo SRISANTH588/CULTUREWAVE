@@ -134,6 +134,8 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 /* EVENT DETAILS FORM */
 .pf-form{display:flex;flex-direction:column;gap:.75rem;}
 .pf-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.affiliate-form{grid-template-columns:minmax(0,1fr) minmax(180px,240px);align-items:end;}
+.affiliate-form .save-btn{align-self:stretch;height:auto;min-height:42px;}
 .pf-field{display:flex;flex-direction:column;gap:.3rem;}
 .pf-field label{font-size:.7rem;font-weight:700;color:#495057;text-transform:uppercase;letter-spacing:.05em;}
 .pf-field input,.pf-field textarea,.pf-field select{padding:.6rem .8rem;border-radius:8px;border:1px solid var(--border);font:inherit;font-size:.86rem;color:var(--text);outline:none;}
@@ -172,6 +174,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
   .stat-grid{grid-template-columns:1fr;}
   .an-grid-4,.an-grid-2{grid-template-columns:1fr 1fr;}
   .pf-row{grid-template-columns:1fr;}
+  .affiliate-form{grid-template-columns:1fr;}
   .invitation-row{grid-template-columns:1fr 1fr!important;}
   .topbar{padding:.6rem .9rem;}
 }
@@ -329,7 +332,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 <div class="panel" id="panel-affiliates">
   <div class="card">
     <div class="card-head"><div><h2>Create affiliate link</h2><p>Give each promoter a unique link and track confirmed ticket sales.</p></div></div>
-    <form id="affiliateForm" class="pf-row" style="align-items:end;">
+    <form id="affiliateForm" class="pf-row affiliate-form">
       <div class="pf-field"><label for="affiliateName">Affiliate name</label><input id="affiliateName" maxlength="60" required placeholder="e.g. Maya Sharma"/></div>
       <button class="save-btn" type="submit">Create link</button>
     </form>
