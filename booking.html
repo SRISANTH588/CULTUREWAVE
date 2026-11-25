@@ -802,6 +802,8 @@ if(embeddedBooking){
   document.body.style.setProperty('background','transparent','important');
 }
 const eventId = urlP.get("eventId") || "";
+const affiliateCode = urlP.get('affiliate') || sessionStorage.getItem(`eventAffiliate:${eventId}`) || '';
+if(affiliateCode && eventId) sessionStorage.setItem(`eventAffiliate:${eventId}`, affiliateCode);
 const passedName = urlP.get("eventName") || "";
 const passedVenue = urlP.get("venueName") || "";
 const passedTicketName = urlP.get("ticketName") || "";
@@ -1808,6 +1810,7 @@ async function saveBooking(data){
       customerPhone: data.phone, customerState:data.state||'', userId: userId,
       organiserId: organiserId,
       ownerId: organiserId,
+      ...(affiliateCode ? {affiliateCode: affiliateCode.slice(0,100)} : {}),
       eventDate: evData.startDate || evData.date || null,
       venueName: evData.venueName || evData.venue || null,
       city: evData.city || null,

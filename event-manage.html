@@ -220,6 +220,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
     <span class="sb-icon">&#9993;</span>
     <span><span style="display:block;">Invitations</span><span class="sb-sub">Issue guest tickets</span></span>
   </button>
+  <button class="sb-item" data-panel="affiliates" onclick="switchPanel(this,'affiliates')">
+    <span class="sb-icon">&#128279;</span>
+    <span><span style="display:block;">Affiliates</span><span class="sb-sub">Create links and track sales</span></span>
+  </button>
   <button class="sb-item" data-panel="seating" onclick="switchPanel(this,'seating')">
     <span class="sb-icon">&#129681;</span>
     <span><span style="display:block;">Table &amp; Seating</span><span class="sb-sub">Manage your venue layout</span></span>
@@ -318,6 +322,21 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
         </tbody>
       </table>
     </div>
+  </div>
+</div>
+
+<!-- CHECK-IN PANEL -->
+<div class="panel" id="panel-affiliates">
+  <div class="card">
+    <div class="card-head"><div><h2>Create affiliate link</h2><p>Give each promoter a unique link and track confirmed ticket sales.</p></div></div>
+    <form id="affiliateForm" class="pf-row" style="align-items:end;">
+      <div class="pf-field"><label for="affiliateName">Affiliate name</label><input id="affiliateName" maxlength="60" required placeholder="e.g. Maya Sharma"/></div>
+      <button class="save-btn" type="submit">Create link</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Affiliate performance</h2><p>Tickets are counted from confirmed or paid bookings attributed to each link.</p></div></div>
+    <div style="overflow-x:auto;"><table class="bk-table"><thead><tr><th>Affiliate</th><th>Link</th><th>Tickets sold</th><th>Bookings</th><th></th></tr></thead><tbody id="affiliateTableBody"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);">Loading affiliates…</td></tr></tbody></table></div>
   </div>
 </div>
 
@@ -991,6 +1010,7 @@ const eventId = params.get('eventId');
 if(!eventId){document.body.innerHTML='<div style="padding:3rem;text-align:center;">No event ID. <a href="vendordashboard.html">Go back</a></div>';}
 
 let eventData=null, allBookings=[], allBookingDocs=[], allPaymentBookingDocs=[], anPeriod=30, hasPremiumPages=false;
+let affiliateDocs=[];
 let manageSeatingMode='builder', manageSeatingLayout={title:'Venue Seating Plan',stage:'STAGE',rows:[],sections:[]};
 function publicEventPath(name){const slug=String(name||'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'event';return `/event/${encodeURIComponent(slug)}`;}
 
@@ -1002,6 +1022,7 @@ function switchPanel(btn,panelId){
   if(panel) panel.classList.add('active');
   if(panelId==='checkin') ciScanPaused=false;
   else stopCiScanner();
+  if(panelId==='affiliates') renderAffiliates();
 }
 
 function avatarColor(name){
@@ -1245,7 +1266,32 @@ function loadBookings(){
     allPaymentBookingDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
     syncManagedBookings();
   },()=>{});
+  db.collection('eventAffiliates').where('eventId','==',eventId).onSnapshot(snap=>{
+    affiliateDocs=snap.docs.map(d=>({id:d.id,...d.data()}));renderAffiliates();
+  },error=>{console.error('Could not load affiliates:',error);const body=document.getElementById('affiliateTableBody');if(body)body.innerHTML='<tr><td colspan="5" style="padding:1.5rem;color:#c92a2a;">Could not load affiliate links. Check your Firestore rules.</td></tr>';});
 }
+
+function affiliateUrl(affiliate){
+  const url=new URL('booking.html',location.href);url.searchParams.set('eventId',eventId);url.searchParams.set('affiliate',affiliate.code);return url.href;
+}
+function affiliateBookingStats(affiliate){
+  const bookings=allBookingDocs.filter(b=>b.affiliateCode===affiliate.code&&!isInvitationBooking(b)&&['confirmed','paid','success','completed'].includes(String(b.status||'').toLowerCase()));
+  return {bookings:bookings.length,tickets:bookings.reduce((sum,b)=>sum+Math.max(0,Number(b.seats??b.ticketCount??b.tickets??1)||1),0)};
+}
+function renderAffiliates(){
+  const body=document.getElementById('affiliateTableBody');if(!body)return;
+  if(!affiliateDocs.length){body.innerHTML='<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);">No affiliate links yet. Create one above.</td></tr>';return;}
+  body.innerHTML=affiliateDocs.map(a=>{const stats=affiliateBookingStats(a),url=affiliateUrl(a);return `<tr><td><strong>${esc(a.name)}</strong></td><td><input aria-label="Affiliate booking link" readonly value="${esc(url)}" style="width:min(420px,45vw);padding:.45rem .55rem;border:1px solid var(--border);border-radius:7px;font:inherit;font-size:.76rem;"></td><td><strong>${stats.tickets}</strong></td><td>${stats.bookings}</td><td><button class="tb-btn" type="button" onclick="copyAffiliateLink('${a.code}')">Copy link</button></td></tr>`;}).join('');
+}
+window.copyAffiliateLink=function(code){const affiliate=affiliateDocs.find(a=>a.code===code);if(!affiliate)return;const url=affiliateUrl(affiliate);navigator.clipboard?.writeText(url).then(()=>showToast('Affiliate link copied!')).catch(()=>prompt('Copy affiliate link:',url));};
+document.getElementById('affiliateForm')?.addEventListener('submit',async event=>{
+  event.preventDefault();if(!user||!eventData||eventData.ownerId!==user.uid){showToast('Only the event organiser can create affiliate links');return;}
+  const name=document.getElementById('affiliateName').value.trim();if(!name)return;
+  const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;
+  try{const ref=db.collection('eventAffiliates').doc();await ref.set({eventId,ownerId:user.uid,name,code:ref.id,createdAt:serverTimestamp()});document.getElementById('affiliateName').value='';showToast('Affiliate link created');}
+  catch(error){console.error('Could not create affiliate link:',error);showToast('Could not create affiliate link. Check Firestore rules.');}
+  finally{button.disabled=false;}
+});
 
 function syncManagedBookings(){
     const all = [...allBookingDocs, ...allPaymentBookingDocs];
@@ -1266,6 +1312,7 @@ function syncManagedBookings(){
       return b.eventId===eventId || b.event?.id===eventId || b.event?.eventId===eventId ||
         (!!currentEventName && bookingEventName===currentEventName);
     });
+    renderAffiliates();
     const attendeeCount = allBookings
       .filter(b=>normBookingStatus(b.status)==='paid')
       .reduce((sum,b)=>{
