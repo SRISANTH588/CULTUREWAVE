@@ -150,6 +150,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;}
 .affiliate-form .save-btn:disabled{opacity:.65;cursor:wait;transform:none;}
 .affiliate-hint{font-size:.72rem;color:var(--muted);margin-top:.15rem;}
 .affiliate-status{font-size:.78rem;color:var(--red);min-height:1.1em;margin-top:.65rem;}
+.affiliate-status.success{color:var(--green);}
+.affiliate-created-link{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-top:.45rem;}
+.affiliate-created-link input{flex:1 1 320px;min-width:0;padding:.45rem .55rem;border:1px solid var(--border);border-radius:7px;font:inherit;font-size:.76rem;color:var(--text);background:#fff;}
 .affiliate-table-card .card-head{margin-bottom:1rem;}
 .affiliate-table-card .bk-table th{padding:.7rem .85rem;background:#fbfcfe;}
 .affiliate-table-card .bk-table td{padding:.9rem .85rem;}
@@ -1288,7 +1291,11 @@ function loadBookings(){
     allPaymentBookingDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
     syncManagedBookings();
   },()=>{});
-  db.collection('eventAffiliates').where('eventId','==',eventId).onSnapshot(snap=>{
+  // Firestore rules are not query filters: include ownerId so the query itself
+  // proves every returned affiliate belongs to the signed-in organiser.
+  const affiliateOwnerId=auth.currentUser?.uid;
+  if(!affiliateOwnerId){const body=document.getElementById('affiliateTableBody');if(body)body.innerHTML='<tr><td colspan="5" style="padding:1.5rem;color:#c92a2a;">Sign in as the event organiser to load affiliate links.</td></tr>';return;}
+  db.collection('eventAffiliates').where('eventId','==',eventId).where('ownerId','==',affiliateOwnerId).onSnapshot(snap=>{
     affiliateDocs=snap.docs.map(d=>({id:d.id,...d.data()}));renderAffiliates();
   },error=>{console.error('Could not load affiliates:',error);const body=document.getElementById('affiliateTableBody');if(body)body.innerHTML='<tr><td colspan="5" style="padding:1.5rem;color:#c92a2a;">Could not load affiliate links. Check your Firestore rules.</td></tr>';});
 }
@@ -1305,7 +1312,8 @@ function renderAffiliates(){
   if(!affiliateDocs.length){body.innerHTML='<tr><td colspan="5" class="affiliate-empty">No affiliate links yet. Create your first promoter link above.</td></tr>';return;}
   body.innerHTML=affiliateDocs.map(a=>{const stats=affiliateBookingStats(a),url=affiliateUrl(a);return `<tr><td><strong>${esc(a.name)}</strong></td><td><input aria-label="Affiliate booking link" readonly value="${esc(url)}" style="width:min(420px,45vw);padding:.45rem .55rem;border:1px solid var(--border);border-radius:7px;font:inherit;font-size:.76rem;"></td><td><strong>${stats.tickets}</strong></td><td>${stats.bookings}</td><td><button class="tb-btn" type="button" onclick="copyAffiliateLink('${a.code}')">Copy link</button></td></tr>`;}).join('');
 }
-window.copyAffiliateLink=async function(code){const affiliate=affiliateDocs.find(a=>a.code===code);if(!affiliate)return;const url=affiliateUrl(affiliate);try{if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');await navigator.clipboard.writeText(url);showToast('Affiliate link copied!');}catch(error){prompt('Copy affiliate link:',url);}};
+window.copyAffiliateUrl=async function(url){try{if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');await navigator.clipboard.writeText(url);showToast('Affiliate link copied!');}catch(error){prompt('Copy affiliate link:',url);}};
+window.copyAffiliateLink=async function(code){const affiliate=affiliateDocs.find(a=>a.code===code);if(!affiliate)return;await window.copyAffiliateUrl(affiliateUrl(affiliate));};
 document.getElementById('affiliateForm')?.addEventListener('submit',async event=>{
   event.preventDefault();
   const status=document.getElementById('affiliateStatus');
@@ -1314,11 +1322,15 @@ document.getElementById('affiliateForm')?.addEventListener('submit',async event=
   const input=document.getElementById('affiliateName'),name=input.value.trim();
   if(!name){input.focus();return;}
   const button=event.currentTarget.querySelector('button[type="submit"]'),original=button.innerHTML;
-  button.disabled=true;button.textContent='Creating…';if(status)status.textContent='';
+  button.disabled=true;button.textContent='Creating…';if(status){status.classList.remove('success');status.textContent='';}
   try{
     const ref=db.collection('eventAffiliates').doc();
-    await ref.set({eventId,ownerId:currentUser.uid,name,code:ref.id,createdAt:serverTimestamp()});
-    input.value='';if(status){status.style.color='var(--green)';status.textContent=`Link for ${name} created. Use Copy link below to share it.`;setTimeout(()=>{status.style.color='';},2500);}showToast('Affiliate link created');
+    const affiliate={id:ref.id,eventId,ownerId:currentUser.uid,name,code:ref.id};
+    await ref.set({...affiliate,createdAt:serverTimestamp()});
+    if(!affiliateDocs.some(item=>item.id===affiliate.id))affiliateDocs.unshift(affiliate);
+    renderAffiliates();
+    const url=affiliateUrl(affiliate);
+    input.value='';if(status){status.classList.add('success');status.innerHTML=`Link for ${esc(name)} created.<div class="affiliate-created-link"><input aria-label="New affiliate booking link" readonly value="${esc(url)}"><button class="tb-btn" type="button" onclick="copyAffiliateUrl('${esc(url)}')">Copy link</button></div>`;}showToast('Affiliate link created');
   }catch(error){
     console.error('Could not create affiliate link:',error);
     const reason=error?.code==='permission-denied'?'Firestore denied this write. Confirm the deployed eventAffiliates rules allow the signed-in event owner to create records.':error?.code==='unavailable'?'Could not reach Firestore. Check your connection and try again.':`Could not create link${error?.message?`: ${error.message}`:''}`;
